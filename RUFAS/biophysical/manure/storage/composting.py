@@ -344,7 +344,7 @@ class Composting(Storage):
             }
             om.add_warning(
                 "Unexpected value or temperature",
-                f"It's unlikely to have have dairy farms where the temperature is < 0 C"
+                f"Unrealistic (< 0 C) annual temperature provided."
                 f" on average, received {manure_temperature}.",
                 info_map=info_map,
             )
