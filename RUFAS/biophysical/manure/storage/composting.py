@@ -344,8 +344,7 @@ class Composting(Storage):
             }
             om.add_warning(
                 "Unexpected value or temperature",
-                f"Unrealistic (< 0 C) annual temperature provided."
-                f" on average, received {manure_temperature}.",
+                f"Unrealistic (< 0 C) annual temperature provided." f" on average, received {manure_temperature}.",
                 info_map=info_map,
             )
             return 0
