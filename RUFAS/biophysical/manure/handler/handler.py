@@ -118,7 +118,7 @@ class Handler(Processor):
         ammonia_emission = 0.0
         fresh_water_volume_used_for_milking = 0.0
 
-        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+        if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
             ammonia_emission = self._calculate_ammonia_emissions(
                 self.manure_stream.ammoniacal_nitrogen,
                 self.manure_stream.volume,
