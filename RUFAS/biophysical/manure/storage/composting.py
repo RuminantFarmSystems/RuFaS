@@ -18,15 +18,33 @@ FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
 }
 
 FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.06,
-    CompostingType.PASSIVE_WINDROW: 0.04,
-    CompostingType.INTENSIVE_WINDROW: 0.06,
+    CompostingType.STATIC_PILE: 0.01,
+    CompostingType.PASSIVE_WINDROW: 0.005,
+    CompostingType.INTENSIVE_WINDROW: 0.005,
 }
 
 FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.06,
     CompostingType.PASSIVE_WINDROW: 0.04,
     CompostingType.INTENSIVE_WINDROW: 0.06,
+}
+
+MCF_TABLE: dict[tuple[float, float], dict[CompostingType, float]] = {
+    (0.0, 10.0): {
+        CompostingType.STATIC_PILE: 1.0,
+        CompostingType.INTENSIVE_WINDROW: 0.5,
+        CompostingType.PASSIVE_WINDROW: 1.0,
+    },
+    (10.0, 18.0): {
+        CompostingType.STATIC_PILE: 2.0,
+        CompostingType.INTENSIVE_WINDROW: 1.0,
+        CompostingType.PASSIVE_WINDROW: 2.0,
+    },
+    (18.0, math.inf): {
+        CompostingType.STATIC_PILE: 2.5,
+        CompostingType.INTENSIVE_WINDROW: 1.5,
+        CompostingType.PASSIVE_WINDROW: 2.5,
+    },
 }
 
 
@@ -78,6 +96,7 @@ class Composting(Storage):
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
+        manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
         manure_temperature = current_day_conditions.mean_air_temperature
         storage_methane = self._calculate_composting_methane_emissions(
             manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
