@@ -83,7 +83,7 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
         Resets mass related attributes after loss of dry matter and/or moisture.
-    _record_stored_crops(self)
+    _record_stored_crops(self, simulation_day: int)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
@@ -162,13 +162,12 @@ class Storage:
         if crop.type == CropType.GRAIN:
             dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
-            self._record_stored_crops(simulation_day)
         if crop.type == CropType.HIGH_MOISTURE:
             dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
-            self._record_stored_crops(simulation_day)
 
         self.stored.append(crop)
+        self._record_stored_crops(simulation_day)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -364,6 +363,25 @@ class Storage:
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
         self.om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
+
+        total_initial_dry_matter_mass = sum([crop.initial_dry_matter_mass for crop in self.stored])
+        dry_matter_loss_percent = (
+            0.0
+            if total_initial_dry_matter_mass == 0.0
+            else (total_initial_dry_matter_mass - total_dry_matter_mass) / total_initial_dry_matter_mass
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
+
+        self.om.add_variable("dry_matter_loss_percent", dry_matter_loss_percent, info_map
+                             | {"units": MeasurementUnits.PERCENT})
+
+        net_dry_matter_percentage = (
+            0.0 if self.stored_mass == 0.0 else (total_dry_matter_mass / self.stored_mass)
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
+
+        self.om.add_variable("net_dry_matter_percentage", net_dry_matter_percentage, info_map
+                             | {"units": MeasurementUnits.PERCENT})
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
         self.om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
