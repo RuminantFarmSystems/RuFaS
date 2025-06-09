@@ -148,8 +148,6 @@ class ManureManager:
 
                 self._manure_nutrient_manager.update_nutrients(nutrients)
 
-
-
     def _normalize_destination_name(self, destination_name: str) -> str:
         """
         Normalizes the destination name by removing suffixes for solid and liquid outputs.
@@ -869,11 +867,11 @@ class ManureManager:
 
         if is_nitrogen_limiting_nutrient:
             limiting_nutrient_requested_amount = results.nitrogen
-            available_amount_in_pool =\
+            available_amount_in_pool = \
                 self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen
         else:
             limiting_nutrient_requested_amount = results.phosphorus
-            available_amount_in_pool =\
+            available_amount_in_pool = \
                 self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus
 
         proportion_of_limiting_nutrient_to_remove = self._determine_limiting_nutrient_proportion_to_be_removed(
@@ -941,7 +939,6 @@ class ManureManager:
         new_stream = replace(stored_manure, **updates)
         return new_stream, removed
 
-
     @staticmethod
     def _determine_non_limiting_nutrient_removal_amount(limiting_nutrient_amount: float,
                                                         non_limiting_nutrients_amount: float,
@@ -964,8 +961,6 @@ class ManureManager:
         """
         nutrient_ratio = min(limiting_nutrient_amount / non_limiting_nutrients_amount, 1)
         return non_limiting_nutrients_amount * nutrient_ratio
-
-
 
     @staticmethod
     def _determine_limiting_nutrient(requested_nitrogen_mass: float,
@@ -1021,7 +1016,6 @@ class ManureManager:
 
         """
         return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)
-
 
     def _record_manure_request_results(
         self, manure_request_results: NutrientRequestResults | None, manure_source: str, time: RufasTime
