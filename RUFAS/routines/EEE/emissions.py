@@ -48,11 +48,26 @@ class EmissionsEstimator:
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
         self._calculate_purchased_feed_emissions(fertilizer_apps["Homegrown Feeds"])
+        self._calculate_purchased_feed_emissions_refreshed()
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
             fertilizer_apps["Fertilizer Applications"],
             fertilizer_apps["Manure Applications"],
             fertilizer_apps["Manure Requests"],
+        )
+
+    def _calculate_purchased_feed_emissions_refreshed(self) -> None:
+        """
+        Calculates purchased feed emissions based on purchased feed totals from FeedManager.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._calculate_purchased_feed_emissions_refreshed.__name__,
+        }
+        self.om.add_warning(
+            "Purchased Feed Emissions Refreshed",
+            "This method is a placeholder for the refreshed purchased feed emissions calculation.",
+            info_map,
         )
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
