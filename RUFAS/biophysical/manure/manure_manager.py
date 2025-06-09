@@ -147,7 +147,6 @@ class ManureManager:
                                             dry_matter=processor.stored_manure.total_solids)
 
                 self._manure_nutrient_manager.update_nutrients(nutrients)
-                #print(self._manure_nutrient_manager.nutrients_by_manure_category[ManureType.LIQUID])
 
 
 
