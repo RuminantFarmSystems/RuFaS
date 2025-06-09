@@ -8,6 +8,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -98,9 +99,22 @@ class Composting(Storage):
 
         manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
         manure_temperature = current_day_conditions.mean_air_temperature
-        storage_methane = self._calculate_composting_methane_emissions(
-            manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
-        )
+        if manure_annual_temperature:
+            storage_methane = self._calculate_composting_methane_emissions(
+                manure_annual_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
+            )
+        else:
+            storage_methane = 0
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+            }
+            self._om.add_error(
+                "No annual mean temperature",
+                "No data of annual mean temperature available in current day condition to calculate MCF.",
+                info_map=info_map,
+            )
+
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
             self._manure_to_process.non_degradable_volatile_solids,
@@ -302,20 +316,17 @@ class Composting(Storage):
             The solid manure methane emission on the current day, kg/day.
         """
         methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
-        return (manure_volatile_solids) * (
-            ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
-        )
+        return manure_volatile_solids * (ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
 
     @staticmethod
     def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
         """
         This function returns the methane conversion factor depending on the composting type and the temperature.
-        TODO issue #2307, update MCF determination method post-refresh.
 
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature on the current day, Celsius.
+            The mean annual manure temperature, Celsius.
         composting_type : CompostingType
             The type of composting being used.
 
@@ -323,13 +334,26 @@ class Composting(Storage):
         -------
         float
             The methane conversion factor, unitless.
+
         """
-        if composting_type == CompostingType.STATIC_PILE:
-            return ManureConstants.MCF_COMPOSTING_STATIC_PILE
+        om = OutputManager()
+        if manure_temperature < 0:
+            info_map = {
+                "class": Composting.__class__.__name__,
+                "function": Composting._calculate_methane_conversion_factor.__name__,
+            }
+            om.add_warning(
+                "Unexpected value or temperature",
+                f"It's unlikely to have have dairy farms where the temperature is < 0 C"
+                f" on average, received {manure_temperature}.",
+                info_map=info_map,
+            )
+            return 0
+
+        if manure_temperature < 10.0:
+            return MCF_TABLE[(0.0, 10.0)][composting_type]
+
+        elif manure_temperature < 18.0:
+            return MCF_TABLE[(10.0, 18.0)][composting_type]
         else:
-            if manure_temperature < ManureConstants.MCF_LOWER_BOUND_TEMPERATURE:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_LOW
-            elif 15 <= manure_temperature <= ManureConstants.MCF_UPPER_BOUND_TEMPERATURE:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM
-            else:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_HIGH
+            return MCF_TABLE[(18.0, math.inf)][composting_type]
