@@ -55,7 +55,7 @@ def anaerobic_lagoon() -> AnaerobicLagoon:
     """Returns a fixture AnaerobicLagoon."""
     return AnaerobicLagoon(
         name="dummy_name",
-        cover=StorageCover.NO_COVER,
+        cover="no_crust_or_cover",
         storage_time_period=18,
         surface_area=6.6,
         capacity=123456.789,

@@ -74,7 +74,7 @@ class Storage(Processor):
         self._received_manure = ManureStream.make_empty_manure_stream()
         self._stored_manure = ManureStream.make_empty_manure_stream()
         self._capacity = capacity
-        self._cover = cover
+        self._cover = StorageCover(cover)
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
         self._manure_to_process = ManureStream.make_empty_manure_stream()
