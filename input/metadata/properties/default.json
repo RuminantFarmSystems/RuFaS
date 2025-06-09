@@ -862,11 +862,97 @@
           "maximum": 5,
           "default": 1.2
         },
-        "manure_management_scenario_id": {
-          "description": "Manure Management Scenario ID (number) -- The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)",
+        "minutes_away_for_milking": {
+          "description": "Total number of minutes that animals in this pen spend away from the pen for milking each day (being milked or traveling to/from the parlor). This value is only used if the pen contains lactating cows.",
           "type": "number",
           "minimum": 0,
-          "default": 0
+          "maximum": 1440,
+          "nullable": true
+        },
+        "first_parlor_processor": {
+          "description": "Name of the parlor cleaning manure handler assigned to this pen. Must be a parlor cleaning handler listed in the manure processors configuration input file  (default file name: manure_processor_configs.json).",
+          "type": "string",
+          "nullable": true
+        },
+        "parlor_stream_name": {
+          "description": "The stream identifier for the parlor-generated manure.",
+          "type": "string",
+          "nullable": true
+        },
+        "manure_streams": {
+          "description": "List of the different destinations amongst which manure produced outside the milking parlor is distributed.",
+          "type": "array",
+          "properties": {
+            "type": "object",
+            "stream_name": {
+              "description": "Unique identifier for the manure stream. Must be unique, i.e., not identical to the stream_name field of any other manure stream defined for the same pen.",
+              "type": "string"
+            },
+            "bedding_name": {
+              "description": "Name of the bedding configuration used for this manure stream. Must match the name of a bedding configuration listed in the animal management file (default file name: refreshed_default_animal.json).",
+              "type": "string"
+            },
+            "stream_proportion": {
+              "description": "For animals in a single pen, the proportion of manure produced outside of manure deposited in or while moving to or from the milking parlor that is assigned to this manure stream. The proportions of all manure streams defined for one pen must sum to 1.",
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "first_processor": {
+              "description": "Name of the first processor in the manure module that this manure stream enters. Must match the name of processor listed in the manure processors input file (cannot be assigned to a parlor stream handler).",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "bedding_configs": {
+      "description": "Bedding configurations for the pen.",
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Unique identifier to reference this bedding configuration. This value should be unique and cannot match the name of any other bedding."
+        },
+        "bedding_type": {
+          "type": "string",
+          "description": "The type of bedding material.",
+          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+        },
+        "bedding_mass_per_day": {
+          "type": "number",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day on a wet weight basis (kg). Bedding mass is applied based on the total number of animals in the pen, and is not based on the stream proportion of the manure stream the bedding is assigned to.",
+          "minimum": 0
+        },
+        "bedding_density": {
+          "type": "number",
+          "description": "The density of the bedding on a wet weight basis (kg/m3)",
+          "minimum": 0
+        },
+        "bedding_dry_matter_content": {
+          "type": "number",
+          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bedding_carbon_fraction": {
+          "type": "number",
+          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bedding_phosphorus_content": {
+          "type": "number",
+          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sand_removal_efficiency": {
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     }
@@ -5071,329 +5157,269 @@
       }
     }
   },
-  "manure_management_properties": {
-    "data_collection_app_compatible": true,
-    "manure_management_scenarios": {
+  "manure_management_properties" : {
+    "data_collection_app_compatible": false,
+    "anaerobic_digester": {
       "type": "array",
-      "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
+      "description": "A list of all configurations for anaerobic digesters.",
       "properties": {
         "type": "object",
-        "scenario_id": {
-          "type": "number",
-          "description": "Scenario ID -- An identification number for livestock enclosures.",
-          "minimum": 0
-        },
-        "bedding_type": {
-          "type": "string",
-          "description": "Name of the bedding configuration used in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
-        },
-        "manure_handler": {
-          "type": "string",
-          "description": "Name of the manure handling method used in the manure management scenario. Must match 'name' attribute of the Manure Handler Config to be used."
-        },
-        "manure_separator": {
-          "type": "string",
-          "description": "Name of the manure separator used in the manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
-        },
-        "manure_separator_after_digestion": {
-          "type": "string",
-          "description": "Name of the manure separator after digestion used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
-        },
-        "manure_treatment": {
-          "type": "string",
-          "description": "Name of the manure treatment and/or storage used in a manure management scenario. Each named treatment must have a Manure Treatment Config defined, unless the treatment is 'anaerobic digestion and lagoon' or 'anaerobic digestion and lagoon with separator'."
-        }
-      }
-    },
-    "bedding_configs": {
-      "type": "array",
-      "properties": {
-        "type": "object",
+        "description": "Configuration for an anaerobic digester.",
         "name": {
           "type": "string",
-          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
+          "description": "The unique identifier of the anaerobic digester. Cannot match the name of any other manure processor."
         },
-        "bedding_type": {
+        "processor_type": {
           "type": "string",
-          "description": "The type of bedding material used in the animal housing.",
-          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
-        },
-        "bedding_mass_per_day": {
-          "type": "number",
-          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
-          "minimum": 0
-        },
-        "bedding_density": {
-          "type": "number",
-          "description": "The density of the bedding on a wet weight basis (kg/m3)",
-          "minimum": 0
-        },
-        "bedding_dry_matter_content": {
-          "type": "number",
-          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_cleaned_fraction": {
-          "type": "number",
-          "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_carbon_fraction": {
-          "type": "number",
-          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_phosphorus_content": {
-          "type": "number",
-          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "sand_removal_efficiency": {
-          "type": "number",
-          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
-          "minimum": 0,
-          "maximum": 1
-        }
-      }
-    },
-    "manure_handler_configs": {
-      "type": "array",
-      "properties": {
-        "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Unique identifier to reference this manure handler config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
-        },
-        "manure_handler_type": {
-          "type": "string",
-          "description": "The type of manure handler (method for cleaning barn alleyways).",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
-        },
-        "cleaning_water_use_rate": {
-          "type": "number",
-          "description": "The rate of water use (L per animal per day, total of fresh and/or recycled water) by a specified manure handler (liters)",
-          "minimum": 0
-        },
-        "minutes_per_cleaning": {
-          "type": "number",
-          "description": "The length of a specified manure handler's cleaning cycle (minutes).",
-          "minimum": 0
-        },
-        "cleanings_per_day": {
-          "type": "number",
-          "description": "The number of cleanings a specified manure handler performs per day.",
-          "minimum": 0
-        },
-        "daily_tillage_frequency": {
-          "type": "number",
-          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a specified compost bedded pack barn pack is tilled.",
-          "minimum": 0
-        },
-        "cleaning_water_recycle_fraction": {
-          "type": "number",
-          "description": "The fraction (0.XX) of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      }
-    },
-    "manure_separator_configs": {
-      "type": "array",
-      "properties": {
-        "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Unique identifier to reference this solid liquid separator config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
-          "pattern": "^(?!none$)(.*)$"
-        },
-        "manure_separator_type": {
-          "type": "string",
-          "description": "The type of mechanical solid-liquid separator.",
-          "pattern": "^(screw press|rotary screen)$"
-        },
-        "percent_dry_solids": {
-          "type": "number",
-          "description": "The dry matter fraction (0.XX) of the manure solids produced by a specified solid liquid separator (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "total_solids_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "volatile_solids_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "nitrogen_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "phosphorus_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "potassium_removal_efficiency_for_separator": {
-          "type": "number",
-          "description": "For a specified solid liquid separator, the fraction (0.XX) of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      }
-    },
-    "manure_treatment_configs": {
-      "type": "array",
-      "properties": {
-        "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Unique identifier to reference this manure treatment/storage config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
-          "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
-        },
-        "manure_treatment_type": {
-          "type": "string",
-          "description": "Manure treatment and/or storage type.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
-        },
-        "total_solids_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Total solids removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "volatile_solids_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Volatile solids removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "nitrogen_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Nitrogen removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Total ammoniacal nitrogen removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "phosphorus_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Phosphorus removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "potassium_removal_efficiency_for_treatment": {
-          "type": "number",
-          "description": "Potassium removal efficiency for the manure storage and treatment system.",
-          "default": 0.0,
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "storage_time_period": {
-          "type": "number",
-          "description": "The number of days that manure is stored in a specified storage before it is removed (days).",
-          "default": 120,
-          "minimum": 0
-        },
-        "freeboard_input": {
-          "type": "number",
-          "description": "Freeboard -- Empty storage space above the manure in the treatment system.",
-          "default": 0.0
-        },
-        "composting_type": {
-          "type": "string",
-          "description": "The type of composting used in a specified compost storage.",
-          "pattern": "^(intensive windrow|passive windrow|static pile)$",
-          "default": "intensive windrow"
-        },
-        "last_compost_turning_or_addition": {
-          "type": "number",
-          "description": "The number of days since the last turning or addition event for a specified compost storage (day)",
-          "default": 1
-        },
-        "manure_cover": {
-          "type": "string",
-          "description": "The type of cover present on a specified manure treatment or storage. A cover refers to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
-          "default": "no cover"
-        },
-        "hydraulic_retention_time": {
-          "type": "number",
-          "description": "Hydraulic Retention Time -- The average time that manure is retained in the treatment system (day).",
-          "default": 0,
-          "minimum": 0
-        },
-        "sludge_accumulation_period": {
-          "type": "number",
-          "description": "Sludge Accumulation Period -- The number of days that sludge is accumulated in the treatment system (day).",
-          "default": 0,
-          "minimum": 0
-        },
-        "sludge_accumulation_volume_fraction": {
-          "type": "number",
-          "description": "Sludge Accumulation Volume Fraction -- Based on the manure solids entering the treatment system.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
-        },
-        "top_cover_volume_fraction": {
-          "type": "number",
-          "description": "Top Cover Volume Fraction -- Fraction of the total volume of the treatment system that is assumed to be the top cover volume.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
-        },
-        "evaporation_fraction": {
-          "type": "number",
-          "description": "Evaporation Fraction -- The fraction of the liquid portion evaporated from the treatment system.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
+          "description": "The type of anaerobic digester used.",
+          "pattern": "ContinuousMix"
         },
         "anaerobic_digestion_temperature_set_point": {
           "type": "number",
-          "description": "The temperature set point for a specified anaerobic digestion treatment system (degrees Celsius).",
-          "default": 0,
+          "description": "Temperature set point of the anaerobic digester (degrees C).",
+          "minimum": 0.0,
+          "maximum": 100.0,
+          "default": 37.5
+        },
+        "hydraulic_retention_time": {
+          "type": "number",
+          "description": "Number of days on average that manure spends in the anaerobic digester (days).",
           "minimum": 0
         },
-        "anaerobic_digestion_temperature_celsius": {
+        "biogas_leakage_fraction": {
           "type": "number",
-          "description": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius).",
-          "default": 0,
-          "minimum": 0
+          "description": "Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended  leakage and is not collected by the gas capture system (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.01
+        }
+      }
+    },
+    "handler": {
+      "type": "array",
+      "description": "A list of all configurations for handlers.",
+      "properties": {
+        "type": "object",
+        "description": "Configuration for a handler processor.",
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the handler processor. Cannot match the name of any other manure processor."
         },
-        "digester_methane_leakage_fraction": {
+        "processor_type": {
+          "type": "string",
+          "description": "The type of handler used.",
+          "pattern": "^(AlleyScraper|ManualScraper|FlushSystem|ParlorCleaningHandler)$"
+        },
+        "cleaning_water_use_amount": {
           "type": "number",
-          "description": "The fraction (0.XX) of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
-          "default": 0.01,
+          "description": "Amount of total (recycled plus fresh) cleaning water used per animal per day (L/animal/day).",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "cleaning_water_recycle_fraction": {
+          "type": "number",
+          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.8
+        },
+        "use_parlor_flush": {
+          "type": "bool",
+          "description": "This input is applicable only to parlor cleaning handlers. Indicator for if a flush system is used in the milking parlor and/or holding area. This flush water may be partially or fully recycled and is in addition to routine parlor cleaning that utilizes only fresh water.",
+          "default": false
+        }
+      }
+    },
+    "separator": {
+      "type": "array",
+      "description": "A list of all configurations for separator processors.",
+      "properties": {
+        "type": "object",
+        "description": "Configuration for a separator processor.",
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the separator."
+        },
+        "processor_type": {
+          "type": "string",
+          "description": "The type of separator used.",
+          "pattern": "^(RotaryScreen|ScrewPress)$"
+        },
+        "separated_solids_dry_matter": {
+          "type": "number",
+          "description": "The dry matter fraction (0.XX percent DM by mass) of manure solids generated from solid liquid separation.",
           "minimum": 0.0,
           "maximum": 1.0
+        },
+        "total_solids_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing total solids from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "volatile_solids_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing volatile solids from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "nitrogen_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing nitrogen from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "ammoniacal_nitrogen_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing ammoniacal nitrogen from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "phosphorus_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing phosphorus from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "potassium_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing potassium from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "ash_efficiency": {
+          "type": "number",
+          "description": "The efficiency of the separator in removing ash from the manure into the separated solids fraction.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "storage": {
+      "type": "array",
+      "description": "A list of all configurations for Storages.",
+      "properties": {
+        "type": "object",
+        "description": "Configuration for a storage processor.",
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the storage processor."
+        },
+        "processor_type": {
+          "type": "string",
+          "description": "The type of storage used.",
+          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|CompostBeddedPackBarn)$"
+        },
+        "capacity": {
+          "type": "number",
+          "description": "The volumetric capacity of the storage (m^3).",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cover": {
+          "type": "string",
+          "description": "The type of cover used with the specified storage.",
+          "pattern": "^(cover|crust|no_crust_or_cover|cover_and_flare)$",
+          "nullable": true
+        },
+        "storage_time_period": {
+          "type": "number",
+          "description": "The length of time (days) manure is stored for between emptying events.",
+          "minimum": 0,
+          "nullable": true
+        },
+        "surface_area": {
+          "type": "number",
+          "description": "The surface area of the manure storage (m^2).",
+          "minimum": 0.0,
+          "nullable": true
+        },
+        "composting_type": {
+          "type": "string",
+          "description": "Composting method, applicable only to the composting storage type.",
+          "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "nullable": true
+        }
+      }
+    }
+  },
+  "manure_processor_connection_properties": {
+    "data_collection_app_compatible": false,
+    "processor_connections": {
+      "type": "array",
+      "description": "A list of processor connection configurations indicating the proportion(s) and destination(s) of the output of all non-separator manure processor(s).",
+      "properties": {
+        "type": "object",
+        "description": "The output destination(s) and the corresponding proportion(s) of the output of the non-separator processors (handlers, digesters, and storages).",
+        "processor_name": {
+          "type": "string",
+          "description": "The unique identifier of a non-separator processor."
+        },
+        "destinations": {
+          "type": "array",
+          "description": "The destination processor(s) and their corresponding proportion(s) to receive from the non-separator processor.",
+          "properties": {
+            "type": "object",
+            "description": "The destination processor(s) and their corresponding proportion(s) to receive from the non-separator processor.",
+            "receiving_processor_name": {
+              "type": "string",
+              "description": "The unique identifier of the receiving processor."
+            },
+            "proportion": {
+              "type": "number",
+              "description": "The proportion of the origin processor output to be passed to the receiving processor.",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          }
+        }
+      }
+    },
+    "separator_connections": {
+      "type": "array",
+      "description": "A list of processor connection configurations indicating the proportion(s) and destination(s) of the output of all separator processors.",
+      "properties": {
+        "type": "object",
+        "description": "The output destination(s) and the corresponding proportion(s) of the output of the separator processor.",
+        "processor_name": {
+          "type": "string",
+          "description": "The unique identifier of a separator processor."
+        },
+        "liquid_output_destinations": {
+          "type": "array",
+          "description": "The destination processor(s) and their corresponding proportion(s) to receive from the liquid output of the separator processor.",
+          "properties": {
+            "type": "object",
+            "description": "The destination processor(s) and their corresponding proportion(s) to receive from the liquid output of the separator processor.",
+            "receiving_processor_name": {
+              "type": "string",
+              "description": "The unique identifier of the receiving processor."
+            },
+            "proportion": {
+              "type": "number",
+              "description": "The proportion of the origin separator liquid output to be passed to the receiving processor.",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          }
+        },
+        "solid_output_destinations": {
+          "type": "array",
+          "description": "The destination processor(s) and their corresponding proportion(s) to receive from the solid output of the separator processor.",
+          "properties": {
+            "type": "object",
+            "description": "The destination processor(s) and their corresponding proportion(s) to receive from the solid output of the separator processor.",
+            "receiving_processor_name": {
+              "type": "string",
+              "description": "The unique identifier of the receiving processor."
+            },
+            "proportion": {
+              "type": "number",
+              "description": "The proportion of the origin separator solid output to be passed to the receiving processor.",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          }
         }
       }
     }

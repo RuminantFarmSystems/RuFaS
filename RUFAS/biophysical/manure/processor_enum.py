@@ -7,6 +7,9 @@ from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamH
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
+from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
 
@@ -33,6 +36,10 @@ class ProcessorType(Enum):
     SlurryStorageOutdoor = SlurryStorageOutdoor
 
     SlurryStorageUnderfloor = SlurryStorageUnderfloor
+
+    Composting = Composting
+    CompostBeddedPackBarn = CompostBeddedPackBarn
+    OpenLot = OpenLot
 
     @classmethod
     def get_processor_class(cls, processor_type: str) -> Type["Processor"]:
