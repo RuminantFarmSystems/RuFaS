@@ -32,7 +32,7 @@ class Storage(Processor):
 
     Parameters
     ----------
-    cover : StorageCover
+    cover : str
         What the storage will be covered with, if anything.
     storage_time_period : int | None
         How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
@@ -64,7 +64,7 @@ class Storage(Processor):
         self,
         name: str,
         is_housing_emissions_calculator: bool,
-        cover: StorageCover,
+        cover: str,
         storage_time_period: int | None,
         surface_area: float,
         capacity: float = inf,
