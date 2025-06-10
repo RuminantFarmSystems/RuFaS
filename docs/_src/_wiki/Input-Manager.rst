@@ -37,7 +37,12 @@ The IM addresses these issues with these functionalities and features:
     Module, Crop and Soil Module, Manure Module, etc...).
 10. Allowing sequential runs.
 
-|RuFaS Overview - IM|
+.. figure:: /_static/IM_diagram.png
+   :alt: RuFaS Overview - IM
+   :align: center
+   :name: rufas overview
+
+   A high-level flow of IM within RuFaS.
 
 How does IM work?
 -----------------
@@ -50,14 +55,18 @@ How does IM work?
 5. After validation and fixing, returns a boolean value to indicate
    whether or not the input data was valid.
 
-.. raw:: html
-
-   <img width="845" alt="Screenshot 2023-10-05 at 11 53 01 AM" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/fabf3eec-eba0-4bfc-b624-dff7afbb7bc7">
+.. figure:: /_static/how_does_IM_work.png
+   :alt: RuFaS Overview - IM
+   :align: center
+   :name: rufas overview
 
 Input validation process in IM:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|Input Manager Data Validation Overview|
+.. figure:: /_static/IM_validation_process.png
+   :alt: RuFaS Overview - IM
+   :align: center
+   :name: rufas overview
 
 Click
 `here <https://whimsical.com/input-manager-data-validation-overview-T6TuSktxPUYe3BRUURhaDm>`__
@@ -132,7 +141,7 @@ In the pipeline for IM development:
    API calls, etc...).
 
 Metadata
-========
+--------
 
 Introduction
 ------------

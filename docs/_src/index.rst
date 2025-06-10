@@ -53,7 +53,12 @@ Versioning
    _wiki/Code-review
    _wiki/best_practices
 
-
+Other Resources
+---------------
+- `Uncle Bob Clean Code Lessons <https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`_
+- `Unit Testing Reference <https://realpython.com/python-testing/>`_
+- `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
+- `Doc String Guide <https://realpython.com/documenting-python-code/>`_
 
 
 Indices and tables

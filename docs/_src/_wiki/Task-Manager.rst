@@ -12,8 +12,7 @@ task execution based on user-configured specifications.
 How It Works
 ------------
 
-Task Manager operates by utilizing the `Input
-Manager <https://github.com/RuminantFarmSystems/MASM/wiki/Input-Manager>`__
+Task Manager operates by utilizing the :doc:`Input Manager <Input-Manager>`
 to fetch and interpret configurations that specify the properties and
 behavior of tasks. This setup allows for detailed customization
 including parallel processing settings, task-specific parameters, and
@@ -21,7 +20,12 @@ output management. Tasks that involve multiple simulation runs, like
 Sensitivity Analysis and End-to-End Testing, are first expanded into
 single simulation tasks, simplifying management and execution.
 
-|RuFaS Overview - TM|
+.. figure:: /_static/TM_diagram.png
+   :alt: RuFaS Overview - TM
+   :align: center
+   :name: rufas overview
+
+   A high-level flow of IM within RuFaS.
 
 Input Configuration
 -------------------

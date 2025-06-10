@@ -68,8 +68,7 @@ Merging to ``main``
 
 1. **Stability Confirmation**: Once the ``test`` branch is confirmed to
    be stable, update the version number in both ``TaskManager`` and the
-   change log. `RuFaS Versioning
-   Policy <https://github.com/RuminantFarmSystems/MASM/wiki/RuFaS-Versioning-Policy>`__
+   change log. :doc:`RuFaS Versioning Policy <RuFaS-Versioning-Policy>`
 2. **Pull Updates**: Pull the stable updates from ``test`` into
    ``main``.
 3. **Approval**: Only `Pooya
@@ -86,8 +85,7 @@ Best Practices
   status of each branch and any important changes.
 - **Documentation**: Maintain clear and up-to-date documentation for all
   changes and testing procedures.
-- **Review and Approval**: Adhere to the `code review
-  guidelines <https://github.com/RuminantFarmSystems/MASM/wiki/Code-review>`__
+- **Review and Approval**: Adhere to the :doc:`code review guidelines <Code-review>`
   to maintain code quality and stability.
 
 By following this branching strategy, we ensure a clear and structured

@@ -13,7 +13,12 @@ files. This flexibility in data processing and aggregation makes the
 Report Generator an indispensable tool for users seeking to draw
 meaningful conclusions from their simulations.
 
-|RuFaS Overview - RG|
+.. figure:: /_static/RG_diagram.png
+   :alt: RuFaS Overview - RG
+   :align: center
+   :name: rufas overview
+
+   A high-level flow of RG within RuFaS.
 
 Filter Files
 ------------

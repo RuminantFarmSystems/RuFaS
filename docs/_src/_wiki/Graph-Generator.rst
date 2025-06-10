@@ -12,7 +12,12 @@ ensuring it remains a versatile resource for users. The Graph Generator
 was initially introduced to the code base in
 https://github.com/RuminantFarmSystems/MASM/pull/779
 
-|RuFaS Overview - GG|
+.. figure:: /_static/GG_diagram.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
+
+   A high-level flow of GG within RuFaS.
 
 Filter Files
 ------------
@@ -186,7 +191,10 @@ This JSON filter specifies a "plot" type, applies regular expression
 filters to select specific variables in the Output Manager's variables
 pool, and customizes the graph's title and legend. It produces:
 
-|daily-aggregate-calf-degradable-volatile-solids-02-Nov-2023_Thu_14-21-06|
+.. figure:: /_static/graph_example1.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 1
 
 Data is in Dictionaries
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,7 +219,10 @@ variables pool, selects ``milk_lactose``, ``milk_protein``, and
 ``milk_fat`` in each instance, and customizes the graph's title and
 legend. It produces:
 
-|daily-milk-nutritions-02-Nov-2023_Thu_14-21-06|
+.. figure:: /_static/graph_example2.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 2
 
 Filtering using Regular Expression Patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,9 +244,10 @@ based on the RegEx-filtered pool keys:
          "variables": [".*"]
    }
 
-.. raw:: html
-
-   <img width="640" alt="Graph of Ration per Animal for Pen 3 with no Legend Specified in Filter File" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/33a31823-f3f0-4010-b9d6-0a3b7edff5b1">
+.. figure:: /_static/graph_example3.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 3
 
 Using Filter By Exclusion
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -256,9 +268,10 @@ the bottom by using the ``filter_by_exclusion`` boolean:
          "filter_by_exclusion": true
    }
 
-.. raw:: html
-
-   <img width="635" alt="Graph of Ration per Animal for Pen 3 with no Legend Specified in Filter File Using Filter By Exclusion" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/87dc3b14-fa6c-4331-b2df-e045a9de36ff">
+.. figure:: /_static/graph_example4.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 4
 
 Multiple graphs in a single filter file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,11 +357,20 @@ with different combinations of data expansion options.
        ]
    }
 
-|image|
+.. figure:: /_static/graph_example5.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 5
 
-|image1|
+.. figure:: /_static/graph_example6.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 6
 
-|image2|
+.. figure:: /_static/graph_example7.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 7
 
 Using Calendar Dates On X-Axis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -384,13 +406,7 @@ date format options:
      "date_format": "%j/%Y"
    }
 
-.. raw:: html
-
-   <img width="1137" alt="Screenshot 2025-01-02 at 5 27 33 PM" src="https://github.com/user-attachments/assets/74302e20-f7e6-4f02-b414-e55c6949f4a0" />
-
-.. |RuFaS Overview - GG| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/6cfa17e2-4056-4b3f-8952-bc51052193ad
-.. |daily-aggregate-calf-degradable-volatile-solids-02-Nov-2023_Thu_14-21-06| image:: https://github.com/RuminantFarmSystems/MASM/assets/51127592/d6593658-95c6-44cf-811d-72a8ad402ff7
-.. |daily-milk-nutritions-02-Nov-2023_Thu_14-21-06| image:: https://github.com/RuminantFarmSystems/MASM/assets/51127592/54ea471f-de94-4ba2-950b-576b62f20c85
-.. |image| image:: https://github.com/user-attachments/assets/ac5a0f85-ee97-4db8-ae3c-83a659278891
-.. |image1| image:: https://github.com/user-attachments/assets/a1c42815-6f65-4bf4-9794-a2873ca0e2b2
-.. |image2| image:: https://github.com/user-attachments/assets/f252c4db-7301-4aec-a5f3-7f2a7af4fe51
+.. figure:: /_static/graph_example8.png
+   :alt: RuFaS Overview - OM
+   :align: center
+   :name: graph example 8

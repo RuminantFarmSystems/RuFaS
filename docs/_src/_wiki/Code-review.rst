@@ -30,7 +30,7 @@ Reviewability is achieved by ensuring that:
 - All functions that are modified or added are type annotated.
 - The code passes all linting checks in alignment with the Flake8 style
   (review linting practices in RuFaS
-  `here <https://github.com/RuminantFarmSystems/MASM/wiki/Using-flake8>`__).
+  :doc:here <Using-Flake8>`).
 - The pull request has a reasonably written description following the
   what-why-how framework. Clearly state what are you changing/adding,
   why is this important/needed, and explain how it works.
