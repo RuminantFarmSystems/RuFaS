@@ -64,10 +64,34 @@ class EmissionsEstimator:
             "class": self.__class__.__name__,
             "function": self._calculate_purchased_feed_emissions_refreshed.__name__,
         }
-        self.om.add_warning(
-            "Purchased Feed Emissions Refreshed",
-            "This method is a placeholder for the refreshed purchased feed emissions calculation.",
-            info_map,
+        filter = {
+            "name": "Feed Ration Totals",
+            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
+            "filters": ["FeedManager.purchase_feed."],
+            "variables": [r"^\d+$"],
+            "slice_start": SLICE_START,
+        }
+        feeds = self.om.filter_variables_pool(filter)
+
+        purchased_feed_totals: dict[str, float] = {
+            key.split('.')[-1]: sum(entry['values'])
+            for key, entry in feeds.items()
+        }
+        self.om.add_variable(
+            "purchased_feed_totals",
+            purchased_feed_totals,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        (
+            actual_purchased_feed_emissions,
+            actual_land_use_change_emissions,
+        ) = self._calculate_actual_purchased_feed_emissions(purchased_feed_totals)
+        emissions_info_map = dict(
+            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
+        )
+        self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
+        self.om.add_variable(
+            "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
         )
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
