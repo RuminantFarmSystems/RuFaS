@@ -17,8 +17,8 @@ into separate pools, and populates requested output channels from the
 pools once the simulation is done. This is done using *filter files*. If
 a filter file's name begins with either ``json_`` or ``csv_``, Output
 Manager handles them itself. However, filter files whose names begin
-with ``report_`` and ``graph_`` are handled by the :doc:`Report Generator <_wiki/Report-Generator>`
-and the :doc:`Graph Generator <_wiki/Graph-Generator>`
+with ``report_`` and ``graph_`` are handled by the :doc:`Report Generator <Report-Generator>`
+and the :doc:`Graph Generator <Graph-Generator>`
 respectively.
 
 Output Manager is a singleton, i.e., only one instance of it can exist
@@ -31,8 +31,7 @@ Quick Start
 
 To set up Output Manager to capture data from a RuFaS simulation:
 
-1. `Add the data you need to the Output Manager variables
-   pool. <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#adding-data-to-the-output-manager>`__
+1. See :ref:`Add the data you need to the Output Manager variables pool <add-label>` for details.
 2. Set up an output filter file to capture your data:
 
 - Create a .txt file in the output_filters folder
@@ -75,8 +74,7 @@ would like to employ chunkification:
    memory.
 
 For a more detailed look at chunkification, some example setups, and a
-diagram of how chunkification works, please see the `chunkification Wiki
-page. <https://github.com/RuminantFarmSystems/MASM/wiki/Chunkification>`__
+diagram of how chunkification works, please see the :doc:`Chunkification wiki page. <Chunkification>`
 
 Output Filters
 --------------
@@ -84,10 +82,8 @@ Output Filters
 Data collected by OutputManager can be filtered and handled by three
 main post-processing functions:
 
-1. It can be aggregated by `Report
-   Generator <https://github.com/RuminantFarmSystems/MASM/wiki/Report-Generator>`__.
-2. It can be graphed in `Graph
-   Generator <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__.
+1. It can be aggregated by :doc:`Report Generator <Report-Generator>`.
+2. It can be graphed in :doc:`Graph Generator <Graph-Generator>`.
 3. It can be filtered to a csv or json file right within OutputManager.
 
 To route filtered data to any of these post-processors, you need to
@@ -228,8 +224,7 @@ Data Origins
 ------------
 
 When variables are added to the output manager, the Output Manager
-requires them to have an `info
-map <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#info_maps>`__
+requires them to have an :ref:`info map <info-label>`
 which tracks the class and function that is sending the data to output
 manager. Each biophysical modules reports its data to a respective
 reporter class to ensure that data from each daily update is added to
@@ -240,8 +235,7 @@ altered, created, or updated the data.
 There is a feature available to be able to track the original class and
 function that sent the data to its respective biophysical module
 reporter. This feature is called Data Origins. More details can be found
-here on the `Data Origins Wiki
-Page <https://github.com/RuminantFarmSystems/MASM/wiki/Data-Origins>`__.
+here on the :doc:`Data Origins Wiki Page <Data-Origins>`.
 
 Diagram
 -------
@@ -544,6 +538,8 @@ with.
 
 --------------
 
+.. _add-label:
+
 Adding Data to the Output Manager
 ---------------------------------
 
@@ -571,6 +567,8 @@ errors throughout the model:
 
 5. Use the appropriate Output Manager method to add the variable, log,
    warning, or error along with its info_map.
+
+.. _info-label:
 
 Info_maps
 ---------
@@ -636,13 +634,12 @@ a simulation and can therefore be overwhelming on its own.
 Output Manager has several features to help users navigate this large
 pool of data:
 
-1. `The variable names
-   list. <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#the-variable-names-list>`__
-2. `The exclude_info_maps
-   flag. <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#the-exclude_info_maps-flag>`__
-3. `Filtering. <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#filtering>`__
+1. :ref:`The variable names list <the-variable-names-list>`.
+2. :ref:`The exclude_info_maps flag <the-exclude_info_maps-flag>`.
+3. :ref:`Filtering <filtering>`.
 
 .. _the-variable-names-list:
+
 
 The variable names list.
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -700,8 +697,7 @@ this:
 The exclude_info_maps flag.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As stated in the `info_maps
-section <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#info_maps>`__,
+As stated in the :ref:`info map section <info-label>`,
 an info_map is meant to capture runtime environment variables to have
 reproducible results. Info_maps are added to the outputs by default.
 However, a user may wish to exclude the info_maps environmental
@@ -750,8 +746,7 @@ How does the filter work?
 
 The Output Manager uses Regular Expression (or RegEx) patterns to look
 for matches in the ``variables_pool``. To learn more about RegEx, jump
-to the `RegEx
-section <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#regular-expressions>`__.
+to the :ref:`regex section <regex-label>`.
 
 To provide additional flexibility in filtering, the user has the option
 to filter the ``variables_pool`` inclusively or exclusively.
@@ -919,6 +914,8 @@ instances of either.
        FlushSystem.daily_update.daily_output.liquid_manure_nitrogen
        Feed.summarize_feed_storage.nitrogen
        NitrogenCollection.manure_collection.daily_update
+
+.. _regex-label:
 
 Regular Expressions
 ~~~~~~~~~~~~~~~~~~~
