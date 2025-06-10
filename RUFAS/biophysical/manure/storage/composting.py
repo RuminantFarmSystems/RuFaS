@@ -41,7 +41,7 @@ MCF_TABLE: dict[tuple[float, float], dict[CompostingType, float]] = {
         CompostingType.INTENSIVE_WINDROW: 1.0,
         CompostingType.PASSIVE_WINDROW: 2.0,
     },
-    (18.0, math.inf): {
+    (18.0, inf): {
         CompostingType.STATIC_PILE: 2.5,
         CompostingType.INTENSIVE_WINDROW: 1.5,
         CompostingType.PASSIVE_WINDROW: 2.5,
@@ -362,4 +362,4 @@ class Composting(Storage):
         elif manure_temperature < 18.0:
             return MCF_TABLE[(10.0, 18.0)][composting_type]
         else:
-            return MCF_TABLE[(18.0, math.inf)][composting_type]
+            return MCF_TABLE[(18.0, inf)][composting_type]
