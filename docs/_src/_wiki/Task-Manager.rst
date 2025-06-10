@@ -1,5 +1,8 @@
+Task Manager
+============
+
 Overview
-========
+--------
 
 Task Manager is a robust tool designed to automate and optimize the
 execution of multiple tasks in parallel within RuFaS. It orchestrates
@@ -21,7 +24,7 @@ single simulation tasks, simplifying management and execution.
 |RuFaS Overview - TM|
 
 Input Configuration
-===================
+-------------------
 
 - ``parallel_workers``: Specifies the number of worker processes that
   should run in parallel, facilitating efficient use of computational
@@ -71,7 +74,7 @@ Input Configuration
     Analysis.
 
 Task Types and Their Specifics
-==============================
+------------------------------
 
 Task Manager supports several distinct task types, each tailored for
 specific purposes:
@@ -100,7 +103,7 @@ specific purposes:
    directory to use the new input schema.
 
 Detailed Sensitivity Analysis Settings
-======================================
+--------------------------------------
 
 Sensitivity Analysis within Task Manager is to determine the impact of
 input variables on output results:
@@ -126,7 +129,7 @@ range for distributing the computational load during sensitivity
 analysis, optimizing resource usage across multiple machines.
 
 Finding a good value for ``parallel_workers``
-=============================================
+---------------------------------------------
 
 ``parallel_workers`` determines how many parallel tasks should run
 concurrently. Ideally, this number should match with how many CPU cores
@@ -159,7 +162,7 @@ If you are a Linux user you already know what you are doing, you don't
 need this.
 
 Example input
-=============
+-------------
 
 .. code:: json
 

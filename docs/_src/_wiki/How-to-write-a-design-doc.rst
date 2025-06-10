@@ -1,3 +1,5 @@
+How To Write a Design Doc
+=========================
 This page is adopted from `this
 article <https://www.freecodecamp.org/news/how-to-write-a-good-software-design-document-66fcf019569c/>`__
 and is split into 4 sections:
@@ -8,7 +10,7 @@ and is split into 4 sections:
 - The **process** around it
 
 Why write a design document?
-============================
+----------------------------
 
 A design doc — also known as a technical spec — is a description of how
 you plan to solve a problem.
@@ -33,7 +35,7 @@ stop there — a lot of smaller projects could benefit from a mini design
 doc too.
 
 What to include in a design doc?
-================================
+--------------------------------
 
 A design doc describes the solution to a problem. Since the nature of
 each problem is different, naturally you’d want to structure your design
@@ -55,7 +57,7 @@ It includes:
 - Detailed Scoping and Timeline
 
 How to write it
-===============
+---------------
 
 Write as simply as possible
 ---------------------------
@@ -113,7 +115,7 @@ evaluate for clarity so that others can actually give you useful
 feedback.
 
 Process
-=======
+-------
 
 Design docs help you get feedback before you waste a bunch of time
 implementing the wrong solution or the solution to the wrong problem.

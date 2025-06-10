@@ -7,12 +7,12 @@ Welcome to Ruminant Farm Simulation (RuFaS)'s documentation!
 ============================================================
 
 Vision
-======
+------
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art,
 open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
 Mission
-=======
+-------
 To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water
 quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest
 standards for prediction accuracy, code structure, and clarity, documentation, and accessibility. Through continuous
@@ -20,33 +20,33 @@ learning and improvement of our methods and algorithms, we are creating an open 
 collaboration.
 
 Navigation
-==========
+----------
 
 .. toctree::
    :maxdepth: 1
-   :caption: Documentation
+   :caption: Documentation:
+
    _code/modules
 
 .. toctree::
    :maxdepth: 1
-   :caption: Getting started
-   _wiki/Onboarding-New-Team-Members
+   :titlesonly:
+   :caption: Infrastructure for Simulation:
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Infrastructure for Simulation
    _wiki/Task-Manager
    _wiki/Input-Manager
    _wiki/RuFaS-Command-Line-Arguments
    _wiki/Output-Manager
+   _wiki/Data-Origins
    _wiki/Report-Generator
    _wiki/Graph-Generator
 
 Versioning
-==========
+----------
 .. toctree::
    :maxdepth: 1
-   :caption: Contributing to RuFaS
+   :caption: Contributing to RuFaS:
+
    _wiki/creating_github_issue
    _wiki/How-to-write-a-design-doc
    _wiki/Branching-Strategy-in-RuFaS
@@ -57,7 +57,7 @@ Versioning
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
