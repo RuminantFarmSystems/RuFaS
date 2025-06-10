@@ -432,13 +432,12 @@ class FeedManager:
 
             total_cost = purchase_amount * feed_info.purchase_cost
 
-            var_name = f"purchased_feed_{rufas_id}"
             info_map = info_map | {
                 "price": feed_info.purchase_cost,
                 "amount_purchased": purchase_amount,
                 "total_cost": total_cost,
             }
-            self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
+            self._om.add_variable(rufas_id, purchase_amount * feed_info.purchase_cost, info_map)
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
     def _adjust_for_shrink(self, purchased_feed: PurchasedFeed, shrink_factor: float = 0.1) -> PurchasedFeed:
