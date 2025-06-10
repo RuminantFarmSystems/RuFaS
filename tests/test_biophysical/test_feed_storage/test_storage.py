@@ -301,11 +301,12 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
     mock_total_amount = mocker.patch.object(storage, "_get_total_nutritive_amount")
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
     expected_get_total_amount_call_count = 9
-    expected_add_var_call_count = 11
+    expected_add_var_call_count = 13
+    expected_mock_store_mass_call_count = 3
 
     storage._record_stored_crops(15)
 
-    mock_stored_mass.assert_called_once()
+    assert mock_stored_mass.call_count == expected_mock_store_mass_call_count
     assert mock_total_amount.call_count == expected_get_total_amount_call_count
     assert mock_add_var.call_count == expected_add_var_call_count
 
