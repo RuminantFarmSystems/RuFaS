@@ -1,3 +1,6 @@
+Data Origins
+============
+
 When variables are added to the Output Manager, they are required to
 have an `info
 map <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#info_maps>`__
