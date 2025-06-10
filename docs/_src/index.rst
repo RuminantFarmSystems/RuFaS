@@ -30,30 +30,31 @@ Navigation
 .. toctree::
    :maxdepth: 1
    :caption: Getting started
-   Onboarding-New-Team-Members
+   _wiki/Onboarding-New-Team-Members
 
 .. toctree::
    :maxdepth: 1
    :caption: Infrastructure for Simulation
-   Task-Manager
-   Input-Manager
-   RuFaS-Command-Line-Arguments
-   Output-Manager
-   Report-Generator
-   Graph-Generator
+   _wiki/Task-Manager
+   _wiki/Input-Manager
+   _wiki/RuFaS-Command-Line-Arguments
+   _wiki/Output-Manager
+   _wiki/Report-Generator
+   _wiki/Graph-Generator
 
 Versioning
 ==========
 .. toctree::
    :maxdepth: 1
    :caption: Contributing to RuFaS
-   Task-Manager
-   Input-Manager
-   RuFaS-Command-Line-Arguments
-   Output-Manager
-   Data-Origins
-   Report-Generator
-   Graph-Generator
+   _wiki/creating_github_issue
+   _wiki/How-to-write-a-design-doc
+   _wiki/Branching-Strategy-in-RuFaS
+   _wiki/Code-review
+   _wiki/best_practices
+
+
+
 
 Indices and tables
 ==================
