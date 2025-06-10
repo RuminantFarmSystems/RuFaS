@@ -237,6 +237,9 @@ function that sent the data to its respective biophysical module
 reporter. This feature is called Data Origins. More details can be found
 here on the :doc:`Data Origins Wiki Page <Data-Origins>`.
 
+.. |RuFaS Overview - OM| image:: /_static/RUFAS_Overview_OM.png
+   :alt: RuFaS Overview - OM
+
 Diagram
 -------
 
