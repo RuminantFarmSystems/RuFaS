@@ -23,7 +23,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build HTML from Sphinx
       run: |
-        sphinx-apidoc -o docs/_src . -d 1 -e
+        sphinx-apidoc -ed 1 --remove-old -o docs/_src/_code/ . ./tests/
         cd docs
         make clean
         make html

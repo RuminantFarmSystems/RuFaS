@@ -10,9 +10,7 @@ Welcome to Ruminant Farm Simulation (RuFaS)'s documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
-   scientific_documentation
-   tests
+   _code/modules
 
 Indices and tables
 ==================
