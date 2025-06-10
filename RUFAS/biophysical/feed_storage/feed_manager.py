@@ -420,7 +420,6 @@ class FeedManager:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.purchase_feed.__name__,
-            "units": MeasurementUnits.DOLLARS,
             "simulation_day": time.simulation_day,
         }
         for rufas_id, purchase_amount in feeds_to_purchase.items():
@@ -437,7 +436,9 @@ class FeedManager:
                 "amount_purchased": purchase_amount,
                 "total_cost": total_cost,
             }
-            self._om.add_variable(rufas_id, purchase_amount * feed_info.purchase_cost, info_map)
+            self._om.add_variable(f"{rufas_id}_cost", purchase_amount * feed_info.purchase_cost,
+                                  info_map | {"units": MeasurementUnits.DOLLARS})
+            self._om.add_variable(rufas_id, purchase_amount, info_map | {"units": MeasurementUnits.KILOGRAMS})
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
     def _adjust_for_shrink(self, purchased_feed: PurchasedFeed, shrink_factor: float = 0.1) -> PurchasedFeed:

@@ -645,7 +645,7 @@ def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Fee
 
     feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=RufasTime))
 
-    assert mock_om_add_variable.call_count == 5
+    assert mock_om_add_variable.call_count == 10
     assert mock_store_purchased_feed.call_count == 5
 
 

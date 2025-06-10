@@ -92,6 +92,7 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
 
     mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
     mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    mocker.patch("RUFAS.simulation_engine.EEEManager.estimate_all")
 
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100

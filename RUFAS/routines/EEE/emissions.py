@@ -47,7 +47,6 @@ class EmissionsEstimator:
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_purchased_feed_emissions(fertilizer_apps["Homegrown Feeds"])
         self._calculate_purchased_feed_emissions_refreshed()
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
@@ -67,8 +66,7 @@ class EmissionsEstimator:
         filter = {
             "name": "Feed Ration Totals",
             "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-            "filters": ["FeedManager.purchase_feed."],
-            "variables": [r"^\d+$"],
+            "filters": ["FeedManager.purchase_feed.*(kg)"],
             "slice_start": SLICE_START,
         }
         feeds = self.om.filter_variables_pool(filter)
