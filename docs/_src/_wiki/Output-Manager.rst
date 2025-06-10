@@ -17,10 +17,8 @@ into separate pools, and populates requested output channels from the
 pools once the simulation is done. This is done using *filter files*. If
 a filter file's name begins with either ``json_`` or ``csv_``, Output
 Manager handles them itself. However, filter files whose names begin
-with ``report_`` and ``graph_`` are handled by the `Report
-Generator <https://github.com/RuminantFarmSystems/MASM/wiki/Report-Generator>`__
-and the `Graph
-Generator <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__
+with ``report_`` and ``graph_`` are handled by the :doc:`Report Generator <_wiki/Report-Generator>`
+and the :doc:`Graph Generator <_wiki/Graph-Generator>`
 respectively.
 
 Output Manager is a singleton, i.e., only one instance of it can exist
