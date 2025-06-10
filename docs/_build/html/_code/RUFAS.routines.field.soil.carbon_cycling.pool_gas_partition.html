@@ -1,0 +1,998 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.carbon_cycling.residue_partition module" href="RUFAS.routines.field.soil.carbon_cycling.residue_partition.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.carbon_cycling.decomposition module" href="RUFAS.routines.field.soil.carbon_cycling.decomposition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.carbon_cycling.html">RUFAS.routines.field.soil.carbon_cycling package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition">
+<span id="rufas-routines-field-soil-carbon-cycling-pool-gas-partition-module"></span><h1>RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.</span></span><span class="sig-name descname"><span class="pre">PoolGasPartition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the partitioning of carbon between different soil pools and the atmosphere,
+contributing to the overall carbon cycling within a field.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
+provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
+provided.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>pseudocode_soil S.6.C.1 to S.6.C.13</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition.partition_pool_gas">
+<span class="sig-name descname"><span class="pre">partition_pool_gas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition.partition_pool_gas" title="Link to this definition"></a></dt>
+<dd><p>Main routine to update variables associated with gas partitioning in all layers.</p>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
+<cite>data</cite> object.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_passive_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_passive_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">passive_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_to_passive_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_carbon_to_passive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_passive_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Aggregate the total amount of passive carbon in the layer.</p>
+<p>This function updates the passive carbon stored in the soil based on the provided inputs.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>passive_carbon_amount<span class="classifier">float</span></dt><dd><p>Passive carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>slow_to_passive_carbon_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into passive carbon (kg/ha).</p>
+</dd>
+<dt>active_carbon_to_passive_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into passive carbon (kg/ha).</p>
+</dd>
+<dt>passive_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated passive carbon stored in the soil (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>References<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.13.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_slow_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_slow_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slow_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_slow_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_carbon_to_slow_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_slow_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Aggregate the total amount of slow carbon in the layer.</p>
+<p>This function updates the slow carbon stored in the soil based on the provided inputs.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slow_carbon_amount<span class="classifier">float</span></dt><dd><p>Slow carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>plant_structural_slow_carbon_remaining<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+<dt>soil_structural_slow_carbon_remaining<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+<dt>active_carbon_to_slow_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>slow_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated slow carbon stored in the soil (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>References<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.12.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_active_decompose_carbon">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_active_decompose_carbon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_active_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_active_decompose_carbon" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant carbon decomposed into the active carbon pool in the layer (kg/ha).</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_metabolic_active_carbon_remaining<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+<dt>plant_structural_active_carbon_remaining<span class="classifier">float</span></dt><dd><p>Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant carbon decomposed into the active carbon pool (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>References<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.11.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_active_decompose_carbon">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_active_decompose_carbon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_active_carbon_remaining</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_active_decompose_carbon" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil carbon decomposed into the active carbon pool in the layer (kg/ha).</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_metabolic_active_carbon_remaining<span class="classifier">float</span></dt><dd><p>Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+<dt>soil_structural_active_carbon_remaining<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil carbon decomposed into the active carbon pool (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>References<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.11.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_active_decompose_carbon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_active_decompose_carbon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_to_active_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_to_active_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_active_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Aggregate the total amount of active carbon in the layer.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>active_carbon_amount<span class="classifier">float</span></dt><dd><p>Active carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>plant_active_decompose_carbon<span class="classifier">float</span></dt><dd><p>Plant carbon decomposed into the active carbon pool (kg/ha).</p>
+</dd>
+<dt>soil_active_decompose_carbon<span class="classifier">float</span></dt><dd><p>Soil carbon decomposed into the active carbon pool (kg/ha).</p>
+</dd>
+<dt>passive_to_active_carbon_amount<span class="classifier">float</span></dt><dd><p>Passive carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>slow_to_active_carbon_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>active_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated active carbon stored in the soil (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>References<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.11.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_to_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_passive_to_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">passive_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_carbon_loss_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_to_active_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate passive carbon decomposed into active carbon in the layer (kg/ha).</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>passive_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>passive_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Fraction of passive carbon lost as CO2 during decomposition (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Passive carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.10.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_carbon_co2_lost_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_passive_carbon_co2_lost_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">passive_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_carbon_loss_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_carbon_co2_lost_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate passive carbon lost as CO2 during decomposition in the layer (kg/ha).</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>passive_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>passive_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Fraction of passive carbon lost as CO2 during decomposition (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Passive carbon lost as CO2 during decomposition (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>References<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.10.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_to_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_slow_to_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slow_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_passive_decompose_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_loss_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_to_active_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate slow carbon decomposed into active carbon in the layer (kg/ha).</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slow_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>slow_carbon_passive_decompose_rate<span class="classifier">float</span></dt><dd><p>Fraction of slow carbon decomposed into passive carbon (unitless).</p>
+</dd>
+<dt>slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Fraction of slow carbon lost as CO2 during decomposition (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Slow carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>References<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.9.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_carbon_co2_lost_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_slow_carbon_co2_lost_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slow_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_loss_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_carbon_co2_lost_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate slow carbon lost as CO2 during decomposition in the layer (kg/ha).</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slow_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Fraction of slow carbon lost as CO2 during decomposition (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Slow carbon lost as CO2 during decomposition (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>References<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.9.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_to_passive_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_slow_to_passive_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slow_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_passive_decompose_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_to_passive_carbon_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate slow carbon decomposed into passive carbon in the layer (kg/ha).</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slow_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>slow_carbon_passive_decompose_rate<span class="classifier">float</span></dt><dd><p>Fraction of slow carbon decomposed into passive carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Slow carbon decomposed into passive carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>References<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.9.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_passive_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_active_carbon_to_passive_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_passive_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate active carbon decomposed into passive carbon in the layer (kg/ha).</p>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>active_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Active carbon decomposed into passive carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h3>References<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.8.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_slow_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_active_carbon_to_slow_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_lost_adjusted_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_slow_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate active carbon lost as CO2 during decomposition into slow carbon in the layer (kg/ha).</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>active_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>carbon_lost_adjusted_factor<span class="classifier">float</span></dt><dd><p>Adjusted factor of CO2 loss from the decomposition of active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>References<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.7.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_slow_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_active_carbon_to_slow_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_carbon_decomposition_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_lost_adjusted_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_to_slow_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate active carbon decomposed into slow carbon in the layer (kg/ha).</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>active_carbon_decomposition_amount<span class="classifier">float</span></dt><dd><p>Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).</p>
+</dd>
+<dt>carbon_lost_adjusted_factor<span class="classifier">float</span></dt><dd><p>Adjusted factor of CO2 loss from the decomposition of active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Active carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h3>References<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.7.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_carbon_lost_adjusted_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_carbon_lost_adjusted_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silt_clay_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_carbon_lost_adjusted_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the adjusted factor of CO2 loss from the decomposition of active carbon in the layer.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>silt_clay_content<span class="classifier">float</span></dt><dd><p>Fraction of silt and clay content in the soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Adjusted factor of CO2 loss from the decomposition of active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>References<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.6.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_carbon_decomposition_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_passive_carbon_decomposition_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passive_carbon_decomposition_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.00013</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_carbon_decomposition_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate passive carbon decomposed into active or passive carbon and CO2 in the layer (kg/ha).</p>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>decomposition_moisture_effect<span class="classifier">float</span></dt><dd><p>Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).</p>
+</dd>
+<dt>decomposition_temperature_effect<span class="classifier">float</span></dt><dd><p>Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).</p>
+</dd>
+<dt>passive_carbon_amount<span class="classifier">float</span></dt><dd><p>Passive carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>passive_carbon_decomposition_factor<span class="classifier">float</span></dt><dd><p>Passive carbon decomposition factor.</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>References<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.5.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_carbon_decomposition_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_slow_carbon_decomposition_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_carbon_decomposition_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0038</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_slow_carbon_decomposition_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate slow carbon decomposed into active or passive carbon and CO2 in the layer (kg/ha).</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>decomposition_moisture_effect<span class="classifier">float</span></dt><dd><p>Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).</p>
+</dd>
+<dt>decomposition_temperature_effect<span class="classifier">float</span></dt><dd><p>Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).</p>
+</dd>
+<dt>slow_carbon_amount<span class="classifier">float</span></dt><dd><p>Slow carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>slow_carbon_decomposition_factor<span class="classifier">float</span></dt><dd><p>Slow carbon decomposition factor.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>References<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.4.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_decomposition_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_active_carbon_decomposition_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_carbon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_carbon_decomposition_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_decomposition_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculate active carbon decomposed into slow or passive carbon and CO2 in the layer (kg/ha).</p>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>moisture_effect<span class="classifier">float</span></dt><dd><p>Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).</p>
+</dd>
+<dt>temperature_effect<span class="classifier">float</span></dt><dd><p>Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).</p>
+</dd>
+<dt>active_carbon<span class="classifier">float</span></dt><dd><p>Active carbon stored in the soil (kg/ha).</p>
+</dd>
+<dt>active_carbon_decomposition_rate<span class="classifier">float</span></dt><dd><p>Active carbon decomposition factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id49">
+<h3>Returns<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h3>References<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.3.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_decomposition_rate">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_active_carbon_decomposition_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silt_clay_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_carbon_decomposition_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.14</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_active_carbon_decomposition_rate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the rate at which active carbon is decomposed into slow or passive carbon and CO2 in the layer
+(unitless).</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>silt_clay_content<span class="classifier">float</span></dt><dd><p>Silt and clay content in the soil (%).</p>
+</dd>
+<dt>max_carbon_decomposition_rate<span class="classifier">float</span></dt><dd><p>Maximum rate of carbon decomposition (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Rate at which active carbon is decomposed into slow or passive carbon and CO2 (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h3>References<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.2.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+Parameters
+———-
+plant_metabolic_active_carbon_usage : float</p>
+<blockquote>
+<div><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+</dd>
+</dl>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h3>References<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id58">
+<h3>References<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant structural carbon being lost as carbon dioxide during decomposition into active carbon in the
+layer (kg/ha).</p>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant structural carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id61">
+<h3>References<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id64">
+<h3>References<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_slow_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
+layer (kg/ha).</p>
+<section id="id65">
+<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id66">
+<h3>Returns<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h3>References<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_slow_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id68">
+<h3>Parameters<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id69">
+<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id70">
+<h3>References<a class="headerlink" href="#id70" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+layer (kg/ha).</p>
+<section id="id71">
+<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id72">
+<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id73">
+<h3>References<a class="headerlink" href="#id73" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id74">
+<h3>Parameters<a class="headerlink" href="#id74" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id75">
+<h3>Returns<a class="headerlink" href="#id75" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id76">
+<h3>References<a class="headerlink" href="#id76" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil structural carbon being lost as carbon dioxide during decomposition into active carbon in the
+layer (kg/ha).</p>
+<section id="id77">
+<h3>Parameters<a class="headerlink" href="#id77" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id78">
+<h3>Returns<a class="headerlink" href="#id78" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id79">
+<h3>References<a class="headerlink" href="#id79" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id80">
+<h3>Parameters<a class="headerlink" href="#id80" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id81">
+<h3>Returns<a class="headerlink" href="#id81" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id82">
+<h3>References<a class="headerlink" href="#id82" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_loss">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_slow_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
+layer (kg/ha).</p>
+<section id="id83">
+<h3>Parameters<a class="headerlink" href="#id83" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
+</dd>
+</dl>
+</section>
+<section id="id84">
+<h3>Returns<a class="headerlink" href="#id84" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id85">
+<h3>References<a class="headerlink" href="#id85" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_slow_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining" title="Link to this definition"></a></dt>
+<dd><p>Calculate soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+layer (kg/ha).</p>
+<section id="id86">
+<h3>Parameters<a class="headerlink" href="#id86" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id87">
+<h3>Returns<a class="headerlink" href="#id87" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id88">
+<h3>References<a class="headerlink" href="#id88" title="Link to this heading"></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.carbon_cycling.decomposition.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.carbon_cycling.decomposition module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.carbon_cycling.residue_partition.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.carbon_cycling.residue_partition module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

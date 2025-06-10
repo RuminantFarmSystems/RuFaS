@@ -1,0 +1,790 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.data_validator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.e2e_test_results_handler module" href="RUFAS.e2e_test_results_handler.html" />
+    <link rel="prev" title="RUFAS.data_collection_app_updater module" href="RUFAS.data_collection_app_updater.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.current_day_conditions.html">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_collection_app_updater.html">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">RUFAS.data_validator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.e2e_test_results_handler.html">RUFAS.e2e_test_results_handler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.enums.html">RUFAS.enums module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.errors.html">RUFAS.errors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.general_constants.html">RUFAS.general_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.graph_generator.html">RUFAS.graph_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.input_manager.html">RUFAS.input_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_manager.html">RUFAS.output_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.report_generator.html">RUFAS.report_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.rufas_time.html">RUFAS.rufas_time module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.simulation_engine.html">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.task_manager.html">RUFAS.task_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.units.html">RUFAS.units module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.util.html">RUFAS.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.weather.html">RUFAS.weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+      <li class="breadcrumb-item active">RUFAS.data_validator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.data_validator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.data_validator">
+<span id="rufas-data-validator-module"></span><h1>RUFAS.data_validator module<a class="headerlink" href="#module-RUFAS.data_validator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementState">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.data_validator.</span></span><span class="sig-name descname"><span class="pre">ElementState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_validator.ElementState" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration of the states a data element can be in during validation. An element cannot
+be in more than one state at a time.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>VALID<span class="classifier">int</span></dt><dd><p>The element is valid.</p>
+</dd>
+<dt>INVALID<span class="classifier">int</span></dt><dd><p>The element is invalid and cannot be fixed.</p>
+</dd>
+<dt>FIXED<span class="classifier">int</span></dt><dd><p>The element is invalid initially but has been fixed.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementState.VALID">
+<span class="sig-name descname"><span class="pre">VALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'valid'</span></em><a class="headerlink" href="#RUFAS.data_validator.ElementState.VALID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementState.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'invalid'</span></em><a class="headerlink" href="#RUFAS.data_validator.ElementState.INVALID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementState.FIXED">
+<span class="sig-name descname"><span class="pre">FIXED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fixed'</span></em><a class="headerlink" href="#RUFAS.data_validator.ElementState.FIXED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.data_validator.</span></span><span class="sig-name descname"><span class="pre">ElementsCounter</span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to keep track of the number of elements in each state during validation.</p>
+<section id="id1">
+<h2>Attributes<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>valid_elements<span class="classifier">int</span></dt><dd><p>The number of valid elements.</p>
+</dd>
+<dt>invalid_elements<span class="classifier">int</span></dt><dd><p>The number of invalid elements.</p>
+</dd>
+<dt>fixed_elements<span class="classifier">int</span></dt><dd><p>The number of fixed elements.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementState" title="RUFAS.data_validator.ElementState"><span class="pre">ElementState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter.update" title="Link to this definition"></a></dt>
+<dd><p>Updates the count of elements in a given state.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>state<span class="classifier">ElementState</span></dt><dd><p>The state of the element.</p>
+</dd>
+<dt>value<span class="classifier">int</span></dt><dd><p>The value by which the count should be updated.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the state is not one of the valid states.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter.increment">
+<span class="sig-name descname"><span class="pre">increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementState" title="RUFAS.data_validator.ElementState"><span class="pre">ElementState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter.increment" title="Link to this definition"></a></dt>
+<dd><p>Increments the count of elements in a given state by one.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>state<span class="classifier">ElementState</span></dt><dd><p>The state of the element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter.reset" title="Link to this definition"></a></dt>
+<dd><p>Resets the counts of all element states to zero.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.ElementsCounter.total_elements">
+<span class="sig-name descname"><span class="pre">total_elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.data_validator.ElementsCounter.total_elements" title="Link to this definition"></a></dt>
+<dd><p>Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.data_validator.</span></span><span class="sig-name descname"><span class="pre">Modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_validator.Modifiability" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Enum class representing the modifiability status of a variable.</p>
+<p>This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
+initialization and if it can be modified during runtime.</p>
+<section id="id3">
+<h2>Attributes<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>REQUIRED_LOCKED<span class="classifier">str</span></dt><dd><p>Indicates the variable must be initialized with a value and cannot be modified thereafter.</p>
+</dd>
+<dt>REQUIRED_UNLOCKED<span class="classifier">str</span></dt><dd><p>Indicates the variable must be initialized with a value but can be modified during runtime.</p>
+</dd>
+<dt>UNREQUIRED_UNLOCKED<span class="classifier">str</span></dt><dd><p>Indicates the variable does not need to be initialized with a value and can be modified during runtime.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.REQUIRED_LOCKED">
+<span class="sig-name descname"><span class="pre">REQUIRED_LOCKED</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'required</span> <span class="pre">locked'</span></em><a class="headerlink" href="#RUFAS.data_validator.Modifiability.REQUIRED_LOCKED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.REQUIRED_UNLOCKED">
+<span class="sig-name descname"><span class="pre">REQUIRED_UNLOCKED</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'required</span> <span class="pre">unlocked'</span></em><a class="headerlink" href="#RUFAS.data_validator.Modifiability.REQUIRED_UNLOCKED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.UNREQUIRED_UNLOCKED">
+<span class="sig-name descname"><span class="pre">UNREQUIRED_UNLOCKED</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unrequired</span> <span class="pre">unlocked'</span></em><a class="headerlink" href="#RUFAS.data_validator.Modifiability.UNREQUIRED_UNLOCKED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.values">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.Modifiability.values" title="Link to this definition"></a></dt>
+<dd><p>Provides a list of the string values of the enum members.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>List[str]</dt><dd><p>A list containing the string values of the enum members.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.get_required_during_initialization">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_required_during_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.data_validator.Modifiability" title="RUFAS.data_validator.Modifiability"><span class="pre">Modifiability</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.Modifiability.get_required_during_initialization" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.Modifiability.get_modifiable_at_runtime">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_modifiable_at_runtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.data_validator.Modifiability" title="RUFAS.data_validator.Modifiability"><span class="pre">Modifiability</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.Modifiability.get_modifiable_at_runtime" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.data_validator.</span></span><span class="sig-name descname"><span class="pre">DataValidator</span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is will be utilized to validate all types of data across RuFas codebase.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.validate_properties">
+<span class="sig-name descname"><span class="pre">validate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.validate_properties" title="Link to this definition"></a></dt>
+<dd><p>Iteratively traverses the metadata properties to check the max depth and routes
+properties to be validated by type.</p>
+<section id="return">
+<h2>return<a class="headerlink" href="#return" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Tuple[bool, str]</dt><dd><p>boolean to indicate the validation status, error message in str if there’s error that should be raised by
+the caller.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._validate_metadata_properties_keys">
+<span class="sig-name descname"><span class="pre">_validate_metadata_properties_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">required_properties_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_properties_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._validate_metadata_properties_keys" title="Link to this definition"></a></dt>
+<dd><p>Validates that keys in the metadata properties sections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._metadata_number_validator">
+<span class="sig-name descname"><span class="pre">_metadata_number_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._metadata_number_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates number type properties in metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._metadata_string_validator">
+<span class="sig-name descname"><span class="pre">_metadata_string_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._metadata_string_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates string type properties in metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._metadata_bool_validator">
+<span class="sig-name descname"><span class="pre">_metadata_bool_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._metadata_bool_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates bool type properties in metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._metadata_array_validator">
+<span class="sig-name descname"><span class="pre">_metadata_array_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._metadata_array_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates array type properties in metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._metadata_object_validator">
+<span class="sig-name descname"><span class="pre">_metadata_object_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._metadata_object_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates object type properties in metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.validate_metadata">
+<span class="sig-name descname"><span class="pre">validate_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_to_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.validate_metadata" title="Link to this definition"></a></dt>
+<dd><p>Checks that top-level metadata has valid and required keys and values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.validate_data_by_type">
+<span class="sig-name descname"><span class="pre">validate_data_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.validate_data_by_type" title="Link to this definition"></a></dt>
+<dd><p>Validates the data based on its specified type.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing properties relevant to the validation.</p>
+</dd>
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>The path to the variable being validated.</p>
+</dd>
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data to be validated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The metadata properties for the data file being checked.</p>
+</dd>
+<dt>elements_counter<span class="classifier">ElementsCounter</span></dt><dd><p>A counter to keep track of the number of valid, invalid, and fixed elements.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization.</p>
+</dd>
+<dt>fixable_data_types: set[str]</dt><dd><p>Set enumerating the data types that the caller will attempt to fix while validating data.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the data is valid, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Raises<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the variable’s properties does not specify a “type”.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>Fixing invalid data will only be attempted if the data is a “simple” type (i.e. a string, bool or number).</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._validate_array_container_properties">
+<span class="sig-name descname"><span class="pre">_validate_array_container_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._validate_array_container_properties" title="Link to this definition"></a></dt>
+<dd><p>Validates the container properties of an array data element.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>The path to the variable being validated.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties for the variable being validated.</p>
+</dd>
+<dt>data<span class="classifier">Any</span></dt><dd><p>The data to be validated.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The metadata properties for the data file being checked.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the array container properties are valid, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._array_type_validator">
+<span class="sig-name descname"><span class="pre">_array_type_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._array_type_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates a data element of type array.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>The path to the variable being validated.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties for the variable being validated.</p>
+</dd>
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data to be validated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, the process will be terminated upon finding invalid data.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The metadata properties for the data file being checked.</p>
+</dd>
+<dt>elements_counter<span class="classifier">ElementsCounter</span></dt><dd><p>A counter to keep track of the number of valid, invalid, and fixed elements.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization.</p>
+</dd>
+<dt>fixable_data_types: set[str]</dt><dd><p>Set of data types that are fixable.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the data element is valid or fixable, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._object_type_validator">
+<span class="sig-name descname"><span class="pre">_object_type_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._object_type_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates a data element of type object.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>The path to the variable being validated.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties for the variable being validated.</p>
+</dd>
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data to be validated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, the process will be terminated upon finding invalid data.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The metadata properties for the data file being checked.</p>
+</dd>
+<dt>elements_counter<span class="classifier">ElementsCounter</span></dt><dd><p>A counter to keep track of the number of valid, invalid, and fixed elements.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the data element is valid or fixable, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Notes<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<p>This method will look for and delete any keys in the data that do not have properties specified for them
+in the metadata properties.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._number_type_validator">
+<span class="sig-name descname"><span class="pre">_number_type_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._number_type_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates an data number element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._string_type_validator">
+<span class="sig-name descname"><span class="pre">_string_type_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._string_type_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates a data string element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._bool_type_validator">
+<span class="sig-name descname"><span class="pre">_bool_type_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixable_data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._bool_type_validator" title="Link to this definition"></a></dt>
+<dd><p>Validates a data bool element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._fix_data">
+<span class="sig-name descname"><span class="pre">_fix_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_hierarchy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._fix_data" title="Link to this definition"></a></dt>
+<dd><p>Attempt to fix the invalid data.</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_properties<span class="classifier">dict[str, Any]</span></dt><dd><p>The properties for the variable of interest.</p>
+</dd>
+<dt>element_hierarchy: list</dt><dd><p>A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.</p>
+</dd>
+<dt>data: dict[str, Any]</dt><dd><p>A buffer dictionary that holds the data for validation and fixing.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The metadata properties section keyword for the data file being checked.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h2>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the data is fixed, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._extract_data_by_key_list">
+<span class="sig-name descname"><span class="pre">_extract_data_by_key_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._extract_data_by_key_list" title="Link to this definition"></a></dt>
+<dd><p>Extracts a value from the data based on a specified path and handles missing data by calling
+DataValidator._log_missing_data().</p>
+<section id="id16">
+<h2>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">List[Any] | Dict[str, Any]</span></dt><dd><p>The data containing the value to be extracted.</p>
+</dd>
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>A list of keys to be used to extract the value from the data.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties for the variable being validated.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h2>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Any</dt><dd><p>The value extracted from the data if found.
+None if not found.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Notes<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<p>This function navigates through the given data (which can be a list or a dictionary) following the path
+specified in <cite>variable_path</cite>. If the path leads to a value, it is returned.
+If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+the variable name by finding the last string element in the <cite>variable_path</cite> array and handles this missing data
+by calling DataValidator._log_missing_data().</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._log_missing_data">
+<span class="sig-name descname"><span class="pre">_log_missing_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._log_missing_data" title="Link to this definition"></a></dt>
+<dd><p>Handles logging for missing data for a variable, logging errors or warnings based on the context of
+initialization or runtime updates.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>Properties of the variable, potentially including its modifiability status.</p>
+</dd>
+<dt>var_name<span class="classifier">str</span></dt><dd><p>The name of the variable with missing data.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>Raised if the missing data is deemed necessary, either during initialization or for a runtime update.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<p>This function determines if it’s being called during the initialization phase and checks if the missing variable
+data is required at this stage using ‘_is_data_required_upon_initialization’. If required, it logs an error and
+raises a KeyError. If not, it logs a warning.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._is_data_required_upon_initialization">
+<span class="sig-name descname"><span class="pre">_is_data_required_upon_initialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._is_data_required_upon_initialization" title="Link to this definition"></a></dt>
+<dd><p>Determines whether a variable requires a data value upon initialization based on its modifiability status.</p>
+<p>This function utilizes the ‘_get_variable_modifiability’ method to ascertain the modifiability status of the
+variable identified by ‘variable_name’ and described by ‘variable_properties’. It then checks if the
+modifiability status is either ‘REQUIRED_AND_LOCKED’ or ‘REQUIRED_AND_UNLOCKED’, indicating that the variable
+must be initialized with a value.</p>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable being evaluated for its initialization requirements.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, which should include its modifiability status among
+others.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h2>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable’s modifiability status necessitates a data value upon initialization,
+False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator._get_variable_modifiability">
+<span class="sig-name descname"><span class="pre">_get_variable_modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.data_validator.Modifiability" title="RUFAS.data_validator.Modifiability"><span class="pre">Modifiability</span></a></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator._get_variable_modifiability" title="Link to this definition"></a></dt>
+<dd><p>Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+value.</p>
+<section id="id24">
+<h2>Notes<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<p>This function looks for a ‘modifiability’ key within <cite>variable_properties</cite>. If present and its value is not
+empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+correspond to any enum members, a KeyError is raised after logging the error. If ‘modifiability’ is absent or
+its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.</p>
+</section>
+<section id="id25">
+<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable for which the modifiability status is being determined. Used for error logging.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, containing the desired ‘modifiability’ property.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Modifiability</dt><dd><p>An enum member representing the variable’s modifiability status.</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h2>Raises<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If ‘modifiability’ in <cite>variable_properties</cite> does not match any enum member in Modifiability. The error
+message includes the invalid modifiability value and suggests valid values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.convert_variable_path_to_str">
+<span class="sig-name descname"><span class="pre">convert_variable_path_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.convert_variable_path_to_str" title="Link to this definition"></a></dt>
+<dd><p>Converts a list of keys (int or str) into a string representation of the path to a variable.</p>
+<section id="id28">
+<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>A list of keys to be used to extract the value from the data.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>A string representation of the path to a variable.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_manager</span> <span class="o">=</span> <span class="n">InputManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;animal&quot;</span><span class="p">,</span> <span class="s2">&quot;herd_information&quot;</span><span class="p">,</span> <span class="s2">&quot;calf_num&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataValidator</span><span class="o">.</span><span class="n">convert_variable_path_to_str</span><span class="p">(</span><span class="n">var_path</span><span class="p">)</span>
+<span class="go">&#39;animal.herd_information.calf_num&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_manager</span> <span class="o">=</span> <span class="n">InputManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;manure_management_scenarios&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;bedding_type&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataValidator</span><span class="o">.</span><span class="n">convert_variable_path_to_str</span><span class="p">(</span><span class="n">var_path</span><span class="p">)</span>
+<span class="go">&#39;manure_management_scenarios.[0].bedding_type&#39;</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.DataValidator.extract_value_by_key_list">
+<span class="sig-name descname"><span class="pre">extract_value_by_key_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.data_validator.DataValidator.extract_value_by_key_list" title="Link to this definition"></a></dt>
+<dd><p>Extracts a value from a nested list or dictionary using a list of keys (int or str).</p>
+<section id="id30">
+<h2>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">List[Any] | Dict[str, Any]</span></dt><dd><p>The data containing the value to be extracted.</p>
+</dd>
+<dt>variable_path<span class="classifier">List[str | int]</span></dt><dd><p>A list of keys to be used to extract the value from the data.</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h2>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Any</dt><dd><p>The value extracted from the data.</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h2>Raises<a class="headerlink" href="#id32" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the value cannot be extracted from the data using the provided variable path.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h2>Examples<a class="headerlink" href="#id33" title="Link to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_validator</span> <span class="o">=</span> <span class="n">DataValidator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example_data</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;herd_information&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">&quot;calf_num&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;heiferI_num&quot;</span><span class="p">:</span> <span class="mi">44</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;heiferII_num&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;heiferIII_num_springers&quot;</span><span class="p">:</span> <span class="mi">12</span>
+<span class="gp">... </span>        <span class="p">}</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;animal&quot;</span><span class="p">,</span> <span class="s2">&quot;herd_information&quot;</span><span class="p">,</span> <span class="s2">&quot;calf_num&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataValidator</span><span class="o">.</span><span class="n">extract_value_by_key_list</span><span class="p">(</span><span class="n">example_data</span><span class="p">,</span> <span class="n">var_path</span><span class="p">)</span>
+<span class="go">8</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_validator</span> <span class="o">=</span> <span class="n">DataValidator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example_data</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;manure_management_scenarios&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">&quot;bedding_type&quot;</span><span class="p">:</span> <span class="s2">&quot;straw&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;manure_handler&quot;</span><span class="p">:</span> <span class="s2">&quot;manual scraping&quot;</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">&quot;bedding_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sawdust&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;manure_handler&quot;</span><span class="p">:</span> <span class="s2">&quot;flush system&quot;</span>
+<span class="gp">... </span>        <span class="p">}</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;manure_management_scenarios&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;bedding_type&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataValidator</span><span class="o">.</span><span class="n">extract_value_by_key_list</span><span class="p">(</span><span class="n">example_data</span><span class="p">,</span> <span class="n">var_path</span><span class="p">)</span>
+<span class="go">&#39;straw&#39;</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.data_collection_app_updater.html" class="btn btn-neutral float-left" title="RUFAS.data_collection_app_updater module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.e2e_test_results_handler.html" class="btn btn-neutral float-right" title="RUFAS.e2e_test_results_handler module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

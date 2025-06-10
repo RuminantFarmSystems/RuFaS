@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.feed.feed_typed_dicts module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.feed.nitrogen_loss module" href="RUFAS.routines.feed.nitrogen_loss.html" />
+    <link rel="prev" title="RUFAS.routines.feed.feed module" href="RUFAS.routines.feed.feed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.feed.html">RUFAS.routines.feed package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.feed.feed_typed_dicts module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.feed.feed_typed_dicts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.feed.feed_typed_dicts">
+<span id="rufas-routines-feed-feed-typed-dicts-module"></span><h1>RUFAS.routines.feed.feed_typed_dicts module<a class="headerlink" href="#module-RUFAS.routines.feed.feed_typed_dicts" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed_typed_dicts.</span></span><span class="sig-name descname"><span class="pre">StorageOption</span></span><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Lists all the expected keys and their value types present in the configuration
+data dictionary for different storage options. Whenever an unexpected key or
+an invalid value type is used, the editor should flag with a warning.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type">
+<span class="sig-name descname"><span class="pre">storage_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture">
+<span class="sig-name descname"><span class="pre">moisture</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive">
+<span class="sig-name descname"><span class="pre">additive</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density">
+<span class="sig-name descname"><span class="pre">packing_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation">
+<span class="sig-name descname"><span class="pre">inoculation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type">
+<span class="sig-name descname"><span class="pre">bunk_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation">
+<span class="sig-name descname"><span class="pre">ventilation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate">
+<span class="sig-name descname"><span class="pre">removal_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter">
+<span class="sig-name descname"><span class="pre">initial_dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed_typed_dicts.</span></span><span class="sig-name descname"><span class="pre">PurchasedFeedTypedDict</span></span><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Lists all the expected keys and their value types present in the
+purchased_feed.json or the like. Whenever an unexpected key or
+an invalid value type is used, the editor should flag with a warning.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_database">
+<span class="sig-name descname"><span class="pre">feed_database</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_database" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feeds_table">
+<span class="sig-name descname"><span class="pre">feeds_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feeds_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table">
+<span class="sig-name descname"><span class="pre">nutrient_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds">
+<span class="sig-name descname"><span class="pre">calf_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.growing_feeds">
+<span class="sig-name descname"><span class="pre">growing_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.growing_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds">
+<span class="sig-name descname"><span class="pre">close_up_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds">
+<span class="sig-name descname"><span class="pre">lac_cow_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds">
+<span class="sig-name descname"><span class="pre">purchased_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds_costs">
+<span class="sig-name descname"><span class="pre">purchased_feeds_costs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds_costs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds">
+<span class="sig-name descname"><span class="pre">farm_grown_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.storage_options">
+<span class="sig-name descname"><span class="pre">storage_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption" title="RUFAS.routines.feed.feed_typed_dicts.StorageOption"><span class="pre">StorageOption</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.storage_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.user_defined_ration_percentages">
+<span class="sig-name descname"><span class="pre">user_defined_ration_percentages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.user_defined_ration_percentages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.feed.feed.html" class="btn btn-neutral float-left" title="RUFAS.routines.feed.feed module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.feed.nitrogen_loss.html" class="btn btn-neutral float-right" title="RUFAS.routines.feed.nitrogen_loss module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

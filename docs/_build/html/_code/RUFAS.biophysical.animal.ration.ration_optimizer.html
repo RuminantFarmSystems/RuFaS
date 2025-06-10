@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.ration.ration_optimizer module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.ration.user_defined_ration_manager module" href="RUFAS.biophysical.animal.ration.user_defined_ration_manager.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.ration.ration_config module" href="RUFAS.biophysical.animal.ration.ration_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.ration.html">RUFAS.biophysical.animal.ration package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.ration.ration_optimizer module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.biophysical.animal.ration.ration_optimizer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.ration.ration_optimizer">
+<span id="rufas-biophysical-animal-ration-ration-optimizer-module"></span><h1>RUFAS.biophysical.animal.ration.ration_optimizer module<a class="headerlink" href="#module-RUFAS.biophysical.animal.ration.ration_optimizer" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.ration_optimizer.</span></span><span class="sig-name descname"><span class="pre">RationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionRequirements</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_average_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RationConfig provides a structured way to represent the collection of animal requirements and feed supply
+information for the ration formulation process.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>animal_requirements<span class="classifier">NutritionRequirements</span></dt><dd><p>Nutrition requirements for pen, used in constraint methods.</p>
+</dd>
+<dt>pen_average_body_weight<span class="classifier">float</span></dt><dd><p>Average body weight in pen, used in constraint methods.</p>
+</dd>
+<dt>feeds_used<span class="classifier">List[Feed]</span></dt><dd><p>List of Feeds used in ration formulation.</p>
+</dd>
+<dt>price_list<span class="classifier">List[float]</span></dt><dd><p>Price for each feed used in ration formulation.</p>
+</dd>
+<dt>feed_minimum_list<span class="classifier">List[float]</span></dt><dd><p>Minimum amount allowed for each feed used in formulation, kg.</p>
+</dd>
+<dt>feed_maximum_list<span class="classifier">List[float]</span></dt><dd><p>Maxmimum amount allowed for each feed used in formulation, kg.</p>
+</dd>
+<dt>TDN_list<span class="classifier">List[float]</span></dt><dd><p>TDN for each feed used in ration formulation.</p>
+</dd>
+<dt>NDF_list: List[float]</dt><dd><p>NDF for each feed used in ration formulation.</p>
+</dd>
+<dt>EE_list<span class="classifier">List[float]</span></dt><dd><p>EE for each feed used in ration formulation.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionRequirements</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_average_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the RationConfig class with the provided feed information. If the input
+is a list, it should have a length corresponding to the decision vector.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_requirements<span class="classifier">NutritionRequirements</span></dt><dd><p>Nutrition requirements for pen, used in constraint methods.</p>
+</dd>
+<dt>pen_available_feeds<span class="classifier">List[Feed]</span></dt><dd><p>List of Feeds used in ration formulation.</p>
+</dd>
+<dt>pen_average_body_weight<span class="classifier">float</span></dt><dd><p>Average body weight in pen, used in constraint methods.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.ration_optimizer.</span></span><span class="sig-name descname"><span class="pre">RationOptimizer</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Nonlinear programming methods to optimally formulate a ration by comparing feed supply and the requirements for
+animals in a given pen.</p>
+<p>This class sets an objective, defines constraints, attempts optimization using scipy’s minimize method, and
+reports unsuccessful optimization attempts to the user.</p>
+<p>Constraint methods compare the supply of an attempted ration to specific limits on a per nutrient/energy basis.</p>
+<p>For constraints with lower thresholds, the minimum value is subtracted from the supply.</p>
+<p>For constraints with upper thresholds, the supply is subtracted from the maximum value.</p>
+<p>In either case, if the difference is non negative, then the solution is considered a ‘success’ in scipy.minimize.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes RationOptimizer object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.set_constraints">
+<span class="sig-name descname"><span class="pre">set_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.set_constraints" title="Link to this definition"></a></dt>
+<dd><p>Defines lists of constraint methods to use for different pens.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>arguments<span class="classifier">Tuple[RationConfig]</span></dt><dd><p>RationConfig used in constraint methods.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.convert_decision_vec_to_feeds">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_decision_vec_to_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.convert_decision_vec_to_feeds" title="Link to this definition"></a></dt>
+<dd><p>Converts the decision vector to a Feeds object for use in NutritionSupplyCalculator methods.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ration_configuration: RationConfig object</dt><dd><p>Stored information relevant to ration formulation.</p>
+</dd>
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in scipy.minimize.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>List[FeedInRation]</dt><dd><p>List of feeds and their attributes used in ration formulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.make_ration_from_solution">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_ration_from_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OptimizeResult</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.make_ration_from_solution" title="Link to this definition"></a></dt>
+<dd><p>Generates ration from scipy result.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>pen_available_feeds<span class="classifier">List[Feed]</span></dt><dd><p>List of Feeds used in ration formulation.</p>
+</dd>
+<dt>solution<span class="classifier">OptimizeResult</span></dt><dd><p>Object from scipy package.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Dict[str, float | str]</dt><dd><p>Formulated ration, with keys as feed IDs, values as kg fed per animal.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_total_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NE_total_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_total_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for total net energy, as sum of net energy required for lactation, pregnancy, maintenance,
+growth, and activity. Only applicable to lactating cows.
+Total energy supply here assumed to be the “largest” supply of net energy available for any individual
+requirement.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The difference between supplied and required total net energy.
+Non-negative value indicates that supply meets or exceeds the requirement for total net energy.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_maintenance_and_activity_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NE_maintenance_and_activity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_maintenance_and_activity_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for maintenance and activity.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for maintenance and activity.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_lactation_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NE_lactation_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_lactation_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for net energy for lactation. Only applicable to lactating cows.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for lactation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_growth_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NE_growth_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NE_growth_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for net energy for growth.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for growth.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.phosphorus_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phosphorus_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.phosphorus_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for phosphorus.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id13">
+<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for phosphorus.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.protein_constraint_lower">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protein_constraint_lower</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.protein_constraint_lower" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the lower bound of metabolizable protein.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for protein.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.protein_constraint_upper">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protein_constraint_upper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.protein_constraint_upper" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the upper bound of metabolizable protein.
+This constraint is a simple check that the supply does not exceed the limit.
+See the upper limit factor as defined in AnimalModuleConstants.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is less than the maximum allowable protein.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.calcium_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calcium_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.calcium_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for calcium.
+This constraint is a simple check that the supply exceeds the requirement.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the requirements for calcium.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_lower">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NDF_constraint_lower</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_lower" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the minimum amount of NDF in a ration.
+This constraint is a simple check that the supply exceeds the amount of NDF desired for a formulated ration.</p>
+<section id="id21">
+<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h2>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the minimum ration percent value for NDF.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_upper">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NDF_constraint_upper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_upper" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the maximum amount of NDF in a ration.
+This constraint is a simple check that the supply does not exceed the NDF desired for a formulated ration.</p>
+<section id="id23">
+<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h2>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is less than the maximum ration percent value for NDF.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.forage_NDF_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forage_NDF_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.forage_NDF_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the minimum amount of forage NDF in a ration.
+This constraint is a simple check that the supply exceeds the amount of forage NDF desired
+for a formulated ration.</p>
+<section id="id25">
+<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is greater than the minimum ration percent value for forage NDF.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.fat_constraint">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fat_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.fat_constraint" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for fat.
+This constraint is a simple check that the supply does not exceed the percentage of fat desired for a
+formulated ration.</p>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is less than the maximum percentage of fat.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.DMI_constraint_lower">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DMI_constraint_lower</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.DMI_constraint_lower" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the minimum amount of dry matter intake.
+This constraint is a simple check that the formulated ration supplies enough dry matter.</p>
+<section id="id29">
+<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is exceeds the minimum dry matter intake.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.DMI_constraint_upper">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DMI_constraint_upper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.DMI_constraint_upper" title="Link to this definition"></a></dt>
+<dd><p>Constraint method for the maximum amount of dry matter intake.
+This constraint is a simple check that the formulated ration does not supply too much dry matter.</p>
+<section id="id31">
+<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector used in the scipy minimize method.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h2>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Non-negative value indicates that supply is less than the maximum dry matter intake.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.objective">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.objective" title="Link to this definition"></a></dt>
+<dd><p>Sets up the objective function in the optimize function for the non-linear
+program. Whenever the paramert x is used, it refers to the “decision vetor
+of the NLP” which means it is a list of solutions where each value in the
+list corresponds to the amount of a given feed (kg) in the formulated diet.
+The goal of this NLP is to minimize the cost of all feeds while satisfying
+all “constraints”, which just means the diet fulfills the average nutrient
+requirements in the pen.</p>
+<section id="id33">
+<h2>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>decision_vector<span class="classifier">numpy.ndarray</span></dt><dd><p>The decision vector of the NLP.</p>
+</dd>
+<dt>ration_config: RationConfig object</dt><dd><p>Attributes are animal requirement and feed supply information required for optimization.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h2>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<p>float</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization">
+<span class="sig-name descname"><span class="pre">attempt_optimization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_average_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionRequirements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.enums.html#RUFAS.enums.AnimalCombination" title="RUFAS.enums.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_ration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">OptimizeResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.is_constraint_violated">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_constraint_violated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.is_constraint_violated" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Helper function to check a solution dictionary to see if a given constraint</dt><dd><p>in a list of constraints was met.</p>
+</dd>
+</dl>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>solution_x: numpy nd array, e.g. npt.NDArray</dt><dd><p>solution.x array from minimize function used in ration_NLP.py</p>
+</dd>
+<dt>constraint: dict[str, Any]</dt><dd><p>constraint function as defined in ration_NLP.py</p>
+</dd>
+<dt>ration_config<span class="classifier">RationConfig object</span></dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the constraint method was not met.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_failed_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints" title="Link to this definition"></a></dt>
+<dd><p>Returns list of constraints that were not met during optmization step.</p>
+<section id="id37">
+<h2>Parameters<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>solution_x: numpy nd array, e.g. npt.NDArray</dt><dd><dl class="simple">
+<dt>solution.x is from minimize function used in ration_NLP.py,</dt><dd><p>solution obj itself is returned as  &lt;dict class ‘scipy.optimize._optimize.OptimizeResult’&gt;</p>
+</dd>
+</dl>
+</dd>
+<dt>constraints: List[dict[str, Callable]]</dt><dd><p>list of constraint functions as defined in ration_NLP.py</p>
+</dd>
+<dt>ration_config<span class="classifier">RationConfig object</span></dt><dd><p>Attributes are animal requirement and feed supply information required for optimization</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h2>Returns<a class="headerlink" href="#id38" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>List[dict[str,Callable]]</dt><dd><dl class="simple">
+<dt>the same type of list as the constraints themselves</dt><dd><p>just filtered such that the ones that failed are returned</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.handle_failed_constraints">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">handle_failed_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_attempts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OptimizeResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig" title="RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig"><span class="pre">RationConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.enums.html#RUFAS.enums.AnimalCombination" title="RUFAS.enums.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_nutrient_requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionRequirements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.handle_failed_constraints" title="Link to this definition"></a></dt>
+<dd><p>Handle and log failed constraints during the ration optimization process.</p>
+<p>This method identifies and logs the constraints that failed during the optimization
+process for a specific pen of animals. It gathers relevant information about the
+failed attempt, including the simulation day, the number of attempts, the failed
+constraints, the attempted ration, and the pen’s nutrient requirements. This
+information is then added to the output manager via a variable.</p>
+<section id="id39">
+<h2>Parameters:<a class="headerlink" href="#id39" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>num_attempts<span class="classifier">int</span></dt><dd><p>The number of ration formulation attempts made so far.</p>
+</dd>
+<dt>solution<span class="classifier">scipy.optimize.OptimizeResult</span></dt><dd><p>The result of the optimization process.</p>
+</dd>
+<dt>ration_config<span class="classifier">RationConfig</span></dt><dd><p>A RationConfig object.</p>
+</dd>
+<dt>animal_combination<span class="classifier">AnimalCombination</span></dt><dd><p>The combination of animals for which the failed constraints are being handled.</p>
+</dd>
+<dt>pen_id<span class="classifier">RUFAS_ID</span></dt><dd><p>The ID for the pen.</p>
+</dd>
+<dt>pen_available_feeds<span class="classifier">AvailableFeedsTypedDict</span></dt><dd><p>A dictionary of available feeds for ration formulation.</p>
+</dd>
+<dt>average_nutrient_requirements<span class="classifier">NutritionRequirements</span></dt><dd><p>The pen’s average (or other summary statistic) requirements used in ration formulation.</p>
+</dd>
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+<dt>info_map<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing additional information to be logged with the failed
+constraints summary.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h2>Returns:<a class="headerlink" href="#id40" title="Link to this heading"></a></h2>
+<p>None</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.ration.ration_config.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.ration.ration_config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.ration.user_defined_ration_manager.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.ration.user_defined_ration_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

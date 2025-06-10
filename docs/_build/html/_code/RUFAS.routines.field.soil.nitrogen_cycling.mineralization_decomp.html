@@ -1,0 +1,295 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization module" href="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion module" href="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.nitrogen_cycling.html">RUFAS.routines.field.soil.nitrogen_cycling package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp">
+<span id="rufas-routines-field-soil-nitrogen-cycling-mineralization-decomp-module"></span><h1>RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp module<a class="headerlink" href="#module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.</span></span><span class="sig-name descname"><span class="pre">MineralizationDecomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This module is responsible for nitrogen mineralization and decomposition.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track nitrogen mineralization and decomposition, creates new one
+if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used by this module to track nitrogen mineralization and decomposition.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.mineralize_and_decompose_nitrogen">
+<span class="sig-name descname"><span class="pre">mineralize_and_decompose_nitrogen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.mineralize_and_decompose_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in
+the top soil layer.</p>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation section 3:1.2.2, specifically eqn. 3:1.2.9 (used to determine how much nitrogen
+gets transferred to the nitrate and active inorganic pools).</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_residue_nutrient_ratio">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_residue_nutrient_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_residue_nutrient_ratio" title="Link to this definition"></a></dt>
+<dd><p>Calculates the ratio carbon to the nutrient passed in the soil layer.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>carbon_amount<span class="classifier">float</span></dt><dd><p>Amount of carbon in the soil layer (kg / ha).</p>
+</dd>
+<dt>organic_nutrient<span class="classifier">float</span></dt><dd><p>Amount of organic nutrients in the soil layer (kg / ha).</p>
+</dd>
+<dt>inorganic_nutrient<span class="classifier">float</span></dt><dd><p>Amount of inorganic nutrients in the soil layer (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The residue nutrient ratio for the nutrient passed (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>References<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation, eqn. 3:1.2.5, 6</p>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>The equations for determining the carbon-nitrogen ratio and carbon-phosphorus ratio are identical in structure
+so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
+there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutrient_term_for_residue_composition_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates terms that used to determine the nutrient cycling composition factor.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_ratio<span class="classifier">float</span></dt><dd><p>The ratio of carbon to a specific nutrient (unitless).</p>
+</dd>
+<dt>constant_term<span class="classifier">float</span></dt><dd><p>The constant term used in this equation (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>One of the terms used in the equation to calculate the nutrient cycling residue composition factor.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>References<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 3:1.2.8</p>
+</section>
+<section id="id6">
+<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>This is a helper method for the method that actually calculates the nutrient cycling residue composition factor.
+It is used for both the nitrogen and phosphorus terms, hence why it takes a generic “nutrient_ratio” and
+different constants.</p>
+<p>When calculating the nitrogen term, the constant is 25. For phosphorus, it is 200.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutrient_cycling_residue_composition_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carbon_nitrogen_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_phosphorus_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the residue composition factor for use in computing the decay rate constant.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>carbon_nitrogen_ratio<span class="classifier">float</span></dt><dd><p>Ratio of carbon to nitrogen in this layer of the soil profile (unitless).</p>
+</dd>
+<dt>carbon_phosphorus_ratio<span class="classifier">float</span></dt><dd><p>Ratio of carbon to phosphorus in this layer of the soil profile (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>The nutrient cycling residue composition factor (unitless).</p>
+</section>
+<section id="id9">
+<h3>References<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 3:1.2.8</p>
+</section>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_decay_rate_constant">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_decay_rate_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fresh_organic_residue_mineralization_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_composition_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_factor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_decay_rate_constant" title="Link to this definition"></a></dt>
+<dd><p>Calculates the decay rate constant for residue.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>fresh_organic_residue_mineralization_rate<span class="classifier">float</span></dt><dd><p>Rate coefficient for mineralization of fresh organic nutrients from residue (unitless).</p>
+</dd>
+<dt>residue_composition_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling residue composition factor for the current soil layer (unitless).</p>
+</dd>
+<dt>temp_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling temperature factor for the current soil layer (unitless).</p>
+</dd>
+<dt>moisture_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling water factor for the current soil layer (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>The decay rate constant for residue decomposition (unitless).</p>
+</section>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 3:1.2.7</p>
+</section>
+<section id="id14">
+<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>The definition for the rate coefficient for mineralization of the residue fresh organic nutrients can be found
+in the SWAT Input .BSN file (see “RSDCO” on page 101) and SWAT Input CROP.DAT file (see “RSDCO_PL” on page 205).</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

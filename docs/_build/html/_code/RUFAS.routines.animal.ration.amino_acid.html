@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.ration.amino_acid module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.animal.ration.animal_requirements module" href="RUFAS.routines.animal.ration.animal_requirements.html" />
+    <link rel="prev" title="RUFAS.routines.animal.ration package" href="RUFAS.routines.animal.ration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.ration.html">RUFAS.routines.animal.ration package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.ration.amino_acid module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.animal.ration.amino_acid.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.animal.ration.amino_acid">
+<span id="rufas-routines-animal-ration-amino-acid-module"></span><h1>RUFAS.routines.animal.ration.amino_acid module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.amino_acid" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.amino_acid.</span></span><span class="sig-name descname"><span class="pre">AminoAcidComposition</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.duodenal_endogenous">
+<span class="sig-name descname"><span class="pre">duodenal_endogenous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.duodenal_endogenous" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.microbial">
+<span class="sig-name descname"><span class="pre">microbial</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.microbial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.scurf">
+<span class="sig-name descname"><span class="pre">scurf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.scurf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.whole_empty_body">
+<span class="sig-name descname"><span class="pre">whole_empty_body</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.whole_empty_body" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.metabolic_fecal">
+<span class="sig-name descname"><span class="pre">metabolic_fecal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.metabolic_fecal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.milk">
+<span class="sig-name descname"><span class="pre">milk</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidComposition.milk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.amino_acid.</span></span><span class="sig-name descname"><span class="pre">EssentialAminoAcidRequirements</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.histidine">
+<span class="sig-name descname"><span class="pre">histidine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.histidine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.isoleucine">
+<span class="sig-name descname"><span class="pre">isoleucine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.isoleucine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.leucine">
+<span class="sig-name descname"><span class="pre">leucine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.leucine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.lysine">
+<span class="sig-name descname"><span class="pre">lysine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.lysine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.methionine">
+<span class="sig-name descname"><span class="pre">methionine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.methionine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.phenylalanine">
+<span class="sig-name descname"><span class="pre">phenylalanine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.phenylalanine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.threonine">
+<span class="sig-name descname"><span class="pre">threonine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.threonine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.thryptophan">
+<span class="sig-name descname"><span class="pre">thryptophan</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.thryptophan" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.valine">
+<span class="sig-name descname"><span class="pre">valine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements.valine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.amino_acid.</span></span><span class="sig-name descname"><span class="pre">AminoAcidCalculator</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator.calculate_essential_amino_acid_requirements">
+<span class="sig-name descname"><span class="pre">calculate_essential_amino_acid_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.animal_types.html#RUFAS.routines.animal.animal_types.AnimalType" title="RUFAS.routines.animal.animal_types.AnimalType"><span class="pre">AnimalType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_weight_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gravid_uterine_weight_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements" title="RUFAS.routines.animal.ration.amino_acid.EssentialAminoAcidRequirements"><span class="pre">EssentialAminoAcidRequirements</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator.calculate_essential_amino_acid_requirements" title="Link to this definition"></a></dt>
+<dd><p>This function calculates the total Essential Amino Acid for an animal according to equations on page 8 of the
+AA requirements design doc.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>animal_type: AnimalType</dt><dd><p>A type or subtype of animal specified in AnimalType enum</p>
+</dd>
+<dt>lactating<span class="classifier">bool</span></dt><dd><p>If the animal is lactating.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg).</p>
+</dd>
+<dt>frame_weight_gain<span class="classifier">float</span></dt><dd><p>Frame weight gain refers to the accretion of both fat and protein in carcass (g / day).</p>
+</dd>
+<dt>gravid_uterine_weight_gain<span class="classifier">float</span></dt><dd><p>Daily energy Requirement associated to increased gain of reproductive tissues as pregnancy advances
+(Mcal / day).</p>
+</dd>
+<dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg / day).</p>
+</dd>
+<dt>milk_true_protein<span class="classifier">float</span></dt><dd><p>True protein contents in milk (%).</p>
+</dd>
+<dt>milk_production: float</dt><dd><p>Milk yield (kg / day).</p>
+</dd>
+<dt>NDF_conc:</dt><dd><p>Concentration (percent value) of Neutral Detergent Fiber in previously fed ration (%).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>total_amino_acid_requirements<span class="classifier">Dict[str, float]</span></dt><dd><p>Total amino acid requirement for each of the essential amino acid (g / day)</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>NPscurf: float</dt><dd><p>Net protein requirement for scurf (g / day).</p>
+</dd>
+<dt>NPEndUrin: float</dt><dd><p>Net protein requirement for endogenous urinary excretion (g / day).</p>
+</dd>
+<dt>CPMFP: float</dt><dd><p>Crude protein in metabolic fecal protein (g / day).</p>
+</dd>
+<dt>NPMFP: float</dt><dd><p>Net protein requirement for metabolic fecal protein (g / day).</p>
+</dd>
+<dt>NPGrowth: float</dt><dd><p>Net protein requirement for body frame weight gain (g / day).</p>
+</dd>
+<dt>NPGest: float</dt><dd><p>Net protein requirement for pregnancy (g / day).</p>
+</dd>
+<dt>NPMilk: float</dt><dd><p>Net protein in milk, or milk true protein yield (g / day).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>Equations on page 8 of the Amino Acid Requirements Design Doc.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_scurf">
+<span class="sig-name descname"><span class="pre">_calculate_scurf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NPscurf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_scurf" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net demand for the specific amino acid in scurf excretion.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>NPscurf: float</dt><dd><p>Net protein requirement for scurf (g / day).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net demand for the specific amino acid in scurf excretion (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_endogenous_urinary_excretion">
+<span class="sig-name descname"><span class="pre">_calculate_endogenous_urinary_excretion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_endogenous_urinary_excretion" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net demand for the specific amino acid for endogenous urinary excretion.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>body_weight: float</dt><dd><p>Body weight (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net demand for the specific amino acid for endogenous urinary excretion (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_metabolic_fecal_protein">
+<span class="sig-name descname"><span class="pre">_calculate_metabolic_fecal_protein</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NPMFP</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_metabolic_fecal_protein" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net demand for the specific amino acid for metabolic fecal protein.</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>NPMFP: float</dt><dd><p>Net protein requirement for metabolic fecal protein (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net demand for the specific amino acid for metabolic fecal protein (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_growth">
+<span class="sig-name descname"><span class="pre">_calculate_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NPGrowth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_growth" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net demand for the specific amino acid for body frame weight gain.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>NPGrowth: float</dt><dd><p>Net protein requirement for body frame weight gain (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net demand for the specific amino acid for body frame weight gain (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_pregnancy">
+<span class="sig-name descname"><span class="pre">_calculate_pregnancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NPGest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_pregnancy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net amino acid composition of protein accretion associated with pregnancy.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>NPGest: float</dt><dd><p>Net protein requirement for pregnancy (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net amino acid composition of protein accretion associated with pregnancy (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_lactation">
+<span class="sig-name descname"><span class="pre">_calculate_lactation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amino_acid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NPMilk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.amino_acid.AminoAcidCalculator._calculate_lactation" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net amino acids yield in milk.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>amino_acid<span class="classifier">str</span></dt><dd><p>The type of amino acid to calculate.</p>
+</dd>
+<dt>NPMilk: float</dt><dd><p>Net protein in milk, or milk true protein yield (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The net amino acids yield in milk (g / day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.ration.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.ration package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.ration.animal_requirements.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.ration.animal_requirements module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.percolation module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.snow module" href="RUFAS.routines.field.soil.snow.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.manure_pool module" href="RUFAS.routines.field.soil.manure_pool.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.percolation module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.field.soil.percolation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.percolation">
+<span id="rufas-routines-field-soil-percolation-module"></span><h1>RUFAS.routines.field.soil.percolation module<a class="headerlink" href="#module-RUFAS.routines.field.soil.percolation" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.percolation.</span></span><span class="sig-name descname"><span class="pre">Percolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is based on the ‘Percolation’ section (2:3.2) in SWAT, designed to manage and simulate soil percolation
+processes. It either accepts an existing SoilData object to work with or creates a new one based on the provided
+field size.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">Optional[SoilData]</span></dt><dd><p>The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
+provided.</p>
+</dd>
+<dt>field_size<span class="classifier">Optional[float], default=None</span></dt><dd><p>The size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData instance being used by the Percolation model.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation.percolate">
+<span class="sig-name descname"><span class="pre">percolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">has_seasonal_high_water_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation.percolate" title="Link to this definition"></a></dt>
+<dd><p>Execute percolation of excess water in each layer of soil profile to the layer directly beneath it.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>has_seasonal_high_water_table<span class="classifier">bool</span></dt><dd><p>A flag indicating whether the HRU has a seasonal high water table (True/False).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.</p>
+<p>This routine calls the subroutine <cite>_percolate_infiltrated_water</cite> to handle percolating water from infiltration
+into the soil profile. If that routine percolates water out of any soil layers (which is the case when there are
+high or sustained amounts of infiltration), this routine will only percolate water out of the soil layers which
+have not had water percolated out of them on the current day.</p>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>SWAT sections 2:3.1 and 2</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation.percolate_infiltrated_water">
+<span class="sig-name descname"><span class="pre">percolate_infiltrated_water</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation.percolate_infiltrated_water" title="Link to this definition"></a></dt>
+<dd><p>Percolates infiltrated water into the soil profile.</p>
+<section id="id2">
+<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
+entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
+infiltration in a row, this method fills soil layers to their saturation point going top-down, and records water
+that is put below a layer as being percolated by it.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation._determine_percolation_travel_time">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_percolation_travel_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">saturation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_capacity_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saturated_hydraulic_conductivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation._determine_percolation_travel_time" title="Link to this definition"></a></dt>
+<dd><p>Calculate the travel time for percolation.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>saturation<span class="classifier">float</span></dt><dd><p>Amount of water in the soil layer when completely saturated (mm).</p>
+</dd>
+<dt>field_capacity_content<span class="classifier">float</span></dt><dd><p>Water content of the soil layer at field capacity (mm).</p>
+</dd>
+<dt>saturated_hydraulic_conductivity<span class="classifier">float</span></dt><dd><p>Saturated hydraulic conductivity of the layer (mm per hour).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Travel time for percolation (hours).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>References<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>SWAT 2:3.2.4</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation._determine_percolation_to_next_layer">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_percolation_to_next_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drainable_volume_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation._determine_percolation_to_next_layer" title="Link to this definition"></a></dt>
+<dd><p>Calculate the amount of water that percolates to the soil layer below it on a given day.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>drainable_volume_water<span class="classifier">float</span></dt><dd><p>Drainable volume of water in the soil layer on a given day (mm).</p>
+</dd>
+<dt>time_step<span class="classifier">float</span></dt><dd><p>Length of the time step over which percolation occurs (hours).</p>
+</dd>
+<dt>travel_time<span class="classifier">float</span></dt><dd><p>Travel time for percolation (hours).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of water percolating to the underlying soil layer on a given day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>References<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>SWAT 2:3.2.3</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation._determine_if_percolation_allowed">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_if_percolation_allowed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_capacity_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saturated_capacity_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_seasonal_high_water_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation._determine_if_percolation_allowed" title="Link to this definition"></a></dt>
+<dd><p>Determine if a layer of soil has enough available capacity to accept more water via percolation.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_water_content<span class="classifier">float</span></dt><dd><p>Water content of the given soil layer (mm).</p>
+</dd>
+<dt>field_capacity_content<span class="classifier">float</span></dt><dd><p>Water content of the given soil layer at field capacity (mm).</p>
+</dd>
+<dt>saturated_capacity_content<span class="classifier">float</span></dt><dd><p>Water content of the given soil layer when completely saturated (mm).</p>
+</dd>
+<dt>is_seasonal_high_water_table<span class="classifier">bool</span></dt><dd><p>Boolean indicating if HRU has a seasonal high water table (True/False).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the soil layer can accept more water from percolation, False if not.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>References<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>SWAT Paragraph in between equations 2:3.2.3, 4</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.Percolation._percolate_between_layers">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_percolate_between_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.layer_data.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.layer_data.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.Percolation._percolate_between_layers" title="Link to this definition"></a></dt>
+<dd><p>Determine the actual amount of water that will percolate from the given upper layer to the given lower layer
+over the provided time step.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>upper_layer<span class="classifier">LayerData</span></dt><dd><p>Given layer of soil to percolate from (LayerData object).</p>
+</dd>
+<dt>lower_layer<span class="classifier">LayerData</span></dt><dd><p>Given layer of soil to percolate to (LayerData object).</p>
+</dd>
+<dt>time_step<span class="classifier">float</span></dt><dd><p>Length of time over which percolation occurs (hours).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of water that will actually be percolated from the upper layer to the lower layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>SWAT Section 2:3.2</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.manure_pool.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.manure_pool module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.snow.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.snow module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

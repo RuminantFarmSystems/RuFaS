@@ -1,0 +1,446 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.manure.processor module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.biophysical.manure.processor_enum module" href="RUFAS.biophysical.manure.processor_enum.html" />
+    <link rel="prev" title="RUFAS.biophysical.manure.manure_manager module" href="RUFAS.biophysical.manure.manure_manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.manure.html">RUFAS.biophysical.manure package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.manure.processor module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.biophysical.manure.processor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.manure.processor">
+<span id="rufas-biophysical-manure-processor-module"></span><h1>RUFAS.biophysical.manure.processor module<a class="headerlink" href="#module-RUFAS.biophysical.manure.processor" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.processor.</span></span><span class="sig-name descname"><span class="pre">Processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_housing_emissions_calculator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Base class for all manure processors.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Unique identifier of the processor.</p>
+</dd>
+<dt>is_housing_emissions_calculator<span class="classifier">bool</span></dt><dd><p>Indicates if a Processor calculates housing emissions.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Unique identifier of the processor used to label outputs.</p>
+</dd>
+<dt>is_housing_emissions_calculator<span class="classifier">bool</span></dt><dd><p>If true, processor will only accept ManureStreams with non-None PenManureData, if false then vice versa.</p>
+</dd>
+<dt>_om<span class="classifier">OutputManager</span></dt><dd><p>Instance of the OutputManager.</p>
+</dd>
+<dt>_prefix<span class="classifier">str</span></dt><dd><p>Prefix in a standardized format for reporting daily outputs from the Processor.</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>receive_manure(manure: ManureStream) -&gt; None</dt><dd><p>Entry point of manure into the processor.</p>
+</dd>
+<dt>process_manure(conditions: CurrentDayConditions, time: RufasTime) -&gt; dict[str, ManureStream]</dt><dd><p>Handles the daily operations for the processor.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_housing_emissions_calculator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes a new Processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor.receive_manure">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">receive_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureStream</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor.receive_manure" title="Link to this definition"></a></dt>
+<dd><p>Takes in manure to be processed.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure<span class="classifier">ManureStream</span></dt><dd><p>The manure to be processed.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the ManureStream is incompatible with the processor receiving it.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor.process_manure">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ManureStream</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor.process_manure" title="Link to this definition"></a></dt>
+<dd><p>Executes the daily manure processing operations.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Current weather and environmental conditions that manure is being processed in.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the simulations temporal information.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[str, ManureStream]</dt><dd><p>Mapping between classification of manure coming out of this processor to the ManureStream containing the
+manure information. If the processor is a separator, the classifications are “solid” and “liquid”. Otherwise
+the only classification is “manure”.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._report_manure_stream">
+<span class="sig-name descname"><span class="pre">_report_manure_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureStream</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._report_manure_stream" title="Link to this definition"></a></dt>
+<dd><p>Reports the manure stream data to Output Manager.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_stream<span class="classifier">ManureStream | dict[str, float]</span></dt><dd><p>The manure stream to report. If a <cite>ManureStream</cite> instance is passed, it will be converted to a dictionary.</p>
+</dd>
+<dt>stream_name<span class="classifier">str</span></dt><dd><p>The name of the manure stream being reported.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor.check_manure_stream_compatibility">
+<span class="sig-name descname"><span class="pre">check_manure_stream_compatibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureStream</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor.check_manure_stream_compatibility" title="Link to this definition"></a></dt>
+<dd><p>Checks if a ManureStream is capable of being processed.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_stream<span class="classifier">ManureStream</span></dt><dd><p>The ManureStream instance being checked for compatibility.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the ManureStream can be processed by the Processor, otherwise false.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._calculate_ammonia_emissions">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_ammonia_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonia_resistance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._calculate_ammonia_emissions" title="Link to this definition"></a></dt>
+<dd><p>Calculate housing and liquid storage ammonia nitrogen emissions.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in manure (kg).</p>
+</dd>
+<dt>volume<span class="classifier">float</span></dt><dd><p>Total volume of the manure produced by the animals in the storage area (m^3).</p>
+</dd>
+<dt>density<span class="classifier">float</span></dt><dd><p>Density of the manure (kg / m^3).</p>
+</dd>
+<dt>total_solids<span class="classifier">float</span></dt><dd><p>Total solids present in the manure (kg).</p>
+</dd>
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Temperature of the manure (degrees C).</p>
+</dd>
+<dt>ammonia_resistance<span class="classifier">float</span></dt><dd><p>Resistance of ammonia transport to the atmosphere (siemens / meter).</p>
+</dd>
+<dt>surface_area<span class="classifier">float</span></dt><dd><p>Total surface area of the manure storage (m^2).</p>
+</dd>
+<dt>pH<span class="classifier">float</span></dt><dd><p>pH value of the manure (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Ammonia nitrogen emission from manure (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If total_ammoniacal_nitrogen &lt; 0.0.
+If volume &lt; 0.0.
+If density &lt; 0.0.
+If surface area of storage &lt; 0.0.0</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._calculate_ammonia_equilibrium_coefficient">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_ammonia_equilibrium_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._calculate_ammonia_equilibrium_coefficient" title="Link to this definition"></a></dt>
+<dd><p>Calculates the equilibrium coefficient for the ammonia gas in the air for a given concentration of total
+ammoniacal nitrogen in the solution.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Manure solution temperature in Kelvin (K).</p>
+</dd>
+<dt>pH<span class="classifier">float</span></dt><dd><p>Manure solution pH (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Equilibrium coefficient for the ammonia gas in the air (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._calculate_henry_law_coefficient_of_ammonia">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_henry_law_coefficient_of_ammonia</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._calculate_henry_law_coefficient_of_ammonia" title="Link to this definition"></a></dt>
+<dd><p>Calculate Henry’s Law coefficient of ammonia.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Temperature in Kelvin (K).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Henry’s law coefficient of ammonia (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._calculate_dissociation_coefficient_of_ammonium">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_dissociation_coefficient_of_ammonium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._calculate_dissociation_coefficient_of_ammonium" title="Link to this definition"></a></dt>
+<dd><p>Calculate dissociation coefficient of ammonium.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Temperature in Kelvin (K).</p>
+</dd>
+<dt>pH<span class="classifier">float</span></dt><dd><p>Manure solution acidity (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Dissociation coefficient of ammonium (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._determine_outdoor_storage_temperature">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_outdoor_storage_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._determine_outdoor_storage_temperature" title="Link to this definition"></a></dt>
+<dd><p>Determines the temperature of the manure in outdoor liquid and slurry storages.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>air_temperature<span class="classifier">float</span></dt><dd><p>The current day’s ambient air temperature (°C).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The estimated temperature of the manure storage (°C).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
+(<a class="reference external" href="mailto:april&#46;leytem&#37;&#52;&#48;usda&#46;gov">april<span>&#46;</span>leytem<span>&#64;</span>usda<span>&#46;</span>gov</a>) and A. VanderZaag (<a class="reference external" href="mailto:andrew&#46;vanderzaag&#37;&#52;&#48;AGR&#46;GC&#46;CA">andrew<span>&#46;</span>vanderzaag<span>&#64;</span>AGR<span>&#46;</span>GC<span>&#46;</span>CA</a>). These bounds are also support by work
+from Genedy and Ogejo, 2021 (<a class="reference external" href="https://doi.org/10.1016/j.compag.2021.106234">https://doi.org/10.1016/j.compag.2021.106234</a>) who observed similar minimum and
+maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.</p>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+liquid manure temperature is assumed to be equal to ambient air temperature.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._determine_barn_temperature">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_barn_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._determine_barn_temperature" title="Link to this definition"></a></dt>
+<dd><p>Calculates the barn temperature.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>air_temperature<span class="classifier">float</span></dt><dd><p>Air temperature (c).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Adjusted barn temperature (c).</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>References<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+reported in Bucklin et al. (FL, upper limit; <a class="reference external" href="https://doi.org/10.13031/2013.28851">https://doi.org/10.13031/2013.28851</a>).
+The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._report_processor_output">
+<span class="sig-name descname"><span class="pre">_report_processor_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_origin_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._report_processor_output" title="Link to this definition"></a></dt>
+<dd><p>Reports an output variable to the OutputManager.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the reported variable.</p>
+</dd>
+<dt>variable_value<span class="classifier">str</span></dt><dd><p>The value of the reported variable value.</p>
+</dd>
+<dt>data_origin_function<span class="classifier">str</span></dt><dd><p>The name of the function that reported the variable value.</p>
+</dd>
+<dt>units<span class="classifier">MeasurementUnits</span></dt><dd><p>The units for the reported variable value.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.processor.Processor._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.processor.Processor._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.manure.manure_manager.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.manure.manure_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.manure.processor_enum.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.manure.processor_enum module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.crop.water_uptake module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.routines.field.field package" href="RUFAS.routines.field.field.html" />
+    <link rel="prev" title="RUFAS.routines.field.crop.water_dynamics module" href="RUFAS.routines.field.crop.water_dynamics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.crop.html">RUFAS.routines.field.crop package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.crop.water_uptake module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.routines.field.crop.water_uptake.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.crop.water_uptake">
+<span id="rufas-routines-field-crop-water-uptake-module"></span><h1>RUFAS.routines.field.crop.water_uptake module<a class="headerlink" href="#module-RUFAS.routines.field.crop.water_uptake" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.water_uptake.</span></span><span class="sig-name descname"><span class="pre">WaterUptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_distro_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_water_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_compensation_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unmet_water_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_water_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.field.crop.nutrient_uptake.html#RUFAS.routines.field.crop.nutrient_uptake.NutrientUptake" title="RUFAS.routines.field.crop.nutrient_uptake.NutrientUptake"><code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientUptake</span></code></a></p>
+<p>This module is responsible for all water uptake routines for a crop in a day.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>crop_data<span class="classifier">CropData, optional</span></dt><dd><p>An instance of <cite>CropData</cite> containing specific crop parameters and states. If not provided, a default
+instance with generic crop parameters is created.</p>
+</dd>
+<dt>water_distro_parameter<span class="classifier">float, default 10</span></dt><dd><p>Water-use distribution parameter governing water-uptake from the soil (unitless).</p>
+</dd>
+<dt>potential_water_uptakes<span class="classifier">Optional[List[float]], default None</span></dt><dd><p>The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).</p>
+</dd>
+<dt>water_compensation_factor<span class="classifier">float, default 0.01</span></dt><dd><p>Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+(unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+can be drawn from deeper layers.</p>
+</dd>
+<dt>unmet_water_demands<span class="classifier">Optional[List[float]], default None</span></dt><dd><p>Cumulative water demands not met by all previous layers (mm).</p>
+</dd>
+<dt>actual_water_uptakes<span class="classifier">Optional[List[float]], default None</span></dt><dd><p>The actual amount of water to be removed from the soil (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>crop_data<span class="classifier">CropData</span></dt><dd><p>Stores and provides access to crop-related data influencing root development, including parameters
+like root depth, growth rates, and environmental conditions affecting root expansion.</p>
+</dd>
+<dt>water_distro_parameter<span class="classifier">float</span></dt><dd><p>Water-use distribution parameter governing water-uptake from the soil (unitless).</p>
+</dd>
+<dt>potential_water_uptakes<span class="classifier">Optional[List[float]]</span></dt><dd><p>The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).</p>
+</dd>
+<dt>water_compensation_factor<span class="classifier">float</span></dt><dd><p>Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+(unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+can be drawn from deeper layers.</p>
+</dd>
+<dt>unmet_water_demands<span class="classifier">Optional[List[float]]</span></dt><dd><p>Cumulative water demands not met by all previous layers (mm).</p>
+</dd>
+<dt>actual_water_uptakes<span class="classifier">Optional[List[float]]</span></dt><dd><p>The actual amount of water to be removed from the soil (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>“Water Uptake By Plants” section of SWAT (5:2.2.1)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_distro_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_water_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_compensation_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unmet_water_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_water_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake.uptake">
+<span class="sig-name descname"><span class="pre">uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake.uptake" title="Link to this definition"></a></dt>
+<dd><p>Main method that conducts all water uptake routines for a crop in a day.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>object tracking soil, from which water will be extracted.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake.extract_water_from_soil">
+<span class="sig-name descname"><span class="pre">extract_water_from_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake.extract_water_from_soil" title="Link to this definition"></a></dt>
+<dd><p>Transfers the current day’s water uptake from soil layers to the crop.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>the object that tracks soil properties, from which to extract water.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If the lengths of <cite>soil_data.soil_layers</cite> and <cite>self.actual_water_uptakes</cite> aren’t equal.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>The module removes the smaller of the previously calculated “actual uptake” and the available
+water in each layer. The actual uptake is updated, if relevant, and the equivalent amount is removed from the
+layers in the SoilData object.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._take_up_water">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_take_up_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_availabilities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wilting_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._take_up_water" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual water taken up by the plant for each soil layer.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>uptakes: list[float]</dt><dd><p>the actual water uptake from each layer of soil (mm)</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Raises<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If the lengths of <cite>potential_uptakes</cite>, <cite>water_availabilities</cite>, and <cite>wilting_points</cite> are not all equal.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>This method is a wrapper that applies _determine_actual_layer_uptake() to each layer.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._determine_actual_layer_uptake">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_actual_layer_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wilting_point_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._determine_actual_layer_uptake" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual water taken up by the plant for a soil layer.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>potential<span class="classifier">float</span></dt><dd><p>the (adjusted and corrected) potential water uptake for a soil layer on the current day (mm)</p>
+</dd>
+<dt>available_water<span class="classifier">float</span></dt><dd><p>the water available in a soil layer (mm)</p>
+</dd>
+<dt>wilting_point_water<span class="classifier">float</span></dt><dd><p>the water content of the layer at the wilting point (mm)</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>uptake<span class="classifier">float</span></dt><dd><p>the actual water that the plant will uptake from the layer (mm)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._reduce_efficiency_of_uptake">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce_efficiency_of_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_availabilities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_capacities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._reduce_efficiency_of_uptake" title="Link to this definition"></a></dt>
+<dd><p>Returns the potential water uptake for each layer after correcting for availability-dependent uptake
+efficiency.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>potential_uptakes<span class="classifier">list[float]</span></dt><dd><p>The unadjusted potential water uptakes for each soil layer (mm).</p>
+</dd>
+<dt>water_availabilities<span class="classifier">list[float]</span></dt><dd><p>The crop’s water availabilities for each soil layer (mm).</p>
+</dd>
+<dt>available_capacities<span class="classifier">float</span></dt><dd><p>Available water capacity for each soil layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>corrected_potentials<span class="classifier">list[float]</span></dt><dd><p>A list of corrected potential water that can be taken up from each layer by the crop on the current day.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Raises<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If <cite>potential_uptakes</cite>, <cite>water_availabilities</cite>, and <cite>available_capacities</cite> are not all equal lengths.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>This method is a wrapper that applies _correct_layer_for_efficiency() to each layer.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._correct_layer_for_efficiency">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_correct_layer_for_efficiency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._correct_layer_for_efficiency" title="Link to this definition"></a></dt>
+<dd><p>Adjusts the potential water uptake from a layer by the uptake efficiency that is concentration-dependent.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>potential_uptake<span class="classifier">float</span></dt><dd><p>The (adjusted) potential water uptake from this layer by the crop on the current day (mm).</p>
+</dd>
+<dt>available_water<span class="classifier">float</span></dt><dd><p>The amount of water actual available for uptake in this layer on the current day (mm).</p>
+</dd>
+<dt>available_capacity<span class="classifier">float</span></dt><dd><p>Available water capacity (not already holding water) for this layer on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>corrected_potential: float</dt><dd><p>The maximum water able to be taken up from this layer, based on the initial concentration of water in the
+soil layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>SWAT 5:2.2.4, 5:2.2.5</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._adjust_water_uptakes">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_adjust_water_uptakes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unmet_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uptake_compensation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._adjust_water_uptakes" title="Link to this definition"></a></dt>
+<dd><p>Adjusts the potential water uptakes for each layer based on drawing from deeper layers when possible.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>potential_uptakes<span class="classifier">list[float]</span></dt><dd><p>The unadjusted potential water uptakes for each soil layer (mm).</p>
+</dd>
+<dt>unmet_demands<span class="classifier">list[float]</span></dt><dd><p>The crop’s water demands for each soil layer (mm).</p>
+</dd>
+<dt>uptake_compensation<span class="classifier">float</span></dt><dd><p>Water uptake compensation factor: the proportion of a crop’s water demand from a given layer that can be
+drawn from the underlying layer when insufficient water exists in the desired layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>adjusted<span class="classifier">list[float]</span></dt><dd><p>The adjusted potential water to be taken up from each layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If the lengths of <cite>potential_uptakes</cite> and <cite>unmet_demands</cite> are not equal.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<p>SWAT 5:2.2.3</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._find_stratified_max_water_uptakes">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_find_stratified_max_water_uptakes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_transpiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_distro_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._find_stratified_max_water_uptakes" title="Link to this definition"></a></dt>
+<dd><p>Calculates the crop’s maximum water uptake from each soil layer during the current day.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>root_depth<span class="classifier">float</span></dt><dd><p>The current depth of the crop root development (mm).</p>
+</dd>
+<dt>max_transpiration<span class="classifier">float</span></dt><dd><p>The maximum potential water lost to crop transpiration for the current day (mm).</p>
+</dd>
+<dt>water_distro_parameter<span class="classifier">float</span></dt><dd><p>The water-use distribution parameter of the crop (unitless).</p>
+</dd>
+<dt>upper_depths<span class="classifier">list[float]</span></dt><dd><p>Depths to the top of each soil layer (mm).</p>
+</dd>
+<dt>lower_depths<span class="classifier">list[float]</span></dt><dd><p>Depths to the bottom of each soil layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>potential_uptakes<span class="classifier">list[float]</span></dt><dd><p>The crop’s maximum potential water uptake for each soil layer (mm) during the current day.</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If the lengths of <cite>upper_depths</cite> and <cite>lower_depths</cite> are not equal.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>References<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>SWAT 5:2.2.2</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._determine_max_water_uptake_to_depth">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_max_water_uptake_to_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_transpiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_distro_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._determine_max_water_uptake_to_depth" title="Link to this definition"></a></dt>
+<dd><p>Calculate the amount of maximum amount water that can possibly be taken up by the plant under ideal
+conditions.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>root_depth<span class="classifier">float</span></dt><dd><p>Current depth of root roots (mm).</p>
+</dd>
+<dt>depth<span class="classifier">float</span></dt><dd><p>Depth from the soil surface (mm).</p>
+</dd>
+<dt>max_transpiration<span class="classifier">float</span></dt><dd><p>Maximum transpiration possible for the plant during the current day (mm).</p>
+</dd>
+<dt>water_distro_parameter<span class="classifier">float</span></dt><dd><p>Water use distribution parameter (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>water<span class="classifier">float</span></dt><dd><p>Maximum amount of water potentially taken up by the plant (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>References<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>SWAT 5:2.2.1</p>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.water_uptake.WaterUptake._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.field.crop.water_uptake.WaterUptake._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.crop.water_dynamics.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.crop.water_dynamics module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.field.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.field package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

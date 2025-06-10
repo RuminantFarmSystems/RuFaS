@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.graph_generator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RUFAS.input_manager module" href="RUFAS.input_manager.html" />
+    <link rel="prev" title="RUFAS.general_constants module" href="RUFAS.general_constants.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.current_day_conditions.html">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_collection_app_updater.html">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_validator.html">RUFAS.data_validator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.e2e_test_results_handler.html">RUFAS.e2e_test_results_handler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.enums.html">RUFAS.enums module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.errors.html">RUFAS.errors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.general_constants.html">RUFAS.general_constants module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">RUFAS.graph_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.input_manager.html">RUFAS.input_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_manager.html">RUFAS.output_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.report_generator.html">RUFAS.report_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.rufas_time.html">RUFAS.rufas_time module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.simulation_engine.html">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.task_manager.html">RUFAS.task_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.units.html">RUFAS.units module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.util.html">RUFAS.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.weather.html">RUFAS.weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+      <li class="breadcrumb-item active">RUFAS.graph_generator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_code/RUFAS.graph_generator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.graph_generator">
+<span id="rufas-graph-generator-module"></span><h1>RUFAS.graph_generator module<a class="headerlink" href="#module-RUFAS.graph_generator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.graph_generator.</span></span><span class="sig-name descname"><span class="pre">GraphGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Graph Generator is used to generate graphs from the simulation results.
+NOTE: This class is not multi-thread safe!!!</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metadata_prefix<span class="classifier">str</span></dt><dd><p>A string to prefix the metadata of the graph.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A RufasTime object used to track the simulation time</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator.generate_graph">
+<span class="sig-name descname"><span class="pre">generate_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator.generate_graph" title="Link to this definition"></a></dt>
+<dd><p>Generate a graph based on filtered data and graph details.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>filtered_pool<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>The result pool after filtering with the provided RegEx filters.</p>
+</dd>
+<dt>graph_details: dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+</dd>
+<dt>save_path: Path</dt><dd><p>The base folder path to save the output.</p>
+</dd>
+<dt>filter_file_name: str</dt><dd><p>The name of the filter file.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+<dt>produce_graphics: bool</dt><dd><p>Flag for whether or not the user wants to produce graphs at after the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>log_pool<span class="classifier">list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]</span></dt><dd><p>A list of log, warning, and error dictionaries containing all the components needed
+to log the information to the appropriate pool.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>Generic exception raised by utility functions.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._set_graph_legend">
+<span class="sig-name descname"><span class="pre">_set_graph_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepared_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._set_graph_legend" title="Link to this definition"></a></dt>
+<dd><p>Sets the graph legend if there is no legend present in the graph details.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+</dd>
+<dt>prepared_data: dict[str, list[Any]]</dt><dd><p>The data to be graphed that’s been prepared for graphing.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph with the legend field populated.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._add_var_units">
+<span class="sig-name descname"><span class="pre">_add_var_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._add_var_units" title="Link to this definition"></a></dt>
+<dd><p>Adds variable units to variable name for graphing.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>filtered_pool<span class="classifier">dict[str, list[Any]]</span></dt><dd><p>The data to be graphed.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]</dt><dd><p>The updated data with units added and logs if info_maps aren’t found to get units.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._generate_legend_keys">
+<span class="sig-name descname"><span class="pre">_generate_legend_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combined_var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_legend_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_legend_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._generate_legend_keys" title="Link to this definition"></a></dt>
+<dd><p>Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>combined_var_name: str</dt><dd><p>The combined variable name to be processed.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>str</dt><dd><p>The stripped variable name.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl>
+<dt>This function identifies prefix and suffix according to the following logic:</dt><dd><dl>
+<dt>prefix:</dt><dd><blockquote>
+<div><dl class="simple">
+<dt>All combined variable names are guaranteed to have a prefix of the following types:</dt><dd><ul class="simple">
+<li><p>a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)</p></li>
+<li><p>default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)</p></li>
+<li><dl class="simple">
+<dt>special cases =&gt; variables from the RufasTime and Weather classes (e.g. RufasTime.day,</dt><dd><p>Weather.rainfall)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>For the special cases of variables from the RufasTime and Weather classes, they do not have any
+suffixes, resulting in <cite>len(combined_var_name_list) == 2</cite>. Therefore, we can just return the second
+element after splitting the combined variable name by “.”.</p>
+<blockquote>
+<div><p>We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+string parsing:
+The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+the words in a phrase by making the first letter of each word capitalized and not using spaces
+e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+separated by underscores.
+Therefore, by checking if <cite>combined_var_name_list[0]</cite> follows the camel case pattern
+(“([A-Z][a-z0-9]+)+”), we are able to find out if the variable is using the default pattern.</p>
+<ul class="simple">
+<li><p><cite>if len(combined_var_name_list) == 1</cite> this check is here just for error proofing, this condition</p></li>
+</ul>
+<p>is unlikely to appear.</p>
+</div></blockquote>
+</div></blockquote>
+<dl>
+<dt>suffix:</dt><dd><p>Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
+After some investigation, we found that all suffixes from the Crop and Soil module follows the
+pattern of field=’*’, for example:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field=’field’</p></li>
+<li><p>FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field=’field’,layer=’2’</p></li>
+</ul>
+</div></blockquote>
+<p>Therefore, by checking if hte last element in combined_var_name_list contains “=”, we are able to
+check if the variable name has suffix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._log_non_numerical_data">
+<span class="sig-name descname"><span class="pre">_log_non_numerical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._log_non_numerical_data" title="Link to this definition"></a></dt>
+<dd><p>Identifies and logs entries in a filtered data pool that contain non-numeric data
+which cannot be used for plotting in a graph.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>filtered_pool<span class="classifier">dict[str, pool_element_type]</span></dt><dd><p>The filtered pool of variables that the user wants to graph.</p>
+</dd>
+<dt>graph_details: dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[dict[str, str | dict[str, str]]]</dt><dd><p>A list of logs, warnings, and errors to be reported to OutputManager.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._draw_graph">
+<span class="sig-name descname"><span class="pre">_draw_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_calendar_dates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._draw_graph" title="Link to this definition"></a></dt>
+<dd><p>Draw the graph based on the provided graph type and data.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>graph_type<span class="classifier">str</span></dt><dd><p>The type of graph to draw.</p>
+</dd>
+<dt>data<span class="classifier">dict[str, list[int | float]]</span></dt><dd><p>The data to use for plotting.</p>
+</dd>
+<dt>selected_variables<span class="classifier">list[str]</span></dt><dd><p>The variables selected to be plotted.</p>
+</dd>
+<dt>mask_values<span class="classifier">bool, default False</span></dt><dd><p>Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
+values.</p>
+</dd>
+<dt>ax<span class="classifier">Axes</span></dt><dd><p>The matplotlib Axes object to plot the graph on.</p>
+</dd>
+<dt>use_calendar_dates<span class="classifier">bool, default False</span></dt><dd><p>Whether to use calendar dates on the x-axis.</p>
+</dd>
+<dt>date_format<span class="classifier">str, default None</span></dt><dd><p>The user-requested format to use for the date on the x-axis.</p>
+</dd>
+<dt>slice_start<span class="classifier">int, default None</span></dt><dd><p>The starting index of the data to plot.</p>
+</dd>
+<dt>slice_end<span class="classifier">int, default None</span></dt><dd><p>The ending index of the data to plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Raises<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._mask_values">
+<span class="sig-name descname"><span class="pre">_mask_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float32</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._mask_values" title="Link to this definition"></a></dt>
+<dd><p>Masks values to remove None and NaN values.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>values<span class="classifier">list[Any]</span></dt><dd><p>list of data to be masked.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[NDArray[Any], NDArray[np.float32]]</dt><dd><p>list of NumPy arrays, the first containing the indices of the masked data and the second containing the
+actual masked data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._customize_graph">
+<span class="sig-name descname"><span class="pre">_customize_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customization_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._customize_graph" title="Link to this definition"></a></dt>
+<dd><p>Apply customizations to the graph.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>fig<span class="classifier">Figure</span></dt><dd><p>The matplotlib Figure object to customize.</p>
+</dd>
+<dt>customization_details<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary of customization details.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._save_graph">
+<span class="sig-name descname"><span class="pre">_save_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._save_graph" title="Link to this definition"></a></dt>
+<dd><p>Save the generated graph to a file.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+</dd>
+<dt>filter_file_name<span class="classifier">str</span></dt><dd><p>The name of the filter file.</p>
+</dd>
+<dt>save_path<span class="classifier">Path</span></dt><dd><p>The base folder path to save the output.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>str</dt><dd><p>The path to the saved graph.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>Generic exception raised if saving the graph fails.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._generate_graph_path">
+<span class="sig-name descname"><span class="pre">_generate_graph_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._generate_graph_path" title="Link to this definition"></a></dt>
+<dd><p>Generate the full path for the output graph and create parent folders if necessary.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+</dd>
+<dt>filter_file_name<span class="classifier">str</span></dt><dd><p>The name of the filter file.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Path</dt><dd><p>The full path to the output graph file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.general_constants.html" class="btn btn-neutral float-left" title="RUFAS.general_constants module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.input_manager.html" class="btn btn-neutral float-right" title="RUFAS.input_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
