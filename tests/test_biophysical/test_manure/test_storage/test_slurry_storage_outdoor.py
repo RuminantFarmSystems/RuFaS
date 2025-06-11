@@ -375,7 +375,7 @@ def test_apply_ammonia_emissions(
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_ammonia_emissions.assert_called_once_with(
         total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-        volume=stored_manure.volume,
+        mass=stored_manure.volume * ManureConstants.SLURRY_MANURE_DENSITY,
         density=ManureConstants.SLURRY_MANURE_DENSITY,
         temperature=dummy_manure_temperature,
         ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,

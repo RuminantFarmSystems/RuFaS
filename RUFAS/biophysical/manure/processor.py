@@ -169,7 +169,7 @@ class Processor(ABC):
     @staticmethod
     def _calculate_ammonia_emissions(
         total_ammoniacal_nitrogen: float,
-        volume: float,
+        mass: float,
         density: float,
         temperature: float,
         ammonia_resistance: float,
@@ -183,8 +183,8 @@ class Processor(ABC):
         ----------
         total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in manure (kg).
-        volume : float
-            Total volume of the manure produced by the animals in the storage area (m^3).
+        mass : float
+            Total mass of the manure produced by the animals in the storage area (m^3).
         density : float
             Density of the manure (kg / m^3).
         total_solids : float
@@ -214,26 +214,26 @@ class Processor(ABC):
         """
         if total_ammoniacal_nitrogen < 0.0:
             raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.0.")
-        if volume < 0.0:
-            raise ValueError("Manure volume must be greater than or equal to 0.0.")
+        if mass < 0.0:
+            raise ValueError("Manure mass must be greater than or equal to 0.0.")
         if density < 0.0:
             raise ValueError("Manure density must be greater than or equal to 0.0.")
         if surface_area < 0.0:
             raise ValueError("Storage surface area must be greater than or equal to 0.0.")
 
-        is_a_param_zero = any(param == 0 for param in [total_ammoniacal_nitrogen, volume, density, surface_area])
+        is_a_param_zero = any(param == 0 for param in [total_ammoniacal_nitrogen, mass, density, surface_area])
         if is_a_param_zero:
             return 0.0
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
-        manure_kilograms_per_square_meter = (volume * density) / surface_area
+        manure_kilograms_per_square_meter = mass / surface_area
         total_ammoniacal_nitrogen_per_meter = total_ammoniacal_nitrogen / surface_area
         equilibrium_coefficient = Processor._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
         ammonia_loss_per_meter = (total_ammoniacal_nitrogen_per_meter * GeneralConstants.SECONDS_PER_DAY * density) / (
             ammonia_resistance * manure_kilograms_per_square_meter * equilibrium_coefficient
         )
         total_ammonia_loss = min(ammonia_loss_per_meter * surface_area, total_ammoniacal_nitrogen)
-        return max(0.0, total_ammonia_loss)
+        return total_ammonia_loss
 
     @staticmethod
     def _calculate_ammonia_equilibrium_coefficient(temperature: float, pH: float) -> float:

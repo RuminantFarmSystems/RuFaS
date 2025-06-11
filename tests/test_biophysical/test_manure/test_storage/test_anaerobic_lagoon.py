@@ -259,12 +259,21 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
         pen_manure_data=None,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
-
-    expected_emissions = 3.0
-    mocker.patch.object(anaerobic_lagoon, "_calculate_ammonia_emissions", return_value=expected_emissions)
+    mock_calculate_ammonia_emissions = mocker.patch.object(
+        anaerobic_lagoon, "_calculate_ammonia_emissions", return_value=1.23
+    )
 
     result = anaerobic_lagoon._apply_ammonia_emissions(manure_temp)
 
-    assert result == expected_emissions
-    assert stored_manure.ammoniacal_nitrogen == pytest.approx(7.0, rel=1e-6)
-    assert stored_manure.nitrogen == pytest.approx(9.0, rel=1e-6)
+    assert result == 1.23
+    assert stored_manure.ammoniacal_nitrogen == pytest.approx(8.77)
+    assert stored_manure.nitrogen == pytest.approx(10.77)
+    mock_calculate_ammonia_emissions.assert_called_once_with(
+        total_ammoniacal_nitrogen=10.0,
+        mass=stored_manure.volume * ManureConstants.SLURRY_MANURE_DENSITY,
+        density=ManureConstants.SLURRY_MANURE_DENSITY,
+        temperature=manure_temp,
+        ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
+        surface_area=anaerobic_lagoon._surface_area,
+        pH=ManureConstants.DEFAULT_STORED_MANURE_PH,
+    )

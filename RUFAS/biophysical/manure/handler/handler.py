@@ -121,7 +121,7 @@ class Handler(Processor):
         if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
             ammonia_emission = self._calculate_ammonia_emissions(
                 self.manure_stream.ammoniacal_nitrogen,
-                self.manure_stream.volume,
+                self.manure_stream.pen_manure_data.manure_urine_mass,
                 ManureConstants.SLURRY_MANURE_DENSITY,
                 barn_temperature,
                 self.determine_ammonia_resistance(barn_temperature),

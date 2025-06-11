@@ -173,7 +173,7 @@ class SlurryStorageOutdoor(Storage):
         """
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
-            volume=self._manure_to_process.volume,
+            mass=self._manure_to_process.volume * ManureConstants.SLURRY_MANURE_DENSITY,
             density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
             ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
