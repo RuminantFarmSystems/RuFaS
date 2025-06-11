@@ -11,7 +11,7 @@ from RUFAS.input_manager import InputManager
 
 """
 This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
-Documentation equation 1.2.6.
+Documentation equation FS.HAY.3.
 """
 FINAL_MOISTURE_PERCENTAGE = 12
 
@@ -20,7 +20,7 @@ INITIAL_LOSS_PERIOD = 30
 
 """
 These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
-References Feed Storage Scientific Documentation table 1.2.9.
+References Feed Storage Scientific Documentation table FS.HAY.7.
 """
 PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_021_6
 PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
@@ -64,6 +64,10 @@ class Hay(Storage):
             Weather instance containing all weather information for the simulation.
         time : RufasTime
             RufasTime instance tracking the current time of the simulation.
+
+        References
+        ----------
+        Feed Storage Scientific Documentation table FS.HAY.9.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
@@ -119,7 +123,8 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
+        .. [1] Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2., FS.HAY.3, FS.HAY.4, FS.HAY.5,
+        FS.HAY.6, FS.HAY.7
 
         """
         days_stored = (time.current_date.date() - crop.storage_time).days
@@ -162,7 +167,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.2.3
+        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.3, FS.HAY.4, FS.HAY.5
 
         """
         days_stored = (time - crop.storage_time).days
@@ -200,7 +205,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.2.7
+        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.6
 
         """
         days_stored = (time - crop.storage_time).days
@@ -233,7 +238,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scienitific Documentation, equation 1.2.8
+        .. [1] Feed Storage Scienitific Documentation, equation FS.HAY.7 and Table FS.HAY.8
 
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
@@ -284,7 +289,8 @@ class Unprotected(Hay):
 
     Notes
     -----
-    The nutrient-specific loss coefficients are listed in table 2.1.1 of the Feed Storage Scientific Documentation.
+    The nutrient-specific loss coefficients are listed in tables FS.HAY.10 and FS.HAY.11 of the Feed Storage
+    Scientific Documentation.
 
     """
 

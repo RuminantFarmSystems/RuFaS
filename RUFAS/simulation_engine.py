@@ -11,6 +11,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
@@ -110,7 +111,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        # EEEManager.estimate_all()
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -131,7 +132,9 @@ class SimulationEngine:
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
-            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
+            self.feed_manager.receive_crop(
+                harvested_crop.harvested_crop, harvested_crop.storage_type, self.time.simulation_day
+            )
             if harvested_crop.harvested_crop.config_name not in next_harvest_dates:
                 crop_config_name = harvested_crop.harvested_crop.config_name
                 next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
