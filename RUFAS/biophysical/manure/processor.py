@@ -187,8 +187,6 @@ class Processor(ABC):
             Total mass of the manure produced by the animals in the storage area (m^3).
         density : float
             Density of the manure (kg / m^3).
-        total_solids : float
-            Total solids present in the manure (kg).
         temperature : float
             Temperature of the manure (degrees C).
         ammonia_resistance : float
