@@ -72,8 +72,7 @@ class EmissionsEstimator:
         feeds = self.om.filter_variables_pool(filter)
 
         purchased_feed_totals: dict[str, float] = {
-            key.split('.')[-1]: sum(entry['values'])
-            for key, entry in feeds.items()
+            key.split(".")[-1]: sum(entry["values"]) for key, entry in feeds.items()
         }
         self.om.add_variable(
             "purchased_feed_totals",
