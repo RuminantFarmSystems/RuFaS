@@ -351,6 +351,27 @@ class Storage:
 
     def _record_stored_crops(self, simulation_day: int) -> None:
         """
+        Wrapper function to record both storage-level and individual crop-level data.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+        """
+        self._record_storage_totals(simulation_day)
+        self._record_individual_crops(simulation_day)
+
+    def _record_storage_totals(self, simulation_day: int) -> None:
+        """
+        Records the total mass and nutrient content of the stored crops at the storage level.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+
+        """
+        """
         Records the total mass and nutrient amounts held in storage.
         """
         info_map = {
@@ -409,6 +430,31 @@ class Storage:
 
         total_ash = self._get_total_nutritive_amount("ash")
         self.om.add_variable("total_ash", total_ash, info_map)
+
+    def _record_individual_crops(self, simulation_day: int) -> None:
+        """
+        Records the mass and nutrient content of each crop currently stored.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+
+        """
+        for crop in self.stored:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._record_individual_crops.__name__,
+                "units": MeasurementUnits.KILOGRAMS,
+                "simulation_day": simulation_day,
+            }
+            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_fresh_mass", crop.fresh_mass, info_map)
+            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_dry_matter_mass", crop.dry_matter_mass,
+                                 info_map)
+            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_initial_dry_matter_mass",
+                                 crop.initial_dry_matter_mass, info_map)
+            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_dry_matter_percentage",
+                                 crop.dry_matter_percentage, info_map)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
         """
