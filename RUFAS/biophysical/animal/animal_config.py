@@ -514,5 +514,5 @@ class AnimalConfig:
                 {
                     "class": AnimalConfig.__class__.__name__,
                     "function": "initialize_animal_config",
-                }
+                },
             )
