@@ -894,7 +894,6 @@ class ManureManager:
                     stored_manure=processor.stored_manure,
                     limiting_nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
                     is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
-                    available_limiting_nutrient_amount=available_amount_in_pool,
                     non_limiting_fields=non_limiting_fields
                 )
                 removal_details["manure_type"] = STORAGE_CLASS_TO_TYPE.get(type(processor))
@@ -905,7 +904,6 @@ class ManureManager:
         stored_manure: ManureStream,
         limiting_nutrient_removal_proportion: float,
         is_nitrogen_limiting_nutrient: bool,
-        available_limiting_nutrient_amount: float,
         non_limiting_fields: list[str],
     ) -> tuple[ManureStream, dict[str, Any]]:
         """
@@ -930,7 +928,7 @@ class ManureManager:
         for field in non_limiting_fields:
             original_non_limiting_amount = getattr(stored_manure, field)
             non_limiting_nutrient_removal_amount = ManureManager._determine_non_limiting_nutrient_removal_amount(
-                available_limiting_nutrient_amount,
+                limiting_nutrient_removal_proportion,
                 original_non_limiting_amount
             )
             removed[field] = non_limiting_nutrient_removal_amount
@@ -940,7 +938,7 @@ class ManureManager:
         return new_stream, removed
 
     @staticmethod
-    def _determine_non_limiting_nutrient_removal_amount(limiting_nutrient_amount: float,
+    def _determine_non_limiting_nutrient_removal_amount(limiting_nutrient_proportion_to_be_removed: float,
                                                         non_limiting_nutrients_amount: float,
                                                         ) -> float:
         """
@@ -948,8 +946,8 @@ class ManureManager:
 
         Parameters
         ----------
-        limiting_nutrient_amount : float
-            The amount of limiting nutrient in the storage (kg).
+        limiting_nutrient_proportion_to_be_removed : float
+            The proportion of limiting nutrient to remove from each storage.
         non_limiting_nutrients_amount : float
             The amount of non-limiting nutrient in the storage (kg).
 
@@ -959,8 +957,7 @@ class ManureManager:
             The amount of non-limiting nutrients to remove in each storage (kg).
 
         """
-        nutrient_ratio = min(limiting_nutrient_amount / non_limiting_nutrients_amount, 1)
-        return non_limiting_nutrients_amount * nutrient_ratio
+        return limiting_nutrient_proportion_to_be_removed * non_limiting_nutrients_amount
 
     @staticmethod
     def _determine_limiting_nutrient(requested_nitrogen_mass: float,
@@ -1012,7 +1009,8 @@ class ManureManager:
 
         Returns
         -------
-        The proportion of limiting nutrient to remove from each storage.
+        float
+            The proportion of limiting nutrient to remove from each storage.
 
         """
         return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)

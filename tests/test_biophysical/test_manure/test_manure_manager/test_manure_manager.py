@@ -942,8 +942,8 @@ def test_remove_nutrients_from_storage(manure_manager: ManureManager,
     "init_n, init_p, limiting_flag, available_limiting, removal_prop, "
     "exp_remain_n, exp_remain_p, exp_removed_n, exp_removed_p",
     [
-        (100.0, 80.0, True, 50.0, 0.5, 50.0, 30.0, 50.0, 50.0),
-        (120.0, 60.0, False, 24.0, 0.4, 96.0, 36.0, 24.0, 24.0),
+        (100.0, 80.0, True, 50.0, 0.5, 50.0, 40, 50.0, 40.0),
+        (120.0, 60.0, False, 24.0, 0.4, 72.0, 36.0, 48.0, 24.0),
     ],
 )
 def test_compute_stream_after_removal_with_real_manure_stream(
@@ -982,7 +982,6 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         stored_manure=initial_stream,
         limiting_nutrient_removal_proportion=removal_prop,
         is_nitrogen_limiting_nutrient=limiting_flag,
-        available_limiting_nutrient_amount=available_limiting,
         non_limiting_fields=non_lim_fields,
     )
 
@@ -1013,16 +1012,18 @@ def test_compute_stream_after_removal_with_real_manure_stream(
 
 
 @pytest.mark.parametrize(
-    "limiting, non_limiting, expected_removed",
+    "portion, non_limiting, expected_removed",
     [
-        (20.0, 50.0, 20.0),
-        (30.0, 30.0, 30.0),
-        (80.0, 50.0, 50.0),
+        (0.1, 50.0, 5.0),
+        (0.1, 30.0, 3.0),
+        (1.0, 50.0, 50.0),
     ],
 )
-def test_determine_non_limiting_nutrient_removal_amount(limiting, non_limiting, expected_removed):
+def test_determine_non_limiting_nutrient_removal_amount(portion: float,
+                                                        non_limiting: float,
+                                                        expected_removed: float):
     removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
-        limiting_nutrient_amount=limiting,
+        limiting_nutrient_proportion_to_be_removed=portion,
         non_limiting_nutrients_amount=non_limiting,
     )
     assert pytest.approx(removed, rel=1e-8) == expected_removed
