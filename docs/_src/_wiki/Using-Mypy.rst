@@ -45,7 +45,10 @@ directories, as well as ``main.py``.
 After the Mypy GitHub Action has run, it will write the number of errors
 it found into the Mypy badge on the README.
 
-|image|
+.. figure:: /_static/mypy.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: mypy
 
 Note:
 ~~~~~
@@ -140,7 +143,7 @@ the git branch that you are currently on. In other words, it does the
 same thing as the GitHub Action but locally, and only the files you have
 worked (not all the files in RuFaS). Note that this script also runs
 ``flake8`` so you may see some linting errors. You can read about those
-`here <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Flake8>`__.
+:doc:`here <Using-Flake8>`.
 
 This tool makes it much more convenient and easy to check the files that
 you have worked in your branch. Let's work through an example:

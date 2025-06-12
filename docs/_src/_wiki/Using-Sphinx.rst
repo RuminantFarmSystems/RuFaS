@@ -93,6 +93,7 @@ for using the Sphinx workflow:
 
 1. Create a new branch and make a pull request with it.
 2. Navigate to the "Actions" tab of GitHub.
+
 .. figure:: /_static/sphinx1.png
    :alt: RuFaS Overview - GG
    :align: center

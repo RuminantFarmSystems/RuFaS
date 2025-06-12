@@ -37,22 +37,25 @@ be the first of 3 which will have the original commit message.
 If there is a red X next to the original commit, that means either the
 Linting or Testing Action has failed.
 
-.. raw:: html
-
-   <img width="757" alt="Screenshot 2024-02-15 at 12 03 37 PM" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/3ed63c92-9868-4653-95dc-c38ed4f95d65">
+.. figure:: /_static/black1.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 Click on the X to learn which Action(s) have failed.
 
-.. raw:: html
-
-   <img width="758" alt="Screenshot 2024-02-15 at 12 03 21 PM" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/5b92a309-11be-42e4-9738-7481f1d3bad5">
+.. figure:: /_static/black2.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 Once all actions have passed and the PR has 2 approvals, it can be
 merged to main as normal.
 
-.. raw:: html
-
-   <img width="758" alt="Screenshot 2024-02-15 at 12 04 07 PM" src="https://github.com/RuminantFarmSystems/MASM/assets/70217952/7348447a-163c-4a68-9294-6396440a359a">
+.. figure:: /_static/black3.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 Manual
 ------

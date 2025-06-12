@@ -128,7 +128,7 @@ the git branch that you are currently on. In other words, it does the
 same thing as the GitHub Action but locally, without requiring you to
 commit and push your code. Note that this script also runs Mypy so you
 may see some type errors. You can read about those
-`here <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Mypy>`__.
+:doc:`here <Using-Mypy>`.
 
 This tool makes it much more convenient and easy to check the files that
 you have worked in your branch. Let's work through an example:

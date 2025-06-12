@@ -26,8 +26,7 @@ As of September 2024, RuFaS has two Actions files:
 ``combined_format_lint_test_mypy.yml`` and ``sphinx.yml``.
 ``combined_format_lint_test_mypy.yml`` runs 2 different jobs, described
 below. ``sphinx.yml`` must be triggered manually, instructions for how
-to do that are located in the `Sphinx Wiki
-page <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Sphinx>`__.
+to do that are located in the :doc:`Sphinx Wiki Page <Using-Sphinx>`.
 
 format_code
 ~~~~~~~~~~~
@@ -41,8 +40,7 @@ The first job in ``combined_format_lint_test_mypy.yml`` does 4 things:
 2. Checks and records if the
    `changelog <https://github.com/RuminantFarmSystems/MASM/blob/dev/changelog.md>`__
    has been updated in this PR.
-3. Formats the code using the `Black formatting
-   tool <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Python's-Black-Formatter>`__.
+3. Formats the code using the :doc:`Black formatting tool <Using-Python's-Black-Formatter>`.
 4. Commits and adds the Black-formatted code to the PR.
 
 lint_test_type_check
@@ -51,12 +49,12 @@ lint_test_type_check
 The second job ``combined_format_lint_test_mypy.yml`` does 6 things:
 
 1. Takes the Black-formatted code added in the first job and uses
-   `flake8 <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Flake8>`__
+   :doc:`flake8 <Using-Flake8>`
    to check for any linting errors.
 2. Checks that the code passes all unit testing.
 3. Checks the percent of the code that is covered by unit testing.
 4. Runs
-   `MyPy <https://github.com/RuminantFarmSystems/MASM/wiki/Using-Mypy>`__
+   :doc:`Mypy <Using-Mypy>`
    on both the dev branch and the PR branch and compares the number of
    static type check errors found.
 5. Updates the README badges for linting, testing, flake8, and MyPy
@@ -117,8 +115,11 @@ Testing Strategy:
    prefer) and make some changes and push those to github.
 6. In the PR created for ``test-test-dev`` update the base branch (the
    branch to which you want to compare ``test-test-dev``) to
-   ``test-dev``. |Screenshot 2024-05-28 at 11 50 35 AM|
+   ``test-dev``.
+
+.. figure:: /_static/gh-action.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 7. Merge ``test-test-dev`` into ``test-dev`` with the above-alterations
    to the Github action.
-
-.. |Screenshot 2024-05-28 at 11 50 35 AM| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/3ebe88a7-6383-4d82-8a9f-929961119d98

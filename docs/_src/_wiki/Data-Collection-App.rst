@@ -25,9 +25,7 @@ Creating the DCA Schemas
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have never worked with the DCA before on your computer, the first
-step to using it is creating the schema. There is a dedicated `Task
-Manager task
-type <https://github.com/RuminantFarmSystems/MASM/wiki/Task-Manager#task-types-and-their-specifics>`__
+step to using it is creating the schema. There is a dedicated :doc:`Task manager tasks <Task-Manager>`
 for this: ``"DATA_COLLECTION_APP_UPDATE"``. This task has already been
 written up in ``input/data/tasks/dca_update_task.json``. Change the
 ``"path"`` in the ``"tasks"`` blob of ``task_manager_metadata.json``
@@ -47,15 +45,30 @@ Using the DCA
 
 To start using the DCA, navigate to the RuFaS directory with your
 computer's file explorer. Click on the directory titled
-``DataCollectionApp``, then ``index.html``. |image|
+``DataCollectionApp``, then ``index.html``.
+
+.. figure:: /_static/dca1.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 After clicking on ``index.html``, a webpage should pop-up in your
-default browser. Now you're all set to start using the DCA! |image1|
+default browser. Now you're all set to start using the DCA!
+
+.. figure:: /_static/dca2.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 To start working on a new input file, click the "+ Data Entry" button.
 Then select which type of input you would like to create from the
 drop-down. After all the data has been entered, click the blue "Save
-Results" button to save all your data entries as JSON files. |image2|
+Results" button to save all your data entries as JSON files.
+
+.. figure:: /_static/dca3.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 *Note*: when "Save Results" is clicked, there maybe a warning from the
 browser warning that there are multiple files to be downloaded. This is
@@ -83,7 +96,3 @@ they will be lost as soon as the DCA update task is run.
 
 *Tip*: ChatGPT knows about JSON-Editor, so it can especially helpful to
 include that you are working with this framework when prompting it.
-
-.. |image| image:: https://github.com/user-attachments/assets/98c17b60-3a64-4962-853d-6b47684ca23b
-.. |image1| image:: https://github.com/user-attachments/assets/b09191fd-6c90-4cb6-a0ce-d5c4887c681c
-.. |image2| image:: https://github.com/user-attachments/assets/31613c7b-c6e1-4a74-8fa9-8a4493530d33

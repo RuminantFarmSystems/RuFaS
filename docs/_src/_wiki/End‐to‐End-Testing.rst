@@ -108,8 +108,7 @@ In the ``input/data/end_to_end_testing`` directory:
    - **E2E JSON Filter File**
 
      - File name format: ``e2e_json_{domain}_filter.json``.
-     - See `E2E JSON filter example
-       file <https://github.com/RuminantFarmSystems/MASM/wiki/End%E2%80%90to%E2%80%90End-Testing/#e2e-json-filter-file>`__
+     - See :ref:`E2E JSON filter file <e2e-json-filter-file>`.
        for reference.
      - **Note:** You won't have anything to put in the
        ``expected_results`` section at setup time. This is expected.
@@ -118,9 +117,7 @@ In the ``input/data/end_to_end_testing`` directory:
    - **E2E Comparison Filter**
 
      - File name format: ``e2e_comparison_{domain}_differences.json``.
-     - See `E2E Comparison filter example
-       file <https://github.com/RuminantFarmSystems/MASM/wiki/End%E2%80%90to%E2%80%90End-Testing/#e2e-comparison-filter-file>`__
-       for reference.
+     - See :ref:`E2E Comparison filter file <e2e-comparison-filter-file>` for reference.
 
 2. **Update the ``end_to_end_testing_results_paths.json`` file** in the
    same directory:
@@ -129,9 +126,7 @@ In the ``input/data/end_to_end_testing`` directory:
      outputs, and the pattern used to find the actual outputs for the
      domain module.
    - **Use the existing entries as examples.**
-   - See `E2E Results Paths example
-     file <https://github.com/RuminantFarmSystems/MASM/wiki/End%E2%80%90to%E2%80%90End-Testing/#e2e-testing-results-paths-file>`__
-     for reference.
+   - See :ref:`E2E Testing Results Paths File <e2e-testing-results-paths-file>` for reference.
    - **Note:** *You will not create a new results paths file. Add your
      new domain's paths to the existing file.*
 

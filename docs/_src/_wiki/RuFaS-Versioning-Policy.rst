@@ -53,8 +53,7 @@ testing, and production-ready code. The three main branches are:
   thoroughly tested and reviewed is merged into ``main``. This is the
   production-ready version of RuFaS that users rely on.
 
-See `Branching Strategy in
-RuFaS <https://github.com/RuminantFarmSystems/MASM/wiki/Branching-Strategy-in-RuFaS>`__
+See :doc:`Branching Strategy <Branching-Strategy-in-RuFaS>`
 for more details.
 
 Version Number Update Process
