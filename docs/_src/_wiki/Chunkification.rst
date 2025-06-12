@@ -12,7 +12,10 @@ rebuild the pool, maintaining the order the original data was added, and
 will continue with postprocessing as it would for a simulation not using
 chunkification.
 
-|OM Chunkification|
+.. figure:: /_static/Chunkification.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 Options
 -------
@@ -156,5 +159,3 @@ uses 80% of the available memory. Similar to ``maximum_memory_usage``,
 if this chunkification setting is used with multiple tasks/simulations
 running in parallel, it will divide this percentage up equally among
 them.
-
-.. |OM Chunkification| image:: https://github.com/user-attachments/assets/e3ea94ca-aecf-4825-94af-9909daacae53

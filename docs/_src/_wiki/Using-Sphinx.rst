@@ -92,13 +92,29 @@ that it will be updated in the same way every time. Here are the steps
 for using the Sphinx workflow:
 
 1. Create a new branch and make a pull request with it.
-2. Navigate to the "Actions" tab of GitHub. |image|
+2. Navigate to the "Actions" tab of GitHub.
+.. figure:: /_static/sphinx1.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 3. Click on "Build Sphinx" on the left-hand side of the page, underneath
-   "All workflows". |image1|
+   "All workflows".
+.. figure:: /_static/sphinx2.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 4. Click "Run workflow" and then select the branch associated with your
-   pull request in the drop down. |image2|
+   pull request in the drop down.
+.. figure:: /_static/sphinx3.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 5. After selecting the desired target branch, click the green "Run
-   workflow" button underneath the branch-selector drop down. |image3|
+   workflow" button underneath the branch-selector drop down.
+.. figure:: /_static/sphinx4.png
+   :alt: RuFaS Overview - GG
+   :align: center
+   :name: rufas overview
 
 After the workflow has finished running, navigate back to your pull
 request. There will be a new commit on with the message "Update Sphinx
@@ -159,9 +175,4 @@ Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`__
 
 `Sphinx <https://www.sphinx-doc.org/>`__
 
-```sphinx-apidoc`` <https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html>`__
-
-.. |image| image:: https://github.com/user-attachments/assets/e80e1b89-fb59-42ec-9316-f60eae3a7e17
-.. |image1| image:: https://github.com/user-attachments/assets/0b96fc5b-611f-4518-9e54-08bbe4b1ba8a
-.. |image2| image:: https://github.com/user-attachments/assets/b98ffb79-c2cc-47c6-a242-6b89e0a80652
-.. |image3| image:: https://github.com/user-attachments/assets/a051ecb6-d76b-4c15-af24-64addb2b1f3d
+`sphinx-apidoc <https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html>`__
