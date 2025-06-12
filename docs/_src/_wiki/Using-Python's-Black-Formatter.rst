@@ -1,5 +1,7 @@
+Using Python's Black Formatter
+==============================
 What and Why
-============
+------------
 
 Black is a PEP 8 compliant opinionated formatter with its own style. It
 has been integrated into the Github Actions Workflow as a part of the
@@ -8,7 +10,7 @@ unified stylistically and takes the code-styling decisions out of the
 individual's hands.
 
 How
-===
+---
 
 Automatic
 ---------
@@ -115,7 +117,7 @@ a subdirectory of the top-level directory, it will run with options
 specified in the ``.pyproject.toml`` configuration file.
 
 External Resources
-==================
+------------------
 
 `Black
 Documentation <https://black.readthedocs.io/en/stable/the_black_code_style/index.html>`__

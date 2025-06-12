@@ -1,5 +1,7 @@
+Using Mypy
+==========
 What and Why
-============
+------------
 
 "Mypy is a static type checker for Python. Type checkers help ensure
 that you’re using variables and functions in your code correctly. With
@@ -30,7 +32,7 @@ This error message tells us that we are trying to assign a ``float``
 value (10.5) to a variable (``x``) that is an ``int``.
 
 How
-===
+---
 
 Automatic
 ---------
@@ -215,7 +217,7 @@ subdirectory of the top-level directory, it will run with options
 specified in the ``mypy`` configuration file.
 
 External Resources
-==================
+------------------
 
 ```mypy`` Documentation <https://mypy.readthedocs.io/en/stable/>`__
 

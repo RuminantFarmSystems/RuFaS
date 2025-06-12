@@ -29,17 +29,39 @@ Navigation
    _code/modules
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :titlesonly:
    :caption: Infrastructure for Simulation:
 
    _wiki/Task-Manager
    _wiki/Input-Manager
    _wiki/RuFaS-Command-Line-Arguments
-   _wiki/Output-Manager
+   _wiki/om
    _wiki/Data-Origins
    _wiki/Report-Generator
    _wiki/Graph-Generator
+   _wiki/End‐to‐End-Testing
+
+Tools
+-----
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing to RuFaS:
+
+   _wiki/Github-Actions
+   _wiki/Using-Mypy
+   _wiki/Using-Python's-Black-Formatter
+   _wiki/Using-Sphinx
+
+Team Culture
+------------
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing to RuFaS:
+
+   _wiki/RuFaS-Versioning-Policy
+   _wiki/SCRUM-at-RuFaS
+
 
 Versioning
 ----------
@@ -59,6 +81,11 @@ Other Resources
 - `Unit Testing Reference <https://realpython.com/python-testing/>`_
 - `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 - `Doc String Guide <https://realpython.com/documenting-python-code/>`_
+
+.. toctree::
+   :maxdepth: 1
+
+   _wiki/Data-Collection-App
 
 
 Indices and tables
