@@ -52,6 +52,7 @@ Tools
    _wiki/Using-Mypy
    _wiki/Using-Python's-Black-Formatter
    _wiki/Using-Sphinx
+   _wiki/Using-Flake8
 
 Team Culture
 ------------
