@@ -1,5 +1,7 @@
-What and Why
+Using Sphinx
 ============
+What and Why
+------------
 
 We use
 `numpy-style <https://numpydoc.readthedocs.io/en/latest/format.html>`__
@@ -15,7 +17,7 @@ to be done at the same time. See the "When" section for an explanation
 of when each needs to be regenerated.
 
 When
-====
+----
 
 The reST files determine the structure of documentation (how different
 pages of the documentation are connected to one another), but they do
@@ -44,7 +46,7 @@ If both reST and HTML/Latex files are being regenerated, it is important
 to do the reST files *first*, then the HTML and/or Latex files.
 
 How
-===
+---
 
 reStructuredText
 ----------------
@@ -148,7 +150,7 @@ codebase, so navigating through the HTML files is similar to exploring
 the RUFAS codebase.
 
 External Resources
-==================
+------------------
 
 `Doc String
 Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`__

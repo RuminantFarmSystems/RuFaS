@@ -1,5 +1,8 @@
+Github Actions
+==============
+
 What and Why
-============
+------------
 
 Github Actions are a continuous integration and continuous delivery
 (CI/CD) platform that allows you to automate your build, test, and
@@ -14,7 +17,7 @@ tries to prevent bad code from being merged into the main and dev
 branches.
 
 How
-===
+---
 
 Github Actions are in the MASM/.github/workflows folder saved as
 ``.yml`` files.
@@ -63,7 +66,7 @@ The second job ``combined_format_lint_test_mypy.yml`` does 6 things:
    will fail at this point if the user hasn't updated the changelog.
 
 Updating and Testing Github Actions
-===================================
+-----------------------------------
 
 The process of updating Github Actions can be challenging. They are
 written in the YAML syntax and the behaviors can often feel

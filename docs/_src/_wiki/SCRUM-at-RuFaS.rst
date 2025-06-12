@@ -71,23 +71,3 @@ Tools and Automation
 - We make use of project management and collaboration tools to
   streamline our SCRUM processes, ensuring better visibility and
   efficiency. **TBD**
-
-.. _2023-sprint-and-on-call-schedule:
-
-2023 Sprint and on-call schedule
---------------------------------
-
-========== ========== ====== ========
-Start Date End Date   Sprint On-Call
-========== ========== ====== ========
-11/8/2023  11/14/2023 1      Niko
-11/15/2023 11/21/2023 1      Allister
-11/22/2023 11/28/2023 2      Ed
-11/29/2023 12/5/2023  2      Loi
-12/6/2023  12/12/2023 3      Pooya
-12/13/2023 12/19/2023 3      Niko
-12/20/2023 12/26/2023 4      Allister
-12/27/2023 1/2/2024   4      Ed
-========== ========== ====== ========
-
-Happy SCRUMming!

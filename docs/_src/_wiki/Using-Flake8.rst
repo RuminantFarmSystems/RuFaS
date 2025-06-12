@@ -1,5 +1,8 @@
-What and Why
+Using Flake8
 ============
+
+What and Why
+------------
 
 "Linting is the automated checking of your source code for programmatic
 and stylistic errors." -
@@ -10,7 +13,7 @@ lines of code are consistently styled and to prevent overly complex code
 from being written.
 
 How
-===
+---
 
 Automatic
 ---------
@@ -231,7 +234,7 @@ a subdirectory of the top-level directory, it will run with options
 specified in the ``flake8`` configuration file.
 
 External Resources
-==================
+------------------
 
 ```flake8``
 Documentation <https://flake8.pycqa.org/en/latest/index.html>`__
