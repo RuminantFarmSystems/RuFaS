@@ -121,6 +121,9 @@ class Growth:
                 growth_outputs.conceptus_weight,
                 self.tissue_changed,
             ) = self.calculate_cow_body_weight_change(growth_inputs)
+            max_cow_body_weight = growth_inputs.mature_body_weight + growth_inputs.calf_birth_weight
+            if growth_outputs.body_weight + self.daily_growth > max_cow_body_weight:
+                self.daily_growth = max_cow_body_weight - growth_outputs.body_weight
             growth_outputs.body_weight += self.daily_growth
         else:
             om = OutputManager()

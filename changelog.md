@@ -177,6 +177,8 @@ v0.9.2
 - [2412](https://github.com/RuminantFarmSystems/RuFaS/pull/2412) - [minor change] [Crop and Soil] Update docstrings in cut_crop
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [Animal] Uses utf-8 encoding for saving CSVs from OutputManager.
 - [2415](https://github.com/RuminantFarmSystems/RuFaS/pull/2415) - [minor change] [Animal] Add "None" as valid cow repro sub methods.
+- [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
+
 
 
 ### v0.9.2

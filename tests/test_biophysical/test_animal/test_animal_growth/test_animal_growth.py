@@ -62,23 +62,24 @@ def test_growth_init(
 
 
 @pytest.mark.parametrize(
-    "animal_type, is_pregnant, body_weight, conceptus_weight, mature_body_weight, days_born, expected_body_weight,"
-    "expected_conceptus_weight, should_add_event, should_raise_value_error, should_raise_runtime_error",
+    "animal_type, is_pregnant, body_weight, conceptus_weight, mature_body_weight, calf_birth_weight, days_born,"
+    "expected_body_weight, expected_conceptus_weight, should_add_event, should_raise_value_error,"
+    "should_raise_runtime_error",
     [
         # Calf growth
-        (AnimalType.CALF, False, 50.0, 0.0, 600.0, 30, 55.0, 0.0, False, False, False),
+        (AnimalType.CALF, False, 50.0, 0.0, 600.0, 45, 30, 55.0, 0.0, False, False, False),
         # Non-pregnant heifer
-        (AnimalType.HEIFER_II, False, 300.0, 0.0, 600.0, 400, 305.0, 0.0, False, False, False),
+        (AnimalType.HEIFER_II, False, 300.0, 0.0, 600.0, 45, 400, 305.0, 0.0, False, False, False),
         # Heifer reaches mature bw
-        (AnimalType.HEIFER_II, True, 500.0, 0.0, 400.0, 400, 400.0, 0.0, True, False, False),
+        (AnimalType.HEIFER_II, True, 500.0, 0.0, 400.0, 45, 400, 400.0, 0.0, True, False, False),
         # Pregnant heifer
-        (AnimalType.HEIFER_II, True, 500.0, 10.0, 600.0, 500, 505.0, 2.0, False, False, False),
+        (AnimalType.HEIFER_II, True, 500.0, 10.0, 600.0, 45, 500, 505.0, 2.0, False, False, False),
         # Cow growth
-        (AnimalType.LAC_COW, False, 650.0, 20.0, 600.0, 700, 655.0, 2.0, False, False, False),
+        (AnimalType.LAC_COW, False, 650.0, 20.0, 600.0, 45, 700, 645.0, 2.0, False, False, False),
         # ValueError: Unsupported type
-        ("UNKNOWN_TYPE", False, 500.0, 0.0, 600.0, 500, 500.0, 0.0, False, True, False),
+        ("UNKNOWN_TYPE", False, 500.0, 0.0, 600.0, 45, 500, 500.0, 0.0, False, True, False),
         # RuntimeError expectation for DRY_COW
-        (AnimalType.DRY_COW, False, 500.0, 0.0, 600.0, 500, 505.0, 2.0, False, False, True),
+        (AnimalType.DRY_COW, False, 500.0, 0.0, 600.0, 45, 500, 505.0, 2.0, False, False, True),
     ],
 )
 def test_evaluate_body_weight_change(
@@ -88,6 +89,7 @@ def test_evaluate_body_weight_change(
     body_weight: float,
     conceptus_weight: float,
     mature_body_weight: float,
+    calf_birth_weight: float,
     days_born: int,
     expected_body_weight: float,
     expected_conceptus_weight: float,
@@ -105,6 +107,7 @@ def test_evaluate_body_weight_change(
     mock_growth_inputs.conceptus_weight = conceptus_weight
     mock_growth_inputs.mature_body_weight = mature_body_weight
     mock_growth_inputs.days_born = days_born
+    mock_growth_inputs.calf_birth_weight = calf_birth_weight
 
     mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
