@@ -19,15 +19,6 @@ standards for prediction accuracy, code structure, and clarity, documentation, a
 learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific
 collaboration.
 
-Onboarding
-----------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Documentation:
-
-   _wiki/onboarding
-
 Navigation
 ----------
 
@@ -36,6 +27,12 @@ Navigation
    :caption: Documentation:
 
    _code/modules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting Started:
+
+   _wiki/onboarding
 
 .. toctree::
    :maxdepth: 2
@@ -55,7 +52,6 @@ Tools
 -----
 .. toctree::
    :maxdepth: 1
-   :caption: Contributing to RuFaS:
 
    _wiki/Github-Actions
    _wiki/Using-Mypy
@@ -67,7 +63,6 @@ Team Culture
 ------------
 .. toctree::
    :maxdepth: 1
-   :caption: Contributing to RuFaS:
 
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
