@@ -19,6 +19,15 @@ standards for prediction accuracy, code structure, and clarity, documentation, a
 learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific
 collaboration.
 
+Onboarding
+----------
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Documentation:
+
+   _wiki/onboarding
+
 Navigation
 ----------
 
