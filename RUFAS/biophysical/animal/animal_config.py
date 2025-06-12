@@ -506,10 +506,12 @@ class AnimalConfig:
 
         cls.milk_reduction_maximum = im.get_data("feed.user_defined_ration_percentages.milk_reduction_maximum")
 
-        if cls.dry_off_day_of_pregnancy <= cls.third_pregnancy_check_day:
+        if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
             om = OutputManager()
             om.add_warning(
-                "Dry-off day of pregnancy conflicts with the 3rd pregnancy check day",
+                "3rd pregnancy check day >= Dry-off day",
+                "Typically, the 3rd pregnancy check day should happen before the dry-off day."
+                "The configured animal input has the 3rd pregnancy check day set to on or after the dry-off day."
                 "This may cause the animal to be stuck in an unexpected state.",
                 {
                     "class": AnimalConfig.__class__.__name__,
