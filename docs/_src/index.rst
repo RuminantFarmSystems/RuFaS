@@ -68,7 +68,7 @@ Team Culture
    _wiki/SCRUM-at-RuFaS
 
 
-Versioning
+Contributing to RuFaS
 ----------
 .. toctree::
    :maxdepth: 1
