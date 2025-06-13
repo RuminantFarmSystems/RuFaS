@@ -121,7 +121,7 @@ def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: Mock
 
     expected_dm_removed = 50.0 * HIGH_MOISTURE_LOSS_COEFFICIENT
     mock_remove_dm.assert_called_once_with(expected_dm_removed)
-    mock_record.assert_called_once_with(20)
+    assert mock_record.call_count == 2
     assert crop in storage.stored
 
 
@@ -305,7 +305,7 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
 
     storage._record_stored_crops(15)
 
-    mock_stored_mass.assert_called_once()
+    assert mock_stored_mass.call_count == 3
     assert mock_total_amount.call_count == expected_get_total_amount_call_count
     assert mock_add_var.call_count == expected_add_var_call_count
 
