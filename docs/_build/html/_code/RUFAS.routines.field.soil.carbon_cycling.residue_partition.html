@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>RUFAS.routines.field.soil.carbon_cycling.residue_partition module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.routines.field.soil.carbon_cycling.residue_partition module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.routines.field.soil.carbon_cycling.residue_partition module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.routines.field.soil.nitrogen_cycling.html" rel="next" title="RUFAS.routines.field.soil.nitrogen_cycling package"/>
+<link href="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.html" rel="prev" title="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.html">RUFAS.routines package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.html">RUFAS.routines.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.soil.carbon_cycling.html">RUFAS.routines.field.soil.carbon_cycling package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.field.soil.carbon_cycling.residue_partition module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-RUFAS.routines.field.soil.carbon_cycling.residue_partition">
+<span id="rufas-routines-field-soil-carbon-cycling-residue-partition-module"></span><h1>RUFAS.routines.field.soil.carbon_cycling.residue_partition module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.residue_partition" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.residue_partition.</span></span><span class="sig-name descname"><span class="pre">ResiduePartition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the partitioning of plant residues within the soil, affecting both plant-available nutrients and soil carbon
+storage.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track residue in the soil profile, creates new one if one is not
+provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha)</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used by this module to track residue in the soil profile.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
+<p>pseudocode_soil S.6.B</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools">
+<span class="sig-name descname"><span class="pre">add_residue_to_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools'"><span>#</span></a></dt>
+<dd><p>Adds residue to pools.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.partition_residue">
+<span class="sig-name descname"><span class="pre">partition_residue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.partition_residue" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.partition_residue'"><span>#</span></a></dt>
+<dd><p>Main routine to updates attributes by using static methods, this method should only be called (by the field/
+field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
+operation.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>rainfall: float</dt><dd><p>Amount of rain (mm).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._add_litter_to_pools">
+<span class="sig-name descname"><span class="pre">_add_litter_to_pools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._add_litter_to_pools" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._add_litter_to_pools'"><span>#</span></a></dt>
+<dd><p>Partitions residue between metabolic and structural pools in all layers of the soil profile.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._set_soil_structural_litter_decomposition_rate">
+<span class="sig-name descname"><span class="pre">_set_soil_structural_litter_decomposition_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._set_soil_structural_litter_decomposition_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._set_soil_structural_litter_decomposition_rate'"><span>#</span></a></dt>
+<dd><p>Sets the soil structural litter decomposition rate using the same methodology as the
+<cite>_determine_plant_structural_to_slow_or_active_rate</cite>.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_lignin_composition">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_residue_lignin_composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_residue_lignin_composition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_lignin_composition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_lignin_composition'"><span>#</span></a></dt>
+<dd><p>This method calculates and updates the plant_residue_lignin_composition based on the amount of rainfall.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_residue_lignin_composition<span class="classifier">float</span></dt><dd><p>Lignin fraction of plant residue (unitless).</p>
+</dd>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain (mm H2O).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The updated plant_residue_lignin_composition.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>References<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.1</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_lignin_nitrogen_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_lignin_nitrogen_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_residue_lignin_composition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_yield_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_lignin_nitrogen_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_lignin_nitrogen_fraction'"><span>#</span></a></dt>
+<dd><p>This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
+is greater than zero.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_residue_lignin_composition<span class="classifier">float</span></dt><dd><p>Lignin fraction of plant residue (unitless).</p>
+</dd>
+<dt>total_residue<span class="classifier">float</span></dt><dd><p>Total amount of soil residue ever added to the field (kg/ha).</p>
+</dd>
+<dt>crop_yield_nitrogen<span class="classifier">float</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant lignin to nitrogen ratio (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>References<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.2</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_metabolic_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_residue_metabolic_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_lignin_nitrogen_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_metabolic_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_metabolic_fraction'"><span>#</span></a></dt>
+<dd><p>This method calculates the fraction of plant residue that is metabolic.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_lignin_nitrogen_ratio<span class="classifier">float</span></dt><dd><p>Plant lignin to nitrogen ratio (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Plant residue fraction that is metabolic (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>References<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.3</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_metabolic_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_dry_matter_residue_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_metabolic_to_soil_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_carbon_amount'"><span>#</span></a></dt>
+<dd><p>This method calculates the updated plant metabolic carbon amount after adding the metabolic carbon
+in dry matter at harvest and reduced by the amount that’s decomposed and incorporated.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_metabolic_carbon_amount: float</dt><dd><p>Plant metabolic carbon amount (kg/ha).</p>
+</dd>
+<dt>plant_residue_metabolic_fraction: float</dt><dd><p>Fraction of plant residue that is metabolic (unitless).</p>
+</dd>
+<dt>plant_dry_matter_residue_amount: float</dt><dd><p>Amount of dry matter residue at harvest (kg/ha).</p>
+</dd>
+<dt>plant_metabolic_active_carbon_usage: float</dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>plant_metabolic_to_soil_carbon_amount: float</dt><dd><p>Metabolic carbon incorporated into soil during tillage (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated plant metabolic carbon amount (hg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.4, S.6.B.I.7</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_active_carbon_usage">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_active_carbon_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_metabolic_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.28</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_active_carbon_usage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_active_carbon_usage'"><span>#</span></a></dt>
+<dd><p>Calculates the amount of plant metabolic carbon decomposed to active carbon (kg/ha).</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>decomposition_moisture_effect: float</dt><dd><p>Moisture effect on decomposition factor (unitless).</p>
+</dd>
+<dt>decomposition_temperature_effect: float</dt><dd><p>Temperature effect on decomposition factor (unitless).</p>
+</dd>
+<dt>plant_metabolic_carbon_amount: float</dt><dd><p>Plant metabolic carbon amount (kg/ha).</p>
+</dd>
+<dt>plant_metabolic_active_carbon_rate: float default = 0.28 (Parton et al. 1987)</dt><dd><p>Rate of decomposition from metabolic to active carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Above ground metabolic carbon decomposed to active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>References<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.5</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_or_active_rate">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_to_slow_or_active_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_residue_metabolic_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_decomposition_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.076</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_or_active_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_or_active_rate'"><span>#</span></a></dt>
+<dd><p>This method calculates the rate at which above ground structural carbon decomposes into slow or active carbon.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>structural_decomposition_factor: float, default = 0.076 (Parton et al. 1987)</dt><dd><p>Structural decomposition factor (unitless).</p>
+</dd>
+<dt>plant_residue_metabolic_fraction: float</dt><dd><p>Fraction of plant residue that is metabolic (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The rate at which above ground structural carbon decomposes into slow or active carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>References<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.9</p>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>the equation used here currently follows the old code to make mathematical sense.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_to_slow_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_to_slow_or_active_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount'"><span>#</span></a></dt>
+<dd><p>This method determines the amount of plant structural carbon decomposed into slow or active carbon.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_structural_to_slow_or_active_rate: float</dt><dd><p>Rate at which above ground structural carbon decomposes into slow or active carbon (unitless).</p>
+</dd>
+<dt>decomposition_moisture_effect: float</dt><dd><p>Moisture effect on decomposition factor (unitless).</p>
+</dd>
+<dt>decomposition_temperature_effect: float</dt><dd><p>Temperature effect on decomposition factor (unitless).</p>
+</dd>
+<dt>plant_structural_carbon_amount: float</dt><dd><p>Plant structural carbon amount (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of plant structural carbon decomposed into slow or active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>References<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.10</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_structural_carbon_transfer_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_structural_carbon_transfer_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_structural_carbon_transfer_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_structural_carbon_transfer_amount'"><span>#</span></a></dt>
+<dd><p>Determines the amount of transfer of plant structural to soil structural carbon during tillage.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_structural_carbon_amount: float</dt><dd><p>Amount of plant structural carbon (kg/ha).</p>
+</dd>
+<dt>tillage_fraction: float</dt><dd><p>Fraction of metabolic carbon incorporated into soil during tillage (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of transfer of structural carbon during tillage (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>References<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.11</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_plant_structural_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_dry_matter_residue_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_metabolic_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_carbon_transfer_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_to_active_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_to_slow_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_structural_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_carbon_amount'"><span>#</span></a></dt>
+<dd><p>Calculates the updated plant structural carbon amount.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_dry_matter_residue_amount: float</dt><dd><p>Amount of dry matter residue at harvest (kg/ha).</p>
+</dd>
+<dt>plant_residue_metabolic_fraction: float</dt><dd><p>Fraction of plant residue that is metabolic (unitless).</p>
+</dd>
+<dt>structural_carbon_transfer_amount: float</dt><dd><p>The amount of transfer of structural carbon during tillage (kg/ha).</p>
+</dd>
+<dt>plant_structural_to_active_carbon_amount: float</dt><dd><p>Amount of plant structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>plant_structural_to_slow_carbon_amount: float</dt><dd><p>Amount of plant structural carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>plant_structural_carbon_amount: float</dt><dd><p>Plant structural carbon amount (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated plant structural carbon amount (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>References<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.I.8, S.6.B.I.12</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_weighted_residue_dry_matter_lignin_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_dry_matter_residue_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction'"><span>#</span></a></dt>
+<dd><p>Calculates the weighted fractional of lignin amount in residue dry matter.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_dry_matter_residue_amount: float</dt><dd><p>The amount of soil dry matter residue at harvest (kg/ha).</p>
+</dd>
+<dt>root_biomass: float</dt><dd><p>Root biomass (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The weighted fractional of lignin amount in residue dry matter (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h3>References<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.2</p>
+</section>
+<section id="id32">
+<h3>Notes<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<p>The referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+mention of biomass unit.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_lignin_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_residue_lignin_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weighted_residue_dry_matter_lignin_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_lignin_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_lignin_fraction'"><span>#</span></a></dt>
+<dd><p>Calculates the fraction of soil residue that’s comprised of lignin.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>weighted_residue_dry_matter_lignin_fraction: float</dt><dd><p>The weighted fractional of lignin amount in residue dry matter (unitless).</p>
+</dd>
+<dt>rainfall: float</dt><dd><p>Amount of rain (mm H2O).</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The fraction of soil residue that’s comprised of lignin (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>References<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.3</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_lignin_to_nitrogen_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_lignin_to_nitrogen_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_lignin_nitrogen_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted_residue_dry_matter_lignin_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_residue_lignin_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_fraction_plant_residue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_lignin_to_nitrogen_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_lignin_to_nitrogen_fraction'"><span>#</span></a></dt>
+<dd><p>This method calculates the soil lignin to nitrogen fraction.</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>plant_lignin_nitrogen_ratio: float</dt><dd><p>Plant lignin to nitrogen ratio (unitless).</p>
+</dd>
+<dt>weighted_residue_dry_matter_lignin_fraction: float</dt><dd><p>Weighted fraction of lignin in residue dry matter (unitless).</p>
+</dd>
+<dt>soil_residue_lignin_fraction: float</dt><dd><p>Soil residue fraction that is composed of lignin (unitless).</p>
+</dd>
+<dt>nitrogen_fraction_plant_residue: float default = 0.4</dt><dd><p>Nitrogen fraction in plant residue at harvest (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil lignin to nitrogen fraction(unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h3>References<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.4</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_metabolic_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_residue_metabolic_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_lignin_to_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_metabolic_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_metabolic_fraction'"><span>#</span></a></dt>
+<dd><p>This method calculates the fraction of soil residue that is metabolic.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_lignin_to_nitrogen_fraction: float</dt><dd><p>Soil lignin to nitrogen fraction(unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The fraction of soil residue that is metabolic(unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>References<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.5</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_metabolic_to_soil_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_residue_metabolic_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_carbon_amount'"><span>#</span></a></dt>
+<dd><p>This method updates the amount of soil metabolic carbon.</p>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_metabolic_carbon_amount: float</dt><dd><p>The amount of soil metabolic carbon (kg/ha).</p>
+</dd>
+<dt>plant_metabolic_to_soil_carbon_amount: float</dt><dd><p>The amount of metabolic carbon incorporated into soil during tillage (kg/ha).</p>
+</dd>
+<dt>root_biomass: float</dt><dd><p>Root biomass (kg/ha).</p>
+</dd>
+<dt>soil_residue_metabolic_fraction: float</dt><dd><p>The fraction of soil residue that is metabolic (unitless).</p>
+</dd>
+<dt>soil_metabolic_active_carbon_usage: float</dt><dd><p>The amount of soil metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The updated amount of soil metabolic carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>References<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.6, S.6.B.II.8</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_to_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_to_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_metabolic_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_to_active_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_to_active_carbon_amount'"><span>#</span></a></dt>
+<dd><p>This method calculates the amount of soil metabolic carbon decomposed into active carbon.</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>decomposition_moisture_effect: float</dt><dd><p>Moisture effect on decomposition factor (unitless).</p>
+</dd>
+<dt>decomposition_temperature_effect: float</dt><dd><p>Temperature effect on decomposition factor (unitless).</p>
+</dd>
+<dt>soil_metabolic_carbon_amount: float</dt><dd><p>Soil metabolic carbon amount (kg/ha).</p>
+</dd>
+<dt>soil_metabolic_active_carbon_rate: float default = 0.35</dt><dd><p>Rate of decomposition from soil metabolic to active carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of soil metabolic carbon decomposed into active carbon(kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>References<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.7</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_to_slow_active_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition_moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_to_slow_or_active_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.094</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount'"><span>#</span></a></dt>
+<dd><p>This method determines the amount of soil structural carbon decomposed into slow or active carbon.</p>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_structural_to_slow_or_active_rate: float default = 0.094 (Parton et al. 1987)</dt><dd><p>Rate at which soil structural carbon decomposes into slow or active carbon (unitless).</p>
+</dd>
+<dt>decomposition_moisture_effect: float</dt><dd><p>Moisture effect on decomposition factor (unitless).</p>
+</dd>
+<dt>decomposition_temperature_effect: float</dt><dd><p>Temperature effect on decomposition factor (unitless).</p>
+</dd>
+<dt>soil_structural_carbon_amount: float</dt><dd><p>Soil structural carbon amount(kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id49">
+<h3>Returns<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h3>References<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.10</p>
+</section>
+<section id="id51">
+<h3>Notes<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<p>This method can be used for both calculating amount of soil structural carbon decomposed into slow carbon and
+amount of soil structural carbon decomposed into active carbon.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_carbon_amount">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_structural_carbon_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_residue_metabolic_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_carbon_transfer_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_to_active_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_to_slow_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_structural_carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_carbon_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_carbon_amount'"><span>#</span></a></dt>
+<dd><p>Calculates the updated soil structural carbon amount.</p>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_residue_metabolic_fraction: float</dt><dd><p>Fraction of soil residue that is metabolic (unitless).</p>
+</dd>
+<dt>structural_carbon_transfer_amount: float</dt><dd><p>The amount of transfer of structural carbon during tillage (kg/ha).</p>
+</dd>
+<dt>soil_structural_to_active_carbon_amount: float</dt><dd><p>Amount of soil structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>soil_structural_to_slow_carbon_amount: float</dt><dd><p>Amount of soil structural carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>root_biomass: float</dt><dd><p>Root biomass (kg/ha).</p>
+</dd>
+<dt>soil_structural_carbon_amount: float</dt><dd><p>Soil structural carbon amount (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Updated soil structural carbon amount (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h3>References<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<p>pseudocode_soil S.6.B.II.9, S.6.B.II.11</p>
+</section>
+</dd></dl>
+</section>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition"><code class="docutils literal notranslate"><span class="pre">ResiduePartition</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.__init__'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.__init__"><code class="docutils literal notranslate"><span class="pre">ResiduePartition.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools"><code class="docutils literal notranslate"><span class="pre">ResiduePartition.add_residue_to_pools()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.partition_residue'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.partition_residue"><code class="docutils literal notranslate"><span class="pre">ResiduePartition.partition_residue()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._add_litter_to_pools'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._add_litter_to_pools"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._add_litter_to_pools()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._set_soil_structural_litter_decomposition_rate'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._set_soil_structural_litter_decomposition_rate"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._set_soil_structural_litter_decomposition_rate()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_lignin_composition'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_lignin_composition"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_residue_lignin_composition()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_lignin_nitrogen_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_lignin_nitrogen_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_lignin_nitrogen_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_metabolic_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_residue_metabolic_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_residue_metabolic_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_metabolic_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_active_carbon_usage'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_metabolic_active_carbon_usage"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_metabolic_active_carbon_usage()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_or_active_rate'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_or_active_rate"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_structural_to_slow_or_active_rate()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_structural_carbon_transfer_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_structural_carbon_transfer_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_structural_carbon_transfer_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_plant_structural_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_plant_structural_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_lignin_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_lignin_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_residue_lignin_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_lignin_to_nitrogen_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_lignin_to_nitrogen_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_lignin_to_nitrogen_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_metabolic_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_residue_metabolic_fraction"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_residue_metabolic_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_metabolic_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_to_active_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_metabolic_to_active_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_metabolic_to_active_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_carbon_amount'" class="reference internal" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition._determine_soil_structural_carbon_amount"><code class="docutils literal notranslate"><span class="pre">ResiduePartition._determine_soil_structural_carbon_amount()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
