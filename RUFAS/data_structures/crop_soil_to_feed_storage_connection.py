@@ -279,14 +279,12 @@ class HarvestedCrop:
 
     def remove_feed_mass(self, mass_to_remove: float) -> None:
         """
-        Removes the specified mass of feed from the crop, adjusting both fresh and dry matter mass proportionally.
-
-        This keeps the dry matter percentage unchanged.
+        Removes the specified mass of feed from the crop and keeps the dry matter percentage unchanged.
 
         Parameters
         ----------
         mass_to_remove : float
-            Total mass of feed to remove (same unit as fresh_mass).
+            Total mass of feed to remove (kg).
         """
         if mass_to_remove > self.fresh_mass:
             raise ValueError("Cannot remove more feed mass than is available.")

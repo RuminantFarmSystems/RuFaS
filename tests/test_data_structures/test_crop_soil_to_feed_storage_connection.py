@@ -178,6 +178,77 @@ def test_remove_dry_matter_mass(
 
 
 @pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove, expected_fresh_mass",
+    [
+        (100.0, 40.0, 25.0, 75.0),   # Normal removal
+        (50.0, 20.0, 0.0, 50.0),     # Zero removal
+        (30.0, 12.0, 30.0, 0.0),     # Remove all fresh mass
+    ],
+)
+def test_remove_feed_mass_valid(
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+    expected_fresh_mass: float,
+) -> None:
+    crop = crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        type=CropType.WHEAT,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+    crop.remove_feed_mass(mass_to_remove)
+    assert crop.fresh_mass == expected_fresh_mass
+
+
+@pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove",
+    [
+        (10.0, 40.0, 15.0),  # Attempt to remove more than available
+    ],
+)
+def test_remove_feed_mass_invalid(
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+) -> None:
+    crop = crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        type=CropType.WHEAT,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+    with pytest.raises(ValueError, match="Cannot remove more feed mass than is available."):
+        crop.remove_feed_mass(mass_to_remove)
+
+
+@pytest.mark.parametrize(
     "mass,percentage,expected",
     [
         (100.0, 25.0, 25.0),
