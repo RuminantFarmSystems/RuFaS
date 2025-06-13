@@ -219,7 +219,7 @@ class Storage:
         """
         Projects the state of crops currently stored at a given future date.
 
-        Parameters
+        Parameters 
         ----------
         crops : list[HarvestedCrop]
             list of HarvestedCrops to project degradations for.
