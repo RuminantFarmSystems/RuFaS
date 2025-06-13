@@ -63,7 +63,7 @@ class SlurryStorageUnderfloor(Storage):
         storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
         if not manure_to_return:
-            self._stored_manure = copy(self._manure_to_process)
+            self.stored_manure = copy(self._manure_to_process)
 
         self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
         self._report_manure_stream(received_manure, "received", time.simulation_day)
