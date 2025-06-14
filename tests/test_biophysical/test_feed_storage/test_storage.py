@@ -168,34 +168,47 @@ def test_process_degradations(
     mass_values = {"fresh_mass": 5000.0, "dry_matter_percentage": 10.0}
     mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value=mass_values)
     mock_record = mocker.patch.object(storage, "_record_stored_crops")
-    mock_degradation = mocker.patch.object(storage, "_calculate_degradation_values", return_value={
-        "gaseous_dry_matter_loss": loss,
-        "crude_protein_percent": percentage,
-        "starch": percentage,
-        "adf": percentage,
-        "ndf": percentage,
-        "lignin": percentage,
-        "ash": percentage,
-        "last_time_degraded": time.current_date,
-        "fresh_mass": mass_values["fresh_mass"],
-        "dry_matter_percentage": mass_values["dry_matter_percentage"],
-    })
+    mock_degradation = mocker.patch.object(
+        storage,
+        "_calculate_degradation_values",
+        return_value={
+            "gaseous_dry_matter_loss": loss,
+            "crude_protein_percent": percentage,
+            "starch": percentage,
+            "adf": percentage,
+            "ndf": percentage,
+            "lignin": percentage,
+            "ash": percentage,
+            "last_time_degraded": time.current_date,
+            "fresh_mass": mass_values["fresh_mass"],
+            "dry_matter_percentage": mass_values["dry_matter_percentage"],
+        },
+    )
 
     original_values = {
         attr: getattr(mock_grain_crop, attr, None)
         for attr in [
-            "crude_protein_percent", "starch", "adf", "ndf", "lignin", "ash",
-            "fresh_mass", "dry_matter_percentage", "last_time_degraded",
+            "crude_protein_percent",
+            "starch",
+            "adf",
+            "ndf",
+            "lignin",
+            "ash",
+            "fresh_mass",
+            "dry_matter_percentage",
+            "last_time_degraded",
         ]
     }
 
     storage.process_degradations(mock_weather, time)
 
     assert mock_degradation.call_count == 2
-    mock_degradation.assert_has_calls([
-        call(mock_first_crop, mock_weather, time),
-        call(mock_second_crop, mock_weather, time),
-    ])
+    mock_degradation.assert_has_calls(
+        [
+            call(mock_first_crop, mock_weather, time),
+            call(mock_second_crop, mock_weather, time),
+        ]
+    )
     assert mock_grain_crop not in [call_args[0][0] for call_args in mock_degradation.call_args_list]
 
     mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", expected_loss, expected_info_map)
@@ -601,12 +614,17 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
     mocker.patch.object(storage, "_get_conditions", return_value=mock_conditions)
     mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=50.0)
 
-    mock_recalc = mocker.patch.object(storage, "recalculate_nutrient_percentage",
-                                      side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-    mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value={
-        "fresh_mass": 900.0,
-        "dry_matter_percentage": 32.0,
-    })
+    mock_recalc = mocker.patch.object(
+        storage, "recalculate_nutrient_percentage", side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    )
+    mocker.patch.object(
+        storage,
+        "_calculate_mass_attributes_after_loss",
+        return_value={
+            "fresh_mass": 900.0,
+            "dry_matter_percentage": 32.0,
+        },
+    )
 
     result = storage._calculate_degradation_values(mock_crop, mock_weather, mock_time)
 

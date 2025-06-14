@@ -219,7 +219,7 @@ class Storage:
         """
         Projects the state of crops currently stored at a given future date.
 
-        Parameters 
+        Parameters
         ----------
         crops : list[HarvestedCrop]
             list of HarvestedCrops to project degradations for.
@@ -398,20 +398,24 @@ class Storage:
         dry_matter_loss_percent = (
             0.0
             if total_initial_dry_matter_mass == 0.0
-            else (total_initial_dry_matter_mass - total_dry_matter_mass) / total_initial_dry_matter_mass
+            else (total_initial_dry_matter_mass - total_dry_matter_mass)
+            / total_initial_dry_matter_mass
             * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
-        self.om.add_variable("dry_matter_loss_percent", dry_matter_loss_percent, info_map
-                             | {"units": MeasurementUnits.PERCENT})
+        self.om.add_variable(
+            "dry_matter_loss_percent", dry_matter_loss_percent, info_map | {"units": MeasurementUnits.PERCENT}
+        )
 
         net_dry_matter_percentage = (
-            0.0 if self.stored_mass == 0.0 else (total_dry_matter_mass / self.stored_mass)
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
+            0.0
+            if self.stored_mass == 0.0
+            else (total_dry_matter_mass / self.stored_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
-        self.om.add_variable("net_dry_matter_percentage", net_dry_matter_percentage, info_map
-                             | {"units": MeasurementUnits.PERCENT})
+        self.om.add_variable(
+            "net_dry_matter_percentage", net_dry_matter_percentage, info_map | {"units": MeasurementUnits.PERCENT}
+        )
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
         self.om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
@@ -465,10 +469,12 @@ class Storage:
                 )
                 continue
             self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_fresh_mass", crop.fresh_mass, info_map)
-            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_dry_matter_mass", crop.dry_matter_mass,
-                                 info_map)
-            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_dry_matter_percentage",
-                                 crop.dry_matter_percentage, info_map)
+            self.om.add_variable(
+                f"{crop.config_name}_{crop.storage_time}_dry_matter_mass", crop.dry_matter_mass, info_map
+            )
+            self.om.add_variable(
+                f"{crop.config_name}_{crop.storage_time}_dry_matter_percentage", crop.dry_matter_percentage, info_map
+            )
             crop.recorded_days.add(simulation_day)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
