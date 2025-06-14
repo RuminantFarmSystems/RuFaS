@@ -151,23 +151,27 @@ class Storage:
             )
         if crop.category not in self.acceptable_crops:
             raise ValueError(
-                f"Can't recieve the crop, the compatible crop categories are {self.acceptable_crops=},\
-                    {crop.category} is not one of them."
+                f"Can't receive the crop, the compatible crop categories are {self.acceptable_crops=}, "
+                f"{crop.category} is not one of them."
             )
         if self.stored_mass + crop.fresh_mass > self.capacity:
             raise Exception(
-                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
-                    exceeds the storage capacity ({self.capacity})"
+                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
+                f"exceeds the storage capacity ({self.capacity})"
             )
-        if crop.type == CropType.GRAIN:
-            dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
-            crop.remove_dry_matter_mass(dry_matter_to_remove)
-        if crop.type == CropType.HIGH_MOISTURE:
-            dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
-            crop.remove_dry_matter_mass(dry_matter_to_remove)
 
         self.stored.append(crop)
         self._record_stored_crops(simulation_day)
+
+        initial_degradation_day_offset = 1
+        if crop.type == CropType.GRAIN:
+            dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+            self._record_stored_crops(simulation_day + initial_degradation_day_offset)
+        elif crop.type == CropType.HIGH_MOISTURE:
+            dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+            self._record_stored_crops(simulation_day + initial_degradation_day_offset)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -192,6 +196,8 @@ class Storage:
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
+            if crop.type == CropType.GRAIN:
+                continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             total_gaseous_dry_matter_loss += degraded_crop_values["gaseous_dry_matter_loss"]
             crop.crude_protein_percent = degraded_crop_values["crude_protein_percent"]
@@ -203,6 +209,7 @@ class Storage:
             crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
             crop.fresh_mass = degraded_crop_values["fresh_mass"]
             crop.dry_matter_percentage = degraded_crop_values["dry_matter_percentage"]
+
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self._record_stored_crops(time.simulation_day)
 
@@ -229,6 +236,8 @@ class Storage:
         """
         degraded_crops: list[HarvestedCrop] = []
         for crop in crops:
+            if crop.type == CropType.GRAIN:
+                continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             last_time_degraded = degraded_crop_values["last_time_degraded"]
             del degraded_crop_values["gaseous_dry_matter_loss"]
@@ -351,11 +360,32 @@ class Storage:
 
     def _record_stored_crops(self, simulation_day: int) -> None:
         """
+        Wrapper function to record both storage-level and individual crop-level data.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+        """
+        self._record_storage_totals(simulation_day)
+        self._record_individual_crops(simulation_day)
+
+    def _record_storage_totals(self, simulation_day: int) -> None:
+        """
+        Records the total mass and nutrient content of the stored crops at the storage level.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+
+        """
+        """
         Records the total mass and nutrient amounts held in storage.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._record_stored_crops.__name__,
+            "function": self._record_storage_totals.__name__,
             "units": MeasurementUnits.KILOGRAMS,
             "simulation_day": simulation_day,
         }
@@ -413,6 +443,39 @@ class Storage:
 
         total_ash = self._get_total_nutritive_amount("ash")
         self.om.add_variable("total_ash", total_ash, info_map)
+
+    def _record_individual_crops(self, simulation_day: int) -> None:
+        """
+        Records the mass and nutrient content of each crop currently stored.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the simulation, used for recording purposes.
+
+        """
+        for crop in self.stored:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._record_individual_crops.__name__,
+                "units": MeasurementUnits.KILOGRAMS,
+                "simulation_day": simulation_day,
+            }
+            if simulation_day in crop.recorded_days:
+                self.om.add_warning(
+                    "Crop Already Recorded Warning",
+                    f"Crop {crop.config_name} on day {simulation_day} has already been recorded, skipping.",
+                    info_map | {"crop": crop.config_name},
+                )
+                continue
+            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_fresh_mass", crop.fresh_mass, info_map)
+            self.om.add_variable(
+                f"{crop.config_name}_{crop.storage_time}_dry_matter_mass", crop.dry_matter_mass, info_map
+            )
+            self.om.add_variable(
+                f"{crop.config_name}_{crop.storage_time}_dry_matter_percentage", crop.dry_matter_percentage, info_map
+            )
+            crop.recorded_days.add(simulation_day)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
         """

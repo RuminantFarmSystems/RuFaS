@@ -1494,7 +1494,7 @@ class HerdManager:
             "1": (sum(parity_1_calving_age) / len(parity_1_calving_age)) if len(parity_1_calving_age) > 0 else 0,
             "2": (sum(parity_2_calving_age) / len(parity_2_calving_age)) if len(parity_2_calving_age) > 0 else 0,
             "3": (sum(parity_3_calving_age) / len(parity_3_calving_age)) if len(parity_3_calving_age) > 0 else 0,
-            "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_3_calving_age) > 0 else 0,
+            "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_4_calving_age) > 0 else 0,
             "5": (sum(parity_5_calving_age) / len(parity_5_calving_age)) if len(parity_5_calving_age) > 0 else 0,
             "greater_than_3": (
                 (sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age))

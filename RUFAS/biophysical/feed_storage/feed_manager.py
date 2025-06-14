@@ -516,19 +516,19 @@ class FeedManager:
         for rufas_id, amount in feeds_to_deduct.items():
             available_feeds: list[HarvestedCrop | PurchasedFeed] = []
             for feed in all_available_feeds:
-                if isinstance(feed, HarvestedCrop):
-                    feed_id = self._select_rufas_id_for_harvested_crop(feed.rufas_ids, list(feeds_to_deduct.keys()))
-                    is_feedable = True if feed_id == rufas_id else False
-                else:
-                    is_feedable = feed.rufas_id == rufas_id
-
+                is_feedable = self._check_feed_availability(feeds_to_deduct, rufas_id, feed)
                 if is_feedable:
                     available_feeds.append(feed)
 
             for feed in available_feeds:
-                amount_to_deduct = min(amount, feed.dry_matter_mass)
+                amount_to_deduct = min(
+                    amount, feed.dry_matter_mass if isinstance(feed, PurchasedFeed) else feed.fresh_mass
+                )
                 amount -= amount_to_deduct
-                feed.remove_dry_matter_mass(amount_to_deduct)
+                if isinstance(feed, PurchasedFeed):
+                    feed.remove_dry_matter_mass(amount_to_deduct)
+                else:
+                    feed.remove_feed_mass(amount_to_deduct)
                 if amount == 0.0:
                     break
             if amount != 0.0:
@@ -537,6 +537,14 @@ class FeedManager:
         for storage in self.active_storages.values():
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
+
+    def _check_feed_availability(self, feeds_to_deduct, rufas_id, feed):
+        if isinstance(feed, HarvestedCrop):
+            feed_id = self._select_rufas_id_for_harvested_crop(feed.rufas_ids, list(feeds_to_deduct.keys()))
+            is_feedable = True if feed_id == rufas_id else False
+        else:
+            is_feedable = feed.rufas_id == rufas_id
+        return is_feedable
 
     def _select_rufas_id_for_harvested_crop(
         self, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID]
