@@ -518,8 +518,9 @@ class FeedManager:
                     available_feeds.append(feed)
 
             for feed in available_feeds:
-                amount_to_deduct = min(amount, feed.dry_matter_mass if
-                                       isinstance(feed, PurchasedFeed) else feed.fresh_mass)
+                amount_to_deduct = min(
+                    amount, feed.dry_matter_mass if isinstance(feed, PurchasedFeed) else feed.fresh_mass
+                )
                 amount -= amount_to_deduct
                 if isinstance(feed, PurchasedFeed):
                     feed.remove_dry_matter_mass(amount_to_deduct)

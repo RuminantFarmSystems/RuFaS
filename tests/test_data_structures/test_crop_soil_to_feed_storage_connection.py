@@ -180,9 +180,9 @@ def test_remove_dry_matter_mass(
 @pytest.mark.parametrize(
     "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove, expected_fresh_mass",
     [
-        (100.0, 40.0, 25.0, 75.0),   # Normal removal
-        (50.0, 20.0, 0.0, 50.0),     # Zero removal
-        (30.0, 12.0, 30.0, 0.0),     # Remove all fresh mass
+        (100.0, 40.0, 25.0, 75.0),  # Normal removal
+        (50.0, 20.0, 0.0, 50.0),  # Zero removal
+        (30.0, 12.0, 30.0, 0.0),  # Remove all fresh mass
     ],
 )
 def test_remove_feed_mass_valid(
