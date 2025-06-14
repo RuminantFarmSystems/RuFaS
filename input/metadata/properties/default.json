@@ -1318,17 +1318,17 @@
         "cow_presynch_program": {
           "type": "string",
           "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+          "pattern": "^(PreSynch|Double OvSynch|G6G|None)$"
         },
         "cow_ovsynch_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch|None)$"
         },
         "cow_resynch_program": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
         },
         "days_in_milk": {
           "type": "number",
