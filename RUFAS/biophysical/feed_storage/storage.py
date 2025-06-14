@@ -458,6 +458,8 @@ class Storage:
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._record_individual_crops.__name__,
+                "suffix": f"crop='{crop.config_name}',"
+                f"stored_date={crop.storage_time}",
                 "units": MeasurementUnits.KILOGRAMS,
                 "simulation_day": simulation_day,
             }
@@ -468,12 +470,12 @@ class Storage:
                     info_map | {"crop": crop.config_name},
                 )
                 continue
-            self.om.add_variable(f"{crop.config_name}_{crop.storage_time}_fresh_mass", crop.fresh_mass, info_map)
+            self.om.add_variable("fresh_mass", crop.fresh_mass, info_map)
             self.om.add_variable(
-                f"{crop.config_name}_{crop.storage_time}_dry_matter_mass", crop.dry_matter_mass, info_map
+                "dry_matter_mass", crop.dry_matter_mass, info_map
             )
             self.om.add_variable(
-                f"{crop.config_name}_{crop.storage_time}_dry_matter_percentage", crop.dry_matter_percentage, info_map
+                "dry_matter_percentage", crop.dry_matter_percentage, info_map
             )
             crop.recorded_days.add(simulation_day)
 

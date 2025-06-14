@@ -253,7 +253,7 @@ def test_report_stored_feeds(
     mock_time.simulation_day = 100
     info_map = {
         "class": feed_manager.__class__.__name__,
-        "function": feed_manager.execute_daily_routine.__name__,
+        "function": feed_manager.report_stored_feeds.__name__,
         "simulation_day": mock_time.simulation_day,
         "units": MeasurementUnits.DRY_KILOGRAMS,
     }
