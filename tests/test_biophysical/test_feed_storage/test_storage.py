@@ -601,7 +601,8 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
     mocker.patch.object(storage, "_get_conditions", return_value=mock_conditions)
     mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=50.0)
 
-    mock_recalc = mocker.patch.object(storage, "recalculate_nutrient_percentage", side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    mock_recalc = mocker.patch.object(storage, "recalculate_nutrient_percentage",
+                                      side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value={
         "fresh_mass": 900.0,
         "dry_matter_percentage": 32.0,
