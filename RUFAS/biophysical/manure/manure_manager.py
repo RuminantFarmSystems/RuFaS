@@ -874,7 +874,7 @@ class ManureManager:
             available_amount_in_pool = \
                 self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus
 
-        proportion_of_limiting_nutrient_to_remove = self._determine_limiting_nutrient_proportion_to_be_removed(
+        proportion_of_limiting_nutrient_to_remove = self._determine_nutrient_proportion_to_be_removed(
             limiting_nutrient_requested_amount,
             available_amount_in_pool
         )
@@ -995,8 +995,8 @@ class ManureManager:
             return False
 
     @staticmethod
-    def _determine_limiting_nutrient_proportion_to_be_removed(limiting_nutrient_requested_mass: float,
-                                                              limited_nutrient_available: float) -> float:
+    def _determine_nutrient_proportion_to_be_removed(limiting_nutrient_requested_mass: float,
+                                                     limited_nutrient_available: float) -> float:
         """
         Calculates the proportion of limiting nutrients to remove.
 

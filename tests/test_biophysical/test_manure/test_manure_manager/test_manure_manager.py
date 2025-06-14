@@ -916,7 +916,7 @@ def test_remove_nutrients_from_storage(manure_manager: ManureManager,
                                                            "_determine_limiting_nutrient",
                                                            return_value=is_nitrogen_limiting_nutrient)
     mock_proportion = mocker.patch.object(manure_manager,
-                                          "_determine_limiting_nutrient_proportion_to_be_removed",
+                                          "_determine_nutrient_proportion_to_be_removed",
                                           return_value=0.8)
     mock_remove = mocker.patch.object(ManureNutrientManager, "remove_nutrients")
     mock_compute = mocker.patch.object(ManureManager, "compute_stream_after_removal",
@@ -1072,7 +1072,7 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
     available,
     expected_prop,
 ):
-    prop = ManureManager._determine_limiting_nutrient_proportion_to_be_removed(
+    prop = ManureManager._determine_nutrient_proportion_to_be_removed(
         limiting_nutrient_requested_mass=requested_mass,
         limited_nutrient_available=available,
     )
