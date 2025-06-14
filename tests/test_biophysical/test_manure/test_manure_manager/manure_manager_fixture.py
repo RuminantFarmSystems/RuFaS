@@ -189,10 +189,10 @@ def manure_manager(mocker: MockerFixture) -> ManureManager:
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager()
     mnm = ManureNutrientManager()
-    mnm.update_nutrients(ManureNutrients(manure_type=ManureType.LIQUID,
-                                         nitrogen=100,
-                                         phosphorus=200,
-                                         ))
+    mnm.add_nutrients(ManureNutrients(manure_type=ManureType.LIQUID,
+                                      nitrogen=100,
+                                      phosphorus=200,
+                                      ))
     manure_manager._manure_nutrient_manager = mnm
     manure_manager.all_processors, manure_manager._all_separators, manure_manager._adjacency_matrix = {}, {}, {}
     manure_manager._processing_order = []

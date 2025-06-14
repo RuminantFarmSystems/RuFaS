@@ -21,7 +21,7 @@ class ManureNutrientManager:
 
     def get_values(self, manure_type: ManureType) -> ManureNutrients:
         """
-        Get the current nutrient values stored in the manager by manure type.
+        Get the current nutrient values stored in the nutrient manager by manure type.
 
         Parameters
         ----------
@@ -32,11 +32,6 @@ class ManureNutrientManager:
         -------
         ManureNutrients
             The current nutrient values stored in the manager for the provided ManureType.
-
-        Raises
-        ------
-        KeyError
-            If the manure type is not in the list of acceptable manure types.
         """
         return self.nutrients_by_manure_category[manure_type]
 
@@ -45,7 +40,7 @@ class ManureNutrientManager:
         for manure_type, pool in self.nutrients_by_manure_category.items():
             self.nutrients_by_manure_category[manure_type] = pool.reset_values()
 
-    def update_nutrients(self, nutrients: ManureNutrients) -> None:
+    def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
         Add or update nutrients to the manager from the manure module by manure type.
 
@@ -54,19 +49,15 @@ class ManureNutrientManager:
         nutrients : ManureNutrients
             The nutrients to be added to or updated in the manager.
 
-        Returns
-        -------
-        None
-
         """
-        current_categorical_nutrients = self.nutrients_by_manure_category.get(nutrients.manure_type)
+        current_nutrients = self.nutrients_by_manure_category.get(nutrients.manure_type)
 
         updated_categorical_nutrients = ManureNutrients(
-            nitrogen=current_categorical_nutrients.nitrogen + nutrients.nitrogen,
-            phosphorus=current_categorical_nutrients.phosphorus + nutrients.phosphorus,
-            potassium=current_categorical_nutrients.potassium + nutrients.potassium,
-            dry_matter=current_categorical_nutrients.dry_matter + nutrients.dry_matter,
-            total_manure_mass=current_categorical_nutrients.total_manure_mass + nutrients.total_manure_mass,
+            nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
+            phosphorus=current_nutrients.phosphorus + nutrients.phosphorus,
+            potassium=current_nutrients.potassium + nutrients.potassium,
+            dry_matter=current_nutrients.dry_matter + nutrients.dry_matter,
+            total_manure_mass=current_nutrients.total_manure_mass + nutrients.total_manure_mass,
             manure_type=nutrients.manure_type,
         )
 
@@ -81,9 +72,6 @@ class ManureNutrientManager:
         removal_details : dict[str, Any]
             The details of nutrients removed from each storage
 
-        Returns
-        -------
-
         """
         current_pool_by_category = self.nutrients_by_manure_category[removal_details.get("manure_type")]
 
@@ -93,26 +81,18 @@ class ManureNutrientManager:
             phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0)),
             potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0)),
             total_manure_mass=max(0.0, (current_pool_by_category.total_manure_mass - removal_details.get("water", 0) -
-                              removal_details.get("total_solids", 0))),
+                                        removal_details.get("total_solids", 0))),
             dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0))
         )
 
         self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
 
-
-
-    def request_nutrients(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
+    def handle_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
-        Handle the request for specific nutrients from the crop and soil module.
-
-        This method evaluates the nutrient request made by considering both nitrogen and phosphorus
-        quantities desired for the specified manure type. It calculates the projected manure mass that
-        would satisfy the request and checks against the nutrients available in the manager.
-
-        If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping for the manure type. The method then returns
-        the results of the nutrient request, which detail the amounts of nutrients that can be provided to
-        fulfill the request. If the request cannot be fulfilled at all, the method will return None.
+        Attempts to fulfill a nutrient request using available manure in the manager.
+        This method evaluates the given nutrient request (including nitrogen, phosphorus, and manure type)
+        and checks if the available nutrient pool can satisfy it. If the request can be met fully or partially,
+        the corresponding nutrients are removed from the manager and a result is returned.
 
         Parameters
         ----------
@@ -132,9 +112,7 @@ class ManureNutrientManager:
 
     def _evaluate_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
-        Evaluate a nutrient request. The method calculates the projected manure mass
-        based on the request for nitrogen and phosphorus for a specific manure type. It then checks if the
-        projected manure mass can be fulfilled by the available nutrients for that manure type in the manager.
+        The method calculates the projected manure mass.
 
         Parameters
         ----------

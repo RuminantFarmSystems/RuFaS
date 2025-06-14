@@ -55,13 +55,10 @@ class FieldManureSupplier:
 
     """
 
-    def __init__(self) -> None:
-        pass
-
     @staticmethod
     def request_nutrients(request: NutrientRequest) -> NutrientRequestResults:
         """
-        Receives requests for amounts of nutrients to be contained in manure and formulates manure reponses to send out.
+        Formulates a manure supply response based on a nutrient request.
 
         Parameters
         ----------

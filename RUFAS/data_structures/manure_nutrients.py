@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields, replace
-from typing import Dict, Optional
+from typing import Optional
 
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.units import MeasurementUnits
@@ -64,7 +64,7 @@ class ManureNutrients:
                     raise ValueError(f"Field {field.name} must be non-negative.")
 
     @property
-    def units_dict(self) -> Dict[str, MeasurementUnits]:
+    def units_dict(self) -> dict[str, MeasurementUnits]:
         """
         Creates a dictionary of unit labels for each property in the ManureNutrients class.
 
@@ -74,7 +74,7 @@ class ManureNutrients:
 
         Returns
         -------
-        Dict[MeasurementUnits, MeasurementUnits]
+        dict[MeasurementUnits, MeasurementUnits]
             A dictionary where keys are the names of attributes representing the units of nutrients and properties,
             and values are the respective units of measurement.
         """

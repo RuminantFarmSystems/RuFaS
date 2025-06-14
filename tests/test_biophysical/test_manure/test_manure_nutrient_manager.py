@@ -106,7 +106,7 @@ def test_request_nutrients(
     )
 
     # Act
-    actual_result = manager.request_nutrients(nutrient_request)
+    actual_result = manager.handle_nutrient_request(nutrient_request)
 
     # Assert
     patch_for_evaluate_nutrient_request.assert_called_once_with(nutrient_request)
@@ -176,7 +176,7 @@ def test_evaluate_nutrient_request(
     """
     # Arrange
     manager = ManureNutrientManager()
-    manager.update_nutrients(current_nutrient_values)
+    manager.add_nutrients(current_nutrient_values)
 
     nitrogen_derived_manure_mass = mocker.MagicMock()
     phosphorus_derived_manure_mass = mocker.MagicMock()
@@ -463,7 +463,7 @@ def test_create_nutrient_request_results(
     """
     # Arrange
     manager = ManureNutrientManager()
-    manager.update_nutrients(nutrients)
+    manager.add_nutrients(nutrients)
 
     # Act
     actual_results = manager._create_nutrient_request_results(projected_manure_mass, manure_type)
@@ -529,7 +529,7 @@ def test_update_nutrients(manure_type: ManureType) -> None:
     )
 
     # Act
-    manager.update_nutrients(nutrients)
+    manager.add_nutrients(nutrients)
 
     # Assert
     assert manager.get_values(manure_type) == nutrients
@@ -565,8 +565,8 @@ def test_remove_nutrients(removal_details: dict[str, Any]) -> None:
                                                dry_matter=10,
                                                total_manure_mass=10,
                                                )
-    manure_nutrient_manager.update_nutrients(original_solid_nutrients)
-    manure_nutrient_manager.update_nutrients(original_liquid_nutrients)
+    manure_nutrient_manager.add_nutrients(original_solid_nutrients)
+    manure_nutrient_manager.add_nutrients(original_liquid_nutrients)
 
     manure_nutrient_manager.remove_nutrients(removal_details)
 

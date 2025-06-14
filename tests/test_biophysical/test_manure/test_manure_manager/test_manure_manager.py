@@ -860,7 +860,7 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     supplemental_result = NutrientRequestResults(nitrogen=5.0, phosphorus=2.5, total_manure_mass=25.0)
     mock_nutrient_request = mocker.MagicMock()
     mock_request = mocker.patch.object(ManureNutrientManager,
-                                       "request_nutrients",
+                                       "handle_nutrient_request",
                                        return_value=(result, not use_supplemental_manure))
 
     mock_record = mocker.patch.object(ManureManager, "_record_manure_request_results")
@@ -919,7 +919,7 @@ def test_remove_nutrients_from_storage(manure_manager: ManureManager,
                                           "_determine_nutrient_proportion_to_be_removed",
                                           return_value=0.8)
     mock_remove = mocker.patch.object(ManureNutrientManager, "remove_nutrients")
-    mock_compute = mocker.patch.object(ManureManager, "compute_stream_after_removal",
+    mock_compute = mocker.patch.object(ManureManager, "_compute_stream_after_removal",
                                        return_value=(MagicMock(ManureStream), {"nitrogen": 50}))
     composting = MagicMock(Composting)
     composting.stored_manure = MagicMock(ManureStream)
@@ -978,9 +978,9 @@ def test_compute_stream_after_removal_with_real_manure_stream(
 
     non_lim_fields: list[str] = []
 
-    new_stream, removed = ManureManager.compute_stream_after_removal(
+    new_stream, removed = ManureManager._compute_stream_after_removal(
         stored_manure=initial_stream,
-        limiting_nutrient_removal_proportion=removal_prop,
+        nutrient_removal_proportion=removal_prop,
         is_nitrogen_limiting_nutrient=limiting_flag,
         non_limiting_fields=non_lim_fields,
     )
