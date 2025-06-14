@@ -218,7 +218,7 @@ class FeedManager:
                     feed_report[rufas_id] = crop.dry_matter_mass
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.execute_daily_routine.__name__,
+            "function": self.report_stored_feeds.__name__,
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.DRY_KILOGRAMS,
         }
