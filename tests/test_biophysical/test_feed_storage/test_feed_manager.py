@@ -231,11 +231,6 @@ def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) 
     pile_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
 
 
-def test_give_feed(feed_manager: FeedManager) -> None:
-    """Tests give_feed in the FeedManager."""
-    feed_manager.give_feed(0.0, CropType.GRAIN)
-
-
 def test_execute_daily_routines(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that the Feed Manager's daily routine is executed correctly."""
     mock_report_stored_feeds = mocker.patch.object(feed_manager, "report_stored_feeds")

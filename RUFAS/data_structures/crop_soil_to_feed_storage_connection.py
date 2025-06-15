@@ -91,32 +91,6 @@ class CropType(Enum):
     MEADOW_FESCUE = "Meadow Fescue"
 
 
-"""Maps the valid combinations of Crop Categories and Crop Types."""
-CROP_CATEGORY_TO_CROP_TYPE_MAPPING = {
-    CropCategory.SMALL_GRAIN: [
-        CropType.WHEAT,
-        CropType.RYE,
-        CropType.OAT,
-        CropType.RICE,
-    ],
-    CropCategory.CORN: [
-        CropType.HIGH_MOISTURE,
-        CropType.SILAGE,
-        CropType.WHOLE_PLANT,
-        CropType.GRAIN,
-    ],
-    CropCategory.SOY: [CropType.FORAGE, CropType.GRAIN],
-    CropCategory.ALFALFA: [CropType.ALFALFA],
-    CropCategory.GRASS: [
-        CropType.RYEGRASS,
-        CropType.ORCHARDGRASS,
-        CropType.FINE_FESCUE,
-        CropType.TALL_FESCUE,
-        CropType.MEADOW_FESCUE,
-    ],
-}
-
-
 class StorageType(Enum):
     """
     Maps each storage type to its respective class.
@@ -147,8 +121,6 @@ class HarvestedCrop:
     ----------
     category : CropCategory
         The category of the crop (enum).
-    type : CropType
-        The type of the crop (enum), a subdivision of crop category.
     config_name : str
         Name of the crop configuration that produced this harvested crop.
     rufas_ids : list[RUFAS_ID]
@@ -244,10 +216,6 @@ class HarvestedCrop:
             If the crop type is not valid for the crop category.
 
         """
-
-        if self.type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[self.category]:
-            raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
-
         self.estimated_maximum_effluent = self.estimate_maximum_effluent()
         self.bale_density = self._calculate_bale_density()
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
