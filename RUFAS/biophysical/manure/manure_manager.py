@@ -136,6 +136,12 @@ class ManureManager:
                             destination_processor.receive_manure(split_stream)
 
         self._manure_nutrient_manager.reset_nutrient_pools()
+        self._build_nutrient_pools()
+
+    def _build_nutrient_pools(self) -> None:
+        """
+        Build the pool for aggregated storage type.
+        """
         for name, processor in self.all_processors.items():
             if isinstance(processor, Storage):
                 manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))

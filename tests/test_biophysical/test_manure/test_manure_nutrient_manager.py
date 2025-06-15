@@ -24,7 +24,7 @@ def test_get_values_success(mocker: MockerFixture) -> None:
     }
     manager._nutrients_by_manure_type = mock_nutrient_dict
 
-    result = manager.get_values(ManureType.LIQUID)
+    result = manager.get_manure_nutrients(ManureType.LIQUID)
 
     assert result == nutrients
 
@@ -532,7 +532,7 @@ def test_update_nutrients(manure_type: ManureType) -> None:
     manager.add_nutrients(nutrients)
 
     # Assert
-    assert manager.get_values(manure_type) == nutrients
+    assert manager.get_manure_nutrients(manure_type) == nutrients
 
 
 @pytest.mark.parametrize(

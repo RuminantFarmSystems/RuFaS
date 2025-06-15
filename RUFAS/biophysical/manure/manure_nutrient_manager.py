@@ -19,7 +19,7 @@ class ManureNutrientManager:
             ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
 
-    def get_values(self, manure_type: ManureType) -> ManureNutrients:
+    def get_manure_nutrients(self, manure_type: ManureType) -> ManureNutrients:
         """
         Get the current nutrient values stored in the nutrient manager by manure type.
 

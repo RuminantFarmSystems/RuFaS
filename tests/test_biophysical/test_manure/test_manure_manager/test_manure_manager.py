@@ -741,6 +741,7 @@ def test_run_daily_update(
     mock_stream = MagicMock(spec=ManureStream)
     mock_stream.pen_manure_data = MagicMock(first_processor="proc1")
     split_mock = mocker.patch.object(mock_stream, "split_stream", return_value=MagicMock(spec=ManureStream))
+    mock_build = mocker.patch.object(manure_manager, "_build_nutrient_pools")
 
     manure_streams = {"stream1": mock_stream}
 
@@ -766,6 +767,8 @@ def test_run_daily_update(
         else:
             split_mock.assert_any_call(proportion)
             dest_processor.receive_manure.assert_called()
+
+        mock_build.assert_called_once()
 
 
 def test_run_daily_update_missing_first_processor_raises_keyerror(mocker: MockerFixture,
