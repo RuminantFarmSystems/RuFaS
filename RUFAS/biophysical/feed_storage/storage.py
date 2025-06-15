@@ -79,8 +79,6 @@ class Storage:
         Receives a harvested crop and adds it to the storage.
     process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
         Processes the degradations and losses of the stored crops.
-    give_feed(amount: float, crop_type: str)
-        Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
         Resets mass related attributes after loss of dry matter and/or moisture.
     _record_stored_crops(self, simulation_day: int)
@@ -304,20 +302,6 @@ class Storage:
             "dry_matter_percentage": mass_values["dry_matter_percentage"],
             "last_time_degraded": last_time_degraded,
         }
-
-    def give_feed(self, amount: float, crop_type: CropType) -> None:
-        """
-        Gives out a specified amount of feed of a certain crop type.
-
-        Parameters
-        ----------
-        amount : float
-            The amount of feed to give out.
-        crop_type : CropType
-            The type of crop to give out.
-
-        """
-        pass
 
     def remove_empty_crops(self) -> None:
         """Removes all crops with no dry matter mass left."""

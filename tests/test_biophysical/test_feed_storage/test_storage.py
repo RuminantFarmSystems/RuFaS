@@ -650,7 +650,3 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         mocker.call(mock_crop.ash, storage.ash_loss_coefficient, 50.0, 300.0),
     ]
     mock_recalc.assert_has_calls(expected_calls)
-
-
-def test_give_feed(storage: Storage) -> None:
-    storage.give_feed(100.0, CropType.ALFALFA)
