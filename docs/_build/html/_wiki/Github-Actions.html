@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Github Actions | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="Github Actions | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="Github Actions | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="Using-Mypy.html" rel="next" title="Using Mypy"/>
+<link href="End%E2%80%90to%E2%80%90End-Testing.html" rel="prev" title="End to End Testing"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_code/modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Github Actions</span>
+</nav>
+<div id="content" role="main">
+<section id="github-actions">
+<h1>Github Actions<a class="headerlink" href="#github-actions" title="Link to this heading"><span>#</span></a></h1>
+<section id="what-and-why">
+<h2>What and Why<a class="headerlink" href="#what-and-why" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#what-and-why'"><span>#</span></a></h2>
+<p>Github Actions are a continuous integration and continuous delivery
+(CI/CD) platform that allows you to automate your build, test, and
+deployment pipeline.</p>
+<p>Essentially, whenever you push code to Github or merge a branch into
+<code class="docutils literal notranslate"><span class="pre">dev</span></code> or <code class="docutils literal notranslate"><span class="pre">main</span></code>, a series of actions are run on that code by Github.
+These actions ensure that the code is meeting the testing, formatting,
+and linting guidelines and standards established by RuFaS. Ensuring your
+code passes these guidelines helps maintain clean, functional code and
+tries to prevent bad code from being merged into the main and dev
+branches.</p>
+</section>
+<section id="how">
+<h2>How<a class="headerlink" href="#how" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how'"><span>#</span></a></h2>
+<p>Github Actions are in the MASM/.github/workflows folder saved as
+<code class="docutils literal notranslate"><span class="pre">.yml</span></code> files.</p>
+<p>As of September 2024, RuFaS has two Actions files:
+<code class="docutils literal notranslate"><span class="pre">combined_format_lint_test_mypy.yml</span></code> and <code class="docutils literal notranslate"><span class="pre">sphinx.yml</span></code>.
+<code class="docutils literal notranslate"><span class="pre">combined_format_lint_test_mypy.yml</span></code> runs 2 different jobs, described
+below. <code class="docutils literal notranslate"><span class="pre">sphinx.yml</span></code> must be triggered manually, instructions for how
+to do that are located in the <a class="reference internal" href="Using-Sphinx.html"><span class="doc">Sphinx Wiki Page</span></a>.</p>
+<section id="format-code">
+<h3>format_code<a class="headerlink" href="#format-code" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#format-code'"><span>#</span></a></h3>
+<p>The first job in <code class="docutils literal notranslate"><span class="pre">combined_format_lint_test_mypy.yml</span></code> does 4 things:</p>
+<ol class="arabic simple">
+<li><p>Checks for any changes to protected files. This check is for files
+that we don’t want anyone to change but that we still want to have
+tracked in Github. The Github Actions will exit out and fail at this
+point if the user has changed any unauthorized files.</p></li>
+<li><p>Checks and records if the
+<a class="reference external" href="https://github.com/RuminantFarmSystems/MASM/blob/dev/changelog.md">changelog</a>
+has been updated in this PR.</p></li>
+<li><p>Formats the code using the <a class="reference internal" href="Using-Python%27s-Black-Formatter.html"><span class="doc">Black formatting tool</span></a>.</p></li>
+<li><p>Commits and adds the Black-formatted code to the PR.</p></li>
+</ol>
+</section>
+<section id="lint-test-type-check">
+<h3>lint_test_type_check<a class="headerlink" href="#lint-test-type-check" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#lint-test-type-check'"><span>#</span></a></h3>
+<p>The second job <code class="docutils literal notranslate"><span class="pre">combined_format_lint_test_mypy.yml</span></code> does 6 things:</p>
+<ol class="arabic simple">
+<li><p>Takes the Black-formatted code added in the first job and uses
+<a class="reference internal" href="Using-Flake8.html"><span class="doc">flake8</span></a>
+to check for any linting errors.</p></li>
+<li><p>Checks that the code passes all unit testing.</p></li>
+<li><p>Checks the percent of the code that is covered by unit testing.</p></li>
+<li><p>Runs
+<a class="reference internal" href="Using-Mypy.html"><span class="doc">Mypy</span></a>
+on both the dev branch and the PR branch and compares the number of
+static type check errors found.</p></li>
+<li><p>Updates the README badges for linting, testing, flake8, and MyPy
+errors.</p></li>
+<li><p>Based on the logged result of the changelog check from job 1,
+notifies the user if they didn’t update the changelog. The action
+will fail at this point if the user hasn’t updated the changelog.</p></li>
+</ol>
+</section>
+</section>
+<section id="updating-and-testing-github-actions">
+<h2>Updating and Testing Github Actions<a class="headerlink" href="#updating-and-testing-github-actions" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#updating-and-testing-github-actions'"><span>#</span></a></h2>
+<p>The process of updating Github Actions can be challenging. They are
+written in the YAML syntax and the behaviors can often feel
+unpredictable. They are also difficult to test locally before pushing to
+Github to see their behavior.</p>
+<p>In particular, there can be challenges predicting the behavior of
+running the Github Actions on a branch when comparing that branch to dev
+and running the Github Actions on dev when code is merged into the dev
+branch. In those latter cases, there is no base branch to which dev is
+compared. There have been multiple times where Github Actions run on a
+branch will function as predicted and then will error when that branch
+is merged into dev.</p>
+<section id="testing-strategy">
+<h3>Testing Strategy:<a class="headerlink" href="#testing-strategy" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#testing-strategy'"><span>#</span></a></h3>
+<ol class="arabic simple">
+<li><p>Create a new branch <code class="docutils literal notranslate"><span class="pre">test-dev</span></code> off <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+<li><p>Update the Github action workflow .yml file in that branch to make
+<code class="docutils literal notranslate"><span class="pre">test-dev</span></code> the <code class="docutils literal notranslate"><span class="pre">on</span> <span class="pre">push</span></code> and <code class="docutils literal notranslate"><span class="pre">on</span> <span class="pre">pull_request</span></code> branch:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">on</span><span class="p">:</span>
+</span><span id="line-2">  <span class="n">push</span><span class="p">:</span>
+</span><span id="line-3">    <span class="n">branches</span><span class="p">:</span> <span class="p">[</span> <span class="n">test</span><span class="o">-</span><span class="n">dev</span> <span class="p">]</span>
+</span><span id="line-4">  <span class="n">pull_request</span><span class="p">:</span>
+</span><span id="line-5">    <span class="n">branches</span><span class="p">:</span> <span class="p">[</span> <span class="n">test</span><span class="o">-</span><span class="n">dev</span> <span class="p">]</span>
+</span></code></pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Change all other references to <code class="docutils literal notranslate"><span class="pre">dev</span></code> to <code class="docutils literal notranslate"><span class="pre">test-dev</span></code>. For example,
+this would update the <code class="docutils literal notranslate"><span class="pre">Get</span> <span class="pre">all</span> <span class="pre">added</span> <span class="pre">or</span> <span class="pre">modified</span> <span class="pre">files</span></code> step to
+reflect this new <code class="docutils literal notranslate"><span class="pre">test-dev</span></code> base branch:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">- name: Get all added or modified files
+</span><span id="line-2">        run: |
+</span><span id="line-3">          BASE_BRANCH=${{ github.base_ref }} || "test-dev"
+</span><span id="line-4">          git fetch origin $BASE_BRANCH
+</span><span id="line-5">          if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
+</span><span id="line-6">            echo "Fallback to test-dev branch because $BASE_BRANCH does not exist."
+</span><span id="line-7">            BASE_BRANCH="test-dev"
+</span><span id="line-8">            git fetch origin $BASE_BRANCH
+</span><span id="line-9">          fi
+</span></code></pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Push that branch to Github.</p></li>
+<li><p>Create a branch off <code class="docutils literal notranslate"><span class="pre">test-dev</span></code> (<code class="docutils literal notranslate"><span class="pre">test-test-dev</span></code> or whatever you
+prefer) and make some changes and push those to github.</p></li>
+<li><p>In the PR created for <code class="docutils literal notranslate"><span class="pre">test-test-dev</span></code> update the base branch (the
+branch to which you want to compare <code class="docutils literal notranslate"><span class="pre">test-test-dev</span></code>) to
+<code class="docutils literal notranslate"><span class="pre">test-dev</span></code>.</p></li>
+</ol>
+<figure class="align-center" id="rufas-overview">
+<img alt="RuFaS Overview - GG" src="../_images/gh-action.png"/>
+</figure>
+<ol class="arabic simple" start="7">
+<li><p>Merge <code class="docutils literal notranslate"><span class="pre">test-test-dev</span></code> into <code class="docutils literal notranslate"><span class="pre">test-dev</span></code> with the above-alterations
+to the Github action.</p></li>
+</ol>
+</section>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#what-and-why'" class="reference internal" href="#what-and-why">What and Why</a></li>
+<li><a :data-current="activeSection === '#how'" class="reference internal" href="#how">How</a><ul>
+<li><a :data-current="activeSection === '#format-code'" class="reference internal" href="#format-code">format_code</a></li>
+<li><a :data-current="activeSection === '#lint-test-type-check'" class="reference internal" href="#lint-test-type-check">lint_test_type_check</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#updating-and-testing-github-actions'" class="reference internal" href="#updating-and-testing-github-actions">Updating and Testing Github Actions</a><ul>
+<li><a :data-current="activeSection === '#testing-strategy'" class="reference internal" href="#testing-strategy">Testing Strategy:</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
