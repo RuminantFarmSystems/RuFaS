@@ -3,7 +3,7 @@ from datetime import date
 from typing import Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -44,6 +44,8 @@ References
 """
 GRAIN_LOSS_COEFFICIENT: float = 0.01
 HIGH_MOISTURE_LOSS_COEFFICIENT: float = 0.05
+GRAIN_CROPS = ["cereal_rye_grain", "corn_grain", "soybean_grain", "triticale_grain", "winter_wheat_grain"]
+HIGH_MOISTURE_CROPS = ["corn_high_moisture"]
 
 
 class Storage:
@@ -162,11 +164,11 @@ class Storage:
         self._record_stored_crops(simulation_day)
 
         initial_degradation_day_offset = 1
-        if crop.type == CropType.GRAIN:
+        if crop.config_name in GRAIN_CROPS:
             dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
             self._record_stored_crops(simulation_day + initial_degradation_day_offset)
-        elif crop.type == CropType.HIGH_MOISTURE:
+        elif crop.config_name in HIGH_MOISTURE_CROPS:
             dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
             self._record_stored_crops(simulation_day + initial_degradation_day_offset)
@@ -194,7 +196,7 @@ class Storage:
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            if crop.type == CropType.GRAIN:
+            if crop.config_name in GRAIN_CROPS:
                 continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             total_gaseous_dry_matter_loss += degraded_crop_values["gaseous_dry_matter_loss"]
@@ -234,7 +236,7 @@ class Storage:
         """
         degraded_crops: list[HarvestedCrop] = []
         for crop in crops:
-            if crop.type == CropType.GRAIN:
+            if crop.config_name in GRAIN_CROPS:
                 continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             last_time_degraded = degraded_crop_values["last_time_degraded"]
