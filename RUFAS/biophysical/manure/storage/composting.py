@@ -8,6 +8,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -323,7 +324,8 @@ class Composting(Storage):
             The solid manure methane emission on the current day, kg/day.
         """
         methane_conversion_factor =\
-            Composting._calculate_methane_conversion_factor(manure_temperature, composting_type) / 100
+            Composting._calculate_methane_conversion_factor(manure_temperature, composting_type) \
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         return manure_volatile_solids * (ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
 
     @staticmethod
