@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.biophysical.feed_storage.storage import HIGH_MOISTURE_LOSS_COEFFICIENT, Storage
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -41,8 +41,7 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    return HarvestedCrop(category=category, **sample_crop_data)
 
 
 @pytest.fixture
@@ -92,7 +91,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
+    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop, 15)
 
@@ -109,11 +108,27 @@ def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: Mock
     """Ensure HIGH_MOISTURE crop triggers dry matter loss logic and records storage."""
     storage.acceptable_crops = [CropCategory.CORN]
 
-    category = CropCategory.CORN
-    crop_type = CropType.HIGH_MOISTURE
-    crop = HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    high_moisture_crop_data = {
+        "harvest_time": date(2025, 3, 7),
+        "storage_time": date(2025, 3, 7),
+        "config_name": "corn_high_moisture",
+        "rufas_ids": [1],
+        "fresh_mass": 100.0,
+        "dry_matter_percentage": 50.0,
+        "dry_matter_digestibility": 70.0,
+        "crude_protein_percent": 10.0,
+        "non_protein_nitrogen": 5.0,
+        "starch": 30.0,
+        "adf": 7.0,
+        "ndf": 15.0,
+        "lignin": 3.0,
+        "sugar": 20.0,
+        "ash": 6.0,
+    }
 
-    # Spy on method calls
+    category = CropCategory.CORN
+    crop = HarvestedCrop(category=category, **high_moisture_crop_data)
+
     mock_remove_dm = mocker.spy(crop, "remove_dry_matter_mass")
     mock_record = mocker.patch.object(storage, "_record_stored_crops")
 
@@ -148,16 +163,16 @@ def test_process_degradations(
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
 
     mock_first_crop = mocker.MagicMock(spec=HarvestedCrop)
-    mock_first_crop.type = CropType.SILAGE
     mock_first_crop.last_time_degraded = date(2025, 1, 1)
+    mock_first_crop.config_name = "alfalfa_hay"
 
     mock_second_crop = mocker.MagicMock(spec=HarvestedCrop)
-    mock_second_crop.type = CropType.SILAGE
     mock_second_crop.last_time_degraded = date(2025, 1, 2)
+    mock_second_crop.config_name = "alfalfa_silage"
 
     mock_grain_crop = mocker.MagicMock(spec=HarvestedCrop)
-    mock_grain_crop.type = CropType.GRAIN
     mock_grain_crop.last_time_degraded = date(2025, 1, 3)
+    mock_grain_crop.config_name = "corn_grain"
 
     storage.stored = [mock_first_crop, mock_second_crop, mock_grain_crop]
 
@@ -252,7 +267,10 @@ def test_project_degradations(
 
     degradable_crops = [replace(harvested_crop) for _ in range(2)]
     grain_crop = replace(harvested_crop)
-    object.__setattr__(grain_crop, "type", CropType.GRAIN)
+    for crop in degradable_crops:
+        object.__setattr__(crop, "config_name", "not_grain")
+
+    object.__setattr__(grain_crop, "config_name", "corn_grain")
     storage.stored = degradable_crops + [grain_crop]
 
     expected_degraded = [
@@ -281,7 +299,6 @@ def test_project_degradations(
     assert actual == expected_degraded
 
     mock_degradation.assert_has_calls([mocker.call(crop, weather, time) for crop in degradable_crops])
-    assert all(call_args[0][0].type != CropType.GRAIN for call_args in mock_degradation.call_args_list)
 
     assert grain_crop not in actual
 

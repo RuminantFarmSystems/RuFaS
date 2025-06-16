@@ -3,7 +3,6 @@ from typing import Dict, List, Any
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
-    CropType,
     HarvestedCrop,
     StorageType,
 )
@@ -65,7 +64,7 @@ STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 
-QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
+QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | float]
 
 
 class FeedManager:

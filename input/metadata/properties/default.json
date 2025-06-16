@@ -2092,11 +2092,6 @@
           "description": "Crop category of the crop configuration.",
           "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
         },
-        "crop_type": {
-          "type": "string",
-          "description": "Subdivision of the crop category of the crop configuration.",
-          "pattern": "^(Wheat|Rye|Oat|Rice|High-moisture|Silage|Whole-plant|Grain|Forage|Alfalfa|Ryegrass|Orchardgrass|Fine Fescue|Tall Fescue|Meadow Fescue)$"
-        },
         "rufas_ids": {
           "type": "array",
           "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
