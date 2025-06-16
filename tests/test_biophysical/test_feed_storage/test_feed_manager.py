@@ -469,15 +469,22 @@ def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: Mock
 
 
 def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
-    """Test that requests for feed made at beginning of a ration interval are handled correctly."""
+    """Test that the daily request for feed is executed correctly."""
+    mock_query_available_feed_totals = mocker.patch.object(
+        feed_manager, "_query_available_feed_totals", return_value={1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5, 6: 6.6}
+    )
+    requested_feed = RequestedFeed(requested_feed={1: 0.8, 3: 3.3, 5: 7.5, 6: 16.6})
+
+    expected_feeds_to_purchase = {1: 0.0, 3: 0.0, 5: 2.0, 6: 10.0}
+
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed", return_value=None)
 
     feed_manager.manage_ration_interval_purchases(
-        requested_feeds=(mock_requested_feeds := MagicMock(auto_spec=RequestedFeed)),
-        time=(mock_time := MagicMock(auto_spec=RufasTime)),
+        requested_feeds=requested_feed, time=(mock_time := MagicMock(auto_spec=RufasTime))
     )
 
-    mock_purchase_feed.assert_called_once_with(mock_requested_feeds.requested_feed, mock_time)
+    mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
+    mock_purchase_feed.assert_called_once_with(pytest.approx(expected_feeds_to_purchase), mock_time)
 
 
 def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFixture) -> None:
