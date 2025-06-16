@@ -178,6 +178,7 @@ v0.9.2
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [Animal] Uses utf-8 encoding for saving CSVs from OutputManager.
 - [2415](https://github.com/RuminantFarmSystems/RuFaS/pull/2415) - [minor change] [Animal] Add "None" as valid cow repro sub methods.
 - [2421](https://github.com/RuminantFarmSystems/RuFaS/pull/2421) - [minor change] [Soil and Crop] Update Canopy Water handling.
+- [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
 
 
 ### v0.9.2
