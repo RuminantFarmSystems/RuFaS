@@ -32,7 +32,7 @@ class RootDevelopment:
     def develop_roots(self, time: RufasTime) -> None:
         """
         Main root development function that updates the root_fraction and root_depth attributes.
-        
+
         Parameters
         ----------
         time : RufasTime
