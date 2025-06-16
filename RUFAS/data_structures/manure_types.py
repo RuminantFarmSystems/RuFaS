@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ManureType(Enum):
     """
     This is an Enum class that represents different types of manure.

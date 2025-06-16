@@ -158,8 +158,7 @@ class PenManure:
             non_degradable_volatile_solids=animal_manure.non_degradable_volatile_solids,
             inorganic_phosphorus_fraction=animal_manure.inorganic_phosphorus_fraction / num_animals,
             organic_phosphorus_fraction=animal_manure.organic_phosphorus_fraction / num_animals,
-            non_water_inorganic_phosphorus_fraction=animal_manure.non_water_inorganic_phosphorus_fraction
-            / num_animals,
+            non_water_inorganic_phosphorus_fraction=animal_manure.non_water_inorganic_phosphorus_fraction / num_animals,
             non_water_organic_phosphorus_fraction=animal_manure.non_water_organic_phosphorus_fraction / num_animals,
             phosphorus=animal_manure.phosphorus * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure.phosphorus_fraction / num_animals,
