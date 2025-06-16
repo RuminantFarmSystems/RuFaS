@@ -1651,13 +1651,11 @@ class Field:
         canopy of another.
         """
         precipitation_reaching_soil = precipitation_total
-        excess_canopy_water = 0.0
 
         for crop in self.crops:
-            precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
-            excess_canopy_water += excess_water
+            precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
-        return precipitation_reaching_soil + excess_canopy_water
+        return precipitation_reaching_soil
 
     def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
         """

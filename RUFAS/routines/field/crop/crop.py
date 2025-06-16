@@ -191,36 +191,29 @@ class Crop:
             self._data.cumulative_potential_evapotranspiration = 0.0
             self._data.cumulative_water_uptake = 0.0
 
-    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple[float, float]:
+    def handle_water_in_canopy(self, available_precipitation: float) -> float:
         """
         Handles the water addition to the crop's canopy and calculates excess water.
 
         Parameters
         ----------
-        precipitation_reaching_soil : float
+        available_precipitation : float
             Amount of water available to reach the soil after considering other crops (mm).
 
         Returns
         -------
         tuple
-            A tuple containing:
-                - Amount of precipitation that reaches the soil after this crop (float)
-                - Excess water that could not be stored in the canopy (float)
+            Amount of precipitation that reaches the soil after this crop (mm).
         """
         canopy_water_excess_capacity = self._data.water_canopy_storage_capacity - self._data.canopy_water
 
-        excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
-        if excess_water_in_canopy != 0.0:
-            self._data.canopy_water = self._data.water_canopy_storage_capacity
-
         water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
-        water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
+        water_taken_to_be_stored = min(available_precipitation, water_taken_to_be_stored)
         self._data.canopy_water += water_taken_to_be_stored
 
-        precipitation_reaching_soil -= water_taken_to_be_stored
-        excess_canopy_water = -1 * excess_water_in_canopy
+        precipitation_reaching_soil = available_precipitation - water_taken_to_be_stored
 
-        return precipitation_reaching_soil, excess_canopy_water
+        return precipitation_reaching_soil
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
         """Wrapper for the canopy evaporation routine."""
