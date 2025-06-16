@@ -19,22 +19,6 @@ class ManureNutrientManager:
             ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
 
-    def get_manure_nutrients(self, manure_type: ManureType) -> ManureNutrients:
-        """
-        Get the current nutrient values stored in the nutrient manager by manure type.
-
-        Parameters
-        ----------
-        manure_type : ManureType
-            The type of manure.
-
-        Returns
-        -------
-        ManureNutrients
-            The current nutrient values stored in the manager for the provided ManureType.
-        """
-        return self.nutrients_by_manure_category[manure_type]
-
     def reset_nutrient_pools(self) -> None:
         """Resets all the pools."""
         for manure_type, pool in self.nutrients_by_manure_category.items():

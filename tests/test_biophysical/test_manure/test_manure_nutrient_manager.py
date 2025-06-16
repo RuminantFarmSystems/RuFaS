@@ -12,23 +12,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest
 from RUFAS.data_structures.manure_types import ManureType
 
 
-def test_get_values_success(mocker: MockerFixture) -> None:
-    """
-    Test get_values() successfully returns nutrients for a valid manure type.
-    """
-    manager = ManureNutrientManager()
-    nutrients = ManureNutrients(manure_type=ManureType.LIQUID)
-    mock_nutrient_dict = {
-        ManureType.LIQUID: nutrients,
-        ManureType.SOLID: mocker.MagicMock(spec=ManureNutrients),
-    }
-    manager._nutrients_by_manure_type = mock_nutrient_dict
-
-    result = manager.get_manure_nutrients(ManureType.LIQUID)
-
-    assert result == nutrients
-
-
 @pytest.mark.parametrize(
     "eval_return, is_nutrient_request_fulfilled, expected_result",
     [
@@ -506,33 +489,6 @@ def test_create_nutrient_request_results_exceptions(
     # Act & Assert
     with pytest.raises(expected_exception, match=expected_error_msg):
         manager._create_nutrient_request_results(projected_manure_mass, manure_type=ManureType.LIQUID)
-
-
-@pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])
-def test_update_nutrients(manure_type: ManureType) -> None:
-    """
-    Unit test for the update_nutrients() method of the ManureNutrientManager class
-    in the manure_nutrient_manager.py file.
-
-    This test verifies that the update_nutrients() method adds ManureNutrients objects
-    to the internal data of a ManureNutrientManager object by manure type.
-
-    """
-    # Arrange
-    manager = ManureNutrientManager()
-    nutrients = ManureNutrients(
-        nitrogen=1,
-        phosphorus=1,
-        total_manure_mass=2,
-        dry_matter=2,
-        manure_type=manure_type,
-    )
-
-    # Act
-    manager.add_nutrients(nutrients)
-
-    # Assert
-    assert manager.get_manure_nutrients(manure_type) == nutrients
 
 
 @pytest.mark.parametrize(
