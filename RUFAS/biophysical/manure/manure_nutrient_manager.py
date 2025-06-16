@@ -14,7 +14,7 @@ class ManureNutrientManager:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
 
-        self.nutrients_by_manure_category: [ManureType, ManureNutrients] = {
+        self.nutrients_by_manure_category: dict[ManureType, ManureNutrients] = {
             ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
             ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
