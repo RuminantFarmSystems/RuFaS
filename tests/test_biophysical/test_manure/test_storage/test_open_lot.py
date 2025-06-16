@@ -118,7 +118,7 @@ def test_process_manure_runs_expected_steps(
     mock_calc_ammonia.assert_called_once()
     mock_apply_n_loss.assert_called_once()
 
-    assert mock_report_output.call_count == 4
+    assert mock_report_output.call_count == 5
     assert mock_report_stream.call_count == 2
 
     assert result == {}

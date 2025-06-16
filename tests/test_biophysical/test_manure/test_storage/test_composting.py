@@ -268,7 +268,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
     manure_temperature = 25.0
     manure_volatile_solids = 100.0
     dummy_mcf = 0.01
-    expected = manure_volatile_solids * (0.24 * 0.67 * dummy_mcf)
+    expected = manure_volatile_solids * (0.24 * 0.67 * dummy_mcf) / 100
 
     mocker.patch.object(
         Composting,
