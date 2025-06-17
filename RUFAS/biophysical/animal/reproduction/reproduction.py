@@ -2057,6 +2057,12 @@ class Reproduction:
                 reproduction_data_stream, simulation_day
             )
 
+        elif (
+                AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.NONE
+                and AnimalConfig.dry_off_day_of_pregnancy <= AnimalConfig.third_pregnancy_check_day
+        ):
+            self.do_not_breed = True
+
         return reproduction_data_stream
 
     def _handle_open_cow_in_pgf_at_pd_resynch(
