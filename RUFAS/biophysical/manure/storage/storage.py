@@ -45,7 +45,7 @@ class Storage(Processor):
     ----------
     _received_manure : ManureStream
         The total amount of manure received by a storage in a single day.
-    _stored_manure : ManureStream
+    stored_manure : ManureStream
         The current amount of manure currently held by the storage.
     _capacity : float
         The volumetric capacity of the storage (m^3).
@@ -72,7 +72,7 @@ class Storage(Processor):
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
         self._received_manure = ManureStream.make_empty_manure_stream()
-        self._stored_manure = ManureStream.make_empty_manure_stream()
+        self.stored_manure = ManureStream.make_empty_manure_stream()
         self._capacity = capacity
         self._cover = cover
         self._storage_time_period = storage_time_period
@@ -90,7 +90,7 @@ class Storage(Processor):
     @property
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
-        return self._stored_manure.volume > self._capacity
+        return self.stored_manure.volume > self._capacity
 
     def _calculate_surface_area(self) -> None:
         """
@@ -121,14 +121,14 @@ class Storage(Processor):
         """
         Adds the manure received on the current day to the manure already stored, and empties the storage if scheduled.
         """
-        self._stored_manure += self._received_manure
+        self.stored_manure += self._received_manure
         self._received_manure = ManureStream.make_empty_manure_stream()
 
         is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            self._report_manure_stream(self._stored_manure, "emptied", time.simulation_day)
-            manure_to_be_returned = {"manure": replace(self._stored_manure)}
-            self._stored_manure = ManureStream.make_empty_manure_stream()
+            self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
+            manure_to_be_returned = {"manure": replace(self.stored_manure)}
+            self.stored_manure = ManureStream.make_empty_manure_stream()
         else:
             manure_to_be_returned = {}
 
