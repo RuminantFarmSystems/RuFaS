@@ -120,9 +120,13 @@ class NutritionSupplyCalculator:
         float
             Discount used to calculate the actual TDN and DE content of feeds in the ration.
 
+        Notes
+        -------
+        [AN.SUP.1], [AN.SUP.2], [AN.SUP.3, [AN.SUP.4]
+        
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.1-3]-[A.Heifer.E.1-3]
+         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         dry_matter_intake = sum([feed.amount for feed in feeds])
@@ -166,9 +170,12 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal / kg).
 
+        Notes
+        -------
+        [AN.SUP.5]
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.6]-[A.Heifer.E.6]
+         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         actual_metabolizable_energy: dict[RUFAS_ID, float] = {}
@@ -205,9 +212,12 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for maintenance in the ration (Mcal).
 
+        Notes
+        -------
+        [AN.SUP.7]
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.8]-[A.Heifer.E.8]
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         actual_maintenance_net_energy: dict[RUFAS_ID, float] = {}
@@ -254,9 +264,13 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for lactation in the ration (Mcal).
 
+        Notes
+        -------
+        [AN.SUP.6]
+
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.7]-[A.Heifer.E.7]
+         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         actual_lactation_net_energy: dict[RUFAS_ID, float] = {}
@@ -298,9 +312,13 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for growth in the ration (Mcal).
 
+        Notes
+        -------
+        [AN.SUP.8]
+        
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.9]-[A.Heifer.E.9]
+         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         actual_growth_net_energy: dict[RUFAS_ID, float] = {}
@@ -337,10 +355,13 @@ class NutritionSupplyCalculator:
         float
             Total digestible calcium supply in the ration (g).
 
+        Notes
+        -------
+        [AN.SUP.15]
+
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.16]-[A.Heifer.E.16]
-
+         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
         """
         calcium_digestibility: dict[RUFAS_ID, float] = {}
 
@@ -384,7 +405,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.17]-[A.Heifer.E.17]
+       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
@@ -439,9 +460,12 @@ class NutritionSupplyCalculator:
         float
             Total metabolizable protein in the ration (g).
 
+        Notes
+        -------
+        [AN.SUP.9],[AN.SUP.10],[AN.SUP.11],[AN.SUP.12],[AN.SUP.13],[AN.SUP.14],
+         [AN.SUP.27], [AN.SUP.29], [AN.SUP.30]
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.13]-[A.Cow.E.13], [A.Cow.E.14]-[A.Heifer.E.14], [A.Cow.E.15]
         .. [1] National Research Council. 2001. Nutrient Requirements of Dairy Cattle: Seventh Revised Edition, 2001.
                Washington, DC: The National Academies Press. https://doi.org/10.17226/9825.
 
@@ -542,9 +566,13 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
+        Notes
+        -------
+        [AN.SUP.25]
+
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.10]-[A.Heifer.E.10]
+       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         protein_passage_rates: dict[RUFAS_ID, float] = {}
@@ -587,9 +615,13 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to RDP percentages (percent).
 
+        Notes
+        -------
+        [AN.SUP.26]
+
         References
         ----------
-        Animal Scientific Documentation [A.Cow.E.11]-[A.Heifer.E.11]
+       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         rdp_percentages: dict[RUFAS_ID, float] = {}
@@ -626,9 +658,13 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to RUP percentages (percent).
 
+        Notes
+        -------
+        [AN.SUP.28]
+
         References
         ----------
-        Animal Scientific documentation [A.Cow.E.12]-[A.Cow.E.12]
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         rup_percentages: dict[RUFAS_ID, float] = {}
@@ -677,6 +713,9 @@ class NutritionSupplyCalculator:
         float
             Total supply of nutrient in a ration (Mcal).
 
+        Notes
+        ----
+        [AN.SUP.4]
         """
         de_attribute = "DE_Base" if cls.nutrient_standard is NutrientStandard.NASEM else "DE"
         return sum([feed.amount * getattr(feed.info, de_attribute) for feed in feeds])
