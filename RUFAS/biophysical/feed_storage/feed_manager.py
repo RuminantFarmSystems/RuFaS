@@ -218,7 +218,7 @@ class FeedManager:
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
-            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, current_feed_totals[feed_id])
+            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, available_amount)
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - available_amount
 
@@ -504,7 +504,25 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-    def _check_feed_availability(self, feeds_to_deduct, rufas_id, feed):
+    def _check_feed_availability(self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int,
+                                 feed: HarvestedCrop | PurchasedFeed) -> bool:
+        """
+        Helper function that checks if a feed can be fed to animals based on the RuFaS ID and the feeds to deduct.
+
+        Parameters
+        ----------
+        feeds_to_deduct : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the amounts of feed that will be removed from storage (kg dry matter).
+        rufas_id : RUFAS_ID
+            RuFaS Feed ID of the feed that is being checked (unitless).
+        feed : HarvestedCrop | PurchasedFeed
+            The feed object to check for availability.
+
+        Returns
+        -------
+        bool
+            True if the feed can be fed to animals, False otherwise.
+        """
         if isinstance(feed, HarvestedCrop):
             feed_id = self._select_rufas_id_for_harvested_crop(feed.rufas_ids, list(feeds_to_deduct.keys()))
             is_feedable = True if feed_id == rufas_id else False
