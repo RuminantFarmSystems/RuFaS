@@ -35,6 +35,8 @@ class NutritionRequirementsCalculator:
         ------
         [AN.NRC.27]
         [AN.NRC.28]
+        [AN.NSM.21]
+        [AN.NSM.22]
 
         Returns
         -------
