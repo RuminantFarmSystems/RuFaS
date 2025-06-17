@@ -3,7 +3,6 @@ from typing import Dict, List, Any
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
-    CropType,
     HarvestedCrop,
     StorageType,
 )
@@ -65,7 +64,7 @@ STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 
-QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
+QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | float]
 
 
 class FeedManager:
@@ -125,12 +124,9 @@ class FeedManager:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
-    def _query_result_factory(
-        self, crop_category: CropCategory, crop_type: CropType, amount: float
-    ) -> QUERY_RESULT_DATA_TYPE:
+    def _query_result_factory(self, crop_category: CropCategory, amount: float) -> QUERY_RESULT_DATA_TYPE:
         return {
             "category": crop_category,
-            "type": crop_type,
             "amount": amount,
         }
 
@@ -181,24 +177,6 @@ class FeedManager:
         for _, storage in self.active_storages.items():
             storage.process_degradations(weather, time)
 
-    def give_feed(self, amount: float, crop_type: CropType) -> float:
-        """
-        Distributes feed to the Animal module based on the FIFO principle.
-
-        Parameters
-        ----------
-        amount : float
-            The amount of feed to distribute.
-        crop_type : CropType
-            The type of crop to distribute.
-
-        Returns
-        -------
-        float
-            The actual amount of feed distributed.
-        """
-        pass
-
     def execute_daily_routine(self, time: RufasTime) -> None:
         """Executes daily routine of the Feed Manager."""
         self.report_stored_feeds(time)
@@ -240,7 +218,7 @@ class FeedManager:
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
-            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, current_feed_totals[feed_id])
+            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, available_amount)
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - available_amount
 
@@ -352,7 +330,6 @@ class FeedManager:
 
     def query_available_feeds(
         self,
-        query_crop_types: List[CropType] | None = None,
         query_crop_categories: List[CropCategory] | None = None,
         query_storage_types: List[StorageType] | None = None,
     ) -> List[QUERY_RESULT_DATA_TYPE]:
@@ -361,8 +338,6 @@ class FeedManager:
 
         Parameters
         ----------
-        query_crop_types : List[CropType], optional, default=None
-            The types of crop to query (if None, all crop types are queried).
         query_crop_categories : List[CropCategory], optional, default=None
             The categories of crop to query (if None, all crop categories are queried).
         query_storage_types : List[StorageType], optional, default=None
@@ -373,7 +348,6 @@ class FeedManager:
         List[QUERY_RESULT_DATA_TYPE]
             The amount of available feed, either as a total or for a specific crop type.
         """
-        query_all_crop_types = query_crop_types is None
         query_all_crop_categories = query_crop_categories is None
         query_all_storage_types = query_storage_types is None
         results: List[QUERY_RESULT_DATA_TYPE] = []
@@ -383,22 +357,17 @@ class FeedManager:
             if not is_storage_queryable:
                 continue
             for stored_crop in storage.stored:
-                is_crop_type_queryable = query_all_crop_types or stored_crop.type in query_crop_types
                 is_crop_category_queryable = query_all_crop_categories or stored_crop.category in query_crop_categories
-                if not (is_crop_type_queryable and is_crop_category_queryable):
+                if not (is_crop_category_queryable):
                     continue
                 for previous_result in results:
-                    if (
-                        stored_crop.type == previous_result["type"]
-                        and stored_crop.category == previous_result["category"]
-                    ):
+                    if stored_crop.category == previous_result["category"]:
                         previous_result["amount"] += stored_crop.fresh_mass
                         break
                 else:
                     results.append(
                         self._query_result_factory(
                             stored_crop.category,
-                            stored_crop.type,
                             stored_crop.fresh_mass,
                         )
                     )
@@ -538,7 +507,26 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-    def _check_feed_availability(self, feeds_to_deduct, rufas_id, feed):
+    def _check_feed_availability(
+        self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int, feed: HarvestedCrop | PurchasedFeed
+    ) -> bool:
+        """
+        Helper function that checks if a feed can be fed to animals based on the RuFaS ID and the feeds to deduct.
+
+        Parameters
+        ----------
+        feeds_to_deduct : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the amounts of feed that will be removed from storage (kg dry matter).
+        rufas_id : RUFAS_ID
+            RuFaS Feed ID of the feed that is being checked (unitless).
+        feed : HarvestedCrop | PurchasedFeed
+            The feed object to check for availability.
+
+        Returns
+        -------
+        bool
+            True if the feed can be fed to animals, False otherwise.
+        """
         if isinstance(feed, HarvestedCrop):
             feed_id = self._select_rufas_id_for_harvested_crop(feed.rufas_ids, list(feeds_to_deduct.keys()))
             is_feedable = True if feed_id == rufas_id else False

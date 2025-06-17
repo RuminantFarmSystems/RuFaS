@@ -3,7 +3,7 @@ from datetime import date
 from typing import Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -44,6 +44,8 @@ References
 """
 GRAIN_LOSS_COEFFICIENT: float = 0.01
 HIGH_MOISTURE_LOSS_COEFFICIENT: float = 0.05
+GRAIN_CROPS = ["cereal_rye_grain", "corn_grain", "soybean_grain", "triticale_grain", "winter_wheat_grain"]
+HIGH_MOISTURE_CROPS = ["corn_high_moisture"]
 
 
 class Storage:
@@ -79,8 +81,6 @@ class Storage:
         Receives a harvested crop and adds it to the storage.
     process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
         Processes the degradations and losses of the stored crops.
-    give_feed(amount: float, crop_type: str)
-        Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
         Resets mass related attributes after loss of dry matter and/or moisture.
     _record_stored_crops(self, simulation_day: int)
@@ -164,11 +164,11 @@ class Storage:
         self._record_stored_crops(simulation_day)
 
         initial_degradation_day_offset = 1
-        if crop.type == CropType.GRAIN:
+        if crop.config_name in GRAIN_CROPS:
             dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
             self._record_stored_crops(simulation_day + initial_degradation_day_offset)
-        elif crop.type == CropType.HIGH_MOISTURE:
+        elif crop.config_name in HIGH_MOISTURE_CROPS:
             dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
             self._record_stored_crops(simulation_day + initial_degradation_day_offset)
@@ -196,7 +196,7 @@ class Storage:
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            if crop.type == CropType.GRAIN:
+            if crop.config_name in GRAIN_CROPS:
                 continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             total_gaseous_dry_matter_loss += degraded_crop_values["gaseous_dry_matter_loss"]
@@ -222,7 +222,7 @@ class Storage:
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            list of HarvestedCrops to project degradations for.
+            List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -236,7 +236,7 @@ class Storage:
         """
         degraded_crops: list[HarvestedCrop] = []
         for crop in crops:
-            if crop.type == CropType.GRAIN:
+            if crop.config_name in GRAIN_CROPS:
                 continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             last_time_degraded = degraded_crop_values["last_time_degraded"]
@@ -304,20 +304,6 @@ class Storage:
             "dry_matter_percentage": mass_values["dry_matter_percentage"],
             "last_time_degraded": last_time_degraded,
         }
-
-    def give_feed(self, amount: float, crop_type: CropType) -> None:
-        """
-        Gives out a specified amount of feed of a certain crop type.
-
-        Parameters
-        ----------
-        amount : float
-            The amount of feed to give out.
-        crop_type : CropType
-            The type of crop to give out.
-
-        """
-        pass
 
     def remove_empty_crops(self) -> None:
         """Removes all crops with no dry matter mass left."""
@@ -508,7 +494,7 @@ class Storage:
         crop : HarvestedCrop
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
-            list of daily weather conditions over which dry matter loss will be calculated.
+            List of daily weather conditions over which dry matter loss will be calculated.
         time : RufasTime
             RufasTime instance containing the time that loss should be processed up to.
 

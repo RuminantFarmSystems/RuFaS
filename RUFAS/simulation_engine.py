@@ -102,7 +102,6 @@ class SimulationEngine:
         ]
         available_feeds_units = {
             "category": MeasurementUnits.UNITLESS,
-            "type": MeasurementUnits.UNITLESS,
             "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
