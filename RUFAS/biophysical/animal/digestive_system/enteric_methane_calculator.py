@@ -30,7 +30,7 @@ class EntericMethaneCalculator:
 
         References
         ----------
-        (Pattanaik et al., 2003) 
+        (Pattanaik et al., 2003)
 
         """
         methane_emission = 0.0
@@ -139,7 +139,7 @@ class EntericMethaneCalculator:
         Returns
         -------
         float
-            The daily enteric emissions for cows (g/day).        
+            The daily enteric emissions for cows (g/day).
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter

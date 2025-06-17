@@ -123,7 +123,7 @@ class NutritionSupplyCalculator:
         Notes
         -------
         [AN.SUP.1], [AN.SUP.2], [AN.SUP.3, [AN.SUP.4]
-        
+
         References
         ----------
          [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -315,7 +315,7 @@ class NutritionSupplyCalculator:
         Notes
         -------
         [AN.SUP.8]
-        
+
         References
         ----------
          [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -391,21 +391,21 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-        Calculates the phosphorus supply in the ration.
+         Calculates the phosphorus supply in the ration.
 
-        Parameters
-        ----------
-        feeds : list[FeedInRation]
-            List of feeds in ration, including the amount and nutritive properties.
+         Parameters
+         ----------
+         feeds : list[FeedInRation]
+             List of feeds in ration, including the amount and nutritive properties.
 
-        Returns
-        -------
-        float
-            Total digestible phosphorus supply in the ration (g).
+         Returns
+         -------
+         float
+             Total digestible phosphorus supply in the ration (g).
 
-        References
-        ----------
-       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+         References
+         ----------
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
@@ -548,31 +548,31 @@ class NutritionSupplyCalculator:
         percentage_concentrates: float,
     ) -> dict[RUFAS_ID, float]:
         """
-        Calculates the protein passage rate of feeds in ration.
+         Calculates the protein passage rate of feeds in ration.
 
-        Parameters
-        ----------
-        feeds : list[FeedInRation]
-            List of feeds in ration, including the amount and nutritive properties.
-        dry_matter_intake : float
-            Total dry matter contained in the ration (kg).
-        body_weight : float
-            The body weight of an animal (kg).
-        percentage_concetrates : dict[RUFAS_ID, float]
-            Percentage of the ration's dry matter which is made up of concentrates.
+         Parameters
+         ----------
+         feeds : list[FeedInRation]
+             List of feeds in ration, including the amount and nutritive properties.
+         dry_matter_intake : float
+             Total dry matter contained in the ration (kg).
+         body_weight : float
+             The body weight of an animal (kg).
+         percentage_concetrates : dict[RUFAS_ID, float]
+             Percentage of the ration's dry matter which is made up of concentrates.
 
-        Returns
-        -------
-        dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
+         Returns
+         -------
+         dict[RUFAS_ID, float]
+             Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
-        Notes
-        -------
-        [AN.SUP.25]
+         Notes
+         -------
+         [AN.SUP.25]
 
-        References
-        ----------
-       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+         References
+         ----------
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         protein_passage_rates: dict[RUFAS_ID, float] = {}
@@ -601,27 +601,27 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], protein_passage_rates: dict[RUFAS_ID, float]
     ) -> dict[RUFAS_ID, float]:
         """
-        Calculates rumen degradable protein (RDP) percentages of feeds in ration.
+         Calculates rumen degradable protein (RDP) percentages of feeds in ration.
 
-        Parameters
-        ----------
-        feeds : list[FeedInRation]
-            List of feeds in ration, including the amount and nutritive properties.
-        protein_passage_rates : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
+         Parameters
+         ----------
+         feeds : list[FeedInRation]
+             List of feeds in ration, including the amount and nutritive properties.
+         protein_passage_rates : dict[RUFAS_ID, float]
+             Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
-        Returns
-        -------
-        dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to RDP percentages (percent).
+         Returns
+         -------
+         dict[RUFAS_ID, float]
+             Mapping of RuFaS Feed IDs to RDP percentages (percent).
 
-        Notes
-        -------
-        [AN.SUP.26]
+         Notes
+         -------
+         [AN.SUP.26]
 
-        References
-        ----------
-       [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+         References
+         ----------
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
         rdp_percentages: dict[RUFAS_ID, float] = {}

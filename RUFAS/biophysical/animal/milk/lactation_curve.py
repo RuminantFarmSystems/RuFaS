@@ -308,9 +308,9 @@ class LactationCurve:
 
         Notes
         -----
-        Herd average 305-day milk yield: [AN.MLK.4] 
+        Herd average 305-day milk yield: [AN.MLK.4]
         Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
-        
+
         Parameters
         ----------
         annual_milk_yield : float
@@ -389,7 +389,7 @@ class LactationCurve:
         Notes
         -----
         [AN.MLK.8]
-        
+
         Parameters
         ----------
         l_param : float

@@ -194,7 +194,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         Notes
         -----
         [AN.NSM.1], [AN.NSM.2], [AN.NSM.3], [AN.NSM.4], [AN.NSM.5]
-        
+
         NASEM (2021)[1] does not adjust energy requirements for environmental temperature as it assumes that confinement
         conditions already provide comfort temperature to the animals. This is something to consider and update for the
         grazing module. Instead of calculating `calf_birth_weight`, NASEM (2021) also contains standards
