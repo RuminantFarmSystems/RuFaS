@@ -504,8 +504,9 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-    def _check_feed_availability(self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int,
-                                 feed: HarvestedCrop | PurchasedFeed) -> bool:
+    def _check_feed_availability(
+        self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int, feed: HarvestedCrop | PurchasedFeed
+    ) -> bool:
         """
         Helper function that checks if a feed can be fed to animals based on the RuFaS ID and the feeds to deduct.
 
