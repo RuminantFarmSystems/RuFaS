@@ -267,7 +267,7 @@ class MilkProduction:
         Notes
         -----
         [AN.MLK.10]
-        
+
         Parameters
         ----------
         l_param: float

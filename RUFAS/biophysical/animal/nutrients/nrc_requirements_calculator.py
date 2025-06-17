@@ -262,7 +262,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Calving interval (days).
         average_daily_gain_heifer : float
             Average daily gain (grams per day).
-        
+
         Notes
         ------
         [AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
@@ -395,7 +395,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-         [AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35], 
+         [AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
          [AN.NRC.36], [AN.NRC.37],[AN.NRC.38]
         bacteria_estimate: Bacteria metabolizable protein production (g).
         TDN: Total digestible nutrients

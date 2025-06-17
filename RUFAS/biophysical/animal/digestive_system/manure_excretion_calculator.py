@@ -20,8 +20,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        Manure excretion: [AN.EXC.1] 
-        Urine excretion: [AN.EXC.2] 
+        Manure excretion: [AN.EXC.1]
+        Urine excretion: [AN.EXC.2]
         Manure total solids excretion: [AN.EXC.3]
         Total volatile solids: [AN.EXC.4]
         Degradable volatile solids excretion: [AN.EXC.5]
@@ -29,7 +29,7 @@ class ManureExcretionCalculator:
         Manure nitrogen excretion: [AN.EXC.7]
         Urine N excretion: [AN.EXC.8]
         Manure total ammoniacal nitrogen: [AN.EXC.9]
-        
+
         Parameters
         ----------
         body_weight : float
@@ -127,8 +127,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        Urine excretion: [AN.EXC.10] 
-        Total manure excretion: [AN.EXC.11] 
+        Urine excretion: [AN.EXC.10]
+        Total manure excretion: [AN.EXC.11]
         Total solids excretion: [AN.EXC.12]
         Total volatile solids excretion: [AN.EXC.13]
         Degradable volatile solids excretion: [AN.EXC.5]
@@ -347,7 +347,7 @@ class ManureExcretionCalculator:
 
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
-        
+
         Parameters
         ----------
         days_in_milk : int
@@ -496,7 +496,7 @@ class ManureExcretionCalculator:
         ----
         Urine excretion: [AN.EXC.28]
         Total manure excretion: [AN.EXC.29]
-        Total solids excretion: [AN.EXC.12] 
+        Total solids excretion: [AN.EXC.12]
         Organic matter intake: [AN.EXC.22]
         Degradable volatile solids: [AN.EXC.23]
         Total volatile solids excretion: [AN.EXC.24]
@@ -509,7 +509,7 @@ class ManureExcretionCalculator:
 
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
-        
+
         Parameters
         ----------
         body_weight : float
@@ -665,7 +665,7 @@ class ManureExcretionCalculator:
         Organic phosphorus fraction: [AN.EXC.32]
         Milk phosphorus: [AN.EXC.33]
         Manure P excreted by a cow: [AN.EXC.34]
-        Total P excreted by a cow: [AN.EXC.35] 
+        Total P excreted by a cow: [AN.EXC.35]
 
         Parameters
         ----------

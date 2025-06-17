@@ -2098,7 +2098,7 @@ class Animal:
         -------
         tuple[int, str]
             Future cull date in simulation days and reason for culling.
-        
+
         Notes
         -------
         [AN.ANM.2]

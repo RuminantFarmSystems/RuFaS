@@ -155,22 +155,22 @@ class Growth:
 
     def calculate_calf_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
-        Calculates the body weight change for calves.
+         Calculates the body weight change for calves.
 
-       Notes
-       ------
-       [AN.BWT.7]
+        Notes
+        ------
+        [AN.BWT.7]
 
 
-        Parameters
-        ----------
-        growth_inputs: GrowthInputs
-            Animal properties related to body weight growth.
+         Parameters
+         ----------
+         growth_inputs: GrowthInputs
+             Animal properties related to body weight growth.
 
-        Returns
-        -------
-        float
-            The daily body weight growth for calves (kg).
+         Returns
+         -------
+         float
+             The daily body weight growth for calves (kg).
         """
         return growth_inputs.birth_weight / AnimalConfig.wean_day
 
