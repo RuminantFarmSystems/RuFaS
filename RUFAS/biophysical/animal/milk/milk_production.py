@@ -231,6 +231,10 @@ class MilkProduction:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
+        Notes
+        -----
+        [AN.MLK.9]
+
         Parameters
         ----------
         days_in_milk : int
@@ -260,6 +264,10 @@ class MilkProduction:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
 
+        Notes
+        -----
+        [AN.MLK.10]
+        
         Parameters
         ----------
         l_param: float
