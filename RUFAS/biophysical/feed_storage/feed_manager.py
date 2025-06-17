@@ -124,9 +124,7 @@ class FeedManager:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
-    def _query_result_factory(
-        self, crop_category: CropCategory, amount: float
-    ) -> QUERY_RESULT_DATA_TYPE:
+    def _query_result_factory(self, crop_category: CropCategory, amount: float) -> QUERY_RESULT_DATA_TYPE:
         return {
             "category": crop_category,
             "amount": amount,

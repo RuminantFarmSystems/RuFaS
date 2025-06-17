@@ -58,9 +58,7 @@ class FeedManager:
     def __init__(self):
         self.active_storages: Dict[StorageType, Storage] = {}
 
-    def _query_result_factory(
-        self, crop_category: CropCategory, amount: float
-    ) -> QUERY_RESULT_DATA_TYPE:
+    def _query_result_factory(self, crop_category: CropCategory, amount: float) -> QUERY_RESULT_DATA_TYPE:
         return {
             "category": crop_category,
             "amount": amount,
