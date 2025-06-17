@@ -1235,6 +1235,9 @@ class Field:
 
         """
         crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
+        bottom_soil_layer = len(self.soil.data.soil_layers) - 1
+        bottom_layer_depth = self.soil.data.soil_layers[bottom_soil_layer].bottom_depth
+        crop.update_crop_max_root_depth(bottom_layer_depth)
         self.crops.append(crop)
 
         self._record_planting(
@@ -1431,7 +1434,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
+            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data, time)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
@@ -1648,13 +1651,11 @@ class Field:
         canopy of another.
         """
         precipitation_reaching_soil = precipitation_total
-        excess_canopy_water = 0.0
 
         for crop in self.crops:
-            precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
-            excess_canopy_water += excess_water
+            precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
-        return precipitation_reaching_soil + excess_canopy_water
+        return precipitation_reaching_soil
 
     def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
         """

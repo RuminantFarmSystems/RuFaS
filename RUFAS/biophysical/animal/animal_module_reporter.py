@@ -9,7 +9,13 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import (
+    ManureStream,
+    StreamType,
+    PenManureData as NewPenManureData,
+)
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
@@ -168,11 +174,11 @@ class AnimalModuleReporter:
         }
 
         for animal in list(pen.animals_in_pen.values()):
-            milk_data_update = {}
+            milk_data_update: dict[str, int | float] = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
             milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
-            milk_data_update["milk_fat"] = animal.milk_production.fat_percent
+            milk_data_update["milk_fat"] = MilkProduction.fat_percent
             milk_data_update["milk_lactose"] = animal.milk_production.lactose_content
             milk_data_update["lactating"] = animal.is_milking
             milk_data_update["parity"] = animal.reproduction.calves
@@ -218,7 +224,7 @@ class AnimalModuleReporter:
             cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
-    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
+    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[int, float]:
         """
         For each pen, adds the average ration per animal to the OutputManager.
 
@@ -231,7 +237,7 @@ class AnimalModuleReporter:
 
         Returns
         -------
-        dict[RUFAS_ID, float]
+        dict[int, float]
             Map of RuFaS Feed IDs to amounts of that feed in the ration (kg dry matter).
 
         """
@@ -641,18 +647,18 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[PenManureData],
+        manure_excretions_output_data: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
 
         Parameters
         ----------
-        manure_excretions_output_data : list[PenManureData],
-            Dictionary mapping prefixes to animal manure data.
+        manure_excretions_output_data : list[tuple[PenManureData, list[dict[str, ManureStream]]]]
+            A list of tuples containing the pen manure data and the manure stream data.
 
         """
-        manure_value_units = {
+        pen_manure_data_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
@@ -675,7 +681,15 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_animal_module_manure.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
         }
-        for pen_manure_data in manure_excretions_output_data:
+
+        all_pen_manure_data: list[PenManureData] = [
+            pen_manure_data["pen_manure_data"] for pen_manure_data in manure_excretions_output_data
+        ]
+        all_pen_manure_streams: list[dict[int, list[dict[str, ManureStream]]]] = [
+            pen_manure_stream["manure_streams"] for pen_manure_stream in manure_excretions_output_data
+        ]
+
+        for pen_manure_data in all_pen_manure_data:
             pen_id: int = pen_manure_data["id"]
             animal_combination: str = pen_manure_data["animal_combination"].name
             manure: AnimalManureExcretions = pen_manure_data["manure"]
@@ -683,8 +697,35 @@ class AnimalModuleReporter:
                 om.add_variable(
                     f"{pen_id}_{animal_combination}_{str(manure_property)}",
                     manure_value,
-                    dict(info_map, **{"units": manure_value_units[manure_property]}),
+                    dict(info_map, **{"units": pen_manure_data_units[manure_property]}),
                 )
+
+        for pen_manure_streams in all_pen_manure_streams:
+            pen_id: int = next(iter(pen_manure_streams))
+            streams_list = pen_manure_streams[pen_id]
+            for stream_dict in streams_list:
+                for stream_name, stream in stream_dict.items():
+                    pen_manure_data = stream.pen_manure_data
+                    animal_combination: str = pen_manure_data.animal_combination
+                    stream_type: StreamType = pen_manure_data.stream_type
+                    manure_stream_dict = asdict(stream)
+                    manure_stream_dict["total_volatile_solids"] = stream.total_volatile_solids
+                    manure_stream_dict["mass"] = stream.mass
+                    for key, value in manure_stream_dict.items():
+                        if key != "pen_manure_data":
+                            om.add_variable(
+                                f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_{str(key)}",
+                                value,
+                                {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]},
+                            )
+                        elif key == "pen_manure_data":
+                            for pen_manure_property, pen_manure_value in asdict(pen_manure_data).items():
+                                om.add_variable(
+                                    f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_"
+                                    f"{str(pen_manure_property)}",
+                                    pen_manure_value,
+                                    {**info_map, "units": NewPenManureData.PEN_MANURE_DATA_UNITS[pen_manure_property]},
+                                )
 
     @classmethod
     def report_pen_manure_properties(cls, pen: Pen, simulation_day: int) -> None:
@@ -918,10 +959,14 @@ class AnimalModuleReporter:
         parity_1 = herd_statistics.num_cow_for_parity["1"]
         parity_2 = herd_statistics.num_cow_for_parity["2"]
         parity_3 = herd_statistics.num_cow_for_parity["3"]
+        parity_4 = herd_statistics.num_cow_for_parity["4"]
+        parity_5 = herd_statistics.num_cow_for_parity["5"]
         parity_greater_than_3 = herd_statistics.num_cow_for_parity["greater_than_3"]
         om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_4", parity_4, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_5", parity_5, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_cow_for_parity_greater_than_3",
             parity_greater_than_3,
@@ -1366,6 +1411,8 @@ class AnimalModuleReporter:
             "number_of_parity_1_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_2_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_3_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_4_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_5_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_4_and_more_cows": MeasurementUnits.ANIMALS,
             "average_calf_age": MeasurementUnits.DAYS,
             "average_heiferI_age": MeasurementUnits.DAYS,

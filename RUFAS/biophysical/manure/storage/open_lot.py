@@ -9,22 +9,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
-"""
-Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).
-"""
-
-NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS: float = 0.02
-"""
-Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
-"""
-
-LEACHING_COEFFICIENT: float = 0.035
-"""Leaching coefficient used in the calculation of leaching N loss in an Open Lot (unitless)."""
-
-DEFAULT_LAYER_TEMPERATURE: float = 30
-"""The default layer temperature for open lot and CBPB."""
-
 
 class OpenLot(Storage):
     def __init__(
@@ -65,18 +49,18 @@ class OpenLot(Storage):
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
-            DEFAULT_LAYER_TEMPERATURE,
+            ManureConstants.DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,
             self._manure_to_process.degradable_volatile_solids,
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
         storage_nitrous_oxide_N = self._calculate_nitrous_oxide_emissions(
-            NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, self._manure_to_process.nitrogen
+            ManureConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, self._manure_to_process.nitrogen
         )
 
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
-            LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
+            ManureConstants.LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_open_lot_ammonia_emissions(self._manure_to_process.nitrogen)
 
@@ -225,4 +209,4 @@ class OpenLot(Storage):
         if received_nitrogen < 0.0:
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
-        return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
+        return ManureConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen

@@ -131,13 +131,10 @@ class Animal:
         The total daily distance traveled by the animal, (m).
     sex: Sex
         The sex of the animal.
-    metabolizable_energy_intake: float
-        The metabolizable energy intake of the animal.
     nutrient_standard: NutrientStandard
         The nutrient standard used to calculate nutrition related values.
     """
 
-    metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
     def __init__(
@@ -1300,11 +1297,11 @@ class Animal:
             body_weight=self.body_weight,
             nutrients=self.nutrition_supply,
             days_in_milk=self.days_in_milk,
-            metabolizable_energy_intake=self.metabolizable_energy_intake,
+            metabolizable_energy_intake=self.nutrition_supply.metabolizable_energy,
             fecal_phosphorus=self.nutrients.fecal_phosphorus,
             urine_phosphorus_required=self.nutrients.urine_phosphorus_required,
             daily_milk_produced=self.milk_production.daily_milk_produced,
-            fat_content=self.milk_production.fat_content,
+            fat_content=MilkProduction.fat_percent,
             protein_content=self.milk_production.true_protein_content,
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
@@ -1335,6 +1332,29 @@ class Animal:
         )
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
+
+    def daily_milking_update_without_history(self) -> None:
+        """
+        Performs the daily milk production update without updating the milk production history attributes.
+        Intended for use prior to first ration formulation interval, since that process requires the milk production
+        to be set for proper estimation of animal requirements.
+
+        If the animal type is not a cow, the method exits without performing any operation.
+        For cows, the method calculates the milking updates using the animal's daily metrics
+        and adjusts the milking-related data accordingly.
+
+        """
+        if not self.animal_type.is_cow:
+            return
+        milk_production_inputs = MilkProductionInputs(
+            days_in_milk=self.days_in_milk,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+        )
+        milk_production_outputs: MilkProductionOutputs = (
+            self.milk_production.perform_daily_milking_update_without_history(milk_production_inputs)
+        )
+        self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
 
     def daily_growth_update(self, time: RufasTime) -> None:
         """
@@ -2276,9 +2296,9 @@ class Animal:
                 animal_type=self.animal_type,
                 parity=self.calves,
                 calving_interval=self.calving_interval,
-                milk_fat=self.milk_production.fat_percent,
-                milk_true_protein=self.milk_production.true_protein_percent,
-                milk_lactose=self.milk_production.lactose_percent,
+                milk_fat=MilkProduction.fat_percent,
+                milk_true_protein=MilkProduction.true_protein_percent,
+                milk_lactose=MilkProduction.lactose_percent,
                 milk_production=self.milk_production.daily_milk_produced,
                 housing=housing,
                 distance=walking_distance,
@@ -2297,9 +2317,9 @@ class Animal:
                 animal_type=self.animal_type,
                 parity=self.calves,
                 calving_interval=self.calving_interval,
-                milk_fat=self.milk_production.fat_percent,
-                milk_true_protein=self.milk_production.true_protein_percent,
-                milk_lactose=self.milk_production.lactose_percent,
+                milk_fat=MilkProduction.fat_percent,
+                milk_true_protein=MilkProduction.true_protein_percent,
+                milk_lactose=MilkProduction.lactose_percent,
                 milk_production=self.milk_production.daily_milk_produced,
                 housing=housing,
                 distance=walking_distance,

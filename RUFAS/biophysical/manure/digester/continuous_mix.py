@@ -9,23 +9,6 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 
 
-"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
-    (m^3 carbon dioxide / m^3 methane)."""
-CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
-
-"""Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
-TAN_INCREASE_FACTOR = 1.60
-
-"""Value of R in the ideal gas law (L·atm/(mol·K)."""
-IDEAL_GAS_LAW_R = 0.0821
-
-"""Molar mass of methane (g)."""
-METHANE_MOLAR_MASS = 16.04
-
-"""Molar mass of carbon dioxide (g)."""
-CARBON_DIOXIDE_MOLAR_MASS = 44.01
-
-
 class ContinuousMix(Digester):
     """
     Defines the behaviors and attributes of an anaerobic digester type, specifically a continuous stirred tank reactor.
@@ -82,13 +65,14 @@ class ContinuousMix(Digester):
             self._report_continuous_mix_outputs(
                 captured_biogas_volume=0.0,
                 captured_methane_volume=0.0,
-                methane_leakage_volume=0.0,
+                methane_leakage_mass=0.0,
                 simulation_day=time.simulation_day,
             )
             return {}
 
         self._manure_in_digester.ammoniacal_nitrogen = min(
-            self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
+            self._manure_in_digester.ammoniacal_nitrogen * ManureConstants.TAN_INCREASE_FACTOR,
+            self._manure_in_digester.nitrogen,
         )
 
         generated_methane_mass, generated_methane_volume = self._calculate_generated_methane()
@@ -103,15 +87,15 @@ class ContinuousMix(Digester):
         self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
-        methane_leakage_volume = self._calculate_methane_leakage(
-            generated_methane_volume, self._biogas_leakage_fraction
+        methane_leakage_mass, methane_leakage_volume = self._calculate_methane_leakage(
+            generated_methane_mass, generated_methane_volume, self._biogas_leakage_fraction
         )
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_continuous_mix_outputs(
             captured_biogas_volume=captured_biogas_volume,
             captured_methane_volume=captured_methane_volume,
-            methane_leakage_volume=methane_leakage_volume,
+            methane_leakage_mass=methane_leakage_mass,
             simulation_day=time.simulation_day,
         )
 
@@ -142,11 +126,11 @@ class ContinuousMix(Digester):
         The calculation uses the ideal gas law and the ratio of carbon dioxide to methane to determine
         the density, mass, and volume of the generated carbon dioxide.
         """
-        carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        carbon_dioxide_density = ManureConstants.CARBON_DIOXIDE_MOLAR_MASS / (
+            GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
+            generated_methane_volume * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
         )
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
         return generated_carbon_dioxide_mass, generated_carbon_dioxide_volume
@@ -165,8 +149,8 @@ class ContinuousMix(Digester):
             - generated_methane_mass (float): The mass of generated methane.
             - generated_methane_volume (float): The volume of generated methane.
         """
-        methane_density = METHANE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        methane_density = ManureConstants.METHANE_MOLAR_MASS / (
+            GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
@@ -228,7 +212,7 @@ class ContinuousMix(Digester):
         self,
         captured_biogas_volume: float,
         captured_methane_volume: float,
-        methane_leakage_volume: float,
+        methane_leakage_mass: float,
         simulation_day: int,
     ) -> None:
         """
@@ -242,8 +226,8 @@ class ContinuousMix(Digester):
              on the current day (m^3).
         captured_methane_volume : float
             Capture methane volume on the current day, after accounting for leakage (m^3).
-        methane_leakage_volume : float
-            Volume of methane lost to the atmosphere through unintended leakage on the current day (m^3).
+        methane_leakage_mass : float
+            The mass of methane lost to the atmosphere through unintended leakage on the current day (kg).
         simulation_day : int
             The current simulation day.
 
@@ -266,10 +250,10 @@ class ContinuousMix(Digester):
             simulation_day,
         )
         self._report_processor_output(
-            "methane_leakage_volume",
-            methane_leakage_volume,
+            "methane_leakage_mass",
+            methane_leakage_mass,
             data_origin_function,
-            MeasurementUnits.CUBIC_METERS,
+            MeasurementUnits.KILOGRAMS,
             simulation_day,
         )
 
@@ -300,21 +284,26 @@ class ContinuousMix(Digester):
         return total_volatile_solids * ManureConstants.ACHIEVABLE_METHANE_EMISSION
 
     @staticmethod
-    def _calculate_methane_leakage(generated_methane_mass: float, leakage_fraction: float) -> float:
+    def _calculate_methane_leakage(
+        generated_methane_mass: float, generated_methane_volume: float, leakage_fraction: float
+    ) -> tuple[float, float]:
         """
         Calculates the mass of methane lost from an anaerobic digester as leakage.
 
         Parameters
         ----------
         generated_methane_mass : float
-            Amount of methane generated within the digester (kg).
+            The mass of methane generated within the digester (kg).
+        generated_methane_mass : float
+            The volume of methane generated within the digester (m^3).
         leakage_fraction : float
             Fraction of generated methane that escapes as leakage (unitless).
 
         Returns
         -------
-        float
-            Mass of methane lost as leakage (kg).
+        tuple[float, float]
+            - Mass of methane lost as leakage (kg).
+            - Volume of methane lost as leakage (m^3).
 
         """
-        return generated_methane_mass * leakage_fraction
+        return generated_methane_mass * leakage_fraction, generated_methane_volume * leakage_fraction

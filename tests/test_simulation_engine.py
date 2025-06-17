@@ -226,10 +226,11 @@ def test_daily_simulation(
         "collect_daily_feed_request",
         return_value=(mock_requested_feed := MagicMock(auto_spec=RequestedFeed)),
     )
+    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
     mock_herd_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
         "daily_routines",
-        return_value=(mock_all_pen_manure_data := [MagicMock(auto_spec=PenManureData)]),
+        return_value=[{"pen_manure_data": mock_pen_manure_data}],
     )
 
     mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "daily_update")
@@ -286,7 +287,7 @@ def test_daily_simulation(
     mock_herd_daily_routines.assert_called_once_with(
         simulation_engine.feed_manager.available_feeds, mock_time, mock_weather, mock_total_inventory
     )
-    mock_manure_daily_update.assert_called_once_with(mock_all_pen_manure_data, mock_time.simulation_day)
+    mock_manure_daily_update.assert_called_once_with([mock_pen_manure_data], mock_time.simulation_day)
     mock_feed_execute_daily_routine.assert_called_once_with(mock_time)
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
@@ -311,6 +312,7 @@ def test_formulate_ration(
     Unit test for function _formulate_ration() in file RUFAS/simulation_engine.py
     """
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    simulation_engine.time.simulation_day = 15
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     simulation_engine.herd_manager.all_pens = [MagicMock(auto_spec=Pen) for _ in range(number_of_pens)]
 
@@ -354,6 +356,7 @@ def test_formulate_ration(
         mock_current_day_conditions.mean_air_temperature,
         ration_formulation_interval_length,
         mock_total_inventory,
+        simulation_engine.time.simulation_day,
     )
     mock_feed_manage_ration_interval_purchases.assert_called_once_with(mock_requested_feed, mock_time)
     assert mock_report_ration_interval_data.call_count == number_of_pens
@@ -457,10 +460,11 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
 
     mock_herd_manager = MagicMock(auto_spec=HerdManager)
     mock_herd_manager_init = mocker.patch("RUFAS.simulation_engine.HerdManager", return_value=mock_herd_manager)
+    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
     mock_herd_manager_collect_pen_manure_data = mocker.patch.object(
         mock_herd_manager,
         "collect_pen_manure_data",
-        return_value=(mock_all_pen_manure_data := [MagicMock(auto_spec=PenManureData)]),
+        return_value=[{"pen_manure_data": mock_pen_manure_data}],
     )
 
     mock_manure_manager = MagicMock(auto_spec=ManureManager)
@@ -506,7 +510,7 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
     assert simulation_engine.herd_manager == mock_herd_manager
     mock_herd_manager_collect_pen_manure_data.assert_called_once()
     mock_manure_manager_init.assert_called_once_with(
-        mock_all_pen_manure_data, mock_weather, mock_time, mock_manure_class_config, mock_simulate_animals
+        [mock_pen_manure_data], mock_weather, mock_time, mock_manure_class_config, mock_simulate_animals
     )
     assert simulation_engine.manure_manager == mock_manure_manager
 

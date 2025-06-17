@@ -227,7 +227,7 @@ def test_calculate_growth_energy_requirements(
     "expected_weight_gain",
     [
         # Test case 1: Lactating animal with valid days in milk
-        (True, None, 150, 30.0, 5.0, -598.25304, -143.88),
+        (True, None, 150, 30.0, 5.0, 0.0, 0.0),
         # Test case 2: Non-lactating animal, pregnant at day 200
         (False, 200, None, 30.0, 5.0, 2.419956, 0.582),
         # Test case 3: Non-lactating animal, not pregnant

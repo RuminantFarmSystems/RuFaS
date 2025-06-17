@@ -2725,16 +2725,16 @@ def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name
     [
         (13, 8, 2, 4, 3, 8, 8),  # Fills both pools with some leftover
         (6, 7, 3, 2, 0, 7, 4),  # Fills one pool, puts some in second, none leftover
-        (14, 5, 7, 1, 12, 5, 5),  # Removes from one pool, fills other, some leftover
-        (3, 6, 8, 9, 8, 6, 6),  # Removes from both pools, lots left over
+        (14, 5, 7, 1, 10, 7, 5),  # Removes from one pool, fills other, some leftover
+        (3, 6, 8, 9, 3, 8, 9),  # Removes from both pools, lots left over
         (
             5,
             10,
             3,
             12,
-            2,
+            0,
             8,
-            10,
+            12,
         ),  # Fills one pool as much as possible, removes excess from
         # another
     ],

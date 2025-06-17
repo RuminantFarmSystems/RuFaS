@@ -71,7 +71,13 @@
         "default": 100,
         "minimum": 6
       },
-      "replace_num": {
+      "lactating_fraction":{
+          "type": "number",
+          "description": "Fraction of cows that are lactating. Used during herd initialization.",
+          "default": 0.5,
+          "minimum": 0
+        },
+        "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
@@ -91,24 +97,36 @@
       },
       "parity_fractions": {
         "type": "object",
-        "description": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5 and greater. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.346
+          "default": 0.36
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.272
+          "default": 0.26
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.379
+          "default": 0.18
+        },
+        "4": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.11
+        },
+        "5": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.9
         }
       },
       "annual_milk_yield": {
@@ -143,7 +161,7 @@
         "description": "General Management",
         "breeding_start_day_h": {
           "type": "number",
-          "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
+          "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus detection (first cycle to occur between 1-21 days later)",
           "default": 380,
           "minimum": 0
         },
@@ -309,15 +327,15 @@
             "description": "Heifer Reproduction Protocols",
             "estrus_detection_rate": {
               "type": "number",
-              "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
-              "default": 0.6,
+              "description": "Estrus Detection Rate (fraction) -- The fraction of total heifers in estrus that are detected and inseminated in the ED (Estrus Detection) protocol",
+              "default": 0.9,
               "minimum": 0,
               "maximum": 1
             },
             "estrus_conception_rate": {
               "type": "number",
-              "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
-              "default": 0.9,
+              "description": "Estrus Conception Rate (fraction) -- The fraction of inseminated heifers that become pregnant for heifers bred on estrus detection (ED (Estrus Detection) and SynchED protocols)",
+              "default": 0.6,
               "minimum": 0,
               "maximum": 1
             },
@@ -330,15 +348,15 @@
               "type": "object",
               "conception_rate": {
                 "type": "number",
-                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                "description": "Conception Rate -- The conception rate for TAI breedings in the heifer reproductive program",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.7,
+                "description": "Estrus Detection Rate -- The fraction of in-heat heifers that would be detected and inseminated in the SynchED programs",
+                "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
               }
@@ -1300,17 +1318,17 @@
         "cow_presynch_program": {
           "type": "string",
           "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+          "pattern": "^(PreSynch|Double OvSynch|G6G|None)$"
         },
         "cow_ovsynch_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch|None)$"
         },
         "cow_resynch_program": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
         },
         "days_in_milk": {
           "type": "number",
@@ -5424,6 +5442,31 @@
       "minimum": 0.0,
       "default": 0.0
     },
+    "humus_mineralization_rate_factor": {
+      "type": "number",
+      "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
+      "minimum": 0.0,
+      "default": 0.003
+    },
+    "denitrification_rate_coefficient": {
+      "type": "number",
+      "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "default": 1.4
+    },
+    "denitrification_threshold_water_content": {
+      "type": "number",
+      "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
+      "minimum": 0.0,
+      "default": 1.0
+    },
+    "residue_fresh_organic_mineralization_rate": {
+      "type": "number",
+      "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
+      "minimum": 0.0,
+      "default": 0.05
+    },
     "soil_evaporation_compensation_coefficient": {
       "type": "number",
       "description": "Modifies depth distribution used to meet soil evaporative demand.\nUnitless.\nReference: SWAT Input .HRU, .BSN - ESCO",
@@ -5558,36 +5601,11 @@
           "default": null,
           "nullable": true
         },
-        "humus_mineralization_rate_factor": {
-          "type": "number",
-          "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
-          "minimum": 0.0,
-          "default": 0.0003
-        },
         "ammonium_volatilization_cation_exchange_factor": {
           "type": "number",
           "description": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5.",
           "minimum": 0.01,
           "default": 0.45
-        },
-        "denitrification_rate_coefficient": {
-          "type": "number",
-          "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
-          "minimum": 0.0,
-          "maximum": 3.0,
-          "default": 0.01
-        },
-        "denitrification_threshold_water_content": {
-          "type": "number",
-          "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
-          "minimum": 0.0,
-          "default": 1.3
-        },
-        "residue_fresh_organic_mineralization_rate": {
-          "type": "number",
-          "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
-          "minimum": 0.0,
-          "default": 0.05
         }
       }
     }
@@ -5965,6 +5983,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6001,6 +6030,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6037,6 +6077,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6073,6 +6124,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },

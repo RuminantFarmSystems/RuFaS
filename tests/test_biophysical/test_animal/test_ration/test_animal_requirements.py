@@ -806,9 +806,6 @@ def test_calculate_NASEM_energy_growth_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
         )
     )
-    print(net_energy_growth, expected_net_energy_growth)
-    print(avg_daily_gain, expected_avg_daily_gain)
-    print(frame_weight_gain_calc, expected_frame_weight_gain)
 
     assert math.isclose(net_energy_growth, expected_net_energy_growth, rel_tol=1e-6)
     assert math.isclose(avg_daily_gain, expected_avg_daily_gain, rel_tol=1e-6)
@@ -849,7 +846,7 @@ def test_calculate_NRC_energy_pregnancy_requirements(
     "expected_net_energy_pregnancy, expected_gravid_uterine_weight_gain",
     [
         # Case 1: Lactating cow with days in milk
-        (True, None, 150, 10.0, 0.5, -36.92304, -8.88),
+        (True, None, 150, 10.0, 0.5, -55.944, -8.88),
         # Case 2: Not lactating, day_of_pregnancy is None → should return 0.0
         (False, None, None, 12.0, 0.6, 0.0, 0.0),
         # Case 3: Not lactating, early pregnancy

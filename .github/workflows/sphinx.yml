@@ -21,8 +21,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build HTML from Sphinx
+    - name: Update .rst files and build HTML from Sphinx
       run: |
+        sphinx-apidoc -ed 1 --remove-old -o docs/_src/_code/ . ./tests/
         cd docs
         make clean
         make html

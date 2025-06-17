@@ -316,10 +316,10 @@ class CropData:
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
     root_depth: float = 1
-    optimal_nitrogen_fraction: Optional[float] = None
-    total_soil_layers: Optional[int] = None
-    accessible_soil_layers: Optional[int] = None
-    inaccessible_soil_layers: Optional[int] = None
+    optimal_nitrogen_fraction: Optional[float] = 0.001
+    total_soil_layers: Optional[int] = 2
+    accessible_soil_layers: Optional[int] = 1
+    inaccessible_soil_layers: Optional[int] = 1
 
     # ---- phosphorus incorporation
     emergence_phosphorus_fraction: float = 0.005
@@ -335,8 +335,8 @@ class CropData:
     cumulative_evaporation: float = 0.0
     cumulative_transpiration: float = 0.0
     cumulative_potential_evapotranspiration: float = 0.0
-    water_deficiency: Optional[float] = None
-    max_transpiration: Optional[float] = None
+    water_deficiency: Optional[float] = 0
+    max_transpiration: Optional[float] = 0
     canopy_water: float = 0
     max_canopy_water_capacity: float = 0.8
 

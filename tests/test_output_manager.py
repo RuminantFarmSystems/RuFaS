@@ -223,16 +223,164 @@ def test_get_units_substr(
 
 
 @pytest.mark.parametrize(
-    "data, expected_result, should_write",
+    "data, direction, expected_result, should_write, should_add_error",
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+            "portrait",
             f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True' f"{os.linesep},test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1.0, True, "test"]}},
+            "portrait",
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True{os.linesep}' f",test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
+                }
+            },
+            "portrait",
+            f'DISCLAIMER,var1 (m){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2' f"{os.linesep},3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1, 2, 3]}},
+            "portrait",
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2{os.linesep}' f",3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2],
+                    "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
+                }
+            },
+            "portrait",
+            f'DISCLAIMER,var1 (unitless){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep}' f",2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
+                    "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
+                }
+            },
+            "portrait",
+            f'DISCLAIMER,var1.v1 (m),var1.v2 (s){os.linesep}"{DISCLAIMER_MESSAGE}",1,1{os.linesep}' f",2,2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key": {
+                    "values": [
+                        {"key1": 1, "key2": [1, 1]},
+                        {"key1": 2, "key2": [2, 2]},
+                        {"key1": 3, "key2": [3, 3]},
+                    ],
+                    "info_maps": [
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                    ],
+                }
+            },
+            "portrait",
+            f"DISCLAIMER,simple_key.key1 (random unit 1),simple_key.key2 (random unit 2)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'1,"[1, 1]"{os.linesep}'
+            f","
+            f'2,"[2, 2]"{os.linesep}'
+            f","
+            f'3,"[3, 3]"{os.linesep}',
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {"values": [1, 2, 3]},
+                "simple_key2": {"values": [4, 5, 6]},
+            },
+            "portrait",
+            f'DISCLAIMER,simple_key1,simple_key2{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},2,5{os.linesep},3,6{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                    ],
+                },
+                "simple_key2": {
+                    "values": [4, 5, 6, 8, 9],
+                    "info_maps": [
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                    ],
+                },
+            },
+            "portrait",
+            f"DISCLAIMER,simple_key1 (random unit),simple_key2 (random unit)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},"
+            f"2,5{os.linesep},"
+            f"3,6{os.linesep},"
+            f",8{os.linesep},"
+            f",9{os.linesep}",
+            True,
+            False,
+        ),
+        ({}, "portrait", "", False, False),
+        (
+            {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}},
+            "landscape",
+            f",0,1,2{os.linesep}"
+            f'DISCLAIMER,"{DISCLAIMER_MESSAGE}",,{os.linesep}'
+            f"var1,1,2,3{os.linesep}"
+            f"var2,4,5,6{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+            "unknown",
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True' f"{os.linesep},test{os.linesep}",
+            True,
             True,
         ),
         (
             {"var1": {"values": [1.0, True, "test"]}},
+            "unknown",
             f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True{os.linesep}' f",test{os.linesep}",
+            True,
             True,
         ),
         (
@@ -242,12 +390,16 @@ def test_get_units_substr(
                     "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
                 }
             },
+            "unknown",
             f'DISCLAIMER,var1 (m){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2' f"{os.linesep},3{os.linesep}",
+            True,
             True,
         ),
         (
             {"var1": {"values": [1, 2, 3]}},
+            "unknown",
             f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2{os.linesep}' f",3{os.linesep}",
+            True,
             True,
         ),
         (
@@ -257,7 +409,9 @@ def test_get_units_substr(
                     "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
                 }
             },
+            "unknown",
             f'DISCLAIMER,var1 (unitless){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep}' f",2{os.linesep}",
+            True,
             True,
         ),
         (
@@ -267,7 +421,9 @@ def test_get_units_substr(
                     "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
                 }
             },
+            "unknown",
             f'DISCLAIMER,var1.v1 (m),var1.v2 (s){os.linesep}"{DISCLAIMER_MESSAGE}",1,1{os.linesep}' f",2,2{os.linesep}",
+            True,
             True,
         ),
         (
@@ -294,6 +450,7 @@ def test_get_units_substr(
                     ],
                 }
             },
+            "unknown",
             f"DISCLAIMER,simple_key.key1 (random unit 1),simple_key.key2 (random unit 2)"
             f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
             f'1,"[1, 1]"{os.linesep}'
@@ -302,14 +459,17 @@ def test_get_units_substr(
             f","
             f'3,"[3, 3]"{os.linesep}',
             True,
+            True,
         ),
         (
             {
                 "simple_key1": {"values": [1, 2, 3]},
                 "simple_key2": {"values": [4, 5, 6]},
             },
+            "unknown",
             f'DISCLAIMER,simple_key1,simple_key2{os.linesep}"{DISCLAIMER_MESSAGE}",'
             f"1,4{os.linesep},2,5{os.linesep},3,6{os.linesep}",
+            True,
             True,
         ),
         (
@@ -331,6 +491,7 @@ def test_get_units_substr(
                     ],
                 },
             },
+            "unknown",
             f"DISCLAIMER,simple_key1 (random unit),simple_key2 (random unit)"
             f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
             f"1,4{os.linesep},"
@@ -339,21 +500,161 @@ def test_get_units_substr(
             f",8{os.linesep},"
             f",9{os.linesep}",
             True,
+            True,
         ),
-        ({}, "", False),
+        ({}, "unknown", "", False, False),
+        (
+            {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True' f"{os.linesep},test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1.0, True, "test"]}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True{os.linesep}' f",test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1 (m){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2' f"{os.linesep},3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1, 2, 3]}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2{os.linesep}' f",3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2],
+                    "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1 (unitless){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep}' f",2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
+                    "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1.v1 (m),var1.v2 (s){os.linesep}"{DISCLAIMER_MESSAGE}",1,1{os.linesep}' f",2,2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key": {
+                    "values": [
+                        {"key1": 1, "key2": [1, 1]},
+                        {"key1": 2, "key2": [2, 2]},
+                        {"key1": 3, "key2": [3, 3]},
+                    ],
+                    "info_maps": [
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                    ],
+                }
+            },
+            None,
+            f"DISCLAIMER,simple_key.key1 (random unit 1),simple_key.key2 (random unit 2)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'1,"[1, 1]"{os.linesep}'
+            f","
+            f'2,"[2, 2]"{os.linesep}'
+            f","
+            f'3,"[3, 3]"{os.linesep}',
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {"values": [1, 2, 3]},
+                "simple_key2": {"values": [4, 5, 6]},
+            },
+            None,
+            f'DISCLAIMER,simple_key1,simple_key2{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},2,5{os.linesep},3,6{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                    ],
+                },
+                "simple_key2": {
+                    "values": [4, 5, 6, 8, 9],
+                    "info_maps": [
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                    ],
+                },
+            },
+            None,
+            f"DISCLAIMER,simple_key1 (random unit),simple_key2 (random unit)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},"
+            f"2,5{os.linesep},"
+            f"3,6{os.linesep},"
+            f",8{os.linesep},"
+            f",9{os.linesep}",
+            True,
+            False,
+        ),
+        ({}, None, "", False, False),
     ],
 )
 def test_dict_to_file_csv(
     mock_output_manager: OutputManager,
     data: Dict[str, Any],
+    direction: str,
     expected_result: str,
     should_write: bool,
+    should_add_error: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    mocker.patch.object(mock_output_manager, "add_log")
     open_mock = mock_open()
 
     with patch("builtins.open", open_mock):
-        mock_output_manager._dict_to_file_csv(data, Path("test"))
+        mock_output_manager._dict_to_file_csv(data, Path("test"), direction)
 
     if should_write:
         open_mock.assert_any_call("test", "w", encoding="utf-8", errors="strict", newline="")
@@ -361,6 +662,16 @@ def test_dict_to_file_csv(
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
 
     assert written_data == expected_result
+    if should_add_error:
+        mock_add_error.assert_called_once_with(
+            "Unknown Direction for CSV Output",
+            f"The provided direction '{direction}' is not recognized. "
+            f"Saving the output in portrait direction as default.",
+            {
+                "class": mock_output_manager.__class__.__name__,
+                "function": mock_output_manager._dict_to_file_csv.__name__,
+            },
+        )
 
 
 def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
@@ -420,7 +731,7 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
 
     with patch("builtins.open", open_mock):
         with raises(Exception):
-            mock_output_manager._dict_to_file_csv(data, Path("test"))
+            mock_output_manager._dict_to_file_csv(data, Path("test"), "portrait")
 
 
 def test_generate_key() -> None:
@@ -1500,8 +1811,9 @@ def test_load_filter_file_content_txt(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
-    result = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
+    result, direction = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
+    assert direction is None
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1516,8 +1828,25 @@ def test_load_filter_file_content_json(
         "other_key": "value",
     }
     mock_file.return_value.read.return_value = json.dumps(data)
-    result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
+    result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
+    assert direction is None
+
+
+@patch("builtins.open", new_callable=mock_open)
+@pytest.mark.parametrize("expected_direction", ["portrait", "landscape", "unknown"])
+def test_load_filter_file_content_json_with_direction(
+    mock_file: MagicMock,
+    expected_direction: str,
+    mock_output_manager: OutputManager,
+) -> None:
+    """Test case for function _load_filter_file_content in output_manager.py"""
+
+    data: Dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": expected_direction}
+    mock_file.return_value.read.return_value = json.dumps(data)
+    result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
+    assert result == [data]
+    assert direction == expected_direction
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1540,8 +1869,36 @@ def test_load_filter_file_content_json_multiple(
         ]
     }
     mock_file.return_value.read.return_value = json.dumps(data)
-    result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
+    result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
+    assert direction is None
+
+
+@patch("builtins.open", new_callable=mock_open)
+@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
+def test_load_filter_file_content_json_multiple_with_direction(
+    mock_file: MagicMock,
+    direction: str,
+    mock_output_manager: OutputManager,
+) -> None:
+    """Test case for function _load_filter_file_content in output_manager.py"""
+    data: Dict[str, Any] = {
+        "direction": direction,
+        "multiple": [
+            {
+                "filters": ["filter1", "filter2"],
+                "other_key": "value1",
+            },
+            {
+                "filters": ["filter3", "filter4"],
+                "other_key": "value2",
+            },
+        ],
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+    result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
+    assert result == data["multiple"]
+    assert direction == direction
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1600,11 +1957,6 @@ def mock_simple_variables_pool() -> Dict[str, OutputManager.pool_element_type]:
         "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
         "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
     }
-
-
-def returner(arg: Any) -> Any:
-    """Returns whatever arg is passed to this method."""
-    return arg
 
 
 @pytest.mark.parametrize(
@@ -1671,7 +2023,7 @@ def test_filter_variables_pool(
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
     mock_output_manager.variables_pool = mock_simple_variables_pool
-    expand_data_temporally = mocker.patch.object(Utility, "expand_data_temporally", side_effect=returner)
+    expand_data_temporally = mocker.patch.object(Utility, "expand_data_temporally", side_effect=lambda _: _)
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected
 
@@ -1965,18 +2317,38 @@ def test_parse_filtered_variables(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics, filter_content, is_faulty, chunkification",
+    "exclude_info_maps, produce_graphics, filter_content, is_faulty, chunkification, direction",
     [
-        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False),
-        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
-        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True),
-        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
-        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, True),
-        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, True),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "portrait"),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "portrait"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "portrait"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "portrait"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "portrait"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, True, "portrait"),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "landscape"),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "landscape"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "landscape"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "landscape"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "landscape"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, True, "landscape"),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "unknown"),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "unknown"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "unknown"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True, "unknown"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, True, "unknown"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, True, "unknown"),
     ],
 )
 def test_save_results(
@@ -1987,6 +2359,7 @@ def test_save_results(
     filter_content: List[Dict[str, str]],
     is_faulty: bool,
     chunkification: bool,
+    direction: str,
 ) -> None:
     # Arrange
     filters_path = Path("filters_path")
@@ -1996,7 +2369,7 @@ def test_save_results(
     graphics_dir = Path("outputs/graphics_dir")
     mock_output_manager.variables_pool = {}
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
-    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
+    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=(filter_content, direction))
     filter_files = ["csv_input_filepath1.txt", "graph_input_filepath2.txt", "json_input_filepath3.txt"]
     mocker.patch.object(mock_output_manager, "_list_filter_files_in_dir", return_value=filter_files)
     mock_exclude_info_maps = mocker.patch.object(mock_output_manager, "_exclude_info_maps", return_value={})
@@ -2033,6 +2406,7 @@ def test_save_results(
                     jsons_dir,
                     graphics_dir,
                     csvs_dir,
+                    direction,
                 )
                 for file_name in filter_files
             ]
@@ -2043,22 +2417,118 @@ def test_save_results(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics, filter_contents, is_faulty, warn_on_conflict",
+    "exclude_info_maps, produce_graphics, filter_contents, is_faulty, warn_on_conflict, direction",
     [
-        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
-        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False),
-        (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False, False),
-        (True, True, [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}], False, False),
-        (True, True, [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}], False, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "portrait"),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "portrait",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "portrait",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "portrait",
+        ),
         (
             True,
             True,
             [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
             False,
             True,
+            "portrait",
+        ),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "landscape"),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "landscape",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "landscape",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "landscape",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
+            False,
+            True,
+            "landscape",
+        ),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "unknown"),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "unknown",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "unknown",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "unknown",
+        ),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
+            False,
+            True,
+            "unknown",
         ),
     ],
 )
@@ -2069,6 +2539,7 @@ def test_save_results_report_generation(
     filter_contents: List[Dict[str, str]],
     is_faulty: bool,
     warn_on_conflict: bool,
+    direction: str,
     mocker: MockerFixture,
 ) -> None:
     # Arrange
@@ -2080,7 +2551,7 @@ def test_save_results_report_generation(
     mock_output_manager.variables_pool = {}
     mock_output_manager.chunkification = False
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
-    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_contents)
+    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=(filter_contents, direction))
     mocker.patch.object(
         mock_output_manager,
         "_list_filter_files_in_dir",
@@ -2129,7 +2600,9 @@ def test_save_results_report_generation(
         assert mock_add_warning.call_count == expected_warning_count
 
 
+@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
 def test_route_save_functions_csv_with_rounding(
+    direction: str,
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
 ) -> None:
@@ -2156,13 +2629,14 @@ def test_route_save_functions_csv_with_rounding(
         Path("json_dir"),
         Path("graphics_dir"),
         Path("output/CSVs/"),
+        direction,
     )
 
     # Assert
     round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path)
+        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path), direction
     )
     mock_add_log.assert_called_once_with(
         "Rounding Values",
@@ -2190,7 +2664,7 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
 
     # Act
     output_manager._route_save_functions(
-        filter_file, filtered_pool, produce_graphics, filter_content, jsons_dir, graphics_dir, csvs_dir
+        filter_file, filtered_pool, produce_graphics, filter_content, jsons_dir, graphics_dir, csvs_dir, "portrait"
     )
 
     # Assert
@@ -2219,7 +2693,7 @@ def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
 
     # Act
     output_manager._route_save_functions(
-        filter_file, filtered_pool, produce_graphics, filter_content, json_dir, graphics_dir, csv_dir
+        filter_file, filtered_pool, produce_graphics, filter_content, json_dir, graphics_dir, csv_dir, "portrait"
     )
 
     # Assert
@@ -2302,6 +2776,7 @@ def test_route_save_functions_graph(
         Path("jsons_dir"),
         Path("graphics_dir"),
         Path("csvs_dir"),
+        "portrait",
     )
 
     mock_generate_graph.assert_not_called()
@@ -2313,7 +2788,14 @@ def test_route_save_functions_graph(
     )
 
     mock_output_manager._route_save_functions(
-        "graph_file", {"key": [1, 2, 3, 4]}, True, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+        "graph_file",
+        {"key": [1, 2, 3, 4]},
+        True,
+        graph_data,
+        Path("jsons_dir"),
+        Path("graphics_dir"),
+        Path("csvs_dir"),
+        "portrait",
     )
     add_warning.assert_called_once_with(
         "No Graphics",
@@ -2327,7 +2809,14 @@ def test_route_save_functions_graph(
 
     mock_generate_graph.side_effect = Exception("test exception")
     mock_output_manager._route_save_functions(
-        "graph_file", {"key": [1, 2, 3, 4]}, True, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+        "graph_file",
+        {"key": [1, 2, 3, 4]},
+        True,
+        graph_data,
+        Path("jsons_dir"),
+        Path("graphics_dir"),
+        Path("csvs_dir"),
+        "portrait",
     )
     add_error.assert_called_with(
         "graph generation exception",
@@ -2713,7 +3202,7 @@ def test_get_error_and_warning_counts(
     ],
 )
 def test_print_credits(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd: CaptureFixture[str]
 ) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
@@ -2737,7 +3226,11 @@ def test_print_credits(
     ],
 )
 def test_print_task_id(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity, task_id: str, expected_output: str, capfd
+    mock_output_manager: OutputManager,
+    log_verbose: LogVerbosity,
+    task_id: str,
+    expected_output: str,
+    capfd: CaptureFixture[str],
 ) -> None:
     """
     Unit test for the print_task_id() method in OutputManager class.
@@ -2759,7 +3252,7 @@ def test_print_task_id(
     ],
 )
 def test_print_errors_warnings_logs(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd: CaptureFixture[str]
 ) -> None:
     mock_output_manager._OutputManager__log_verbose = log_verbose
     task_id = "id"
@@ -3495,3 +3988,405 @@ def test_get_origin_label(
         mocked_add_error.assert_called_once()
     else:
         mocked_add_error.assert_not_called()
+
+
+def test_validate_string_list_valid(mocker: MockerFixture) -> None:
+    """Test for validate_string_list()."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings(["a", "b"], "key", "test_filter")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_string_list_invalid_type(mocker: MockerFixture) -> None:
+    """Test for validate_string_list() raising on non-list."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings("not_a_list", "key", "test_filter")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_string_list_invalid_element(mocker: MockerFixture) -> None:
+    """Test for validate_string_list() raising on non-string elements."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings(["a", 1], "key", "test_filter")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_dict_of_numbers_valid(mocker: MockerFixture) -> None:
+    """Test for validate_dict_of_numbers()."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_dict_of_numbers({"a": 1, "b": 2.0}, "constants", "test_filter")
+
+    mock_add_error.assert_not_called()
+
+
+def test_validate_dict_of_numbers_invalid_value(mocker: MockerFixture) -> None:
+    """Test for validate_dict_of_numbers() raising on non-numeric values."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_dict_of_numbers({"a": "one"}, "constants", "test_filter")
+
+    mock_add_error.assert_called_once()
+
+
+def test_validate_aggregator_valid(mocker: MockerFixture) -> None:
+    """Test for validate_aggregator() with supported functions."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    for func in ["average", "division", "product", "SD", "sum", "subtraction"]:
+        om.validate_aggregator(func, "agg", "test_filter")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_aggregator_invalid(mocker: MockerFixture) -> None:
+    """Test for validate_aggregator() raising on unsupported function."""
+    om = OutputManager()
+
+    with pytest.raises(ValueError):
+        om.validate_aggregator("median", "agg", "test_filter")
+
+
+def test_validate_type_match(mocker: MockerFixture) -> None:
+    """Test for validate_type() not calling add_error on matching type."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
+
+    om.validate_type("abc", "field", "test_filter", str, "a string")
+
+    mock_add.assert_not_called()
+
+
+def test_validate_type_mismatch(mocker: MockerFixture) -> None:
+    """Test for validate_type() calling add_error on type mismatch."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
+
+    om.validate_type(123, "field", "test_filter", str, "a string")
+
+    mock_add.assert_called_once_with(
+        "Invalid report filter data type",
+        "[ERROR] 'field' in test_filter must be a string but received <class 'int'>.",
+        {"class": om.__class__.__name__, "function": om.validate_type.__name__},
+    )
+
+
+def test_validate_graph_type_valid(mocker: MockerFixture) -> None:
+    """Test for validate_graph_type() with supported types."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    for t in ["plot", "barbs", "violin"]:
+        om.validate_graph_type(t, "type", "test_filter")
+
+    mock_add_error.assert_not_called()
+
+
+def test_validate_graph_type_invalid(mocker: MockerFixture) -> None:
+    """Test for validate_graph_type() raising on unsupported type."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_graph_type("unsupported", "type", "test_filter")
+
+    mock_add_error.assert_called_once()
+
+
+def test_validate_customization_details_valid(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() with allowed options."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_customization_details({"title": "My Chart", "grid": True}, "customization_details", "test_filter")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_customization_details_invalid_type(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() raising on non-dict."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
+    om.validate_customization_details("not a dict", "customization_details", "test_filter")
+    mock_add.assert_called_once()
+
+
+def test_validate_customization_details_unknown_option(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() raising on unknown option."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_customization_details({"unknown_opt": 123}, "customization_details", "test_filter")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_graph_details_and_options_valid() -> None:
+    """Test for validate_graph_details() with complete details."""
+    details = {
+        "type": "plot",
+        "filters": ["a"],
+        "customization_details": {"title": "Chart"},
+        "legend": ["L1"],
+        "display_units": True,
+        "use_calendar_dates": False,
+        "data_significant_digits": 3,
+    }
+    om = OutputManager()
+    om.validate_graph_details(details, "graph_details", "test_filter")
+
+
+def test_validate_graph_details_missing_type(mocker: MockerFixture) -> None:
+    """Test for validate_graph_details() raising when type missing."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    om.validate_graph_details({"filters": ["a"]}, "graph_details", "test_filter")
+    mock_error.assert_called_once()
+
+
+def test_validate_filter_content_valid_report(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+            "vertical_aggregation": "sum",
+            "fill_value": 0,
+            "graph_details": {"type": "stem"},
+        }
+    ]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_graph_details_validation = mocker.patch.object(OutputManager, "validate_graph_details")
+    om.validate_filter_content(tmp_path)
+    assert mock_validate_type.call_count == 2
+    mock_graph_details_validation.assert_called_once()
+
+
+def test_validate_filter_content_valid_csv(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+        }
+    ]
+    file: Path = tmp_path / "csv_f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_csv_validation = mocker.patch.object(OutputManager, "validate_csv_filters")
+    om.validate_filter_content(tmp_path)
+    mock_csv_validation.assert_called_once()
+
+
+def test_validate_filter_content_valid_json(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+        }
+    ]
+    file: Path = tmp_path / "json_f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_json_validation = mocker.patch.object(OutputManager, "validate_json_filters")
+    om.validate_filter_content(tmp_path)
+    mock_json_validation.assert_called_once()
+
+
+def test_validate_filter_content_valid_txt(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = "txt tests"
+    file: Path = tmp_path / "f1.txt"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_log = mocker.patch.object(OutputManager, "add_log")
+    om.validate_filter_content(tmp_path)
+    mock_log.assert_called_once()
+
+
+def test_validate_filter_content_missing_key(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() raising when filters key missing."""
+    bad: Any = [{"name": "Report1"}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(bad))
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(bad, None))
+    om.validate_filter_content(tmp_path)
+    mock_error.assert_called_once()
+
+
+def test_validate_report_filters_valid_filters(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() with filters key present."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"]}
+    error_spy = mocker.patch.object(om, "add_error")
+    om.validate_report_filters(filter_content, "test_filter")
+    error_spy.assert_not_called()
+
+
+def test_validate_report_filters_valid_cross_references(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() with cross_references key present."""
+    om = OutputManager()
+    filter_content: Any = {"cross_references": ["R1"]}
+    error_spy = mocker.patch.object(om, "add_error")
+    om.validate_report_filters(filter_content, "test_filter")
+    error_spy.assert_not_called()
+
+
+def test_validate_report_filters_missing_both(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() raising when neither filters nor cross_references present."""
+    om = OutputManager()
+    filter_content: Any = {"name": "TestReport"}
+    error_spy = mocker.patch.object(om, "add_error")
+    om.validate_report_filters(filter_content, "test_filter")
+    assert error_spy.call_count == 1
+    title_arg, message_arg, info_map = error_spy.call_args.args
+    assert "Parsing error" in title_arg
+
+
+def test_validate_report_filters_unknown_key(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() raising on unknown key."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"], "unknown": 123}
+    error_spy = mocker.patch.object(om, "add_error")
+    om.validate_report_filters(filter_content, "test_filter")
+    assert any("Unknown key in report filter" in call.args[0] for call in error_spy.mock_calls)
+
+
+def test_validate_report_filters_fill_value_ignored(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() ignoring fill_value key."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"], "fill_value": "anything"}
+    error_spy = mocker.patch.object(om, "add_error")
+    om.validate_report_filters(filter_content, "test_filter")
+    error_spy.assert_not_called()
+
+
+def test_validate_filter_content_unsupported_key(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() raising when filters key missing."""
+    bad: Any = [{"name": "Report1", "filters": ["x"], "random": 0}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(bad))
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(bad, None))
+    om.validate_filter_content(tmp_path)
+    mock_error.assert_called_once()
+
+
+def test_validate_json_filters_valid(mocker: MockerFixture) -> None:
+    """validate_json_filters should call the right validators on a minimal valid JSON filter."""
+    om = OutputManager()
+    content: dict[str, Any] = {
+        "name": "JSON1",
+        "filters": ["a"],
+        "variables": ["b"],
+    }
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_validate_list = mocker.patch.object(OutputManager, "validate_list_of_strings")
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_json_filters(content, "test.json")
+    mock_validate_type.assert_called_once_with("JSON1", "name", "test.json", expected=str, type_label="a string")
+    assert mock_validate_list.call_count == 2
+    mock_validate_list.assert_has_calls(
+        [
+            mocker.call(["a"], "filters", "test.json"),
+            mocker.call(["b"], "variables", "test.json"),
+        ],
+        any_order=True,
+    )
+    mock_add_error.assert_not_called()
+
+
+def test_validate_json_filters_non_dict(mocker: MockerFixture) -> None:
+    """validate_json_filters should error out if passed a non-dict."""
+    om = OutputManager()
+    bad_content: Any = ["not", "a", "dict"]
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_json_filters(bad_content, "bad.json")
+    mock_add_error.assert_called_once()
+    args, _ = mock_add_error.call_args
+    assert "Parsing error" in args[0]
+
+
+def test_validate_json_filters_unknown_key(mocker: MockerFixture) -> None:
+    """validate_json_filters should report unknown keys and still run known validators."""
+    om = OutputManager()
+    content: dict[str, Any] = {
+        "name": "JSON2",
+        "filters": ["x"],
+        "variables": ["y"],
+        "extra": 123,
+    }
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_validate_list = mocker.patch.object(OutputManager, "validate_list_of_strings")
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_json_filters(content, "f.json")
+    mock_validate_type.assert_called_once()
+    assert mock_validate_list.call_count == 2
+    add_error_calls = [c for c in mock_add_error.call_args_list if "Unknown key in json filter" in c[0][0]]
+    assert len(add_error_calls) == 1
+
+
+def test_validate_csv_filters_valid(mocker: MockerFixture) -> None:
+    """validate_csv_filters should call the right validators on a minimal valid CSV filter."""
+    om = OutputManager()
+    content: dict[str, Any] = {
+        "name": "CSV1",
+        "filters": ["a"],
+        "direction": "up",
+    }
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_validate_list = mocker.patch.object(OutputManager, "validate_list_of_strings")
+    mock_validate_direction = mocker.patch.object(OutputManager, "validate_direction")
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_csv_filters(content, "test.csv")
+    mock_validate_type.assert_called_once_with("CSV1", "name", "test.csv", expected=str, type_label="a string")
+    mock_validate_list.assert_called_once_with(["a"], "filters", "test.csv")
+    mock_validate_direction.assert_called_once_with("up", "direction", "test.csv")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_csv_filters_non_dict(mocker: MockerFixture) -> None:
+    """validate_csv_filters should error out if passed a non-dict."""
+    om = OutputManager()
+    bad_content: Any = "not a dict"
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_csv_filters(bad_content, "bad.csv")
+    mock_add_error.assert_called_once()
+    assert "Parsing error" in mock_add_error.call_args[0][0]
+
+
+def test_validate_csv_filters_unknown_key(mocker: MockerFixture) -> None:
+    """validate_csv_filters should report unknown keys and still run known validators."""
+    om = OutputManager()
+    content: dict[str, Any] = {
+        "name": "CSV2",
+        "filters": ["f"],
+        "direction": "down",
+        "surprise": True,
+    }
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_validate_list = mocker.patch.object(OutputManager, "validate_list_of_strings")
+    mock_validate_direction = mocker.patch.object(OutputManager, "validate_direction")
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_csv_filters(content, "f.csv")
+    mock_validate_type.assert_called_once()
+    mock_validate_list.assert_called_once()
+    mock_validate_direction.assert_called_once()
+    calls = [c for c in mock_add_error.call_args_list if "Unknown key in csv filter" in c[0][0]]
+    assert len(calls) == 1
