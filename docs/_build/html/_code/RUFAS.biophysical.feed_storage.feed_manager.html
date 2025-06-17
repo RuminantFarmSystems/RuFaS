@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>RUFAS.biophysical.feed_storage.feed_manager module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.biophysical.feed_storage.feed_manager module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.biophysical.feed_storage.feed_manager module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.feed_storage.grain.html" rel="next" title="RUFAS.biophysical.feed_storage.grain module"/>
+<link href="RUFAS.biophysical.feed_storage.baleage.html" rel="prev" title="RUFAS.biophysical.feed_storage.baleage module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.feed_storage.html">RUFAS.biophysical.feed_storage package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.feed_storage.feed_manager module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-RUFAS.biophysical.feed_storage.feed_manager">
+<span id="rufas-biophysical-feed-storage-feed-manager-module"></span><h1>RUFAS.biophysical.feed_storage.feed_manager module<a class="headerlink" href="#module-RUFAS.biophysical.feed_storage.feed_manager" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.feed_manager.</span></span><span class="sig-name descname"><span class="pre">CROP_TO_STORAGE_MAPPING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">CropCategory</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage" title="RUFAS.biophysical.feed_storage.storage.Storage"><span class="pre">Storage</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CropCategory.ALFALFA:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.CORN:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.grain.Grain'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Silage'&gt;],</span> <span class="pre">CropCategory.GRASS:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.SMALL_GRAIN:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.grain.Grain'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.SOY:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.grain.Grain'&gt;]}</span></em><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING'"><span>#</span></a></dt>
+<dd><p>Maps each StorageType enum element to the associated Storage subclass.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.STORAGE_TYPE_TO_CLASS_MAP">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.feed_manager.</span></span><span class="sig-name descname"><span class="pre">STORAGE_TYPE_TO_CLASS_MAP</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">StorageType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage" title="RUFAS.biophysical.feed_storage.storage.Storage"><span class="pre">Storage</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{StorageType.BAG:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Bag'&gt;,</span> <span class="pre">StorageType.BALEAGE:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.baleage.Baleage'&gt;,</span> <span class="pre">StorageType.BUNKER:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Bunker'&gt;,</span> <span class="pre">StorageType.DRY:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.grain.Dry'&gt;,</span> <span class="pre">StorageType.HIGH_MOISTURE:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.grain.HighMoisture'&gt;,</span> <span class="pre">StorageType.PILE:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.silage.Pile'&gt;,</span> <span class="pre">StorageType.PROTECTED_INDOORS:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.ProtectedIndoors'&gt;,</span> <span class="pre">StorageType.PROTECTED_TARPED:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.ProtectedTarped'&gt;,</span> <span class="pre">StorageType.PROTECTED_WRAPPED:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.ProtectedWrapped'&gt;,</span> <span class="pre">StorageType.UNPROTECTED:</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.biophysical.feed_storage.hay.Unprotected'&gt;}</span></em><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.STORAGE_TYPE_TO_CLASS_MAP" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.STORAGE_TYPE_TO_CLASS_MAP'"><span>#</span></a></dt>
+<dd><p>Ratio of the price of an on-farm price to the price of buying that feed from an off farm source.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.feed_manager.</span></span><span class="sig-name descname"><span class="pre">FeedManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientStandard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_to_rufas_ids_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the feed storage, handling crop reception, purchasing, degradation processing, feed distribution,
+and querying available feeds.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Dict[StorageType, Storage]</dt><dd><p>Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientStandard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_to_rufas_ids_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds'"><span>#</span></a></dt>
+<dd><p>Returns the list of available feeds.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.update_available_feed_amounts">
+<span class="sig-name descname"><span class="pre">update_available_feed_amounts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.update_available_feed_amounts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.update_available_feed_amounts'"><span>#</span></a></dt>
+<dd><p>Updates the amounts feeds available based on what is currently stored.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.translate_crop_config_name_to_rufas_id">
+<span class="sig-name descname"><span class="pre">translate_crop_config_name_to_rufas_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">next_harvest_dates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.translate_crop_config_name_to_rufas_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.translate_crop_config_name_to_rufas_id'"><span>#</span></a></dt>
+<dd><p>Remaps crop configs and their next harvest date to RuFaS feed IDs and their next harvest date.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_result_factory">
+<span class="sig-name descname"><span class="pre">_query_result_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CropCategory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CropType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">CropCategory</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CropType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_result_factory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_result_factory'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.receive_crop">
+<span class="sig-name descname"><span class="pre">receive_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvested_crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HarvestedCrop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StorageType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.receive_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.receive_crop'"><span>#</span></a></dt>
+<dd><p>Receives a harvested crop and assigns it to a storage unit.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>harvested_crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The harvested crop to be stored.</p>
+</dd>
+<dt>storage_type<span class="classifier">StorageType</span></dt><dd><p>The type of storage to use for this crop.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the crop type is not compatible with the storage type.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.process_degradations">
+<span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.process_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.process_degradations'"><span>#</span></a></dt>
+<dd><p>Processes the degradation of all stored feeds over time.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.give_feed">
+<span class="sig-name descname"><span class="pre">give_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CropType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.give_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.give_feed'"><span>#</span></a></dt>
+<dd><p>Distributes feed to the Animal module based on the FIFO principle.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>amount<span class="classifier">float</span></dt><dd><p>The amount of feed to distribute.</p>
+</dd>
+<dt>crop_type<span class="classifier">CropType</span></dt><dd><p>The type of crop to distribute.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The actual amount of feed distributed.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.execute_daily_routine">
+<span class="sig-name descname"><span class="pre">execute_daily_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.execute_daily_routine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.execute_daily_routine'"><span>#</span></a></dt>
+<dd><p>Executes daily routine of the Feed Manager.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.report_stored_feeds">
+<span class="sig-name descname"><span class="pre">report_stored_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.report_stored_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.report_stored_feeds'"><span>#</span></a></dt>
+<dd><p>Outputs total amounts of feeds currently stored by the FeedManager.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_daily_feed_request">
+<span class="sig-name descname"><span class="pre">manage_daily_feed_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RequestedFeed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_daily_feed_request" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_daily_feed_request'"><span>#</span></a></dt>
+<dd><p>Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_inventory">
+<span class="sig-name descname"><span class="pre">get_total_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inventory_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">TotalInventory</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_inventory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_inventory'"><span>#</span></a></dt>
+<dd><p>Gets the inventory expected to be held in storage at the specified date.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>inventory_date<span class="classifier">date</span></dt><dd><p>Date at which inventory of feeds should be estimated for.</p>
+</dd>
+<dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather data for the simulation.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the current time of the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>TotalInventory</dt><dd><p>Total inventory of feeds projected to be held at the current date.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the requested inventory date has already passed in the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_planning_cycle_purchases">
+<span class="sig-name descname"><span class="pre">manage_planning_cycle_purchases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ideal_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IdealFeeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_planning_cycle_purchases" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_planning_cycle_purchases'"><span>#</span></a></dt>
+<dd><p>Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
+future harvests, budget, etc.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_ration_interval_purchases">
+<span class="sig-name descname"><span class="pre">manage_ration_interval_purchases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RequestedFeed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_ration_interval_purchases" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_ration_interval_purchases'"><span>#</span></a></dt>
+<dd><p>Manages the purchasing of feeds at the beginning of a ration interval.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_available_feed_totals">
+<span class="sig-name descname"><span class="pre">_query_available_feed_totals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stored_crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">HarvestedCrop</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_available_feed_totals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_available_feed_totals'"><span>#</span></a></dt>
+<dd><p>Gets the current dry matter mass of each feed ID currently in storage.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>query_feed_ids<span class="classifier">list[RUFAS_ID]</span></dt><dd><p>List of RuFaS Feed IDs to get amounts of feed stored for.</p>
+</dd>
+<dt>stored_crops<span class="classifier">list[HarvestedCrop] | None, default None</span></dt><dd><p>Stored crops to tally feed amounts from. If None, tallies feed amounts from all feeds currently stored.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[RUFAS_ID, float]</dt><dd><p>Map of RuFaS Feed IDs to the amounts of each in storage (kg dry matter).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.query_available_feeds">
+<span class="sig-name descname"><span class="pre">query_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_crop_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">CropType</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_crop_categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">CropCategory</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_storage_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">StorageType</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">CropCategory</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CropType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.query_available_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.query_available_feeds'"><span>#</span></a></dt>
+<dd><p>Queries the available amount of feed in storage.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>query_crop_types<span class="classifier">List[CropType], optional, default=None</span></dt><dd><p>The types of crop to query (if None, all crop types are queried).</p>
+</dd>
+<dt>query_crop_categories<span class="classifier">List[CropCategory], optional, default=None</span></dt><dd><p>The categories of crop to query (if None, all crop categories are queried).</p>
+</dd>
+<dt>query_storage_types<span class="classifier">List[StorageType], optional, default=None</span></dt><dd><p>The types of storage to query (if None, all storages types are queried).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>List[QUERY_RESULT_DATA_TYPE]</dt><dd><p>The amount of available feed, either as a total or for a specific crop type.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed">
+<span class="sig-name descname"><span class="pre">purchase_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_to_purchase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed'"><span>#</span></a></dt>
+<dd><p>Records amounts and cost of feed purchased, and orchestrates storing them.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>feeds_to_purchase<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the amounts of that feed to be purchased (kg dry matter).</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._store_purchased_feed">
+<span class="sig-name descname"><span class="pre">_store_purchased_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rufas_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purchase_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._store_purchased_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._store_purchased_feed'"><span>#</span></a></dt>
+<dd><p>Stores feeds which have been purchased.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>rufas_id<span class="classifier">RUFAS_ID</span></dt><dd><p>RuFaS Feed ID of the feed that is to be stored (unitless).</p>
+</dd>
+<dt>purchase_amount<span class="classifier">float</span></dt><dd><p>Amount of feed that was purchased (kg dry matter).</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory">
+<span class="sig-name descname"><span class="pre">_deduct_feeds_from_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_to_deduct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory'"><span>#</span></a></dt>
+<dd><p>Removes feeds from storage in a FIFO manner.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>feeds_to_deduct<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the amounts of feed that will be removed from storage (kg dry matter).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Raises<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the amount of feed to deduct is greater than the amount in storage.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop">
+<span class="sig-name descname"><span class="pre">_select_rufas_id_for_harvested_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop'"><span>#</span></a></dt>
+<dd><p>Choose which feed a harvested crop will be fed as.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>crop_ids<span class="classifier">list[RUFAS_ID]</span></dt><dd><p>All RuFaS IDs that a crop may be fed as.</p>
+</dd>
+<dt>feed_ids<span class="classifier">list[RUFAS_ID]</span></dt><dd><p>List of RuFaS Feed IDs that are being selected from.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>RUFAS_ID | None</dt><dd><p>The RuFaS Feed ID that the harvested crop will be mapped to. If there is no feed that the crop can be fed as
+None will be returned.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds">
+<span class="sig-name descname"><span class="pre">_setup_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientStandard</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds'"><span>#</span></a></dt>
+<dd><p>Creates list of feeds available for use in the simulation.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>feed_config<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>Mapping of the feeds available for purchase to the prices of those feeds.</p>
+</dd>
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Indicates whether the NASEM or NRC nutrient standards is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>list[Feed]</dt><dd><p>Nutrition and price information of feeds available in the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library">
+<span class="sig-name descname"><span class="pre">_process_feed_library</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientStandard</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library'"><span>#</span></a></dt>
+<dd><p>Collects and processes the feed library input so that it can be translated into a simulation-friendly format.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Indicates whether the NASEM or NRC nutrient standards is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[RUFAS_ID, dict[str, Any]]</dt><dd><p>Mapping of RuFaS feed IDs to the nutritional properties of those feeds.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.feed_manager.FeedManager.setup_stored_feeds">
+<span class="sig-name descname"><span class="pre">setup_stored_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.setup_stored_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.setup_stored_feeds'"><span>#</span></a></dt>
+<dd><p>Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing.</p>
+</dd></dl>
+</section>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING"><code class="docutils literal notranslate"><span class="pre">CROP_TO_STORAGE_MAPPING</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.STORAGE_TYPE_TO_CLASS_MAP'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.STORAGE_TYPE_TO_CLASS_MAP"><code class="docutils literal notranslate"><span class="pre">STORAGE_TYPE_TO_CLASS_MAP</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager"><code class="docutils literal notranslate"><span class="pre">FeedManager</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.__init__'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.__init__"><code class="docutils literal notranslate"><span class="pre">FeedManager.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.available_feeds</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.update_available_feed_amounts'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.update_available_feed_amounts"><code class="docutils literal notranslate"><span class="pre">FeedManager.update_available_feed_amounts()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.translate_crop_config_name_to_rufas_id'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.translate_crop_config_name_to_rufas_id"><code class="docutils literal notranslate"><span class="pre">FeedManager.translate_crop_config_name_to_rufas_id()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_result_factory'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_result_factory"><code class="docutils literal notranslate"><span class="pre">FeedManager._query_result_factory()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.receive_crop'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.receive_crop"><code class="docutils literal notranslate"><span class="pre">FeedManager.receive_crop()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.process_degradations'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.process_degradations"><code class="docutils literal notranslate"><span class="pre">FeedManager.process_degradations()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.give_feed'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.give_feed"><code class="docutils literal notranslate"><span class="pre">FeedManager.give_feed()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.execute_daily_routine'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.execute_daily_routine"><code class="docutils literal notranslate"><span class="pre">FeedManager.execute_daily_routine()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.report_stored_feeds'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.report_stored_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.report_stored_feeds()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_daily_feed_request'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_daily_feed_request"><code class="docutils literal notranslate"><span class="pre">FeedManager.manage_daily_feed_request()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_inventory'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_inventory"><code class="docutils literal notranslate"><span class="pre">FeedManager.get_total_inventory()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_planning_cycle_purchases'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_planning_cycle_purchases"><code class="docutils literal notranslate"><span class="pre">FeedManager.manage_planning_cycle_purchases()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_ration_interval_purchases'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.manage_ration_interval_purchases"><code class="docutils literal notranslate"><span class="pre">FeedManager.manage_ration_interval_purchases()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_available_feed_totals'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._query_available_feed_totals"><code class="docutils literal notranslate"><span class="pre">FeedManager._query_available_feed_totals()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.query_available_feeds'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.query_available_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.query_available_feeds()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed"><code class="docutils literal notranslate"><span class="pre">FeedManager.purchase_feed()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._store_purchased_feed'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._store_purchased_feed"><code class="docutils literal notranslate"><span class="pre">FeedManager._store_purchased_feed()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory"><code class="docutils literal notranslate"><span class="pre">FeedManager._deduct_feeds_from_inventory()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop"><code class="docutils literal notranslate"><span class="pre">FeedManager._select_rufas_id_for_harvested_crop()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager._setup_available_feeds()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library"><code class="docutils literal notranslate"><span class="pre">FeedManager._process_feed_library()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.setup_stored_feeds'" class="reference internal" href="#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.setup_stored_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.setup_stored_feeds()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
