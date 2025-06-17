@@ -222,7 +222,7 @@ class Storage:
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            list of HarvestedCrops to project degradations for.
+            List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -494,7 +494,7 @@ class Storage:
         crop : HarvestedCrop
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
-            list of daily weather conditions over which dry matter loss will be calculated.
+            List of daily weather conditions over which dry matter loss will be calculated.
         time : RufasTime
             RufasTime instance containing the time that loss should be processed up to.
 
