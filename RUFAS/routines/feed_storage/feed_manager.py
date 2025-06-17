@@ -59,11 +59,10 @@ class FeedManager:
         self.active_storages: Dict[StorageType, Storage] = {}
 
     def _query_result_factory(
-        self, crop_category: CropCategory, crop_type: CropType, amount: float
+        self, crop_category: CropCategory, amount: float
     ) -> QUERY_RESULT_DATA_TYPE:
         return {
             "category": crop_category,
-            "type": crop_type,
             "amount": amount,
         }
 
@@ -110,24 +109,6 @@ class FeedManager:
         """
         for _, storage in self.active_storages.items():
             storage.process_degradations(weather, time)
-
-    def give_feed(self, amount: float, crop_type: CropType) -> float:
-        """
-        Distributes feed to the Animal module based on the FIFO principle.
-
-        Parameters
-        ----------
-        amount : float
-            The amount of feed to distribute.
-        crop_type : CropType
-            The type of crop to distribute.
-
-        Returns
-        -------
-        float
-            The actual amount of feed distributed.
-        """
-        pass
 
     def query_available_feeds(
         self,
