@@ -18,9 +18,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -69,9 +67,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 @pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
@@ -83,9 +79,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 @pytest.mark.parametrize("dry_matter_percentage,expected", [(30.0, 408.0), (15.0, 474.0), (95.0, 122.0)])
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
     crop.dry_matter_percentage = dry_matter_percentage
 
     actual = crop._calculate_bale_density()
@@ -99,9 +93,7 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 )
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
 

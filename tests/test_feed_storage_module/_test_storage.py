@@ -69,9 +69,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, **sample_crop_data  # type: ignore[arg-type]
-    )
+    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
 
