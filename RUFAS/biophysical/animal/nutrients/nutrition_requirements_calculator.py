@@ -31,6 +31,11 @@ class NutritionRequirementsCalculator:
         milk_production: float
             Daily milk yield (kg).
 
+        Notes
+        ------
+        [AN.NRC.27]
+        [AN.NRC.28]
+
         Returns
         -------
         net_energy_lactation : float
