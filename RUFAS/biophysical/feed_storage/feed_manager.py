@@ -210,7 +210,7 @@ class FeedManager:
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():
             self._om.add_variable(
-                f"requested_feed_{feed_id}",
+                f"{feed_id}_requested_amount",
                 amount_requested,
                 {
                     "class": self.__class__.__name__,
@@ -221,7 +221,7 @@ class FeedManager:
             )
             available_amount = current_feed_totals[feed_id]
             self._om.add_variable(
-                f"available_feed_{feed_id}",
+                f"{feed_id}_available_amount",
                 available_amount,
                 {
                     "class": self.__class__.__name__,
@@ -521,7 +521,7 @@ class FeedManager:
                 if isinstance(feed, PurchasedFeed):
                     feed.remove_dry_matter_mass(amount_to_deduct)
                     self._om.add_variable(
-                        f"purchased_feed_{feed.rufas_id}_deducted",
+                        f"purchased_feed_{feed.rufas_id}_amount_deducted",
                         amount_to_deduct,
                         {
                             "class": self.__class__.__name__,
@@ -533,7 +533,7 @@ class FeedManager:
                 else:
                     feed.remove_feed_mass(amount_to_deduct)
                     self._om.add_variable(
-                        f"farmgrown_feed_{feed.config_name}_deducted",
+                        f"farmgrown_feed_{feed.config_name}_amount_deducted",
                         amount_to_deduct,
                         {
                             "class": self.__class__.__name__,
