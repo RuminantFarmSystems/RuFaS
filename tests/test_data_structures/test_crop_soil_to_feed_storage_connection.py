@@ -1,53 +1,15 @@
 import copy
+from datetime import date, datetime, timedelta
+from typing import cast
 
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_feed_storage.sample_crop_data import sample_crop_data
-
-
-@pytest.mark.parametrize(
-    "category, crop_type",
-    [
-        (CropCategory.SMALL_GRAIN, CropType.WHEAT),
-        (CropCategory.SMALL_GRAIN, CropType.RYE),
-        (CropCategory.SMALL_GRAIN, CropType.OAT),
-        (CropCategory.SMALL_GRAIN, CropType.RICE),
-        (CropCategory.CORN, CropType.HIGH_MOISTURE),
-        (CropCategory.CORN, CropType.SILAGE),
-        (CropCategory.CORN, CropType.WHOLE_PLANT),
-        (CropCategory.CORN, CropType.GRAIN),
-        (CropCategory.SOY, CropType.FORAGE),
-        (CropCategory.SOY, CropType.GRAIN),
-        (CropCategory.ALFALFA, CropType.ALFALFA),
-        (CropCategory.GRASS, CropType.RYEGRASS),
-        (CropCategory.GRASS, CropType.ORCHARDGRASS),
-        (CropCategory.GRASS, CropType.FINE_FESCUE),
-        (CropCategory.GRASS, CropType.TALL_FESCUE),
-        (CropCategory.GRASS, CropType.MEADOW_FESCUE),
-    ],
-)
-def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
-    try:
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
-    except ValueError:
-        pytest.fail(f"Unexpected ValueError with {category} and {crop_type}")
-
-
-@pytest.mark.parametrize(
-    "category, crop_type",
-    [
-        (CropCategory.CORN, CropType.WHEAT),
-        (CropCategory.ALFALFA, CropType.SILAGE),
-        (CropCategory.GRASS, CropType.RICE),
-        (CropCategory.SOY, CropType.HIGH_MOISTURE),
-    ],
-)
-def test_invalid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
-    with pytest.raises(ValueError):
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_attributes(mocker: MockerFixture) -> None:
@@ -55,14 +17,12 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_dry_mass = mocker.patch.object(
         HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
     )
-    mock_effluent = mocker.patch.object(HarvestedCrop, "_estimate_maximum_effluent", return_value=10.0)
+    mock_effluent = mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
     mock_bale_density = mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -86,6 +46,162 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_dry_mass.assert_called_once()
 
 
+def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None:
+    """Test that RufasTime objects passed into HarvestedCrop are converted to dates."""
+    mock_datetime = datetime(2025, 6, 7)
+    mocker.patch.object(HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0)
+    mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0)
+
+    rufas_time = RufasTime(
+        start_date=mock_datetime,
+        end_date=mock_datetime + timedelta(days=10),
+        current_date=mock_datetime,
+    )
+
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=cast(date, rufas_time),
+        storage_time=cast(date, rufas_time),
+        fresh_mass=100.0,
+        dry_matter_percentage=50.0,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+
+    assert crop.harvest_time == mock_datetime.date()
+    assert crop.storage_time == mock_datetime.date()
+
+
+@pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove, expected_fresh_mass, expected_dmp",
+    [
+        # Normal case: partial removal
+        (100.0, 40.0, 10.0, 90.0, (30.0 / 90.0) * GeneralConstants.FRACTION_TO_PERCENTAGE),
+        # Edge case: full removal
+        (50.0, 20.0, 50.0, 0.0, 0.0),
+    ],
+)
+def test_remove_dry_matter_mass(
+    mocker: MockerFixture,
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+    expected_fresh_mass: float,
+    expected_dmp: float,
+) -> None:
+    """Test the removal of dry matter mass and corresponding updates to the crop."""
+    mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=0.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=0.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=0.0)
+    mocker.patch.object(
+        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=initial_dry_matter_mass
+    )
+
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+
+    crop.remove_dry_matter_mass(mass_to_remove)
+
+    assert crop.fresh_mass == expected_fresh_mass
+    assert crop.dry_matter_percentage == pytest.approx(expected_dmp, abs=1e-6)
+
+
+@pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove, expected_fresh_mass",
+    [
+        (100.0, 40.0, 25.0, 75.0),  # Normal removal
+        (50.0, 20.0, 0.0, 50.0),  # Zero removal
+        (30.0, 12.0, 30.0, 0.0),  # Remove all fresh mass
+    ],
+)
+def test_remove_feed_mass_valid(
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+    expected_fresh_mass: float,
+) -> None:
+    crop = crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+    crop.remove_feed_mass(mass_to_remove)
+    assert crop.fresh_mass == expected_fresh_mass
+
+
+@pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove",
+    [
+        (10.0, 40.0, 15.0),  # Attempt to remove more than available
+    ],
+)
+def test_remove_feed_mass_invalid(
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+) -> None:
+    crop = crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+    with pytest.raises(ValueError, match="Cannot remove more feed mass than is available."):
+        crop.remove_feed_mass(mass_to_remove)
+
+
 @pytest.mark.parametrize(
     "mass,percentage,expected",
     [
@@ -101,7 +217,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **crop_data)
 
     actual = crop.dry_matter_mass
 
@@ -111,13 +227,11 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 @pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
-    actual = crop._estimate_maximum_effluent()
+    actual = crop.estimate_maximum_effluent()
 
     assert pytest.approx(actual) == expected
 
@@ -125,9 +239,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 @pytest.mark.parametrize("dry_matter_percentage,expected", [(30.0, 408.0), (15.0, 474.0), (95.0, 122.0)])
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
 
     actual = crop._calculate_bale_density()
@@ -141,9 +253,7 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 )
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
 
