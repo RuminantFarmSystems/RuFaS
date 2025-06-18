@@ -5,6 +5,9 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
+from RUFAS.data_structures.manure_nutrients import ManureNutrients
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.output_manager import OutputManager
 
 
@@ -185,7 +188,15 @@ def processor_connections_input_json() -> dict[str, list[dict[str, Any]]]:
 def manure_manager(mocker: MockerFixture) -> ManureManager:
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager()
-
+    mnm = ManureNutrientManager()
+    mnm.add_nutrients(
+        ManureNutrients(
+            manure_type=ManureType.LIQUID,
+            nitrogen=100,
+            phosphorus=200,
+        )
+    )
+    manure_manager._manure_nutrient_manager = mnm
     manure_manager.all_processors, manure_manager._all_separators, manure_manager._adjacency_matrix = {}, {}, {}
     manure_manager._processing_order = []
     manure_manager._om = MagicMock(auto_spec=OutputManager)

@@ -103,11 +103,11 @@ def test_process_manure_cover_behaviors(
 ) -> None:
     """Tests anaerobic lagoon behavior under various cover types."""
     anaerobic_lagoon._cover = cover
-    anaerobic_lagoon._stored_manure = stored_manure
+    anaerobic_lagoon.stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
-        anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
+        anaerobic_lagoon.stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
 
@@ -151,7 +151,7 @@ def test_process_manure_cover_behaviors(
 
     mock_report_manure_stream.assert_has_calls(
         [
-            call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time.simulation_day),
+            call(anaerobic_lagoon.stored_manure, "accumulated", dummy_time.simulation_day),
             call(expected_received_manure, "received", dummy_time.simulation_day),
         ]
     )
@@ -175,14 +175,14 @@ def test_process_manure_cover_behaviors(
 
     if expect_precip_added:
         assert anaerobic_lagoon._received_manure.volume == 0.0
-        assert anaerobic_lagoon._stored_manure.volume == pytest.approx(
+        assert anaerobic_lagoon.stored_manure.volume == pytest.approx(
             stored_manure.volume + received_manure.volume,
             rel=1e-6,
         )
-        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+        assert anaerobic_lagoon.stored_manure.water >= stored_manure.water + received_manure.water
     else:
-        assert anaerobic_lagoon._stored_manure.volume >= stored_manure.volume + received_manure.volume
-        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+        assert anaerobic_lagoon.stored_manure.volume >= stored_manure.volume + received_manure.volume
+        assert anaerobic_lagoon.stored_manure.water >= stored_manure.water + received_manure.water
 
     assert result == {}
     assert anaerobic_lagoon._received_manure == ManureStream.make_empty_manure_stream()

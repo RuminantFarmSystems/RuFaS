@@ -1,76 +1,168 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html lang="en"
+      data-content_root="./"
+      x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      class="scroll-smooth"
+      :class="{'dark': darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)}"
+>
 <head>
-  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Module Index &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-
+  <meta charset="utf-8" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
- 
+    <title>Python Module Index | Ruminant Farm Simulation (RuFaS)  documentation</title>
+    <meta property="og:title" content="Python Module Index | Ruminant Farm Simulation (RuFaS)  documentation" />
+    <meta name="twitter:title" content="Python Module Index | Ruminant Farm Simulation (RuFaS)  documentation" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
+      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=42baaae4" />
+        <link rel="search" title="Search" href="search.html" />
+        <link rel="index" title="Index" href="genindex.html" />
+
+    <script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+
 
 
 </head>
+  <body x-data="{ showSidebar: false, showScrollTop: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+    <div x-cloak x-show="showSidebar" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content" class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
+      Skip to content
+    </a><header
+  class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+    <div class="hidden mr-4 md:flex">
+      <a href="index.html" class="flex items-center mr-6">
+          <img height="24" width="24" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+      </a></div><button
+      class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
+      type="button" @click="showSidebar = true">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" aria-hidden="true"
+        fill="currentColor">
+        <path
+          d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z" />
+      </svg>
+      <span class="sr-only">Toggle navigation menu</span>
+    </button>
+    <div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+      <div class="flex-1 w-full md:w-auto md:flex-none"><form id="searchbox"
+      action="search.html"
+      method="get"
+      class="relative flex items-center group"
+      @keydown.k.window.meta="$refs.search.focus()">
+  <input x-ref="search"
+          name="q"
+          id="search-input"
+          type="search"
+          aria-label="Search the docs"
+          placeholder="Search ..."
+          class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" />
+  <kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+    <span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+      </div>
+      <nav class="flex items-center space-x-1">
+        <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
+          class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
+          type="button"
+          aria-label="Color theme switcher">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
+            <path
+              d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
+            <path
+              d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+    <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
+  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
+  :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            Ruminant Farm Simulation (RuFaS)
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+    <a href="index.html" class="!justify-start text-sm md:!hidden bg-background">
+        <img height="16" width="16" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+    </a>
+
+    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+      <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+  <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">GitHub</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_code/modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/om.html">Output Manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 
-        </div>
+</nav>
       </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Python Module Index</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    </div>
+    <button type="button" @click="showSidebar = false"
+      class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+        stroke="none" class="h-4 w-4">
+        <path
+          d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z" />
+      </svg>
+    </button>
+  </aside>
+        <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
 
    <h1>Python Module Index</h1>
 
@@ -86,7 +178,7 @@
      <tr>
        <td></td>
        <td>
-       <a href="main.html#module-main"><code class="xref">main</code></a></td><td>
+       <a href="_code/main.html#module-main"><code class="xref">main</code></a></td><td>
        <em></em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-r"><td></td><td>
@@ -95,946 +187,1398 @@
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-1" style="display: none" alt="-" /></td>
        <td>
-       <a href="RUFAS.html#module-RUFAS"><code class="xref">RUFAS</code></a></td><td>
+       <a href="_code/RUFAS.html#module-RUFAS"><code class="xref">RUFAS</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.current_day_conditions"><code class="xref">RUFAS.current_day_conditions</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.html#module-RUFAS.biophysical"><code class="xref">RUFAS.biophysical</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.errors"><code class="xref">RUFAS.errors</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.html#module-RUFAS.biophysical.animal"><code class="xref">RUFAS.biophysical.animal</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.general_constants"><code class="xref">RUFAS.general_constants</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal.html#module-RUFAS.biophysical.animal.animal"><code class="xref">RUFAS.biophysical.animal.animal</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.graph_generator"><code class="xref">RUFAS.graph_generator</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_config.html#module-RUFAS.biophysical.animal.animal_config"><code class="xref">RUFAS.biophysical.animal.animal_config</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.input_manager"><code class="xref">RUFAS.input_manager</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_constants.html#module-RUFAS.biophysical.animal.animal_constants"><code class="xref">RUFAS.biophysical.animal.animal_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.output_manager"><code class="xref">RUFAS.output_manager</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_genetics.html#module-RUFAS.biophysical.animal.animal_genetics"><code class="xref">RUFAS.biophysical.animal.animal_genetics</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.report_generator"><code class="xref">RUFAS.report_generator</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_genetics.animal_genetics.html#module-RUFAS.biophysical.animal.animal_genetics.animal_genetics"><code class="xref">RUFAS.biophysical.animal.animal_genetics.animal_genetics</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.html#module-RUFAS.routines"><code class="xref">RUFAS.routines</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_grouping_scenarios.html#module-RUFAS.biophysical.animal.animal_grouping_scenarios"><code class="xref">RUFAS.biophysical.animal.animal_grouping_scenarios</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal"><code class="xref">RUFAS.routines.animal</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_health.html#module-RUFAS.biophysical.animal.animal_health"><code class="xref">RUFAS.biophysical.animal.animal_health</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_grouping_scenarios"><code class="xref">RUFAS.routines.animal.animal_grouping_scenarios</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_health.animal_health.html#module-RUFAS.biophysical.animal.animal_health.animal_health"><code class="xref">RUFAS.biophysical.animal.animal_health.animal_health</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_manager"><code class="xref">RUFAS.routines.animal.animal_manager</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_health.animal_health_status.html#module-RUFAS.biophysical.animal.animal_health.animal_health_status"><code class="xref">RUFAS.biophysical.animal.animal_health.animal_health_status</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_constants"><code class="xref">RUFAS.routines.animal.animal_module_constants</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_health.disease.html#module-RUFAS.biophysical.animal.animal_health.disease"><code class="xref">RUFAS.biophysical.animal.animal_health.disease</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_reporter"><code class="xref">RUFAS.routines.animal.animal_module_reporter</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_health.outcomes.html#module-RUFAS.biophysical.animal.animal_health.outcomes"><code class="xref">RUFAS.biophysical.animal.animal_health.outcomes</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_typed_dicts"><code class="xref">RUFAS.routines.animal.animal_typed_dicts</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#module-RUFAS.biophysical.animal.animal_module_constants"><code class="xref">RUFAS.biophysical.animal.animal_module_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_types"><code class="xref">RUFAS.routines.animal.animal_types</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.animal_module_reporter.html#module-RUFAS.biophysical.animal.animal_module_reporter"><code class="xref">RUFAS.biophysical.animal.animal_module_reporter</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.clustering_pen_grouping"><code class="xref">RUFAS.routines.animal.clustering_pen_grouping</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.digestive_system.html#module-RUFAS.biophysical.animal.digestive_system"><code class="xref">RUFAS.biophysical.animal.digestive_system</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle"><code class="xref">RUFAS.routines.animal.life_cycle</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.digestive_system.digestive_system.html#module-RUFAS.biophysical.animal.digestive_system.digestive_system"><code class="xref">RUFAS.biophysical.animal.digestive_system.digestive_system</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_base"><code class="xref">RUFAS.routines.animal.life_cycle.animal_base</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.html#module-RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator"><code class="xref">RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_constants"><code class="xref">RUFAS.routines.animal.life_cycle.animal_constants</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.html#module-RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator"><code class="xref">RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_events"><code class="xref">RUFAS.routines.animal.life_cycle.animal_events</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator.html#module-RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator"><code class="xref">RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_population"><code class="xref">RUFAS.routines.animal.life_cycle.animal_population</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.growth.html#module-RUFAS.biophysical.animal.growth"><code class="xref">RUFAS.biophysical.animal.growth</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.body_weight_history"><code class="xref">RUFAS.routines.animal.life_cycle.body_weight_history</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.growth.growth.html#module-RUFAS.biophysical.animal.growth.growth"><code class="xref">RUFAS.biophysical.animal.growth.growth</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.calf"><code class="xref">RUFAS.routines.animal.life_cycle.calf</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.herd_factory.html#module-RUFAS.biophysical.animal.herd_factory"><code class="xref">RUFAS.biophysical.animal.herd_factory</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.cow"><code class="xref">RUFAS.routines.animal.life_cycle.cow</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.herd_manager.html#module-RUFAS.biophysical.animal.herd_manager"><code class="xref">RUFAS.biophysical.animal.herd_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferI"><code class="xref">RUFAS.routines.animal.life_cycle.heiferI</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.milk.html#module-RUFAS.biophysical.animal.milk"><code class="xref">RUFAS.biophysical.animal.milk</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferII"><code class="xref">RUFAS.routines.animal.life_cycle.heiferII</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.milk.lactation_curve.html#module-RUFAS.biophysical.animal.milk.lactation_curve"><code class="xref">RUFAS.biophysical.animal.milk.lactation_curve</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferIII"><code class="xref">RUFAS.routines.animal.life_cycle.heiferIII</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#module-RUFAS.biophysical.animal.milk.milk_production"><code class="xref">RUFAS.biophysical.animal.milk.milk_production</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.herd_factory"><code class="xref">RUFAS.routines.animal.life_cycle.herd_factory</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.html#module-RUFAS.biophysical.animal.nutrients"><code class="xref">RUFAS.biophysical.animal.nutrients</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.hormone_delivery_schedule"><code class="xref">RUFAS.routines.animal.life_cycle.hormone_delivery_schedule</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.html#module-RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator"><code class="xref">RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.life_cycle"><code class="xref">RUFAS.routines.animal.life_cycle.life_cycle</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.html#module-RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator"><code class="xref">RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.pen_history"><code class="xref">RUFAS.routines.animal.life_cycle.pen_history</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nutrients.html#module-RUFAS.biophysical.animal.nutrients.nutrients"><code class="xref">RUFAS.biophysical.animal.nutrients.nutrients</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.repro_protocol_enums"><code class="xref">RUFAS.routines.animal.life_cycle.repro_protocol_enums</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_evaluator.html#module-RUFAS.biophysical.animal.nutrients.nutrition_evaluator"><code class="xref">RUFAS.biophysical.animal.nutrients.nutrition_evaluator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.repro_protocol_misc"><code class="xref">RUFAS.routines.animal.life_cycle.repro_protocol_misc</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.html#module-RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator"><code class="xref">RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure"><code class="xref">RUFAS.routines.animal.manure</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#module-RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator"><code class="xref">RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.calf_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.calf_manure_excretion</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.pen.html#module-RUFAS.biophysical.animal.pen"><code class="xref">RUFAS.biophysical.animal.pen</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.dry_cow_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.dry_cow_manure_excretion</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.html#module-RUFAS.biophysical.animal.ration"><code class="xref">RUFAS.biophysical.animal.ration</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.general_manure"><code class="xref">RUFAS.routines.animal.manure.general_manure</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#module-RUFAS.biophysical.animal.ration.amino_acid"><code class="xref">RUFAS.biophysical.animal.ration.amino_acid</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.growing_heifer_manure_excretion</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#module-RUFAS.biophysical.animal.ration.animal_requirements"><code class="xref">RUFAS.biophysical.animal.ration.animal_requirements</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.lactating_cow_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.lactating_cow_manure_excretion</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.calf_ration_manager.html#module-RUFAS.biophysical.animal.ration.calf_ration_manager"><code class="xref">RUFAS.biophysical.animal.ration.calf_ration_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.methane_mitigation"><code class="xref">RUFAS.routines.animal.manure.methane_mitigation</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#module-RUFAS.biophysical.animal.ration.ration_config"><code class="xref">RUFAS.biophysical.animal.ration.ration_config</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.pen"><code class="xref">RUFAS.routines.animal.pen</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#module-RUFAS.biophysical.animal.ration.ration_optimizer"><code class="xref">RUFAS.biophysical.animal.ration.ration_optimizer</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration"><code class="xref">RUFAS.routines.animal.ration</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#module-RUFAS.biophysical.animal.ration.user_defined_ration_manager"><code class="xref">RUFAS.biophysical.animal.ration.user_defined_ration_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.animal_requirements"><code class="xref">RUFAS.routines.animal.ration.animal_requirements</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.reproduction.html#module-RUFAS.biophysical.animal.reproduction"><code class="xref">RUFAS.biophysical.animal.reproduction</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.calf_ration"><code class="xref">RUFAS.routines.animal.ration.calf_ration</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.html#module-RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule"><code class="xref">RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_config"><code class="xref">RUFAS.routines.animal.ration.ration_config</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.reproduction.repro_protocol_misc.html#module-RUFAS.biophysical.animal.reproduction.repro_protocol_misc"><code class="xref">RUFAS.biophysical.animal.reproduction.repro_protocol_misc</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_driver"><code class="xref">RUFAS.routines.animal.ration.ration_driver</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.reproduction.repro_state_manager.html#module-RUFAS.biophysical.animal.reproduction.repro_state_manager"><code class="xref">RUFAS.biophysical.animal.reproduction.repro_state_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_optimizer"><code class="xref">RUFAS.routines.animal.ration.ration_optimizer</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#module-RUFAS.biophysical.animal.reproduction.reproduction"><code class="xref">RUFAS.biophysical.animal.reproduction.reproduction</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.user_defined_ration"><code class="xref">RUFAS.routines.animal.ration.user_defined_ration</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.html#module-RUFAS.biophysical.feed_storage"><code class="xref">RUFAS.biophysical.feed_storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed"><code class="xref">RUFAS.routines.feed</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.baleage.html#module-RUFAS.biophysical.feed_storage.baleage"><code class="xref">RUFAS.biophysical.feed_storage.baleage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed.carbon_loss"><code class="xref">RUFAS.routines.feed.carbon_loss</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#module-RUFAS.biophysical.feed_storage.feed_manager"><code class="xref">RUFAS.biophysical.feed_storage.feed_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed.feed"><code class="xref">RUFAS.routines.feed.feed</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.grain.html#module-RUFAS.biophysical.feed_storage.grain"><code class="xref">RUFAS.biophysical.feed_storage.grain</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed.feed_typed_dicts"><code class="xref">RUFAS.routines.feed.feed_typed_dicts</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.hay.html#module-RUFAS.biophysical.feed_storage.hay"><code class="xref">RUFAS.biophysical.feed_storage.hay</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed.nitrogen_loss"><code class="xref">RUFAS.routines.feed.nitrogen_loss</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#module-RUFAS.biophysical.feed_storage.purchased_feed_storage"><code class="xref">RUFAS.biophysical.feed_storage.purchased_feed_storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed.html#module-RUFAS.routines.feed.protein_degradation"><code class="xref">RUFAS.routines.feed.protein_degradation</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.silage.html#module-RUFAS.biophysical.feed_storage.silage"><code class="xref">RUFAS.biophysical.feed_storage.silage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage"><code class="xref">RUFAS.routines.feed_storage</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.feed_storage.storage.html#module-RUFAS.biophysical.feed_storage.storage"><code class="xref">RUFAS.biophysical.feed_storage.storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.baleage"><code class="xref">RUFAS.routines.feed_storage.baleage</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.html#module-RUFAS.biophysical.manure"><code class="xref">RUFAS.biophysical.manure</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.enums"><code class="xref">RUFAS.routines.feed_storage.enums</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.digester.html#module-RUFAS.biophysical.manure.digester"><code class="xref">RUFAS.biophysical.manure.digester</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.grain"><code class="xref">RUFAS.routines.feed_storage.grain</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.digester.continuous_mix.html#module-RUFAS.biophysical.manure.digester.continuous_mix"><code class="xref">RUFAS.biophysical.manure.digester.continuous_mix</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.harvested_crop"><code class="xref">RUFAS.routines.feed_storage.harvested_crop</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.digester.digester.html#module-RUFAS.biophysical.manure.digester.digester"><code class="xref">RUFAS.biophysical.manure.digester.digester</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.hay"><code class="xref">RUFAS.routines.feed_storage.hay</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.handler.html#module-RUFAS.biophysical.manure.handler"><code class="xref">RUFAS.biophysical.manure.handler</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.storage"><code class="xref">RUFAS.routines.feed_storage.storage</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.handler.handler.html#module-RUFAS.biophysical.manure.handler.handler"><code class="xref">RUFAS.biophysical.manure.handler.handler</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.html#module-RUFAS.routines.field"><code class="xref">RUFAS.routines.field</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.handler.parlor_cleaning.html#module-RUFAS.biophysical.manure.handler.parlor_cleaning"><code class="xref">RUFAS.biophysical.manure.handler.parlor_cleaning</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop"><code class="xref">RUFAS.routines.field.crop</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.handler.single_stream_handler.html#module-RUFAS.biophysical.manure.handler.single_stream_handler"><code class="xref">RUFAS.biophysical.manure.handler.single_stream_handler</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.biomass_allocation"><code class="xref">RUFAS.routines.field.crop.biomass_allocation</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.manure_constants.html#module-RUFAS.biophysical.manure.manure_constants"><code class="xref">RUFAS.biophysical.manure.manure_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop"><code class="xref">RUFAS.routines.field.crop.crop</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.manure_manager.html#module-RUFAS.biophysical.manure.manure_manager"><code class="xref">RUFAS.biophysical.manure.manure_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations"><code class="xref">RUFAS.routines.field.crop.crop_configurations</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.processor.html#module-RUFAS.biophysical.manure.processor"><code class="xref">RUFAS.biophysical.manure.processor</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.alfalfa"><code class="xref">RUFAS.routines.field.crop.crop_configurations.alfalfa</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.processor_enum.html#module-RUFAS.biophysical.manure.processor_enum"><code class="xref">RUFAS.biophysical.manure.processor_enum</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.cereal_rye"><code class="xref">RUFAS.routines.field.crop.crop_configurations.cereal_rye</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.separator.html#module-RUFAS.biophysical.manure.separator"><code class="xref">RUFAS.biophysical.manure.separator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.corn"><code class="xref">RUFAS.routines.field.crop.crop_configurations.corn</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.separator.separator.html#module-RUFAS.biophysical.manure.separator.separator"><code class="xref">RUFAS.biophysical.manure.separator.separator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.soybean"><code class="xref">RUFAS.routines.field.crop.crop_configurations.soybean</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.html#module-RUFAS.biophysical.manure.storage"><code class="xref">RUFAS.biophysical.manure.storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.tall_fescue"><code class="xref">RUFAS.routines.field.crop.crop_configurations.tall_fescue</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.anaerobic_lagoon.html#module-RUFAS.biophysical.manure.storage.anaerobic_lagoon"><code class="xref">RUFAS.biophysical.manure.storage.anaerobic_lagoon</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.triticale"><code class="xref">RUFAS.routines.field.crop.crop_configurations.triticale</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.compost_bedded_pack_barn.html#module-RUFAS.biophysical.manure.storage.compost_bedded_pack_barn"><code class="xref">RUFAS.biophysical.manure.storage.compost_bedded_pack_barn</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.crop_configurations.html#module-RUFAS.routines.field.crop.crop_configurations.winter_wheat"><code class="xref">RUFAS.routines.field.crop.crop_configurations.winter_wheat</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.composting.html#module-RUFAS.biophysical.manure.storage.composting"><code class="xref">RUFAS.biophysical.manure.storage.composting</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop_data"><code class="xref">RUFAS.routines.field.crop.crop_data</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.composting_type.html#module-RUFAS.biophysical.manure.storage.composting_type"><code class="xref">RUFAS.biophysical.manure.storage.composting_type</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop_management"><code class="xref">RUFAS.routines.field.crop.crop_management</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.open_lot.html#module-RUFAS.biophysical.manure.storage.open_lot"><code class="xref">RUFAS.biophysical.manure.storage.open_lot</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.dormancy"><code class="xref">RUFAS.routines.field.crop.dormancy</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.slurry_storage_outdoor.html#module-RUFAS.biophysical.manure.storage.slurry_storage_outdoor"><code class="xref">RUFAS.biophysical.manure.storage.slurry_storage_outdoor</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.growth_constraints"><code class="xref">RUFAS.routines.field.crop.growth_constraints</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.slurry_storage_underfloor.html#module-RUFAS.biophysical.manure.storage.slurry_storage_underfloor"><code class="xref">RUFAS.biophysical.manure.storage.slurry_storage_underfloor</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.harvest_operations"><code class="xref">RUFAS.routines.field.crop.harvest_operations</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.solids_storage_calculator.html#module-RUFAS.biophysical.manure.storage.solids_storage_calculator"><code class="xref">RUFAS.biophysical.manure.storage.solids_storage_calculator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.heat_units"><code class="xref">RUFAS.routines.field.crop.heat_units</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.storage.html#module-RUFAS.biophysical.manure.storage.storage"><code class="xref">RUFAS.biophysical.manure.storage.storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.leaf_area_index"><code class="xref">RUFAS.routines.field.crop.leaf_area_index</code></a></td><td>
+       <a href="_code/RUFAS.biophysical.manure.storage.storage_cover.html#module-RUFAS.biophysical.manure.storage.storage_cover"><code class="xref">RUFAS.biophysical.manure.storage.storage_cover</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_incorporation"><code class="xref">RUFAS.routines.field.crop.nitrogen_incorporation</code></a></td><td>
+       <a href="_code/RUFAS.current_day_conditions.html#module-RUFAS.current_day_conditions"><code class="xref">RUFAS.current_day_conditions</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.phosphorus_incorporation"><code class="xref">RUFAS.routines.field.crop.phosphorus_incorporation</code></a></td><td>
+       <a href="_code/RUFAS.data_collection_app_updater.html#module-RUFAS.data_collection_app_updater"><code class="xref">RUFAS.data_collection_app_updater</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.root_development"><code class="xref">RUFAS.routines.field.crop.root_development</code></a></td><td>
+       <a href="_code/RUFAS.data_validator.html#module-RUFAS.data_validator"><code class="xref">RUFAS.data_validator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.species_data_factory"><code class="xref">RUFAS.routines.field.crop.species_data_factory</code></a></td><td>
+       <a href="_code/RUFAS.e2e_test_results_handler.html#module-RUFAS.e2e_test_results_handler"><code class="xref">RUFAS.e2e_test_results_handler</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.water_dynamics"><code class="xref">RUFAS.routines.field.crop.water_dynamics</code></a></td><td>
+       <a href="_code/RUFAS.enums.html#module-RUFAS.enums"><code class="xref">RUFAS.enums</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.water_uptake"><code class="xref">RUFAS.routines.field.crop.water_uptake</code></a></td><td>
+       <a href="_code/RUFAS.errors.html#module-RUFAS.errors"><code class="xref">RUFAS.errors</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.html#module-RUFAS.routines.field.crop_and_soil_constants"><code class="xref">RUFAS.routines.field.crop_and_soil_constants</code></a></td><td>
+       <a href="_code/RUFAS.general_constants.html#module-RUFAS.general_constants"><code class="xref">RUFAS.general_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field"><code class="xref">RUFAS.routines.field.field</code></a></td><td>
+       <a href="_code/RUFAS.graph_generator.html#module-RUFAS.graph_generator"><code class="xref">RUFAS.graph_generator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.fertilizer_application"><code class="xref">RUFAS.routines.field.field.fertilizer_application</code></a></td><td>
+       <a href="_code/RUFAS.input_manager.html#module-RUFAS.input_manager"><code class="xref">RUFAS.input_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.field"><code class="xref">RUFAS.routines.field.field.field</code></a></td><td>
+       <a href="_code/RUFAS.output_manager.html#module-RUFAS.output_manager"><code class="xref">RUFAS.output_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.field_data"><code class="xref">RUFAS.routines.field.field.field_data</code></a></td><td>
+       <a href="_code/RUFAS.report_generator.html#module-RUFAS.report_generator"><code class="xref">RUFAS.report_generator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.manure_application"><code class="xref">RUFAS.routines.field.field.manure_application</code></a></td><td>
+       <a href="_code/RUFAS.routines.html#module-RUFAS.routines"><code class="xref">RUFAS.routines</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.tillage_application"><code class="xref">RUFAS.routines.field.field.tillage_application</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.html#module-RUFAS.routines.animal"><code class="xref">RUFAS.routines.animal</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager"><code class="xref">RUFAS.routines.field.manager</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_grouping_scenarios.html#module-RUFAS.routines.animal.animal_grouping_scenarios"><code class="xref">RUFAS.routines.animal.animal_grouping_scenarios</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.crop_schedule"><code class="xref">RUFAS.routines.field.manager.crop_schedule</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_manager.html#module-RUFAS.routines.animal.animal_manager"><code class="xref">RUFAS.routines.animal.animal_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.events"><code class="xref">RUFAS.routines.field.manager.events</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_module_constants.html#module-RUFAS.routines.animal.animal_module_constants"><code class="xref">RUFAS.routines.animal.animal_module_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.fertilizer_schedule"><code class="xref">RUFAS.routines.field.manager.fertilizer_schedule</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_module_reporter.html#module-RUFAS.routines.animal.animal_module_reporter"><code class="xref">RUFAS.routines.animal.animal_module_reporter</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.field_manager"><code class="xref">RUFAS.routines.field.manager.field_manager</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_typed_dicts.html#module-RUFAS.routines.animal.animal_typed_dicts"><code class="xref">RUFAS.routines.animal.animal_typed_dicts</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.manure_schedule"><code class="xref">RUFAS.routines.field.manager.manure_schedule</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.animal_types.html#module-RUFAS.routines.animal.animal_types"><code class="xref">RUFAS.routines.animal.animal_types</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.schedule"><code class="xref">RUFAS.routines.field.manager.schedule</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.clustering_pen_grouping.html#module-RUFAS.routines.animal.clustering_pen_grouping"><code class="xref">RUFAS.routines.animal.clustering_pen_grouping</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.tillage_schedule"><code class="xref">RUFAS.routines.field.manager.tillage_schedule</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.general_properties.html#module-RUFAS.routines.animal.general_properties"><code class="xref">RUFAS.routines.animal.general_properties</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil"><code class="xref">RUFAS.routines.field.soil</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle"><code class="xref">RUFAS.routines.animal.life_cycle</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling"><code class="xref">RUFAS.routines.field.soil.carbon_cycling</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.animal_base.html#module-RUFAS.routines.animal.life_cycle.animal_base"><code class="xref">RUFAS.routines.animal.life_cycle.animal_base</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.animal_constants.html#module-RUFAS.routines.animal.life_cycle.animal_constants"><code class="xref">RUFAS.routines.animal.life_cycle.animal_constants</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.decomposition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.decomposition</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.animal_events.html#module-RUFAS.routines.animal.life_cycle.animal_events"><code class="xref">RUFAS.routines.animal.life_cycle.animal_events</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.animal_population.html#module-RUFAS.routines.animal.life_cycle.animal_population"><code class="xref">RUFAS.routines.animal.life_cycle.animal_population</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.residue_partition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.residue_partition</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.body_weight_history.html#module-RUFAS.routines.animal.life_cycle.body_weight_history"><code class="xref">RUFAS.routines.animal.life_cycle.body_weight_history</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.evaporation"><code class="xref">RUFAS.routines.field.soil.evaporation</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.calf.html#module-RUFAS.routines.animal.life_cycle.calf"><code class="xref">RUFAS.routines.animal.life_cycle.calf</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.infiltration"><code class="xref">RUFAS.routines.field.soil.infiltration</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.cow.html#module-RUFAS.routines.animal.life_cycle.cow"><code class="xref">RUFAS.routines.animal.life_cycle.cow</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.layer_data"><code class="xref">RUFAS.routines.field.soil.layer_data</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.heiferI.html#module-RUFAS.routines.animal.life_cycle.heiferI"><code class="xref">RUFAS.routines.animal.life_cycle.heiferI</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.heiferII.html#module-RUFAS.routines.animal.life_cycle.heiferII"><code class="xref">RUFAS.routines.animal.life_cycle.heiferII</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.denitrification"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.denitrification</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.heiferIII.html#module-RUFAS.routines.animal.life_cycle.heiferIII"><code class="xref">RUFAS.routines.animal.life_cycle.heiferIII</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.herd_factory.html#module-RUFAS.routines.animal.life_cycle.herd_factory"><code class="xref">RUFAS.routines.animal.life_cycle.herd_factory</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.html#module-RUFAS.routines.animal.life_cycle.hormone_delivery_schedule"><code class="xref">RUFAS.routines.animal.life_cycle.hormone_delivery_schedule</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.lactation_curve.html#module-RUFAS.routines.animal.life_cycle.lactation_curve"><code class="xref">RUFAS.routines.animal.life_cycle.lactation_curve</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.life_cycle.html#module-RUFAS.routines.animal.life_cycle.life_cycle"><code class="xref">RUFAS.routines.animal.life_cycle.life_cycle</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.pen_history.html#module-RUFAS.routines.animal.life_cycle.pen_history"><code class="xref">RUFAS.routines.animal.life_cycle.pen_history</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.percolation"><code class="xref">RUFAS.routines.field.soil.percolation</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.repro_protocol_enums.html#module-RUFAS.routines.animal.life_cycle.repro_protocol_enums"><code class="xref">RUFAS.routines.animal.life_cycle.repro_protocol_enums</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.repro_protocol_misc.html#module-RUFAS.routines.animal.life_cycle.repro_protocol_misc"><code class="xref">RUFAS.routines.animal.life_cycle.repro_protocol_misc</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.fertilizer"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.fertilizer</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.life_cycle.repro_state_manager.html#module-RUFAS.routines.animal.life_cycle.repro_state_manager"><code class="xref">RUFAS.routines.animal.life_cycle.repro_state_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.manure"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.manure</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure"><code class="xref">RUFAS.routines.animal.manure</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.calf_manure_excretion.html#module-RUFAS.routines.animal.manure.calf_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.calf_manure_excretion</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.dry_cow_manure_excretion.html#module-RUFAS.routines.animal.manure.dry_cow_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.dry_cow_manure_excretion</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.general_manure.html#module-RUFAS.routines.animal.manure.general_manure"><code class="xref">RUFAS.routines.animal.manure.general_manure</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.snow"><code class="xref">RUFAS.routines.field.soil.snow</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.growing_heifer_manure_excretion.html#module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.growing_heifer_manure_excretion</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil"><code class="xref">RUFAS.routines.field.soil.soil</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.lactating_cow_manure_excretion.html#module-RUFAS.routines.animal.manure.lactating_cow_manure_excretion"><code class="xref">RUFAS.routines.animal.manure.lactating_cow_manure_excretion</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_config_factory"><code class="xref">RUFAS.routines.field.soil.soil_config_factory</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.manure.methane_mitigation.html#module-RUFAS.routines.animal.manure.methane_mitigation"><code class="xref">RUFAS.routines.animal.manure.methane_mitigation</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_data"><code class="xref">RUFAS.routines.field.soil.soil_data</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.pen.html#module-RUFAS.routines.animal.pen"><code class="xref">RUFAS.routines.animal.pen</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_erosion"><code class="xref">RUFAS.routines.field.soil.soil_erosion</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.purchased_feed_emissions_estimator.html#module-RUFAS.routines.animal.purchased_feed_emissions_estimator"><code class="xref">RUFAS.routines.animal.purchased_feed_emissions_estimator</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_temp"><code class="xref">RUFAS.routines.field.soil.soil_temp</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration"><code class="xref">RUFAS.routines.animal.ration</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.html#module-RUFAS.routines.manure"><code class="xref">RUFAS.routines.manure</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.amino_acid.html#module-RUFAS.routines.animal.ration.amino_acid"><code class="xref">RUFAS.routines.animal.ration.amino_acid</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings"><code class="xref">RUFAS.routines.manure.beddings</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.animal_requirements.html#module-RUFAS.routines.animal.ration.animal_requirements"><code class="xref">RUFAS.routines.animal.ration.animal_requirements</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings.bedding_classes"><code class="xref">RUFAS.routines.manure.beddings.bedding_classes</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.calf_ration.html#module-RUFAS.routines.animal.ration.calf_ration"><code class="xref">RUFAS.routines.animal.ration.calf_ration</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units"><code class="xref">RUFAS.routines.manure.constants_and_units</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.ration_config.html#module-RUFAS.routines.animal.ration.ration_config"><code class="xref">RUFAS.routines.animal.ration.ration_config</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.gas_emission_constants"><code class="xref">RUFAS.routines.manure.constants_and_units.gas_emission_constants</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.ration_driver.html#module-RUFAS.routines.animal.ration.ration_driver"><code class="xref">RUFAS.routines.animal.ration.ration_driver</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.manure_constants"><code class="xref">RUFAS.routines.manure.constants_and_units.manure_constants</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.ration_optimizer.html#module-RUFAS.routines.animal.ration.ration_optimizer"><code class="xref">RUFAS.routines.animal.ration.ration_optimizer</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.units"><code class="xref">RUFAS.routines.manure.constants_and_units.units</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.ration.user_defined_ration.html#module-RUFAS.routines.animal.ration.user_defined_ration"><code class="xref">RUFAS.routines.animal.ration.user_defined_ration</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions"><code class="xref">RUFAS.routines.manure.gas_emissions</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.types.html#module-RUFAS.routines.animal.types"><code class="xref">RUFAS.routines.animal.types</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions.calculator"><code class="xref">RUFAS.routines.manure.gas_emissions.calculator</code></a></td><td>
+       <a href="_code/RUFAS.routines.animal.types.preg_check_config.html#module-RUFAS.routines.animal.types.preg_check_config"><code class="xref">RUFAS.routines.animal.types.preg_check_config</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers"><code class="xref">RUFAS.routines.manure.IO_helpers</code></a></td><td>
+       <a href="_code/RUFAS.routines.EEE.html#module-RUFAS.routines.EEE"><code class="xref">RUFAS.routines.EEE</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"><code class="xref">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler</code></a></td><td>
+       <a href="_code/RUFAS.routines.EEE.EEE_manager.html#module-RUFAS.routines.EEE.EEE_manager"><code class="xref">RUFAS.routines.EEE.EEE_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper"><code class="xref">RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper</code></a></td><td>
+       <a href="_code/RUFAS.routines.EEE.emissions.html#module-RUFAS.routines.EEE.emissions"><code class="xref">RUFAS.routines.EEE.emissions</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers"><code class="xref">RUFAS.routines.manure.manure_handlers</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.html#module-RUFAS.routines.feed"><code class="xref">RUFAS.routines.feed</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_classes"><code class="xref">RUFAS.routines.manure.manure_handlers.manure_handler_classes</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.carbon_loss.html#module-RUFAS.routines.feed.carbon_loss"><code class="xref">RUFAS.routines.feed.carbon_loss</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_daily_output"><code class="xref">RUFAS.routines.manure.manure_handlers.manure_handler_daily_output</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.feed.html#module-RUFAS.routines.feed.feed"><code class="xref">RUFAS.routines.feed.feed</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.milking_parlor"><code class="xref">RUFAS.routines.manure.manure_handlers.milking_parlor</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.feed_typed_dicts.html#module-RUFAS.routines.feed.feed_typed_dicts"><code class="xref">RUFAS.routines.feed.feed_typed_dicts</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.html#module-RUFAS.routines.manure.manure_manager"><code class="xref">RUFAS.routines.manure.manure_manager</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.nitrogen_loss.html#module-RUFAS.routines.feed.nitrogen_loss"><code class="xref">RUFAS.routines.feed.nitrogen_loss</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients"><code class="xref">RUFAS.routines.manure.manure_nutrients</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed.protein_degradation.html#module-RUFAS.routines.feed.protein_degradation"><code class="xref">RUFAS.routines.feed.protein_degradation</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager"><code class="xref">RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage"><code class="xref">RUFAS.routines.feed_storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrients"><code class="xref">RUFAS.routines.manure.manure_nutrients.manure_nutrients</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.baleage.html#module-RUFAS.routines.feed_storage.baleage"><code class="xref">RUFAS.routines.feed_storage.baleage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request"><code class="xref">RUFAS.routines.manure.manure_nutrients.nutrient_request</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.feed_manager.html#module-RUFAS.routines.feed_storage.feed_manager"><code class="xref">RUFAS.routines.feed_storage.feed_manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request_results"><code class="xref">RUFAS.routines.manure.manure_nutrients.nutrient_request_results</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.grain.html#module-RUFAS.routines.feed_storage.grain"><code class="xref">RUFAS.routines.feed_storage.grain</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_separators.html#module-RUFAS.routines.manure.manure_separators"><code class="xref">RUFAS.routines.manure.manure_separators</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.hay.html#module-RUFAS.routines.feed_storage.hay"><code class="xref">RUFAS.routines.feed_storage.hay</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_separators.html#module-RUFAS.routines.manure.manure_separators.manure_separator_classes"><code class="xref">RUFAS.routines.manure.manure_separators.manure_separator_classes</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.silage.html#module-RUFAS.routines.feed_storage.silage"><code class="xref">RUFAS.routines.feed_storage.silage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_separators.html#module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output"><code class="xref">RUFAS.routines.manure.manure_separators.manure_separator_daily_output</code></a></td><td>
+       <a href="_code/RUFAS.routines.feed_storage.storage.html#module-RUFAS.routines.feed_storage.storage"><code class="xref">RUFAS.routines.feed_storage.storage</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments"><code class="xref">RUFAS.routines.manure.manure_treatments</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.html#module-RUFAS.routines.field"><code class="xref">RUFAS.routines.field</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_digestion</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop"><code class="xref">RUFAS.routines.field.crop</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.biomass_allocation.html#module-RUFAS.routines.field.crop.biomass_allocation"><code class="xref">RUFAS.routines.field.crop.biomass_allocation</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.crop.html#module-RUFAS.routines.field.crop.crop"><code class="xref">RUFAS.routines.field.crop.crop</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.base_manure_treatment"><code class="xref">RUFAS.routines.manure.manure_treatments.base_manure_treatment</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.crop_data.html#module-RUFAS.routines.field.crop.crop_data"><code class="xref">RUFAS.routines.field.crop.crop_data</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn"><code class="xref">RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.crop_data_factory.html#module-RUFAS.routines.field.crop.crop_data_factory"><code class="xref">RUFAS.routines.field.crop.crop_data_factory</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_configs</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.crop_management.html#module-RUFAS.routines.field.crop.crop_management"><code class="xref">RUFAS.routines.field.crop.crop_management</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.dormancy.html#module-RUFAS.routines.field.crop.dormancy"><code class="xref">RUFAS.routines.field.crop.dormancy</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_factory</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.growth_constraints.html#module-RUFAS.routines.field.crop.growth_constraints"><code class="xref">RUFAS.routines.field.crop.growth_constraints</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_types"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_types</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.harvest_operations.html#module-RUFAS.routines.field.crop.harvest_operations"><code class="xref">RUFAS.routines.field.crop.harvest_operations</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_types"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_types</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.heat_units.html#module-RUFAS.routines.field.crop.heat_units"><code class="xref">RUFAS.routines.field.crop.heat_units</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.open_lots"><code class="xref">RUFAS.routines.manure.manure_treatments.open_lots</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.leaf_area_index.html#module-RUFAS.routines.field.crop.leaf_area_index"><code class="xref">RUFAS.routines.field.crop.leaf_area_index</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor"><code class="xref">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.nitrogen_uptake.html#module-RUFAS.routines.field.crop.nitrogen_uptake"><code class="xref">RUFAS.routines.field.crop.nitrogen_uptake</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor"><code class="xref">RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.non_water_uptake.html#module-RUFAS.routines.field.crop.non_water_uptake"><code class="xref">RUFAS.routines.field.crop.non_water_uptake</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen"><code class="xref">RUFAS.routines.manure.pen</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.nutrient_uptake.html#module-RUFAS.routines.field.crop.nutrient_uptake"><code class="xref">RUFAS.routines.field.crop.nutrient_uptake</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure"><code class="xref">RUFAS.routines.manure.pen_manure</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.phosphorus_uptake.html#module-RUFAS.routines.field.crop.phosphorus_uptake"><code class="xref">RUFAS.routines.field.crop.phosphorus_uptake</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.manure_manager_pen"><code class="xref">RUFAS.routines.manure.pen_manure.manure_manager_pen</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.root_development.html#module-RUFAS.routines.field.crop.root_development"><code class="xref">RUFAS.routines.field.crop.root_development</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.pen_manure"><code class="xref">RUFAS.routines.manure.pen_manure.pen_manure</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.water_dynamics.html#module-RUFAS.routines.field.crop.water_dynamics"><code class="xref">RUFAS.routines.field.crop.water_dynamics</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.protocols.html#module-RUFAS.routines.manure.protocols"><code class="xref">RUFAS.routines.manure.protocols</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.crop.water_uptake.html#module-RUFAS.routines.field.crop.water_uptake"><code class="xref">RUFAS.routines.field.crop.water_uptake</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.protocols.html#module-RUFAS.routines.manure.protocols.liquid_manure_portion_protocol"><code class="xref">RUFAS.routines.manure.protocols.liquid_manure_portion_protocol</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.html#module-RUFAS.routines.field.field"><code class="xref">RUFAS.routines.field.field</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.reception_pits.html#module-RUFAS.routines.manure.reception_pits"><code class="xref">RUFAS.routines.manure.reception_pits</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.fertilizer_application.html#module-RUFAS.routines.field.field.fertilizer_application"><code class="xref">RUFAS.routines.field.field.fertilizer_application</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.reception_pits.html#module-RUFAS.routines.manure.reception_pits.reception_pit"><code class="xref">RUFAS.routines.manure.reception_pits.reception_pit</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.field.html#module-RUFAS.routines.field.field.field"><code class="xref">RUFAS.routines.field.field.field</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.routines.manure.reception_pits.html#module-RUFAS.routines.manure.reception_pits.reception_pit_daily_output"><code class="xref">RUFAS.routines.manure.reception_pits.reception_pit_daily_output</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.field_data.html#module-RUFAS.routines.field.field.field_data"><code class="xref">RUFAS.routines.field.field.field_data</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.simulation_engine"><code class="xref">RUFAS.simulation_engine</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.manure_application.html#module-RUFAS.routines.field.field.manure_application"><code class="xref">RUFAS.routines.field.field.manure_application</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.time"><code class="xref">RUFAS.time</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.field.tillage_application.html#module-RUFAS.routines.field.field.tillage_application"><code class="xref">RUFAS.routines.field.field.tillage_application</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.util"><code class="xref">RUFAS.util</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager"><code class="xref">RUFAS.routines.field.manager</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="RUFAS.html#module-RUFAS.weather"><code class="xref">RUFAS.weather</code></a></td><td>
+       <a href="_code/RUFAS.routines.field.manager.crop_schedule.html#module-RUFAS.routines.field.manager.crop_schedule"><code class="xref">RUFAS.routines.field.manager.crop_schedule</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.fertilizer_schedule.html#module-RUFAS.routines.field.manager.fertilizer_schedule"><code class="xref">RUFAS.routines.field.manager.fertilizer_schedule</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.field_data_reporter.html#module-RUFAS.routines.field.manager.field_data_reporter"><code class="xref">RUFAS.routines.field.manager.field_data_reporter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.field_manager.html#module-RUFAS.routines.field.manager.field_manager"><code class="xref">RUFAS.routines.field.manager.field_manager</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.manure_schedule.html#module-RUFAS.routines.field.manager.manure_schedule"><code class="xref">RUFAS.routines.field.manager.manure_schedule</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.schedule.html#module-RUFAS.routines.field.manager.schedule"><code class="xref">RUFAS.routines.field.manager.schedule</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.manager.tillage_schedule.html#module-RUFAS.routines.field.manager.tillage_schedule"><code class="xref">RUFAS.routines.field.manager.tillage_schedule</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil"><code class="xref">RUFAS.routines.field.soil</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling"><code class="xref">RUFAS.routines.field.soil.carbon_cycling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.html#module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.carbon_cycling.decomposition.html#module-RUFAS.routines.field.soil.carbon_cycling.decomposition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.decomposition</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition.html#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.carbon_cycling.residue_partition.html#module-RUFAS.routines.field.soil.carbon_cycling.residue_partition"><code class="xref">RUFAS.routines.field.soil.carbon_cycling.residue_partition</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.evaporation.html#module-RUFAS.routines.field.soil.evaporation"><code class="xref">RUFAS.routines.field.soil.evaporation</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.infiltration.html#module-RUFAS.routines.field.soil.infiltration"><code class="xref">RUFAS.routines.field.soil.infiltration</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.layer_data.html#module-RUFAS.routines.field.soil.layer_data"><code class="xref">RUFAS.routines.field.soil.layer_data</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.manure_pool.html#module-RUFAS.routines.field.soil.manure_pool"><code class="xref">RUFAS.routines.field.soil.manure_pool</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.denitrification.html#module-RUFAS.routines.field.soil.nitrogen_cycling.denitrification"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.denitrification</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.html#module-RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.html#module-RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.html#module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling"><code class="xref">RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.percolation.html#module-RUFAS.routines.field.soil.percolation"><code class="xref">RUFAS.routines.field.soil.percolation</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.fertilizer.html#module-RUFAS.routines.field.soil.phosphorus_cycling.fertilizer"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.fertilizer</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.manure.html#module-RUFAS.routines.field.soil.phosphorus_cycling.manure"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.manure</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.html#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus"><code class="xref">RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.snow.html#module-RUFAS.routines.field.soil.snow"><code class="xref">RUFAS.routines.field.soil.snow</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.soil.html#module-RUFAS.routines.field.soil.soil"><code class="xref">RUFAS.routines.field.soil.soil</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.soil_config_factory.html#module-RUFAS.routines.field.soil.soil_config_factory"><code class="xref">RUFAS.routines.field.soil.soil_config_factory</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.soil_data.html#module-RUFAS.routines.field.soil.soil_data"><code class="xref">RUFAS.routines.field.soil.soil_data</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.soil_erosion.html#module-RUFAS.routines.field.soil.soil_erosion"><code class="xref">RUFAS.routines.field.soil.soil_erosion</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.field.soil.soil_temp.html#module-RUFAS.routines.field.soil.soil_temp"><code class="xref">RUFAS.routines.field.soil.soil_temp</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.html#module-RUFAS.routines.manure"><code class="xref">RUFAS.routines.manure</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings"><code class="xref">RUFAS.routines.manure.beddings</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.beddings.bedding_classes.html#module-RUFAS.routines.manure.beddings.bedding_classes"><code class="xref">RUFAS.routines.manure.beddings.bedding_classes</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units"><code class="xref">RUFAS.routines.manure.constants_and_units</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.constants_and_units.gas_emission_constants.html#module-RUFAS.routines.manure.constants_and_units.gas_emission_constants"><code class="xref">RUFAS.routines.manure.constants_and_units.gas_emission_constants</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.constants_and_units.manure_constants.html#module-RUFAS.routines.manure.constants_and_units.manure_constants"><code class="xref">RUFAS.routines.manure.constants_and_units.manure_constants</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.constants_and_units.units.html#module-RUFAS.routines.manure.constants_and_units.units"><code class="xref">RUFAS.routines.manure.constants_and_units.units</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.enums.html#module-RUFAS.routines.manure.enums"><code class="xref">RUFAS.routines.manure.enums</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.enums.ManureCoverEnum.html#module-RUFAS.routines.manure.enums.ManureCoverEnum"><code class="xref">RUFAS.routines.manure.enums.ManureCoverEnum</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.field_manure_supplier.html#module-RUFAS.routines.manure.field_manure_supplier"><code class="xref">RUFAS.routines.manure.field_manure_supplier</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions"><code class="xref">RUFAS.routines.manure.gas_emissions</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.gas_emissions.calculator.html#module-RUFAS.routines.manure.gas_emissions.calculator"><code class="xref">RUFAS.routines.manure.gas_emissions.calculator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers"><code class="xref">RUFAS.routines.manure.IO_helpers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.html#module-RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"><code class="xref">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.html#module-RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper"><code class="xref">RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers"><code class="xref">RUFAS.routines.manure.manure_handlers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_handlers.manure_handler_classes.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_classes"><code class="xref">RUFAS.routines.manure.manure_handlers.manure_handler_classes</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_daily_output"><code class="xref">RUFAS.routines.manure.manure_handlers.manure_handler_daily_output</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_handlers.milking_parlor.html#module-RUFAS.routines.manure.manure_handlers.milking_parlor"><code class="xref">RUFAS.routines.manure.manure_handlers.milking_parlor</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_manager.html#module-RUFAS.routines.manure.manure_manager"><code class="xref">RUFAS.routines.manure.manure_manager</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients"><code class="xref">RUFAS.routines.manure.manure_nutrients</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager"><code class="xref">RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrients"><code class="xref">RUFAS.routines.manure.manure_nutrients.manure_nutrients</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_separators.html#module-RUFAS.routines.manure.manure_separators"><code class="xref">RUFAS.routines.manure.manure_separators</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_separators.manure_separator_classes.html#module-RUFAS.routines.manure.manure_separators.manure_separator_classes"><code class="xref">RUFAS.routines.manure.manure_separators.manure_separator_classes</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_separators.manure_separator_daily_output.html#module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output"><code class="xref">RUFAS.routines.manure.manure_separators.manure_separator_daily_output</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments"><code class="xref">RUFAS.routines.manure.manure_treatments</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.anaerobic_digestion.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_digestion</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon"><code class="xref">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#module-RUFAS.routines.manure.manure_treatments.base_manure_treatment"><code class="xref">RUFAS.routines.manure.manure_treatments.base_manure_treatment</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn.html#module-RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn"><code class="xref">RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.composting.html#module-RUFAS.routines.manure.manure_treatments.composting"><code class="xref">RUFAS.routines.manure.manure_treatments.composting</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.composting_types.html#module-RUFAS.routines.manure.manure_treatments.composting_types"><code class="xref">RUFAS.routines.manure.manure_treatments.composting_types</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_configs</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.manure_treatment_factory.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_factory</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.manure_treatment_types.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_types"><code class="xref">RUFAS.routines.manure.manure_treatments.manure_treatment_types</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.open_lots.html#module-RUFAS.routines.manure.manure_treatments.open_lots"><code class="xref">RUFAS.routines.manure.manure_treatments.open_lots</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor"><code class="xref">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor"><code class="xref">RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen"><code class="xref">RUFAS.routines.manure.pen</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure"><code class="xref">RUFAS.routines.manure.pen_manure</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.pen_manure.manure_manager_pen.html#module-RUFAS.routines.manure.pen_manure.manure_manager_pen"><code class="xref">RUFAS.routines.manure.pen_manure.manure_manager_pen</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.pen_manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.pen_manure"><code class="xref">RUFAS.routines.manure.pen_manure.pen_manure</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.protocols.html#module-RUFAS.routines.manure.protocols"><code class="xref">RUFAS.routines.manure.protocols</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.html#module-RUFAS.routines.manure.protocols.liquid_manure_portion_protocol"><code class="xref">RUFAS.routines.manure.protocols.liquid_manure_portion_protocol</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.reception_pits.html#module-RUFAS.routines.manure.reception_pits"><code class="xref">RUFAS.routines.manure.reception_pits</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.reception_pits.reception_pit.html#module-RUFAS.routines.manure.reception_pits.reception_pit"><code class="xref">RUFAS.routines.manure.reception_pits.reception_pit</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.routines.manure.reception_pits.reception_pit_daily_output.html#module-RUFAS.routines.manure.reception_pits.reception_pit_daily_output"><code class="xref">RUFAS.routines.manure.reception_pits.reception_pit_daily_output</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.rufas_time.html#module-RUFAS.rufas_time"><code class="xref">RUFAS.rufas_time</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.simulation_engine.html#module-RUFAS.simulation_engine"><code class="xref">RUFAS.simulation_engine</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.task_manager.html#module-RUFAS.task_manager"><code class="xref">RUFAS.task_manager</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.units.html#module-RUFAS.units"><code class="xref">RUFAS.units</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.util.html#module-RUFAS.util"><code class="xref">RUFAS.util</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_code/RUFAS.weather.html#module-RUFAS.weather"><code class="xref">RUFAS.weather</code></a></td><td>
        <em></em></td></tr>
    </table>
 
 
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2023, RuFaS team.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+        </main>
       </div>
-    </section>
+    </div><footer class="py-6 border-t border-border md:py-0">
+    <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+      <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+        <p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team&nbsp;Built with <a class="font-medium underline underline-offset-4"
+    href="https://www.sphinx-doc.org"
+    rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
+  
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+  
 </body>
 </html>
