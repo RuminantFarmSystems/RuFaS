@@ -322,16 +322,15 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
 
 def test_reset_values() -> None:
     """Test the rest_values() function."""
-    nutrients = ManureNutrients(manure_type=ManureType.LIQUID,
-                                nitrogen=134,
-                                phosphorus=159.6,
-                                potassium=924,
-                                dry_matter=77.7,
-                                total_manure_mass=131)
+    nutrients = ManureNutrients(
+        manure_type=ManureType.LIQUID,
+        nitrogen=134,
+        phosphorus=159.6,
+        potassium=924,
+        dry_matter=77.7,
+        total_manure_mass=131,
+    )
     reset = nutrients.reset_values()
-    assert reset == ManureNutrients(manure_type=ManureType.LIQUID,
-                                        nitrogen=0,
-                                        phosphorus=0,
-                                        potassium=0,
-                                        dry_matter=0,
-                                        total_manure_mass=0)
+    assert reset == ManureNutrients(
+        manure_type=ManureType.LIQUID, nitrogen=0, phosphorus=0, potassium=0, dry_matter=0, total_manure_mass=0
+    )

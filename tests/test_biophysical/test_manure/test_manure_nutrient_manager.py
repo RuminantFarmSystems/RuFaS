@@ -34,7 +34,7 @@ from RUFAS.data_structures.manure_types import ManureType
                     dry_matter_fraction=0.5,
                 ),
                 True,
-            )
+            ),
         ),
         # Case 2: Request partially fulfilled
         (
@@ -55,21 +55,17 @@ from RUFAS.data_structures.manure_types import ManureType
                     dry_matter_fraction=0.5,
                 ),
                 False,
-            )
+            ),
         ),
         # Case 3: Request cannot be fulfilled
-        (
-            None,
-            False,
-            (None, False)
-        ),
+        (None, False, (None, False)),
     ],
 )
 def test_request_nutrients(
     mocker: MockerFixture,
     eval_return: NutrientRequestResults,
     is_nutrient_request_fulfilled: bool,
-    expected_result: tuple[NutrientRequestResults | None, bool]
+    expected_result: tuple[NutrientRequestResults | None, bool],
 ) -> None:
     """
     Unit test for the request_nutrients() method of the ManureNutrientManager class.
@@ -494,33 +490,37 @@ def test_create_nutrient_request_results_exceptions(
 @pytest.mark.parametrize(
     "removal_details",
     [
-        ({"manure_type": ManureType.LIQUID,
-          "nitrogen": 1,
-          "phosphorus": 2,
-          "potassium": 3,
-          "total_manure_mass": 4,
-          "total_solids": 5,
-          "water": 4,
-          "random": 5000})
-    ]
+        {
+            "manure_type": ManureType.LIQUID,
+            "nitrogen": 1,
+            "phosphorus": 2,
+            "potassium": 3,
+            "total_manure_mass": 4,
+            "total_solids": 5,
+            "water": 4,
+            "random": 5000,
+        }
+    ],
 )
 def test_remove_nutrients(removal_details: dict[str, Any]) -> None:
     """Tests the function remove_nutrients()."""
     manure_nutrient_manager = ManureNutrientManager()
-    original_liquid_nutrients = ManureNutrients(manure_type=ManureType.LIQUID,
-                                                nitrogen=10,
-                                                phosphorus=10,
-                                                potassium=10,
-                                                dry_matter=10,
-                                                total_manure_mass=10,
-                                                )
-    original_solid_nutrients = ManureNutrients(manure_type=ManureType.SOLID,
-                                               nitrogen=10,
-                                               phosphorus=10,
-                                               potassium=10,
-                                               dry_matter=10,
-                                               total_manure_mass=10,
-                                               )
+    original_liquid_nutrients = ManureNutrients(
+        manure_type=ManureType.LIQUID,
+        nitrogen=10,
+        phosphorus=10,
+        potassium=10,
+        dry_matter=10,
+        total_manure_mass=10,
+    )
+    original_solid_nutrients = ManureNutrients(
+        manure_type=ManureType.SOLID,
+        nitrogen=10,
+        phosphorus=10,
+        potassium=10,
+        dry_matter=10,
+        total_manure_mass=10,
+    )
     manure_nutrient_manager.add_nutrients(original_solid_nutrients)
     manure_nutrient_manager.add_nutrients(original_liquid_nutrients)
 
