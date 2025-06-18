@@ -88,7 +88,7 @@ class OpenLot(Storage):
             "carbon_decomposition", carbon_decomposition, data_origin_function, units, simulation_day
         )
 
-        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self._stored_manure
+        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self.stored_manure
         self._report_manure_stream(accumulated_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", time.simulation_day)
 

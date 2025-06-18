@@ -235,7 +235,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
         assert result == {}
-        assert storage._stored_manure == dummy_total_manure
+        assert storage.stored_manure == dummy_total_manure
         mock_report_manure_stream.assert_called_once()
     if is_overflowing:
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)

@@ -107,7 +107,7 @@ class CompostBeddedPackBarn(Storage):
             simulation_day,
         )
 
-        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self._stored_manure
+        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self.stored_manure
         self._report_manure_stream(accumulated_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", simulation_day)
 
