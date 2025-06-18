@@ -315,9 +315,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
     assert result is True
     mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
     mock_purchase_feed.assert_called_once_with(pytest.approx(expected_feeds_to_purchase), mock_time)
-    mock_deduct_feeds_from_inventory.assert_called_once_with(
-        expected_inventory_deduction, mock_time.simulation_day
-    )
+    mock_deduct_feeds_from_inventory.assert_called_once_with(expected_inventory_deduction, mock_time.simulation_day)
 
 
 def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -687,8 +685,9 @@ def test_deduct_feeds_from_inventory(
     assert mock_om_add_variable.call_count == add_variable_call_count
 
 
-def test_deduct_feeds_from_inventory_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop,
-                                           mocker: MockerFixture) -> None:
+def test_deduct_feeds_from_inventory_error(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop, mocker: MockerFixture
+) -> None:
     """Test that an error is raised correctly when too much feed is deducted from inventory."""
     harvested_crop.rufas_ids, harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = [1], 100.0, 100.0
     feed_manager.active_storages[StorageType.PILE].stored = [harvested_crop]
