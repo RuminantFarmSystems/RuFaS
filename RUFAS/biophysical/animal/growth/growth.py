@@ -47,6 +47,14 @@ class Growth:
         """
         Handles an animal's daily growth updates.
 
+         Notes
+        -----
+        Calf growth - [AN.BWT.1]
+        Non-preg heifer growth - [AN.BWT.2]
+        Preg heifer growth -  [AN.BWT.3]
+        1st & 2nd parity cow growth - [AN.BWT.4]
+        Parity 3+ cow growth - [AN.BWT.5]
+
         Parameters
         ----------
         general_properties: GeneralProperties
@@ -147,23 +155,33 @@ class Growth:
 
     def calculate_calf_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
-        Calculates the body weight change for calves.
+         Calculates the body weight change for calves.
 
-        Parameters
-        ----------
-        growth_inputs: GrowthInputs
-            Animal properties related to body weight growth.
+        Notes
+        ------
+        [AN.BWT.7]
 
-        Returns
-        -------
-        float
-            The daily body weight growth for calves (kg).
+
+         Parameters
+         ----------
+         growth_inputs: GrowthInputs
+             Animal properties related to body weight growth.
+
+         Returns
+         -------
+         float
+             The daily body weight growth for calves (kg).
         """
         return growth_inputs.birth_weight / AnimalConfig.wean_day
 
     def calculate_non_pregnant_heifer_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
-        Calculates the body weight change for non-pregnant heifers.
+        Calculates the body weight change of heifers due to growth.
+
+        Notes
+        ------
+        [AN.BWT.8]
+        [AN.BWT.9]
 
         Parameters
         ----------
@@ -196,6 +214,11 @@ class Growth:
         """
         Calculates the body weight change for pregnant heifers.
 
+        Notes
+        -----
+        [AN.BWT.3]
+        [AN.BWT.9]
+
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -206,9 +229,7 @@ class Growth:
         tuple[float, float]
             The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
 
-        References
-        ----------
-        Life cycle pseudocode @[A.1A.C.9]
+
         """
         target_average_daily_growth_pregnant_heifer = self._calculate_pregnant_heifer_target_daily_growth(growth_inputs)
 
@@ -223,6 +244,11 @@ class Growth:
         """
         Calculates the body weight change for cows.
 
+        Notes
+        -----
+        [AN.BWT.4]
+        [AN.BWT.5]
+
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -234,9 +260,6 @@ class Growth:
             The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
             tissue changed (kg).
 
-        References
-        ----------
-        Life cycle pseudocode @[A.1A.C.56/57/58]
         """
         (conceptus_growth, updated_conceptus_weight, self.tissue_changed) = self._calculate_cow_conceptus_growth(
             growth_inputs
@@ -255,6 +278,14 @@ class Growth:
     def _calculate_pregnant_heifer_conceptus_growth(self, growth_inputs: GrowthInputs) -> tuple[float, float]:
         """
         Calculates the conceptus growth for pregnant heifers.
+
+        Notes
+        --------
+        Total conceptus weight - [AN.BWT.14]
+        conceptus parameter - [AN.BWT.15]
+        Conceptus growth - [AN.BWT.16]
+        Conceptus weight change at parturition - [AN.BWT.17]
+
 
         Parameters
         ----------
@@ -284,6 +315,13 @@ class Growth:
         """
         Calculates the conceptus growth for cows.
 
+        Notes
+        -------
+        Total conceptus weight - [AN.BWT.14]
+        conceptus parameter - [AN.BWT.15]
+        Conceptus growth - [AN.BWT.16]
+        Conceptus weight change at parturition - [AN.BWT.17]
+
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -307,6 +345,10 @@ class Growth:
         """
         Calculates the target daily growth for pregnant heifers.
 
+        Notes
+        ----------
+        [AN.BWT.9]
+
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -325,6 +367,14 @@ class Growth:
     def _calculate_cow_target_daily_growth(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the target daily growth for cows.
+
+        Notes
+        ---------
+        [AN.BWT.10]
+        [AN.BWT.11]
+        [AN.BWT.12]
+        [AN.BWT.13]
+
 
         Parameters
         ----------
@@ -359,6 +409,12 @@ class Growth:
     def _calculate_cow_body_weight_tissue_change(self, growth_inputs: GrowthInputs) -> tuple[float, float]:
         """
         Calculates the body weight tissue growth for cows.
+
+        Notes
+        --------
+        [AN.BWT.18]
+        [AN.BWT.19]
+        [AN.BWT.20]
 
         Parameters
         ----------
