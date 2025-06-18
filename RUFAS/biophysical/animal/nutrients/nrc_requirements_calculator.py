@@ -201,6 +201,13 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NRC.1]
+        [AN.NRC.2]
+        [AN.NRC.3]
+        [AN.NRC.4]
+        [AN.NRC.5]
+        [AN.NRC.6]
+        [AN.NRC.7]
         Energy requirements for activity are not included within calculations for maintenance.
 
         References
@@ -256,6 +263,10 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         average_daily_gain_heifer : float
             Average daily gain (grams per day).
 
+        Notes
+        ------
+        [AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
+        [AN.NRC.20], [AN.NRC.21], [AN.NRC.22], [AN.NRC.23], [AN.NRC.24]
         Returns
         -------
         tuple[float, float, float]
@@ -263,7 +274,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.A.7]-[A.Cow.A.14], [A.Heifer.A.8]-[A.Heifer.A.15]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 11 "Growth", pp. 234-243, 2001.
 
@@ -310,12 +320,12 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NRC.25], [AN.NRC.26]
         Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
         requirement is assumed to be zero.
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.A.15]-[A.Heifer.A.16], [A.Cow.A.16]-[A.Heifer.A.17]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 2 "Energy", pp. 21-22, 2001.
 
@@ -385,6 +395,8 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+         [AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
+         [AN.NRC.36], [AN.NRC.37],[AN.NRC.38]
         bacteria_estimate: Bacteria metabolizable protein production (g).
         TDN: Total digestible nutrients
         maintenance: Metabolizable protein requirement for maintenance (g).
@@ -396,7 +408,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.B.1] through [A.Cow.B.7], [A.Heifer.B.1] through [A.Heifer.B.6]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
 
@@ -470,6 +481,10 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         milk_production: float
             Milk yield (kg/d).
 
+        Notes
+        ------
+        [AN.NRC.39],[AN.NRC.41], [AN.NRC.43], [AN.NRC.45],[AN.NRC.47], [AN.NRC.49]
+
         Returns
         -------
         float
@@ -477,8 +492,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.C.1]-[A.Heifer.C.1], [A.Cow.C.2]-[A.Heifer.C.2],
-            [A.Cow.C.3]-[A.Heifer.C.3], [A.Cow.C.4]-[A.Heifer.C.4], [A.Cow.C.5]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
 
@@ -539,6 +552,10 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Average daily gain (grams per day).
         dry_matter_intake_estimate : float
             Estimated dry matter intake (kg/d).
+
+        Notes
+        -------
+        [AN.NRC.42], [AN.NRC.44], [AN.NRC.46],[AN.NRC.48], [AN.NRC.50]
 
         Returns
         -------
@@ -613,6 +630,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NRC.51], [AN.NRC.52], [AN.NRC.53], [AN.NRC.54], [AN.NRC.55]
         The sum of dry matter intake of each feed is assumed to be less than
         dry matter intake estimation (Sum of Feed < dry_matter_intake_estimate).
 
@@ -678,13 +696,13 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NRC.8],[AN.NRC.9], [AN.NRC.10], [AN.NRC.11], [AN.NRC.12]
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
         system and hilly topography will cost additional energy. Grazing is not implemented yet in the current version
         of code.
 
         References
         ----------
-        Animal Scientific Documentation [A.Cow.A.4]-[A.Heifer.A.5], [A.Cow.A.6]-[A.Heifer.A.7]
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
