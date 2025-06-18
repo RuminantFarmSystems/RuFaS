@@ -139,6 +139,8 @@ class Storage(Processor):
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
+            empty_stream = ManureStream.make_empty_manure_stream()
+            self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
             manure_to_be_returned = {}
 
         if self.is_overflowing is True:
