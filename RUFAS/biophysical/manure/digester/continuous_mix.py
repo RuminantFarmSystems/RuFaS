@@ -17,7 +17,7 @@ class ContinuousMix(Digester):
     ----------
     name : str
         Unique identifier of the anaerobic digester.
-    temperature_set_point : float
+    anaerobic_digestion_temperature_set_point : float
         Temperature set point for the anaerobic digestion (°C).
     hydraulic_retention_time : int
         Number of days manure spends in the anaerobic digester (days).
@@ -42,13 +42,13 @@ class ContinuousMix(Digester):
     def __init__(
         self,
         name: str,
-        temperature_set_point: float,
+        anaerobic_digestion_temperature_set_point: float,
         hydraulic_retention_time: int,
         biogas_leakage_fraction: float,
     ) -> None:
         super().__init__(name=name, is_housing_emissions_calculator=False)
         self._manure_in_digester: ManureStream = ManureStream.make_empty_manure_stream()
-        self._temperature_set_point: float = temperature_set_point
+        self._temperature_set_point: float = anaerobic_digestion_temperature_set_point
         self._hydraulic_retention_time: int = hydraulic_retention_time
         self._biogas_leakage_fraction: float = biogas_leakage_fraction
 
