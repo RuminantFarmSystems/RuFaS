@@ -182,6 +182,7 @@ v0.9.2
 - [2433](https://github.com/RuminantFarmSystems/RuFaS/pull/2433) - [minor change] [Soil and Crop][FeedStorage] Removes all references to crop type attribute and enum.
 - [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
+- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
 
 
 ### v0.9.2
