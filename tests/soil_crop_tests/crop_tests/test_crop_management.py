@@ -331,7 +331,6 @@ def test_store_harvested_crop(
     crop_management = CropManagement(crop_data=mock_crop_data, wet_yield_collected=wet_yield_collected)
     expected_harvest_crop = HarvestedCrop(
         category=mock_crop_data.crop_category,
-        type=mock_crop_data.crop_type,
         harvest_time=mock_time.current_date.date(),
         storage_time=mock_time.current_date.date(),
         fresh_mass=expected_fresh_mass,

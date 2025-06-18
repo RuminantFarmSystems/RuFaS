@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration, CropDataFactory
 from RUFAS.routines.field.crop.crop_data import PlantCategory
@@ -19,7 +19,6 @@ def test_setup_crop_configurations(mocker: MockerFixture) -> None:
                 "name": "alfalfa_silage",
                 "plant_category": "perennial_legume",
                 "crop_category": "Alfalfa",
-                "crop_type": "Alfalfa",
                 "rufas_ids": [104, 109, 110],
                 "is_nitrogen_fixer": True,
                 "minimum_temperature": 4.0,
@@ -63,7 +62,6 @@ def test_setup_crop_configurations(mocker: MockerFixture) -> None:
         name="alfalfa_silage",
         plant_category=PlantCategory.PERENNIAL_LEGUME,
         crop_category=CropCategory.ALFALFA,
-        crop_type=CropType.ALFALFA,
         rufas_ids=[104, 109, 110],
         is_nitrogen_fixer=True,
         minimum_temperature=4.0,
@@ -206,7 +204,7 @@ def test_setup_crop_configurations_error(mocker: MockerFixture) -> None:
 def test_manufacture_crop_configuration_error() -> None:
     """Test that CropDataFactory prevents crop configurations with invalid category and type combinations."""
     CropDataFactory._om = OutputManager()
-    crop_config = {"name": "invalid", "crop_category": "Alfalfa", "crop_type": "Wheat"}
+    crop_config = {"name": "invalid", "crop_category": "Alfalfa", "plant_category": "annual_grass"}
 
     with pytest.raises(ValueError):
         CropDataFactory._manufacture_crop_configuration(crop_config)
@@ -229,7 +227,6 @@ def test_create_crop_data() -> None:
             name="alfalfa_silage",
             plant_category=PlantCategory.PERENNIAL_LEGUME,
             crop_category=CropCategory.ALFALFA,
-            crop_type=CropType.ALFALFA,
             rufas_ids=[104, 109, 110],
             is_nitrogen_fixer=True,
             minimum_temperature=4.0,
