@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.rufas_time import RufasTime
 
 from .sample_crop_data import sample_crop_data
@@ -33,7 +33,8 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)  # type: ignore[arg-type]
+    crop_type = CropType.WHEAT
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_acceptable_crops(baleage: Baleage) -> None:

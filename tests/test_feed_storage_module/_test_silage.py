@@ -4,7 +4,7 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.silage import Bag, Bunker, Pile, Silage
 from RUFAS.rufas_time import RufasTime
@@ -30,7 +30,8 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)  # type: ignore[arg-type]
+    crop_type = CropType.WHEAT
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_acceptable_crops(silage: Silage):

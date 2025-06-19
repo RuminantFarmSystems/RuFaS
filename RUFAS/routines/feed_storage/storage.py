@@ -1,7 +1,7 @@
 from typing import List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -66,6 +66,8 @@ class Storage:
         Receives a harvested crop and adds it to the storage.
     process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
         Processes the degradations and losses of the stored crops.
+    give_feed(amount: float, crop_type: str)
+        Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
         Resets mass related attributes after loss of dry matter and/or moisture.
     record_stored_crops(self)
@@ -192,6 +194,20 @@ class Storage:
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
+
+    def give_feed(self, amount: float, crop_type: CropType) -> None:
+        """
+        Gives out a specified amount of feed of a certain crop type.
+
+        Parameters
+        ----------
+        amount : float
+            The amount of feed to give out.
+        crop_type : CropType
+            The type of crop to give out.
+
+        """
+        pass
 
     def reset_mass_attributes_after_loss(
         self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float

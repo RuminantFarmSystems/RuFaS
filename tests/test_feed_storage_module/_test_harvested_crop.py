@@ -3,9 +3,51 @@ import copy
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 
 from .sample_crop_data import sample_crop_data
+
+
+@pytest.mark.parametrize(
+    "category, crop_type",
+    [
+        (CropCategory.SMALL_GRAIN, CropType.WHEAT),
+        (CropCategory.SMALL_GRAIN, CropType.RYE),
+        (CropCategory.SMALL_GRAIN, CropType.OAT),
+        (CropCategory.SMALL_GRAIN, CropType.RICE),
+        (CropCategory.CORN, CropType.HIGH_MOISTURE),
+        (CropCategory.CORN, CropType.SILAGE),
+        (CropCategory.CORN, CropType.WHOLE_PLANT),
+        (CropCategory.CORN, CropType.GRAIN),
+        (CropCategory.SOY, CropType.FORAGE),
+        (CropCategory.SOY, CropType.GRAIN),
+        (CropCategory.ALFALFA, CropType.ALFALFA),
+        (CropCategory.GRASS, CropType.RYEGRASS),
+        (CropCategory.GRASS, CropType.ORCHARDGRASS),
+        (CropCategory.GRASS, CropType.FINE_FESCUE),
+        (CropCategory.GRASS, CropType.TALL_FESCUE),
+        (CropCategory.GRASS, CropType.MEADOW_FESCUE),
+    ],
+)
+def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
+    try:
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+    except ValueError:
+        pytest.fail(f"Unexpected ValueError with {category} and {crop_type}")
+
+
+@pytest.mark.parametrize(
+    "category, crop_type",
+    [
+        (CropCategory.CORN, CropType.WHEAT),
+        (CropCategory.ALFALFA, CropType.SILAGE),
+        (CropCategory.GRASS, CropType.RICE),
+        (CropCategory.SOY, CropType.HIGH_MOISTURE),
+    ],
+)
+def test_invalid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
+    with pytest.raises(ValueError):
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_attributes(mocker: MockerFixture) -> None:
@@ -18,7 +60,9 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -57,7 +101,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)  # type: ignore[arg-type]
 
     actual = crop.dry_matter_mass
 
@@ -67,7 +111,9 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 @pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
@@ -79,7 +125,9 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 @pytest.mark.parametrize("dry_matter_percentage,expected", [(30.0, 408.0), (15.0, 474.0), (95.0, 122.0)])
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     crop.dry_matter_percentage = dry_matter_percentage
 
     actual = crop._calculate_bale_density()
@@ -93,7 +141,9 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 )
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
 
