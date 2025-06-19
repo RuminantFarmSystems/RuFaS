@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.hay import (
     FINAL_MOISTURE_PERCENTAGE,
@@ -49,7 +49,8 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    crop_type = CropType.WHEAT
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 @pytest.fixture

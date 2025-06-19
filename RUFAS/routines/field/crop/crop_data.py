@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 
 
@@ -70,6 +70,8 @@ class CropData:
         Indicates if the crop is currently alive in the field.
     crop_category : CropCategory
         Broad category into which this crop type falls.
+    crop_type : CropType
+        Sub type of this crop.
     storage_type : StorageType
         Method of storage for this crop when harvested.
     planting_year : int
@@ -247,6 +249,7 @@ class CropData:
     is_alive: bool = True
 
     crop_category: CropCategory = CropCategory.SMALL_GRAIN
+    crop_type: CropType = CropType.GRAIN
     storage_type: StorageType = StorageType.DRY
 
     # Management variables
