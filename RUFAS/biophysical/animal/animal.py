@@ -2058,8 +2058,8 @@ class Animal:
         int
             Calculated future death date in simulation days.
 
-        Notes
-        -------
+        References
+        ----------
         [AN.ANM.1]
 
         """
@@ -2099,8 +2099,8 @@ class Animal:
         tuple[int, str]
             Future cull date in simulation days and reason for culling.
 
-        Notes
-        -------
+        References
+        ----------
         [AN.ANM.2]
 
         """

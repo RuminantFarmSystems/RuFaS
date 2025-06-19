@@ -140,7 +140,6 @@ class EntericMethaneCalculator:
         -------
         float
             The daily enteric emissions for cows (g/day).
-
         """
         dry_matter_intake = nutrient_amounts.dry_matter
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
@@ -301,7 +300,6 @@ class EntericMethaneCalculator:
         -------
         float
             The daily enteric emissions for dry cows (g/day).
-
 
         References
         ----------

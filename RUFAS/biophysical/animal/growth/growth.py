@@ -155,7 +155,7 @@ class Growth:
 
     def calculate_calf_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
-         Calculates the body weight change for calves.
+        Calculates the body weight change for calves.
 
         Notes
         ------
@@ -229,7 +229,6 @@ class Growth:
         tuple[float, float]
             The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
 
-
         """
         target_average_daily_growth_pregnant_heifer = self._calculate_pregnant_heifer_target_daily_growth(growth_inputs)
 
@@ -285,7 +284,6 @@ class Growth:
         conceptus parameter - [AN.BWT.15]
         Conceptus growth - [AN.BWT.16]
         Conceptus weight change at parturition - [AN.BWT.17]
-
 
         Parameters
         ----------
@@ -374,7 +372,6 @@ class Growth:
         [AN.BWT.11]
         [AN.BWT.12]
         [AN.BWT.13]
-
 
         Parameters
         ----------
