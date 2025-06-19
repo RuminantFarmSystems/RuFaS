@@ -193,6 +193,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.1], [AN.NSM.2], [AN.NSM.3], [AN.NSM.4], [AN.NSM.5]
+
         NASEM (2021)[1] does not adjust energy requirements for environmental temperature as it assumes that confinement
         conditions already provide comfort temperature to the animals. This is something to consider and update for the
         grazing module. Instead of calculating `calf_birth_weight`, NASEM (2021) also contains standards
@@ -201,7 +203,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         `uterine_weight`. `day_of_pregnancy` (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in
         NASEM (2021) book.
 
-        References
+         References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
@@ -258,6 +260,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.11], [AN.NSM.12], [AN.NSM.13], [AN.NSM.14], [AN.NSM.15], [AN.NSM.16], [AN.NSM.17]
         In NASEM (2021)[1], body frame gain (fat + protein) corresponds to the true growth and it is part of the
         calculation which is further partitioned to body reserves or condition gain (or loss), and pregnancy-associated
         gain (considered a pregnancy requirement).
@@ -327,6 +330,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.18], [AN.NSM.19], [AN.NSM.20]
         Assumptions: tissue contains 0.882 Mcal of energy / kg; an ME to gestation energy efficiency of 0.14;
         and ME to net_energy_lactation efficiency of 0.66.MEpreg = Metabolizable energy requirement for pregnancy,
             Mcal net_energy_lactation/day
@@ -340,13 +344,17 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
 
-        if lactating:
-            gravid_uterine_weight_gain = -0.2 * days_in_milk * (uterine_weight - 0.204)
-        elif day_of_pregnancy is None:
-            gravid_uterine_weight_gain = 0.0
-        else:
+        if day_of_pregnancy is not None:
             gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
-        net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        elif lactating and days_in_milk < 100:
+            gravid_uterine_weight_gain = -0.2 * days_in_milk * (uterine_weight - 0.204)
+        else:
+            gravid_uterine_weight_gain = 0.0
+
+        if gravid_uterine_weight_gain > 0:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        else:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14)
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
     @classmethod
@@ -390,6 +398,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.23],[AN.NSM.24],[AN.NSM.25],[AN.NSM.26],[AN.NSM.27],
+        [AN.NSM.28],[AN.NSM.29],[AN.NSM.30],[AN.NSM.31], [AN.NSM.36], [AN.NSM.37], [AN.NSM.38], [AN.NSM.39]
         As in the NRC (2021), the protein requirement is also divided into four components: maintenance, growth,
         pregnancy, and lactation (all of them on a metabolizable protein basis (MP, g).
         The MP is defined as the sum of rumen undegraded protein (RUP + microbial protein (MCP).
@@ -481,6 +491,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.40], [AN.NSM.42], [AN.NSM.44], [AN.NSM.46], [AN.NSM.48]
         NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
 
         References
@@ -552,6 +563,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.41], [AN.NSM.43], [AN.NSM.45], [AN.NSM.47], [AN.NSM.49]
         NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
 
         References
@@ -631,6 +643,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.50],[AN.NSM.51]
         The sum of dry matter intake of each feed is assumed to be less than
         dry matter intake estimation (Sum of Feed < DMIest).
         There are additional equation in NASEM (2021) book including neutral detergent concentrations in the diet
@@ -696,7 +709,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-        NASEM calculations use distance walked in kilometers, hence the unit conversion. Activity requirement
+        [AN.NSM.6]. [AN.NSM.7], [AN.NSM.8], [AN.NSM.9], [AN.NSM.10]
+         NASEM calculations use distance walked in kilometers, hence the unit conversion. Activity requirement
         (net_energy_activity) is proportional to body weight and daily walking distance. Grazing system and hilly
         topography will cost additional energy. Grazing is not implemented yet in the current version of code.
 

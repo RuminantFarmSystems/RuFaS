@@ -162,15 +162,29 @@ v0.9.2
 - [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
 - [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
 - [2354](https://github.com/RuminantFarmSystems/MASM/pull/2354) - [minor change] [Soil and Crop] Debug Soil N Cycling and Field N2O emissions.
-- [2351](https://github.com/RuminantFarmSystems/MASM/pull/2351) [minor change] [Output Manager] Adds validations to report filter contents.
+- [2351](https://github.com/RuminantFarmSystems/MASM/pull/2351) - [minor change] [Output Manager] Adds validations to report filter contents.
 - [2370](https://github.com/RuminantFarmSystems/MASM/pull/2370) - [minor change] [Animal] Added console warning when using sexed semen for her initialization.
 - [2371](https://github.com/RuminantFarmSystems/MASM/pull/2371) - [minor change] [ReportGenerator] Allow for RG aggregation of np.float()s
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
 - [2252](https://github.com/RuminantFarmSystems/MASM/pull/2252) - [minor change] [Animal] Adds logic to initialize herds using specific parity distributions.
+- [2389](https://github.com/RuminantFarmSystems/MASM/pull/2389) - [minor change] [FeedStorage] Finishes up version 1 of the Feed Storage module.
 - [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
-- [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
+- [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties.
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
 - [2383](https://github.com/RuminantFarmSystems/MASM/pull/2383) - [minor change] [Code of Conduct] Added contributor code of conduct.
+- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
+- [2399](https://github.com/RuminantFarmSystems/RuFaS/pull/2399) - [minor change] [Crop and Soil] Change infiltration value in ManureApplication to default of 0.4.
+- [2400](https://github.com/RuminantFarmSystems/RuFaS/pull/2400) - [minor change] [Animal] Fixes the bug in heifer first estrus day calculation.
+- [2409](https://github.com/RuminantFarmSystems/RuFaS/pull/2409) - [minor change] [Animal] Adds back code we did not want removed in #2404 and implements original fix in #2404 - fixes incorrect attribute reference in heifer enteric methane calculation and updates references to MilkProduction class attributes.
+- [2412](https://github.com/RuminantFarmSystems/RuFaS/pull/2412) - [minor change] [Crop and Soil] Update docstrings in cut_crop
+- [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [Animal] Uses utf-8 encoding for saving CSVs from OutputManager.
+- [2415](https://github.com/RuminantFarmSystems/RuFaS/pull/2415) - [minor change] [Animal] Add "None" as valid cow repro sub methods.
+- [2421](https://github.com/RuminantFarmSystems/RuFaS/pull/2421) - [minor change] [Soil and Crop] Update Canopy Water handling.
+- [2433](https://github.com/RuminantFarmSystems/RuFaS/pull/2433) - [minor change] [Soil and Crop][FeedStorage] Removes all references to crop type attribute and enum.
+- [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
+- [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
+- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
+
 
 ### v0.9.2
 

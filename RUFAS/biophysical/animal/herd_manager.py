@@ -136,10 +136,9 @@ class HerdManager:
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
         self.is_ration_defined_by_user = is_ration_defined_by_user
-        if self.is_ration_defined_by_user:
-            ration_feed_config = self.im.get_data("feed")
-            UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
-            self.set_milk_type_in_calf_ration_manager()
+        ration_feed_config = self.im.get_data("feed")
+        UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
+        self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
         allowances = self.im.get_data("feed.allowances")
@@ -801,9 +800,13 @@ class HerdManager:
             pen_with_min_stocking_density.set_animal_nutritional_requirements(
                 temperature=current_day_conditions.mean_air_temperature, available_feeds=available_feeds
             )
+            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
+                pen_with_min_stocking_density.animal_combination
+            )
+            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
             self._reformulate_ration_single_pen(
                 pen=pen_with_min_stocking_density,
-                available_feeds=available_feeds,
+                pen_available_feeds=pen_available_feeds,
                 current_temperature=current_day_conditions.mean_air_temperature,
                 total_inventory=total_inventory,
             )
@@ -1243,7 +1246,7 @@ class HerdManager:
         ----------
         total_inventory : TotalInventory
             The total inventory of all available feeds.
-        next_harvest_dates : Dict[RUFAS_ID, date]
+        next_harvest_dates : dict[RUFAS_ID, date]
             The next harvest date for each applicable feed type.
         time : RufasTime
             RufasTime object.
@@ -1287,6 +1290,12 @@ class HerdManager:
             total_inventory.available_feeds.get(rufas_id, 0.0) / total_animal_population / days_until_next_harvest
         )
 
+    def _find_pen_available_feeds(
+        self, all_available_feeds: list[Feed], user_defined_ration_feed_ids: list[RUFAS_ID]
+    ) -> list[Feed]:
+        """Find the available feeds for the pen."""
+        return [feed for feed in all_available_feeds if feed.rufas_id in user_defined_ration_feed_ids]
+
     def formulate_rations(
         self,
         available_feeds: list[Feed],
@@ -1325,12 +1334,16 @@ class HerdManager:
             if not pen.is_populated:
                 pen.ration = {}
                 continue
-            self._reformulate_ration_single_pen(pen, available_feeds, current_temperature, total_inventory)
+            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
+                pen.animal_combination
+            )
+            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
+            self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
 
     def _reformulate_ration_single_pen(
-        self, pen: Pen, available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
+        self, pen: Pen, pen_available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
     ) -> None:
         """
         Reformulates ration for a single pen.
@@ -1339,19 +1352,26 @@ class HerdManager:
         ----------
         pen : Pen
             Pen that requires ration reformulation.
-        available_feeds : List[Feed]
-            List of available feeds.
+        pen_available_feeds : List[Feed]
+            List of available feeds in this pen.
         current_temperature : float
             Current temperature (C).
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
 
         """
-        if self.is_ration_defined_by_user is True:
-            pen.use_user_defined_ration(available_feeds, current_temperature)
+        if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
+            pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
+            if pen.animal_combination == AnimalCombination.LAC_COW and pen.average_milk_production == 0.0:
+                for animal in pen.animals_in_pen:
+                    pen.animals_in_pen[animal].daily_milking_update_without_history()
             pen.formulate_optimized_ration(
-                available_feeds, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
+                pen_available_feeds,
+                current_temperature,
+                self._max_daily_feeds,
+                self.advance_purchase_allowance,
+                total_inventory,
             )
 
     def update_herd_statistics(self) -> None:
@@ -1474,7 +1494,7 @@ class HerdManager:
             "1": (sum(parity_1_calving_age) / len(parity_1_calving_age)) if len(parity_1_calving_age) > 0 else 0,
             "2": (sum(parity_2_calving_age) / len(parity_2_calving_age)) if len(parity_2_calving_age) > 0 else 0,
             "3": (sum(parity_3_calving_age) / len(parity_3_calving_age)) if len(parity_3_calving_age) > 0 else 0,
-            "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_3_calving_age) > 0 else 0,
+            "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_4_calving_age) > 0 else 0,
             "5": (sum(parity_5_calving_age) / len(parity_5_calving_age)) if len(parity_5_calving_age) > 0 else 0,
             "greater_than_3": (
                 (sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age))
