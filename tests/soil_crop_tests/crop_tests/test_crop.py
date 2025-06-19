@@ -64,9 +64,10 @@ def test_perform_daily_crop_update(
     )
     mock_field_data = mocker.Mock(spec=FieldData)
     mock_soil_data = mocker.Mock(spec=SoilData)
+    mock_time = mocker.Mock(spec=RufasTime)
 
     # Call the method
-    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data)
+    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data, mock_time)
 
     # Assertions
     if should_update:
@@ -136,11 +137,11 @@ def test_cycle_water_for_crops(
 
 @pytest.mark.parametrize(
     "water_canopy_storage_capacity, initial_canopy_water, precipitation_reaching_soil,"
-    "expected_precipitation_reaching_soil, expected_excess_canopy_water",
+    "expected_precipitation_reaching_soil",
     [
-        (10.0, 5.0, 8.0, 3.0, 0.0),  # Partial canopy storage, no excess water
-        (10.0, 10.0, 5.0, 5.0, 0.0),  # Full canopy storage, no excess water
-        (10.0, 15.0, 10.0, 10.0, 5.0),  # Canopy overfilled, excess water
+        (10.0, 5.0, 8.0, 3.0),  # Partial canopy storage, no excess water
+        (10.0, 10.0, 5.0, 5.0),  # Full canopy storage, no excess water
+        (10.0, 15.0, 10.0, 10.0),  # Canopy overfilled, excess water
     ],
 )
 def test_handle_water_in_canopy(
@@ -150,7 +151,6 @@ def test_handle_water_in_canopy(
     initial_canopy_water: float,
     precipitation_reaching_soil: float,
     expected_precipitation_reaching_soil: float,
-    expected_excess_canopy_water: float,
 ) -> None:
     """Test handle_water_in_canopy() method in crop.py."""
     crop = Crop(mock_crop_data)
@@ -167,12 +167,9 @@ def test_handle_water_in_canopy(
 
     canopy_water_mock.return_value = initial_canopy_water
 
-    actual_precipitation_reaching_soil, actual_excess_canopy_water = crop.handle_water_in_canopy(
-        precipitation_reaching_soil
-    )
+    actual_precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
     assert actual_precipitation_reaching_soil == expected_precipitation_reaching_soil
-    assert actual_excess_canopy_water == expected_excess_canopy_water
 
     expected_canopy_water = min(
         water_canopy_storage_capacity,
