@@ -2058,6 +2058,10 @@ class Animal:
         int
             Calculated future death date in simulation days.
 
+        Notes
+        -------
+        [AN.ANM.1]
+
         """
         if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
@@ -2094,6 +2098,10 @@ class Animal:
         -------
         tuple[int, str]
             Future cull date in simulation days and reason for culling.
+
+        Notes
+        -------
+        [AN.ANM.2]
 
         """
         cull_reason = ""

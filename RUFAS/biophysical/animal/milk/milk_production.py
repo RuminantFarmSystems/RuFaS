@@ -231,6 +231,10 @@ class MilkProduction:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
+        Notes
+        -----
+        [AN.MLK.9]
+
         Parameters
         ----------
         days_in_milk : int
@@ -259,6 +263,10 @@ class MilkProduction:
     def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
+
+        Notes
+        -----
+        [AN.MLK.10]
 
         Parameters
         ----------
