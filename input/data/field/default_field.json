@@ -4,7 +4,7 @@
     "fertilizer_management_specification": "fertilizer_schedule",
     "manure_management_specification": "manure_schedule",
     "tillage_management_specification": "tillage_schedule",
-    "field_size": 35.0,
+    "field_size": 1.0,
     "absolute_latitude": 43.5,
     "longitude": -89.4,
     "minimum_daylength": 9.0,

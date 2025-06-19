@@ -18,6 +18,21 @@
         {"purchased_feed": 202, "purchased_feed_cost": 0.82},
         {"purchased_feed": 216, "purchased_feed_cost": 0.44}
     ],
+    "farm_grown_feeds": [],
+
+    "storage_options": [
+        {
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
+            "additive": "preservative",
+            "packing_density": 200,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        }
+    ],
     "user_defined_ration_percentages": {
         "calf": [],
         "growing": [],

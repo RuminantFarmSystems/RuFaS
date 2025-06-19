@@ -45,7 +45,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/example_alf_corn_rotation.json",
+      "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -129,21 +129,21 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
+      "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Schedule of tillage applications for a field.",
-      "path": "input/data/tillage_schedule/no_till.json",
+      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
@@ -157,7 +157,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/barnyard_100yr.csv",
+      "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
