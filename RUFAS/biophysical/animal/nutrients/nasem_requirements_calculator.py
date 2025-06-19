@@ -203,7 +203,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         `uterine_weight`. `day_of_pregnancy` (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in
         NASEM (2021) book.
 
-         References
+        References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
