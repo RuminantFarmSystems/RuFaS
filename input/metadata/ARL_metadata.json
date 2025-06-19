@@ -27,6 +27,19 @@
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
+    },  "animal_net_merit": {
+      "title": "Animal Net Merit data",
+      "description": "The net merit value for cows.",
+      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
+      "type": "csv",
+      "properties": "animal_net_merit_properties"
+    },
+    "animal_top_listing_semen": {
+      "title": "Animal Top Listing Semen data",
+      "description": "The top listing semen value for new born calves.",
+      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
+      "type": "csv",
+      "properties": "animal_top_listing_semen_properties"
     },
     "crop": {
       "title": "Crop data",
@@ -146,6 +159,20 @@
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
+    },
+    "tractor_dataset": {
+      "title": "Tractor Dataset",
+      "description": "Details agricultural machinery operations for various crops, including tractor size, operations (planting, mowing, collection, etc.), implement details, operational parameters (depth, width, mass), and throughput metrics, spanning different crop types and soil management practices.",
+      "path": "input/data/EEE/tractor_dataset.csv",
+      "type": "csv",
+      "properties": "tractor_dataset_properties"
+    },
+    "EEE_constants": {
+      "title": "EEE Constants",
+      "description": "The constants that are used in EEE module.",
+      "path": "input/data/EEE/constants.json",
+      "type": "json",
+      "properties": "EEE_constants_properties"
     },
     "properties": {
       "title": "Metadata Properties",
