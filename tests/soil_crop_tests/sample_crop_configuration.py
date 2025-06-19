@@ -1,4 +1,4 @@
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, StorageType
 from RUFAS.routines.field.crop.crop_data import PlantCategory
 from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration
 
@@ -7,7 +7,6 @@ SAMPLE_CROP_CONFIGURATION = CropConfiguration(
     name="alfalfa_silage",
     plant_category=PlantCategory.PERENNIAL_LEGUME,
     crop_category=CropCategory.ALFALFA,
-    crop_type=CropType.ALFALFA,
     rufas_ids=[104, 109, 110],
     is_nitrogen_fixer=True,
     minimum_temperature=4.0,
