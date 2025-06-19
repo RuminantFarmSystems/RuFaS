@@ -1246,7 +1246,7 @@ class HerdManager:
         ----------
         total_inventory : TotalInventory
             The total inventory of all available feeds.
-        next_harvest_dates : dict[RUFAS_ID, date]
+        next_harvest_dates : Dict[RUFAS_ID, date]
             The next harvest date for each applicable feed type.
         time : RufasTime
             RufasTime object.

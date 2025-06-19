@@ -2,6 +2,8 @@ from typing import Any, TypedDict
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
+    CropType,
+    CROP_CATEGORY_TO_CROP_TYPE_MAPPING,
     StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
@@ -20,6 +22,7 @@ class CropConfiguration(TypedDict):
     name: str
     plant_category: PlantCategory
     crop_category: CropCategory
+    crop_type: CropType
     rufas_ids: list[RUFAS_ID]
     is_nitrogen_fixer: bool
     minimum_temperature: float
@@ -82,6 +85,7 @@ class CropDataFactory:
         ------
         ValueError
             If the names of crop configurations are not unique.
+
         """
         cls._crop_configurations = {}
         cls._om = OutputManager()
@@ -123,12 +127,29 @@ class CropDataFactory:
             If the crop type is not valid for the crop category.
 
         """
+        name = config["name"]
         crop_category = CropCategory(config["crop_category"])
+        crop_type = CropType(config["crop_type"])
+
+        if crop_type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[crop_category]:
+            info_map = {
+                "class": cls.__name__,
+                "function": cls._manufacture_crop_configuration.__name__,
+                "crop_type": crop_type,
+                "crop_category": crop_category,
+                "name": name,
+            }
+            err_name = "Invalid crop category and type combination."
+            err_msg = f"Crop configuration {name=} has {crop_category=} and {crop_type=}."
+            cls._om.add_error(err_name, err_msg, info_map)
+            raise ValueError(f"{err_name} {err_msg}")
+
         plant_category = PlantCategory(config["plant_category"])
         storage_type = StorageType(config["storage_type"])
 
         config["plant_category"] = plant_category
         config["crop_category"] = crop_category
+        config["crop_type"] = crop_type
         config["storage_type"] = storage_type
 
         new_config: CropConfiguration = CropConfiguration(**config)

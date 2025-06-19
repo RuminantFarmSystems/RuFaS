@@ -58,7 +58,6 @@ class Silage(Storage):
             "class": self.__class__.__name__,
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
-            "simulation_day": time.simulation_day,
         }
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
@@ -136,7 +135,6 @@ class Silage(Storage):
         if days_of_effluent_to_process == 0:
             return post_loss_values
 
-        crop.estimated_maximum_effluent = crop.estimate_maximum_effluent()
         dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
             crop.estimated_maximum_effluent, days_of_effluent_to_process
         )
@@ -159,7 +157,7 @@ class Silage(Storage):
 
     def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: RufasTime) -> int:
         """
-        Calculates the number of days of effluent loss to process for an ensiled crop.
+        Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
 
         Parameters
         ----------
@@ -168,22 +166,19 @@ class Silage(Storage):
         time : RufasTime
             RufasTime instance containing the current time of the simulation.
 
-        Returns
-        -------
-        int
-            Number of days to calculate effluent loss for.
-
         Notes
         -----
-        - Effluent loss is fixed at 10 days if the crop is still within the first 10 days of storage.
-        - After that period, it is calculated as the number of days since the last degradation.
-        """
-        days_since_storage = (time.current_date.date() - crop.storage_time).days
+        Effluent loss only occurs in an ensiled crop during the first 10 days of storage, so this method calculates the
+        numbers of days which were in that initial 10-day period between the time when the crop was last degraded and
+        the current time.
 
-        if days_since_storage <= 10:
-            return max(0, min(10, (time.current_date.date() - crop.last_time_degraded).days))
-        else:
-            return (time.current_date.date() - crop.last_time_degraded).days
+        """
+        time_since_last_degradation = crop.last_time_degraded - crop.storage_time
+        days_of_effluent_processed = min(EFFLUENT_CONSTRAINER, time_since_last_degradation.days)
+        time_since_storage = time.current_date.date() - crop.storage_time
+        total_days_of_effluent_since_storage = min(EFFLUENT_CONSTRAINER, time_since_storage.days)
+        days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
+        return days_of_effluent_to_process
 
     def calculate_dry_matter_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
         """
@@ -203,7 +198,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7
+        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
 
         """
         return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
@@ -226,7 +221,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.SIL.5
+        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
@@ -253,7 +248,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
 
         """
         if loss_fraction == 0.0:
@@ -287,7 +282,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
 
         """
         if loss_fraction == 0.0:
