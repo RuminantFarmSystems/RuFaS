@@ -194,6 +194,10 @@ class LactationCurve:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
 
+        Notes
+        -----
+        Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
+
         Parameters
         ----------
         l_param : float
@@ -302,6 +306,11 @@ class LactationCurve:
         """
         Calculates the 305-day milk yield for each lactation group based on total farm milk production.
 
+        Notes
+        -----
+        Herd average 305-day milk yield: [AN.MLK.4]
+        Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
+
         Parameters
         ----------
         annual_milk_yield : float
@@ -376,6 +385,10 @@ class LactationCurve:
     ) -> float:
         """
         Modifies Wood's l parameter to best fit a given 305 day milk yield.
+
+        Notes
+        -----
+        [AN.MLK.8]
 
         Parameters
         ----------
