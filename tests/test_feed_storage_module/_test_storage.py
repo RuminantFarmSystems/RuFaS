@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -39,7 +39,8 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)  # type: ignore[arg-type]
+    crop_type = CropType.WHEAT
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
@@ -69,7 +70,9 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)  # type: ignore[arg-type]
+    incompatible_crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
 
