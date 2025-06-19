@@ -1134,7 +1134,25 @@ class Reproduction:
         )
 
     def _calculate_calf_birth_weight(self, breed: Breed) -> float:
-        """Calculate the birth weight of the calf based on the breed."""
+        """
+         Calculates the birth weight of the calf based on the breed.
+
+        Notes
+        ------
+        [AN.BWT.6]
+
+
+         Parameters
+         ----------
+         breed: Breed
+             The breed of the animal.
+
+         Returns
+         -------
+         float
+             The birth weight for the calf (kg).
+        """
+
         average_birth_weight_by_breed = {
             Breed.HO: AnimalConfig.birth_weight_avg_ho,
             Breed.JE: AnimalConfig.birth_weight_avg_je,
