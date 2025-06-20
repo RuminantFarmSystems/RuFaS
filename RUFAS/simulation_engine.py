@@ -12,11 +12,11 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutr
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import herd_manager
 
 """
 Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
@@ -92,8 +92,8 @@ class SimulationEngine:
             self.herd_manager.herd_statistics,
             self.herd_manager.herd_reproduction_statistics,
             self.time,
-            self.herd_manager.heiferIIs,
-            self.herd_manager.cows,
+            self.herd_manager.heiferII_events_by_id,
+            self.herd_manager.cow_events_by_id,
         )
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
@@ -174,9 +174,8 @@ class SimulationEngine:
         all_manure_data = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.daily_update(all_manure_data, self.time.simulation_day)
 
         self.feed_manager.execute_daily_routine(self.time)
 
@@ -200,8 +199,7 @@ class SimulationEngine:
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
-        for pen in self.herd_manager.all_pens:
-            AnimalModuleReporter.report_ration_interval_data(pen, self.time.simulation_day)
+        self.herd_manager.report_ration_interval_data(self.time.simulation_day)
 
     def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
         """Requests nutrients from the manure manager for each field in the simulation.
@@ -275,8 +273,6 @@ class SimulationEngine:
         feed_class_config = self.im.get_data("feed")
         self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
-        manure_class_config = self.im.get_data("manure_management")
-
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
@@ -291,13 +287,8 @@ class SimulationEngine:
             is_ration_defined_by_user=self.is_ration_defined_by_user,
             available_feeds=self.feed_manager.available_feeds,
         )
-        all_manure_data = self.herd_manager.collect_pen_manure_data()
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        simulate_animals: bool = self.im.get_data("config.simulate_animals")
-        self.manure_manager: ManureManager = ManureManager(
-            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
-        )
+        self.manure_manager: ManureManager = ManureManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:
