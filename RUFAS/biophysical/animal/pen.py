@@ -27,6 +27,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import Nutri
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -643,8 +644,8 @@ class Pen:
             water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
             ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
             nitrogen=pen_animal_excretions.manure_nitrogen,
-            phosphorus=pen_animal_excretions.phosphorus,
-            potassium=pen_animal_excretions.potassium,
+            phosphorus=pen_animal_excretions.phosphorus * GeneralConstants.GRAMS_TO_KG,
+            potassium=pen_animal_excretions.potassium * GeneralConstants.GRAMS_TO_KG,
             ash=0,
             non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
             degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
