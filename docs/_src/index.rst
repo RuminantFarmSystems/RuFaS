@@ -69,7 +69,7 @@ Team Culture
 
 
 Contributing to RuFaS
-----------
+---------------------
 .. toctree::
    :maxdepth: 1
    :caption: Contributing to RuFaS:

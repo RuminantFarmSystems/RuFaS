@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>RUFAS.input_manager module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.input_manager module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.input_manager module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.output_manager.html" rel="next" title="RUFAS.output_manager module"/>
+<link href="RUFAS.graph_generator.html" rel="prev" title="RUFAS.graph_generator module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.input_manager module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-RUFAS.input_manager">
+<span id="rufas-input-manager-module"></span><h1>RUFAS.input_manager module<a class="headerlink" href="#module-RUFAS.input_manager" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.input_manager.</span></span><span class="sig-name descname"><span class="pre">FIXABLE_INPUT_DATA_TYPES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'bool',</span> <span class="pre">'number',</span> <span class="pre">'string'}</span></em><a class="headerlink" href="#RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES'"><span>#</span></a></dt>
+<dd><p>Set enumerating the input data formats the Input Manager can accept.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.input_manager.</span></span><span class="sig-name descname"><span class="pre">InputManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.input_manager.InputManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Input Manager class responsible for loading, validating, and providing access to input data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.__instance">
+<span class="sig-name descname"><span class="pre">__instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.__instance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.__instance'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.meta_data">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meta_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.meta_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.meta_data'"><span>#</span></a></dt>
+<dd><p>The getter method for __metadata</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.pool">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.pool'"><span>#</span></a></dt>
+<dd><p>The getter method for __pool</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.start_data_processing">
+<span class="sig-name descname"><span class="pre">start_data_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.start_data_processing" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.start_data_processing'"><span>#</span></a></dt>
+<dd><p>Starts the pipeline for organizing metadata and input data processing.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>metadata_path<span class="classifier">Path</span></dt><dd><p>File path to the metadata.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool, default=True</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+If False, the process will be terminated after going through and validating the entire data.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if data is valid, otherwise False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_metadata">
+<span class="sig-name descname"><span class="pre">_load_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_metadata" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._load_metadata'"><span>#</span></a></dt>
+<dd><p>Loads metadata from json file to IM metadata dict.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>metadata_path<span class="classifier">Path</span></dt><dd><p>The path to the metadata file.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If an error occurs while opening or reading the metadata_path file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_properties">
+<span class="sig-name descname"><span class="pre">_load_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_properties" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._load_properties'"><span>#</span></a></dt>
+<dd><p>Loads properties data from a specified JSON file and updates the metadata.</p>
+<p>This method reads the properties file path from the metadata, checks if the file exists, and then loads the
+properties into the metadata. The original properties data in the metadata is first copied to a separate
+attribute for future reference and then removed from the metadata files section.</p>
+<section id="id2">
+<h2>Raises<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the properties file does not exist at the specified path.</p>
+</dd>
+<dt>json.JSONDecodeError</dt><dd><p>If there is an error in decoding the JSON file.</p>
+</dd>
+<dt>Exception</dt><dd><p>For any other unexpected errors during properties loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_data_from_json">
+<span class="sig-name descname"><span class="pre">_load_data_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_data_from_json" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._load_data_from_json'"><span>#</span></a></dt>
+<dd><p>Loads data from input json file.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>file_path<span class="classifier">Path</span></dt><dd><p>Path to the input file to load.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>The data dictionary loaded from the json file.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Raises<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Exception</dt><dd><p>For any other unexpected errors during JSON file loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_data_from_csv">
+<span class="sig-name descname"><span class="pre">_load_data_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_data_from_csv" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._load_data_from_csv'"><span>#</span></a></dt>
+<dd><p>Loads data from input csv file.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>file_path<span class="classifier">Path</span></dt><dd><p>Path to the input file to load.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>The data dictionary loaded from the json file.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Raises<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the CSV file does not exist at the specified path.</p>
+</dd>
+<dt>Exception</dt><dd><p>For any other unexpected errors during CSV file loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._populate_pool">
+<span class="sig-name descname"><span class="pre">_populate_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._populate_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._populate_pool'"><span>#</span></a></dt>
+<dd><p>Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
+then adds data to the pool.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+If False, the process will be terminated after going through and validating the entire data,
+If invalid data is found.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if data is valid, otherwise False.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Raises<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If faulty data type found in data blob key.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._get_variable_modifiability">
+<span class="sig-name descname"><span class="pre">_get_variable_modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_validator.html#RUFAS.data_validator.Modifiability" title="RUFAS.data_validator.Modifiability"><span class="pre">Modifiability</span></a></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._get_variable_modifiability" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._get_variable_modifiability'"><span>#</span></a></dt>
+<dd><p>Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+value.</p>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>This function looks for a ‘modifiability’ key within <cite>variable_properties</cite>. If present and its value is not
+empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+correspond to any enum members, a KeyError is raised after logging the error. If ‘modifiability’ is absent or
+its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.</p>
+</section>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable for which the modifiability status is being determined. Used for error logging.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, containing the desired ‘modifiability’ property.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Modifiability</dt><dd><p>An enum member representing the variable’s modifiability status.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Raises<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If ‘modifiability’ in <cite>variable_properties</cite> does not match any enum member in Modifiability. The error
+message includes the invalid modifiability value and suggests valid values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._is_input_required_upon_initialization">
+<span class="sig-name descname"><span class="pre">_is_input_required_upon_initialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._is_input_required_upon_initialization" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._is_input_required_upon_initialization'"><span>#</span></a></dt>
+<dd><p>Determines whether a variable requires an input value upon initialization based on its modifiability status.</p>
+<p>This function utilizes the ‘_get_variable_modifiability’ method to ascertain the modifiability status of the
+variable identified by ‘variable_name’ and described by ‘variable_properties’. It then checks if the
+modifiability status is either ‘REQUIRED_AND_LOCKED’ or ‘REQUIRED_AND_UNLOCKED’, indicating that the variable
+must be initialized with a value.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable being evaluated for its initialization requirements.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, which should include its modifiability status among
+others.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable’s modifiability status necessitates an input value upon initialization,
+False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._is_modifiable_during_runtime">
+<span class="sig-name descname"><span class="pre">_is_modifiable_during_runtime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._is_modifiable_during_runtime" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._is_modifiable_during_runtime'"><span>#</span></a></dt>
+<dd><p>Checks if a variable can be modified during runtime based on its modifiability status.</p>
+<p>This function determines the modifiability status of a variable using the ‘_get_variable_modifiability’ method.
+It assesses whether the variable, identified by ‘variable_name’ and described by ‘variable_properties’, is
+allowed to be modified after initialization. A variable is considered modifiable during runtime if its
+modifiability status is either ‘REQUIRED_AND_UNLOCKED’ or ‘NOT_REQUIRED_AND_UNLOCKED’.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to check for runtime modifiability.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, including details that determine its modifiability.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is allowed to be modified during runtime, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._log_missing_data">
+<span class="sig-name descname"><span class="pre">_log_missing_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._log_missing_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._log_missing_data'"><span>#</span></a></dt>
+<dd><p>Handles logging for missing data for a variable, logging errors or warnings based on the context of
+initialization or runtime updates.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>Properties of the variable, potentially including its modifiability status.</p>
+</dd>
+<dt>var_name<span class="classifier">str</span></dt><dd><p>The name of the variable with missing data.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Raises<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>Raised if the missing data is deemed necessary, either during initialization or for a runtime update.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<p>This function determines if it’s being called during the initialization phase and checks if the missing variable
+data is required at this stage using ‘_is_input_required_upon_initialization’. If required, it logs an error and
+raises a KeyError. If not, it logs a warning.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.get_data'"><span>#</span></a></dt>
+<dd><p>Get the requested data from the pool if it exists. If not, None is returned.</p>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data_address<span class="classifier">str</span></dt><dd><p>The address of the requested data.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h2>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Any</dt><dd><p>The requested data if found. None otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#examples'"><span>#</span></a></h2>
+<p>The user can request as broad or narrow a selection of the input data pool as is needed.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return the value of <cite>calf_num</cite> of the <cite>herd_information</cite> section in the <cite>animal</cite> blob
+(in this example, the value for <cite>calf_num</cite> is 8):
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information.calf_num’)
+8</p>
+<p>If a broader range of data is needed, the user can expand the query to get_data
+by shortening the data_address. This will return the full herd_information object:
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information’)
+{
+calf_num: 8,
+heiferI_num: 44,
+heiferII_num: 38,
+heiferIII_num_springers: 5,
+cow_num: 100,
+herd_num: 187,
+herd_init: False,
+breed: HO
+}</p>
+<p>If the requested data does not exist, the method will return None:
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information.nonexistent_property’)
+None</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.check_property_exists_in_pool">
+<span class="sig-name descname"><span class="pre">check_property_exists_in_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.check_property_exists_in_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.check_property_exists_in_pool'"><span>#</span></a></dt>
+<dd><p>Check if the requested property exists in the pool.</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data_address<span class="classifier">str</span></dt><dd><p>The address of the requested property.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the property exists in the pool, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Examples<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
+<p>The user can check if a property exists in the pool.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return True if the property <cite>calf_num</cite> exists in the <cite>herd_information</cite> section of the <cite>animal</cite> blob:
+&gt;&gt;&gt; input_manager.check_property_exists_in_pool(‘animal.herd_information.calf_num’)
+True</p>
+<p>If the property does not exist, the method will return False:
+&gt;&gt;&gt; input_manager.check_property_exists_in_pool(‘animal.herd_information.nonexistent_property’)
+False</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_metadata" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.get_metadata'"><span>#</span></a></dt>
+<dd><blockquote>
+<div><p>Get the requested metadata from the IM metadata dictionary.</p>
+<dl class="simple">
+<dt>metadata_address<span class="classifier">str</span></dt><dd><p>The address of the requested metadata.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Any</dt><dd><p>The requested metadata if found.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the requested metadata is not found.</p>
+</dd>
+</dl>
+<p>The user can request as broad or narrow a selection of the metadata as is needed.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return the ‘type’ for <cite>albedo</cite> in the <cite>soil_profile_properties</cite> section of the metadata’s properties
+(the type for <cite>albedo</cite> is <cite>number</cite>):
+&gt;&gt;&gt; input_manager.get_metadata(‘properties.soil_profile_properties.albedo.type’)
+“number”</p>
+<p>If a broader range of the metadata is needed, the user can expand the query to get_metadata
+by shortening the metadata_address. This will return the full ‘albedo’ object containing its type,
+description, minimum, maximum, and default:
+&gt;&gt;&gt; input_manager.get_metadata(‘properties.soil_profile_properties.albedo’)
+{
+“type”: “number”,
+“description”: “Ratio of solar radiation reflected by soil to amount of incident upon it.</p>
+</div></blockquote>
+<p>Unitless.
+Reference: SWAT Input .SOL - SOL_ALB”,</p>
+<blockquote>
+<div><p>“minimum”: 0.0,
+“maximum”: 1.0,
+“default”: 0.16
+}</p>
+</div></blockquote>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_data_keys_by_properties">
+<span class="sig-name descname"><span class="pre">get_data_keys_by_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_data_keys_by_properties" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.get_data_keys_by_properties'"><span>#</span></a></dt>
+<dd><p>Retrieves the list of metadata keys that point to data which have the target_properties.</p>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>target_properties<span class="classifier">str</span></dt><dd><p>The name of the metadata properties group that is being searched for.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[str]</dt><dd><p>List of keys which point to data within the Input Manager’s data pool that adhere to the target metadata
+properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h2>Examples<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
+<p>If the metadata looked like the following:
+<a href="#id30"><span class="problematic" id="id31">``</span></a>`
+{</p>
+<blockquote>
+<div><dl>
+<dt>“files”: {</dt><dd><dl class="simple">
+<dt>“field_1”: {</dt><dd><p>“properties”: “field_properties”,
+…</p>
+</dd>
+</dl>
+<p>},
+“soil_1”: {</p>
+<blockquote>
+<div><p>“properties”: “soil_profile_properties”,
+…</p>
+</div></blockquote>
+<p>},
+“field_2”: {</p>
+<blockquote>
+<div><p>“properties”: “field_properties”,
+…</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>},
+“properties”: {…},
+…</p>
+</div></blockquote>
+<section id="id32">
+<h3>}<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<p>The the call <cite>get_data_keys_by_properties(“field_properties”)</cite> would be expected to return the list
+<cite>[“field_1”, “field_2”]</cite>.</p>
+</section>
+</section>
+<section id="id33">
+<h2>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<p>If no keys have the specified property, the method returns an empty list.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.flush_pool">
+<span class="sig-name descname"><span class="pre">flush_pool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.flush_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.flush_pool'"><span>#</span></a></dt>
+<dd><p>Clear the variable pool.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._metadata_properties_exist">
+<span class="sig-name descname"><span class="pre">_metadata_properties_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._metadata_properties_exist" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._metadata_properties_exist'"><span>#</span></a></dt>
+<dd><p>Checks if specific properties exist in the metadata for a given variable.</p>
+<section id="id34">
+<h2>Notes<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<p>This function is designed to verify the existence of specified properties
+within the metadata of a particular variable. It returns a boolean indicating
+the existence of the properties, and a KeyError in case of missing metadata
+or properties.</p>
+</section>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable for which the metadata is to be checked.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key representing the specific properties blob in the metadata to check.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the properties exist, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h2>Raises<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no metadata is loaded in InputManager.__metadata.</p>
+</dd>
+<dt>KeyError</dt><dd><p>If no metadata properties can be found with the given <cite>properties_blob_key</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._add_variable_to_pool">
+<span class="sig-name descname"><span class="pre">_add_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._add_variable_to_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._add_variable_to_pool'"><span>#</span></a></dt>
+<dd><p>Adds a variable to the pool after validating its data against specified metadata properties.</p>
+<section id="id38">
+<h2>Notes<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h2>
+<p>This function processes and validates the input data for a variable based on its metadata properties,
+attempting to fix any invalid elements. If all elements are valid or successfully fixed, the data is added
+to a pool. The function supports eager termination, which can halt the process early if invalid data is
+encountered or if a non-modifiable variable is attempted to be modified during runtime.</p>
+</section>
+<section id="id39">
+<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>input_data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data associated with the variable that needs validation and addition to the pool.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Flag indicating whether the function should return early in case of invalid data.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h2>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is successfully added, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h2>Raises<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If eager_termination is True and the variable failed validation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._prepare_data">
+<span class="sig-name descname"><span class="pre">_prepare_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._prepare_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._prepare_data'"><span>#</span></a></dt>
+<dd><p>Prepare data and metadata properties for validation.</p>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>input_data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data associated with the variable that needs validation and addition to the pool.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h2>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Tuple[List[str], Dict[str, Any], Dict[str, Any]]</dt><dd><p>Prepared element hierarchy, data, and metadata properties.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._check_modifiability">
+<span class="sig-name descname"><span class="pre">_check_modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._check_modifiability" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._check_modifiability'"><span>#</span></a></dt>
+<dd><p>Checks whether a variable is allowed to be modified at runtime.</p>
+<section id="id44">
+<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>metadata_properties<span class="classifier">dict[str, Any]</span></dt><dd><p>Metadata for each property of a variable, including details like type, description, modifiability,
+and validation constraints.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Indicator for the need of eager termination.</p>
+</dd>
+</dl>
+</section>
+<section id="id45">
+<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>Indicator for whether the data is modifiable.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h2>Raises<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>PermissionError</dt><dd><p>If eager_termination is True and the variable is not modifiable during runtime.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._validate_data">
+<span class="sig-name descname"><span class="pre">_validate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_validator.html#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._validate_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._validate_data'"><span>#</span></a></dt>
+<dd><p>Validate input data based on metadata properties.</p>
+<section id="id47">
+<h2>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">dict[str, Any]</span></dt><dd><p>Data to be validated.</p>
+</dd>
+<dt>metadata_properties<span class="classifier">dict[str, Any]</span></dt><dd><p>Metadata for each property of a variable, including details like type, description, modifiability,
+and validation constraints.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Indicator for the need of eager termination.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+<dt>elements_counter<span class="classifier">ElementsCounter</span></dt><dd><p>An ElementsCounter object to keep track of status of variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id48">
+<h2>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>dict[str, Any]</dt><dd><p>A dictionary of validated data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._add_to_pool">
+<span class="sig-name descname"><span class="pre">_add_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._add_to_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._add_to_pool'"><span>#</span></a></dt>
+<dd><p>Add validated data to the pool.</p>
+<section id="id49">
+<h2>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>validated_data<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary of validated data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.add_runtime_variable_to_pool">
+<span class="sig-name descname"><span class="pre">add_runtime_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.add_runtime_variable_to_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.add_runtime_variable_to_pool'"><span>#</span></a></dt>
+<dd><p>Adds a variable to the InputManager’s pool after validating it against metadata.</p>
+<section id="id50">
+<h2>Notes<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
+<p>This function takes in a variable along with its name and a key to access its validation metadata.
+It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.</p>
+</section>
+<section id="id51">
+<h2>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>variable_name: str</dt><dd><p>The name of the dictionary variable to be added.</p>
+</dd>
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data of the variable, structured as a dictionary.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>A key used to locate the metadata for validation of the variable.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+If False, the function returns False.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h2>Returns<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is successfully validated and added to the pool.
+False if the variable is invalid and not added to the pool.</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h2>Raises<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If <cite>data</cite> is not the expected type of Dict[str, Any].</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.dump_get_data_logs">
+<span class="sig-name descname"><span class="pre">dump_get_data_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.dump_get_data_logs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.dump_get_data_logs'"><span>#</span></a></dt>
+<dd><p>Dumps the stored get data logs to a JSON file at the specified path.</p>
+<section id="id54">
+<h2>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>path<span class="classifier">Path</span></dt><dd><p>The directory path where the JSON file will be saved.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.save_metadata_properties">
+<span class="sig-name descname"><span class="pre">save_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.save_metadata_properties" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.save_metadata_properties'"><span>#</span></a></dt>
+<dd><p>Saves metadata properties in CSV format.</p>
+<section id="id55">
+<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The path to the output directory where the metadata properties CSV will be saved.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h2>Raises<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the file cannot be saved at the specified path.</p>
+</dd>
+<dt>PermissionError</dt><dd><p>If the user does not have permission to save the file at the specified path.</p>
+</dd>
+<dt>OSError</dt><dd><p>For any other unexpected error that occurs while trying to save the CSV.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._parse_metadata_properties">
+<span class="sig-name descname"><span class="pre">_parse_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._parse_metadata_properties" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._parse_metadata_properties'"><span>#</span></a></dt>
+<dd><p>Recursively traverse through the metadata properties dictionary
+to flatten it by creating a record for each entry.</p>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties data to be parsed.</p>
+</dd>
+<dt>prefix<span class="classifier">str, optional</span></dt><dd><p>The data record prefix, by default ‘’.</p>
+</dd>
+<dt>sep<span class="classifier">str, optional</span></dt><dd><p>The separator used between parts of the data entry names, by default ‘_’.</p>
+</dd>
+</dl>
+</section>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>List[Dict[str, Any]]</dt><dd><p>A list of flattened data entries from the json file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._check_property_type_primitive">
+<span class="sig-name descname"><span class="pre">_check_property_type_primitive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._check_property_type_primitive" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._check_property_type_primitive'"><span>#</span></a></dt>
+<dd><p>Checks whether the property’s “type” is primitive or an array of primitive types.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._create_record">
+<span class="sig-name descname"><span class="pre">_create_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._create_record" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._create_record'"><span>#</span></a></dt>
+<dd><p>Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.</p>
+<section id="id59">
+<h2>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data_entry<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data entry from the json file to be converted into the record format.</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>The name to be used for the record.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>A dictionary of the data entry converted to the record format.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.compare_metadata_properties">
+<span class="sig-name descname"><span class="pre">compare_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_properties_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.compare_metadata_properties" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.compare_metadata_properties'"><span>#</span></a></dt>
+<dd><p>Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.export_pool_to_csv">
+<span class="sig-name descname"><span class="pre">export_pool_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.export_pool_to_csv" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.export_pool_to_csv'"><span>#</span></a></dt>
+<dd><p>Flatten the interested input data and export the variables with their values into a CSV.</p>
+<section id="id61">
+<h2>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>output_prefix: str</dt><dd><p>The output prefix for the current task.</p>
+</dd>
+<dt>output_path: Path</dt><dd><p>The folder to save the output CSV.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES'" class="reference internal" href="#RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES"><code class="docutils literal notranslate"><span class="pre">FIXABLE_INPUT_DATA_TYPES</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager'" class="reference internal" href="#RUFAS.input_manager.InputManager"><code class="docutils literal notranslate"><span class="pre">InputManager</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.__instance'" class="reference internal" href="#RUFAS.input_manager.InputManager.__instance"><code class="docutils literal notranslate"><span class="pre">InputManager.__instance</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.__init__'" class="reference internal" href="#RUFAS.input_manager.InputManager.__init__"><code class="docutils literal notranslate"><span class="pre">InputManager.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.meta_data'" class="reference internal" href="#RUFAS.input_manager.InputManager.meta_data"><code class="docutils literal notranslate"><span class="pre">InputManager.meta_data</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.pool"><code class="docutils literal notranslate"><span class="pre">InputManager.pool</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.start_data_processing'" class="reference internal" href="#RUFAS.input_manager.InputManager.start_data_processing"><code class="docutils literal notranslate"><span class="pre">InputManager.start_data_processing()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._load_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager._load_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager._load_metadata()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._load_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager._load_properties"><code class="docutils literal notranslate"><span class="pre">InputManager._load_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._load_data_from_json'" class="reference internal" href="#RUFAS.input_manager.InputManager._load_data_from_json"><code class="docutils literal notranslate"><span class="pre">InputManager._load_data_from_json()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._load_data_from_csv'" class="reference internal" href="#RUFAS.input_manager.InputManager._load_data_from_csv"><code class="docutils literal notranslate"><span class="pre">InputManager._load_data_from_csv()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._populate_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager._populate_pool"><code class="docutils literal notranslate"><span class="pre">InputManager._populate_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._get_variable_modifiability'" class="reference internal" href="#RUFAS.input_manager.InputManager._get_variable_modifiability"><code class="docutils literal notranslate"><span class="pre">InputManager._get_variable_modifiability()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._is_input_required_upon_initialization'" class="reference internal" href="#RUFAS.input_manager.InputManager._is_input_required_upon_initialization"><code class="docutils literal notranslate"><span class="pre">InputManager._is_input_required_upon_initialization()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._is_modifiable_during_runtime'" class="reference internal" href="#RUFAS.input_manager.InputManager._is_modifiable_during_runtime"><code class="docutils literal notranslate"><span class="pre">InputManager._is_modifiable_during_runtime()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._log_missing_data'" class="reference internal" href="#RUFAS.input_manager.InputManager._log_missing_data"><code class="docutils literal notranslate"><span class="pre">InputManager._log_missing_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.get_data'" class="reference internal" href="#RUFAS.input_manager.InputManager.get_data"><code class="docutils literal notranslate"><span class="pre">InputManager.get_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.check_property_exists_in_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.check_property_exists_in_pool"><code class="docutils literal notranslate"><span class="pre">InputManager.check_property_exists_in_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.get_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager.get_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager.get_metadata()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.get_data_keys_by_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager.get_data_keys_by_properties"><code class="docutils literal notranslate"><span class="pre">InputManager.get_data_keys_by_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.flush_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.flush_pool"><code class="docutils literal notranslate"><span class="pre">InputManager.flush_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._metadata_properties_exist'" class="reference internal" href="#RUFAS.input_manager.InputManager._metadata_properties_exist"><code class="docutils literal notranslate"><span class="pre">InputManager._metadata_properties_exist()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._add_variable_to_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager._add_variable_to_pool"><code class="docutils literal notranslate"><span class="pre">InputManager._add_variable_to_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._prepare_data'" class="reference internal" href="#RUFAS.input_manager.InputManager._prepare_data"><code class="docutils literal notranslate"><span class="pre">InputManager._prepare_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._check_modifiability'" class="reference internal" href="#RUFAS.input_manager.InputManager._check_modifiability"><code class="docutils literal notranslate"><span class="pre">InputManager._check_modifiability()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._validate_data'" class="reference internal" href="#RUFAS.input_manager.InputManager._validate_data"><code class="docutils literal notranslate"><span class="pre">InputManager._validate_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._add_to_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager._add_to_pool"><code class="docutils literal notranslate"><span class="pre">InputManager._add_to_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.add_runtime_variable_to_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.add_runtime_variable_to_pool"><code class="docutils literal notranslate"><span class="pre">InputManager.add_runtime_variable_to_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.dump_get_data_logs'" class="reference internal" href="#RUFAS.input_manager.InputManager.dump_get_data_logs"><code class="docutils literal notranslate"><span class="pre">InputManager.dump_get_data_logs()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.save_metadata_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager.save_metadata_properties"><code class="docutils literal notranslate"><span class="pre">InputManager.save_metadata_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._parse_metadata_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager._parse_metadata_properties"><code class="docutils literal notranslate"><span class="pre">InputManager._parse_metadata_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._check_property_type_primitive'" class="reference internal" href="#RUFAS.input_manager.InputManager._check_property_type_primitive"><code class="docutils literal notranslate"><span class="pre">InputManager._check_property_type_primitive()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._create_record'" class="reference internal" href="#RUFAS.input_manager.InputManager._create_record"><code class="docutils literal notranslate"><span class="pre">InputManager._create_record()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.compare_metadata_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager.compare_metadata_properties"><code class="docutils literal notranslate"><span class="pre">InputManager.compare_metadata_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.export_pool_to_csv'" class="reference internal" href="#RUFAS.input_manager.InputManager.export_pool_to_csv"><code class="docutils literal notranslate"><span class="pre">InputManager.export_pool_to_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>

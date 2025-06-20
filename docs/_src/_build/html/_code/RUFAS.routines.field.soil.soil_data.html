@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>RUFAS.routines.field.soil.soil_data module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.routines.field.soil.soil_data module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.routines.field.soil.soil_data module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.routines.field.soil.soil_erosion.html" rel="next" title="RUFAS.routines.field.soil.soil_erosion module"/>
+<link href="RUFAS.routines.field.soil.soil_config_factory.html" rel="prev" title="RUFAS.routines.field.soil.soil_config_factory module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.html">RUFAS.routines package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.html">RUFAS.routines.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.field.soil.soil_data module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-RUFAS.routines.field.soil.soil_data">
+<span id="rufas-routines-field-soil-soil-data-module"></span><h1>RUFAS.routines.field.soil.soil_data module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_data" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_data.</span></span><span class="sig-name descname"><span class="pre">SoilData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">'generic</span> <span class="pre">soil</span> <span class="pre">configuration'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_layers:</span> <span class="pre">~typing.List[~RUFAS.routines.field.soil.layer_data.LayerData]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size:</span> <span class="pre">dataclasses.InitVar[float]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_water_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_nitrates_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_soil_evaporation_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_sediment_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_surface_runoff_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_fertilizer_phosphorus:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_soil_phosphorus_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_nitrates_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_ammonium_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_fresh_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_stable_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_active_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_evaporated:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_moisture_condition_parameter:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_retention_parameter:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_condition_parameter:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infiltrated_water:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vadose_zone_layer:</span> <span class="pre">~RUFAS.routines.field.soil.layer_data.LayerData</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">albedo:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_temperature_effect:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_amount:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_day_snow_temperature:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_snow_temperature:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_lag_factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_coverage_fraction:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_base_temperature:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_coverage_maximum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_factor_maximum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">4.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_factor_minimum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">4.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_sublimated:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_sediment:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_runoff_volume:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover_type:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'BARE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_available_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recalcitrant_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runoff_fertilizer_phosphorus:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_application:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rain_events_after_fertilizer_application:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_manure:</span> <span class="pre">~RUFAS.routines.field.soil.manure_pool.ManurePool</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grazing_manure:</span> <span class="pre">~RUFAS.routines.field.soil.manure_pool.ManurePool</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_phosphorus_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrate_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_fresh_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_stable_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_active_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">humus_mineralization_rate_factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denitrification_rate_coefficient:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denitrification_threshold_water_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_fresh_organic_mineralization_rate:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_lignin_composition:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.17</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_lignin_nitrogen_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_metabolic_fraction:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_yield_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a data class that stores and tracks all Soil attributes that are given in input files as well as ones that
+are generated by modules in Soil.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">string, optional, default “generic soil configuration”</span></dt><dd><p>Name of the soil configuration.</p>
+</dd>
+<dt>soil_layers<span class="classifier">List[LayerData], optional, default None</span></dt><dd><p>List of soil layer data objects, where the top layer is the 0th element and the bottom is the nth element.</p>
+</dd>
+<dt>field_size<span class="classifier">InitVar[float], default None</span></dt><dd><p>Size of the field (ha).
+Note: this attribute is only used for initialization. After that, it cannot be used.</p>
+</dd>
+<dt>initial_water_content<span class="classifier">float, default None</span></dt><dd><p>Total soil water content at the beginning of a year, for use in determining annual change (mm).</p>
+</dd>
+<dt>initial_nitrates_total<span class="classifier">float, default None</span></dt><dd><p>Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare).</p>
+</dd>
+<dt>annual_soil_evaporation_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of water evaporated from the soil this year (mm).</p>
+</dd>
+<dt>annual_runoff_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of runoff that occurred in a year (mm).</p>
+</dd>
+<dt>annual_eroded_sediment_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of sediment that eroded in a year (metric tons).</p>
+</dd>
+<dt>annual_surface_runoff_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of the volume of surface runoff that occurred in a year (mm per hectare).</p>
+</dd>
+<dt>annual_runoff_fertilizer_phosphorus<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff (kg).</p>
+</dd>
+<dt>annual_runoff_machine_manure_inorganic_phosphorus<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of inorganic phosphorus from machine-applied manure that was carried off the field by runoff
+(kg).</p>
+</dd>
+<dt>annual_runoff_machine_manure_organic_phosphorus<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of organic phosphorus from machine-applied manure that was carried off the field by runoff
+(kg).</p>
+</dd>
+<dt>annual_runoff_grazing_manure_inorganic_phosphorus<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of inorganic phosphorus from grazer-applied manure that was carried off the field by runoff
+(kg).</p>
+</dd>
+<dt>annual_runoff_grazing_manure_organic_phosphorus<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff (kg).</p>
+</dd>
+<dt>annual_soil_phosphorus_runoff<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg / ha).</p>
+</dd>
+<dt>annual_runoff_nitrates_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of nitrates that were removed from the top soil layer by runoff (kg).</p>
+</dd>
+<dt>annual_runoff_ammonium_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of ammonium that was removed from the top soil layer by runoff (kg).</p>
+</dd>
+<dt>annual_eroded_fresh_organic_nitrogen_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of fresh organic nitrogen that was removed from the top soil layer by erosion (kg).</p>
+</dd>
+<dt>annual_eroded_stable_organic_nitrogen_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of stable organic nitrogen that was removed from the top soil layer by erosion (kg).</p>
+</dd>
+<dt>annual_eroded_active_organic_nitrogen_total<span class="classifier">float, default 0</span></dt><dd><p>Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg).</p>
+</dd>
+<dt>water_evaporated<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of water evaporated from the soil profile on the current day (mm).</p>
+</dd>
+<dt>second_moisture_condition_parameter<span class="classifier">float, default 85</span></dt><dd><p>‘Curve number’ parameter for average moisture conditions equation (unitless).</p>
+</dd>
+<dt>previous_retention_parameter<span class="classifier">Optional[float], default None</span></dt><dd><p>Retention parameter for the previous day (mm) (used in SWAT 2:1.1.9).</p>
+</dd>
+<dt>average_subbasin_slope<span class="classifier">float, default 0.05</span></dt><dd><p>Average slope of the subbasin expressed as rise over run (meters/meters).</p>
+</dd>
+<dt>moisture_condition_parameter<span class="classifier">Optional[float], default None</span></dt><dd><p>Curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11).</p>
+</dd>
+<dt>accumulated_runoff<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of rainfall discharged as runoff on the current day (mm).</p>
+</dd>
+<dt>infiltrated_water<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of water that infiltrated the soil profile on the day (mm).</p>
+</dd>
+<dt>vadose_zone_layer<span class="classifier">Optional[LayerData], default None</span></dt><dd><p>LayerData object that represents the vadose zone layer, where the top depth is set equal to the bottom depth of
+the lowest soil layer and the bottom depth is arbitrary, starting with no water.</p>
+</dd>
+<dt>time_step<span class="classifier">float, default 24</span></dt><dd><p>Length of the time step over which percolation occurs (hours).</p>
+</dd>
+<dt>albedo<span class="classifier">float, default 0.16</span></dt><dd><p>Proportion of solar radiation that is reflected by the soil surface (unitless).</p>
+</dd>
+<dt>previous_temperature_effect<span class="classifier">float, default 0.8</span></dt><dd><p>Variable that controls the influence of the previous day’s temperature on the current day’s temperature, ranging
+from 0 to 1, inclusive. SWAT sets the lag coefficient to 0.8 (unitless).</p>
+</dd>
+<dt>snow_content<span class="classifier">float, default 0.0</span></dt><dd><p>Water content of the snow pack (mm H2O).</p>
+</dd>
+<dt>snow_melt_amount<span class="classifier">float, default 0.0</span></dt><dd><p>Water content of the snow that melted on the current day (mm H2O).</p>
+</dd>
+<dt>previous_day_snow_temperature<span class="classifier">Optional[float], default None</span></dt><dd><p>Snow pack temperature on the previous day (ºC).</p>
+</dd>
+<dt>current_day_snow_temperature<span class="classifier">Optional[float], default None</span></dt><dd><p>Snow pack temperature of the current day (ºC).</p>
+</dd>
+<dt>snow_lag_factor<span class="classifier">float, default 1.0</span></dt><dd><p>Snow pack temperature lag factor (unitless).</p>
+</dd>
+<dt>snow_coverage_fraction<span class="classifier">float, default 1.0</span></dt><dd><p>Fraction of snow coverage (unitless).</p>
+</dd>
+<dt>snow_melt_base_temperature<span class="classifier">float, default 0.5</span></dt><dd><p>Snow melt base temperature (ºC). The snow pack will not melt until the snow pack temperature exceeds this
+threshold value.</p>
+</dd>
+<dt>snow_coverage_maximum<span class="classifier">float, default 1.0</span></dt><dd><p>Minimum snow water content that corresponds to 100% snow cover (mm H2O).</p>
+</dd>
+<dt>snow_melt_factor_maximum<span class="classifier">float, default 4.5</span></dt><dd><p>Melt factor for snow on June 21, SMFMX (mm H2O/°C-day).</p>
+</dd>
+<dt>snow_melt_factor_minimum<span class="classifier">float, default 4.5</span></dt><dd><p>Melt factor for snow on December 21, SMFMN (mm H2O/°C-day).</p>
+</dd>
+<dt>water_sublimated<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of snow water content lost through sublimation on the current day (mm).</p>
+</dd>
+<dt>slope_length<span class="classifier">float, default 3</span></dt><dd><p>Length of the slope (meters).</p>
+</dd>
+<dt>manning<span class="classifier">float, default 0.4</span></dt><dd><p>Manning roughness coefficient for this subbasin (unitless).</p>
+</dd>
+<dt>eroded_sediment<span class="classifier">float, default 0</span></dt><dd><p>Cumulative amount of sediment that has been eroded off of the field in a day (metric tons).</p>
+</dd>
+<dt>surface_runoff_volume<span class="classifier">float, optional, default None</span></dt><dd><p>Volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1.</p>
+</dd>
+<dt>cover_type<span class="classifier">str, default “BARE”</span></dt><dd><p>The cover type of the soil surface, which can be bare, residue covered, or grassed.</p>
+</dd>
+<dt>full_available_phosphorus_pool<span class="classifier">float, default 0</span></dt><dd><p>Starting value of the available phosphorus pool (kg). This value does not change when phosphorus is removed from
+the available phosphorus pool, but does change when a new application of fertilizer phosphorus is applied.</p>
+</dd>
+<dt>available_phosphorus_pool<span class="classifier">float, default 0</span></dt><dd><p>Amount of phosphorus available for soil adsorption and leaching via runoff before the first rainfall event after
+application (kg).</p>
+</dd>
+<dt>recalcitrant_phosphorus_pool<span class="classifier">float, default 0</span></dt><dd><p>Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg).</p>
+</dd>
+<dt>runoff_fertilizer_phosphorus<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of solubilized phosphorus that has been leached off the field by runoff (kg).</p>
+</dd>
+<dt>days_since_application<span class="classifier">int, default 0</span></dt><dd><p>Number of days since phosphorus was applied to the field via fertilizer.</p>
+</dd>
+<dt>rain_events_after_fertilizer_application<span class="classifier">int, default 0</span></dt><dd><p>Number of rain events that have occurred since phosphorus was applied to the field via fertilizer.</p>
+</dd>
+<dt>soil_phosphorus_runoff<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of phosphorus removed from the surface soil layer by runoff (kg / ha).</p>
+</dd>
+<dt>nitrate_runoff<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of nitrate removed from the soil surface by runoff (kg / ha).</p>
+</dd>
+<dt>ammonium_runoff<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of ammonium removed from the soil surface by runoff (kg / ha).</p>
+</dd>
+<dt>eroded_fresh_organic_nitrogen<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of fresh organic nitrogen removed from the soil surface by eroded sediment (kg / ha).</p>
+</dd>
+<dt>eroded_stable_organic_nitrogen<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of stable organic nitrogen removed from the soil surface by eroded sediment (kg / ha).</p>
+</dd>
+<dt>eroded_active_organic_nitrogen<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of active organic nitrogen removed from the soil surface by eroded sediment (kg / ha).</p>
+</dd>
+<dt>humus_mineralization_rate_factor<span class="classifier">float, default 0.0003</span></dt><dd><p>Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
+Reference: SWAT Input .BSN file, see “CMN” on page 101.</p>
+</dd>
+<dt>denitrification_rate_coefficient<span class="classifier">float, default 1.4</span></dt><dd><p>Controls the rate of denitrification in this layer of soil (unitless).
+Note: acceptable values for this attribute are in the range [0.0, 3.0].
+Reference: SWAT Input .BSN file, see “CDN” on page 101.</p>
+</dd>
+<dt>denitrification_threshold_water_content<span class="classifier">float, default 1.10</span></dt><dd><p>Fraction of field capacity water content above which denitrification takes place (unitless).
+Reference: SWAT Input .BSN file, see “SDNCO” on page 102.</p>
+</dd>
+<dt>residue_fresh_organic_mineralization_rate<span class="classifier">float, default 0.05</span></dt><dd><p>Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
+Reference: SWAT Input .BSN file (see “RSDCO” on page 101) and SWAT Input CROP.DAT file (see “RSDCO_PL” on page
+205).</p>
+</dd>
+<dt>plant_residue_lignin_composition<span class="classifier">float, default 0.17</span></dt><dd><p>Lignin fraction of plant residue (unitless).</p>
+</dd>
+<dt>plant_lignin_nitrogen_ratio<span class="classifier">float, default 0</span></dt><dd><p>Plant lignin to nitrogen ratio (unitless).</p>
+</dd>
+<dt>plant_residue_metabolic_fraction<span class="classifier">float, default 0</span></dt><dd><p>Plant residue fraction that is metabolic (unitless).</p>
+</dd>
+<dt>crop_yield_nitrogen<span class="classifier">float, default 0</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
+</dd>
+<dt>machine_manure<span class="classifier">ManurePool</span></dt><dd><p>A ManurePool instance holding data for machine-applied manure.</p>
+</dd>
+<dt>grazing_manure<span class="classifier">ManurePool</span></dt><dd><p>A ManurePool instance holding data for grazing-applied manure</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'generic</span> <span class="pre">soil</span> <span class="pre">configuration'</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.name" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.name'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.soil_layers">
+<span class="sig-name descname"><span class="pre">soil_layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.soil.layer_data.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.soil_layers'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.field_size">
+<span class="sig-name descname"><span class="pre">field_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dataclasses.InitVar</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.field_size" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.field_size'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.initial_water_content">
+<span class="sig-name descname"><span class="pre">initial_water_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.initial_water_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.initial_water_content'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.initial_nitrates_total">
+<span class="sig-name descname"><span class="pre">initial_nitrates_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.initial_nitrates_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.initial_nitrates_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_evaporation_total">
+<span class="sig-name descname"><span class="pre">annual_soil_evaporation_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_evaporation_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_evaporation_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_total">
+<span class="sig-name descname"><span class="pre">annual_runoff_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_sediment_total">
+<span class="sig-name descname"><span class="pre">annual_eroded_sediment_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_sediment_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_sediment_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_surface_runoff_total">
+<span class="sig-name descname"><span class="pre">annual_surface_runoff_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_surface_runoff_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_surface_runoff_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_fertilizer_phosphorus">
+<span class="sig-name descname"><span class="pre">annual_runoff_fertilizer_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_fertilizer_phosphorus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_fertilizer_phosphorus'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_phosphorus_runoff">
+<span class="sig-name descname"><span class="pre">annual_soil_phosphorus_runoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_phosphorus_runoff" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_phosphorus_runoff'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_nitrates_total">
+<span class="sig-name descname"><span class="pre">annual_runoff_nitrates_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_nitrates_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_nitrates_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_ammonium_total">
+<span class="sig-name descname"><span class="pre">annual_runoff_ammonium_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_ammonium_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_ammonium_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_fresh_organic_nitrogen_total">
+<span class="sig-name descname"><span class="pre">annual_eroded_fresh_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_fresh_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_fresh_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_stable_organic_nitrogen_total">
+<span class="sig-name descname"><span class="pre">annual_eroded_stable_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_stable_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_stable_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_active_organic_nitrogen_total">
+<span class="sig-name descname"><span class="pre">annual_eroded_active_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_active_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_active_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.water_evaporated">
+<span class="sig-name descname"><span class="pre">water_evaporated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.water_evaporated" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.water_evaporated'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.second_moisture_condition_parameter">
+<span class="sig-name descname"><span class="pre">second_moisture_condition_parameter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">85</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.second_moisture_condition_parameter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.second_moisture_condition_parameter'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.previous_retention_parameter">
+<span class="sig-name descname"><span class="pre">previous_retention_parameter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_retention_parameter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.previous_retention_parameter'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.average_subbasin_slope">
+<span class="sig-name descname"><span class="pre">average_subbasin_slope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.05</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.average_subbasin_slope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.average_subbasin_slope'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.moisture_condition_parameter">
+<span class="sig-name descname"><span class="pre">moisture_condition_parameter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.moisture_condition_parameter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.moisture_condition_parameter'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.accumulated_runoff">
+<span class="sig-name descname"><span class="pre">accumulated_runoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.accumulated_runoff" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.accumulated_runoff'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.infiltrated_water">
+<span class="sig-name descname"><span class="pre">infiltrated_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.infiltrated_water" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.infiltrated_water'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.vadose_zone_layer">
+<span class="sig-name descname"><span class="pre">vadose_zone_layer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.soil.layer_data.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.vadose_zone_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.vadose_zone_layer'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.time_step">
+<span class="sig-name descname"><span class="pre">time_step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">24</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.time_step" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.time_step'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.albedo">
+<span class="sig-name descname"><span class="pre">albedo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.16</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.albedo" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.albedo'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.previous_temperature_effect">
+<span class="sig-name descname"><span class="pre">previous_temperature_effect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.8</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_temperature_effect" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.previous_temperature_effect'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_content">
+<span class="sig-name descname"><span class="pre">snow_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_content'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_amount">
+<span class="sig-name descname"><span class="pre">snow_melt_amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_amount'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.previous_day_snow_temperature">
+<span class="sig-name descname"><span class="pre">previous_day_snow_temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_day_snow_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.previous_day_snow_temperature'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.current_day_snow_temperature">
+<span class="sig-name descname"><span class="pre">current_day_snow_temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.current_day_snow_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.current_day_snow_temperature'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_lag_factor">
+<span class="sig-name descname"><span class="pre">snow_lag_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_lag_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_lag_factor'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_fraction">
+<span class="sig-name descname"><span class="pre">snow_coverage_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_fraction'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_base_temperature">
+<span class="sig-name descname"><span class="pre">snow_melt_base_temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_base_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_base_temperature'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_maximum">
+<span class="sig-name descname"><span class="pre">snow_coverage_maximum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_maximum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_maximum'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_maximum">
+<span class="sig-name descname"><span class="pre">snow_melt_factor_maximum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.5</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_maximum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_maximum'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_minimum">
+<span class="sig-name descname"><span class="pre">snow_melt_factor_minimum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.5</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_minimum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_minimum'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.water_sublimated">
+<span class="sig-name descname"><span class="pre">water_sublimated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.water_sublimated" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.water_sublimated'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.slope_length">
+<span class="sig-name descname"><span class="pre">slope_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.slope_length" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.slope_length'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.manning">
+<span class="sig-name descname"><span class="pre">manning</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.manning" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.manning'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.eroded_sediment">
+<span class="sig-name descname"><span class="pre">eroded_sediment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_sediment" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_sediment'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.surface_runoff_volume">
+<span class="sig-name descname"><span class="pre">surface_runoff_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.surface_runoff_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.surface_runoff_volume'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.cover_type">
+<span class="sig-name descname"><span class="pre">cover_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BARE'</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.cover_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.cover_type'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.full_available_phosphorus_pool">
+<span class="sig-name descname"><span class="pre">full_available_phosphorus_pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.full_available_phosphorus_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.full_available_phosphorus_pool'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.available_phosphorus_pool">
+<span class="sig-name descname"><span class="pre">available_phosphorus_pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.available_phosphorus_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.available_phosphorus_pool'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.recalcitrant_phosphorus_pool">
+<span class="sig-name descname"><span class="pre">recalcitrant_phosphorus_pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.recalcitrant_phosphorus_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.recalcitrant_phosphorus_pool'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus">
+<span class="sig-name descname"><span class="pre">runoff_fertilizer_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.days_since_application">
+<span class="sig-name descname"><span class="pre">days_since_application</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.days_since_application" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.days_since_application'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.rain_events_after_fertilizer_application">
+<span class="sig-name descname"><span class="pre">rain_events_after_fertilizer_application</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.rain_events_after_fertilizer_application" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.rain_events_after_fertilizer_application'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.machine_manure">
+<span class="sig-name descname"><span class="pre">machine_manure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.soil.manure_pool.html#RUFAS.routines.field.soil.manure_pool.ManurePool" title="RUFAS.routines.field.soil.manure_pool.ManurePool"><span class="pre">ManurePool</span></a></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.machine_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.machine_manure'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.grazing_manure">
+<span class="sig-name descname"><span class="pre">grazing_manure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.soil.manure_pool.html#RUFAS.routines.field.soil.manure_pool.ManurePool" title="RUFAS.routines.field.soil.manure_pool.ManurePool"><span class="pre">ManurePool</span></a></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.grazing_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.grazing_manure'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.soil_phosphorus_runoff">
+<span class="sig-name descname"><span class="pre">soil_phosphorus_runoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_phosphorus_runoff" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.soil_phosphorus_runoff'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.nitrate_runoff">
+<span class="sig-name descname"><span class="pre">nitrate_runoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.nitrate_runoff" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.nitrate_runoff'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.ammonium_runoff">
+<span class="sig-name descname"><span class="pre">ammonium_runoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.ammonium_runoff" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.ammonium_runoff'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.eroded_fresh_organic_nitrogen">
+<span class="sig-name descname"><span class="pre">eroded_fresh_organic_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_fresh_organic_nitrogen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_fresh_organic_nitrogen'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.eroded_stable_organic_nitrogen">
+<span class="sig-name descname"><span class="pre">eroded_stable_organic_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_stable_organic_nitrogen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_stable_organic_nitrogen'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.eroded_active_organic_nitrogen">
+<span class="sig-name descname"><span class="pre">eroded_active_organic_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_active_organic_nitrogen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_active_organic_nitrogen'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.humus_mineralization_rate_factor">
+<span class="sig-name descname"><span class="pre">humus_mineralization_rate_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0003</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.humus_mineralization_rate_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.humus_mineralization_rate_factor'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.denitrification_rate_coefficient">
+<span class="sig-name descname"><span class="pre">denitrification_rate_coefficient</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.4</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_rate_coefficient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_rate_coefficient'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.denitrification_threshold_water_content">
+<span class="sig-name descname"><span class="pre">denitrification_threshold_water_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.1</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_threshold_water_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_threshold_water_content'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.residue_fresh_organic_mineralization_rate">
+<span class="sig-name descname"><span class="pre">residue_fresh_organic_mineralization_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.05</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.residue_fresh_organic_mineralization_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.residue_fresh_organic_mineralization_rate'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_lignin_composition">
+<span class="sig-name descname"><span class="pre">plant_residue_lignin_composition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.17</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_lignin_composition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_lignin_composition'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.plant_lignin_nitrogen_ratio">
+<span class="sig-name descname"><span class="pre">plant_lignin_nitrogen_ratio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_lignin_nitrogen_ratio" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.plant_lignin_nitrogen_ratio'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_metabolic_fraction">
+<span class="sig-name descname"><span class="pre">plant_residue_metabolic_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_metabolic_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_metabolic_fraction'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.crop_yield_nitrogen">
+<span class="sig-name descname"><span class="pre">crop_yield_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.crop_yield_nitrogen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.crop_yield_nitrogen'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.total_residue">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_residue</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.total_residue" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.total_residue'"><span>#</span></a></dt>
+<dd><p>Amount of total plant residue, above and below-ground, on the field which is to be transferred to litter pools
+in the soil profile (kg/ha).</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData._subdivide_top_layer">
+<span class="sig-name descname"><span class="pre">_subdivide_top_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData._subdivide_top_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData._subdivide_top_layer'"><span>#</span></a></dt>
+<dd><p>This method ensures that the soil profile has a top layer that is 20 mm deep.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>The presence of a top layer of soil that is 20 mm deep is a necessity to properly execute SurPhos. This top 20
+mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
+20 mm of soil makes it more available to be eroded off the field by runoff.</p>
+<p>This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute">
+<span class="sig-name descname"><span class="pre">get_vectorized_layer_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute'"><span>#</span></a></dt>
+<dd><p>Returns a list containing the specified attribute for each soil layer.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>attribute<span class="classifier">str</span></dt><dd><p>The LayerData attribute or property to be vectorized.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>layered_attribute<span class="classifier">list[any]</span></dt><dd><p>Values of the specified attribute for each layer.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.set_vectorized_layer_attribute">
+<span class="sig-name descname"><span class="pre">set_vectorized_layer_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.set_vectorized_layer_attribute" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.set_vectorized_layer_attribute'"><span>#</span></a></dt>
+<dd><p>Sets a given attribute for all layers in soil_data.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>attribute<span class="classifier">str</span></dt><dd><p>The LayerData attribute to set.</p>
+</dd>
+<dt>values<span class="classifier">list[any]</span></dt><dd><p>Values of the attribute to set for each layer.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.do_annual_reset">
+<span class="sig-name descname"><span class="pre">do_annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.do_annual_reset" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.do_annual_reset'"><span>#</span></a></dt>
+<dd><p>This method resets all annual totals to zero at the end of the year/beginning of a new year</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_soil_water_content">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_soil_water_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_soil_water_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_soil_water_content'"><span>#</span></a></dt>
+<dd><p>Calculate the amount of water in the entire soil profile (excluding the amount of water held in the profile at
+the wilting point) (mm).</p>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total soil water content in millimeters (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<p>This method calculates the total soil water content in the entire soil profile. It assumes that the lower bound
+of water is 0. The calculation is done per layer, meaning that if one layer has water content greater than its
+wilting water point and another layer has water content less than its wilting point, the first layer will not
+have to compensate for the deficit in the second layer.</p>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_saturation">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_saturation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_saturation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_saturation'"><span>#</span></a></dt>
+<dd><p>Calculate the amount of water in the soil profile when completely saturated (mm).</p>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The saturated soil water content in millimeters (mm).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_field_capacity">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_field_capacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_field_capacity" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_field_capacity'"><span>#</span></a></dt>
+<dd><p>Calculate the total amount of water contained in the entire soil profile at field capacity
+(but not saturated) (mm).</p>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The soil water content at field capacity in millimeters (mm).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">soil_water_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor'"><span>#</span></a></dt>
+<dd><p>Get the soil water factor (unitless).</p>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The soil water factor, in the range [0.0, 1.0] (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h3>
+<p>SWAT Theoretical documentation eqn. 5:2.3.18</p>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_bulk_density">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_bulk_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_bulk_density" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_bulk_density'"><span>#</span></a></dt>
+<dd><p>Calculate the average bulk density of the soil profile based on the bulk density of each soil layer,
+weighted by the thickness.</p>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The average bulk density of the soil profile (Mg per cubic meter).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_nitrates_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_nitrates_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_nitrates_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_nitrates_total'"><span>#</span></a></dt>
+<dd><p>Calculate and return the total amount of nitrates in the soil.</p>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of nitrates in the soil (kg per hectare).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_ammonium_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_ammonium_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_ammonium_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_ammonium_total'"><span>#</span></a></dt>
+<dd><p>Calculate and return the total amount of nitrates in the soil.</p>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of ammonium in the soil (kg / ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_active_organic_nitrogen_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_active_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_active_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_active_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd><p>Calculate and return the total amount of active organic nitrogen in the soil.</p>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of active organic nitrogen in the soil (kg / ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_stable_organic_nitrogen_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_stable_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_stable_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_stable_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd><p>Calculate and return the total amount of stable organic nitrogen in the soil.</p>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of stable organic nitrogen in the soil (kg / ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_fresh_organic_nitrogen_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_fresh_organic_nitrogen_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_fresh_organic_nitrogen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_fresh_organic_nitrogen_total'"><span>#</span></a></dt>
+<dd><p>Calculate and return the total amount of fresh organic nitrogen in the soil.</p>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of fresh organic nitrogen in the soil (kg / ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.cover_factor">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cover_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.cover_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.cover_factor'"><span>#</span></a></dt>
+<dd><p>Returns the cover factor based on the cover type for determining phosphorus absorption by soil
+from surface-applied fertilizer before the first rainfall event after application.</p>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The cover factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the cover type is not one of the acceptable types (“BARE”, “RESIDUE_COVER”, or “GRASSED”).</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>References<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<p>pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants may differ between documents; defer to
+pseudocode_soil and old code).</p>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.solubilizing_factor">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solubilizing_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.solubilizing_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.solubilizing_factor'"><span>#</span></a></dt>
+<dd><p>Returns the fraction of fertilizer phosphorus removed from the available or recalcitrant pool based on the
+number of rain events.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>rain_events<span class="classifier">int</span></dt><dd><p>The number of rain events.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The fraction of fertilizer phosphorus removed (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>References<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<p>SurPhos paragraph just below [16].</p>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_total">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_carbon_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_total'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_emissions">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">profile_carbon_emissions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_emissions'"><span>#</span></a></dt>
+<dd><p>Calculates the total amount of CO2 respirated from the soil profile.</p>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">average_clay_percent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent'"><span>#</span></a></dt>
+<dd><p>Calculates the average percent of soil.</p>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Average clay percent of the soil (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_data.SoilData.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">'generic</span> <span class="pre">soil</span> <span class="pre">configuration'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_layers:</span> <span class="pre">~typing.List[~RUFAS.routines.field.soil.layer_data.LayerData]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size:</span> <span class="pre">dataclasses.InitVar[float]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_water_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_nitrates_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_soil_evaporation_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_sediment_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_surface_runoff_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_fertilizer_phosphorus:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_soil_phosphorus_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_nitrates_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_runoff_ammonium_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_fresh_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_stable_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_eroded_active_organic_nitrogen_total:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_evaporated:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_moisture_condition_parameter:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_retention_parameter:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_condition_parameter:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infiltrated_water:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vadose_zone_layer:</span> <span class="pre">~RUFAS.routines.field.soil.layer_data.LayerData</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">albedo:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_temperature_effect:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_amount:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_day_snow_temperature:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_snow_temperature:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_lag_factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_coverage_fraction:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_base_temperature:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_coverage_maximum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_factor_maximum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">4.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_melt_factor_minimum:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">4.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_sublimated:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_sediment:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_runoff_volume:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover_type:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'BARE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_available_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recalcitrant_phosphorus_pool:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runoff_fertilizer_phosphorus:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_application:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rain_events_after_fertilizer_application:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_manure:</span> <span class="pre">~RUFAS.routines.field.soil.manure_pool.ManurePool</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grazing_manure:</span> <span class="pre">~RUFAS.routines.field.soil.manure_pool.ManurePool</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_phosphorus_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrate_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_runoff:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_fresh_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_stable_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_active_organic_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">humus_mineralization_rate_factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denitrification_rate_coefficient:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denitrification_threshold_water_content:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_fresh_organic_mineralization_rate:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_lignin_composition:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.17</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_lignin_nitrogen_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_residue_metabolic_fraction:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_yield_nitrogen:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_data.SoilData.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.soil.soil_data.SoilData.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+</section>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData"><code class="docutils literal notranslate"><span class="pre">SoilData</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.name'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.name"><code class="docutils literal notranslate"><span class="pre">SoilData.name</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.soil_layers'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_layers"><code class="docutils literal notranslate"><span class="pre">SoilData.soil_layers</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.field_size'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.field_size"><code class="docutils literal notranslate"><span class="pre">SoilData.field_size</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.initial_water_content'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.initial_water_content"><code class="docutils literal notranslate"><span class="pre">SoilData.initial_water_content</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.initial_nitrates_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.initial_nitrates_total"><code class="docutils literal notranslate"><span class="pre">SoilData.initial_nitrates_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_evaporation_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_evaporation_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_soil_evaporation_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_runoff_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_sediment_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_sediment_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_eroded_sediment_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_surface_runoff_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_surface_runoff_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_surface_runoff_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_fertilizer_phosphorus'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_fertilizer_phosphorus"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_runoff_fertilizer_phosphorus</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_phosphorus_runoff'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_soil_phosphorus_runoff"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_soil_phosphorus_runoff</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_nitrates_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_nitrates_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_runoff_nitrates_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_ammonium_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_runoff_ammonium_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_runoff_ammonium_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_fresh_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_fresh_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_eroded_fresh_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_stable_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_stable_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_eroded_stable_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_active_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.annual_eroded_active_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.annual_eroded_active_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.water_evaporated'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.water_evaporated"><code class="docutils literal notranslate"><span class="pre">SoilData.water_evaporated</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.second_moisture_condition_parameter'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.second_moisture_condition_parameter"><code class="docutils literal notranslate"><span class="pre">SoilData.second_moisture_condition_parameter</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.previous_retention_parameter'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_retention_parameter"><code class="docutils literal notranslate"><span class="pre">SoilData.previous_retention_parameter</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.average_subbasin_slope'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.average_subbasin_slope"><code class="docutils literal notranslate"><span class="pre">SoilData.average_subbasin_slope</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.moisture_condition_parameter'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.moisture_condition_parameter"><code class="docutils literal notranslate"><span class="pre">SoilData.moisture_condition_parameter</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.accumulated_runoff'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.accumulated_runoff"><code class="docutils literal notranslate"><span class="pre">SoilData.accumulated_runoff</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.infiltrated_water'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.infiltrated_water"><code class="docutils literal notranslate"><span class="pre">SoilData.infiltrated_water</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.vadose_zone_layer'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.vadose_zone_layer"><code class="docutils literal notranslate"><span class="pre">SoilData.vadose_zone_layer</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.time_step'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.time_step"><code class="docutils literal notranslate"><span class="pre">SoilData.time_step</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.albedo'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.albedo"><code class="docutils literal notranslate"><span class="pre">SoilData.albedo</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.previous_temperature_effect'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_temperature_effect"><code class="docutils literal notranslate"><span class="pre">SoilData.previous_temperature_effect</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_content'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_content"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_content</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_amount'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_amount"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_melt_amount</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.previous_day_snow_temperature'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.previous_day_snow_temperature"><code class="docutils literal notranslate"><span class="pre">SoilData.previous_day_snow_temperature</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.current_day_snow_temperature'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.current_day_snow_temperature"><code class="docutils literal notranslate"><span class="pre">SoilData.current_day_snow_temperature</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_lag_factor'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_lag_factor"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_lag_factor</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_fraction"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_coverage_fraction</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_base_temperature'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_base_temperature"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_melt_base_temperature</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_maximum'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_coverage_maximum"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_coverage_maximum</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_maximum'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_maximum"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_melt_factor_maximum</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_minimum'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.snow_melt_factor_minimum"><code class="docutils literal notranslate"><span class="pre">SoilData.snow_melt_factor_minimum</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.water_sublimated'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.water_sublimated"><code class="docutils literal notranslate"><span class="pre">SoilData.water_sublimated</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.slope_length'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.slope_length"><code class="docutils literal notranslate"><span class="pre">SoilData.slope_length</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.manning'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.manning"><code class="docutils literal notranslate"><span class="pre">SoilData.manning</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_sediment'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_sediment"><code class="docutils literal notranslate"><span class="pre">SoilData.eroded_sediment</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.surface_runoff_volume'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.surface_runoff_volume"><code class="docutils literal notranslate"><span class="pre">SoilData.surface_runoff_volume</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.cover_type'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.cover_type"><code class="docutils literal notranslate"><span class="pre">SoilData.cover_type</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.full_available_phosphorus_pool'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.full_available_phosphorus_pool"><code class="docutils literal notranslate"><span class="pre">SoilData.full_available_phosphorus_pool</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.available_phosphorus_pool'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.available_phosphorus_pool"><code class="docutils literal notranslate"><span class="pre">SoilData.available_phosphorus_pool</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.recalcitrant_phosphorus_pool'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.recalcitrant_phosphorus_pool"><code class="docutils literal notranslate"><span class="pre">SoilData.recalcitrant_phosphorus_pool</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus"><code class="docutils literal notranslate"><span class="pre">SoilData.runoff_fertilizer_phosphorus</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.days_since_application'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.days_since_application"><code class="docutils literal notranslate"><span class="pre">SoilData.days_since_application</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.rain_events_after_fertilizer_application'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.rain_events_after_fertilizer_application"><code class="docutils literal notranslate"><span class="pre">SoilData.rain_events_after_fertilizer_application</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.machine_manure'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.machine_manure"><code class="docutils literal notranslate"><span class="pre">SoilData.machine_manure</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.grazing_manure'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.grazing_manure"><code class="docutils literal notranslate"><span class="pre">SoilData.grazing_manure</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.soil_phosphorus_runoff'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_phosphorus_runoff"><code class="docutils literal notranslate"><span class="pre">SoilData.soil_phosphorus_runoff</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.nitrate_runoff'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.nitrate_runoff"><code class="docutils literal notranslate"><span class="pre">SoilData.nitrate_runoff</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.ammonium_runoff'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.ammonium_runoff"><code class="docutils literal notranslate"><span class="pre">SoilData.ammonium_runoff</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_fresh_organic_nitrogen'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_fresh_organic_nitrogen"><code class="docutils literal notranslate"><span class="pre">SoilData.eroded_fresh_organic_nitrogen</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_stable_organic_nitrogen'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_stable_organic_nitrogen"><code class="docutils literal notranslate"><span class="pre">SoilData.eroded_stable_organic_nitrogen</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.eroded_active_organic_nitrogen'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.eroded_active_organic_nitrogen"><code class="docutils literal notranslate"><span class="pre">SoilData.eroded_active_organic_nitrogen</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.humus_mineralization_rate_factor'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.humus_mineralization_rate_factor"><code class="docutils literal notranslate"><span class="pre">SoilData.humus_mineralization_rate_factor</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_rate_coefficient'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_rate_coefficient"><code class="docutils literal notranslate"><span class="pre">SoilData.denitrification_rate_coefficient</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_threshold_water_content'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.denitrification_threshold_water_content"><code class="docutils literal notranslate"><span class="pre">SoilData.denitrification_threshold_water_content</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.residue_fresh_organic_mineralization_rate'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.residue_fresh_organic_mineralization_rate"><code class="docutils literal notranslate"><span class="pre">SoilData.residue_fresh_organic_mineralization_rate</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_lignin_composition'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_lignin_composition"><code class="docutils literal notranslate"><span class="pre">SoilData.plant_residue_lignin_composition</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.plant_lignin_nitrogen_ratio'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_lignin_nitrogen_ratio"><code class="docutils literal notranslate"><span class="pre">SoilData.plant_lignin_nitrogen_ratio</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_metabolic_fraction'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.plant_residue_metabolic_fraction"><code class="docutils literal notranslate"><span class="pre">SoilData.plant_residue_metabolic_fraction</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.crop_yield_nitrogen'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.crop_yield_nitrogen"><code class="docutils literal notranslate"><span class="pre">SoilData.crop_yield_nitrogen</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.total_residue'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.total_residue"><code class="docutils literal notranslate"><span class="pre">SoilData.total_residue</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData._subdivide_top_layer'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData._subdivide_top_layer"><code class="docutils literal notranslate"><span class="pre">SoilData._subdivide_top_layer()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute"><code class="docutils literal notranslate"><span class="pre">SoilData.get_vectorized_layer_attribute()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.set_vectorized_layer_attribute'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.set_vectorized_layer_attribute"><code class="docutils literal notranslate"><span class="pre">SoilData.set_vectorized_layer_attribute()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.do_annual_reset'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.do_annual_reset"><code class="docutils literal notranslate"><span class="pre">SoilData.do_annual_reset()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_soil_water_content'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_soil_water_content"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_soil_water_content</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_saturation'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_saturation"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_saturation</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_field_capacity'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_field_capacity"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_field_capacity</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor"><code class="docutils literal notranslate"><span class="pre">SoilData.soil_water_factor</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_bulk_density'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_bulk_density"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_bulk_density</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_nitrates_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_nitrates_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_nitrates_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_ammonium_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_ammonium_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_ammonium_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_active_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_active_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_active_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_stable_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_stable_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_stable_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_fresh_organic_nitrogen_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_fresh_organic_nitrogen_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_fresh_organic_nitrogen_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.cover_factor'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.cover_factor"><code class="docutils literal notranslate"><span class="pre">SoilData.cover_factor</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.solubilizing_factor'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.solubilizing_factor"><code class="docutils literal notranslate"><span class="pre">SoilData.solubilizing_factor</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_total'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_total"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_carbon_total</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_emissions'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.profile_carbon_emissions"><code class="docutils literal notranslate"><span class="pre">SoilData.profile_carbon_emissions</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent"><code class="docutils literal notranslate"><span class="pre">SoilData.average_clay_percent</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.soil.soil_data.SoilData.__init__'" class="reference internal" href="#RUFAS.routines.field.soil.soil_data.SoilData.__init__"><code class="docutils literal notranslate"><span class="pre">SoilData.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>

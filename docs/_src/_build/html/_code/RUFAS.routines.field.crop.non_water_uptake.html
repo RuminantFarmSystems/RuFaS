@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>RUFAS.routines.field.crop.non_water_uptake module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.routines.field.crop.non_water_uptake module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.routines.field.crop.non_water_uptake module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.routines.field.crop.nutrient_uptake.html" rel="next" title="RUFAS.routines.field.crop.nutrient_uptake module"/>
+<link href="RUFAS.routines.field.crop.nitrogen_uptake.html" rel="prev" title="RUFAS.routines.field.crop.nitrogen_uptake module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.html">RUFAS.routines package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.html">RUFAS.routines.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.field.crop.html">RUFAS.routines.field.crop package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.field.crop.non_water_uptake module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-RUFAS.routines.field.crop.non_water_uptake">
+<span id="rufas-routines-field-crop-non-water-uptake-module"></span><h1>RUFAS.routines.field.crop.non_water_uptake module<a class="headerlink" href="#module-RUFAS.routines.field.crop.non_water_uptake" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">NonWaterUptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_distro_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_nutrient_uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_nutrient_potentials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unmet_nutrient_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_requests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_nutrient_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_nutrient_uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake'"><span>#</span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.field.crop.nutrient_uptake.html#RUFAS.routines.field.crop.nutrient_uptake.NutrientUptake" title="RUFAS.routines.field.crop.nutrient_uptake.NutrientUptake"><code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientUptake</span></code></a></p>
+<p>Manages non-water uptakes in crops.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>crop_data<span class="classifier">Optional[CropData], optional</span></dt><dd><p>An instance of <cite>CropData</cite> containing crop specifications and attributes.
+Defaults to a new instance of <cite>CropData</cite> if not provided.</p>
+</dd>
+<dt>nutrient_distro_param<span class="classifier">float, default 10.0</span></dt><dd><p>Nutrient uptake distribution parameter (unitless).</p>
+</dd>
+<dt>nutrient_shapes<span class="classifier">Optional[List[float]], default None</span></dt><dd><p>Shape coefficients for nutrient uptake equations (unitless).</p>
+</dd>
+<dt>previous_nutrient: Optional[float], default None</dt><dd><p>Nutrient in biomass on the previous day (kg/ha).</p>
+</dd>
+<dt>potential_nutrient_uptake<span class="classifier">Optional[float], default None</span></dt><dd><p>Potential nutrient uptake under ideal conditions (kg/ha).</p>
+</dd>
+<dt>layer_nutrient_potentials<span class="classifier">Optional[float], default None</span></dt><dd><p>Potential nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+<dt>unmet_nutrient_demands<span class="classifier">Optional[float], default None</span></dt><dd><p>Unmet nutrient demands by overlaying soil layers (kg/ha).</p>
+</dd>
+<dt>nutrient_requests<span class="classifier">Optional[float], default None</span></dt><dd><p>Nutrient requested from each soil layer (kg/ha).</p>
+</dd>
+<dt>actual_nutrient_uptakes<span class="classifier">Optional[List[float]], default None</span></dt><dd><p>Actual nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+<dt>total_nutrient_uptake<span class="classifier">Optional[float], default None</span></dt><dd><p>Total nutrient uptake by the plant (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>nutrient_distro_param<span class="classifier">float</span></dt><dd><p>Nutrient uptake distribution parameter (unitless).</p>
+</dd>
+<dt>nutrient_shapes<span class="classifier">Optional[List[float]]</span></dt><dd><p>Shape coefficients for nutrient uptake equations (unitless).</p>
+</dd>
+<dt>previous_nutrient<span class="classifier">Optional[float]</span></dt><dd><p>Nutrient in biomass on the previous day (kg/ha).</p>
+</dd>
+<dt>potential_nutrient_uptake<span class="classifier">Optional[float]</span></dt><dd><p>Potential nutrient uptake under ideal conditions (kg/ha).</p>
+</dd>
+<dt>layer_nutrient_potentials<span class="classifier">Optional[float]</span></dt><dd><p>Potential nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+<dt>unmet_nutrient_demands<span class="classifier">Optional[float]</span></dt><dd><p>Unmet nutrient demands by overlaying soil layers (kg/ha).</p>
+</dd>
+<dt>nutrient_requests<span class="classifier">Optional[float]</span></dt><dd><p>Nutrient requested from each soil layer (kg/ha).</p>
+</dd>
+<dt>actual_nutrient_uptakes<span class="classifier">Optional[List[float]]</span></dt><dd><p>Actual nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+<dt>total_nutrient_uptake<span class="classifier">Optional[float]</span></dt><dd><p>Total nutrient uptake by the plant (kg/ha).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_distro_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_nutrient_uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_nutrient_potentials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unmet_nutrient_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_requests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_nutrient_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_nutrient_uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_main_process">
+<span class="sig-name descname"><span class="pre">uptake_main_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_layer_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_main_process" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_main_process'"><span>#</span></a></dt>
+<dd><p>Generic nutrient uptake routine that extracts nutrient from the soil and updates crop_data.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object that tracks soil properties and nutrient content.</p>
+</dd>
+<dt>nutrient_name<span class="classifier">str</span></dt><dd><p>The name of the nutrient.</p>
+</dd>
+<dt>soil_layer_attr<span class="classifier">str</span></dt><dd><p>The soil layer attribute of the nutrient.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_nutrient">
+<span class="sig-name descname"><span class="pre">uptake_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_nutrient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_nutrient'"><span>#</span></a></dt>
+<dd><p>Conducts steps necessary to uptake nutrient from soil.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>layer_nutrient<span class="classifier">List[float]</span></dt><dd><p>Nutrients contained in each soil layer; updated in place.</p>
+</dd>
+<dt>layer_depths<span class="classifier">List[float]</span></dt><dd><p>The lowest depth of each soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>After the actual nutrient uptake is calculated for each accessible soil layer, that amount is removed
+from the layer_nutrient list given as input to the function.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.shift_nutrient_time">
+<span class="sig-name descname"><span class="pre">shift_nutrient_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.shift_nutrient_time" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.shift_nutrient_time'"><span>#</span></a></dt>
+<dd><p>Copies the current nutrient value to previous_nutrient (for use between time steps).</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_potential_nutrient_uptake">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_potential_nutrient_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_growth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_potential_nutrient_uptake" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_potential_nutrient_uptake'"><span>#</span></a></dt>
+<dd><p>Calculates the potential nutrient uptake for the day.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>demand<span class="classifier">float</span></dt><dd><p>The maximum or optimal nutrient uptake of the plant on a given day (kg/ha).</p>
+</dd>
+<dt>nutrient_start<span class="classifier">float</span></dt><dd><p>Nutrient biomass at the end of the previous day (kg/ha).</p>
+</dd>
+<dt>mature_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at plant maturity (unitless).</p>
+</dd>
+<dt>max_growth<span class="classifier">float</span></dt><dd><p>Maximum potential biomass the plant can gain on a given day (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The potential nutrient uptake for the day (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.5, 5:2.3.23</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_layer_extracted_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource'"><span>#</span></a></dt>
+<dd><p>Calculates the amount of a resource actually extracted from each layer of the soil.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>requests<span class="classifier">List[float]</span></dt><dd><p>Desired amount of the resource from each layer.</p>
+</dd>
+<dt>sources<span class="classifier">List[float]</span></dt><dd><p>The pool of available resources in each layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>List[float]</dt><dd><p>The actual amounts of a resource extracted from the soil layers.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>References<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.8, 5:2.3.26</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_extracted_resource">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_extracted_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_extracted_resource" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_extracted_resource'"><span>#</span></a></dt>
+<dd><p>Calculates the amount of a resource that can be drawn from a source, based on a request.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>request<span class="classifier">float</span></dt><dd><p>Requested amount of the resource (kg/ha).</p>
+</dd>
+<dt>source<span class="classifier">float</span></dt><dd><p>Amount of the resource available at the source (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of the resource to be extracted, considering the request and source availability (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>References<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.8, 5:2.3.26</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.find_deepest_accessible_soil_layer">
+<span class="sig-name descname"><span class="pre">find_deepest_accessible_soil_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.find_deepest_accessible_soil_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.find_deepest_accessible_soil_layer'"><span>#</span></a></dt>
+<dd><p>Evaluates the accessibility of layers in the soil profile by plant roots.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>depths<span class="classifier">list[float]</span></dt><dd><p>The maximum depth of each soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Notes<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<p>This function determines the total number of soil layers, identifies the deepest layer accessible to the roots,
+and calculates the number of layers that remain inaccessible to the plant. It provides insight into how deep
+the plant can potentially draw nutrients and water from the soil profile.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_deepest_accessible_layer">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_deepest_accessible_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_deepest_accessible_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_deepest_accessible_layer'"><span>#</span></a></dt>
+<dd><p>Determines the deepest soil layer that is accessible to roots.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>root_depth<span class="classifier">float</span></dt><dd><p>The root depth of the plant, indicating how deep the roots extend into the soil (mm).</p>
+</dd>
+<dt>layer_bounds<span class="classifier">list[float]</span></dt><dd><p>A list containing the depths (in centimeters or meters) of the lower boundaries of each soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>An integer indicating the deepest soil layer that the roots can access. For example, a return of 1 means
+only the first layer is accessible (i.e., layer_bounds[:1]), and a return of 2 means the first and second
+layers are accessible (i.e., layer_bounds[:2]).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>Negative root depth is provided.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<p>This method assumes that if there are no roots (root depth of 0), then none of the soil layers are accessible
+for nutrient uptake by the crop.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.access_layers">
+<span class="sig-name descname"><span class="pre">access_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.access_layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.access_layers'"><span>#</span></a></dt>
+<dd><p>Utility function that removes any inaccessible layers from a list.</p>
+<p>This method filters the input list to include only the layers of the soil profile that are accessible
+to the plant’s roots, based on the plant’s root depth and the soil layer depths.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>layer_list<span class="classifier">list[float]</span></dt><dd><p>A list containing a value for each layer of the soil profile.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>List[float]</dt><dd><p>A trimmed list with an element for each soil layer that is accessible to the plant’s roots.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake_potential">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_layer_nutrient_uptake_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_distribution_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake_potential" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake_potential'"><span>#</span></a></dt>
+<dd><p>Calculates the potential nutrient uptake from each soil layer based on plant demand and root depth.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>layer_bounds<span class="classifier">list[float]</span></dt><dd><p>A list of lower boundaries for each soil layer, in ascending order (i.e., increasing depths). Each entry
+represents the depth to the bottom of the layer (mm).</p>
+</dd>
+<dt>total_demand<span class="classifier">float</span></dt><dd><p>The total nutrient demand of the plant, indicating how much nutrient the plant needs to meet its growth
+requirements (kg/ha).</p>
+</dd>
+<dt>root_depth<span class="classifier">float</span></dt><dd><p>The current depth of the plant’s roots, determining which soil layers are accessible for nutrient uptake
+(mm).</p>
+</dd>
+<dt>nutrient_distribution_parameter<span class="classifier">float</span></dt><dd><p>A parameter that influences the distribution of nutrient uptake across the accessible soil layers, affecting
+how uptake is allocated among the layers (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>list[float]</dt><dd><p>A list of potential nutrient uptake values from each layer, with the uptake from inaccessible layers set to
+zero.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Raises<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the boundaries are not in ascending order (deeper layers should follow shallower ones).
+If there are duplicate depths, indicating multiple soil layers at the same depth.</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>References<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<p>pseudocode: C.5.C.2, C.5.C.3</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_nutrient_uptake_to_depth">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_nutrient_uptake_to_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_distribution_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_nutrient_uptake_to_depth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_nutrient_uptake_to_depth'"><span>#</span></a></dt>
+<dd><p>Calculates the potential nutrient uptake from the soil surface to a specified depth.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>demand<span class="classifier">float</span></dt><dd><p>The current nutrient demand of the plant (kg/ha).</p>
+</dd>
+<dt>depth<span class="classifier">float</span></dt><dd><p>The depth (in the same units as root_depth, typically centimeters or meters) to which nutrient uptake is
+calculated (mm).</p>
+</dd>
+<dt>root_depth<span class="classifier">float</span></dt><dd><p>The current depth of the plant’s roots (mm).</p>
+</dd>
+<dt>nutrient_distribution_parameter<span class="classifier">float</span></dt><dd><p>The nutrient uptake distribution parameter affecting how uptake is allocated with depth.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The potential amount of nutrient that can be taken up from the soil surface to the specified depth (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>References<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.6, 5:2.3.24</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_nutrient_from_soil_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_nutrient_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers'"><span>#</span></a></dt>
+<dd><p>Extracts nutrient from the soil profile by layer.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>actual_nutrient_uptakes<span class="classifier">Optional[List[float]]</span></dt><dd><p>Actual nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+<dt>layer_nutrients<span class="classifier">list[float]</span></dt><dd><p>A list of nutrients (in units such as kg/ha) present in each layer of the soil profile, from which nutrients
+will be extracted by the plant.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Notes<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<p>The <cite>layer_nutrients</cite> list is updated in place. Actual nutrient uptake values, calculated by another method,
+are subtracted from the nitrate content of each corresponding soil layer.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile">
+<span class="sig-name descname"><span class="pre">extend_nutrient_uptakes_to_full_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual_nutrient_uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile'"><span>#</span></a></dt>
+<dd><p>Determines the actual nutrient uptakes for the full soil profile, not just the accessible layers.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>actual_nutrient_uptakes<span class="classifier">Optional[List[float]]</span></dt><dd><p>Actual nutrient uptake from each soil layer (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>Notes<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<p>Zeros are appended to the list of nutrient uptakes for each inaccessible soil layer, indicating no nutrient
+uptake from those layers.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_nutrient_shape_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">half_mature_heat_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_heat_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emergence_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">half_mature_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters'"><span>#</span></a></dt>
+<dd><p>Calculates the shape coefficients for the nutrient fraction equation.</p>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>half_mature_heat_fraction<span class="classifier">float</span></dt><dd><p>PHU (Potential Heat Units) fraction at half-maturity.</p>
+</dd>
+<dt>mature_heat_fraction<span class="classifier">float</span></dt><dd><p>PHU fraction at full maturity.</p>
+</dd>
+<dt>emergence_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at emergence.</p>
+</dd>
+<dt>half_mature_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at half-maturity.</p>
+</dd>
+<dt>mature_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at maturity.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>List[float]</dt><dd><p>A list containing the first and second shape coefficients, respectively.</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<p>SWAT assumes that the difference between the nutrient fraction near maturity and the nutrient fraction at
+maturity in the crop is equal to 0.00001 (as per SWAT theoretical documentation pages 331 and 336, top
+paragraphs of both). Therefore, the near mature nutrient fraction is adjusted to meet that assumption in this
+calculation.</p>
+</section>
+<section id="id31">
+<h3>References<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21</p>
+</section>
+<section id="id32">
+<h3>Raises<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If half_mature_heat_fraction equals mature_heat_fraction.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_shape_log">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_shape_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heat_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emergence_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_shape_log" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_shape_log'"><span>#</span></a></dt>
+<dd><p>Calculate the logarithmic component of the shape coefficient formulae for nutrient uptake.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>heat_fraction<span class="classifier">float</span></dt><dd><p>PHU (Potential Heat Units) fraction of interest.</p>
+</dd>
+<dt>nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction of interest at a specific point in the growth cycle.</p>
+</dd>
+<dt>mature_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at maturity, indicating the nutrient level when the plant is fully matured.</p>
+</dd>
+<dt>emergence_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at emergence, indicating the initial nutrient level when the plant emerges.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The logarithmic term of the nutrient shape coefficients, crucial for calculating the shape coefficients
+used in nutrient uptake modeling (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>Raises<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If any of the nutrient or heat fractions are outside the range of 0 to 1.
+If <cite>emergence_nutrient_fraction</cite> is equivalent to <cite>mature_nutrient_fraction</cite>.
+If <cite>nutrient_fraction</cite> is equivalent to <cite>emergence_nutrient_fraction</cite> or <cite>mature_nutrient_fraction</cite>.
+If <cite>nutrient_fraction</cite> is greater than or equal to <cite>emergence_nutrient_fraction</cite>.
+If <cite>nutrient_fraction</cite> is 0.
+If <cite>heat_fraction</cite> is 0.
+If the calculated denominator is greater than 1.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h3>References<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_optimal_nutrient_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heat_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emergence_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_nutrient_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient_fraction'"><span>#</span></a></dt>
+<dd><p>Calculates the optimal fraction of nutrient in the plant biomass on a given day.</p>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>heat_fraction<span class="classifier">float</span></dt><dd><p>Fraction of total potential heat units (PHU fraction) accumulated to date.</p>
+</dd>
+<dt>emergence_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Expected fraction of plant biomass comprised of nutrient at plant emergence.</p>
+</dd>
+<dt>mature_nutrient_fraction<span class="classifier">float</span></dt><dd><p>Nutrient fraction at maturity.</p>
+</dd>
+<dt>shape1<span class="classifier">float</span></dt><dd><p>First nutrient uptake shape parameter.</p>
+</dd>
+<dt>shape2<span class="classifier">float</span></dt><dd><p>Second nutrient uptake shape parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h3>Returns<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The calculated optimal nutrient fraction in the plant biomass for the given day.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>References<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<p>SWAT Reference: Equations 5:2.3.1, 5:2.3.19</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_optimal_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whole</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient'"><span>#</span></a></dt>
+<dd><p>Calculate the mass of a nutrient as a constituent from the fractional mass of the whole.</p>
+<section id="id40">
+<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>fraction<span class="classifier">float</span></dt><dd><p>Proportion of the whole made up of the nutrient (unitless).</p>
+</dd>
+<dt>whole<span class="classifier">float</span></dt><dd><p>Total mass of the whole in which the nutrient is a part (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Mass of the nutrient as a constituent of the whole (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id42">
+<h3>References<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.4, 5:2.3.22</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_stored_nutrient">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_stored_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uptake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_stored_nutrient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_stored_nutrient'"><span>#</span></a></dt>
+<dd><p>Calculates the mass of the nutrient stored in plant material after the current day’s growth cycle.</p>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>uptake<span class="classifier">float</span></dt><dd><p>The mass of the nutrient taken up by the plant on the current day (kg/ha).</p>
+</dd>
+<dt>previous<span class="classifier">float</span></dt><dd><p>The nutrient mass stored in the plant at the end of the previous day (kg/ha).</p>
+</dd>
+<dt>fixed<span class="classifier">float</span></dt><dd><p>The mass of nutrient fixed by the plant on the current day, applicable only to nutrient (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total mass of the nutrient in the plant at the end of the current day (kg/ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_layer_nutrient_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_uptake_potentials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake'"><span>#</span></a></dt>
+<dd><p>Calculates nutrient amount uptaken from each soil layer.</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>layer_demands<span class="classifier">List[float]</span></dt><dd><p>List of demands for the nutrient from each soil layer not met by the above layers.</p>
+</dd>
+<dt>layer_uptake_potentials<span class="classifier">List[float]</span></dt><dd><p>List of maximum potential uptake of the nutrient from each soil layer.</p>
+</dd>
+<dt>layer_nutrient<span class="classifier">List[float]</span></dt><dd><p>List of nutrient amounts available in each soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>List[float]</dt><dd><p>Amount of nutrient mass taken up from each soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>References<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<p>SWAT 5:2.3.1, 5:2.3.2 (see paragraphs below equations 5:2.3.8 and 5:2.3.26)</p>
+</section>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._abc_impl'"><span>#</span></a></dt>
+<dd></dd></dl>
+</section>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.__init__'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.__init__"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_main_process'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_main_process"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.uptake_main_process()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_nutrient'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.uptake_nutrient"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.uptake_nutrient()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.shift_nutrient_time'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.shift_nutrient_time"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.shift_nutrient_time()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_potential_nutrient_uptake'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_potential_nutrient_uptake"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_potential_nutrient_uptake()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_layer_extracted_resource()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_extracted_resource'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_extracted_resource"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake._determine_extracted_resource()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.find_deepest_accessible_soil_layer'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.find_deepest_accessible_soil_layer"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.find_deepest_accessible_soil_layer()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_deepest_accessible_layer'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_deepest_accessible_layer"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake._determine_deepest_accessible_layer()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.access_layers'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.access_layers"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.access_layers()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake_potential'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake_potential"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_layer_nutrient_uptake_potential()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_nutrient_uptake_to_depth'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_nutrient_uptake_to_depth"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake._determine_nutrient_uptake_to_depth()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.extract_nutrient_from_soil_layers()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.extend_nutrient_uptakes_to_full_profile()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_nutrient_shape_parameters()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_shape_log'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._determine_shape_log"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake._determine_shape_log()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient_fraction'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient_fraction"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_optimal_nutrient_fraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_optimal_nutrient()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_stored_nutrient'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_stored_nutrient"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_stored_nutrient()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake.determine_layer_nutrient_uptake"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake.determine_layer_nutrient_uptake()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._abc_impl'" class="reference internal" href="#RUFAS.routines.field.crop.non_water_uptake.NonWaterUptake._abc_impl"><code class="docutils literal notranslate"><span class="pre">NonWaterUptake._abc_impl</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
