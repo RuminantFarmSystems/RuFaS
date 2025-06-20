@@ -305,7 +305,15 @@ class FeedManager:
 
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: RufasTime) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
-        self.purchase_feed(requested_feeds.requested_feed, time)
+        current_feed_totals = self._query_available_feed_totals(list(requested_feeds.requested_feed.keys()))
+        feeds_to_purchase = {id: 0.0 for id in requested_feeds.requested_feed.keys()}
+        for feed_id, amount_requested in requested_feeds.requested_feed.items():
+            available_amount = current_feed_totals[feed_id]
+
+            amount_to_purchase = max(amount_requested - available_amount, 0.0)
+            feeds_to_purchase[feed_id] = amount_to_purchase
+
+        self.purchase_feed(feeds_to_purchase, time)
 
     def _query_available_feed_totals(
         self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
