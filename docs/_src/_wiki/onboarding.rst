@@ -768,10 +768,8 @@ open your Git Desktop and VS Code.
 
       There you will find default_task.json.
 
-   .. figure:: /_static/taskmnger.png
-      :alt: This figure demonstrates where you may find the
-      task_manager_metadata.json file and the location of the path for
-      the next default task.
+   .. figure:: /_static/defaulttask.png
+      :alt: default task mngr
       :name: fig:example
       :width: 80.0%
 
@@ -785,16 +783,14 @@ open your Git Desktop and VS Code.
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-   .. figure:: /_static/defaulttask.png
-      :alt: When you open the default_task.json file, this is what you
-      should see. Notice that the default scenario is a single run of a
-      simulation titled, "SIMULATION_SINGLE_RUN."
-      :name: fig:example
-      :width: 80.0%
+.. figure:: /_static/defaulttask.png
+   :alt: default task
+   :name: fig:example
+   :width: 80.0%
 
-      When you open the default_task.json file, this is what you should
-      see. Notice that the default scenario is a single run of a
-      simulation titled, "SIMULATION_SINGLE_RUN."
+When you open the default_task.json file, this is what you should
+see. Notice that the default scenario is a single run of a
+simulation titled, "SIMULATION_SINGLE_RUN."
 
 #. In the default_metadata.json file, you will observe a long list of
    paths to different input or config files. These are where you will be
@@ -811,18 +807,15 @@ open your Git Desktop and VS Code.
          remember. We recommend "default_metadatav1.json" or something
          similar.
 
-   .. figure:: /_static/defaultmeta.png
-      :alt: This is an example of what you will see when you open your
-      default metadata json file. Depending on what you are looking for,
-      you may use this to better understand what input or config files
-      you will need to look at.
-      :name: fig:example
-      :width: 80.0%
+.. figure:: /_static/defaultmeta.png
+   :alt: default meta
+   :name: fig:example
+   :width: 80.0%
 
-      This is an example of what you will see when you open your default
-      metadata json file. Depending on what you are looking for, you may
-      use this to better understand what input or config files you will
-      need to look at.
+This is an example of what you will see when you open your default
+metadata json file. Depending on what you are looking for, you may
+use this to better understand what input or config files you will
+need to look at.
 
 #. Using the paths in either the default_metadata.json file or the
    version of the file that you created, locate the values that you wish

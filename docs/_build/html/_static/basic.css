@@ -190,7 +190,7 @@ img.toggler {
 div.modindex-jumpbox {
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    margin: 1em 0;
+    margin: 1em 0 1em 0;
     padding: 0.4em;
 }
 
@@ -331,7 +331,7 @@ aside.topic,
 div.topic {
     border: 1px solid #ccc;
     padding: 7px;
-    margin: 10px 0;
+    margin: 10px 0 10px 0;
 }
 
 p.topic-title {
@@ -408,6 +408,8 @@ table caption span.caption-number {
     font-style: italic;
 }
 
+table caption span.caption-text {
+}
 
 table.docutils td, table.docutils th {
     padding: 1px 8px 1px 5px;
@@ -458,6 +460,8 @@ figcaption span.caption-number {
 }
 
 div.figure p.caption span.caption-text,
+figcaption span.caption-text {
+}
 
 /* -- field list styles ----------------------------------------------------- */
 
@@ -830,6 +834,8 @@ div.code-block-caption span.caption-number {
     font-style: italic;
 }
 
+div.code-block-caption span.caption-text {
+}
 
 div.literal-block-wrapper {
     margin: 1em 0;
