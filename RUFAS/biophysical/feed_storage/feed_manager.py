@@ -440,8 +440,9 @@ class FeedManager:
                 info_map | {"units": MeasurementUnits.DOLLARS},
             )
             self._om.add_variable(
-                f"{purchase_type}_{rufas_id}_amount_purchased", purchase_amount,
-                info_map | {"units": MeasurementUnits.KILOGRAMS}
+                f"{purchase_type}_{rufas_id}_amount_purchased",
+                purchase_amount,
+                info_map | {"units": MeasurementUnits.KILOGRAMS},
             )
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
