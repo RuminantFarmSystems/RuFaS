@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/refreshed_default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -106,11 +106,18 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "Manure data",
-      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/manure_management.json",
+      "title": "Manure Processor Configurations",
+      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
+      "path": "input/data/manure/manure_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
+    },
+    "manure_processor_connection": {
+      "title": "Manure Processor Connections",
+      "description": "The connection configs for all manure processors.",
+      "path": "input/data/manure/manure_processor_connections.json",
+      "type": "json",
+      "properties": "manure_processor_connection_properties"
     },
     "soil_1": {
       "title": "Soil data",

@@ -535,7 +535,8 @@ class ManureExcretionCalculator:
 
         References
         ----------
-        (Wilkerson et al., 1997; Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Johnson et al., 2016; Appuhamy et al., 2018; NASEM, 2021)
+        (Wilkerson et al., 1997; Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Johnson et al., 2016;
+        Appuhamy et al., 2018; NASEM, 2021)
 
         """
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
