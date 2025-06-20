@@ -107,7 +107,7 @@ def test_process_manure(
 ) -> None:
     """Tests manure processing on a non-emptying day with a cover on the slurry storage."""
     slurry_storage_outdoor._cover = cover_type
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
+    slurry_storage_outdoor.stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     expected_total_manure = stored_manure + received_manure
 
     dummy_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
@@ -125,7 +125,7 @@ def test_process_manure(
 
     def process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = (
+        slurry_storage_outdoor.stored_manure = (
             ManureStream.make_empty_manure_stream() if is_emptying_day else expected_total_manure
         )
         return {"manure": copy(expected_total_manure)} if is_emptying_day else {}
@@ -205,10 +205,10 @@ def test_process_manure(
     ]
     assert slurry_storage_outdoor._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
-        assert slurry_storage_outdoor._stored_manure == ManureStream.make_empty_manure_stream()
+        assert slurry_storage_outdoor.stored_manure == ManureStream.make_empty_manure_stream()
         assert result == {"manure": expected_total_manure}
     else:
-        assert slurry_storage_outdoor._stored_manure == expected_total_manure
+        assert slurry_storage_outdoor.stored_manure == expected_total_manure
         assert result == {}
 
 
@@ -375,7 +375,7 @@ def test_apply_ammonia_emissions(
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_ammonia_emissions.assert_called_once_with(
         total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-        volume=stored_manure.volume,
+        mass=stored_manure.volume * ManureConstants.SLURRY_MANURE_DENSITY,
         density=ManureConstants.SLURRY_MANURE_DENSITY,
         temperature=dummy_manure_temperature,
         ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,

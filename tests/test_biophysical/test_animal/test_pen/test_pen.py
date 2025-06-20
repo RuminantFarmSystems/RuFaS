@@ -29,8 +29,6 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
     Feed,
-    AdvancePurchaseAllowance,
-    TotalInventory,
 )
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager

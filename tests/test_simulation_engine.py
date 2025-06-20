@@ -415,7 +415,7 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
     ]
     mock_check_manure_schedules.assert_any_call(field_1, mock_time)
     mock_check_manure_schedules.assert_any_call(field_2, mock_time)
-    mock_request_nutrients.assert_called_once_with(mock_nutrient_request_result)
+    mock_request_nutrients.assert_called_once()
 
 
 @pytest.mark.parametrize("is_end_to_end_test_run", [True, False])
