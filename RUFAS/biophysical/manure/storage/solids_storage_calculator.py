@@ -236,7 +236,9 @@ class SolidsStorageCalculator:
         return max(0.0, ManureConstants.MCF_CONSTANT_A * manure_temperature - ManureConstants.MCF_CONSTANT_B)
 
     @staticmethod
-    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
+    def calculate_degradable_volatile_solids_fraction(
+        degradable_volatile_solids: float, total_volatile_solids: float
+    ) -> float:
         """
         Calculates the fraction of degradable volatile solids.
 
@@ -244,8 +246,8 @@ class SolidsStorageCalculator:
         ----------
         degradable_volatile_solids : float
             Mass of degradable volatile solids in the manure stream (kg).
-        total_solids : float
-            Mass of total solids in the manure stream (kg).
+        total_volatile_solids : float
+            Mass of total volatile solids in the manure stream (kg).
 
         Returns
         -------
@@ -253,4 +255,7 @@ class SolidsStorageCalculator:
             The fraction of degradable volatile solids (unitless).
 
         """
-        return degradable_volatile_solids / total_solids
+        if total_volatile_solids == 0:
+            return 0
+        else:
+            return degradable_volatile_solids / total_volatile_solids

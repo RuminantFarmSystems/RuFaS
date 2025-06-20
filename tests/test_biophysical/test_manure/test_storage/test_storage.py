@@ -32,7 +32,7 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._storage_time_period = 120
     storage._surface_area = 300.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
-    storage._stored_manure = ManureStream.make_empty_manure_stream()
+    storage.stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
     return storage
 
@@ -75,8 +75,8 @@ def test_storage_init() -> None:
     assert actual.is_housing_emissions_calculator is False
     assert actual._received_manure.mass == 0.0
     assert actual._received_manure.pen_manure_data is None
-    assert actual._stored_manure.mass == 0.0
-    assert actual._stored_manure.pen_manure_data is None
+    assert actual.stored_manure.mass == 0.0
+    assert actual.stored_manure.pen_manure_data is None
     assert actual._capacity == inf
     assert actual._cover == StorageCover.COVER
     assert actual._storage_time_period == 100
@@ -143,21 +143,45 @@ def test_receive_manure(storage: Storage, manure_received: list[ManureStream], e
 
 
 @pytest.mark.parametrize(
-    "pen_manure_data, is_housing_emissions_calculator",
+    "pen_manure_data, is_housing_emissions_calculator, expected_msg",
     [
-        (None, True),
-        (PenManureData(100, 3000.0, AnimalCombination.LAC_COW, None, 100.0, 15.0, StreamType.GENERAL), False),
+        # Case 1: Missing pen manure data for housing emissions calculator
+        (
+            None,
+            True,
+            (
+                "Processor 'fixture' received a ManureStream without pen manure data, "
+                "which is required for housing emissions calculations. Cannot place a handler "
+                "before Open Lot/Compost Bedded Pack in the manure processor connection chain."
+            ),
+        ),
+        (
+            PenManureData(100, 3000.0, AnimalCombination.LAC_COW, None, 100.0, 15.0, StreamType.GENERAL),
+            False,
+            "Processor 'fixture' received an incompatible ManureStream.",
+        ),
     ],
 )
 def test_receive_manure_error(
-    storage: Storage, pen_manure_data: PenManureData | None, is_housing_emissions_calculator: bool
+    storage: Storage,
+    pen_manure_data: PenManureData | None,
+    is_housing_emissions_calculator: bool,
+    expected_msg: str,
+    mocker,
 ) -> None:
-    """Test that the receive_manure method in Storage raises an error correctly."""
+    """Test that Storage.receive_manure raises appropriate errors for invalid streams."""
     storage.is_housing_emissions_calculator = is_housing_emissions_calculator
     manure_stream = ManureStream.make_empty_manure_stream()
     manure_stream.pen_manure_data = pen_manure_data
-    with pytest.raises(ValueError, match="Processor 'fixture' received an incompatible ManureStream."):
+
+    mock_om = mocker.patch.object(storage, "_om")
+    mock_om.add_error = MagicMock()
+
+    with pytest.raises(ValueError, match=expected_msg):
         storage.receive_manure(manure_stream)
+
+    mock_om.add_error.assert_called_once()
+    assert expected_msg in str(mock_om.add_error.call_args[0][1])
 
 
 @pytest.mark.parametrize(
@@ -168,7 +192,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_handle_overflowing_manure = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
     mock_time = MagicMock(spec=RufasTime)
-    mock_time.simulation_day = storage._storage_time_period if is_emptying_day else 1
+    mock_time.simulation_day = storage._storage_time_period - 1 if is_emptying_day else 1
     mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
 
     storage._received_manure = (
@@ -186,7 +210,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             pen_manure_data=None,
         )
     )
-    storage._stored_manure = (
+    storage.stored_manure = (
         dummy_stored_manure := ManureStream(
             water=10.11,
             ammoniacal_nitrogen=20.22,
@@ -207,12 +231,12 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
         assert result["manure"] == dummy_total_manure
-        assert storage._stored_manure == ManureStream.make_empty_manure_stream()
+        assert storage.stored_manure == ManureStream.make_empty_manure_stream()
         mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
         assert result == {}
-        assert storage._stored_manure == dummy_total_manure
-        mock_report_manure_stream.assert_not_called()
+        assert storage.stored_manure == dummy_total_manure
+        mock_report_manure_stream.assert_called_once()
     if is_overflowing:
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)
     else:
@@ -233,7 +257,7 @@ def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time
 )
 def test_is_overflowing(storage: Storage, volume: float, capacity: float, expected: bool) -> None:
     """Test that the Storage correctly identifies when it is overflowing."""
-    storage._stored_manure.volume = volume
+    storage.stored_manure.volume = volume
     storage._capacity = capacity
 
     actual = storage.is_overflowing
@@ -281,3 +305,24 @@ def test_calculate_nitrous_oxide_emissions(factor: float, nitrogen: float, expec
     actual = Storage._calculate_nitrous_oxide_emissions(factor, nitrogen)
 
     assert actual == expected
+
+
+def test_calculate_surface_area(mocker: MockerFixture) -> None:
+    """Test that the surface area of a storage is calculated correctly."""
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.MANURE_CONVERSION_CONSTANT", 0.1175)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.FREEBOARD_CONSTANT", 1.20)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.DEPTH_CONSTANT", 4.572)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.PRECIPITATION_CONSTANT", 0.25)
+    mocker.patch(
+        "RUFAS.biophysical.manure.storage.storage.InputManager", autospec=True
+    ).return_value.get_data.return_value = 100
+
+    storage = Storage(
+        name="test_storage",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        storage_time_period=30,
+        surface_area=None,
+    )
+    storage.__post_init__()
+    assert storage._surface_area == pytest.approx(97.8713558537714)
