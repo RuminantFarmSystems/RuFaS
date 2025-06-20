@@ -461,8 +461,9 @@ class Storage:
                 continue
             self.om.add_variable("fresh_mass", crop.fresh_mass, info_map)
             self.om.add_variable("dry_matter_mass", crop.dry_matter_mass, info_map)
-            self.om.add_variable("dry_matter_percentage", crop.dry_matter_percentage,
-                                 info_map | {"units": MeasurementUnits.PERCENT})
+            self.om.add_variable(
+                "dry_matter_percentage", crop.dry_matter_percentage, info_map | {"units": MeasurementUnits.PERCENT}
+            )
             crop.recorded_days.add(simulation_day)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:

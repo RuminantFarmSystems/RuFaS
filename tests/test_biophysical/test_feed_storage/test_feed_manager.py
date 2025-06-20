@@ -298,9 +298,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
         return_value={1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5, 6: 6.6},
     )
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed")
-    mock_deduct_feeds_from_inventory = mocker.patch.object(
-        feed_manager, "_deduct_feeds_from_inventory"
-    )
+    mock_deduct_feeds_from_inventory = mocker.patch.object(feed_manager, "_deduct_feeds_from_inventory")
 
     requested_feed = RequestedFeed(requested_feed={1: 0.8, 3: 3.3, 5: 7.5, 6: 16.6})
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
@@ -313,21 +311,18 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
     mock_time = mocker.Mock(spec=RufasTime)
     mock_time.simulation_day = 123
 
-    result = feed_manager.manage_daily_feed_request(
-        requested_feed=requested_feed, time=mock_time
-    )
+    result = feed_manager.manage_daily_feed_request(requested_feed=requested_feed, time=mock_time)
 
     assert result is True
-    mock_query_available_feed_totals.assert_called_once_with(
-        list(requested_feed.requested_feed.keys())
-    )
+    mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
     mock_purchase_feed.assert_called_once_with(
         pytest.approx(expected_feeds_to_purchase),
         mock_time,
         purchase_type="daily_feed_request",
     )
     mock_deduct_feeds_from_inventory.assert_called_once_with(
-        pytest.approx(expected_inventory_deduction), mock_time.simulation_day,
+        pytest.approx(expected_inventory_deduction),
+        mock_time.simulation_day,
     )
 
 
@@ -475,7 +470,7 @@ def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: Mock
     expected_feeds_to_purchase = {1: 1.1, 2: 1.6, 3: 3.3, 4: 0.0}
     feed_manager.manage_planning_cycle_purchases(mock_ideal_feeds, time=(mock_time := MagicMock(auto_spec=RufasTime)))
 
-    mock_purchase_feed.assert_called_once_with(expected_feeds_to_purchase, mock_time, purchase_type='planning_cycle')
+    mock_purchase_feed.assert_called_once_with(expected_feeds_to_purchase, mock_time, purchase_type="planning_cycle")
 
 
 def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
