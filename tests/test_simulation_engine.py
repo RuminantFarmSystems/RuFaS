@@ -256,7 +256,8 @@ def test_daily_simulation(
     mock_weather_get_current_day_conditions.assert_called_once_with(mock_time)
     mock_field_daily_update_routine.assert_called_once_with(mock_weather, mock_time, mock_manure_applications)
     assert mock_field_receive_crop.call_args_list == [
-        call(harvested_crop.harvested_crop, harvested_crop.storage_type) for harvested_crop in mock_harvested_crops
+        call(harvested_crop.harvested_crop, harvested_crop.storage_type, simulation_engine.time.simulation_day)
+        for harvested_crop in mock_harvested_crops
     ]
 
     not_harvested_feeds_config_names = [
