@@ -180,7 +180,9 @@ v0.9.2
 - [2421](https://github.com/RuminantFarmSystems/RuFaS/pull/2421) - [minor change] [Soil and Crop] Update Canopy Water handling.
 - [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
-- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
+- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2435) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module.
+- [2438](https://github.com/RuminantFarmSystems/RuFaS/pull/2438) - [minor change] [GitHub Actions] Updates the Sphinx documentation workflow to deploy to GitHub Pages via the gh-pages branch and removes build artifacts from the main branch.
+- [2443](https://github.com/RuminantFarmSystems/RuFaS/pull/2443) - [minor change] [metadata] Moves input/metadata/task_manager_metadata.json to input/task_manager_metadata.json and updates the corresponding entries in the code.
 
 
 ### v0.9.2
