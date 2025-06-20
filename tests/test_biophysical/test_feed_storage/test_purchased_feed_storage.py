@@ -68,7 +68,7 @@ def test_report_stored_purchased_feeds(
     """Test that the storage can report the stored feeds."""
     expected_info_map = {
         "class": "PurchasedFeedStorage",
-        "function": "report_stored_feeds",
+        "function": "report_stored_purchased_feeds",
         "simulation_day": (expected_sim_day := 3),
         "units": MeasurementUnits.KILOGRAMS,
         "rufas_id": 1,
