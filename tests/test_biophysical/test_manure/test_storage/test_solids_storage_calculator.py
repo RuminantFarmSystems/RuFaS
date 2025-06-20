@@ -134,3 +134,8 @@ def test_calculate_ifsm_methane_emission_error() -> None:
 def test_calculate_degradable_volatile_solids_fraction() -> None:
     """Tests calculate_degradable_volatile_solids_fraction()."""
     assert SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(1, 2) == 0.5
+
+
+def test_calculate_degradable_volatile_solids_fraction_no_total_volatile_solids() -> None:
+    """Tests calculate_degradable_volatile_solids_fraction()."""
+    assert SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(1, 0) == 0.0

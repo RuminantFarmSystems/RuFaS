@@ -110,7 +110,7 @@ def test_get_schedule() -> None:
         10: {"set_ai_day": True, "set_conception_rate": True, "set_ovsynch_end": True},
     }
     assert cow_schedule == expected_cow_schedule
-    assert HormoneDeliverySchedule.get_schedule("invalid_category", "some_protocol") is None    # type: ignore
+    assert HormoneDeliverySchedule.get_schedule("invalid_category", "some_protocol") is None  # type: ignore
     assert HormoneDeliverySchedule.get_schedule("heifers", "invalid_protocol") is None
 
 
@@ -139,6 +139,7 @@ def test_get_adjusted_schedule() -> None:
         13: {"set_ai_day": True, "set_conception_rate": True, "set_ovsynch_end": True},
     }
     assert adjusted_cow_schedule == expected_adjusted_cow_schedule
-    assert HormoneDeliverySchedule.get_adjusted_schedule(
-        "invalid_category", "some_protocol", start_day) is None    # type: ignore
+    assert (
+        HormoneDeliverySchedule.get_adjusted_schedule("invalid_category", "some_protocol", start_day) is None
+    )  # type: ignore
     assert HormoneDeliverySchedule.get_adjusted_schedule("heifers", "invalid_protocol", start_day) is None

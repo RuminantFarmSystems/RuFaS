@@ -3,7 +3,6 @@ import math
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
@@ -85,7 +84,7 @@ def test_process_manure_runs_expected_steps(
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     mock_calc_comp_meth_emission = mocker.patch.object(
         composting_instance, "_calculate_composting_methane_emissions", return_value=1.0
@@ -106,7 +105,7 @@ def test_process_manure_runs_expected_steps(
     mock_report_stream = mocker.patch.object(composting_instance, "_report_manure_stream")
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
-        composting_instance._stored_manure += composting_instance._received_manure
+        composting_instance.stored_manure += composting_instance._received_manure
         composting_instance._received_manure = ManureStream.make_empty_manure_stream()
         return {}
 
@@ -115,7 +114,9 @@ def test_process_manure_runs_expected_steps(
         side_effect=mock_process_manure_side_effect,
     )
 
-    mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
+    mock_conditions = mocker.MagicMock(
+        spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0, annual_mean_air_temperature=15
+    )
     mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 50
 
@@ -142,7 +143,7 @@ def test_apply_dry_matter_loss_valid(
     mocker: MockerFixture,
 ) -> None:
     """Ensure solids are updated correctly with valid dry matter loss."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     composting_instance._manure_to_process = copy(received_manure)
     mocker.patch.object(
@@ -171,7 +172,7 @@ def test_apply_dry_matter_loss_raises_value_error(
     mocker: MockerFixture,
 ) -> None:
     """Ensure ValueError is raised and error is logged when losses go below zero."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     composting_instance._manure_to_process = copy(received_manure)
     composting_instance._om = OutputManager()
@@ -262,12 +263,12 @@ def test_calculate_nitrous_oxide_emissions() -> None:
     assert result == pytest.approx(expected)
 
 
-def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
+def test_calculate_composting_methane_emissions(mocker: MockerFixture, composting_instance: Composting) -> None:
     """Test composting methane emissions calculation."""
     manure_temperature = 25.0
     manure_volatile_solids = 100.0
     dummy_mcf = 0.01
-    expected = manure_volatile_solids * (0.24 * 0.67 * dummy_mcf)
+    expected = manure_volatile_solids * (0.24 * 0.67 * dummy_mcf) / 100
 
     mocker.patch.object(
         Composting,
@@ -275,7 +276,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
         return_value=dummy_mcf,
     )
 
-    result = Composting._calculate_composting_methane_emissions(
+    result = composting_instance._calculate_composting_methane_emissions(
         manure_temperature,
         manure_volatile_solids,
         CompostingType.PASSIVE_WINDROW,
@@ -285,34 +286,29 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "composting_type, temperature, expected",
+    "manure_temperature, composting_type, expected_mcf",
     [
-        (CompostingType.STATIC_PILE, 10.0, ManureConstants.MCF_COMPOSTING_STATIC_PILE),
-        (
-            CompostingType.PASSIVE_WINDROW,
-            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
-            ManureConstants.MCF_COMPOSTING_WINDROW_LOW,
-        ),
-        (
-            CompostingType.PASSIVE_WINDROW,
-            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
-            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
-        ),
-        (
-            CompostingType.INTENSIVE_WINDROW,
-            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
-            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
-        ),
-        (
-            CompostingType.INTENSIVE_WINDROW,
-            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
-            ManureConstants.MCF_COMPOSTING_WINDROW_HIGH,
-        ),
+        (-5.0, CompostingType.STATIC_PILE, 0.0),
+        (0.0, CompostingType.STATIC_PILE, 1.0),
+        (9.999, CompostingType.INTENSIVE_WINDROW, 0.5),
+        (5.5, CompostingType.PASSIVE_WINDROW, 1.0),
+        (10.0, CompostingType.STATIC_PILE, 2.0),
+        (15.0, CompostingType.INTENSIVE_WINDROW, 1.0),
+        (17.999, CompostingType.PASSIVE_WINDROW, 2.0),
+        (18.0, CompostingType.STATIC_PILE, 2.5),
+        (25.0, CompostingType.INTENSIVE_WINDROW, 1.5),
+        (100.0, CompostingType.PASSIVE_WINDROW, 2.5),
     ],
 )
-def test_calculate_methane_conversion_factor(
-    composting_type: CompostingType, temperature: float, expected: float
+def test_valid_temperatures_return_expected_mcf(
+    composting_instance: Composting, manure_temperature: float, composting_type: CompostingType, expected_mcf: float
 ) -> None:
-    """Test MCF value returned based on composting type and temperature."""
-    result = Composting._calculate_methane_conversion_factor(temperature, composting_type)
-    assert result == expected
+    result = composting_instance._calculate_methane_conversion_factor(manure_temperature, composting_type)
+    assert result == expected_mcf
+
+
+def test_warning_called_for_negative_temperature(mocker: MockerFixture, composting_instance: Composting) -> None:
+    mock_warn = mocker.patch.object(OutputManager, "add_warning")
+    result = composting_instance._calculate_methane_conversion_factor(-1.0, CompostingType.STATIC_PILE)
+    assert result == 0.0
+    mock_warn.assert_called_once()
