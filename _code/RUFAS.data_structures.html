@@ -7,11 +7,12 @@
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Animal Module | Ruminant Farm Simulation (RuFaS)  documentation</title>
-<meta content="Animal Module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
-<meta content="Animal Module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<title>RUFAS.data_structures package | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.data_structures package | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.data_structures package | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <script>
@@ -70,48 +71,48 @@
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../_code/modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Task-Manager.html">Task Manager</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Input-Manager.html">Input Manager</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
-<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
-<li class="toctree-l2"><a class="reference internal" href="Output-Manager.html">Output Manager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Chunkification.html">Chunkification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../_wiki/om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_wiki/Chunkification.html">Chunkification</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Data-Origins.html">Data Origins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Report-Generator.html">Report Generator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Graph-Generator.html">Graph Generator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Github-Actions.html">Github Actions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Using-Mypy.html">Using Mypy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Using-Sphinx.html">Using Sphinx</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Using-Flake8.html">Using Flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="creating_github_issue.html">Creating a GitHub Issue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Code-review.html">Code Review</a></li>
-<li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Data-Collection-App.html">Data Collection App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -131,115 +132,38 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Animal Module</span>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.data_structures package</span>
 </nav>
 <div id="content" role="main">
-<p>This page is adapted from <a class="reference external" href="https://ecommons.cornell.edu/bitstream/handle/1813/110228/Reed%2c%20Kristan.pdf?sequence=2&amp;isAllowed=y">Ruminant Farm Systems Model: Development
-Progress and
-Applications</a>.</p>
-<p>Last Updated: Jun 13th, 2023</p>
-<section id="animal-module">
-<h1>Animal Module<a class="headerlink" href="#animal-module" title="Link to this heading"><span>#</span></a></h1>
-<p>The <strong>Animal Module</strong> combines the composition and inventory of farm
-grown feeds tracked by the <strong>Feed Management and Inventory Module</strong> with
-purchased feed to simulate feed delivery each day through the automated,
-least-cost diet formulation algorithms. The diet formulation algorithms
-are currently based on the NRC (2001) Nutrient Requirements for Dairy
-Cattle though we hope to update them soon. The Animal Module uses a
-Monte Carlo stochastic framework to simulate each individual animal as
-they move through their lifecycle on the farm which is represented by 5
-distinct animal classes. Detailed descriptions of the ration formulation
-methods and the life events simulated by the Animal Module are provided
-in our recent publication (Hansen et al., 2021).</p>
+<section id="rufas-data-structures-package">
+<h1>RUFAS.data_structures package<a class="headerlink" href="#rufas-data-structures-package" title="Link to this heading"><span>#</span></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#submodules'"><span>#</span></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.animal_manure_excretions.html">RUFAS.data_structures.animal_manure_excretions module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html">RUFAS.data_structures.animal_to_manure_connection module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html">RUFAS.data_structures.crop_soil_to_feed_storage_connection module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.events.html">RUFAS.data_structures.events module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html">RUFAS.data_structures.feed_storage_to_animal_connection module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.manure_nutrients.html">RUFAS.data_structures.manure_nutrients module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.manure_supplement_methods.html">RUFAS.data_structures.manure_supplement_methods module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html">RUFAS.data_structures.manure_to_crop_soil_connection module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.manure_types.html">RUFAS.data_structures.manure_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.pen_manure_data.html">RUFAS.data_structures.pen_manure_data module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html">RUFAS.data_structures.tillage_implements module</a></li>
+</ul>
+</div>
 </section>
-<section id="manure-module">
-<h1>Manure Module<a class="headerlink" href="#manure-module" title="Link to this heading"><span>#</span></a></h1>
-<p>The <strong>Manure Module</strong> first simulates ammonia emissions from the barn
-floor after excretion and before cleaning and then combines the bedding,
-flush water, and parlor cleaning water into a simulated reception pit.
-Currently the model can represent both flushing and scraping cleaning
-systems from tie stall and free stall pens. Compost bedded-pack barns
-and dry-lot housing systems are still in development. After the
-reception pit, the model simulates movement of the combined manure and
-wastewater to either long term storage or for processing. Current
-options for manure processing include mechanical solid-liquid separation
-and anaerobic digestion. Manure emissions and composition change are
-estimated at each daily step during manure handling, processing, and
-storage.</p>
-</section>
-<section id="crop-and-soil-module">
-<h1>Crop and Soil Module<a class="headerlink" href="#crop-and-soil-module" title="Link to this heading"><span>#</span></a></h1>
-<p>On the days when the <strong>Crop and Soil Module</strong> simulates manure
-application to fields, the <strong>Manure Module</strong> passes information about
-the amount and composition of the manure in storage and subtracts the
-mass of the simulated manure application from the stored quantities. The
-<strong>Crop and Soil Module</strong> then simulates daily biogeochemical nutrient
-and water transformation, crop uptake, and loss from the soil profile
-based on a combination of the SWAT (Neitsch et al., 2011), SurPhos
-(Vadas, 2009) and DayCent (Del Grosso et al., 2011) models. Crop growth
-rate and composition is based on solar radiation, temperature, and water
-and N availability. At harvest, above ground crop biomass is partitioned
-into crop residue that remains on the field and that which is
-transferred to the <strong>Feed Management and Inventory Module</strong> to inventory
-management, completing the dairy farm nutrient cycle.</p>
-</section>
-<section id="feed-management-and-inventory-module">
-<h1>Feed Management and Inventory Module<a class="headerlink" href="#feed-management-and-inventory-module" title="Link to this heading"><span>#</span></a></h1>
-<p>The <strong>Feed Management and Inventory Module</strong> is currently managed by the
-<code class="docutils literal notranslate"><span class="pre">Feed</span></code> class and its subclass, <code class="docutils literal notranslate"><span class="pre">Storage</span></code>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Feed</span></code> class takes in data from the input JSON file and stores
-information for the feeds managed by the farm and the methods for
-storage. It contains the <code class="docutils literal notranslate"><span class="pre">Storage</span></code> subclass which specifies a single
-feed storage receptacle.</p>
-<p>Upon harvest, farm grown feed is grouped by crop type, harvest date, and
-quality, then assigned to an available storage receptacle sequentially.
-Quality assessment for farm-grown feeds addressed in Future Enhancements
-section. Forage quality of purchased feeds is provided by the Feed
-Library database that is queried in the <code class="docutils literal notranslate"><span class="pre">Feed</span></code> class.</p>
-<p>Nutrients are lost at various stages from harvest to feedout at various
-rates for different feed-storage combinations. Feed storage loss is
-currently an empirical model of those reductions based on the work of
-Kevin Panke-Buisse, a research microbiologist at the USDA DFRC in
-Madison, WI. After pairing a crop to a storage receptacle, the model is
-calibrated and nutrient losses at each stage are calculated and applied
-sequentially.</p>
-<p>Feed compositions are provided in the Feed Library database along with
-the qualities of purchased feeds. The database structure has three
-tables: user_feeds, feed_quality, and nutrients. The user_feeds table
-contains the feed_id keys and feed names for selection by the user. The
-feed_quality table contains the feed_id, quality categories, and the
-nutrient thresholds for the quality categories. The nutrients table
-contains the feed composition data required for ration formulation.</p>
-<section id="future-enhancements">
-<h2>Future enhancements<a class="headerlink" href="#future-enhancements" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#future-enhancements'"><span>#</span></a></h2>
-<p>Develop a <code class="docutils literal notranslate"><span class="pre">FeedManagement</span></code> class that directs the management of the
-<code class="docutils literal notranslate"><span class="pre">Feed</span></code> class similar to the <code class="docutils literal notranslate"><span class="pre">AnimalManagement</span></code> and
-<code class="docutils literal notranslate"><span class="pre">ManureManagement</span></code> classes.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">FeedManagement</span></code> class will have 5 primary jobs:</p>
-<ol class="arabic simple">
-<li><p>Keep track of the different <code class="docutils literal notranslate"><span class="pre">Storage</span></code> objects and how much of each
-type of feed is in all of them</p></li>
-<li><p>Direct newly-harvested feed from the <strong>Crop and Soil module</strong> to a
-storage object</p></li>
-<li><p>Tell the <strong>Animal Module</strong> how much feed there is</p></li>
-<li><p>Remove feed from the <code class="docutils literal notranslate"><span class="pre">Storage</span></code> objects daily as the <strong>Animal
-Module</strong> uses it to feed to cows</p></li>
-<li><p>Sort farm-grown feeds based on a quality assessment based on the
-fr_PHU (fraction of potential heat units) accumulated by the crop at
-harvest.</p></li>
-</ol>
+<section id="module-RUFAS.data_structures">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.data_structures" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#module-RUFAS.data_structures'"><span>#</span></a></h2>
 </section>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li></li>
-<li><a :data-current="activeSection === '#manure-module'" class="reference internal" href="#manure-module">Manure Module</a></li>
-<li><a :data-current="activeSection === '#crop-and-soil-module'" class="reference internal" href="#crop-and-soil-module">Crop and Soil Module</a></li>
-<li><a :data-current="activeSection === '#feed-management-and-inventory-module'" class="reference internal" href="#feed-management-and-inventory-module">Feed Management and Inventory Module</a><ul>
-<li><a :data-current="activeSection === '#future-enhancements'" class="reference internal" href="#future-enhancements">Future enhancements</a></li>
-</ul>
-</li>
+<li><a :data-current="activeSection === '#submodules'" class="reference internal" href="#submodules">Submodules</a></li>
+<li><a :data-current="activeSection === '#module-RUFAS.data_structures'" class="reference internal" href="#module-RUFAS.data_structures">Module contents</a></li>
 </ul>
 </div>
 </aside>

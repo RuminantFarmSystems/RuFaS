@@ -12,6 +12,7 @@
 <meta content="RUFAS.biophysical.animal.digestive_system.digestive_system module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.html" rel="next" title="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator module"/>
@@ -154,7 +155,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion">
-<span class="sig-name descname"><span class="pre">manure_excretion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">manure_excretion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_manure_excretions.html#RUFAS.data_structures.animal_manure_excretions.AnimalManureExcretions" title="RUFAS.data_structures.animal_manure_excretions.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></em><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.phosphorus_excreted">
@@ -186,6 +187,39 @@ with information about supported animal types.</p>
 </dl>
 </section>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure">
+<span class="sig-name descname"><span class="pre">_calculate_base_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_requirement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_reserves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_endogenous_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure'"><span>#</span></a></dt>
+<dd><p>Calculates the base manure production in terms of phosphorus for an animal.</p>
+<p>The function determines the amount of phosphorus excreted via urine and feces
+based on the animal’s body weight, phosphorus intake, requirements, reserves,
+and endogenous loss.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>The body weight of the animal (kg).</p>
+</dd>
+<dt>phosphorus_intake<span class="classifier">float</span></dt><dd><p>The amount of phosphorus consumed by the animal (g).</p>
+</dd>
+<dt>phosphorus_requirement<span class="classifier">float</span></dt><dd><p>The required phosphorus intake for the animal’s physiological needs (g).</p>
+</dd>
+<dt>phosphorus_reserves<span class="classifier">float</span></dt><dd><p>The phosphorus reserves in the animal’s body (g).
+Can be negative indicating a deficit.</p>
+</dd>
+<dt>phosphorus_endogenous_loss<span class="classifier">float</span></dt><dd><p>The endogenous loss of phosphorus (g).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><p>A tuple containing two values:
+- The amount of phosphorus excreted in urine (g).
+- The amount of phosphorus excreted in feces (g).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -197,6 +231,7 @@ with information about supported animal types.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.phosphorus_excreted'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.phosphorus_excreted"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.phosphorus_excreted</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.enteric_methane_emission</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.process_digestion()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem._calculate_base_manure()</span></code></a></li>
 </ul>
 </li>
 </ul>

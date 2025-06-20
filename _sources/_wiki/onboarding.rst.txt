@@ -2,116 +2,23 @@
 **Welcome to RuFaS**
 ====================
 
-:Author: 
-
 .. container:: titlepage
 
    **Welcome to RuFaS**
 
-   Introduction to RuFaS for new Team Members
+   Introduction to RuFaS for New Team Members
 
-   1970-01-01
+   2025-06-20
 
-   .. figure:: /_static/rufas.png
+   .. image:: /_static/rufas.png
+      :align: center
       :alt: image
       :width: 40.0%
 
    Onboarding Document v.2
 
-**Before You Begin**
-====================
-
-The purpose of this document is to introduce new team members to the
-RuFaS model, the code base, and the workflow. After reviewing this, you
-should feel comfortable setting up the basic program platforms to run
-RuFaS, joining the appropriate teams and workflows, and confidently
-documenting your work. We know there is a lot to review, but be proud
-because by reading this, you’re already off to a great start!
-
-We expect that you will still have questions, so remember to take notes
-as they come up and reach out to a team member for support!
-
-#. **Meet with Supervisor**
-
-   .. figure:: /_static/leader.png
-      :alt: image
-      :width: 40.0%
-
-   #. Get onboarded with the team, get to know the people you will
-      closely work with, learn about the work that you will be doing,
-      clarify the expectations and appropriate regular meeting
-      schedules.
-
-   #. Check in with your supervisor about invitations to the Slack,
-      Basecamp, and GitHub channels. \*Be sure to ask who your
-      Onboarding Buddy is! This person will be a great resource for you
-      as you get to know the project, the people, and your role.
-
-   #. Make sure you are added to biweekly all-team-meetings on Zoom
-      (download Zoom if you do not already have an account)
-
-   #. Talk to other RuFas Team members! They know better than anyone how
-      to navigate the model and what RuFaS is all about.
-
-#. Contact Your Onboarding Buddy
-
-   .. figure:: /_static/devteam.png
-      :alt: image
-      :width: 40.0%
-
-   #. Email or Slack (if you are able to complete item 3 in this list)
-      your buddy for any questions related to RuFaS including technical
-      support, subject comprehension, team workflow and culture
-      questions, and any other qutestions that come up!
-
-   #. Even after you complete this onboarding document, your buddy is
-      available to help answer questions and support you with anything
-      not covered by the onboarding document.
-
-   #. Remember, everyone on the RuFaS team is available to answer
-      questions, but the assigned contact will be a great resource that
-      may be more familiar with your progress.
-
-#. **Join Slack**
-
-   .. figure:: /_static/slack.png
-      :alt: image
-      :width: 40.0%
-
-   #. Make sure you are invited to join the specific channels that are
-      related to your work.
-
-   #. Slack is the main communication channel for the team. (Not email
-      but an email is an option if needed).
-
-   #. Download and join the RuFaS Slack group.
-
-#. Join Basecamp
-
-   #. Make sure you reach out to your supervisor for a Basecamp invite.
-
-   #. Basecamp is an efficient collaboration tool to keep track of
-      assignments, work together on documents, plan projects, and store
-      archival documentation.
-
-#. **Join GitHub Repo**
-
-   .. figure:: /_static/Git.png
-      :alt: image
-      :width: 40.0%
-
-   #. Create a GitHub account if you don’t have one already, reach out
-      to your supervisor for a GitHub invite.
-
-   #. Look at current open pull requests and recently merged/closed pull
-      requests to get an idea of what recent activity has been across
-      the RuFaS model.
-
-Now, let’s get RuFaS added to your computer so that you can get started
-familiarizing yourself with the workflow.
-
 **The Modules of RuFaS**
-========================
+------------------------
 
 This section is not required for installing software or working with the
 RuFaS model specifically, but instead provides a general overview of the
@@ -121,8 +28,6 @@ capabilities of RuFaS and expected outputs of each module.
    :alt: This is a brief overview of the RuFaS Model
    :name: fig:example
    :width: 100.0%
-
-   This is a brief overview of the RuFaS Model
 
 .. container:: itemize
 
@@ -144,9 +49,10 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Herd exits
 
-   .. figure:: /_static/animalmod.png
+   .. image:: /_static/animalmod.png
       :alt: image
-      :width: 40.0%
+      :width: 60.0%
+      :align: center
 
    Remember, while overarching decisions about whether you’d like to
    provide the diet recipe or have RuFaS formulate one for you and
@@ -180,9 +86,10 @@ capabilities of RuFaS and expected outputs of each module.
    -  Storage: length of time, cover/crust/cap and flare on liquid
       manure storage
 
-   .. figure:: /_static/manuremod.png
+   .. image:: /_static/manuremod.png
       :alt: image
-      :width: 40.0%
+      :width: 60.0%
+      :align: center
 
    The output of this module estimates manure composition, quantity of
    manure, storage emissions, biogas capture from anaerobic digestion,
@@ -208,9 +115,10 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Milk reduction maximum and tolerance
 
-   .. figure:: /_static/feedmod.png
+   .. image:: /_static/feedmod.png
       :alt: image
-      :width: 40.0%
+      :width: 60.0%
+      :align: center
 
    Outputs of interest for this module will consider production and
    environmental impacts.
@@ -227,36 +135,36 @@ capabilities of RuFaS and expected outputs of each module.
    manure application or manage inventories of the harvested crops and
    provide feed to the herd based on availability.
 
-   .. figure:: /_static/soilcropmod.png
+   .. image:: /_static/soilcropmod.png
       :alt: image
-      :width: 40.0%
+      :width: 60.0%
+      :align: center
 
    Outputs are estimated crop measures like biomass accumulation or
    harvest yields and field parameters like emissions, soil erosion,
    phosphorus runoff and nitrate percolation.
 
-   .. figure:: /_static/Modules.png
-      :alt: This image summarizes the processes and outputs of the four
-      modules of the RuFaS Model
-      :name: fig:example
-      :width: 60.0%
+.. figure:: /_static/Modules.png
+   :align: center
+   :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
+   :name: fig:example
+   :width: 80.0%
 
-      This image summarizes the processes and outputs of the four
-      modules of the RuFaS Model
+This image summarizes the processes and outputs of the four
+modules of the RuFaS Model
 
 .. figure:: /_static/EEE.png
+   :align: center
    :alt: This is my image
    :name: fig:example
-   :width: 60.0%
-
-   This is my image
+   :width: 80.0%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
 our Scientific Documentation Manual available in This is XXXXXXXXXXX.
 
 **Downloading the Software**
-============================
+----------------------------
 
 The purpose of this section is to guide you, the user, in downloading
 the tools needed to work with RuFaS. You will be downloading:
@@ -367,7 +275,7 @@ repository for your offline repository.
 
                             git version 2.40.0.windows.
 
-   .. figure:: /_static/GitSite.png
+   .. image:: /_static/GitSite.png
       :alt: image
 
    **Cloning and Repository Set Up** To set up RuFaS, we first must
@@ -472,7 +380,7 @@ another RuFaS team member if you need assistance troubleshooting.
 
 -  Follow the setup wizard to install VS Code.
 
-.. figure:: /_static/VSsite.png
+.. image:: /_static/VSsite.png
    :alt: image
 
 -  **Set Up Virtual Environment** A virtual environment is a
@@ -488,13 +396,13 @@ another RuFaS team member if you need assistance troubleshooting.
 
    -  Open VS Code and locate the terminal at the bottom of the window.
 
-   .. figure:: /_static/locateTerm.png
+   .. image:: /_static/locateTerm.png
       :alt: image
 
    -  If it is not immediately apparent, go to the menu at the top of
       the window and create a "New Terminal"
 
-   .. figure:: /_static/newterminal.png
+   .. image:: /_static/newterminal.png
       :alt: image
 
    -  Place your cursor in the terminal and type in the command
@@ -511,27 +419,18 @@ section and have downloaded all of the programs you need to get started.
 This is a great time to take a pause. Let’s review. Before continuing,
 you should have already:
 
-#. Met with your supervisor and joined all communication and file
-   sharing platforms.
+#. Git,
 
-#. Be added to Zoom invitations for All Team Meetings and regular
-   meetings deemed appropriate for the module you work on and the tasks
-   you will be completing.
+#. VS Code (and set up your virtual environment), and
 
-#. Installed
-
-   -  Git,
-
-   -  VS Code (and set up your virtual environment), and
-
-   -  Python v. 3.12 or 3.13.
+#. Python v. 3.12 or 3.13.
 
 If you have completed all of those steps, let’s learn a little bit about
 the program and some basic principles to make running RuFaS a little
 more straighforward.
 
 **Beginner’s Guide to RuFaS: Basic Principles and Practice**
-============================================================
+------------------------------------------------------------
 
 If you have experience working in collaborative software development
 projects and using these tools, you may want to skip this section. If
@@ -668,8 +567,6 @@ of your role on the team).
    packages and dependencies for a project, preventing conflicts with
    other projects.
 
-Now let’s practice running simulations and making our own changes.
-
 *Basic Principles of RuFaS Structure: What is RuFaS Doing?*
 -----------------------------------------------------------
 
@@ -685,9 +582,8 @@ Git Desktop.
 
 -  Test Default Settings of RuFaS
 
-   .. figure:: _static/terminal.png
-      :alt: Your terminal will appear at the bottom of your VS Code
-      screen.
+   .. figure:: /_static/terminal.png
+      :alt: Your terminal will appear at the bottom of your VS Code screen.
       :name: fig:example
 
       Your terminal will appear at the bottom of your VS Code screen.
@@ -827,7 +723,7 @@ open your Git Desktop and VS Code.
    in by looking at the bottom left of your screen. You may also create
    a new branch to work in if you wish.
 
-   .. figure:: _static/checkbranch.png
+   .. figure:: /_static/checkbranch.png
       :alt: The bottom of your VS Code window is where you will find the
       branch you’re working in.
       :name: fig:example
@@ -843,7 +739,7 @@ open your Git Desktop and VS Code.
    -  In the menu to the left select the input dropdown and then select
       metadata dropdown.
 
-   .. figure:: _static/findmeta.png
+   .. figure:: /_static/findmeta.png
       :alt: The VS Code window has a menu on the left side of the screen
       where you will spend the most time navigating between dropdowns to
       find the files you need to change and your outcomes. You will
@@ -872,10 +768,8 @@ open your Git Desktop and VS Code.
 
       There you will find default_task.json.
 
-   .. figure:: _static/taskmnger.png
-      :alt: This figure demonstrates where you may find the
-      task_manager_metadata.json file and the location of the path for
-      the next default task.
+   .. figure:: /_static/defaulttask.png
+      :alt: default task mngr
       :name: fig:example
       :width: 80.0%
 
@@ -889,16 +783,14 @@ open your Git Desktop and VS Code.
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-   .. figure:: _static/defaulttask.png
-      :alt: When you open the default_task.json file, this is what you
-      should see. Notice that the default scenario is a single run of a
-      simulation titled, "SIMULATION_SINGLE_RUN."
-      :name: fig:example
-      :width: 80.0%
+.. figure:: /_static/defaulttask.png
+   :alt: default task
+   :name: fig:example
+   :width: 80.0%
 
-      When you open the default_task.json file, this is what you should
-      see. Notice that the default scenario is a single run of a
-      simulation titled, "SIMULATION_SINGLE_RUN."
+When you open the default_task.json file, this is what you should
+see. Notice that the default scenario is a single run of a
+simulation titled, "SIMULATION_SINGLE_RUN."
 
 #. In the default_metadata.json file, you will observe a long list of
    paths to different input or config files. These are where you will be
@@ -915,18 +807,15 @@ open your Git Desktop and VS Code.
          remember. We recommend "default_metadatav1.json" or something
          similar.
 
-   .. figure:: _static/defaultmeta.png
-      :alt: This is an example of what you will see when you open your
-      default metadata json file. Depending on what you are looking for,
-      you may use this to better understand what input or config files
-      you will need to look at.
-      :name: fig:example
-      :width: 80.0%
+.. figure:: /_static/defaultmeta.png
+   :alt: default meta
+   :name: fig:example
+   :width: 80.0%
 
-      This is an example of what you will see when you open your default
-      metadata json file. Depending on what you are looking for, you may
-      use this to better understand what input or config files you will
-      need to look at.
+This is an example of what you will see when you open your default
+metadata json file. Depending on what you are looking for, you may
+use this to better understand what input or config files you will
+need to look at.
 
 #. Using the paths in either the default_metadata.json file or the
    version of the file that you created, locate the values that you wish
@@ -942,7 +831,7 @@ open your Git Desktop and VS Code.
    -  In your newly created json file, change the "cow_num" from 100 to
       10000 and your "replace_num" from 500 to 3000.
 
-   .. figure:: /_static/cownum.png
+   .. image:: /_static/cownum.png
       :alt: image
 
 #. Now we need to make sure that all of the paths that we just walked
@@ -987,7 +876,7 @@ open your Git Desktop and VS Code.
 
       -  Graphs (see Step 11 on how to generate Graphs)
 
-   .. figure:: /_static/reveal.png
+   .. image:: /_static/reveal.png
       :alt: image
 
 #. You may have noticed that your output includes ALL possible variables
@@ -1021,7 +910,7 @@ open your Git Desktop and VS Code.
       indicates it is ’off.’ The one in GREEN will be used to generate a
       report.
 
-   .. figure:: /_static/onoff.png
+   .. image:: /_static/onoff.png
       :alt: image
 
 Additional Materials
@@ -1039,11 +928,7 @@ Additional Materials
 
 -  If using VS Code or PyCharm and unsure of how to proceed with setting
    up the virtual environment (or if you have any other questions or
-   concerns), remember you have 2 great resources at your disposal:
-
-   -  Send a message through the slack channel (dev-team).
-
-   -  Contact your onboarding buddy.
+   concerns), please reach out to the RuFaS team for support.
 
 -  If you are going to be creating or running a lot of code, we
    recommend you review `Uncle Bob’s clean code philosophy

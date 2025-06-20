@@ -1,0 +1,28 @@
+RUFAS.data\_structures package
+==============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   RUFAS.data_structures.animal_manure_excretions
+   RUFAS.data_structures.animal_to_manure_connection
+   RUFAS.data_structures.crop_soil_to_feed_storage_connection
+   RUFAS.data_structures.events
+   RUFAS.data_structures.feed_storage_to_animal_connection
+   RUFAS.data_structures.manure_nutrients
+   RUFAS.data_structures.manure_supplement_methods
+   RUFAS.data_structures.manure_to_crop_soil_connection
+   RUFAS.data_structures.manure_types
+   RUFAS.data_structures.pen_manure_data
+   RUFAS.data_structures.tillage_implements
+
+Module contents
+---------------
+
+.. automodule:: RUFAS.data_structures
+   :members:
+   :show-inheritance:
+   :undoc-members:

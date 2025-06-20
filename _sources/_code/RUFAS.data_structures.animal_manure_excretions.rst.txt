@@ -1,0 +1,7 @@
+RUFAS.data\_structures.animal\_manure\_excretions module
+========================================================
+
+.. automodule:: RUFAS.data_structures.animal_manure_excretions
+   :members:
+   :show-inheritance:
+   :undoc-members:

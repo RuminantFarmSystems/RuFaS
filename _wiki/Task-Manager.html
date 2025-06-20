@@ -12,6 +12,7 @@
 <meta content="Task Manager | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="Input-Manager.html" rel="next" title="Input Manager"/>
@@ -196,8 +197,9 @@ warnings, etc.).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">variable_name_style</span></code>: Formatting style for variable names in
 output files.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">exclude_info_map</span></code>s: Boolean to exclude info maps from output.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">init_herd</span></code>, <code class="docutils literal notranslate"><span class="pre">save_animals</span></code>, <code class="docutils literal notranslate"><span class="pre">save_animals_directory</span></code>:
-Controls for initializing data sets and saving results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">init_herd</span></code>: a boolean value indicating if we want to generate a herd. It is False by default (if not specified), which we will load and use the data in <cite>animal_population.json</cite>. If it’s set to True, we will generate a herd according to the user-input.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_animals</span></code>: a boolean value indicating if we want to save the generated animals into a JSON file for future usage. False by default.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_animals_directory</span></code>: a string value indicating the file path to save the generated herd.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">filters_directory</span></code>, <code class="docutils literal notranslate"><span class="pre">csv_output_directory</span></code>,
 <code class="docutils literal notranslate"><span class="pre">json_output_directory</span></code>, <code class="docutils literal notranslate"><span class="pre">graphics_directory</span></code>,
 <code class="docutils literal notranslate"><span class="pre">report_directory</span></code>, <code class="docutils literal notranslate"><span class="pre">logs_directory</span></code>: Directories for storing
