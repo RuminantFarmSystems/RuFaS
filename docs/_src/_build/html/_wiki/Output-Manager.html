@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Output Manager | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="Output Manager | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="Output Manager | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="Chunkification.html" rel="next" title="Chunkification"/>
+<link href="om.html" rel="prev" title="Output Manager"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_code/modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="om.html">Output Manager</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Output Manager</span>
+</nav>
+<div id="content" role="main">
+<section id="output-manager">
+<h1>Output Manager<a class="headerlink" href="#output-manager" title="Link to this heading"><span>#</span></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#overview'"><span>#</span></a></h2>
+<p>As its name suggests, it is in charge of managing the output. Output
+Manager collects variables, warnings, logs, and errors during the
+simulation (and other processes) and, as accurately as possible,
+documents the source and point in the code from which the data was
+generated. This will give developers and users more information about
+their model simulations as well as provide some flexibility for other
+uses down the road.</p>
+<p>Output Manager works by collecting variables, logs, warnings, and errors
+into separate pools, and populates requested output channels from the
+pools once the simulation is done. This is done using <em>filter files</em>. If
+a filter file’s name begins with either <code class="docutils literal notranslate"><span class="pre">json_</span></code> or <code class="docutils literal notranslate"><span class="pre">csv_</span></code>, Output
+Manager handles them itself. However, filter files whose names begin
+with <code class="docutils literal notranslate"><span class="pre">report_</span></code> and <code class="docutils literal notranslate"><span class="pre">graph_</span></code> are handled by the <a class="reference internal" href="Report-Generator.html"><span class="doc">Report Generator</span></a>
+and the <a class="reference internal" href="Graph-Generator.html"><span class="doc">Graph Generator</span></a>
+respectively.</p>
+<p>Output Manager is a singleton, i.e., only one instance of it can exist
+(per application/memory segment). After the first instance is created,
+future calls to the constructor method return the first instance. Also,
+the initializer method only works once.</p>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#quick-start'"><span>#</span></a></h2>
+<p>To set up Output Manager to capture data from a RuFaS simulation:</p>
+<ol class="arabic simple">
+<li><p>See <a class="reference internal" href="#add-label"><span class="std std-ref">Add the data you need to the Output Manager variables pool</span></a> for details.</p></li>
+<li><p>Set up an output filter file to capture your data:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Create a .txt file in the output_filters folder
+(MASM/output/output_filters).</p></li>
+<li><p>The name of the file should start with either <code class="docutils literal notranslate"><span class="pre">json</span></code> or <code class="docutils literal notranslate"><span class="pre">csv</span></code>
+depending on which format you desire. Be specific with your naming
+(e.g. <code class="docutils literal notranslate"><span class="pre">json_cow_lactation.txt</span></code>).</p></li>
+<li><p>Add the text pattern(s) for the variables you want to capture. Output
+Manager uses RegEx pattern matching so for example if you want to
+capture all variables relating to the <code class="docutils literal notranslate"><span class="pre">Cow</span></code> class, you would enter
+<code class="docutils literal notranslate"><span class="pre">^Cow.*</span></code> into the filter .txt file you created.</p></li>
+<li><p>To capture all variables, you would enter <code class="docutils literal notranslate"><span class="pre">.*</span></code>. For more details on
+how to write RegEx patterns to help capture the specific data you
+need, <a class="reference external" href="https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file">see the pattern matching
+section.</a></p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p>Run a simulation!</p></li>
+</ol>
+</section>
+<section id="chunkification">
+<h2>Chunkification<a class="headerlink" href="#chunkification" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#chunkification'"><span>#</span></a></h2>
+<p>Using chunkification, users can periodically dump the current variable
+pool and save a chunk into a JSON file. This will allow us to break down
+a larger simulation pool into smaller chunks. There are three main
+settings users can set in their task manager task to control how they
+would like to employ chunkification:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">save_chunk_threshold_call_count</span></code>: If this variable is specified,
+the OM will keep track of the number of calls to the
+OM.add_variable() function. Once it reaches the threshold number, the
+current variable pool will be dumped, and the other metrics will be
+ignored.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maximum_memory_usage</span></code>: If <code class="docutils literal notranslate"><span class="pre">save_chunk_threshold_call_count</span></code> is
+not specified but this variable is, the OM will set OM.max_pool_size
+to the specified maximum_memory_usage amount.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maximum_memory_usage_percent</span></code>: If neither
+save_chunk_threshold_call_count nor maximum_memory_usage is
+specified, we will use maximum_memory_usage_percent to determine the
+maximum memory usage by simply multiplying it with the available
+memory.</p></li>
+</ol>
+<p>For a more detailed look at chunkification, some example setups, and a
+diagram of how chunkification works, please see the <a class="reference internal" href="Chunkification.html"><span class="doc">Chunkification wiki page.</span></a></p>
+</section>
+<section id="output-filters">
+<h2>Output Filters<a class="headerlink" href="#output-filters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#output-filters'"><span>#</span></a></h2>
+<p>Data collected by OutputManager can be filtered and handled by three
+main post-processing functions:</p>
+<ol class="arabic simple">
+<li><p>It can be aggregated by <a class="reference internal" href="Report-Generator.html"><span class="doc">Report Generator</span></a>.</p></li>
+<li><p>It can be graphed in <a class="reference internal" href="Graph-Generator.html"><span class="doc">Graph Generator</span></a>.</p></li>
+<li><p>It can be filtered to a csv or json file right within OutputManager.</p></li>
+</ol>
+<p>To route filtered data to any of these post-processors, you need to
+create a filter file in <code class="docutils literal notranslate"><span class="pre">.json</span></code> format.</p>
+<ul class="simple">
+<li><p>To graph your data, the filter file should start with <code class="docutils literal notranslate"><span class="pre">graph_</span></code>.</p></li>
+<li><p>To aggregate your data, the filter file name should start with
+<code class="docutils literal notranslate"><span class="pre">report_</span></code>.</p></li>
+<li><p>To simply filter the data to a .csv or .json file, the filter file
+name should start with <code class="docutils literal notranslate"><span class="pre">csv_</span></code> or <code class="docutils literal notranslate"><span class="pre">json_</span></code> respectively.</p></li>
+</ul>
+<p>Typically naming the file after the data it is collecting is the best
+practice (e.g. <code class="docutils literal notranslate"><span class="pre">report_average_milk_production.json</span></code>).</p>
+<p>Within that filter file there are a number of options to specify what
+data you want and how you want it presented. Here is a list of filter
+options for GraphGenerator and ReportGenerator. More details are
+available in their respective Wiki pages.</p>
+<p><strong>Note: for filtering data using Output Manager, the only filter entries
+that have any effect are ``”name”``, ``”filters”``, ``”variables”``, and
+``”filter_by_exclusion”``.</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Output Filter Entry</p></th>
+<th class="head"><p>Data Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Graph Generator</p></th>
+<th class="head"><p>Report Generator</p></th>
+<th class="head"><p>Example Entry</p></th>
+<th class="head"><p>Required?
+(RG/GG/BOTH)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>str</p></td>
+<td><p>N/A</p></td>
+<td><p>n/a</p></td>
+<td><p>The name of the report to appear in the column header of report CSV.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">"Average</span> <span class="pre">Herd</span> <span class="pre">Milk</span> <span class="pre">Fat"</span></code></p></td>
+<td><p>OPTIONAL</p></td>
+</tr>
+<tr class="row-odd"><td><p>title</p></td>
+<td><p>str</p></td>
+<td><p>N/A</p></td>
+<td><p>The title of the graph.</p></td>
+<td><p>n/a</p></td>
+<td><p>“Gallons Milk Per Cow”</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p>str</p></td>
+<td><p>N/A</p></td>
+<td><p>The type of graph you want
+plotted.</p></td>
+<td><p>n/a</p></td>
+<td><p>“stackplot”</p></td>
+<td><p>GG</p></td>
+</tr>
+<tr class="row-odd"><td><p>filters</p></td>
+<td><p>list[str]</p></td>
+<td><p>N/A</p></td>
+<td><p>RegEx pattern that defines
+what vars will be plotted
+on a single graph.</p></td>
+<td><p>RegEx pattern that defines what vars will be in a report.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[".*homegrown_feed_emissions.homegrown_corn_grain_emissions.*"]</span></code></p></td>
+<td><p>GG, RG (if
+cross_references
+is not provided)</p></td>
+</tr>
+<tr class="row-even"><td><p>variables</p></td>
+<td><p>list[str]</p></td>
+<td><p>N/A</p></td>
+<td><p>List of keys to be plotted
+when data from the filters
+pattern is stored in a
+dictionary.</p></td>
+<td><p>List of keys to be included in the report when the data from the filters pattern is stored
+in a dictionary.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">["nitrous_oxide_emissions",</span> <span class="pre">"ammonia_emissions",</span> <span class="pre">"carbon_stock_change"]</span></code></p></td>
+<td><p>BOTH (when data
+in dictionary)</p></td>
+</tr>
+<tr class="row-odd"><td><p>filter_by_exclusion</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>A partner field to the
+variables field. This
+boolean allows the user to
+specify if they want to
+plot everything in the
+variables field or exclude
+what’s in the field.</p></td>
+<td><p>Similar to how it functions in GG, this specifies whether to include or exclude variables
+from the resulting CSV output.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>use_name</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>Whether to use the filter
+name when constructing the
+key name for data pulled
+from a dictionary.</p></td>
+<td><p>Whether to use the filter name when constructing the key name for data pulled from a
+dictionary.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>customization_details</p></td>
+<td><p>See <a class="reference internal" href="Graph-Generator.html"><span class="doc">GG Wiki</span></a></p></td>
+<td><p>N/A</p></td>
+<td><p>Customization options such
+as legends, titles, and
+more.</p></td>
+<td><p>N/A</p></td>
+<td></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>legend</p></td>
+<td><p>list[str]</p></td>
+<td><p>N/A</p></td>
+<td><p>Legend is customizable. If
+left blank, the Graph
+Generator auto-generates a
+legend based on the keys
+of the data prepared to be
+plotted.</p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">["var1",</span> <span class="pre">"var2",</span> <span class="pre">"var3"]</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>use_calendar_dates</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>If true use dates/time as
+measurement on graph’s
+x-axis</p></td>
+<td><p>n/a</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>date_format</p></td>
+<td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">day_month_year</span></code></p></td>
+<td><p>Specifies format of
+date/time along x-axis of
+graph</p></td>
+<td><p>n/a</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">day_of_year</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>display_units</p></td>
+<td><p>bool</p></td>
+<td><p>true</p></td>
+<td><p>Units measured during the
+simulation are
+automatically displayed in
+the graph legend.</p></td>
+<td><p>If true, units for aggregated report data will appear in the report title.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>omit_legend_prefix/suffix</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>Allows removal of the
+prefix or suffix from a
+variable for display in
+the graph legend. Set
+“omit_legend_prefix”: true
+or “omit_legend_suffix”:
+true.</p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>expand_data</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>Graph filters support data
+expansion options:
+“expand_data”,
+“fill_value”,
+“use_fill_value_in_gaps”,
+and
+“use_fill_value_at_end”.
+Additionally supports
+“mask_values” to remove
+NaNs.</p></td>
+<td><p>Boolean flag to determine if data expansion should be attempted. Other options include
+“fill_value”, “use_fill_value_in_gaps”, and “use_fill_value_at_end”.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>constants</p></td>
+<td><p>dict[str, float]</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>These are values defined within the report that can be combined with variables in
+aggregation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{"Liters</span> <span class="pre">to</span> <span class="pre">Gallons":</span> <span class="pre">0.264172}</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>cross_references</p></td>
+<td><p>list[str]</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>References the values generated in other reports for aggregation operations.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">["Milk</span> <span class="pre">protein,</span> <span class="pre">kg_ver_agg_.*"]</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>vertical_aggregation</p></td>
+<td><p>str</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Function used for aggregating data within each column.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">"sum"</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>horizontal_aggregation</p></td>
+<td><p>str</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Function used for aggregating data within each row.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">"product"</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>horizontal_first</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>N/A</p></td>
+<td><p>Determines whether horizontal aggregation precedes vertical aggregation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>horizontal_order</p></td>
+<td><p>list[str]</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Specifies the order in horizontal aggregation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">["Herd</span> <span class="pre">FPCM,</span> <span class="pre">kg_hor_agg",</span> <span class="pre">"Milking</span> <span class="pre">cows_ver_agg",</span> <span class="pre">"Days</span> <span class="pre">per</span> <span class="pre">year"]</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>slice_start</p></td>
+<td><p>int</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Index to start slicing data for the report.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-730</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>slice_end</p></td>
+<td><p>int</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Index to end slicing data.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">365</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>graph_details</p></td>
+<td><p>dict[str, str]</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>Indicates report data should be graphed, must specify graph type (e.g., “plot”,
+“stackplot”).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{"type":</span> <span class="pre">"plot"}</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>graph_and_report</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>N/A</p></td>
+<td><p>Boolean flag to save report data requested for graphing to CSV.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>simplify_units</p></td>
+<td><p>bool</p></td>
+<td><p>true</p></td>
+<td><p>N/A</p></td>
+<td><p>If false, complex units from aggregation won’t be simplified.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>data_significant_digits</p></td>
+<td><p>int</p></td>
+<td><p>N/A</p></td>
+<td><p># significant digits for
+graphed data.</p></td>
+<td><p># significant digits for reported data. <a class="reference external" href="https://github.com/RuminantFarmSystems/MASM/wiki/Report-Generator#filter-content">See further details in RG
+wiki.</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>No - only occurs
+at
+post-processing
+stage. Will not
+cause values to
+be rounded
+during
+simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p>direction</p></td>
+<td><p>str</p></td>
+<td><p>“portrait”</p></td>
+<td><p>N/A</p></td>
+<td><p>The output CSV orientation. Either “portrait” or “landscape”. If no value is provided or
+providing an unexpected value, the default “portrait” direction will be used.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">"portrait"</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="data-origins">
+<h2>Data Origins<a class="headerlink" href="#data-origins" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#data-origins'"><span>#</span></a></h2>
+<p>When variables are added to the output manager, the Output Manager
+requires them to have an <a class="reference internal" href="#info-label"><span class="std std-ref">info map</span></a>
+which tracks the class and function that is sending the data to output
+manager. Each biophysical modules reports its data to a respective
+reporter class to ensure that data from each daily update is added to
+Output Manager at the same time within a module. As you can hopefully
+see, this leads to obfuscation of the original class and function that
+altered, created, or updated the data.</p>
+<p>There is a feature available to be able to track the original class and
+function that sent the data to its respective biophysical module
+reporter. This feature is called Data Origins. More details can be found
+here on the <a class="reference internal" href="Data-Origins.html"><span class="doc">Data Origins Wiki Page</span></a>.</p>
+</section>
+<section id="diagram">
+<h2>Diagram<a class="headerlink" href="#diagram" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#diagram'"><span>#</span></a></h2>
+<figure class="align-center" id="rufas-overview">
+<img alt="RuFaS Overview - OM" src="../_images/OM_diagram.png"/>
+<figcaption>
+<p><span class="caption-text">A high-level flow of OM within RuFaS.</span><a class="headerlink" href="#rufas-overview" title="Link to this image"><span>#</span></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="data-pools">
+<h2>Data Pools<a class="headerlink" href="#data-pools" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#data-pools'"><span>#</span></a></h2>
+<p>There are 4 main pools of data Output Manager collects:</p>
+<ol class="arabic simple">
+<li><p>Variables</p></li>
+<li><p>Logs</p></li>
+<li><p>Warnings</p></li>
+<li><p>Errors</p></li>
+</ol>
+<p><strong>Variables</strong> are data calculated or changed as a result of the
+simulation running.</p>
+<p><strong>Logs</strong> are used to track events that occur during the simulation.</p>
+<p><strong>Warnings</strong> are messages issued in situations where it is useful to
+alert the user of some condition in the simulation where that condition
+arising doesn’t warrant terminating the simulation.</p>
+<p><strong>Errors</strong> are messages issued about a condition in the simulation where
+that condition arising is greatly impacting the result of the simulation
+but doesn’t necessarily warrant terminating the simulation or raising an
+exception.</p>
+<p>For another way to think about logs, warnings, and errors:</p>
+<p>Imagine you go to your car, open the door, get in, close the door, and
+start the engine. All of these are logs. Then you look at the dashboard
+to see there is a light on trying to draw your attention to the fact
+that you haven’t buckled your seat belt. This is a warning. Then you
+turn on the AC, sadly, it is not working. This is an error that goes to
+the errors pool because while there is a malfunction, it doesn’t stop
+you from getting to your destination. You start moving, your speed is
+variable. Then you get a flat tire, so you have to stop and fix it. This
+is an error that needs to be raised as an exception because it is not
+possible to move forward and you would not add it to the errors pool.</p>
+<section id="writing-logs-warnings-and-errors">
+<h3>Writing Logs, Warnings, and Errors<a class="headerlink" href="#writing-logs-warnings-and-errors" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#writing-logs-warnings-and-errors'"><span>#</span></a></h3>
+<p>There are some best practices for writing logs, warnings, and errors in
+a way that is clear, actionable, and consistent. This section outlines
+different paradigms for naming and structuring messages, allowing
+flexibility based on the specific use case. The goal is to help users
+easily navigate the logs, identify issues, and take appropriate actions.</p>
+<section id="general-best-practices">
+<h4>General Best Practices<a class="headerlink" href="#general-best-practices" title="Link to this heading"><span>#</span></a></h4>
+<ol class="arabic simple">
+<li><p>Clarity and Brevity: Keep messages concise but informative. Avoid
+being repetitive.</p></li>
+<li><p>Context: Include the necessary details—what happened, where it
+happened, and why (especially for warnings and errors). All of this
+information need to be contained in both the name and message fields,
+as well as the info map.</p></li>
+<li><p>Actionability: Ensure warnings and errors provide clear, actionable
+guidance when appropriate.</p></li>
+</ol>
+</section>
+<section id="naming-and-structuring-messages">
+<h4>Naming and Structuring Messages<a class="headerlink" href="#naming-and-structuring-messages" title="Link to this heading"><span>#</span></a></h4>
+<p>There are two paradigms presented here for naming logs, warnings, and
+errors, with variations in their structure and level of detail. But
+these are by no means the only way to write log messages.</p>
+<section id="consistent-naming-with-varied-messages">
+<span id="id1"></span><h5>1. Consistent Naming with Varied Messages<a class="headerlink" href="#consistent-naming-with-varied-messages" title="Link to this heading"><span>#</span></a></h5>
+<p>This approach uses a consistent name for logs, warnings, or errors
+originating from the same part of the system, while the message
+describes the specific event or issue.</p>
+<ul class="simple">
+<li><p>Logs: This approach is particularly useful for logs, where it’s
+important to track the flow of actions in the same process. Logs will
+group under a single name, making it easy to follow a sequence of
+events.</p></li>
+<li><p>Warnings: For warnings, consistent naming helps users monitor
+recurring issues in specific areas of the system. However, messages
+must be clear about the nature and impact of each warning.</p></li>
+<li><p>Errors: For errors, this paradigm highlights where critical issues are
+occurring. Each error message should provide detailed information
+about the failure, but the consistent naming makes it easy to identify
+patterns.</p>
+<ul>
+<li><p>Pros: Groups related messages together for easier navigation.</p></li>
+<li><p>Cons: Users might need to read through multiple messages under the
+same name to find relevant details.</p></li>
+</ul>
+</li>
+</ul>
+<p><em>Examples</em></p>
+<p>Logs:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"OutputManager.create_directory.Attempting to create a new directory."</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">      </span><span class="s2">"Attempting to create a new directory at .."</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/logs."</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/reports."</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/reports."</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/reports."</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/reports."</span><span class="p">,</span>
+</span><span id="line-11"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/reports."</span><span class="p">,</span>
+</span><span id="line-12"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/logs."</span><span class="p">,</span>
+</span><span id="line-13"><span class="w">      </span><span class="s2">"Attempting to create a new directory at output/logs."</span>
+</span><span id="line-14"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-15"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-16"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>Warnings:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"DataValidator._number_type_validator.Validation: value greater than maximum"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">      </span><span class="s2">"Variable: 'NDICP.[92]' has value: 27.0, greater than maximum value:  12.00. Violates properties defined in metadata properties section 'NRC_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">      </span><span class="s2">"Variable: 'NDF.[21]' has value: 86.2, greater than maximum value:  85.00. Violates properties defined in metadata properties section 'NRC_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">      </span><span class="s2">"Variable: 'ADICP.[39]' has value: 9.275, greater than maximum value:  8.00. Violates properties defined in metadata properties section 'NASEM_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">      </span><span class="s2">"Variable: 'ADICP.[72]' has value: 8.306, greater than maximum value:  8.00. Violates properties defined in metadata properties section 'NASEM_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">      </span><span class="s2">"Variable: 'NDICP.[39]' has value: 12.695, greater than maximum value:  12.00. Violates properties defined in metadata properties section 'NASEM_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">      </span><span class="s2">"Variable: 'NDICP.[66]' has value: 30.34, greater than maximum value:  12.00. Violates properties defined in metadata properties section 'NASEM_Comp_properties'."</span><span class="p">,</span>
+</span><span id="line-11"><span class="w">      </span><span class="s2">"Variable: 'NDICP.[72]' has value: 16.169, greater than maximum value:  12.00. Violates properties defined in metadata properties section 'NASEM_Comp_properties'."</span>
+</span><span id="line-12"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-13"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-14"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>Errors:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"ReportGenerator.generate_report.report_generation_error"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">      </span><span class="s2">"Error generating report (Homegrown Feed Emissions) =&gt; ValueError: filter ['.*homegrown_.*_emissions.*'] in Homegrown Feed Emissions led to empty report data."</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">      </span><span class="s2">"Error generating report (Not a filter) =&gt; ValueError: filter ['Not.present.*'] in Not a filter led to empty report data."</span>
+</span><span id="line-7"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-8"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-9"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="cause-effect-or-action-outcome-pattern">
+<span id="id2"></span><h5>2. Cause-Effect (or Action-Outcome) Pattern<a class="headerlink" href="#cause-effect-or-action-outcome-pattern" title="Link to this heading"><span>#</span></a></h5>
+<p>This paradigm focuses on using the name to describe the cause of the
+log, warning, or error, and the message to describe the outcome or
+action taken.</p>
+<ul class="simple">
+<li><p>Logs: In logs, this approach helps clarify what action was taken and
+what result it produced. It can be useful when you need to focus on
+specific actions and outcomes rather than grouping all logs from a
+particular area.</p></li>
+<li><p>Warnings: For warnings, the name should describe the condition that
+triggered the warning, while the message outlines what was done (or
+needs to be done) in response. This structure makes it easy to
+understand what caused the warning and its potential impact.</p></li>
+<li><p>Errors: In errors, the cause-effect pattern provides a clear
+description of the problem and what needs to be done to resolve it.
+This is especially helpful in critical situations where immediate
+action is required.</p>
+<ul>
+<li><p>Pros: Provides clarity by directly linking cause and effect, making
+it easier for users to understand and respond.</p></li>
+<li><p>Cons: Related issues may be dispersed across different categories,
+making it harder to track patterns over time.</p></li>
+</ul>
+</li>
+</ul>
+<p><em>Examples</em></p>
+<p>Logs:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"InputManager._load_metadata.load_metadata_attempt"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">      </span><span class="s2">"Attempting to load metadata from input/metadata/default_metadata.json."</span>
+</span><span id="line-6"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-7"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-8"><span class="w">  </span><span class="nt">"InputManager._load_metadata.load_metadata_success"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-11"><span class="w">      </span><span class="s2">"Successfully loaded metadata from input/metadata/default_metadata.json"</span>
+</span><span id="line-12"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-13"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-14"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>Warnings:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report.Missing Purchased Feed Emissions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">      </span><span class="s2">"Missing data for RuFaS feed 216, omitting from purchased feed emissions estimation."</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">      </span><span class="s2">"Missing data for RuFaS feed 176, omitting from purchased feed emissions estimation."</span>
+</span><span id="line-7"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-8"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-9"><span class="w">  </span><span class="nt">"PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report.Missing Land Use Change Purchased Feed Emissions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"info_maps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="line-11"><span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-12"><span class="w">      </span><span class="s2">"Missing data for RuFaS feed 216, omitting from land use change purchased feed emissions estimation."</span><span class="p">,</span>
+</span><span id="line-13"><span class="w">      </span><span class="s2">"Missing data for RuFaS feed 176, omitting from land use change purchased feed emissions estimation."</span>
+</span><span id="line-14"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-15"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-16"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="choosing-the-right-approach">
+<h4>Choosing the Right Approach<a class="headerlink" href="#choosing-the-right-approach" title="Link to this heading"><span>#</span></a></h4>
+<ul class="simple">
+<li><p>Logs: Use consistent naming when you want to group related events from
+the same process. Use cause-effect when you want to highlight specific
+actions and their results.</p></li>
+<li><p>Warnings: If you expect recurring issues from a particular area,
+consistent naming helps to monitor them. Use cause-effect when you
+need to focus on the condition that triggered the warning and how the
+system is responding.</p></li>
+<li><p>Errors: Consistent naming is useful when tracking failures in a
+specific process. Use cause-effect to make it clear what went wrong
+and what action should be taken.</p></li>
+</ul>
+</section>
+<section id="summary-of-pros-and-cons">
+<h4>Summary of Pros and Cons<a class="headerlink" href="#summary-of-pros-and-cons" title="Link to this heading"><span>#</span></a></h4>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Paradigm</p></th>
+<th class="head"><p>Pros</p></th>
+<th class="head"><p>Cons</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Consistent Naming</p></td>
+<td><p>Easy to group
+related messages.</p></td>
+<td><p>Users may need to
+sift through
+multiple messages.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cause-Effect
+(Action-Outcome)</p></td>
+<td><p>Clear description of
+cause and outcome.</p></td>
+<td><p>Similar issues may
+be scattered, making
+pattern
+identification
+harder.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="info-maps">
+<h4>Info Maps<a class="headerlink" href="#info-maps" title="Link to this heading"><span>#</span></a></h4>
+<p>Filling in the info maps with the context included in the name and title
+makes logs, warnings, and errors easier to process on a large scale
+i.e., querying logs stored in a database and processed by a script.</p>
+</section>
+<section id="naming-conventions">
+<h4>Naming Conventions<a class="headerlink" href="#naming-conventions" title="Link to this heading"><span>#</span></a></h4>
+<p>By following patterns for the names of warnings and errors, maintainers
+of RuFaS will be able to automate some parts of their processing and
+analysis. This will be helpful when there are very high volumes of
+warnings and errors, and manually checking them would be too time
+consuming.</p>
+<p>To keep the “name” field of warnings and errors in RuFaS consistent,
+stick to the following rule of thumb:</p>
+<ul class="simple">
+<li><p>Whatever problem is causing the warning or error to be logged, figure
+out which Python
+<a class="reference external" href="https://docs.python.org/3/library/exceptions.html">Exception</a> it
+would be raised as.</p></li>
+<li><p>Remove the “Error” from the name of that exception.</p></li>
+<li><p>Prepend the shortened exception and “:” to the logged name.</p></li>
+</ul>
+<p>For example, a key that is expected to be a dictionary is not there. If
+this were an uncaught exception, it would be raised as a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>.
+So when if the name of the error that is being logged instead is
+“Missing xyz information from abc data”, the name would be rewritten as
+“Key: Missing xyz information from abc data”.</p>
+</section>
+<section id="what-not-to-do">
+<h4>What <strong>NOT</strong> To Do<a class="headerlink" href="#what-not-to-do" title="Link to this heading"><span>#</span></a></h4>
+<p><em>Never</em> leave the name or message of a log, warning, or error blank!
+There should always be a name and message, no matter how unnecessary it
+may seem.</p>
+<p>Don’t add errors to the Output Manager in places other than where the
+error was discovered (except in cases where this is <em>absolutely</em>
+necessary). Doing so makes the code more convoluted and harder to work
+with.</p>
+<hr class="docutils"/>
+</section>
+</section>
+</section>
+<section id="adding-data-to-the-output-manager">
+<span id="add-label"></span><h2>Adding Data to the Output Manager<a class="headerlink" href="#adding-data-to-the-output-manager" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#adding-data-to-the-output-manager'"><span>#</span></a></h2>
+<p>To use the Output Manager to collect variables, logs, warnings, or
+errors throughout the model:</p>
+<ol class="arabic simple">
+<li><p>Import the Output Manager class into the Python file you are working
+in. The best practice is to organize this statement alphabetically at
+the top of the file.</p></li>
+<li><p>Instantiate Output Manager - most of the time within the <strong>init</strong> of
+the class so it’s available for all functions in the class. This
+should only need to be done once in each particular program file.
+Because Output Manager is a singleton, you can instantiate it anew
+once in each program file and it will always refer back to the same
+Output Manager. Therefore you do not need to import it between
+different program files.</p></li>
+<li><p>Next initialize one of the main parameters required by an entry into
+each of the Output Manager pools: the info_map. (More on info_maps
+below)</p></li>
+<li><p>Avoid entering hard-coded values to the info_map and Output Manager
+pools.</p></li>
+<li><p>Use the appropriate Output Manager method to add the variable, log,
+warning, or error along with its info_map.</p></li>
+</ol>
+</section>
+<section id="info-label">
+<span id="id3"></span><h2>Info_maps<a class="headerlink" href="#info-label" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#info-label'"><span>#</span></a></h2>
+<p>The Info_map requires you to send both the caller class* and the caller
+function i.e. wherever you are in a particular program file. It can take
+additional optional contextual variables that might be helpful in
+figuring out the state of the model and class at the moment something
+was added to one of the Output Manager pools. So you will need to create
+a new instance of info_map within each method/function it is needed in
+within each class.</p>
+<p>* While many of the functions within the RuFaS model are organized into
+classes, there remain some functions within the codebase that are not.
+In the case where data needs to be added to the Output Manager from a
+function that is not currently associated with a class, the caller
+class, in this case, can be entered into the info_map as
+“no_caller_class”.</p>
+<p>An info_map is meant to capture environment variables to have
+reproducible results, warnings, and errors. Adding the caller class and
+caller function is the bare minimum.</p>
+<p><strong>HOWEVER</strong></p>
+<p>Info_maps are added to the associated pool at every instance during the
+simulation. Many variables are added on a daily basis so please
+carefully consider the data you are adding to the info_map because the
+size of the Output Manager files can grow unmanageably large over longer
+simulations if large data structures are added frequently.</p>
+<p>Info_map best practices:</p>
+<ul class="simple">
+<li><p>Be mindful of the frequency with which the function in which you are
+adding the data to the Output Manager is called. If it is a function
+that is called daily, look closely at the data you are adding at both
+the info_maps level and the variable/warning/error/log itself.</p></li>
+<li><p>Be cautious to add larger data structures such as objects to the
+info_maps (or directly to the pools). Instead look to extract specific
+pieces of data you believe would be helpful as contextual data for
+what you are adding to the Output Manager pools.</p></li>
+<li><p>Be considerate - each piece of data added to the Output Manager will
+be collected for every simulation run by everyone who runs the model.
+Info_maps can be intentionally excluded from the Output Manager pools
+but we want to leave the option for people to run the simulation with
+info_maps included.</p></li>
+</ul>
+</section>
+<section id="navigating-variables-pool-data">
+<h2>Navigating Variables Pool Data<a class="headerlink" href="#navigating-variables-pool-data" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#navigating-variables-pool-data'"><span>#</span></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> data is of primary interest to most people
+running the model as it contains the data produced by the simulation
+engine. After each simulation, the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> data is turned
+into a JSON file and multiple CSV files. The entirety of the
+<code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> data is dumped to a JSON file titled
+<code class="docutils literal notranslate"><span class="pre">all_variables_[timestamp].json</span></code>. Additionally, each variable is saved
+into its own CSV file, titled <code class="docutils literal notranslate"><span class="pre">[variable]_[timestamp].csv</span></code>, in the
+<code class="docutils literal notranslate"><span class="pre">ouput/CSVs/om/variables/</span></code> directory.</p>
+<p>This <code class="docutils literal notranslate"><span class="pre">all_variables</span></code> JSON file contains a LOT of data generated during
+a simulation and can therefore be overwhelming on its own.</p>
+<p>Output Manager has several features to help users navigate this large
+pool of data:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#the-variable-names-list"><span class="std std-ref">The variable names list</span></a>.</p></li>
+<li><p><a class="reference internal" href="#the-exclude-info-maps-flag"><span class="std std-ref">The exclude_info_maps flag</span></a>.</p></li>
+<li><p><a class="reference internal" href="#filtering"><span class="std std-ref">Filtering</span></a>.</p></li>
+</ol>
+<section id="the-variable-names-list">
+<span id="id4"></span><h3>The variable names list.<a class="headerlink" href="#the-variable-names-list" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#the-variable-names-list'"><span>#</span></a></h3>
+<p>At the end of each simulation, Output Manager generates a text file that
+lists the names of all variables added to the variables pool during the
+simulation. The name of this file follows the pattern:
+<code class="docutils literal notranslate"><span class="pre">variable_names_[timestamp].txt</span></code>. This file is saved in the output
+folder alongside the other JSON output files. The variable names list
+provides a good overview to see what data has been reported.</p>
+<p>The structure of each variable name is:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ClassName.function_name.variable_name.[values/info_maps]:</span> <span class="pre">nested_variable_name(if</span> <span class="pre">applicable)</span></code></p>
+<p>An example variables name file generated by a simulation looks like
+this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">_exclude_info_maps=True, expect info_maps accordingly.
+</span><span id="line-2">MilkingParlor.__init__.fresh_water_use_rate
+</span><span id="line-3">MilkingParlor.__init__.fresh_water_use_rate.info_maps: minutes_spent_in_holding_area
+</span><span id="line-4">MilkingParlor.__init__.fresh_water_use_rate.info_maps: minutes_spent_per_milking
+</span><span id="line-5">MilkingParlor.__init__.fresh_water_use_rate.info_maps: wash_water_use_rate
+</span><span id="line-6">MilkingParlor.__init__.fresh_water_use_rate.info_maps: num_milkings
+</span><span id="line-7">ManualScraping.__init__.milking_parlor.info_maps: weather
+</span><span id="line-8">ManualScraping.__init__.milking_parlor.info_maps: config
+</span><span id="line-9">ManualScraping.__init__.milking_parlor.info_maps: time
+</span><span id="line-10">ManualScraping.__init__.milking_parlor.values: num_milkings
+</span><span id="line-11">ManualScraping.__init__.milking_parlor.values: minutes_spent_in_holding_area
+</span><span id="line-12">ManualScraping.__init__.milking_parlor.values: minutes_spent_per_milking
+</span><span id="line-13">ManualScraping.__init__.milking_parlor.values: wash_water_use_rate
+</span><span id="line-14">ManualScraping.__init__.milking_parlor.values: fresh_water_use_rate
+</span><span id="line-15">FlushSystem.__init__.milking_parlor.values: num_milkings
+</span><span id="line-16">FlushSystem.__init__.milking_parlor.values: minutes_spent_in_holding_area
+</span><span id="line-17">FlushSystem.__init__.milking_parlor.values: minutes_spent_per_milking
+</span><span id="line-18">FlushSystem.__init__.milking_parlor.values: wash_water_use_rate
+</span><span id="line-19">FlushSystem.__init__.milking_parlor.values: fresh_water_use_rate
+</span><span id="line-20">Cow.milking_update.milk_data_at_milk_update.values: days_in_milk
+</span><span id="line-21">Cow.milking_update.milk_data_at_milk_update.values: estimated_daily_milk_produced
+</span><span id="line-22">Cow.milking_update.milk_data_at_milk_update.values: milk_protein
+</span><span id="line-23">Cow.milking_update.milk_data_at_milk_update.values: milk_fat
+</span><span id="line-24">Cow.milking_update.milk_data_at_milk_update.values: milk_lactose
+</span><span id="line-25">Cow.milking_update.milk_data_at_milk_update.values: lactating
+</span><span id="line-26">Cow.milking_update.milk_data_at_milk_update.values: parity
+</span><span id="line-27">Cow.milking_update.milk_data_at_milk_update.values: cow_id
+</span><span id="line-28">LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: calf_num
+</span><span id="line-29">LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: heiferI_num
+</span><span id="line-30">LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: heiferII_num
+</span><span id="line-31">…
+</span></code></pre></div>
+</div>
+</section>
+<section id="the-exclude-info-maps-flag">
+<span id="id5"></span><h3>The exclude_info_maps flag.<a class="headerlink" href="#the-exclude-info-maps-flag" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#the-exclude-info-maps-flag'"><span>#</span></a></h3>
+<p>As stated in the <a class="reference internal" href="#info-label"><span class="std std-ref">info map section</span></a>,
+an info_map is meant to capture runtime environment variables to have
+reproducible results. Info_maps are added to the outputs by default.
+However, a user may wish to exclude the info_maps environmental
+variables to reduce the amount of data in the output files they’re
+looking through.</p>
+<p>To do this, run the model by <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main.py</span> <span class="pre">-ei</span></code> which indicates
+info_maps should be excluded. (Running <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main.py</span> <span class="pre">-h</span></code> shows all
+available args).</p>
+</section>
+<section id="filtering">
+<span id="id6"></span><h3>Filtering.<a class="headerlink" href="#filtering" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#filtering'"><span>#</span></a></h3>
+<p>To get the most refined variables_pool results, the Output Manager
+allows a user to filter the variables_pool using pattern-matching. The
+user will create text files listing the patterns they want to be
+matched. These text files are expected to be stored in the
+<code class="docutils literal notranslate"><span class="pre">MASM/output/output_filters</span></code> directory.</p>
+<p>Filtering the JSON and the CSV output is done separately. The files
+containing patterns for JSON output must begin with <code class="docutils literal notranslate"><span class="pre">json_</span></code> and the
+files containing patterns fro CSV ouput must begin with <code class="docutils literal notranslate"><span class="pre">csv_</span></code>.</p>
+<p>A pattern text file will have one filter pattern per line. Each line
+will be treated as a separate pattern to match across the entirety of
+the variables_pool.</p>
+<p><strong>The pattern only checks against the
+``ClassName.function_name.variable_name`` portion of each variable. The
+``values/info_maps`` and ``nested variable name`` are not searched.</strong></p>
+<p>At the end of a simulation, the Output Manager will look in the
+<code class="docutils literal notranslate"><span class="pre">MASM/output/output_filters</span></code> directory and create an output file for
+each text file found in this directory.</p>
+<p>Each output file will be named following the pattern
+<code class="docutils literal notranslate"><span class="pre">saved_variables_&lt;filter</span> <span class="pre">file</span> <span class="pre">name&gt;_&lt;timestamp&gt;.json</span></code> or
+<code class="docutils literal notranslate"><span class="pre">saved_variables_&lt;filter</span> <span class="pre">file</span> <span class="pre">name&gt;_&lt;timestamp&gt;.csv</span></code>. All JSON output
+files will be written to the <code class="docutils literal notranslate"><span class="pre">output/</span></code> directory, while all CSV output
+files will be written to the <code class="docutils literal notranslate"><span class="pre">output/CSVs/om/</span></code> directory.</p>
+</section>
+<section id="how-does-the-filter-work">
+<h3>How does the filter work?<a class="headerlink" href="#how-does-the-filter-work" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-does-the-filter-work'"><span>#</span></a></h3>
+<p>The Output Manager uses Regular Expression (or RegEx) patterns to look
+for matches in the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code>. To learn more about RegEx, jump
+to the <a class="reference internal" href="#regex-label"><span class="std std-ref">regex section</span></a>.</p>
+<p>To provide additional flexibility in filtering, the user has the option
+to filter the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> inclusively or exclusively.</p>
+<p>“Inclusive” filtering will look in the patterns file and add all the
+matching data from the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> to the output file.</p>
+<p>“Exclusive” filtering will look in the patterns file and add everything
+<em>except</em> for the matching data from the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> to the output
+file.</p>
+<p>For example, if the <code class="docutils literal notranslate"><span class="pre">variables_pool</span></code> contains <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>:
+Inclusively filtering <code class="docutils literal notranslate"><span class="pre">a</span></code> would lead to an output file containing just
+<code class="docutils literal notranslate"><span class="pre">a</span></code> while exclusively filtering <code class="docutils literal notranslate"><span class="pre">a</span></code> would lead to an output file
+containing just <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code>.</p>
+<p><strong>If the first line of the pattern file is “exclude” then the file is
+treated as exclusion; otherwise, the inclusion mechanism will be
+called.</strong></p>
+<p><strong>Note:</strong> For this reason, “exclude” is the keyword that OM uses to
+differentiate inclusion and exclusion, therefore, if reported variables
+have this keyword in them, unexpected outputs might be produced.</p>
+<p><strong>If the first entry is not “exclude”, the filter patterns file will be
+treated as inclusive and will add only the data from the variables pool
+that the filter finds matches those patterns.</strong></p>
+<p>***</p>
+<p>Here is an example of a filters file that would be treated as
+“exclusive” by the Output Manager
+(<strong>[json_/csv_]filter_patterns.txt</strong>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">exclude
+</span><span id="line-2">Feed.summarize_feed_storage.nutrients_summary
+</span><span id="line-3">.*milk.*update
+</span><span id="line-4">MilkingParlor.calc_wash_water_volume_used_in_holding_area.wash_water_volume_used_in_holding_area
+</span><span id="line-5">MilkingParlor.__init__.fresh_water_use_rate
+</span><span id="line-6">^LifeCycleManager.*update$
+</span></code></pre></div>
+</div>
+<p>That same group of filters if you wanted the Output Manager to treat the
+patterns as “inclusive” (<strong>[json_/csv_]filter_patterns.txt</strong>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">Feed.summarize_feed_storage.nutrients_summary
+</span><span id="line-2">.*milk.*update
+</span><span id="line-3">MilkingParlor.calc_wash_water_volume_used_in_holding_area.wash_water_volume_used_in_holding_area
+</span><span id="line-4">MilkingParlor.__init__.fresh_water_use_rate
+</span><span id="line-5">^LifeCycleManager.*update$
+</span></code></pre></div>
+</div>
+<p>In practice, you will want to name your filters file specifically to
+inform the name of your output file.</p>
+<p>***</p>
+<p>As the user may note, some of the above filter patterns are full
+variable names as listed from the <code class="docutils literal notranslate"><span class="pre">variable_names</span></code> text file and some
+are shortened with some additional characters added in. These entries
+with extra characters are filter patterns using Regular Expressions
+(RegEx). Because RegEx may not be familiar to everyone using the RuFaS
+model, we’re providing some examples that are adaptable to users’ needs.</p>
+<p>One quick note for substitutions from provided examples - RegEx is case
+sensitive so you must match the case of a specific search term <em>exactly</em>
+e.g. LifeCycleManager NOT lifecyclemanager nor Lifecyclemanager nor
+LifeCyclemanager.</p>
+</section>
+<hr class="docutils"/>
+<section id="here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file">
+<h3>Here are some base example patterns that can be used as templates for making your own filter pattern file:<a class="headerlink" href="#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file'"><span>#</span></a></h3>
+<p><strong>1. Match by class:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="o">^</span><span class="n">Cow</span><span class="o">.*</span>
+</span></code></pre></div>
+</div>
+<p>This would match all variables added from within the Cow class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">Cow.milking_update.milk_data_at_milk_update.values: days_in_milk
+</span><span id="line-2">Cow.milking_update.milk_data_at_milk_update.values: estimated_daily_milk_produced
+</span><span id="line-3">…
+</span></code></pre></div>
+</div>
+<p>Cow can be substituted for any class name but keep the format
+^ClassName.* and remember to match the case exactly.</p>
+<p><strong>2. Match by variable name:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="o">.*</span><span class="n">daily_output</span><span class="o">.*</span>
+</span></code></pre></div>
+</div>
+<p>This would match all variables that ended in “daily_output” regardless
+of what class or function they were added from:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">ManualScraping.daily_update.daily_output.values: pen_id
+</span><span id="line-2">ManualScraping.daily_update.daily_output.values: simulation_day
+</span><span id="line-3">…
+</span><span id="line-4">ReceptionPit.daily_update.daily_output.values: pen_id
+</span><span id="line-5">ReceptionPit.daily_update.daily_output.values: simulation_day
+</span><span id="line-6">…
+</span><span id="line-7">FlushSystem.daily_update.daily_output.values: simulation_day
+</span><span id="line-8">FlushSystem.daily_update.daily_output.values: manure_urea
+</span><span id="line-9">…
+</span></code></pre></div>
+</div>
+<p>It would NOT match variables like these though because of the text
+between “daily” and “output”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Feed</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_phosphorus_outputs</span><span class="o">.</span><span class="n">values</span><span class="p">:</span> <span class="n">phosphorus</span>
+</span><span id="line-2"><span class="n">Feed</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_nitrogen_outputs</span><span class="o">.</span><span class="n">values</span><span class="p">:</span> <span class="n">nitrogen</span>
+</span></code></pre></div>
+</div>
+<p><strong>3. Match by a combination of class name and variable name:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="o">^</span><span class="n">ManualScraping</span><span class="o">.*</span><span class="n">daily_output</span><span class="o">.*</span>
+</span></code></pre></div>
+</div>
+<p>This would match all variables added from within the ManualScraping
+class that end with daily_output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">ManualScraping.daily_update.daily_output.info_maps: sim_day
+</span><span id="line-2">ManualScraping.daily_update.daily_output.info_maps: bedding
+</span><span id="line-3">ManualScraping.daily_update.daily_output.values: pen_id
+</span><span id="line-4">…
+</span></code></pre></div>
+</div>
+<p>It would NOT match either of these:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">ManualScraping</span><span class="o">.</span><span class="n">_get_current_day_average_temperature_in_celsius</span><span class="o">.</span><span class="n">current_day_average_temperature_in_celsius</span>
+</span><span id="line-2"><span class="n">ManualScraping</span><span class="o">.</span><span class="n">calc_cleaning_water_volume_in_main_barn</span><span class="o">.</span><span class="n">cleaning_water_volume_in_main_barn</span>
+</span></code></pre></div>
+</div>
+<p><strong>4. Match by keyword:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="o">.*</span><span class="p">[</span><span class="n">nN</span><span class="p">]</span><span class="n">itrogen</span><span class="o">.*</span>
+</span></code></pre></div>
+</div>
+<p>This would match all variables, function names, and class names
+containing the word nitrogen. Note: the [nN] near the start of the
+pattern indicates that in the search the first letter of “nitrogen” can
+be either lowercase OR uppercase N. It would therefore capture all
+instances of either.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">ReceptionPit</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_total_ammoniacal_nitrogen</span>
+</span><span id="line-2"><span class="n">ReceptionPit</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_nitrogen</span>
+</span><span id="line-3"><span class="n">ManualScraping</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_total_ammoniacal_nitrogen</span>
+</span><span id="line-4"><span class="n">ManualScraping</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_nitrogen</span>
+</span><span id="line-5"><span class="n">FlushSystem</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_total_ammoniacal_nitrogen</span>
+</span><span id="line-6"><span class="n">FlushSystem</span><span class="o">.</span><span class="n">daily_update</span><span class="o">.</span><span class="n">daily_output</span><span class="o">.</span><span class="n">liquid_manure_nitrogen</span>
+</span><span id="line-7"><span class="n">Feed</span><span class="o">.</span><span class="n">summarize_feed_storage</span><span class="o">.</span><span class="n">nitrogen</span>
+</span><span id="line-8"><span class="n">NitrogenCollection</span><span class="o">.</span><span class="n">manure_collection</span><span class="o">.</span><span class="n">daily_update</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="regular-expressions">
+<span id="regex-label"></span><h3>Regular Expressions<a class="headerlink" href="#regular-expressions" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#regular-expressions'"><span>#</span></a></h3>
+<p>A full explanation of Regular Expressions is not appropriate (nor
+possible) in this space but users are encouraged to look more into the
+subject with these resources:</p>
+<p><a class="reference external" href="https://youtu.be/S5jse5_Zw40">Introduction to Regular Expressions in RuFaS and its application for
+filtering outputs</a></p>
+<p><a class="reference external" href="https://www.geeksforgeeks.org/regular-expression-python-examples-set-1/#">RegEx
+introduction</a></p>
+<p><a class="reference external" href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">Second Regex
+introduction</a></p>
+<p><a class="reference external" href="https://regex101.com/">RegEx tester with cheat sheet</a> - remember to
+specify Python in the “flavor” section on the left side.</p>
+<p><a class="reference external" href="https://www.debuggex.com/cheatsheet/regex/python">RegEx cheat-sheet</a></p>
+<p><a class="reference external" href="https://www.youtube.com/watch?v=wnuBwl2ekmo">Introduction video to pattern matching with RegEx in Python taught
+using PyCharm IDE</a></p>
+<p><a class="reference external" href="https://docs.python.org/3/library/re.html">Regular Expressions full Python
+documentation</a></p>
+<p><strong>One final RegEx note:</strong> There are a LOT of other resources related to
+Regular Expressions you will find with a simple Google search. RegEx is
+very widely used across a variety of programming languages. In most
+cases, using a RegEx tester specifically built for JavaScript (for
+example) won’t cause any issues. But because of small differences
+between programming languages, RegEx can behave slightly differently
+between them and give you unexpected results so the best option is to
+seek out and use RegEx resources specifically geared towards use in
+Python.</p>
+<hr class="docutils"/>
+<p>The Output Manager has more details, configurations, and optional
+arguments for many of its methods that are not part of a typical use
+case but it is still encouraged for the user to explore in the
+<a class="reference external" href="https://github.com/RuminantFarmSystems/MASM/blob/master/RUFAS/output_manager.py">output_manager.py
+file</a>.</p>
+</section>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#overview'" class="reference internal" href="#overview">Overview</a></li>
+<li><a :data-current="activeSection === '#quick-start'" class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a :data-current="activeSection === '#chunkification'" class="reference internal" href="#chunkification">Chunkification</a></li>
+<li><a :data-current="activeSection === '#output-filters'" class="reference internal" href="#output-filters">Output Filters</a></li>
+<li><a :data-current="activeSection === '#data-origins'" class="reference internal" href="#data-origins">Data Origins</a></li>
+<li><a :data-current="activeSection === '#diagram'" class="reference internal" href="#diagram">Diagram</a></li>
+<li><a :data-current="activeSection === '#data-pools'" class="reference internal" href="#data-pools">Data Pools</a><ul>
+<li><a :data-current="activeSection === '#writing-logs-warnings-and-errors'" class="reference internal" href="#writing-logs-warnings-and-errors">Writing Logs, Warnings, and Errors</a><ul>
+<li><a :data-current="activeSection === '#general-best-practices'" class="reference internal" href="#general-best-practices">General Best Practices</a></li>
+<li><a :data-current="activeSection === '#naming-and-structuring-messages'" class="reference internal" href="#naming-and-structuring-messages">Naming and Structuring Messages</a><ul>
+<li><a :data-current="activeSection === '#consistent-naming-with-varied-messages'" class="reference internal" href="#consistent-naming-with-varied-messages">1. Consistent Naming with Varied Messages</a></li>
+<li><a :data-current="activeSection === '#cause-effect-or-action-outcome-pattern'" class="reference internal" href="#cause-effect-or-action-outcome-pattern">2. Cause-Effect (or Action-Outcome) Pattern</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#choosing-the-right-approach'" class="reference internal" href="#choosing-the-right-approach">Choosing the Right Approach</a></li>
+<li><a :data-current="activeSection === '#summary-of-pros-and-cons'" class="reference internal" href="#summary-of-pros-and-cons">Summary of Pros and Cons</a></li>
+<li><a :data-current="activeSection === '#info-maps'" class="reference internal" href="#info-maps">Info Maps</a></li>
+<li><a :data-current="activeSection === '#naming-conventions'" class="reference internal" href="#naming-conventions">Naming Conventions</a></li>
+<li><a :data-current="activeSection === '#what-not-to-do'" class="reference internal" href="#what-not-to-do">What <strong>NOT</strong> To Do</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#adding-data-to-the-output-manager'" class="reference internal" href="#adding-data-to-the-output-manager">Adding Data to the Output Manager</a></li>
+<li><a :data-current="activeSection === '#info-label'" class="reference internal" href="#info-label">Info_maps</a></li>
+<li><a :data-current="activeSection === '#navigating-variables-pool-data'" class="reference internal" href="#navigating-variables-pool-data">Navigating Variables Pool Data</a><ul>
+<li><a :data-current="activeSection === '#the-variable-names-list'" class="reference internal" href="#the-variable-names-list">The variable names list.</a></li>
+<li><a :data-current="activeSection === '#the-exclude-info-maps-flag'" class="reference internal" href="#the-exclude-info-maps-flag">The exclude_info_maps flag.</a></li>
+<li><a :data-current="activeSection === '#filtering'" class="reference internal" href="#filtering">Filtering.</a></li>
+<li><a :data-current="activeSection === '#how-does-the-filter-work'" class="reference internal" href="#how-does-the-filter-work">How does the filter work?</a></li>
+<li><a :data-current="activeSection === '#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file'" class="reference internal" href="#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file">Here are some base example patterns that can be used as templates for making your own filter pattern file:</a></li>
+<li><a :data-current="activeSection === '#regular-expressions'" class="reference internal" href="#regular-expressions">Regular Expressions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=9bcbadda"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
