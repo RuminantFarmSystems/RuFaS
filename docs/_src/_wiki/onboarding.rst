@@ -2,17 +2,16 @@
 **Welcome to RuFaS**
 ====================
 
-:Author: 
-
 .. container:: titlepage
 
    **Welcome to RuFaS**
 
    Introduction to RuFaS for New Team Members
 
-   1970-01-01
+   2025-06-20
 
    .. image:: /_static/rufas.png
+      :align: center
       :alt: image
       :width: 40.0%
 
@@ -29,8 +28,6 @@ capabilities of RuFaS and expected outputs of each module.
    :alt: This is a brief overview of the RuFaS Model
    :name: fig:example
    :width: 100.0%
-
-   This is a brief overview of the RuFaS Model
 
 .. container:: itemize
 
@@ -54,6 +51,8 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/animalmod.png
       :alt: image
+      :width: 60.0%
+      :align: center
 
    Remember, while overarching decisions about whether you’d like to
    provide the diet recipe or have RuFaS formulate one for you and
@@ -89,6 +88,8 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/manuremod.png
       :alt: image
+      :width: 60.0%
+      :align: center
 
    The output of this module estimates manure composition, quantity of
    manure, storage emissions, biogas capture from anaerobic digestion,
@@ -116,6 +117,8 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/feedmod.png
       :alt: image
+      :width: 60.0%
+      :align: center
 
    Outputs of interest for this module will consider production and
    environmental impacts.
@@ -134,25 +137,27 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/soilcropmod.png
       :alt: image
+      :width: 60.0%
+      :align: center
 
    Outputs are estimated crop measures like biomass accumulation or
    harvest yields and field parameters like emissions, soil erosion,
    phosphorus runoff and nitrate percolation.
 
-    .. figure:: /_static/Modules.png
-       :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
-       :name: fig:example
-       :width: 60.0%
+.. figure:: /_static/Modules.png
+   :align: center
+   :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
+   :name: fig:example
+   :width: 80.0%
 
-      This image summarizes the processes and outputs of the four
-      modules of the RuFaS Model
+This image summarizes the processes and outputs of the four
+modules of the RuFaS Model
 
 .. figure:: /_static/EEE.png
+   :align: center
    :alt: This is my image
    :name: fig:example
-   :width: 60.0%
-
-   This is my image
+   :width: 80.0%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
