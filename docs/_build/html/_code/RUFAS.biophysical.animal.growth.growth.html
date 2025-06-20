@@ -10,7 +10,7 @@
 <title>RUFAS.biophysical.animal.growth.growth module | Ruminant Farm Simulation (RuFaS)  documentation</title>
 <meta content="RUFAS.biophysical.animal.growth.growth module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.animal.growth.growth module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
-<link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
@@ -176,6 +176,12 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth.evaluate_body_weight_change">
 <span class="sig-name descname"><span class="pre">evaluate_body_weight_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">GrowthOutputs</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth.evaluate_body_weight_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth.evaluate_body_weight_change'"><span>#</span></a></dt>
 <dd><p>Handles an animal’s daily growth updates.</p>
+<blockquote>
+<div><p>Notes</p>
+</div></blockquote>
+<p>Preg heifer growth -  [AN.BWT.3]
+1st &amp; 2nd parity cow growth - [AN.BWT.4]
+Parity 3+ cow growth - [AN.BWT.5]</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
 <dl class="simple">
@@ -201,35 +207,42 @@ after the growth-related routines for the current day.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth.calculate_calf_body_weight_change">
 <span class="sig-name descname"><span class="pre">calculate_calf_body_weight_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth.calculate_calf_body_weight_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth.calculate_calf_body_weight_change'"><span>#</span></a></dt>
-<dd><p>Calculates the body weight change for calves.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
+<dd><blockquote>
+<div><p>Calculates the body weight change for calves.</p>
+</div></blockquote>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>[AN.BWT.7]</p>
+<blockquote>
+<div><dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
-</section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily body weight growth for calves (kg).</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth.calculate_non_pregnant_heifer_body_weight_change">
 <span class="sig-name descname"><span class="pre">calculate_non_pregnant_heifer_body_weight_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth.calculate_non_pregnant_heifer_body_weight_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth.calculate_non_pregnant_heifer_body_weight_change'"><span>#</span></a></dt>
-<dd><p>Calculates the body weight change for non-pregnant heifers.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dd><p>Calculates the body weight change of heifers due to growth.</p>
+<section id="id1">
+<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<p>[AN.BWT.8]
+[AN.BWT.9]</p>
+</section>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily body weight growth for non-pregnant heifers (kg).</p>
 </dd>
@@ -239,8 +252,8 @@ after the growth-related routines for the current day.</p>
 <h3>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h3>
 <p>Life cycle pseudocode @[A.1A.C.6] in pseudocode, which are from Fox et al. 1999 and NRC 2001.</p>
 </section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <p>For animals over 55% of their mature body weight, the equation results in a negative return.
 Therefore, when the result is negative, the minimum BW change constant is returned instead.</p>
 </section>
@@ -250,22 +263,23 @@ Therefore, when the result is negative, the minimum BW change constant is return
 <span class="sig-name descname"><span class="pre">calculate_pregnant_heifer_body_weight_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth.calculate_pregnant_heifer_body_weight_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth.calculate_pregnant_heifer_body_weight_change'"><span>#</span></a></dt>
 <dd><p>Calculates the body weight change for pregnant heifers.</p>
 <section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<p>[AN.BWT.3]
+[AN.BWT.9]</p>
+</section>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float]</dt><dd><p>The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).</p>
 </dd>
 </dl>
-</section>
-<section id="id7">
-<h3>References<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
-<p>Life cycle pseudocode @[A.1A.C.9]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -273,23 +287,24 @@ Therefore, when the result is negative, the minimum BW change constant is return
 <span class="sig-name descname"><span class="pre">calculate_cow_body_weight_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth.calculate_cow_body_weight_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth.calculate_cow_body_weight_change'"><span>#</span></a></dt>
 <dd><p>Calculates the body weight change for cows.</p>
 <section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<p>[AN.BWT.4]
+[AN.BWT.5]</p>
+</section>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float, float]</dt><dd><p>The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
 tissue changed (kg).</p>
 </dd>
 </dl>
-</section>
-<section id="id10">
-<h3>References<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
-<p>Life cycle pseudocode @[A.1A.C.56/57/58]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -297,14 +312,21 @@ tissue changed (kg).</p>
 <span class="sig-name descname"><span class="pre">_calculate_pregnant_heifer_conceptus_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth._calculate_pregnant_heifer_conceptus_growth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth._calculate_pregnant_heifer_conceptus_growth'"><span>#</span></a></dt>
 <dd><p>Calculates the conceptus growth for pregnant heifers.</p>
 <section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<h3>Notes<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<p>Total conceptus weight - [AN.BWT.14]
+conceptus parameter - [AN.BWT.15]
+Conceptus growth - [AN.BWT.16]
+Conceptus weight change at parturition - [AN.BWT.17]</p>
+</section>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id12">
-<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float]</dt><dd><p>The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).</p>
 </dd>
@@ -315,15 +337,22 @@ tissue changed (kg).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_conceptus_growth">
 <span class="sig-name descname"><span class="pre">_calculate_cow_conceptus_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_conceptus_growth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_conceptus_growth'"><span>#</span></a></dt>
 <dd><p>Calculates the conceptus growth for cows.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<section id="id14">
+<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<p>Total conceptus weight - [AN.BWT.14]
+conceptus parameter - [AN.BWT.15]
+Conceptus growth - [AN.BWT.16]
+Conceptus weight change at parturition - [AN.BWT.17]</p>
+</section>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id14">
-<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float, float]</dt><dd><p>The conceptus growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
 tissue changed (kg).</p>
@@ -335,15 +364,19 @@ tissue changed (kg).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth._calculate_pregnant_heifer_target_daily_growth">
 <span class="sig-name descname"><span class="pre">_calculate_pregnant_heifer_target_daily_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth._calculate_pregnant_heifer_target_daily_growth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth._calculate_pregnant_heifer_target_daily_growth'"><span>#</span></a></dt>
 <dd><p>Calculates the target daily growth for pregnant heifers.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Notes<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<p>[AN.BWT.9]</p>
+</section>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily growth rate for pregnant heifers (kg).</p>
 </dd>
@@ -354,15 +387,22 @@ tissue changed (kg).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_target_daily_growth">
 <span class="sig-name descname"><span class="pre">_calculate_cow_target_daily_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_target_daily_growth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_target_daily_growth'"><span>#</span></a></dt>
 <dd><p>Calculates the target daily growth for cows.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<section id="id20">
+<h3>Notes<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<p>[AN.BWT.10]
+[AN.BWT.11]
+[AN.BWT.12]
+[AN.BWT.13]</p>
+</section>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily growth rate for cows (kg).</p>
 </dd>
@@ -373,15 +413,21 @@ tissue changed (kg).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_body_weight_tissue_change">
 <span class="sig-name descname"><span class="pre">_calculate_cow_body_weight_tissue_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrowthInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_body_weight_tissue_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.growth.growth.Growth._calculate_cow_body_weight_tissue_change'"><span>#</span></a></dt>
 <dd><p>Calculates the body weight tissue growth for cows.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<section id="id23">
+<h3>Notes<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<p>[AN.BWT.18]
+[AN.BWT.19]
+[AN.BWT.20]</p>
+</section>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_inputs: GrowthInputs</dt><dd><p>Animal properties related to body weight growth.</p>
 </dd>
 </dl>
 </section>
-<section id="id20">
-<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float]</dt><dd><p>The body weight tissue growth for cows (kg), and the updated tissue changed (kg).</p>
 </dd>

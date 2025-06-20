@@ -10,7 +10,7 @@
 <title>RUFAS.biophysical.animal.animal module | Ruminant Farm Simulation (RuFaS)  documentation</title>
 <meta content="RUFAS.biophysical.animal.animal module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.animal.animal module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
-<link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../_static/pygments.css?v=8d216cef" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
@@ -1265,17 +1265,25 @@ False otherwise.</p>
 </dd>
 </dl>
 </section>
+<section id="id83">
+<h3>Notes<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
+<p>[AN.ANM.1]</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date">
 <span class="sig-name descname"><span class="pre">determine_future_cull_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date'"><span>#</span></a></dt>
 <dd><p>Determine the future cull date and reason for the animal based on parity-specific probabilities.</p>
-<section id="id83">
-<h3>Returns<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
+<section id="id84">
+<h3>Returns<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[int, str]</dt><dd><p>Future cull date in simulation days and reason for culling.</p>
 </dd>
 </dl>
+</section>
+<section id="id85">
+<h3>Notes<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
+<p>[AN.ANM.2]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -1285,8 +1293,8 @@ False otherwise.</p>
 history if the animal is in a different pen than it was the last time
 this method is called or modifying the last element in the pen_history
 list to reflect the current simulation day.</p>
-<section id="id84">
-<h3>Parameters<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
+<section id="id86">
+<h3>Parameters<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_pen: int</dt><dd><p>The id of the new pen that the animal is assigned to.</p>
 </dd>
@@ -1302,8 +1310,8 @@ list to reflect the current simulation day.</p>
 <span class="sig-name descname"><span class="pre">set_daily_walking_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertical_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.set_daily_walking_distance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.set_daily_walking_distance'"><span>#</span></a></dt>
 <dd><p>Calculates and sets the animal’s daily vertical and horizontal
 walking distance (DVD and DHD).</p>
-<section id="id85">
-<h3>Parameters<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
+<section id="id87">
+<h3>Parameters<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>vertical_dist_to_parlor<span class="classifier">float</span></dt><dd><p>Vertical distance to milking parlor (km).</p>
 </dd>
@@ -1321,8 +1329,8 @@ walking distance (DVD and DHD).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements">
 <span class="sig-name descname"><span class="pre">calculate_nutrition_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walking_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">NutritionRequirements</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements'"><span>#</span></a></dt>
 <dd><p>Gets the nutrition requirements for an animal.</p>
-<section id="id86">
-<h3>Parameters<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
+<section id="id88">
+<h3>Parameters<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>housing<span class="classifier">str</span></dt><dd><p>The housing type of the animal, either “barn” or “grazing”.</p>
 </dd>
@@ -1334,8 +1342,8 @@ walking distance (DVD and DHD).</p>
 </dd>
 </dl>
 </section>
-<section id="id87">
-<h3>Returns<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
+<section id="id89">
+<h3>Returns<a class="headerlink" href="#id89" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id89'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NutritionRequirements</dt><dd><p>The nutrition requirements for the animal.</p>
 </dd>
