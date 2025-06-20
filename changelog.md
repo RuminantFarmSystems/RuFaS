@@ -183,8 +183,10 @@ v0.9.2
 - [2317](https://github.com/RuminantFarmSystems/MASM/pull/2317) - [minor change] [Animal][Manure] Moves the bedding calculations into the Animal module.
 - [2388](https://github.com/RuminantFarmSystems/MASM/pull/2388) - [minor change] [Manure] Enacts and incorporates refreshed daily manure processing functionality.
 - [2348](https://github.com/RuminantFarmSystems/MASM/pull/2348) - [minor change] [Animal][Metadata][Manure] Metadata Update for Animal Manure Connection.
-- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2435) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
 - [2451](https://github.com/RuminantFarmSystems/RuFaS/pull/2451) - [minor change] [Sphinx] Updates favicon for the sphinx website; Updates the wiki for TaskManager about detail Herd Generation info.
+- [2452](https://github.com/RuminantFarmSystems/MASM/pull/2452) - [minor change] [Wiki]Updated external documents.
+- [2438](https://github.com/RuminantFarmSystems/RuFaS/pull/2438) - [minor change] [GitHub Actions] Updates the Sphinx documentation workflow to deploy to GitHub Pages via the gh-pages branch and removes build artifacts from the main branch.
+- [2443](https://github.com/RuminantFarmSystems/RuFaS/pull/2443) - [minor change] [metadata] Moves input/metadata/task_manager_metadata.json to input/task_manager_metadata.json and updates the corresponding entries in the code.
 
 
 ### v0.9.2
