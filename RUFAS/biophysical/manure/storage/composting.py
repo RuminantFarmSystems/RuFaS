@@ -323,9 +323,10 @@ class Composting(Storage):
         float
             The solid manure methane emission on the current day, kg/day.
         """
-        methane_conversion_factor =\
-            Composting._calculate_methane_conversion_factor(manure_temperature, composting_type) \
+        methane_conversion_factor = (
+            Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
             * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         return manure_volatile_solids * (ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
 
     @staticmethod
