@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionSt
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements, \
     NutritionEvaluationResults
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
@@ -163,6 +164,14 @@ class AnimalModuleReporter:
         for milk_stats in milk_reports:
             milk_data_update: dict[str, int | float] = asdict(milk_stats)
             milk_data_update["lactating"] = milk_stats.is_milking
+            milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
+            milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
+            milk_data_update["milk_fat"] = MilkProduction.fat_percent
+            milk_data_update["milk_lactose"] = animal.milk_production.lactose_content
+            milk_data_update["lactating"] = animal.is_milking
+            milk_data_update["parity"] = animal.reproduction.calves
+            milk_data_update["cow_id"] = animal.id
+            milk_data_update["pen_id"] = animal.pen_history[-1]["pen"]
             milk_data_update["simulation_day"] = simulation_day
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
 

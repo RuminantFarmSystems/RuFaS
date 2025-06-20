@@ -220,6 +220,11 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
         mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
     ]
 
+    mock_udr_key = mocker.MagicMock()
+    mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
+
+    mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=available_feeds)
+
     result = herd_manager.formulate_rations(
         available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
     )
@@ -336,6 +341,7 @@ def test_reformulate_ration_single_pen(
         mock_use_user_defined_ration.assert_not_called()
         mock_formulate_optimized_ration.assert_called_once_with(
             available_feeds,
+            current_temperature,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
             mock_total_inventory,
