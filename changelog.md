@@ -180,6 +180,7 @@ v0.9.2
 - [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
 - [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
+- [2442](https://github.com/RuminantFarmSystems/RuFaS/pull/2442) - [minor change] [FeedManager][FeedStorage] Finishes up version 1 of the Feed Storage/Manager modules.
 - [2317](https://github.com/RuminantFarmSystems/MASM/pull/2317) - [minor change] [Animal][Manure] Moves the bedding calculations into the Animal module.
 - [2388](https://github.com/RuminantFarmSystems/MASM/pull/2388) - [minor change] [Manure] Enacts and incorporates refreshed daily manure processing functionality.
 - [2348](https://github.com/RuminantFarmSystems/MASM/pull/2348) - [minor change] [Animal][Metadata][Manure] Metadata Update for Animal Manure Connection.
