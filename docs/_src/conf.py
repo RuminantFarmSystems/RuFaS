@@ -37,3 +37,4 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_permalinks_icon = '<span>#</span>'
 html_theme = 'sphinxawesome_theme'
 html_logo = "_static/img/RuFaS Logo Vector.svg"
+html_favicon = "_static/rufas.png"
