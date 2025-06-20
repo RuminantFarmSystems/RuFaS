@@ -242,7 +242,7 @@ class FeedManager:
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - available_amount
 
-        self.purchase_feed(feeds_to_purchase, time)
+        self.purchase_feed(feeds_to_purchase, time, purchase_type="daily_feed_request")
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory, time.simulation_day)
         return True
 
@@ -302,11 +302,19 @@ class FeedManager:
             )
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
-        self.purchase_feed(feeds_to_purchase, time)
+        self.purchase_feed(feeds_to_purchase, time, purchase_type="planning_cycle")
 
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: RufasTime) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
-        self.purchase_feed(requested_feeds.requested_feed, time)
+        current_feed_totals = self._query_available_feed_totals(list(requested_feeds.requested_feed.keys()))
+        feeds_to_purchase = {id: 0.0 for id in requested_feeds.requested_feed.keys()}
+        for feed_id, amount_requested in requested_feeds.requested_feed.items():
+            available_amount = current_feed_totals[feed_id]
+
+            amount_to_purchase = max(amount_requested - available_amount, 0.0)
+            feeds_to_purchase[feed_id] = amount_to_purchase
+
+        self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
 
     def _query_available_feed_totals(
         self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
@@ -394,7 +402,7 @@ class FeedManager:
 
         return results
 
-    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime) -> None:
+    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime, purchase_type: str) -> None:
         """
         Records amounts and cost of feed purchased, and orchestrates storing them.
 
@@ -427,12 +435,13 @@ class FeedManager:
                 "total_cost": total_cost,
             }
             self._om.add_variable(
-                f"{rufas_id}_cost",
+                f"{purchase_type}_{rufas_id}_cost",
                 purchase_amount * feed_info.purchase_cost,
                 info_map | {"units": MeasurementUnits.DOLLARS},
             )
             self._om.add_variable(
-                f"{rufas_id}_amount_purchased", purchase_amount, info_map | {"units": MeasurementUnits.KILOGRAMS}
+                f"{purchase_type}_{rufas_id}_amount_purchased", purchase_amount,
+                info_map | {"units": MeasurementUnits.KILOGRAMS}
             )
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
