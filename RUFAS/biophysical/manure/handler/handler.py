@@ -17,8 +17,6 @@ class Handler(Processor):
     ----------
     name : str
         Unique identifier of the processor.
-    handler_type: str
-        The type of manure handler.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
     cleaning_water_recycle_fraction : float
@@ -44,14 +42,14 @@ class Handler(Processor):
     def __init__(
         self,
         name: str,
-        handler_type: str,
+        processor_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
         use_parlor_flush: bool,
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
-        self.handler_type = handler_type
+        self.handler_type = processor_type
         self.cleaning_water_use_amount = cleaning_water_use_amount
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
@@ -113,7 +111,6 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
-            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -121,10 +118,10 @@ class Handler(Processor):
         ammonia_emission = 0.0
         fresh_water_volume_used_for_milking = 0.0
 
-        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+        if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
             ammonia_emission = self._calculate_ammonia_emissions(
                 self.manure_stream.ammoniacal_nitrogen,
-                self.manure_stream.volume,
+                self.manure_stream.pen_manure_data.manure_urine_mass,
                 ManureConstants.SLURRY_MANURE_DENSITY,
                 barn_temperature,
                 self.determine_ammonia_resistance(barn_temperature),
@@ -132,7 +129,7 @@ class Handler(Processor):
                 ManureConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
             )
 
-        if self.handler_type == "PARLOR_CLEANING":
+        if self.__class__.__name__ == "ParlorCleaningHandler":
             num_animals = self.manure_stream.pen_manure_data.num_animals
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 
@@ -175,22 +172,22 @@ class Handler(Processor):
             MeasurementUnits.KILOGRAMS,
             time.simulation_day,
         )
+        output_stream = ManureStream(
+            water=manure_water,
+            ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            potassium=potassium,
+            ash=ash,
+            non_degradable_volatile_solids=non_degradable_volatile_solids,
+            degradable_volatile_solids=degradable_volatile_solids,
+            volume=volume,
+            total_solids=total_solids,
+            pen_manure_data=None,
+        )
+        self._report_manure_stream(output_stream, "", time.simulation_day)
 
-        return {
-            "manure": ManureStream(
-                water=manure_water,
-                ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-                nitrogen=nitrogen,
-                phosphorus=phosphorus,
-                potassium=potassium,
-                ash=ash,
-                non_degradable_volatile_solids=non_degradable_volatile_solids,
-                degradable_volatile_solids=degradable_volatile_solids,
-                volume=volume,
-                total_solids=total_solids,
-                pen_manure_data=None,
-            )
-        }
+        return {"manure": output_stream}
 
     def determine_handler_cleaning_water_volume(
         self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
@@ -241,15 +238,10 @@ class Handler(Processor):
         info_map = {"class": self.__class__.__name__, "function": self.check_manure_stream_compatibility.__name__}
         if not super().check_manure_stream_compatibility(manure_stream):
             return False
-        if (
-            manure_stream.pen_manure_data is not None
-            and manure_stream.pen_manure_data.pen_type is not None
-            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]
-        ):
+        if manure_stream is None or manure_stream.pen_manure_data is None:
             self._om.add_error(
-                "Unsupported pen type.",
-                f"Handler should only be used with freestall and tiestall pen types,"
-                f" received {manure_stream.pen_manure_data.pen_type}.",
+                "None type ManureStream or PenManureData.",
+                "The received ManureStream or PenManureData of the manure stream is None type.",
                 info_map,
             )
             return False

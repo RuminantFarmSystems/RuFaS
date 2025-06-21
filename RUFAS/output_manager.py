@@ -1092,9 +1092,9 @@ class OutputManager(object):
         df = pd.concat([disclaimer_df, df], axis=1)
 
         if direction == "portrait" or direction is None:
-            df.to_csv(path, index=False)
+            df.to_csv(path, index=False, encoding="utf-8")
         elif direction == "landscape":
-            df.T.to_csv(path)
+            df.T.to_csv(path, encoding="utf-8")
         else:
             self.add_error(
                 "Unknown Direction for CSV Output",
@@ -1102,7 +1102,7 @@ class OutputManager(object):
                 f"Saving the output in portrait direction as default.",
                 info_map,
             )
-            df.to_csv(path, index=False)
+            df.to_csv(path, index=False, encoding="utf-8")
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
