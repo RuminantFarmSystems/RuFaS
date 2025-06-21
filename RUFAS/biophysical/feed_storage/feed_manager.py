@@ -469,6 +469,17 @@ class FeedManager:
         # TODO get shrink factor from appropriate feed library source when that data becomes available.
         # Default 10% shrink factor for all purchased feeds for now.
         adjusted_mass = purchased_feed.dry_matter_mass * (1 - shrink_factor)
+        self._om.add_variable(
+            f"purchased_feed_{purchased_feed.rufas_id}_amount_lost_to_shrink",
+            purchased_feed.dry_matter_mass - adjusted_mass,
+            {
+                "class": self.__class__.__name__,
+                "function": self._adjust_for_shrink.__name__,
+                "units": MeasurementUnits.DRY_KILOGRAMS,
+                "rufas_id": purchased_feed.rufas_id,
+                "shrink_factor": shrink_factor,
+            },
+        )
         return PurchasedFeed(
             rufas_id=purchased_feed.rufas_id,
             dry_matter_mass=adjusted_mass,
