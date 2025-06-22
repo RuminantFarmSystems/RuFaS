@@ -201,7 +201,7 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
         }
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass})
+            self._om.add_variable(f"stored_feed_{rufas_id}", [mass, time.simulation_day], {**info_map, "rufas_id": rufas_id, "mass": mass})
 
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: RufasTime) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
@@ -211,7 +211,7 @@ class FeedManager:
         for feed_id, amount_requested in requested_feed.requested_feed.items():
             self._om.add_variable(
                 f"{feed_id}_requested_amount",
-                amount_requested,
+                [amount_requested, time.simulation_day],
                 {
                     "class": self.__class__.__name__,
                     "function": self.manage_daily_feed_request.__name__,
@@ -222,7 +222,7 @@ class FeedManager:
             available_amount = current_feed_totals[feed_id]
             self._om.add_variable(
                 f"{feed_id}_available_amount",
-                available_amount,
+                [available_amount, time.simulation_day],
                 {
                     "class": self.__class__.__name__,
                     "function": self.manage_daily_feed_request.__name__,
@@ -441,12 +441,13 @@ class FeedManager:
             )
             self._om.add_variable(
                 f"{purchase_type}_{rufas_id}_amount_purchased",
-                purchase_amount,
+                [purchase_amount, time.simulation_day],
                 info_map | {"units": MeasurementUnits.KILOGRAMS},
             )
-            self._store_purchased_feed(rufas_id, purchase_amount, time)
+            self._store_purchased_feed(rufas_id, purchase_amount, time, purchase_type)
 
-    def _adjust_for_shrink(self, purchased_feed: PurchasedFeed, shrink_factor: float = 0.1) -> PurchasedFeed:
+    def _adjust_for_shrink(self, purchased_feed: PurchasedFeed, purchase_type: str, simulation_day: int,
+                           shrink_factor: float = 0.1) -> PurchasedFeed:
         """
         Adjusts the purchased feed to account for shrink loss in storage.
 
@@ -454,6 +455,10 @@ class FeedManager:
         ----------
         purhased_feed : PurchasedFeed
             PurchasedFeed object containing the feed to be adjusted.
+        purchase_type : str
+            Type of purchase being made, used for output variable naming.
+        simulation_day : int
+            The current simulation day, used for tracking feed adjustments.
         shrink_factor : float, optional
             The expected fraction of feed lost due to shrink (default is 0.1 for 10%).
 
@@ -470,8 +475,8 @@ class FeedManager:
         # Default 10% shrink factor for all purchased feeds for now.
         adjusted_mass = purchased_feed.dry_matter_mass * (1 - shrink_factor)
         self._om.add_variable(
-            f"purchased_feed_{purchased_feed.rufas_id}_amount_lost_to_shrink",
-            purchased_feed.dry_matter_mass - adjusted_mass,
+            f"{purchase_type}_purchased_feed_{purchased_feed.rufas_id}_amount_lost_to_shrink",
+            [purchased_feed.dry_matter_mass - adjusted_mass, simulation_day],
             {
                 "class": self.__class__.__name__,
                 "function": self._adjust_for_shrink.__name__,
@@ -486,7 +491,8 @@ class FeedManager:
             storage_time=purchased_feed.storage_time,
         )
 
-    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime,
+                              purchase_type: str) -> None:
         """
         Stores feeds which have been purchased and adjusts for shrink.
 
@@ -498,10 +504,11 @@ class FeedManager:
             Amount of feed that was purchased (kg dry matter).
         time : RufasTime
             RufasTime object.
-
+        purchase_type : str
+            Type of purchase being made, used for output variable naming.
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
-        shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed)
+        shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed, purchase_type, time.simulation_day)
         self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float], simulation_day: int) -> None:
@@ -528,46 +535,60 @@ class FeedManager:
 
         all_available_feeds = sorted(all_available_feeds, key=lambda feed: feed.storage_time)
 
+        total_purchased_feed_deductions: dict[RUFAS_ID, float] = {}
+        total_farmgrown_feed_deductions: dict[RUFAS_ID, float] = {}
+
         for rufas_id, amount in feeds_to_deduct.items():
-            available_feeds: list[HarvestedCrop | PurchasedFeed] = []
-            for feed in all_available_feeds:
-                is_feedable = self._check_feed_availability(feeds_to_deduct, rufas_id, feed)
-                if is_feedable:
-                    available_feeds.append(feed)
+            available_feeds = [
+                feed for feed in all_available_feeds
+                if self._check_feed_availability(feeds_to_deduct, rufas_id, feed)
+            ]
 
             for feed in available_feeds:
-                amount_to_deduct = min(
-                    amount, feed.dry_matter_mass if isinstance(feed, PurchasedFeed) else feed.fresh_mass
-                )
+                amount_to_deduct = min(amount, feed.dry_matter_mass)
                 amount -= amount_to_deduct
+
                 if isinstance(feed, PurchasedFeed):
                     feed.remove_dry_matter_mass(amount_to_deduct)
-                    self._om.add_variable(
-                        f"purchased_feed_{feed.rufas_id}_amount_deducted",
-                        amount_to_deduct,
-                        {
-                            "class": self.__class__.__name__,
-                            "function": self._deduct_feeds_from_inventory.__name__,
-                            "units": MeasurementUnits.DRY_KILOGRAMS,
-                            "simulation_day": simulation_day,
-                        },
-                    )
+                    total_purchased_feed_deductions[rufas_id] = \
+                        total_purchased_feed_deductions.get(rufas_id, 0.0) + amount_to_deduct
                 else:
                     feed.remove_feed_mass(amount_to_deduct)
-                    self._om.add_variable(
-                        f"farmgrown_feed_{feed.config_name}_amount_deducted",
-                        amount_to_deduct,
-                        {
-                            "class": self.__class__.__name__,
-                            "function": self._deduct_feeds_from_inventory.__name__,
-                            "units": MeasurementUnits.KILOGRAMS,
-                            "simulation_day": simulation_day,
-                        },
+                    harvested_rufas_id = self._select_rufas_id_for_harvested_crop(
+                        feed.rufas_ids, list(feeds_to_deduct.keys())
                     )
+                    total_farmgrown_feed_deductions[harvested_rufas_id] = \
+                        total_farmgrown_feed_deductions.get(harvested_rufas_id, 0.0) + amount_to_deduct
+
                 if amount == 0.0:
                     break
+
             if amount != 0.0:
                 raise ValueError(f"Was not able to deduct remaining {amount} of feed {rufas_id}.")
+
+        for feed_id, amount_deducted in total_farmgrown_feed_deductions.items():
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_total_amount_deducted",
+                [amount_deducted, simulation_day],
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._deduct_feeds_from_inventory.__name__,
+                    "units": MeasurementUnits.DRY_KILOGRAMS,
+                    "simulation_day": simulation_day,
+                },
+            )
+
+        for feed_id, amount_deducted in total_purchased_feed_deductions.items():
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_total_amount_deducted",
+                [amount_deducted, simulation_day],
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._deduct_feeds_from_inventory.__name__,
+                    "units": MeasurementUnits.DRY_KILOGRAMS,
+                    "simulation_day": simulation_day,
+                },
+            )
 
         for storage in self.active_storages.values():
             storage.remove_empty_crops()
