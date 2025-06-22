@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/refreshed_default_animal.json",
+      "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -41,20 +41,6 @@
       "path": "input/data/animal/lactation_curve_adjustment_inputs.json",
       "type": "json",
       "properties": "lactation_properties"
-    },
-    "crop": {
-      "title": "Crop data",
-      "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/default_rotation.json",
-      "type": "json",
-      "properties": "crop_schedule_properties"
-    },
-    "crop_configurations": {
-      "title": "Crop Configurations",
-      "description": "Configurations for how crops grow and are managed.",
-      "path": "input/data/crop_configurations/default_crop_configs.json",
-      "type": "json",
-      "properties": "crop_configuration_properties"
     },
     "economy": {
       "title": "Economy data",
@@ -106,25 +92,67 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "Manure Processor Configurations",
-      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
-      "path": "input/data/manure/manure_processor_configs.json",
+      "title": "Manure data",
+      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
+      "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "manure_processor_connection": {
-      "title": "Manure Processor Connections",
-      "description": "The connection configs for all manure processors.",
-      "path": "input/data/manure/manure_processor_connections.json",
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
       "type": "json",
-      "properties": "manure_processor_connection_properties"
+      "properties": "crop_configuration_properties"
     },
+    "field_1": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/example_field_1_corn_alf.json",
+      "type": "json",
+      "properties": "field_properties"
+    }, 
     "soil_1": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
       "path": "input/data/soil/default_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
+    },
+    "Corn-Alf-Silage": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/example_alf_corn_silage_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_1": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_1": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_1": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/no_till.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "field_2": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/example_field_2_corn_alf.json",
+      "type": "json",
+      "properties": "field_properties"
     },
     "soil_2": {
       "title": "Soil data",
@@ -133,33 +161,33 @@
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule": {
+    "CornGrain-AlfHay": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/example_alf_hay_corn_grain_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_2": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule": {
+    "manure_schedule_2": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/default_manure_schedule.json",
+      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule": {
+    "tillage_schedule_2": {
       "title": "Tillage schedule.",
       "description": "Schedule of tillage applications for a field.",
-      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
-    },
-    "field": {
-      "title": "Field specification",
-      "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/default_field.json",
-      "type": "json",
-      "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
