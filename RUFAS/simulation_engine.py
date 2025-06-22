@@ -180,7 +180,7 @@ class SimulationEngine:
             all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
         )
 
-        self.feed_manager.execute_daily_routine(self.time)
+        # self.feed_manager.execute_daily_routine(self.time)
 
         self.time.record_time()
         self.weather.record_weather(self.time)

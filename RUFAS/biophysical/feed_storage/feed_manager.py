@@ -240,12 +240,16 @@ class FeedManager:
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
-            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, available_amount)
+            feeds_to_remove_from_inventory[feed_id] = amount_requested
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - available_amount
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="daily_feed_request")
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory, time.simulation_day)
+        self.report_stored_feeds(time)
+        for storage in self.active_storages.values():
+            storage.remove_empty_crops()
+        self.purchased_feed_storage.remove_empty_crops()
         return True
 
     def get_total_inventory(self, inventory_date: date, weather: Weather, time: RufasTime) -> TotalInventory:
@@ -597,10 +601,6 @@ class FeedManager:
                     "simulation_day": simulation_day,
                 },
             )
-
-        for storage in self.active_storages.values():
-            storage.remove_empty_crops()
-        self.purchased_feed_storage.remove_empty_crops()
 
     def _check_feed_availability(
         self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int, feed: HarvestedCrop | PurchasedFeed
