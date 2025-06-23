@@ -190,6 +190,7 @@ v0.9.2
 - [2453](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Create CODEOWNERS file.
 - [2454](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Add Contributors file.
 - [2455](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Update ReadMe file.
+- [2456](https://github.com/RuminantFarmSystems/RuFaS/pull/2456) - [minor change] [Animal] Updated milking fraction value, parity 5 default.
 
 ### v0.9.2
 
