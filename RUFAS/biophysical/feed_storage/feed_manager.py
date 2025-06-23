@@ -234,6 +234,15 @@ class FeedManager:
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():
+            available_amount = current_feed_totals[feed_id]
+            tolerance = 1e-6
+            is_fulfillable_with_inventory = amount_requested <= available_amount
+            is_fulfillable_with_purchase = (
+                amount_requested - available_amount
+            ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
+            is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
+            if is_request_unfulfillable:
+                return False
             self._om.add_variable(
                 f"{feed_id}_requested_amount",
                 amount_requested,
@@ -244,7 +253,6 @@ class FeedManager:
                     "simulation_day": time.simulation_day,
                 },
             )
-            available_amount = current_feed_totals[feed_id]
             self._om.add_variable(
                 f"{feed_id}_available_amount",
                 available_amount,
@@ -255,14 +263,6 @@ class FeedManager:
                     "simulation_day": time.simulation_day,
                 },
             )
-            tolerance = 1e-6
-            is_fulfillable_with_inventory = amount_requested <= available_amount
-            is_fulfillable_with_purchase = (
-                amount_requested - available_amount
-            ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
-            is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
-            if is_request_unfulfillable:
-                return False
             feeds_to_remove_from_inventory[feed_id] = amount_requested
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - available_amount
