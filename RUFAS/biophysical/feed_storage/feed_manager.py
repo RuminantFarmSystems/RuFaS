@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Dict, List, Any
+from typing import Any
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
@@ -9,7 +9,6 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     FeedCategorization,
     FeedComponentType,
-    Feed,
     RUFAS_ID,
     NASEMFeed,
     NRCFeed,
@@ -64,7 +63,7 @@ STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 
-QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | float]
+QUERY_RESULT_DATA_TYPE = dict[str, CropCategory | float]
 
 
 class FeedManager:
@@ -74,7 +73,7 @@ class FeedManager:
 
     Attributes
     ----------
-    Dict[StorageType, Storage]
+    dict[StorageType, Storage]
         Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
@@ -85,7 +84,7 @@ class FeedManager:
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
         self.active_storages: dict[StorageType, Storage] = {}
-        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
@@ -101,7 +100,7 @@ class FeedManager:
             self.crop_to_rufas_id[crop] = rufas_id
 
     @property
-    def available_feeds(self) -> list[Feed]:
+    def available_feeds(self) -> list[NASEMFeed | NRCFeed]:
         """Returns the list of available feeds."""
         return self._available_feeds
 
@@ -364,35 +363,39 @@ class FeedManager:
 
     def query_available_feeds(
         self,
-        query_crop_categories: List[CropCategory] | None = None,
-        query_storage_types: List[StorageType] | None = None,
-    ) -> List[QUERY_RESULT_DATA_TYPE]:
+        query_crop_categories: list[CropCategory] | None = None,
+        query_storage_types: list[StorageType] | None = None,
+    ) -> list[QUERY_RESULT_DATA_TYPE]:
         """
         Queries the available amount of feed in storage.
 
         Parameters
         ----------
-        query_crop_categories : List[CropCategory], optional, default=None
+        query_crop_categories : list[CropCategory], optional, default=None
             The categories of crop to query (if None, all crop categories are queried).
-        query_storage_types : List[StorageType], optional, default=None
+        query_storage_types : list[StorageType], optional, default=None
             The types of storage to query (if None, all storages types are queried).
 
         Returns
         -------
-        List[QUERY_RESULT_DATA_TYPE]
+        list[QUERY_RESULT_DATA_TYPE]
             The amount of available feed, either as a total or for a specific crop type.
         """
         query_all_crop_categories = query_crop_categories is None
         query_all_storage_types = query_storage_types is None
-        results: List[QUERY_RESULT_DATA_TYPE] = []
+        results: list[QUERY_RESULT_DATA_TYPE] = []
 
         for storage_type, storage in self.active_storages.items():
-            is_storage_queryable = query_all_storage_types or storage_type in query_storage_types
+            is_storage_queryable: bool = query_all_storage_types or (
+                query_storage_types is not None and storage_type in query_storage_types
+            )
             if not is_storage_queryable:
                 continue
             for stored_crop in storage.stored:
-                is_crop_category_queryable = query_all_crop_categories or stored_crop.category in query_crop_categories
-                if not (is_crop_category_queryable):
+                is_crop_category_queryable: bool = query_all_crop_categories or (
+                    query_crop_categories is not None and stored_crop.category in query_crop_categories
+                )
+                if not is_crop_category_queryable:
                     continue
                 for previous_result in results:
                     if stored_crop.category == previous_result["category"]:
