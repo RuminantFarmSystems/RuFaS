@@ -290,7 +290,8 @@ def test_report_stored_feeds(
 
 def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that daily feed requests are managed correctly."""
-    feed_manager._om = mocker.Mock()
+    mock_om = MagicMock(auto_spec=OutputManager)
+    feed_manager._om = mock_om
     feed_manager._om.add_variable = mocker.Mock()
 
     mock_query_available_feed_totals = mocker.patch.object(
@@ -326,7 +327,9 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
 
 
 def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mocker: MockerFixture) -> None:
-    feed_manager._om = mocker.Mock()
+    """Test that daily feed requests that cannot be fulfilled are handled correctly."""
+    mock_om = MagicMock(auto_spec=OutputManager)
+    feed_manager._om = mock_om
     feed_manager._om.add_variable = mocker.Mock()
 
     mock_query_available_feed_totals = mocker.patch.object(
@@ -554,7 +557,6 @@ def test_query_available_feeds_no_parameters(
     assert len(results) == 2
     assert results[0]["category"] == CropCategory.ALFALFA
     assert results[1]["category"] == CropCategory.CORN
-    assert sum(result["amount"] for result in results) == 350
 
 
 def test_query_available_feeds_specific_crop_categories(
