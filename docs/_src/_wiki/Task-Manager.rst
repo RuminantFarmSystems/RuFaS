@@ -62,8 +62,9 @@ Input Configuration
   - ``variable_name_style``: Formatting style for variable names in
     output files.
   - ``exclude_info_map``\ s: Boolean to exclude info maps from output.
-  - ``init_herd``, ``save_animals``, ``save_animals_directory``:
-    Controls for initializing data sets and saving results.
+  - ``init_herd``: a boolean value indicating if we want to generate a herd. It is False by default (if not specified), which we will load and use the data in `animal_population.json`. If it's set to True, we will generate a herd according to the user-input.
+  - ``save_animals``: a boolean value indicating if we want to save the generated animals into a JSON file for future usage. False by default.
+  - ``save_animals_directory``: a string value indicating the file path to save the generated herd.
   - ``filters_directory``, ``csv_output_directory``,
     ``json_output_directory``, ``graphics_directory``,
     ``report_directory``, ``logs_directory``: Directories for storing

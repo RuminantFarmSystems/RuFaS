@@ -1,4 +1,5 @@
 from copy import copy
+from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
@@ -15,12 +16,12 @@ class OpenLot(Storage):
         self,
         name: str,
         storage_time_period: int | None,
-        surface_area: float,
+        surface_area: float = inf,
         cover: StorageCover = StorageCover.NO_COVER,
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=False,
+            is_housing_emissions_calculator=True,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
@@ -83,8 +84,12 @@ class OpenLot(Storage):
         self._report_processor_output(
             "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, units, simulation_day
         )
+        self._report_processor_output(
+            "carbon_decomposition", carbon_decomposition, data_origin_function, units, simulation_day
+        )
 
-        self._report_manure_stream(self._stored_manure, "accumulated", time.simulation_day)
+        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self.stored_manure
+        self._report_manure_stream(accumulated_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", time.simulation_day)
 
         return manure_to_return
