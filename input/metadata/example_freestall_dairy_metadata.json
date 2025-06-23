@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/refreshed_default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -115,7 +115,7 @@
     "soil_1": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/default_soil.json",
+      "path": "input/data/soil/example_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
@@ -157,7 +157,7 @@
     "soil_2": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/default_soil_2.json",
+      "path": "input/data/soil/example_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
