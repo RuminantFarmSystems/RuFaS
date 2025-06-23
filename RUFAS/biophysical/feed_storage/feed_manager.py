@@ -84,6 +84,7 @@ class _FeedPurchase:
     purchase_type : PurchaseType
         The type of purchase being made.
     """
+
     rufas_id: RUFAS_ID
     amount_purchased: float
     purchase_type: PurchaseType
@@ -225,9 +226,7 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
         }
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(
-                f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass}
-            )
+            self._om.add_variable(f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass})
 
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: RufasTime) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
@@ -436,8 +435,9 @@ class FeedManager:
 
         return results
 
-    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime,
-                      purchase_type: PurchaseType) -> None:
+    def purchase_feed(
+        self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime, purchase_type: PurchaseType
+    ) -> None:
         """
         Records amounts and cost of feed purchased, and orchestrates storing them.
 
@@ -483,11 +483,7 @@ class FeedManager:
                 info_map | {"units": MeasurementUnits.KILOGRAMS},
             )
             self._daily_purchases.append(
-                _FeedPurchase(
-                    rufas_id=rufas_id,
-                    amount_purchased=purchase_amount,
-                    purchase_type=purchase_type
-                )
+                _FeedPurchase(rufas_id=rufas_id, amount_purchased=purchase_amount, purchase_type=purchase_type)
             )
             self._store_purchased_feed(rufas_id, purchase_amount, time, purchase_type)
 

@@ -648,8 +648,13 @@ def test_purchase_feed_error(
         ("ration_interval", 90.0),
     ],
 )
-def test_store_purchased_feed(feed_manager: FeedManager, time: RufasTime, purchase_type: str,
-                              expected_dry_matter_mass: float, mocker: MockerFixture) -> None:
+def test_store_purchased_feed(
+    feed_manager: FeedManager,
+    time: RufasTime,
+    purchase_type: str,
+    expected_dry_matter_mass: float,
+    mocker: MockerFixture,
+) -> None:
     """Test that purchased feeds are stored correctly."""
     receive_feed = mocker.patch.object(feed_manager.purchased_feed_storage, "receive_feed", return_value=None)
     expected_date = time.current_date.date()
