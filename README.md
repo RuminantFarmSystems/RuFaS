@@ -45,7 +45,7 @@ RuFaS is grounded in peer-reviewed science and collaborative development. It is 
 3. **Submit a pull request** with a clear description of your changes.
 4. **Tag relevant maintainers** for review.
 
-> Please follow the guidance in [CONTRIBUTING.md](path to GitHub link) 
+> Please follow the guidance in [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1)
 
 > For prerequisites and testing read the [PREREQUISITES](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) and [End-to-End Testing](https://ruminantfarmsystems.github.io/RuFaS/_wiki/End%E2%80%90to%E2%80%90End-Testing.html) files.
 
@@ -62,7 +62,7 @@ RuFaS welcomes coding and noncoding contributions from individuals demonstrating
 - 🎨  Design user interfaces or visual assets
 - 📣  Promote RuFaS within your networks
 
-> Please see the [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) code of conduct and [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/pull/2454) for full details.
+> Please see the [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) code of conduct and [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1) for full details.
 
 ---
 
