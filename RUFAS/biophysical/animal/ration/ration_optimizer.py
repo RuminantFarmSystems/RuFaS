@@ -695,6 +695,36 @@ class RationOptimizer:
         animal_combination: AnimalCombination,
         previous_ration: Dict[RUFAS_ID | str, float | str] | None = None,
     ) -> Tuple[OptimizeResult | None, RationConfig]:
+        """
+        Function that sets up the nutrients and requirements lists into structured
+        inputs for non-linear optimization.
+
+        Parameters
+        ----------
+        pen_average_body_weight : float
+            Average body weight of animals in pen.
+        requirements : AnimalRequirements
+            Summary of requirements for a group of animals.
+        pen_available_feeds : List[Feed]
+            A list of Feeds available during ration formulation.
+        animal_combination : AnimalCombination
+            The animal combination to optimize the ration for.
+        previous_ration : Dict[RUFAS_ID, str | float] | None
+            Ration from previous formulation interval, if available.
+
+        Returns
+        -------
+        OptimizeResult
+            Scipy object with information regarding the minimization attempt.
+        RationConfig
+            RationCofig object.
+
+        Notes
+        -----
+        Note that the optimization equation cited here is implemented in scipy's minimize method.
+        [AN.RAT.1]
+
+        """
         ration_config = RationConfig(requirements, pen_available_feeds, pen_average_body_weight)
 
         if previous_ration:
