@@ -71,12 +71,6 @@
         "default": 100,
         "minimum": 6
       },
-      "lactating_fraction":{
-          "type": "number",
-          "description": "Fraction of cows that are lactating. Used during herd initialization.",
-          "default": 0.5,
-          "minimum": 0
-        },
         "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
