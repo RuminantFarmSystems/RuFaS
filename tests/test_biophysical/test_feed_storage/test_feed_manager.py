@@ -1,3 +1,4 @@
+from typing import get_args
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -22,7 +23,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     IdealFeeds,
 )
-from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
+from RUFAS.biophysical.feed_storage.feed_manager import _FeedPurchase, FeedManager, PurchaseType
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile, Bag
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
@@ -613,13 +614,18 @@ def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Fee
     """Test that feeds are purchased correctly."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
     feed_manager._available_feeds = mock_available_feeds
+    feed_manager._rufas_ids_purchased_today = set()
+    feed_manager._daily_purchases = []
+    feed_manager._om = MagicMock(auto_spec=OutputManager)
 
-    mock_om = MagicMock(auto_spec=OutputManager)
-    mock_om_add_variable = mocker.patch.object(mock_om, "add_variable")
-    feed_manager._om = mock_om
+    mock_om_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
     mock_store_purchased_feed = mocker.patch.object(feed_manager, "_store_purchased_feed")
 
-    feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=RufasTime), purchase_type="test_purchase")
+    feed_manager.purchase_feed(
+        feeds_to_purchase,
+        MagicMock(auto_spec=RufasTime, simulation_day=42),
+        purchase_type="test_purchase"
+    )
 
     assert mock_om_add_variable.call_count == 10
     assert mock_store_purchased_feed.call_count == 5
@@ -631,14 +637,68 @@ def test_purchase_feed_error(
     """Test that trying to purchase an unavailable feed raises an error."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 7: 7.7}
     feed_manager._available_feeds = mock_available_feeds
+    feed_manager._rufas_ids_purchased_today = set()
+    feed_manager._daily_purchases = []
+    feed_manager._om = MagicMock(auto_spec=OutputManager)
 
-    mock_om = MagicMock(auto_spec=OutputManager)
-    mocker.patch.object(mock_om, "add_variable")
-    feed_manager._om = mock_om
+    mocker.patch.object(feed_manager._om, "add_variable")
     mocker.patch.object(feed_manager, "_store_purchased_feed")
 
-    with pytest.raises(ValueError):
-        feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=RufasTime), purchase_type="test_purchase")
+    with pytest.raises(ValueError, match="Trying to purchase unavailable feed 7"):
+        feed_manager.purchase_feed(
+            feeds_to_purchase,
+            MagicMock(auto_spec=RufasTime, simulation_day=42),
+            purchase_type="test_purchase"
+        )
+
+
+def test_report_daily_purchases(feed_manager, mocker):
+    """report_daily_purchases aggregates totals, writes them to OutputManager,
+    and then clears the daily state."""
+    feed_manager._rufas_ids_purchased_today = {101, 102}
+    feed_manager._daily_purchases = []
+    purchase_types: list[str] = list(get_args(PurchaseType))
+    feed_manager._daily_purchases.extend([
+        _FeedPurchase(rufas_id=101, amount_purchased=10.0, purchase_type=purchase_types[0]),
+        _FeedPurchase(rufas_id=101, amount_purchased=5.0, purchase_type=purchase_types[1]
+                      if len(purchase_types) > 1 else purchase_types[0]),
+        _FeedPurchase(rufas_id=102, amount_purchased=20.0, purchase_type=purchase_types[0]),
+    ])
+
+    feed_manager._om = mocker.MagicMock(spec=OutputManager)
+    mock_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
+    feed_manager.report_daily_purchases(simulation_day=5)
+    totals = {
+        (purchase_types[0], 101): 10.0,
+        (purchase_types[1] if len(purchase_types) > 1 else purchase_types[0], 101): 5.0,
+        (purchase_types[0], 102): 20.0,
+    }
+    expected_calls = [
+        mocker.call(f"{pt}_{rid}_amount_purchased", totals.get((pt, rid), 0.0), mocker.ANY)
+        for pt in purchase_types
+        for rid in (101, 102)
+    ]
+
+    mock_add_variable.assert_has_calls(expected_calls, any_order=True)
+    assert mock_add_variable.call_count == len(purchase_types) * 2
+    assert feed_manager._daily_purchases == []
+    assert feed_manager._rufas_ids_purchased_today == set()
+
+
+def test_report_daily_purchases_no_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Test that report_daily_purchases exits early when there are no recorded purchases."""
+    feed_manager._rufas_ids_purchased_today = set()
+    feed_manager._daily_purchases = [
+        _FeedPurchase(rufas_id=101, amount_purchased=10.0, purchase_type="daily_feed_request")
+    ]
+    feed_manager._om = mocker.MagicMock(spec=OutputManager)
+    mock_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
+
+    feed_manager.report_daily_purchases(simulation_day=6)
+
+    mock_add_variable.assert_not_called()
+    assert len(feed_manager._daily_purchases) == 1
+    assert feed_manager._rufas_ids_purchased_today == set()
 
 
 @pytest.mark.parametrize(
