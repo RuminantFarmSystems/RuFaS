@@ -191,6 +191,7 @@ v0.9.2
 - [2454](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Add Contributors file.
 - [2455](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Update ReadMe file.
 - [2456](https://github.com/RuminantFarmSystems/RuFaS/pull/2456) - [minor change] [Animal] Updated milking fraction value, parity 5 default.
+- [2458](https://github.com/RuminantFarmSystems/RuFaS/pull/2458) - [minor change] [Animal] Added docstring and equation ID to attempt_optimization.
 - [2457](https://github.com/RuminantFarmSystems/RuFaS/pull/2457) - [minor change] [Documentation] Added scientific documentation folder with first PDFs.
 
 ### v0.9.2
