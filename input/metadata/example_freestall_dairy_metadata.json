@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/default_config.json",
+      "path": "input/data/config/example_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/refreshed_default_animal.json",
+      "path": "input/data/animal/refreshed_example_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -73,7 +73,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/default_feed.json",
+      "path": "input/data/feed/example_Northeast_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -92,11 +92,18 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "Manure data",
-      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/manure_management.json",
+      "title": "Manure Processor Configurations",
+      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
+      "path": "input/data/manure/manure_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
+    },
+    "manure_processor_connection": {
+      "title": "Manure Processor Connections",
+      "description": "The connection configs for all manure processors.",
+      "path": "input/data/manure/manure_processor_connections.json",
+      "type": "json",
+      "properties": "manure_processor_connection_properties"
     },
     "crop_configurations": {
       "title": "Crop Configurations",
@@ -192,7 +199,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/barnyard_weather.csv",
+      "path": "input/data/weather/example_wisconsin_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -227,7 +234,7 @@
     "feed_management": {
       "title": "Feed Management Dataset",
       "description": "Feed management data.",
-      "path": "input/data/feed_management/default_feed_management.json",
+      "path": "input/data/feed_management/example_feed_management.json",
       "type": "json",
       "properties": "feed_storage_input_properties"
     }
