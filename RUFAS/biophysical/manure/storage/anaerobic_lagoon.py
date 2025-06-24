@@ -69,7 +69,7 @@ class AnaerobicLagoon(Storage):
 
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
+        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
@@ -87,7 +87,7 @@ class AnaerobicLagoon(Storage):
         received_manure.nitrogen = max(0.0, received_manure.nitrogen - nitrous_oxide_emissions)
 
         if not manure_to_return:
-            self._stored_manure = copy(self._manure_to_process)
+            self.stored_manure = copy(self._manure_to_process)
 
         self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
         self._report_manure_stream(received_manure, "received", time.simulation_day)
@@ -196,7 +196,7 @@ class AnaerobicLagoon(Storage):
         """
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
-            volume=self._manure_to_process.volume,
+            mass=self._manure_to_process.volume * ManureConstants.SLURRY_MANURE_DENSITY,
             density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
             ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,

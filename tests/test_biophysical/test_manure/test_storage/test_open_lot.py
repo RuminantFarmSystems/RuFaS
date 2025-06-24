@@ -20,7 +20,7 @@ def test_open_lot_init(mocker: MockerFixture) -> None:
 
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
-        is_housing_emissions_calculator=False,
+        is_housing_emissions_calculator=True,
         cover=StorageCover.NO_COVER,
         storage_time_period=dummy_storage_time_period,
         surface_area=10,
@@ -76,7 +76,7 @@ def test_process_manure_runs_expected_steps(
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
-    open_lot._stored_manure = stored_manure
+    open_lot.stored_manure = stored_manure
     open_lot._received_manure = received_manure
     mock_calc_comp_meth_emission = mocker.patch.object(
         SolidsStorageCalculator, "calculate_ifsm_methane_emission", return_value=1.0
@@ -95,7 +95,7 @@ def test_process_manure_runs_expected_steps(
     mock_report_stream = mocker.patch.object(open_lot, "_report_manure_stream")
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
-        open_lot._stored_manure += open_lot._received_manure
+        open_lot.stored_manure += open_lot._received_manure
         open_lot._received_manure = ManureStream.make_empty_manure_stream()
         return {}
 
@@ -118,7 +118,7 @@ def test_process_manure_runs_expected_steps(
     mock_calc_ammonia.assert_called_once()
     mock_apply_n_loss.assert_called_once()
 
-    assert mock_report_output.call_count == 4
+    assert mock_report_output.call_count == 5
     assert mock_report_stream.call_count == 2
 
     assert result == {}
@@ -160,7 +160,7 @@ def test_apply_dry_matter_loss_valid(
     mocker: MockerFixture,
 ) -> None:
     """Ensure solids are updated correctly with valid dry matter loss."""
-    open_lot._stored_manure = stored_manure
+    open_lot.stored_manure = stored_manure
     open_lot._received_manure = received_manure
     open_lot._manure_to_process = copy(received_manure)
     mocker.patch.object(
@@ -189,7 +189,7 @@ def test_apply_dry_matter_loss_raises_value_error(
     mocker: MockerFixture,
 ) -> None:
     """Ensure ValueError is raised and error is logged when losses go below zero."""
-    open_lot._stored_manure = stored_manure
+    open_lot.stored_manure = stored_manure
     open_lot._received_manure = received_manure
     open_lot._manure_to_process = copy(received_manure)
     open_lot._om = OutputManager()

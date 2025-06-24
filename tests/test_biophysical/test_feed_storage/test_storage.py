@@ -400,12 +400,12 @@ def test_get_total_nutritive_amount(
 @pytest.mark.parametrize(
     "dry_matter,percentage,category,temps,expected",
     [
-        (100.0, 25.0, CropCategory.ALFALFA, [20.0] * 3, 4.286303394879),
-        (40.0, 20.0, CropCategory.ALFALFA, [6.0, 4.0, 6.0], 0.624),
+        (100.0, 25.0, CropCategory.ALFALFA, [20.0] * 3, 0.1379672649553659),
+        (40.0, 20.0, CropCategory.ALFALFA, [6.0, 4.0, 6.0], 0.0208),
         (150.0, 19.0, CropCategory.ALFALFA, [10.0] * 4, 0.0),
-        (200.0, 23.0, CropCategory.ALFALFA, [46.0, 44.0, 46.0], 2.9016),
-        (140.0, 15.0, CropCategory.CORN, [30.0, 28.0, 29.0], 1.2096),
-        (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 2.019438),
+        (200.0, 23.0, CropCategory.ALFALFA, [46.0, 44.0, 46.0], 0.09671999999999999),
+        (140.0, 15.0, CropCategory.CORN, [30.0, 28.0, 29.0], 0.04032),
+        (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 0.44291418402941823),
         (55.0, 66.0, CropCategory.GRASS, [25.0] * 2, 0.0),
         (120.0, 4.0, CropCategory.SMALL_GRAIN, [15.0], 0.0),
         (100.0, 24.0, CropCategory.GRASS, [], 0.0),

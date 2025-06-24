@@ -188,19 +188,25 @@ class HarvestedCrop:
             return
         self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-    def remove_feed_mass(self, mass_to_remove: float) -> None:
+    def remove_feed_mass(self, dm_to_remove: float) -> None:
         """
-        Removes the specified mass of feed from the crop and keeps the dry matter percentage unchanged.
+        Removes the specified dry matter mass of feed from the crop and keeps the dry matter percentage unchanged.
 
         Parameters
         ----------
-        mass_to_remove : float
-            Total mass of feed to remove (kg).
+        dm_to_remove : float
+            Dry-matter to remove. (kg).
         """
-        if mass_to_remove > self.fresh_mass:
-            raise ValueError("Cannot remove more feed mass than is available.")
+        dm_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        fresh_to_remove = dm_to_remove / dm_fraction
 
-        self.fresh_mass -= mass_to_remove
+        if fresh_to_remove > self.fresh_mass + 1e-6:
+            raise ValueError(
+                f"Cannot remove {dm_to_remove:.3f} kg DM "
+                f"({fresh_to_remove:.3f} kg fresh) - only {self.fresh_mass:.3f} kg fresh available."
+            )
+
+        self.fresh_mass -= fresh_to_remove
 
     def estimate_maximum_effluent(self) -> float:
         """

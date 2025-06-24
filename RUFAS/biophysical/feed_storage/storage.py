@@ -14,14 +14,18 @@ from RUFAS.weather import Weather
 These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and
 lower fractions of dry matter that allow fermentation, and the constants that regulate how dry matter is lost to
 fermentation. These values are defined in the Feed Storage Scientific Documentation, section 1.3.
+
+Loss coeffecient and base loss fraction are defined as fractions per day, so they are divided by 30 to convert them to
+a daily basis.
+
 """
 ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
     "lower_temp_limit": 5.0,
     "upper_temp_limit": 45.0,
     "lower_dry_matter_limit": 0.20,
     "upper_dry_matter_limit": 0.60,
-    "loss_coefficient": 0.0364,
-    "base_loss_fraction": 0.0156,
+    "loss_coefficient": 0.0364 / 30,
+    "base_loss_fraction": 0.0156 / 30,
 }
 
 NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
@@ -29,8 +33,8 @@ NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
     "upper_temp_limit": 40.0,
     "lower_dry_matter_limit": 0.15,
     "upper_dry_matter_limit": 0.60,
-    "loss_coefficient": 0.0193,
-    "base_loss_fraction": 0.00864,
+    "loss_coefficient": 0.0193 / 30,
+    "base_loss_fraction": 0.00864 / 30,
 }
 
 """
@@ -457,7 +461,9 @@ class Storage:
                 continue
             self.om.add_variable("fresh_mass", crop.fresh_mass, info_map)
             self.om.add_variable("dry_matter_mass", crop.dry_matter_mass, info_map)
-            self.om.add_variable("dry_matter_percentage", crop.dry_matter_percentage, info_map)
+            self.om.add_variable(
+                "dry_matter_percentage", crop.dry_matter_percentage, info_map | {"units": MeasurementUnits.PERCENT}
+            )
             crop.recorded_days.add(simulation_day)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:

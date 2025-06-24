@@ -25,7 +25,6 @@ from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
-    manure_management_json,
     feed_json,
     mock_get_data_side_effect,
     mock_herd_manager,
@@ -35,7 +34,6 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
 
 assert config_json is not None
 assert animal_json is not None
-assert manure_management_json is not None
 assert feed_json is not None
 assert mock_get_data_side_effect is not None
 assert mock_herd is not None
