@@ -196,7 +196,7 @@ v0.9.2
 - [2459](https://github.com/RuminantFarmSystems/RuFaS/pull/2459) - [minor change] [Readme] Updated links in readme.
 - [2457](https://github.com/RuminantFarmSystems/RuFaS/pull/2457) - [minor change] [Documentation] Added scientific documentation folder with first PDFs.
 - [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
-
+- [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 
 ### v0.9.2
 
