@@ -2172,11 +2172,6 @@
           "description": "Crop category of the crop configuration.",
           "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
         },
-        "crop_type": {
-          "type": "string",
-          "description": "Subdivision of the crop category of the crop configuration.",
-          "pattern": "^(Wheat|Rye|Oat|Rice|High-moisture|Silage|Whole-plant|Grain|Forage|Alfalfa|Ryegrass|Orchardgrass|Fine Fescue|Tall Fescue|Meadow Fescue)$"
-        },
         "rufas_ids": {
           "type": "array",
           "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
@@ -3876,78 +3871,6 @@
           "type": "number",
           "description": "Cost of Feed (US dollars/kg DM)",
           "minimum": 0
-        }
-      }
-    },
-    "farm_grown_feeds": {
-      "type": "array",
-      "description": "Farm-Grown Feeds",
-      "properties": {
-        "type": "number",
-        "minimum": 1,
-        "maximum": 306
-      }
-    },
-    "storage_options": {
-      "type": "array",
-      "description": "Storage Options.",
-      "properties": {
-        "type": "object",
-        "storage_type": {
-          "type": "string",
-          "description": "Storage Type -- The type of storage unit used. This only applies to farm grown forage feeds",
-          "default": "Bunker Silo",
-          "pattern": "^(8' Diameter Bag|10' Diameter Bag|12' Diameter Bag|14' Diameter Bag|Upright Silo - Traditional|Upright Silo - Oxygen-Excluding|Bunker Silo|Pile|Wrapped Bale|Bale - Covered|Bale - Uncovered|Bin)$"
-        },
-        "moisture": {
-          "type": "string",
-          "description": "Moisture -- The management practices used that determine the dry matter content of the preserved feed.",
-          "default": "Wilted",
-          "pattern": "^(Direct Cut|Wilted|Baleage|Haylage|Moist Hay|Dry Hay)$"
-        },
-        "additive": {
-          "type": "string",
-          "description": "Additive -- Type of additive added to the forage material before ensiling.",
-          "pattern": "^(preservative|nutrient additive|absorbant)$",
-          "default": "preservative"
-        },
-        "packing_density": {
-          "type": "number",
-          "description": "Packing Density -- The density of ensiled feed material, kg DM /m3",
-          "minimum": 200,
-          "maximum": 800,
-          "default": 200
-        },
-        "inoculation": {
-          "type": "string",
-          "description": "Inoculation",
-          "pattern": "^(None|heterofermentative|homofermentative)$",
-          "default": "None"
-        },
-        "bunk_type": {
-          "type": "string",
-          "description": "Bunk Type -- The type of bunk used to store the feed.",
-          "pattern": "^(open_floor)$",
-          "default": "open_floor"
-        },
-        "ventilation": {
-          "type": "bool",
-          "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
-          "default": true
-        },
-        "removal_rate": {
-          "type": "number",
-          "description": "Removal Rate -- Average rate of removal of material from the storage unit or silo described as the horizontal distance from the front of the storage. In units of meters.",
-          "minimum": 0,
-          "maximum": 20,
-          "default": 0.5
-        },
-        "initial_dry_matter": {
-          "type": "number",
-          "description": "Initial Dry Matter -- The mass of feed dry matter in the storage unit at initiation of the simulation.",
-          "minimum": 0,
-          "maximum": 500000,
-          "default": 1000
         }
       }
     },
@@ -6188,7 +6111,7 @@
         "description": "Diameter of hay bales (meters).",
         "minimum": 0.5,
         "maximum": 4,
-        "default": 2.5
+        "default": 1.8
     },
     "post_wilting_moisture_percentage": {
         "type": "number",

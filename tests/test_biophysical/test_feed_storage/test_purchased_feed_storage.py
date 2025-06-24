@@ -56,7 +56,7 @@ def test_remove_empty_crops(purchased_feed_storage: PurchasedFeedStorage, purcha
 
 
 @pytest.mark.parametrize("mass, num_feeds, expected", [(100.0, 3, 300.0), (50.0, 1, 50.0), (0.0, 1, 0.0)])
-def test_report_stored_feeds(
+def test_report_stored_purchased_feeds(
     purchased_feed_storage: PurchasedFeedStorage,
     purchased_feed: PurchasedFeed,
     time: RufasTime,
@@ -68,7 +68,7 @@ def test_report_stored_feeds(
     """Test that the storage can report the stored feeds."""
     expected_info_map = {
         "class": "PurchasedFeedStorage",
-        "function": "report_stored_feeds",
+        "function": "report_stored_purchased_feeds",
         "simulation_day": (expected_sim_day := 3),
         "units": MeasurementUnits.KILOGRAMS,
         "rufas_id": 1,
@@ -80,7 +80,7 @@ def test_report_stored_feeds(
     expected_call = mocker.call("stored_feed_1", expected, expected_info_map)
     add_var = mocker.patch.object(purchased_feed_storage._om, "add_variable")
 
-    purchased_feed_storage.report_stored_feeds(time)
+    purchased_feed_storage.report_stored_purchased_feeds(time)
 
     assert add_var.call_args_list == [expected_call]
 

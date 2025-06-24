@@ -219,7 +219,6 @@ def test_daily_simulation(
     mock_feed_manage_daily_feed_request = mocker.patch.object(
         simulation_engine.feed_manager, "manage_daily_feed_request", return_value=is_ok_to_feed_animals
     )
-    mock_feed_execute_daily_routine = mocker.patch.object(simulation_engine.feed_manager, "execute_daily_routine")
 
     mock_herd_update_all_max_daily_feeds = mocker.patch.object(
         simulation_engine.herd_manager,
@@ -256,7 +255,8 @@ def test_daily_simulation(
     mock_weather_get_current_day_conditions.assert_called_once_with(mock_time)
     mock_field_daily_update_routine.assert_called_once_with(mock_weather, mock_time, mock_manure_applications)
     assert mock_field_receive_crop.call_args_list == [
-        call(harvested_crop.harvested_crop, harvested_crop.storage_type) for harvested_crop in mock_harvested_crops
+        call(harvested_crop.harvested_crop, harvested_crop.storage_type, simulation_engine.time.simulation_day)
+        for harvested_crop in mock_harvested_crops
     ]
 
     not_harvested_feeds_config_names = [
@@ -298,7 +298,6 @@ def test_daily_simulation(
         simulation_engine.feed_manager.available_feeds, mock_time, mock_weather, mock_total_inventory
     )
     mock_manure_daily_update.assert_called_once_with(mock_manure_streams, mock_time, mock_current_day_conditions)
-    mock_feed_execute_daily_routine.assert_called_once_with(mock_time)
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
     mock_advance_time.assert_called_once_with()
