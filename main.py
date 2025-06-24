@@ -117,7 +117,7 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
         "-p",
         "--path-to-metadata",
         help="Path to the task manager metadata that will determine the tasks run",
-        default="input/metadata/task_manager_metadata.json",
+        default="input/task_manager_metadata.json",
     )
     return parser.parse_args(args)
 

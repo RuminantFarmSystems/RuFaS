@@ -20,5 +20,5 @@ class StorageCover(Enum):
 
     COVER = "cover"
     CRUST = "crust"
-    NO_COVER = "no cover"
-    COVER_AND_FLARE = "cover and flare"
+    NO_COVER = "no_crust_or_cover"
+    COVER_AND_FLARE = "cover_and_flare"

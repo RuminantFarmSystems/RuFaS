@@ -5,6 +5,9 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
+from RUFAS.data_structures.manure_nutrients import ManureNutrients
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.output_manager import OutputManager
 
 
@@ -14,7 +17,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
         "anaerobic_digester": [
             {
                 "name": "anaerobic_digester_1",
-                "type": "ContinuousMix",
+                "processor_type": "ContinuousMix",
                 "hydraulic_retention_time": 25,
                 "top_cover_volume_fraction": 0.2,
                 "evaporation_fraction": 0.02,
@@ -23,7 +26,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "anaerobic_digester_2",
-                "type": "ContinuousMix",
+                "processor_type": "ContinuousMix",
                 "hydraulic_retention_time": 25,
                 "top_cover_volume_fraction": 0.2,
                 "evaporation_fraction": 0.02,
@@ -34,7 +37,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
         "handler": [
             {
                 "name": "alley_scraper_1",
-                "type": "AlleyScraper",
+                "processor_type": "AlleyScraper",
                 "handler_type": "AlleyScraper",
                 "cleaning_water_use_amount": 0.0,
                 "cleaning_water_recycle_fraction": 0.8,
@@ -42,7 +45,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "manual_scraper_1",
-                "type": "ManualScraper",
+                "processor_type": "ManualScraper",
                 "handler_type": "ManualScraper",
                 "cleaning_water_use_amount": 0.0,
                 "cleaning_water_recycle_fraction": 0.8,
@@ -50,7 +53,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "flush_system_1",
-                "type": "FlushSystem",
+                "processor_type": "FlushSystem",
                 "handler_type": "FlushSystem",
                 "cleaning_water_use_amount": 0.0,
                 "cleaning_water_recycle_fraction": 0.8,
@@ -58,7 +61,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "parlor_cleaning_handler_1",
-                "type": "ParlorCleaningHandler",
+                "processor_type": "ParlorCleaningHandler",
                 "handler_type": "ParlorCleaningHandler",
                 "cleaning_water_use_amount": 0.0,
                 "cleaning_water_recycle_fraction": 0.8,
@@ -68,7 +71,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
         "separator": [
             {
                 "name": "rotary_screen_1",
-                "type": "RotaryScreen",
+                "processor_type": "RotaryScreen",
                 "separated_solids_dry_matter": 0.20,
                 "total_solids_efficiency": 0.35,
                 "volatile_solids_efficiency": 0.40,
@@ -80,7 +83,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "screw_press_1",
-                "type": "ScrewPress",
+                "processor_type": "ScrewPress",
                 "separated_solids_dry_matter": 0.35,
                 "total_solids_efficiency": 0.25,
                 "volatile_solids_efficiency": 0.30,
@@ -94,7 +97,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
         "storage": [
             {
                 "name": "slurry_storage_outdoor_1",
-                "type": "SlurryStorageOutdoor",
+                "processor_type": "SlurryStorageOutdoor",
                 "capacity": None,
                 "cover": "no cover",
                 "storage_time_period": 120,
@@ -102,7 +105,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "slurry_storage_underfloor_1",
-                "type": "SlurryStorageUnderfloor",
+                "processor_type": "SlurryStorageUnderfloor",
                 "capacity": None,
                 "cover": "cover",
                 "storage_time_period": 120,
@@ -110,7 +113,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
             },
             {
                 "name": "anaerobic_lagoon_1",
-                "type": "AnaerobicLagoon",
+                "processor_type": "AnaerobicLagoon",
                 "capacity": None,
                 "cover": "no cover",
                 "storage_time_period": 365,
@@ -185,7 +188,15 @@ def processor_connections_input_json() -> dict[str, list[dict[str, Any]]]:
 def manure_manager(mocker: MockerFixture) -> ManureManager:
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager()
-
+    mnm = ManureNutrientManager()
+    mnm.add_nutrients(
+        ManureNutrients(
+            manure_type=ManureType.LIQUID,
+            nitrogen=100,
+            phosphorus=200,
+        )
+    )
+    manure_manager._manure_nutrient_manager = mnm
     manure_manager.all_processors, manure_manager._all_separators, manure_manager._adjacency_matrix = {}, {}, {}
     manure_manager._processing_order = []
     manure_manager._om = MagicMock(auto_spec=OutputManager)
@@ -948,7 +959,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
     return {
         "anaerobic_digester_1": {
             "name": "anaerobic_digester_1",
-            "type": "ContinuousMix",
+            "processor_type": "ContinuousMix",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -957,7 +968,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "anaerobic_digester_2": {
             "name": "anaerobic_digester_2",
-            "type": "ContinuousMix",
+            "processor_type": "ContinuousMix",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -966,7 +977,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "rotary_screen_1": {
             "name": "rotary_screen_1",
-            "type": "RotaryScreen",
+            "processor_type": "RotaryScreen",
             "separated_solids_dry_matter": 0.2,
             "total_solids_efficiency": 0.35,
             "volatile_solids_efficiency": 0.4,
@@ -978,7 +989,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "screw_press_1": {
             "name": "screw_press_1",
-            "type": "ScrewPress",
+            "processor_type": "ScrewPress",
             "separated_solids_dry_matter": 0.35,
             "total_solids_efficiency": 0.25,
             "volatile_solids_efficiency": 0.3,
@@ -990,7 +1001,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "slurry_storage_outdoor_1": {
             "name": "slurry_storage_outdoor_1",
-            "type": "SlurryStorageOutdoor",
+            "processor_type": "SlurryStorageOutdoor",
             "capacity": None,
             "cover": "no cover",
             "storage_time_period": 120,
@@ -998,7 +1009,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "slurry_storage_underfloor_1": {
             "name": "slurry_storage_underfloor_1",
-            "type": "SlurryStorageUnderfloor",
+            "processor_type": "SlurryStorageUnderfloor",
             "capacity": None,
             "cover": "cover",
             "storage_time_period": 120,
@@ -1006,7 +1017,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "anaerobic_lagoon_1": {
             "name": "anaerobic_lagoon_1",
-            "type": "AnaerobicLagoon",
+            "processor_type": "AnaerobicLagoon",
             "capacity": None,
             "cover": "no cover",
             "storage_time_period": 365,
@@ -1014,7 +1025,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "alley_scraper_1": {
             "name": "alley_scraper_1",
-            "type": "AlleyScraper",
+            "processor_type": "AlleyScraper",
             "handler_type": "AlleyScraper",
             "cleaning_water_use_amount": 0.0,
             "cleaning_water_recycle_fraction": 0.8,
@@ -1022,7 +1033,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "manual_scraper_1": {
             "name": "manual_scraper_1",
-            "type": "ManualScraper",
+            "processor_type": "ManualScraper",
             "handler_type": "ManualScraper",
             "cleaning_water_use_amount": 0.0,
             "cleaning_water_recycle_fraction": 0.8,
@@ -1030,7 +1041,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "flush_system_1": {
             "name": "flush_system_1",
-            "type": "FlushSystem",
+            "processor_type": "FlushSystem",
             "handler_type": "FlushSystem",
             "cleaning_water_use_amount": 0.0,
             "cleaning_water_recycle_fraction": 0.8,
@@ -1038,7 +1049,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
         },
         "parlor_cleaning_handler_1": {
             "name": "parlor_cleaning_handler_1",
-            "type": "ParlorCleaningHandler",
+            "processor_type": "ParlorCleaningHandler",
             "handler_type": "ParlorCleaningHandler",
             "cleaning_water_use_amount": 0.0,
             "cleaning_water_recycle_fraction": 0.8,

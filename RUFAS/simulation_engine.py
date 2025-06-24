@@ -12,7 +12,7 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutr
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -101,7 +101,6 @@ class SimulationEngine:
         ]
         available_feeds_units = {
             "category": MeasurementUnits.UNITLESS,
-            "type": MeasurementUnits.UNITLESS,
             "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
@@ -131,7 +130,9 @@ class SimulationEngine:
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
-            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
+            self.feed_manager.receive_crop(
+                harvested_crop.harvested_crop, harvested_crop.storage_type, self.time.simulation_day
+            )
             if harvested_crop.harvested_crop.config_name not in next_harvest_dates:
                 crop_config_name = harvested_crop.harvested_crop.config_name
                 next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
@@ -174,11 +175,12 @@ class SimulationEngine:
         all_manure_data = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.run_daily_update(
+            all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
+        )
 
-        self.feed_manager.execute_daily_routine(self.time)
+        self.feed_manager.report_daily_purchases(self.time.simulation_day)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -220,7 +222,10 @@ class SimulationEngine:
                 manure_request = manure_event_request.nutrient_request
                 manure_request_results = None
                 if manure_request is not None:
-                    manure_request_results = self.manure_manager.request_nutrients(manure_request)
+                    simulate_animals: bool = self.im.get_data("config.simulate_animals")
+                    manure_request_results = self.manure_manager.request_nutrients(
+                        manure_request, simulate_animals, self.time
+                    )
                 manure_applications.append(ManureEventNutrientRequestResults(field_name, event, manure_request_results))
         return manure_applications
 
@@ -275,8 +280,6 @@ class SimulationEngine:
         feed_class_config = self.im.get_data("feed")
         self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
-        manure_class_config = self.im.get_data("manure_management")
-
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
@@ -286,15 +289,13 @@ class SimulationEngine:
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         self.herd_manager: HerdManager = HerdManager(
-            self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
+            self.weather,
+            self.time,
+            is_ration_defined_by_user=self.is_ration_defined_by_user,
+            available_feeds=self.feed_manager.available_feeds,
         )
-        all_manure_data = self.herd_manager.collect_pen_manure_data()
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        simulate_animals: bool = self.im.get_data("config.simulate_animals")
-        self.manure_manager: ManureManager = ManureManager(
-            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
-        )
+        self.manure_manager: ManureManager = ManureManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:
