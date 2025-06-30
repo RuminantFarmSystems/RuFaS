@@ -1,3 +1,4 @@
+from collections import defaultdict
 import re
 from datetime import date
 from typing import Any, Literal
@@ -67,14 +68,17 @@ class EmissionsEstimator:
         filter = {
             "name": "Feed Ration Totals",
             "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-            "filters": ["FeedManager.purchase_feed.*(kg)"],
+            "filters": ["FeedManager.report_daily_purchases.*"],
             "slice_start": SLICE_START,
         }
         feeds = self.om.filter_variables_pool(filter)
 
-        purchased_feed_totals: dict[str, float] = {
-            key.split(".")[-1]: sum(entry["values"]) for key, entry in feeds.items()
-        }
+        purchased_feed_totals: dict[str, float] = defaultdict(float)
+
+        for key, value in feeds.items():
+            if match := re.search(r'_(\d+)_amount_purchased$', key):
+                feed_id = match.group(1)
+                purchased_feed_totals[feed_id] += sum(value.get("values", []))
         self.om.add_variable(
             "purchased_feed_totals",
             purchased_feed_totals,
