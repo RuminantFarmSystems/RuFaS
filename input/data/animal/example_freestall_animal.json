@@ -24,8 +24,8 @@
   "animal_config": {
     "management_decisions": {
       "breeding_start_day_h": 380,
-      "heifer_repro_method": "ED",
-      "cow_repro_method": "ED-TAI",
+      "heifer_repro_method": "Synch-ED",
+      "cow_repro_method": "TAI",
       "semen_type": "conventional",
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,

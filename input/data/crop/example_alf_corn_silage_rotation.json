@@ -3,6 +3,12 @@
  
   {
     "crop_species": "corn_silage",
+    "planting_days": [
+      127
+    ],
+    "planting_years": [
+      2013
+    ],
     "harvest_days": [
       263
     ],
@@ -13,22 +19,23 @@
       "harvest_kill"
     ],
     "harvest_type": "scheduled",
-    "planting_days": [
-      127
-    ],
-    "planting_years": [
-      2013
-    ],
     "pattern_repeat": 0,
     "planting_skip": 0,
     "harvesting_skip": 0
   },
   {
     "crop_species": "alfalfa_silage",
+    
+    "planting_days": [
+      89
+    ],
+    "planting_years": [
+      2014
+    ],
     "harvest_days": [
-      150, 179, 210,
-      120, 150, 179, 210,
-      120, 150, 179, 210
+      150, 179, 210,242,
+      120, 150, 179, 210, 242,
+      120, 150, 179, 210, 242
     ],
     "harvest_years": [
       2014,2014,2014,
@@ -36,23 +43,23 @@
       2016,2016,2016,2016
     ],
     "harvest_operations": [
-      "harvest_only", "harvest_only","harvest_only",
       "harvest_only", "harvest_only","harvest_only","harvest_only",
-      "harvest_only", "harvest_only","harvest_only","harvest_kill"
+      "harvest_only", "harvest_only","harvest_only","harvest_only","harvest_only",
+      "harvest_only","harvest_only", "harvest_only","harvest_only","harvest_kill"
     ],
     "harvest_type": "scheduled",
-    "planting_days": [
-      89
-    ],
-    "planting_years": [
-      2014
-    ],
     "pattern_repeat": 0,
     "planting_skip": 0,
     "harvesting_skip": 0
   },
   {
     "crop_species": "corn_silage",
+    "planting_days": [
+      127
+    ],
+    "planting_years": [
+      2017
+    ],
     "harvest_days": [
       263
     ],
@@ -63,22 +70,22 @@
       "harvest_kill"
     ],
     "harvest_type": "scheduled",
-    "planting_days": [
-      127
-    ],
-    "planting_years": [
-      2017
-    ],
     "pattern_repeat": 0,
     "planting_skip": 0,
     "harvesting_skip": 0
   },
    {
     "crop_species": "alfalfa_silage",
+    "planting_days": [
+      89
+    ],
+    "planting_years": [
+      2018
+    ],
     "harvest_days": [
-      150, 179, 210,
-      120, 150, 179, 210,
-      120, 150, 179, 210
+      150, 179, 210, 242,
+      120, 150, 179, 210, 242,
+      120, 150, 179, 210, 242
     ],
     "harvest_years": [
       2018,2018,2018,
@@ -86,17 +93,11 @@
       2020,2020,2020,2020
     ],
     "harvest_operations": [
-      "harvest_only", "harvest_only","harvest_only",
       "harvest_only", "harvest_only","harvest_only","harvest_only",
-      "harvest_only", "harvest_only","harvest_only","harvest_kill"
+      "harvest_only","harvest_only", "harvest_only","harvest_only","harvest_only",
+      "harvest_only","harvest_only", "harvest_only","harvest_only","harvest_kill"
     ],
     "harvest_type": "scheduled",
-    "planting_days": [
-      89
-    ],
-    "planting_years": [
-      2018
-    ],
     "pattern_repeat": 0,
     "planting_skip": 0,
     "harvesting_skip": 0
