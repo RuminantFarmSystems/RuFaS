@@ -189,14 +189,15 @@ v0.9.2
 - [2438](https://github.com/RuminantFarmSystems/RuFaS/pull/2438) - [minor change] [GitHub Actions] Updates the Sphinx documentation workflow to deploy to GitHub Pages via the gh-pages branch and removes build artifacts from the main branch.
 - [2443](https://github.com/RuminantFarmSystems/RuFaS/pull/2443) - [minor change] [metadata] Moves input/metadata/task_manager_metadata.json to input/task_manager_metadata.json and updates the corresponding entries in the code.
 - [2453](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Create CODEOWNERS file.
-- [2454](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Add Contributors file.
-- [2455](https://github.com/RuminantFarmSystems/RuFaS/pull/2453) - [minor change] [Code Owners] Update ReadMe file.
+- [2454](https://github.com/RuminantFarmSystems/RuFaS/pull/2454) - [minor change] [Code Owners] Add Contributors file.
+- [2455](https://github.com/RuminantFarmSystems/RuFaS/pull/2455) - [minor change] [Code Owners] Update ReadMe file.
 - [2456](https://github.com/RuminantFarmSystems/RuFaS/pull/2456) - [minor change] [Animal] Updated milking fraction value, parity 5 default.
 - [2458](https://github.com/RuminantFarmSystems/RuFaS/pull/2458) - [minor change] [Animal] Added docstring and equation ID to attempt_optimization.
 - [2459](https://github.com/RuminantFarmSystems/RuFaS/pull/2459) - [minor change] [Readme] Updated links in readme.
 - [2457](https://github.com/RuminantFarmSystems/RuFaS/pull/2457) - [minor change] [Documentation] Added scientific documentation folder with first PDFs.
 - [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
+- [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking
 
 ### v0.9.2
 
