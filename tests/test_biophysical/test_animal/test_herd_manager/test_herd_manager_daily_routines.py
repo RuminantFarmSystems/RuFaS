@@ -257,7 +257,7 @@ def test_update_herd_structure(
         available_feeds=mock_available_feeds,
         current_day_conditions=mock_current_day_conditions,
         total_inventory=mock_total_inventory,
-        simulation_day=15
+        simulation_day=15,
     )
 
     mock_handle_graduated_animals.assert_called_once_with(
@@ -379,7 +379,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         available_feeds=[mock_feed],
         current_day_conditions=mock_weather.get_current_day_conditions(),
         total_inventory=mock_total_inventory,
-        simulation_day=15
+        simulation_day=15,
     )
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()

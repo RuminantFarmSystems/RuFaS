@@ -332,8 +332,9 @@ def test_reformulate_ration_single_pen(
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, mock_total_inventory,
-                                                15)
+    herd_manager._reformulate_ration_single_pen(
+        mock_pen, available_feeds, current_temperature, mock_total_inventory, 15
+    )
 
     if use_user_defined_ration:
         mock_use_user_defined_ration.assert_called_once_with(available_feeds, current_temperature)
@@ -346,5 +347,5 @@ def test_reformulate_ration_single_pen(
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
             mock_total_inventory,
-            15
+            15,
         )

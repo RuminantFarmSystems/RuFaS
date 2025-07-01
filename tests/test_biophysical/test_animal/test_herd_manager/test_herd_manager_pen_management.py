@@ -315,7 +315,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
             pen_available_feeds=mock_pen_avail_feeds,
             current_temperature=mock_current_day_conditions.mean_air_temperature,
             total_inventory=total_inventory,
-            simulation_day=15
+            simulation_day=15,
         )
         assert animal.id in herd_manager.animal_to_pen_id_map
         assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
