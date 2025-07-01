@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
@@ -677,7 +678,7 @@ class NutritionSupplyCalculator:
         return rup_percentages
 
     @classmethod
-    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> float:
+    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> Any:
         """
         Calculates the content of a specific nutrient in a ration.
 
@@ -699,7 +700,7 @@ class NutritionSupplyCalculator:
         )
 
     @classmethod
-    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> float:
+    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> Any:
         """
         Calculates the amount of digestible energy in a ration.
 

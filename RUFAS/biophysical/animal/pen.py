@@ -149,9 +149,8 @@ class Pen:
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
-        self.allocated_feeds = set()
+        self.allocated_feeds: set[Any] = set()
         self.ration_optimizer = RationOptimizer()
-        self.allocated_feeds: set[int] = set()
         self.om = OutputManager()
 
     @property
@@ -947,7 +946,7 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, pen_feeds, temperature, previous_ration
+        self, pen_feeds: list[Feed], temperature: float, previous_ration: Any
     ) -> tuple[OptimizeResult | None, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)

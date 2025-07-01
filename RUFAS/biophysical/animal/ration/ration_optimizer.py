@@ -1,7 +1,6 @@
 import random
 from scipy.optimize import OptimizeResult, minimize
 import numpy as np
-import scipy
 import numpy.typing as npt
 from typing import List, Tuple, Dict, Callable, Any, Sequence, Optional
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
@@ -175,8 +174,8 @@ class RationOptimizer:
     def make_ration_from_solution(
         cls,
         pen_available_feeds: List[Feed],
-        solution: scipy.optimize.OptimizeResult,
-    ) -> Dict[str, float | str]:
+        solution: OptimizeResult,
+    ) -> dict[int, float | str]:
         """
         Generates ration from scipy result.
 
