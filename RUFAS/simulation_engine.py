@@ -296,8 +296,3 @@ class SimulationEngine:
         )
 
         self.manure_manager: ManureManager = ManureManager()
-
-        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
-        if self.is_end_to_end_test_run:
-            end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
-            self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)

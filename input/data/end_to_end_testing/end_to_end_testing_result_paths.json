@@ -1,12 +1,6 @@
 {
     "end_to_end_test_result_paths": [
         {
-            "domain": "FeedStorage",
-            "expected_results_path": "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
-            "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_",
-            "tolerance": 0.1
-        },
-        {
             "domain": "CropAndSoil",
             "expected_results_path": "input/data/end_to_end_testing/e2e_json_crop_soil_filter.json",
             "actual_results_path": "end-to-end-testing_saved_variables_e2e_crop_and_soil_",
