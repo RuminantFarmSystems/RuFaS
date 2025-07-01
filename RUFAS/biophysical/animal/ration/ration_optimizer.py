@@ -45,8 +45,8 @@ class RationConfig:
 
     def __init__(
         self,
-        animal_requirements: NutritionRequirements = None,
-        pen_available_feeds=None,
+        animal_requirements: NutritionRequirements,
+        pen_available_feeds: list[Feed],
         pen_average_body_weight: float = 0,
     ) -> None:
         """
@@ -848,7 +848,7 @@ class RationOptimizer:
     @staticmethod
     def is_constraint_violated(
         solution_x: npt.NDArray[np.float64],
-        constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
+        constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str,
         ration_config: RationConfig,
     ) -> bool:
         """
@@ -880,7 +880,7 @@ class RationOptimizer:
     @staticmethod
     def find_failed_constraints(
         solution_x: npt.NDArray[np.float64],
-        constraints: List[Dict[str, Callable[[Any, Any], float]]],
+        constraints: list[dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str],
         ration_config: RationConfig,
     ) -> List[Dict[str, Callable[[Any, Any], float]]]:
         """
