@@ -441,7 +441,6 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
             (mock_feed_config := {"dummy": "feed config"}),
             (mock_ration_interval_length := 30),
             (mock_is_ration_defined_by_user := True),
-            (mock_end_to_end_testing_inputs := {"dummy": {"end_to_end": "testing inputs"}}),
         ],
     )
 
@@ -482,8 +481,6 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         call("animal.ration.formulation_interval"),
         call("animal.ration.user_input"),
     ]
-    if is_end_to_end_test_run:
-        expected_get_data_call_args_list.append(call("end_to_end_testing_inputs"))
     assert mock_im_get_data.call_args_list == expected_get_data_call_args_list
     assert simulation_engine.om.time == mock_time
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
@@ -509,11 +506,6 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
     assert simulation_engine.herd_manager == mock_herd_manager
     mock_manure_manager_init.assert_called_once_with()
     assert simulation_engine.manure_manager == mock_manure_manager
-
-    if is_end_to_end_test_run:
-        mock_feed_manager_setup_stored_feeds.assert_called_once_with(mock_end_to_end_testing_inputs, mock_time)
-    else:
-        mock_feed_manager_setup_stored_feeds.assert_not_called()
 
 
 @pytest.mark.parametrize(
