@@ -3,6 +3,7 @@ import numpy as np
 from unittest.mock import MagicMock, patch
 
 from pytest_mock import MockerFixture
+from scipy.optimize import OptimizeResult
 
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
@@ -126,6 +127,16 @@ def test_ration_config_initialization(mock_feed: Feed, mock_requirements: Nutrit
     assert config.feed_maximum_list == [10.0]
 
 
+def test_ration_config_initialization_no_feeds(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
+    """Test initialization of RationConfig and derived attributes."""
+    config = RationConfig(mock_requirements, None, 600)
+    assert config.animal_requirements == mock_requirements
+    assert config.feeds_used == []
+    assert config.price_list == []
+    assert config.feed_minimum_list == []
+    assert config.feed_maximum_list == []
+
+
 def test_convert_decision_vec_to_feeds(ration_config: RationConfig) -> None:
     """Test conversion of decision vector to feed list."""
     vec = np.array([5.0])
@@ -229,3 +240,147 @@ def test_find_failed_constraints(full_config: RationConfig) -> None:
     constraints = [{"type": "ineq", "fun": lambda x, cfg: -1.0}, {"type": "ineq", "fun": lambda x, cfg: 1.0}]
     failed = RationOptimizer.find_failed_constraints(vec, constraints, full_config)
     assert len(failed) == 1
+
+
+def test_ndf_constraint_lower_non_zero_intake(mocker: MockerFixture):
+    """Tests ndf_constraint_lower for non-zero intake."""
+    decision_vector = np.array([1.0, 2.0, 3.0])
+    config = MagicMock(RationConfig)
+
+    mock_calc = mocker.patch.object(
+        RationOptimizer,
+        "_calculate_NDF_constraints",
+        return_value=0.42
+    )
+
+    result = RationOptimizer.NDF_constraint_lower(decision_vector, config)
+
+    mock_calc.assert_called_once_with(decision_vector, config, 6.0)
+    assert result == 0.42
+
+
+def test_ndf_constraint_lower_zero_intake():
+    """Tests ndf_constraint_lower for zero intake."""
+    decision_vector = np.array([0.0, 0.0, 0.0])
+    config = MagicMock(RationConfig)
+    result = RationOptimizer.NDF_constraint_lower(decision_vector, config)
+
+    assert result == -1.0
+
+
+def test_ndf_constraint_upper_non_zero_intake(mocker: MockerFixture):
+    """Tests ndf_constraint_upper for non-zero intake."""
+    decision_vector = np.array([1.0, 2.0, 3.0])
+    config = MagicMock(RationConfig)
+
+    mock_calc = mocker.patch.object(
+        RationOptimizer,
+        "_calculate_NDF_constraints",
+        return_value=0.42
+    )
+
+    result = RationOptimizer.NDF_constraint_upper(decision_vector, config)
+
+    mock_calc.assert_called_once_with(decision_vector, config, 6.0)
+    assert result == -0.42
+
+
+def test_ndf_constraint_upper_zero_intake():
+    """Tests ndf_constraint_upper for zero intake."""
+    decision_vector = np.array([0.0, 0.0, 0.0])
+    config = MagicMock(RationConfig)
+
+    result = RationOptimizer.NDF_constraint_upper(decision_vector, config)
+
+    assert result == -1.0
+
+
+def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture):
+    """Tests forage_NDF_constraint for non-zero intake."""
+    decision_vector = np.array([1.0, 2.0, 3.0])  # sum = 6.0
+    config = MagicMock(RationConfig)
+    mock_feeds = MagicMock()
+
+    mocker.patch.object(
+        RationOptimizer,
+        "convert_decision_vec_to_feeds",
+        return_value=mock_feeds
+    )
+    mocker.patch.object(
+        NutritionSupplyCalculator,
+        "calculate_forage_neutral_detergent_fiber_content",
+        return_value=1.8
+    )
+
+    result = RationOptimizer.forage_NDF_constraint(decision_vector, config)
+    assert result == 15.0
+
+
+def test_forage_ndf_constraint_zero_intake():
+    """Tests forage_NDF_constraint for zero intake."""
+    decision_vector = np.array([0.0, 0.0, 0.0])
+    config = MagicMock(RationConfig)
+
+    result = RationOptimizer.forage_NDF_constraint(decision_vector, config)
+
+    assert result == -1.0
+
+
+def test_fat_constraint_non_zero_intake():
+    """Tests fat_constraint for non-zero intake."""
+    decision_vector = np.array([1.0, 2.0, 3.0])
+    config = MagicMock(RationConfig)
+    config.EE_list = np.array([0.02, 0.03, 0.04])
+
+    result = RationOptimizer.fat_constraint(decision_vector, config)
+
+    assert result == pytest.approx(
+        7.0 - 0.0333333333,
+        rel=1e-6
+    )
+
+
+def test_fat_constraint_zero_intake():
+    """Tests fat_constraint for zero intake."""
+    decision_vector = np.array([0.0, 0.0, 0.0])
+    config = MagicMock(RationConfig)
+    config.EE_list = np.array([0.02, 0.03, 0.04])
+
+    result = RationOptimizer.fat_constraint(decision_vector, config)
+
+    assert result == -1.0
+
+
+def test_attempt_optimization_success(mocker: MockerFixture):
+    """Tests successful optimization flow in attempt_optimization."""
+    optimizer = RationOptimizer()
+
+    pen_average_body_weight = 600.0
+    requirements = MagicMock(NutritionRequirements)
+    feeds = [MagicMock(Feed)]
+    animal_comb = MagicMock(AnimalCombination)
+    previous_ration = {"feed1": 3.0}
+
+    # Prepare mocks
+    mock_config = MagicMock(RationConfig)
+    mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig", return_value=mock_config)
+
+    mocker.patch.object(optimizer, "_build_initial_value", return_value=[1.0, 2.0])
+    mocker.patch.object(optimizer, "_build_bounds", return_value=[(0.0, 10.0), (0.0, 10.0)])
+    mocker.patch.object(optimizer, "set_constraints")
+    mocker.patch.object(optimizer, "_select_constraints", return_value=[{"type": "ineq", "fun": lambda x: 1}])
+    mocker.patch.object(optimizer, "objective", return_value=0.0)
+
+    mock_result = MagicMock(OptimizeResult)
+    mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.minimize", return_value=mock_result)
+
+    result, config = optimizer.attempt_optimization(
+        pen_average_body_weight,
+        requirements,
+        feeds,
+        animal_comb,
+        previous_ration
+    )
+
+    assert result == mock_result
+    assert config == mock_config

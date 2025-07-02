@@ -45,7 +45,7 @@ class RationConfig:
     def __init__(
         self,
         animal_requirements: NutritionRequirements,
-        pen_available_feeds: list[Feed],
+        pen_available_feeds: Optional[list[Feed]],
         pen_average_body_weight: float = 0,
     ) -> None:
         """
