@@ -273,10 +273,7 @@ def test_is_constraint_violated_eq_not_close() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {
-        "type": "eq",
-        "fun": lambda x, cfg: 0.5  # Not close to 0
-    }
+    constraint = {"type": "eq", "fun": lambda x, cfg: 0.5}  # Not close to 0
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is True
@@ -287,10 +284,7 @@ def test_is_constraint_violated_eq_close_to_zero() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {
-        "type": "eq",
-        "fun": lambda x, cfg: 1e-9
-    }
+    constraint = {"type": "eq", "fun": lambda x, cfg: 1e-9}
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is False
