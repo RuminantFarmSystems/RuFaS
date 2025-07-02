@@ -199,6 +199,7 @@ v0.9.2
 - [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking
+- [2381](https://github.com/RuminantFarmSystems/MASM/pull/2381) - [minor change] [Animal] Refactor ration formulation.
 
 ### v0.9.2
 
