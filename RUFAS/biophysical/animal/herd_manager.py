@@ -167,6 +167,14 @@ class HerdManager:
         self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
             feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
         )
+        self.animals_deaths_by_stage: dict[AnimalType, int] = {
+            AnimalType.CALF: 0,
+            AnimalType.HEIFER_I: 0,
+            AnimalType.HEIFER_II: 0,
+            AnimalType.HEIFER_III: 0,
+            AnimalType.DRY_COW: 0,
+            AnimalType.LAC_COW: 0,
+        }
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
@@ -388,6 +396,8 @@ class HerdManager:
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
+            if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
+                self.animals_deaths_by_stage[animal.animal_type] += 1
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
