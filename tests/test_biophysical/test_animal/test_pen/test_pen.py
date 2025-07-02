@@ -1,8 +1,10 @@
 from typing import Any
 from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
+from scipy.optimize import OptimizeResult
 
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -22,6 +24,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
@@ -1122,15 +1125,115 @@ def test_set_animal_nutritional_supply(pen: Pen, animals_in_pen: dict[int, Anima
     assert mock_set.call_count == 2
 
 
-def test_formulate_optimized_ration(pen: Pen, mocker: MockerFixture) -> None:
-    # pen.formulate_optimized_ration(
-    #     pen_available_feeds=mocker.MagicMock(),
-    #     temperature=mocker.MagicMock(),
-    #     max_daily_feeds={},
-    #     advance_purchase_allowance=MagicMock(autospec=AdvancePurchaseAllowance),
-    #     total_inventory=MagicMock(autospec=TotalInventory),
-    # )
-    pass
+def _mock_solution(success: bool) -> OptimizeResult:
+    """Creates a mock OptimizeResult with specified success status."""
+    solution = Mock(spec=OptimizeResult)
+    solution.success = success
+    solution.x = np.array([1.0])
+    return solution
+
+
+def _mock_feeds() -> list[Feed]:
+    return [MagicMock(spec=Feed)]
+
+
+def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: Pen) -> None:
+    """LAC_COW: succeeds on first attempt."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = "pen1"
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+    mocker.patch.object(pen, "_attempt_formulation", return_value=(_mock_solution(True), MagicMock()))
+    mocker.patch.object(RationOptimizer, "handle_failed_constraints")
+    mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
+
+    pen.formulate_optimized_ration(
+        pen_available_feeds=_mock_feeds(),
+        temperature=25.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=1,
+    )
+
+    mock_apply.assert_called_once()
+
+
+def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen):
+    """LAC_COW: first attempt fails, second succeeds."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = "pen1"
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+    mocker.patch.object(
+        pen, "_attempt_formulation",
+        side_effect=[(_mock_solution(False), MagicMock()), (_mock_solution(True), MagicMock())]
+    )
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints")
+    mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
+
+    pen.formulate_optimized_ration(
+        pen_available_feeds=_mock_feeds(),
+        temperature=25.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=2,
+    )
+
+    mock_apply.assert_called_once()
+
+
+def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixture, pen: Pen):
+    """Non-LAC_COW: fails and no previous ration exists, raises error."""
+    pen.animal_combination = AnimalCombination.GROWING
+    pen.ration = {}
+    pen.id = "pen2"
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "_attempt_formulation", return_value=(_mock_solution(False), MagicMock()))
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints")
+    mocker.patch.object(pen, "_apply_successful_solution")
+
+    with pytest.raises(ValueError, match="No previous ration available"):
+        pen.formulate_optimized_ration(
+            pen_available_feeds=_mock_feeds(),
+            temperature=22.0,
+            max_daily_feeds={},
+            advance_purchase_allowance=MagicMock(),
+            total_inventory=MagicMock(),
+            simulation_day=3,
+        )
+
+
+def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixture, pen: Pen):
+    """Non-LAC_COW: fails but uses previous ration, logs fallback."""
+    pen.animal_combination = AnimalCombination.CLOSE_UP
+    pen.ration = {"feed1": 2.0}
+    pen.id = "pen3"
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "_attempt_formulation", return_value=(_mock_solution(False), MagicMock()))
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints")
+    mocker.patch.object(pen, "_apply_successful_solution")
+
+    pen.formulate_optimized_ration(
+        pen_available_feeds=_mock_feeds(),
+        temperature=21.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=4,
+    )
+
+    pen.om.add_log.assert_called_once()
+    pen.om.add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
