@@ -1241,8 +1241,7 @@ def test_attempt_formulation(mocker: MockerFixture, pen: Pen) -> None:
     """Tests the function _attempt_formulation"""
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
-    mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization",
-                                       return_value=mock_result)
+    mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization", return_value=mock_result)
     result = pen._attempt_formulation(_mock_feeds(), 25, None)
     mock_set.assert_called_once()
     mock_attempt.assert_called_once()
@@ -1302,17 +1301,19 @@ def test_reduce_on_lactation_failure_low_milk(mocker: MockerFixture, pen: Pen) -
         pen._reduce_on_lactation_failure({"key": "value"})
 
     mock_om.add_error.assert_called_once_with(
-        "Milk production too low",
-        "Check failed_constraint_summary_for_pen_3 to see cause.",
-        {"key": "value"}
+        "Milk production too low", "Check failed_constraint_summary_for_pen_3 to see cause.", {"key": "value"}
     )
 
 
 def test_reduce_on_lactation_failure_reduction_fails(mocker: MockerFixture, pen: Pen) -> None:
     """Raises error if milk production reduction fails"""
     mock_om = MagicMock()
-    mocker.patch.object(type(pen), "average_milk_production", new_callable=PropertyMock,
-                        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1)
+    mocker.patch.object(
+        type(pen),
+        "average_milk_production",
+        new_callable=PropertyMock,
+        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1,
+    )
     mocker.patch.object(pen, "reduce_milk_production", return_value=False)
     pen.om = mock_om
     pen.id = 3
@@ -1323,14 +1324,18 @@ def test_reduce_on_lactation_failure_reduction_fails(mocker: MockerFixture, pen:
     mock_om.add_error.assert_called_once_with(
         "Milk production reduction limit reached.",
         "Check failed_constraint_summary_for_pen_3 and consider adjusting input.",
-        {"note": "x"}
+        {"note": "x"},
     )
 
 
 def test_reduce_on_lactation_failure_success(mocker: MockerFixture, pen: Pen) -> None:
     """No error if milk production is above minimum and reduction succeeds"""
-    mocker.patch.object(type(pen), "average_milk_production", new_callable=PropertyMock,
-                        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1)
+    mocker.patch.object(
+        type(pen),
+        "average_milk_production",
+        new_callable=PropertyMock,
+        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1,
+    )
     mocker.patch.object(pen, "reduce_milk_production", return_value=True)
     pen.om = MagicMock()
     pen.id = 2
