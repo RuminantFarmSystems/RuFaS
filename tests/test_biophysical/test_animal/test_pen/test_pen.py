@@ -1171,8 +1171,9 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
 
     mocker.patch.object(pen, "reset_milk_production_reduction")
     mocker.patch.object(
-        pen, "_attempt_formulation",
-        side_effect=[(_mock_solution(False), MagicMock()), (_mock_solution(True), MagicMock())]
+        pen,
+        "_attempt_formulation",
+        side_effect=[(_mock_solution(False), MagicMock()), (_mock_solution(True), MagicMock())],
     )
     mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints")
     mocker.patch.object(pen, "_reduce_on_lactation_failure")
