@@ -24,7 +24,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
+from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
@@ -1141,7 +1141,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     """LAC_COW: succeeds on first attempt."""
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
-    pen.id = "pen1"
+    pen.id = 3
     pen.om = MagicMock(spec=OutputManager)
 
     mocker.patch.object(pen, "reset_milk_production_reduction")
@@ -1162,11 +1162,11 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     mock_apply.assert_called_once()
 
 
-def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen):
+def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW: first attempt fails, second succeeds."""
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
-    pen.id = "pen1"
+    pen.id = 3
     pen.om = MagicMock(spec=OutputManager)
 
     mocker.patch.object(pen, "reset_milk_production_reduction")
@@ -1191,11 +1191,11 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
     mock_apply.assert_called_once()
 
 
-def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixture, pen: Pen):
+def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixture, pen: Pen) -> None:
     """Non-LAC_COW: fails and no previous ration exists, raises error."""
     pen.animal_combination = AnimalCombination.GROWING
     pen.ration = {}
-    pen.id = "pen2"
+    pen.id = 2
     pen.om = MagicMock(spec=OutputManager)
 
     mocker.patch.object(pen, "_attempt_formulation", return_value=(_mock_solution(False), MagicMock()))
@@ -1213,11 +1213,11 @@ def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixtur
         )
 
 
-def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixture, pen: Pen):
+def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixture, pen: Pen) -> None:
     """Non-LAC_COW: fails but uses previous ration, logs fallback."""
     pen.animal_combination = AnimalCombination.CLOSE_UP
-    pen.ration = {"feed1": 2.0}
-    pen.id = "pen3"
+    pen.ration = {1: 2.0}
+    pen.id = 3
     pen.om = MagicMock(spec=OutputManager)
 
     mocker.patch.object(pen, "_attempt_formulation", return_value=(_mock_solution(False), MagicMock()))
@@ -1234,6 +1234,108 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     )
 
     pen.om.add_log.assert_called_once()
+    pen.om.add_error.assert_not_called()
+
+
+def test_attempt_formulation(mocker: MockerFixture, pen: Pen) -> None:
+    """Tests the function _attempt_formulation"""
+    mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
+    mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
+    mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization",
+                                       return_value=mock_result)
+    result = pen._attempt_formulation(_mock_feeds(), 25, None)
+    mock_set.assert_called_once()
+    mock_attempt.assert_called_once()
+    assert result == mock_result
+
+
+def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:
+    """Tests _apply_successful_solution when pen is populated"""
+    solution = MagicMock(spec=OptimizeResult)
+
+    mocker.patch.object(pen.ration_optimizer, "make_ration_from_solution", return_value={3: 3.0})
+    mocker.patch.object(pen, "set_animal_nutritional_supply")
+    mocker.patch.object(NutritionEvaluator, "evaluate_nutrition_supply", return_value=("ignored", "evaluated"))
+    mocker.patch.object(NutritionEvaluationResults, "make_empty_evaluation_results")
+
+    mocker.patch.object(type(pen), "average_nutrition_requirements", new_callable=PropertyMock, return_value="req")
+    mocker.patch.object(type(pen), "average_nutrition_supply", new_callable=PropertyMock, return_value="supply")
+    mocker.patch.object(type(pen), "is_populated", new_callable=PropertyMock, return_value=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+
+    pen._apply_successful_solution(solution, _mock_feeds())
+
+    assert pen.ration == {3: 3.0}
+    assert pen.average_nutrition_evaluation == "evaluated"
+
+
+def test_apply_successful_solution_not_populated(mocker: MockerFixture, pen: Pen) -> None:
+    """Tests _apply_successful_solution when pen is not populated"""
+    solution = MagicMock(spec=OptimizeResult)
+
+    mocker.patch.object(pen.ration_optimizer, "make_ration_from_solution", return_value="ration")
+    mocker.patch.object(pen, "set_animal_nutritional_supply")
+    mocker.patch.object(NutritionEvaluator, "evaluate_nutrition_supply", return_value=("ignored", "evaluated"))
+    mock_empty = mocker.patch.object(NutritionEvaluationResults, "make_empty_evaluation_results", return_value="empty")
+
+    mocker.patch.object(type(pen), "average_nutrition_requirements", new_callable=PropertyMock, return_value="req")
+    mocker.patch.object(type(pen), "average_nutrition_supply", new_callable=PropertyMock, return_value="supply")
+    mocker.patch.object(type(pen), "is_populated", new_callable=PropertyMock, return_value=False)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+
+    pen._apply_successful_solution(solution, _mock_feeds())
+
+    assert str(pen.average_nutrition_evaluation) == "empty"
+    mock_empty.assert_called_once()
+
+
+def test_reduce_on_lactation_failure_low_milk(mocker: MockerFixture, pen: Pen) -> None:
+    """Raises error if milk production is below minimum"""
+    mock_om = MagicMock()
+    mocker.patch.object(type(pen), "average_milk_production", new_callable=PropertyMock, return_value=0.5)
+    pen.om = mock_om
+    pen.id = 3
+
+    with pytest.raises(ValueError, match="Cannot meet minimum milk production."):
+        pen._reduce_on_lactation_failure({"key": "value"})
+
+    mock_om.add_error.assert_called_once_with(
+        "Milk production too low",
+        "Check failed_constraint_summary_for_pen_3 to see cause.",
+        {"key": "value"}
+    )
+
+
+def test_reduce_on_lactation_failure_reduction_fails(mocker: MockerFixture, pen: Pen) -> None:
+    """Raises error if milk production reduction fails"""
+    mock_om = MagicMock()
+    mocker.patch.object(type(pen), "average_milk_production", new_callable=PropertyMock,
+                        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1)
+    mocker.patch.object(pen, "reduce_milk_production", return_value=False)
+    pen.om = mock_om
+    pen.id = 3
+
+    with pytest.raises(ValueError, match="Milk production reduction limit reached."):
+        pen._reduce_on_lactation_failure({"note": "x"})
+
+    mock_om.add_error.assert_called_once_with(
+        "Milk production reduction limit reached.",
+        "Check failed_constraint_summary_for_pen_3 and consider adjusting input.",
+        {"note": "x"}
+    )
+
+
+def test_reduce_on_lactation_failure_success(mocker: MockerFixture, pen: Pen) -> None:
+    """No error if milk production is above minimum and reduction succeeds"""
+    mocker.patch.object(type(pen), "average_milk_production", new_callable=PropertyMock,
+                        return_value=AnimalModuleConstants.MINIMUM_AVG_PEN_MILK + 1)
+    mocker.patch.object(pen, "reduce_milk_production", return_value=True)
+    pen.om = MagicMock()
+    pen.id = 2
+
+    pen._reduce_on_lactation_failure({"ok": "yes"})
     pen.om.add_error.assert_not_called()
 
 
