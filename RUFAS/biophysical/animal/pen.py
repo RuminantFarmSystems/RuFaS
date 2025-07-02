@@ -34,7 +34,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
 from RUFAS.output_manager import OutputManager
 
-
 om = OutputManager()
 
 
@@ -917,15 +916,13 @@ class Pen:
                 )
 
             # Lac cow success exit and non lac cow one time run only exit
-            if solution and solution.success or self.animal_combination is not AnimalCombination.LAC_COW:
+            if solution and solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
             # For lac cow
             self._reduce_on_lactation_failure(info_map=info_map)
 
         if solution is not None and solution.success:
-            print(self.animal_combination)
-            print(f"num_attempts = {num_attempts}")
             self._apply_successful_solution(solution, pen_available_feeds)
         elif self.ration == {}:
             self.om.add_error(
