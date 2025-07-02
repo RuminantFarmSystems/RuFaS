@@ -1,3 +1,5 @@
+from typing import cast
+
 import pytest
 import numpy as np
 from unittest.mock import MagicMock, patch
@@ -187,6 +189,38 @@ def test_select_constraints() -> None:
     assert all("type" in c for c in result)
 
 
+def test_select_constraints_growing() -> None:
+    """Tests that heifer_constraints are returned for GROWING."""
+    optimizer = RationOptimizer()
+    optimizer.heifer_constraints = [{"type": "ineq", "fun": lambda x, config: 1.0}]
+    result = optimizer._select_constraints(AnimalCombination.GROWING)
+    assert result == optimizer.heifer_constraints
+
+
+def test_select_constraints_close_up() -> None:
+    """Tests that heifer_constraints are returned for CLOSE_UP."""
+    optimizer = RationOptimizer()
+    optimizer.heifer_constraints = [{"type": "ineq", "fun": lambda x, config: 1.0}]
+    result = optimizer._select_constraints(AnimalCombination.CLOSE_UP)
+    assert result == optimizer.heifer_constraints
+
+
+def test_select_constraints_growing_and_close_up() -> None:
+    """Tests that heifer_constraints are returned for GROWING_AND_CLOSE_UP."""
+    optimizer = RationOptimizer()
+    optimizer.heifer_constraints = [{"type": "ineq", "fun": lambda x, config: 1.0}]
+    result = optimizer._select_constraints(AnimalCombination.GROWING_AND_CLOSE_UP)
+    assert result == optimizer.heifer_constraints
+
+
+def test_select_constraints_invalid_combination() -> None:
+    """Tests that ValueError is raised for an invalid combination."""
+    optimizer = RationOptimizer()
+    invalid_combination = MagicMock()
+    with pytest.raises(ValueError, match="Invalid animal combination"):
+        optimizer._select_constraints(invalid_combination)
+
+
 def test_objective(ration_config: RationConfig) -> None:
     """Test objective cost function value from decision vector."""
     result = RationOptimizer.objective(np.array([5.0]), ration_config)
@@ -234,6 +268,34 @@ def test_is_constraint_violated(full_config: RationConfig) -> None:
     assert violated is True
 
 
+def test_is_constraint_violated_eq_not_close() -> None:
+    """Tests that violation is True for eq-type constraint with result not close to zero."""
+    solution_x = np.array([1.0, 2.0])
+    config = MagicMock(RationConfig)
+
+    constraint = {
+        "type": "eq",
+        "fun": lambda x, cfg: 0.5  # Not close to 0
+    }
+
+    result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
+    assert result is True
+
+
+def test_is_constraint_violated_eq_close_to_zero() -> None:
+    """Tests that violation is False for eq-type constraint when result is close to zero."""
+    solution_x = np.array([1.0, 2.0])
+    config = MagicMock(RationConfig)
+
+    constraint = {
+        "type": "eq",
+        "fun": lambda x, cfg: 1e-9
+    }
+
+    result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
+    assert result is False
+
+
 def test_find_failed_constraints(full_config: RationConfig) -> None:
     """Test identification of failed constraints from a set."""
     vec = np.array([5.0])
@@ -242,7 +304,7 @@ def test_find_failed_constraints(full_config: RationConfig) -> None:
     assert len(failed) == 1
 
 
-def test_ndf_constraint_lower_non_zero_intake(mocker: MockerFixture):
+def test_ndf_constraint_lower_non_zero_intake(mocker: MockerFixture) -> None:
     """Tests ndf_constraint_lower for non-zero intake."""
     decision_vector = np.array([1.0, 2.0, 3.0])
     config = MagicMock(RationConfig)
@@ -259,7 +321,7 @@ def test_ndf_constraint_lower_non_zero_intake(mocker: MockerFixture):
     assert result == 0.42
 
 
-def test_ndf_constraint_lower_zero_intake():
+def test_ndf_constraint_lower_zero_intake() -> None:
     """Tests ndf_constraint_lower for zero intake."""
     decision_vector = np.array([0.0, 0.0, 0.0])
     config = MagicMock(RationConfig)
@@ -268,7 +330,7 @@ def test_ndf_constraint_lower_zero_intake():
     assert result == -1.0
 
 
-def test_ndf_constraint_upper_non_zero_intake(mocker: MockerFixture):
+def test_ndf_constraint_upper_non_zero_intake(mocker: MockerFixture) -> None:
     """Tests ndf_constraint_upper for non-zero intake."""
     decision_vector = np.array([1.0, 2.0, 3.0])
     config = MagicMock(RationConfig)
@@ -285,7 +347,7 @@ def test_ndf_constraint_upper_non_zero_intake(mocker: MockerFixture):
     assert result == -0.42
 
 
-def test_ndf_constraint_upper_zero_intake():
+def test_ndf_constraint_upper_zero_intake() -> None:
     """Tests ndf_constraint_upper for zero intake."""
     decision_vector = np.array([0.0, 0.0, 0.0])
     config = MagicMock(RationConfig)
@@ -295,7 +357,7 @@ def test_ndf_constraint_upper_zero_intake():
     assert result == -1.0
 
 
-def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture):
+def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture) -> None:
     """Tests forage_NDF_constraint for non-zero intake."""
     decision_vector = np.array([1.0, 2.0, 3.0])  # sum = 6.0
     config = MagicMock(RationConfig)
@@ -316,7 +378,7 @@ def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture):
     assert result == 15.0
 
 
-def test_forage_ndf_constraint_zero_intake():
+def test_forage_ndf_constraint_zero_intake() -> None:
     """Tests forage_NDF_constraint for zero intake."""
     decision_vector = np.array([0.0, 0.0, 0.0])
     config = MagicMock(RationConfig)
@@ -326,7 +388,7 @@ def test_forage_ndf_constraint_zero_intake():
     assert result == -1.0
 
 
-def test_fat_constraint_non_zero_intake():
+def test_fat_constraint_non_zero_intake() -> None:
     """Tests fat_constraint for non-zero intake."""
     decision_vector = np.array([1.0, 2.0, 3.0])
     config = MagicMock(RationConfig)
@@ -340,7 +402,7 @@ def test_fat_constraint_non_zero_intake():
     )
 
 
-def test_fat_constraint_zero_intake():
+def test_fat_constraint_zero_intake() -> None:
     """Tests fat_constraint for zero intake."""
     decision_vector = np.array([0.0, 0.0, 0.0])
     config = MagicMock(RationConfig)
@@ -351,15 +413,15 @@ def test_fat_constraint_zero_intake():
     assert result == -1.0
 
 
-def test_attempt_optimization_success(mocker: MockerFixture):
+def test_attempt_optimization_success(mocker: MockerFixture) -> None:
     """Tests successful optimization flow in attempt_optimization."""
     optimizer = RationOptimizer()
 
     pen_average_body_weight = 600.0
     requirements = MagicMock(NutritionRequirements)
-    feeds = [MagicMock(Feed)]
+    feeds = cast(list[Feed], [MagicMock()])
     animal_comb = MagicMock(AnimalCombination)
-    previous_ration = {"feed1": 3.0}
+    previous_ration = cast(dict[int | str, float | str], {"feed1": 3.0})
 
     # Prepare mocks
     mock_config = MagicMock(RationConfig)
@@ -384,3 +446,108 @@ def test_attempt_optimization_success(mocker: MockerFixture):
 
     assert result == mock_result
     assert config == mock_config
+
+
+def test_attempt_optimization_clips_initial_values(mocker: MockerFixture) -> None:
+    """Ensures attempt_optimization clips x0 to the provided bounds."""
+    optimizer = RationOptimizer()
+
+    pen_average_body_weight = 600.0
+    requirements = MagicMock(NutritionRequirements)
+    feeds = cast(list[Feed], [MagicMock()])
+    animal_comb = MagicMock(AnimalCombination)
+
+    mock_config = MagicMock()
+    mocker.patch(
+        "RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig",
+        return_value=mock_config,
+    )
+
+    mocker.patch.object(optimizer, "_build_initial_value", return_value=[-1.0, 15.0])
+
+    mocker.patch.object(optimizer, "_build_bounds", return_value=[(0.0, 10.0), (0.0, 10.0)])
+
+    mocker.patch.object(optimizer, "set_constraints")
+    mocker.patch.object(optimizer, "_select_constraints", return_value=[])
+    mocker.patch.object(optimizer, "objective", return_value=0.0)
+
+    minimize_mock = mocker.patch(
+        "RUFAS.biophysical.animal.ration.ration_optimizer.minimize",
+        return_value=MagicMock(),
+    )
+
+    optimizer.attempt_optimization(
+        pen_average_body_weight,
+        requirements,
+        feeds,
+        animal_comb,
+        previous_ration=None,
+    )
+
+    passed_x0 = minimize_mock.call_args[0][1]
+    assert np.array_equal(passed_x0, np.array([0.0, 10.0], dtype=float))
+
+
+def test_handle_failed_constraints_lac_cow(mocker: MockerFixture) -> None:
+    """Tests handle_failed_constraints for LAC_COW animal combination."""
+    optimizer = RationOptimizer()
+    optimizer.cow_constraints = [{"fun": MagicMock(__name__="mock_constraint")}]
+    mocker.patch.object(optimizer, "make_ration_from_solution", return_value={"mock_ration": 1.0})
+
+    mock_failed_constraints = [{"fun": MagicMock(__name__="constraint_1")}]
+
+    mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=MagicMock())
+    mocker.patch.object(RationOptimizer, "find_failed_constraints", return_value=mock_failed_constraints)
+
+    solution = MagicMock(spec=OptimizeResult)
+    solution.x = np.array([1.0, 2.0])
+    config = MagicMock()
+    requirements = MagicMock(spec=NutritionRequirements)
+    pen_feeds = [MagicMock(spec=Feed)]
+    pen_id = 1
+    sim_day = 10
+
+    optimizer.handle_failed_constraints(
+        num_attempts=2,
+        solution=solution,
+        ration_config=config,
+        animal_combination=AnimalCombination.LAC_COW,
+        pen_id=pen_id,
+        pen_available_feeds=pen_feeds,
+        average_nutrient_requirements=requirements,
+        sim_day=sim_day,
+    )
+
+
+def test_handle_failed_constraints_heifer_combination(mocker: MockerFixture) -> None:
+    """Tests handle_failed_constraints for heifer-type animal combination."""
+    optimizer = RationOptimizer()
+    optimizer.heifer_constraints = [{"fun": MagicMock(__name__="mock_constraint")}]
+    mocker.patch.object(optimizer, "make_ration_from_solution", return_value={"mock_ration": 2.0})
+
+    mock_failed_constraints = [{"fun": MagicMock(__name__="constraint_2")}]
+
+    mock_om = MagicMock()
+    mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=mock_om)
+    mocker.patch.object(RationOptimizer, "find_failed_constraints", return_value=mock_failed_constraints)
+
+    solution = MagicMock(spec=OptimizeResult)
+    solution.x = np.array([2.0, 3.0])
+    config = MagicMock()
+    requirements = MagicMock(spec=NutritionRequirements)
+    pen_feeds = [MagicMock(spec=Feed)]
+    pen_id = 2
+    sim_day = 12
+
+    optimizer.handle_failed_constraints(
+        num_attempts=1,
+        solution=solution,
+        ration_config=config,
+        animal_combination=AnimalCombination.CLOSE_UP,
+        pen_id=pen_id,
+        pen_available_feeds=pen_feeds,
+        average_nutrient_requirements=requirements,
+        sim_day=sim_day,
+    )
+
+    mock_om.add_variable.assert_called_once()
