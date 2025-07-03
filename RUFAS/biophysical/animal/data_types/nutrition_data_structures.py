@@ -202,6 +202,7 @@ class NutritionSupply:
     def __post_init__(self) -> None:
         """Sets the nitrogen supply of a ration based on the crude protein supply."""
         self.nitrogen_supply = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+        print(GeneralConstants.PROTEIN_TO_NITROGEN)
 
     def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
         """Add two NutritionSupply objects together."""
