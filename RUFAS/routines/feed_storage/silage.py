@@ -3,7 +3,7 @@ from typing import Optional
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -21,7 +21,7 @@ class Silage(Storage):
 
     Methods
     -------
-    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: Time)
+    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
         Calculates the number of days to effluent loss needs to be processed for in the given crop.
     calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total dry matter lost to effluent that occurred over the given number of days.
@@ -45,7 +45,7 @@ class Silage(Storage):
         ]
         self.om = OutputManager()
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
         of `process_degradations` to handle the fermentative loss.
@@ -54,8 +54,8 @@ class Silage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
@@ -96,7 +96,7 @@ class Silage(Storage):
 
         super().process_degradations(weather, time)
 
-    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
+    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: RufasTime) -> int:
         """
         Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
 
@@ -104,8 +104,8 @@ class Silage(Storage):
         ----------
         crop : HarvestedCrop
             Ensiled crop that is being degraded.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Notes
         -----

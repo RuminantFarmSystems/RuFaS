@@ -8,7 +8,7 @@ from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
@@ -87,7 +87,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
     handler.manure_stream = stream
     add_variable_patch = mocker.patch.object(handler._om, "add_variable")
 
-    result = handler.process_manure(conditions, MagicMock(Time))
+    result = handler.process_manure(conditions, MagicMock(RufasTime))
 
     assert result["manure"] == stream
     assert add_variable_patch.call_count == 2
@@ -115,7 +115,7 @@ def test_process_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         conditions = CurrentDayConditions(
             mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
         )
-        time_obj = MagicMock(Time)
+        time_obj = MagicMock(RufasTime)
         handler.process_manure(conditions, time_obj)
         assert False
     except TypeError:

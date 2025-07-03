@@ -8,7 +8,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.routines.feed_storage.storage import Storage
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -106,8 +106,8 @@ def test_process_degradations(
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
-    mock_init_time = mocker.patch.object(Time, "__init__", return_value=None)
-    mock_time = Time()
+    mock_init_time = mocker.patch.object(RufasTime, "__init__", return_value=None)
+    mock_time = RufasTime()
     mock_time.start_date = date(year=2024, month=1, day=1)
     mock_time.end_date = date(year=2024, month=12, day=31)
     mock_time.current_date = date(year=2024, month=6, day=1)
@@ -293,9 +293,9 @@ def test_get_conditions(
     expected_offset: int,
 ) -> None:
     """Tests _get_conditions in Storage."""
-    mock_curr_time = mocker.MagicMock(autospec=Time)
+    mock_curr_time = mocker.MagicMock(autospec=RufasTime)
     mock_curr_time.simulation_day = curr_day
-    mock_last_degradation_time = mocker.MagicMock(autospec=Time)
+    mock_last_degradation_time = mocker.MagicMock(autospec=RufasTime)
     mock_last_degradation_time.simulation_day = last_day
     returned_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)]
     mock_weather = mocker.MagicMock(autospec=Weather)
@@ -341,11 +341,11 @@ def test_process_moisture_loss(
         fresh_mass * harvested_crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
     )
     harvested_crop.fresh_mass = fresh_mass
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
+    harvested_crop.storage_time = mocker.MagicMock(autospec=RufasTime)
     setattr(harvested_crop.storage_time, "simulation_day", 0)
-    harvested_crop.last_time_degraded = mocker.MagicMock(autospec=Time)
+    harvested_crop.last_time_degraded = mocker.MagicMock(autospec=RufasTime)
     setattr(harvested_crop.last_time_degraded, "simulation_day", 0)
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     setattr(mock_time, "simulation_day", days)
     storage.stored = [harvested_crop]
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
@@ -377,11 +377,11 @@ def test_calculate_moisture_loss(
     expected: float,
 ) -> None:
     """Tests that moisture losses from a hayed crop are calculated correctly."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
+    harvested_crop.storage_time = mocker.MagicMock(autospec=RufasTime)
     setattr(harvested_crop.storage_time, "simulation_day", 1)
     harvested_crop.initial_dry_matter_percentage = 100.0 - initial_moisture
     harvested_crop.initial_dry_matter_mass = 400.0
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     setattr(mock_time, "simulation_day", days + 1)
 
     actual = storage._calculate_moisture_loss(harvested_crop, mock_time, 30, 12.0)

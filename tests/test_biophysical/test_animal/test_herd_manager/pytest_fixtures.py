@@ -21,7 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -230,448 +230,27 @@ def animal_json() -> dict[str, Any]:
 
 
 @pytest.fixture
-def manure_management_json() -> dict[str, Any]:
-    return {
-        "manure_management_scenarios": [
-            {
-                "scenario_id": 0,
-                "bedding_type": "sawdust",
-                "manure_handler": "manual scraping",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "anaerobic lagoon",
-            },
-            {
-                "scenario_id": 1,
-                "bedding_type": "sawdust",
-                "manure_handler": "manual scraping",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "slurry storage outdoor",
-            },
-            {
-                "scenario_id": 2,
-                "bedding_type": "sawdust",
-                "manure_handler": "manual scraping",
-                "manure_separator": "screw press",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "slurry storage outdoor",
-            },
-            {
-                "scenario_id": 3,
-                "bedding_type": "sawdust",
-                "manure_handler": "flush system",
-                "manure_separator": "rotary screen",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "anaerobic lagoon",
-            },
-            {
-                "scenario_id": 4,
-                "bedding_type": "sand",
-                "manure_handler": "flush system",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "anaerobic lagoon",
-            },
-            {
-                "scenario_id": 5,
-                "bedding_type": "sawdust",
-                "manure_handler": "manual scraping",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "anaerobic digestion and lagoon",
-            },
-            {
-                "scenario_id": 6,
-                "bedding_type": "sawdust",
-                "manure_handler": "flush system",
-                "manure_separator": "rotary screen",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "anaerobic digestion and lagoon",
-            },
-            {
-                "scenario_id": 7,
-                "bedding_type": "sawdust",
-                "manure_handler": "flush system",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "rotary screen",
-                "manure_treatment": "anaerobic digestion and lagoon with separator",
-            },
-            {
-                "scenario_id": 8,
-                "bedding_type": "CBPB sawdust",
-                "manure_handler": "tillage",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "compost bedded pack barn",
-            },
-            {
-                "scenario_id": 9,
-                "bedding_type": "none",
-                "manure_handler": "harrowing",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "open lots",
-            },
-            {
-                "scenario_id": 10,
-                "bedding_type": "none",
-                "manure_handler": "flush system",
-                "manure_separator": "screw press",
-                "manure_separator_after_digestion": "rotary screen",
-                "manure_treatment": "anaerobic digestion and lagoon with separator",
-            },
-            {
-                "scenario_id": 11,
-                "bedding_type": "sawdust",
-                "manure_handler": "alley scraper",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "composting",
-            },
-            {
-                "scenario_id": 12,
-                "bedding_type": "straw",
-                "manure_handler": "manual scraping",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "composting",
-            },
-            {
-                "scenario_id": 13,
-                "bedding_type": "straw",
-                "manure_handler": "alley scraper",
-                "manure_separator": "none",
-                "manure_separator_after_digestion": "none",
-                "manure_treatment": "composting",
-            },
-        ],
-        "bedding_configs": [
-            {
-                "name": "sawdust",
-                "bedding_type": "sawdust",
-                "bedding_mass_per_day": 1.97,
-                "bedding_density": 250.0,
-                "bedding_dry_matter_content": 0.9,
-                "bedding_cleaned_fraction": 1.0,
-                "bedding_carbon_fraction": 0.0,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 0.0,
-            },
-            {
-                "name": "CBPB sawdust",
-                "bedding_type": "CBPB sawdust",
-                "bedding_mass_per_day": 12,
-                "bedding_density": 350.0,
-                "bedding_dry_matter_content": 0.9,
-                "bedding_cleaned_fraction": 1.0,
-                "bedding_carbon_fraction": 0.35,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 0.0,
-            },
-            {
-                "name": "manure solids",
-                "bedding_type": "manure solids",
-                "bedding_mass_per_day": 2.50,
-                "bedding_density": 400.0,
-                "bedding_dry_matter_content": 0.9,
-                "bedding_cleaned_fraction": 1.0,
-                "bedding_carbon_fraction": 0.0,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 0.0,
-            },
-            {
-                "name": "straw",
-                "bedding_type": "straw",
-                "bedding_mass_per_day": 1.97,
-                "bedding_density": 100.0,
-                "bedding_dry_matter_content": 0.9,
-                "bedding_cleaned_fraction": 1.0,
-                "bedding_carbon_fraction": 0.35,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 0.0,
-            },
-            {
-                "name": "sand",
-                "bedding_type": "sand",
-                "bedding_mass_per_day": 25.0,
-                "bedding_density": 1500.0,
-                "bedding_dry_matter_content": 0.9,
-                "bedding_cleaned_fraction": 1.0,
-                "bedding_carbon_fraction": 0.0,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 1.0,
-            },
-            {
-                "name": "none",
-                "bedding_type": "none",
-                "bedding_mass_per_day": 0.0,
-                "bedding_density": 0.0,
-                "bedding_dry_matter_content": 0.0,
-                "bedding_cleaned_fraction": 0.0,
-                "bedding_carbon_fraction": 0.0,
-                "bedding_phosphorus_content": 0.0,
-                "sand_removal_efficiency": 0.0,
-            },
-        ],
-        "manure_handler_configs": [
-            {
-                "name": "flush system",
-                "manure_handler_type": "flush system",
-                "cleaning_water_use_rate": 757.0,
-                "minutes_per_cleaning": 8,
-                "cleanings_per_day": 2,
-                "daily_tillage_frequency": 0,
-                "cleaning_water_recycle_fraction": 0.80,
-            },
-            {
-                "name": "manual scraping",
-                "manure_handler_type": "manual scraping",
-                "cleaning_water_use_rate": 10.0,
-                "minutes_per_cleaning": 8,
-                "cleanings_per_day": 2,
-                "daily_tillage_frequency": 0,
-                "cleaning_water_recycle_fraction": 0.10,
-            },
-            {
-                "name": "alley scraper",
-                "manure_handler_type": "alley scraper",
-                "cleaning_water_use_rate": 10.0,
-                "minutes_per_cleaning": 8,
-                "cleanings_per_day": 2,
-                "daily_tillage_frequency": 0,
-                "cleaning_water_recycle_fraction": 0.10,
-            },
-            {
-                "name": "tillage",
-                "manure_handler_type": "tillage",
-                "cleaning_water_use_rate": 0.0,
-                "minutes_per_cleaning": 0.0,
-                "cleanings_per_day": 0,
-                "daily_tillage_frequency": 1,
-                "cleaning_water_recycle_fraction": 0.0,
-            },
-            {
-                "name": "harrowing",
-                "manure_handler_type": "harrowing",
-                "cleaning_water_use_rate": 0.0,
-                "minutes_per_cleaning": 0.0,
-                "cleanings_per_day": 0,
-                "daily_tillage_frequency": 0,
-                "cleaning_water_recycle_fraction": 0.0,
-            },
-        ],
-        "manure_separator_configs": [
-            {
-                "name": "rotary screen",
-                "manure_separator_type": "rotary screen",
-                "percent_dry_solids": 0.20,
-                "total_solids_removal_efficiency_for_separator": 0.35,
-                "volatile_solids_removal_efficiency_for_separator": 0.40,
-                "nitrogen_removal_efficiency_for_separator": 0.30,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.15,
-                "phosphorus_removal_efficiency_for_separator": 0.40,
-                "potassium_removal_efficiency_for_separator": 0.15,
-            },
-            {
-                "name": "screw press",
-                "manure_separator_type": "screw press",
-                "percent_dry_solids": 0.35,
-                "total_solids_removal_efficiency_for_separator": 0.25,
-                "volatile_solids_removal_efficiency_for_separator": 0.30,
-                "nitrogen_removal_efficiency_for_separator": 0.30,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
-                "phosphorus_removal_efficiency_for_separator": 0.20,
-                "potassium_removal_efficiency_for_separator": 0.23,
-            },
-        ],
-        "manure_treatment_configs": [
-            {
-                "name": "slurry storage underfloor",
-                "manure_treatment_type": "slurry storage underfloor",
-                "total_solids_removal_efficiency_for_treatment": 0.0,
-                "volatile_solids_removal_efficiency_for_treatment": 0.0,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-                "phosphorus_removal_efficiency_for_treatment": 0.0,
-                "potassium_removal_efficiency_for_treatment": 0.0,
-                "storage_time_period": 120,
-                "manure_cover": "crust",
-            },
-            {
-                "name": "slurry storage outdoor",
-                "manure_treatment_type": "slurry storage outdoor",
-                "total_solids_removal_efficiency_for_treatment": 0.00,
-                "volatile_solids_removal_efficiency_for_treatment": 0.0,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-                "phosphorus_removal_efficiency_for_treatment": 0.00,
-                "potassium_removal_efficiency_for_treatment": 0.00,
-                "storage_time_period": 120,
-                "freeboard_input": 0.3048,
-                "manure_cover": "crust",
-            },
-            {
-                "name": "anaerobic lagoon",
-                "manure_treatment_type": "anaerobic lagoon",
-                "total_solids_removal_efficiency_for_treatment": 0.0,
-                "volatile_solids_removal_efficiency_for_treatment": 0.0,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-                "phosphorus_removal_efficiency_for_treatment": 0.0,
-                "potassium_removal_efficiency_for_treatment": 0.0,
-                "hydraulic_retention_time": 365,
-                "sludge_accumulation_period": 10.0,
-                "sludge_accumulation_volume_fraction": 0.00,
-                "storage_time_period": 365,
-                "freeboard_input": 0.3048,
-                "manure_cover": "cover",
-            },
-            {
-                "name": "anaerobic digestion",
-                "manure_treatment_type": "anaerobic digestion",
-                "total_solids_removal_efficiency_for_treatment": 0.45,
-                "volatile_solids_removal_efficiency_for_treatment": 0.40,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.1,
-                "phosphorus_removal_efficiency_for_treatment": 0.0,
-                "potassium_removal_efficiency_for_treatment": 0.0,
-                "hydraulic_retention_time": 25,
-                "sludge_accumulation_period": 1.0,
-                "sludge_accumulation_volume_fraction": 0.03,
-                "top_cover_volume_fraction": 0.2,
-                "evaporation_fraction": 0.02,
-                "anaerobic_digestion_temperature_set_point": 37.5,
-                "anaerobic_digestion_temperature_celsius": 37.5,
-                "manure_cover": "N/A",
-                "digester_methane_leakage_fraction": 0.01,
-            },
-            {
-                "name": "compost bedded pack barn",
-                "manure_treatment_type": "compost bedded pack barn",
-                "total_solids_removal_efficiency_for_treatment": 0.0,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-                "phosphorus_removal_efficiency_for_treatment": 0.0,
-                "potassium_removal_efficiency_for_treatment": 0.0,
-                "volatile_solids_removal_efficiency_for_treatment": 0.0,
-                "hydraulic_retention_time": 365,
-                "sludge_accumulation_period": 10.0,
-                "sludge_accumulation_volume_fraction": 0.00251,
-                "storage_time_period": 120,
-                "freeboard_input": 0.3048,
-            },
-            {
-                "name": "open lots",
-                "manure_treatment_type": "open lots",
-                "total_solids_removal_efficiency_for_treatment": 0.0,
-                "nitrogen_removal_efficiency_for_treatment": 0.0,
-                "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-                "phosphorus_removal_efficiency_for_treatment": 0.0,
-                "potassium_removal_efficiency_for_treatment": 0.0,
-                "volatile_solids_removal_efficiency_for_treatment": 0.0,
-                "storage_time_period": 365,
-            },
-            {
-                "name": "composting",
-                "manure_treatment_type": "composting",
-                "composting_type": "intensive windrow",
-                "storage_time_period": 365,
-            },
-        ],
-    }
-
-
-@pytest.fixture
 def feed_json() -> dict[str, Any]:
     return {
-        "calf_feeds": [
-            202,
-            216
-        ],
-        "growing_feeds": [
-            2,
-            44,
-            51,
-            110,
-            167,
-            176,
-            231,
-            234
-        ],
-        "close_up_feeds": [
-            2,
-            44,
-            51,
-            100,
-            110,
-            167,
-            231,
-            234
-        ],
-        "lac_cow_feeds": [
-            2,
-            44,
-            51,
-            94,
-            110,
-            167,
-            231,
-            234
-        ],
+        "calf_feeds": [202, 216],
+        "growing_feeds": [2, 44, 51, 110, 167, 176, 231, 234],
+        "close_up_feeds": [2, 44, 51, 100, 110, 167, 231, 234],
+        "lac_cow_feeds": [2, 44, 51, 94, 110, 167, 231, 234],
         "purchased_feeds": [
-            {
-                "purchased_feed": 2,
-                "purchased_feed_cost": 0.154
-            },
-            {
-                "purchased_feed": 44,
-                "purchased_feed_cost": 0.208
-            },
-            {
-                "purchased_feed": 51,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 94,
-                "purchased_feed_cost": 0.01
-            },
-            {
-                "purchased_feed": 100,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 110,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 167,
-                "purchased_feed_cost": 0.489
-            },
-            {
-                "purchased_feed": 176,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 202,
-                "purchased_feed_cost": 0.001
-            },
-            {
-                "purchased_feed": 216,
-                "purchased_feed_cost": 1.0
-            },
-            {
-                "purchased_feed": 231,
-                "purchased_feed_cost": 0.794
-            },
-            {
-                "purchased_feed": 234,
-                "purchased_feed_cost": 0.331
-            }
+            {"purchased_feed": 2, "purchased_feed_cost": 0.154},
+            {"purchased_feed": 44, "purchased_feed_cost": 0.208},
+            {"purchased_feed": 51, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 94, "purchased_feed_cost": 0.01},
+            {"purchased_feed": 100, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 110, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 167, "purchased_feed_cost": 0.489},
+            {"purchased_feed": 176, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 202, "purchased_feed_cost": 0.001},
+            {"purchased_feed": 216, "purchased_feed_cost": 1.0},
+            {"purchased_feed": 231, "purchased_feed_cost": 0.794},
+            {"purchased_feed": 234, "purchased_feed_cost": 0.331},
         ],
-        "farm_grown_feeds": [
-            1
-        ],
+        "farm_grown_feeds": [1],
         "storage_options": [
             {
                 "storage_type": "Bunker Silo",
@@ -682,7 +261,7 @@ def feed_json() -> dict[str, Any]:
                 "bunk_type": "open_floor",
                 "ventilation": True,
                 "removal_rate": 6,
-                "initial_dry_matter": 0
+                "initial_dry_matter": 0,
             },
             {
                 "storage_type": "Bunker Silo",
@@ -693,210 +272,128 @@ def feed_json() -> dict[str, Any]:
                 "bunk_type": "open_floor",
                 "ventilation": True,
                 "removal_rate": 6,
-                "initial_dry_matter": 0
-            }
+                "initial_dry_matter": 0,
+            },
         ],
         "user_defined_ration_percentages": {
-            "calf": [
-                {
-                    "feed_type": 202,
-                    "ration_percentage": 50
-                },
-                {
-                    "feed_type": 216,
-                    "ration_percentage": 50
-                }
-            ],
+            "calf": [{"feed_type": 202, "ration_percentage": 50}, {"feed_type": 216, "ration_percentage": 50}],
             "growing": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 3.4
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 4.2
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 30.8
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 36.3
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 4.8
-                },
-                {
-                    "feed_type": 176,
-                    "ration_percentage": 17.5
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.5
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.5
-                }
+                {"feed_type": 2, "ration_percentage": 3.4},
+                {"feed_type": 44, "ration_percentage": 4.2},
+                {"feed_type": 51, "ration_percentage": 30.8},
+                {"feed_type": 110, "ration_percentage": 36.3},
+                {"feed_type": 167, "ration_percentage": 4.8},
+                {"feed_type": 176, "ration_percentage": 17.5},
+                {"feed_type": 231, "ration_percentage": 1.5},
+                {"feed_type": 234, "ration_percentage": 1.5},
             ],
             "close_up": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 3.8
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 4.1
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 40.6
-                },
-                {
-                    "feed_type": 94,
-                    "ration_percentage": 22.2
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 21.5
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 5.7
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.1
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.0
-                }
+                {"feed_type": 2, "ration_percentage": 3.8},
+                {"feed_type": 44, "ration_percentage": 4.1},
+                {"feed_type": 51, "ration_percentage": 40.6},
+                {"feed_type": 94, "ration_percentage": 22.2},
+                {"feed_type": 110, "ration_percentage": 21.5},
+                {"feed_type": 167, "ration_percentage": 5.7},
+                {"feed_type": 231, "ration_percentage": 1.1},
+                {"feed_type": 234, "ration_percentage": 1.0},
             ],
             "lac_cow": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 11.7
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 11.2
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 39.3
-                },
-                {
-                    "feed_type": 100,
-                    "ration_percentage": 7.5
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 13.7
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 13.1
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.8
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.7
-                }
+                {"feed_type": 2, "ration_percentage": 11.7},
+                {"feed_type": 44, "ration_percentage": 11.2},
+                {"feed_type": 51, "ration_percentage": 39.3},
+                {"feed_type": 100, "ration_percentage": 7.5},
+                {"feed_type": 110, "ration_percentage": 13.7},
+                {"feed_type": 167, "ration_percentage": 13.1},
+                {"feed_type": 231, "ration_percentage": 1.8},
+                {"feed_type": 234, "ration_percentage": 1.7},
             ],
             "tolerance": 0.1,
-            "milk_reduction_maximum": 0.5
+            "milk_reduction_maximum": 0.5,
         },
         "allowances": [
             {
                 "purchased_feed": 2,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 44,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 51,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 94,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 100,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 110,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 167,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 176,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 202,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 216,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 231,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 234,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
-            }
-        ]
+                "planning_cycle_allowance": 1000.0,
+            },
+        ],
     }
 
 
 @pytest.fixture
 def mock_get_data_side_effect(
     config_json: dict[str, Any],
-        animal_json: dict[str, Any],
-        manure_management_json: dict[str, Any],
-        feed_json: dict[str, Any]
+    animal_json: dict[str, Any],
+    feed_json: dict[str, Any],
 ) -> list[Any]:
-    return [config_json, animal_json, manure_management_json, feed_json, feed_json["allowances"]]
+    return [config_json, animal_json, feed_json, feed_json["allowances"]]
 
 
 @pytest.fixture
@@ -957,12 +454,11 @@ def mock_herd_manager(
 ) -> tuple[HerdManager, dict[str, MagicMock]]:
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_available_feeds: list[Feed] = [mock_feed] * 8
 
     im = InputManager()
-    mock_get_data: MagicMock = mocker.patch.object(
-        im, "get_data", side_effect=mock_get_data_side_effect)
+    mock_get_data: MagicMock = mocker.patch.object(im, "get_data", side_effect=mock_get_data_side_effect)
     mock_initialize_animal_config: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
     )
@@ -972,16 +468,21 @@ def mock_herd_manager(
     mock_set_milk_quality: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
-    mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
-                 return_value=None)
+    mocker.patch(
+        "RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__", return_value=None
+    )
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
-    HerdFactory.set_post_animal_population(AnimalPopulation(
-        calves=calves,
-        heiferIs=heiferIs,
-        heiferIIs=heiferIIs,
-        heiferIIIs=heiferIIIs,
-        cows=cows,
-        replacement=replacement))
+    mocker.patch("RUFAS.biophysical.animal.pen.Pen._initialize_beddings", return_value=None)
+    HerdFactory.set_post_animal_population(
+        AnimalPopulation(
+            calves=calves,
+            heiferIs=heiferIs,
+            heiferIIs=heiferIIs,
+            heiferIIIs=heiferIIIs,
+            cows=cows,
+            replacement=replacement,
+        )
+    )
     mock_purchased_feed_emissions_estimator_init: MagicMock = mocker.patch(
         "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
         return_value=None,
@@ -999,33 +500,33 @@ def mock_herd_manager(
 
 
 def mock_animal(
-        animal_type: AnimalType,
-        days_in_milk: int = 0,
-        days_in_pregnancy: int = 0,
-        days_born: int = 0,
-        id: int = 0,
-        body_weight: float = 88.8,
-        mature_body_weight: float = 100.0,
-        total_phosphorus: float = 18.8,
-        sold: bool = False,
-        calves: int = 0,
-        calving_interval: int = 0,
-        calving_to_pregnancy_time: int = 0,
-        most_recent_new_birth_age: int = 0,
-        GnRH_injections: int = 0,
-        PGF_injections: int = 0,
-        CIDR_count: int = 0,
-        pregnancy_diagnoses: int = 0,
-        semen_number: int = 0,
-        AI_times: int = 0,
-        ED_days: int = 0,
-        breeding_to_preg_time: int = 0,
-        daily_milk_produced: float = 0.0,
-        milk_fat_content: float = 0.0,
-        milk_protein_content: float = 0.0,
-        sold_at_day: int | None = None,
-        dead_at_day: int | None = None,
-        cull_reason: str = "",
+    animal_type: AnimalType,
+    days_in_milk: int = 0,
+    days_in_pregnancy: int = 0,
+    days_born: int = 0,
+    id: int = 0,
+    body_weight: float = 88.8,
+    mature_body_weight: float = 100.0,
+    total_phosphorus: float = 18.8,
+    sold: bool = False,
+    calves: int = 0,
+    calving_interval: int = 0,
+    calving_to_pregnancy_time: int = 0,
+    most_recent_new_birth_age: int = 0,
+    GnRH_injections: int = 0,
+    PGF_injections: int = 0,
+    CIDR_count: int = 0,
+    pregnancy_diagnoses: int = 0,
+    semen_number: int = 0,
+    AI_times: int = 0,
+    ED_days: int = 0,
+    breeding_to_preg_time: int = 0,
+    daily_milk_produced: float = 0.0,
+    milk_fat_content: float = 0.0,
+    milk_protein_content: float = 0.0,
+    sold_at_day: int | None = None,
+    dead_at_day: int | None = None,
+    cull_reason: str = "",
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -1081,21 +582,20 @@ def mock_pen(pen_id: int, animal_combination: AnimalCombination) -> Pen:
         horizontal_dist_to_milking_parlor=0.0,
         number_of_stalls=100,
         housing_type="",
-        bedding_type="",
         pen_type="",
-        manure_handling="",
-        manure_separator="",
-        manure_separator_after_digestion="",
-        manure_storage="",
         animal_combination=animal_combination,
-        max_stocking_density=1.0
+        max_stocking_density=1.0,
+        minutes_away_for_milking=120,
+        first_parlor_processor=None,
+        parlor_stream_name=None,
+        manure_streams=[],
     )
     return pen
 
 
 @pytest.fixture
 def herd_manager(
-        mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
+    mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
 ) -> HerdManager:
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
@@ -1114,11 +614,5 @@ def herd_manager(
 @pytest.fixture
 def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
-        id=0,
-        animal_type="",
-        sold_at_day=0,
-        body_weight=0.0,
-        cull_reason="NA",
-        days_in_milk="NA",
-        parity="NA"
+        id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
     )

@@ -5,17 +5,19 @@ from typing import Any, Dict, List
 import numpy as np
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
@@ -167,11 +169,11 @@ class AnimalModuleReporter:
         }
 
         for animal in list(pen.animals_in_pen.values()):
-            milk_data_update = {}
+            milk_data_update: dict[str, int | float] = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
             milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
-            milk_data_update["milk_fat"] = animal.milk_production.fat_percent
+            milk_data_update["milk_fat"] = MilkProduction.fat_percent
             milk_data_update["milk_lactose"] = animal.milk_production.lactose_content
             milk_data_update["lactating"] = animal.is_milking
             milk_data_update["parity"] = animal.reproduction.calves
@@ -217,7 +219,7 @@ class AnimalModuleReporter:
             cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
-    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
+    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[int, float]:
         """
         For each pen, adds the average ration per animal to the OutputManager.
 
@@ -230,7 +232,7 @@ class AnimalModuleReporter:
 
         Returns
         -------
-        dict[RUFAS_ID, float]
+        dict[int, float]
             Map of RuFaS Feed IDs to amounts of that feed in the ration (kg dry matter).
 
         """
@@ -632,26 +634,86 @@ class AnimalModuleReporter:
         }
         for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
             om.add_variable(
-                f"enteric_methane_emission_for_pen_{pen_id_combination}",
+                f"enteric_methane_emission_for_{pen_id_combination}",
                 enteric_methane_emission,
                 dict(info_map, **{"units": MeasurementUnits.GRAMS}),
             )
 
     @classmethod
-    def report_animal_module_manure(
-        cls,
-        manure_excretions_output_data: list[PenManureData],
-    ) -> None:
+    def report_manure_streams(cls, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
         """
-        Generate detailed report of manure properties in the Animal Module.
+        Report Animal Module manure stream data to Output Manager.
 
         Parameters
         ----------
-        manure_excretions_output_data : list[PenManureData],
-            Dictionary mapping prefixes to animal manure data.
+        manure_streams : dict[str, ManureStream]
+            A dictionary of manure stream data, where the key is the formatted stream name
+            and the value is the ManureStream object.
+        simulation_day : int
+            The simulation day.
 
         """
-        manure_value_units = {
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_manure_streams.__name__,
+            "data_origin": [("HerdManager", "daily_routines")],
+            "simulation_day": simulation_day,
+        }
+        MANURE_STREAM_UNITS = {
+            "total_bedding_mass": MeasurementUnits.KILOGRAMS,
+            "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
+            **ManureStream.MANURE_STREAM_UNITS,
+        }
+
+        for stream_name, manure_stream in manure_streams.items():
+            if isinstance(manure_stream, ManureStream):
+                manure_stream_dict = asdict(manure_stream)
+                manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
+                manure_stream_dict["mass"] = manure_stream.mass
+                if manure_stream.pen_manure_data is None:
+                    raise ValueError(f"No PenManureData for {stream_name}: pen_manure_data must be present.")
+                manure_stream_dict["total_bedding_mass"] = manure_stream.pen_manure_data.total_bedding_mass
+                manure_stream_dict["total_bedding_volume"] = manure_stream.pen_manure_data.total_bedding_volume
+            else:
+                om.add_error(
+                    "Manure Stream Type Error",
+                    "This function requires either a ManureStream instance or a dictionary.",
+                    info_map,
+                )
+                raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly report it.")
+
+            if manure_stream_dict.keys() != MANURE_STREAM_UNITS.keys():
+                om.add_error(
+                    "Manure Stream Keys Error",
+                    f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, "
+                    f"received: {set(manure_stream_dict.keys())}.",
+                    info_map,
+                )
+                raise ValueError(
+                    "Manure Stream must contain the same keys as manure_stream_units to properly report it."
+                )
+
+            for key, value in manure_stream_dict.items():
+                if key != "pen_manure_data":
+                    om.add_variable(f"{key}_{stream_name}", value, {**info_map, "units": MANURE_STREAM_UNITS[key]})
+
+    @classmethod
+    def report_manure_excretions(
+        cls, manure_excretions: dict[str, AnimalManureExcretions], simulation_day: int
+    ) -> None:
+        """
+        Report pen AnimalManureExcretions to Output Manager.
+
+        Parameters
+        ----------
+        manure_excretions : dict[str, AnimalManureExcretions]
+            A dictionary of manure excretion data, where the key is the formatted base name
+            and the value is the AnimalManureExcretions object.
+        simulation_day : int
+            The simulation day.
+
+        """
+        pen_manure_data_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
@@ -671,18 +733,16 @@ class AnimalModuleReporter:
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_animal_module_manure.__name__,
+            "function": AnimalModuleReporter.report_manure_excretions.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
+            "simulation_day": simulation_day,
         }
-        for pen_manure_data in manure_excretions_output_data:
-            pen_id: int = pen_manure_data["id"]
-            animal_combination: str = pen_manure_data["animal_combination"].name
-            manure: AnimalManureExcretions = pen_manure_data["manure"]
-            for manure_property, manure_value in asdict(manure).items():
+        for base_name, manure_excretion in manure_excretions.items():
+            for manure_property, manure_value in asdict(manure_excretion).items():
                 om.add_variable(
-                    f"{pen_id}_{animal_combination}_{str(manure_property)}",
+                    f"{base_name}_{str(manure_property)}",
                     manure_value,
-                    dict(info_map, **{"units": manure_value_units[manure_property]}),
+                    dict(info_map, **{"units": pen_manure_data_units[manure_property]}),
                 )
 
     @classmethod
@@ -917,10 +977,14 @@ class AnimalModuleReporter:
         parity_1 = herd_statistics.num_cow_for_parity["1"]
         parity_2 = herd_statistics.num_cow_for_parity["2"]
         parity_3 = herd_statistics.num_cow_for_parity["3"]
+        parity_4 = herd_statistics.num_cow_for_parity["4"]
+        parity_5 = herd_statistics.num_cow_for_parity["5"]
         parity_greater_than_3 = herd_statistics.num_cow_for_parity["greater_than_3"]
         om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_4", parity_4, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_5", parity_5, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_cow_for_parity_greater_than_3",
             parity_greater_than_3,
@@ -1091,7 +1155,7 @@ class AnimalModuleReporter:
             sold_at_day_max,
             dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
-        for day in range(1, total_days + 1):
+        for day in range(total_days):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal["body_weight"] for sold_animal in daily_sell[day])
@@ -1165,7 +1229,7 @@ class AnimalModuleReporter:
         cls,
         herd_statistics: HerdStatistics,
         herd_reproduction_statistics: HerdReproductionStatistics,
-        time: Time,
+        time: RufasTime,
         heiferIIs: List[Animal],
         cows: List[Animal],
     ) -> None:
@@ -1178,8 +1242,8 @@ class AnimalModuleReporter:
             Instance of HerdStatistics class.
         herd_reproduction_statistics : HerdReproductionStatistics
             Instance of HerdReproductionStatistics class.
-        time : Time
-            The Time object with the current time information.
+        time : RufasTime
+            The RufasTime object with the current time information.
         heiferIIs : List[Animal]
             The list of HeiferIIs.
         cows : List[Animal]
@@ -1344,6 +1408,57 @@ class AnimalModuleReporter:
             herd_reproduction_statistics.cow_conception_rate,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
+
+    @classmethod
+    def report_animal_population_statistics(cls, prefix: str, herd_summary: AnimalPopulationStatistics) -> None:
+        """Reports the herd summary statistics for the starting animal population."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_animal_population_statistics.__name__,
+        }
+        units = {
+            "breed": MeasurementUnits.UNITLESS,
+            "number_of_calves": MeasurementUnits.ANIMALS,
+            "number_of_heiferIs": MeasurementUnits.ANIMALS,
+            "number_of_heiferIIs": MeasurementUnits.ANIMALS,
+            "number_of_heiferIIIs": MeasurementUnits.ANIMALS,
+            "number_of_cows": MeasurementUnits.ANIMALS,
+            "number_of_replacement_heiferIIIS": MeasurementUnits.ANIMALS,
+            "number_of_lactating_cows": MeasurementUnits.ANIMALS,
+            "number_of_dry_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_1_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_2_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_3_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_4_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_5_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_4_and_more_cows": MeasurementUnits.ANIMALS,
+            "average_calf_age": MeasurementUnits.DAYS,
+            "average_heiferI_age": MeasurementUnits.DAYS,
+            "average_heiferII_age": MeasurementUnits.DAYS,
+            "average_heiferIII_age": MeasurementUnits.DAYS,
+            "average_cow_age": MeasurementUnits.DAYS,
+            "average_replacement_age": MeasurementUnits.DAYS,
+            "average_calf_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferI_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferII_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferIII_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_cow_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_replacement_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_cow_days_in_pregnancy": MeasurementUnits.DAYS,
+            "average_cow_days_in_milk": MeasurementUnits.DAYS,
+            "average_cow_parity": MeasurementUnits.UNITLESS,
+            "average_cow_calving_interval": MeasurementUnits.DAYS,
+        }
+        for variable_name, value in herd_summary.__dict__.items():
+            if isinstance(value, dict):
+                for sub_variable_name, sub_value in value.items():
+                    om.add_variable(
+                        f"{prefix}_{sub_variable_name}",
+                        sub_value,
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+                    )
+            else:
+                om.add_variable(f"{prefix}_{variable_name}", value, dict(info_map, **{"units": units[variable_name]}))
 
     @classmethod
     def report_total_disease_days(cls) -> None:

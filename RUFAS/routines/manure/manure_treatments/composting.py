@@ -22,7 +22,7 @@ class Composting(BaseManureTreatment):
     ----------
     weather : Weather
         The current weather conditions.
-    time : Time
+    time : RufasTime
         The current time information.
     manure_treatment_config : ManureTreatmentConfig
         Configuration settings for manure treatment.
@@ -89,7 +89,7 @@ class Composting(BaseManureTreatment):
         ----------
         weather : Weather
             The current weather conditions.
-        time : Time
+        time : RufasTime
             The current time information.
         manure_treatment_config : ManureTreatmentConfig
             Configuration settings for manure treatment.

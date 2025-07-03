@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 from RUFAS.enums import AnimalCombination
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -39,8 +41,14 @@ class PenManureData:
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
-    stream_type : ManureStreamType
+    stream_type : StreamType
         The type of manure stream in the pen.
+    first_processor : str
+        The name of the first processor to handle the manure stream.
+    total_bedding_mass: float
+        The total mass of the bedding applied to the manure stream (kg).
+    total_bedding_volume: float
+        The total volume of the bedding applied to the manure stream (m^3).
     """
 
     num_animals: int
@@ -50,10 +58,33 @@ class PenManureData:
     manure_urine_mass: float
     manure_urine_nitrogen: float
     stream_type: StreamType
+    first_processor: Optional[str] = None
+    total_bedding_mass: Optional[float] = None
+    total_bedding_volume: Optional[float] = None
+
+    PEN_MANURE_DATA_UNITS = {
+        "num_animals": MeasurementUnits.ANIMALS,
+        "manure_deposition_surface_area": MeasurementUnits.SQUARE_METERS,
+        "animal_combination": MeasurementUnits.UNITLESS,
+        "pen_type": MeasurementUnits.UNITLESS,
+        "manure_urine_mass": MeasurementUnits.KILOGRAMS,
+        "manure_urine_nitrogen": MeasurementUnits.KILOGRAMS,
+        "stream_type": MeasurementUnits.UNITLESS,
+        "first_processor": MeasurementUnits.UNITLESS,
+        "total_bedding_mass": MeasurementUnits.KILOGRAMS,
+        "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
+    }
 
     def __post_init__(self) -> None:
         if self.stream_type == StreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
+
+    def set_first_processor(self, processor_name: str) -> None:
+        self.first_processor = processor_name
+
+    def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
+        self.total_bedding_mass = bedding_mass
+        self.total_bedding_volume = bedding_volume
 
     def __add__(self, other: "PenManureData") -> "PenManureData":
         """
@@ -79,6 +110,8 @@ class PenManureData:
             raise ValueError("Cannot combine PenManureData instances with a general manure stream type.")
         if self.animal_combination != other.animal_combination:
             raise ValueError("Cannot combine PenManureData instances with different animal combinations.")
+        if self.first_processor != other.first_processor:
+            raise ValueError("Cannot combine PenManureData instances with different first processors.")
 
         return PenManureData(
             num_animals=self.num_animals + other.num_animals,
@@ -88,6 +121,9 @@ class PenManureData:
             manure_urine_mass=self.manure_urine_mass + other.manure_urine_mass,
             manure_urine_nitrogen=self.manure_urine_nitrogen + other.manure_urine_nitrogen,
             stream_type=self.stream_type,
+            first_processor=self.first_processor,
+            total_bedding_mass=sum(filter(None, [self.total_bedding_mass, other.total_bedding_mass])),
+            total_bedding_volume=sum(filter(None, [self.total_bedding_volume, other.total_bedding_volume])),
         )
 
 
@@ -237,4 +273,62 @@ class ManureStream:
             total_solids=0.0,
             volume=0.0,
             pen_manure_data=None,
+        )
+
+    def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
+        """
+        Splits this manure stream using the specified ratio.
+
+        Parameters
+        ----------
+        split_ratio : float
+            Proportion of this stream to split into the new stream.
+        stream_type : StreamType | None, default None
+            Type to assign to the new manure stream's PenManureData, if applicable.
+
+        Returns
+        -------
+        ManureStream
+            A new ManureStream instance representing the split portion.
+
+        Raises
+        ------
+        ValueErrorcov
+            If split_ratio is not between 0 and 1.
+        """
+        if not (0 < split_ratio <= 1):
+            OutputManager().add_error(
+                "ManureStream split ratio error",
+                f"Invalid split ratio: {split_ratio}. Must be between 0 and 1.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.split_stream.__name__,
+                },
+            )
+            raise ValueError("Split ratio must be greater than 0 and less than 1.")
+
+        split_pen_manure_data = None
+        if self.pen_manure_data is not None and stream_type is not None:
+            split_pen_manure_data = PenManureData(
+                num_animals=self.pen_manure_data.num_animals,
+                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
+                animal_combination=self.pen_manure_data.animal_combination,
+                pen_type=self.pen_manure_data.pen_type,
+                manure_urine_mass=self.pen_manure_data.manure_urine_mass * split_ratio,
+                manure_urine_nitrogen=self.pen_manure_data.manure_urine_nitrogen * split_ratio,
+                stream_type=stream_type,
+            )
+
+        return ManureStream(
+            water=self.water * split_ratio,
+            ammoniacal_nitrogen=self.ammoniacal_nitrogen * split_ratio,
+            nitrogen=self.nitrogen * split_ratio,
+            phosphorus=self.phosphorus * split_ratio,
+            potassium=self.potassium * split_ratio,
+            ash=self.ash * split_ratio,
+            non_degradable_volatile_solids=self.non_degradable_volatile_solids * split_ratio,
+            degradable_volatile_solids=self.degradable_volatile_solids * split_ratio,
+            total_solids=self.total_solids * split_ratio,
+            volume=self.volume * split_ratio,
+            pen_manure_data=split_pen_manure_data,
         )

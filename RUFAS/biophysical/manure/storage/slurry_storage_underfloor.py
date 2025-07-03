@@ -2,28 +2,13 @@ from copy import copy
 
 from math import inf
 
-from RUFAS.biophysical.manure.storage.storage import (
-    Storage,
-    DEFAULT_PH_FOR_AMMONIA,
-    STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
-)
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-SLURRY_MANURE_DENSITY = 990
-"""The density of slurry manure (kg/:math:`m^3`)."""
-
-STORAGE_HSC = 4.1
-"""Housing specific constant for manure storage (s/m)."""
-
-METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
-"""
-The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-ratio of 1:3 (methane : carbon dioxide).
-"""
 
 
 class SlurryStorageUnderfloor(Storage):
@@ -45,7 +30,7 @@ class SlurryStorageUnderfloor(Storage):
             capacity=capacity,
         )
 
-    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
         and updates relevant storage properties.
@@ -55,7 +40,7 @@ class SlurryStorageUnderfloor(Storage):
         current_day_conditions : CurrentDayConditions
             The weather conditions of the current day, including precipitation and mean
             air temperature.
-        time : Time
+        time : RufasTime
             The current time.
 
         Returns
@@ -67,7 +52,7 @@ class SlurryStorageUnderfloor(Storage):
         """
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
+        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
         manure_temperature = self._determine_barn_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
@@ -78,7 +63,7 @@ class SlurryStorageUnderfloor(Storage):
         storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
         if not manure_to_return:
-            self._stored_manure = copy(self._manure_to_process)
+            self.stored_manure = copy(self._manure_to_process)
 
         self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
         self._report_manure_stream(received_manure, "received", time.simulation_day)
@@ -129,20 +114,24 @@ class SlurryStorageUnderfloor(Storage):
         )
 
         self._manure_to_process.total_solids = max(
-            0.0, self._manure_to_process.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            0.0,
+            self._manure_to_process.total_solids
+            - total_storage_methane * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO,
         )
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.degradable_volatile_solids
-                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.non_degradable_volatile_solids
-                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
 
@@ -166,12 +155,12 @@ class SlurryStorageUnderfloor(Storage):
         """
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
-            volume=self._manure_to_process.volume,
-            density=SLURRY_MANURE_DENSITY,
+            mass=self._manure_to_process.volume * ManureConstants.SLURRY_MANURE_DENSITY,
+            density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
+            ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
             surface_area=self._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+            pH=ManureConstants.DEFAULT_STORED_MANURE_PH,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
             0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen
@@ -196,7 +185,9 @@ class SlurryStorageUnderfloor(Storage):
 
         """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrous_oxide_emissions_factor=ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
+                self._cover
+            ],
             nitrogen_added=received_manure_nitrogen,
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)

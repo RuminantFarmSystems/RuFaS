@@ -3,8 +3,12 @@ from __future__ import annotations
 import copy
 from typing import Literal, Any
 
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferTAISubProtocol, HeiferSynchEDSubProtocol, \
-    CowTAISubProtocol, CowPreSynchSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+    CowTAISubProtocol,
+    CowPreSynchSubProtocol,
+)
 
 
 class HormoneDeliverySchedule:
@@ -126,8 +130,7 @@ class HormoneDeliverySchedule:
 
     @staticmethod
     def get_schedule(
-            animal_category: Literal["heifers", "cows"],
-            protocol_name: str
+        animal_category: Literal["heifers", "cows"], protocol_name: str
     ) -> dict[int, dict[str, Any]] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name.

@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -26,7 +26,7 @@ class AnaerobicDigestion(BaseManureTreatment):
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: ManureTreatmentConfig | Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
     ) -> None:
         super().__init__(weather, time, manure_treatment_config)

@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -134,7 +134,7 @@ class CropManagement:
         harvest_op: HarvestOperation,
         field_name: str,
         field_size: float,
-        time: Time,
+        time: RufasTime,
         soil_data: SoilData,
     ) -> HarvestedCropStorageType | None:
         """
@@ -148,8 +148,8 @@ class CropManagement:
             The name of the field that contains this crop.
         field_size : float
             Size of the field that contains this crop (ha)
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
         feed_manager : FeedManager
@@ -253,10 +253,7 @@ class CropManagement:
         the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are
         used.
 
-        Note that, because above-ground biomass is calculated daily as a function of the total biomass and the root
-        fraction (biomass_allocation.py, root_development.py), it does not make sense to alter the above-ground biomass
-        here directly, even though that is more realistic. The current process should produce effective estimates over
-        the growing season
+        The above and below-ground biomass fractions are updated via the recalculated_biomass_distribution function.
 
         This method is meant to be called from one of the various harvest operations.
 
@@ -335,14 +332,14 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvestedCropStorageType:
+    def _get_harvested_crop(self, time: RufasTime, field_size: float) -> HarvestedCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
         Parameters
         ----------
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
         field_size: float
             Size of the field from which this crop was harvested (ha).
         feed_manager: FeedManager
@@ -360,7 +357,6 @@ class CropManagement:
         """
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
-            type=self.data.crop_type,
             config_name=self.data.name,
             rufas_ids=self.data.rufas_ids,
             harvest_time=time.current_date.date(),
@@ -490,7 +486,6 @@ class CropManagement:
         surface_fraction = (self.yield_residue - self.data.root_biomass) / self.yield_residue
         self._add_yield_residue_to_layer(
             surface_layer,
-            True,
             surface_fraction,
             self.yield_residue,
             self.residue_nitrogen,
@@ -504,7 +499,6 @@ class CropManagement:
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
         self._add_yield_residue_to_layer(
             surface_layer,
-            True,
             root_frac_to_bottom_depth,
             subsurface_residue,
             subsurface_nitrogen,
@@ -517,14 +511,13 @@ class CropManagement:
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
             self._add_yield_residue_to_layer(
-                layer, False, layer_fraction, subsurface_residue, subsurface_nitrogen, subsurface_phosphorus
+                layer, layer_fraction, subsurface_residue, subsurface_nitrogen, subsurface_phosphorus
             )
             root_frac_to_top_depth = root_frac_to_bottom_depth
 
     def _add_yield_residue_to_layer(
         self,
         layer: LayerData,
-        is_surface_layer: bool,
         layer_fraction: float,
         crop_biomass: float,
         nitrogen: float,
@@ -537,8 +530,6 @@ class CropManagement:
         ----------
         layer : LayerData
             The soil layer into which nutrients and residue are being added.
-        is_surface_layer : bool
-            True if the layer being added to is at the soil's surface.
         layer_fraction : float
             Fraction of residue and nutrients going into the soil layer.
         crop_biomass : float
@@ -554,10 +545,8 @@ class CropManagement:
         phosphorus_to_add = phosphorus * layer_fraction
 
         layer.plant_residue += plant_residue_to_add
-        if is_surface_layer:
-            layer.fresh_organic_nitrogen_content += nitrogen_to_add
-        else:
-            layer.active_organic_nitrogen_content += nitrogen_to_add
+        layer.fresh_organic_nitrogen_content += nitrogen_to_add
+
         layer.labile_inorganic_phosphorus_content += phosphorus_to_add
 
     def _calculate_root_mass_distribution(self, bottom_depth: float) -> float:

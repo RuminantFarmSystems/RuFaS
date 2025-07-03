@@ -5,7 +5,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -124,14 +124,14 @@ def manure_stream() -> ManureStream:
 
 @pytest.fixture
 def time(mocker: MockerFixture) -> Any:
-    """Creates a mocked Time object with a simulation day."""
+    """Creates a mocked RufasTime object with a simulation day."""
     time = mocker.MagicMock()
     time.simulation_day = 42
     return time
 
 
 def test_report_manure_stream_via_process_manure(
-    mock_separator: Separator, manure_stream: ManureStream, time: Time, mocker: MockerFixture
+    mock_separator: Separator, manure_stream: ManureStream, time: RufasTime, mocker: MockerFixture
 ) -> None:
     """Test that _report_manure_stream is called correctly from process_manure."""
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
@@ -154,7 +154,7 @@ def test_report_manure_stream_via_process_manure(
     )
 
 
-def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasTime, mocker: MockerFixture) -> None:
     """Test logging when manure_stream is a valid dictionary."""
     manure_dict: dict[str, float | None] = {
         "water": 1000.0,
@@ -187,7 +187,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, 
     )
 
 
-def test_report_manure_stream_invalid_type(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_invalid_type(mock_separator: Separator, time: RufasTime, mocker: MockerFixture) -> None:
     """Test error logging and ValueError when manure_stream is an invalid type."""
     invalid_input = cast("ManureStream | dict[str, float | None]", "invalid_string")
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
@@ -206,7 +206,9 @@ def test_report_manure_stream_invalid_type(mock_separator: Separator, time: Time
     )
 
 
-def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_mismatched_keys(
+    mock_separator: Separator, time: RufasTime, mocker: MockerFixture
+) -> None:
     """Test error logging and ValueError when manure_stream_dict keys do not match MANURE_STREAM_UNITS."""
     invalid_manure_dict: dict[str, float | None] = {"wrong_key": 42.0}
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
@@ -252,7 +254,7 @@ def test_report_processor_output(
     data_origin_function: str,
     variable_units: MeasurementUnits,
     mock_separator: Separator,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Tests that the Processor output is reported correctly."""

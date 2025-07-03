@@ -227,7 +227,8 @@ class AminoAcidCalculator:
 
         References
         ----------
-        Equations on page 8 of the Amino Acid Requirements Design Doc.
+         [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
+            8th edition." National Academic Press,
         """
         total_amino_acid_requirements: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
             histidine=0.0,

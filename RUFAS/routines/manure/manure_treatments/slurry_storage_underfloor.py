@@ -9,7 +9,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -19,17 +19,17 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     Attributes:
         All attributes inherited from BaseManureTreatment.
         In addition, the following attributes are defined:
-        storage_time_period: Time in days that the manure is stored in the manure
+        storage_time_period: RufasTime in days that the manure is stored in the manure
             treatment system, days.
 
     """
 
-    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initialize the underfloor slurry storage manure treatment.
 
         Args:
             weather: A Weather object.
-            time: A Time object.
+            time: A RufasTime object.
             manure_treatment_config: A ManureTreatmentConfig object containing
                 the configuration data for the manure treatment system.
 

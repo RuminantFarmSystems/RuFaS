@@ -37,7 +37,7 @@ class UserDefinedRationManager:
             List of dictionaries containing the user-defined rations for each animal combination.
 
         """
-        info_map = {"class": cls.__class__.__name__, "function": cls.set_user_defined_rations.__name__}
+        info_map = {"class": cls.__name__, "function": cls.set_user_defined_rations.__name__}
 
         cls.user_defined_rations = {animal_combination: {} for animal_combination in AnimalCombination}
 
@@ -112,3 +112,22 @@ class UserDefinedRationManager:
         }
 
         return ration
+
+    @classmethod
+    def get_user_defined_ration_feeds(cls, animal_combination: AnimalCombination) -> list[RUFAS_ID]:
+        """
+        Generate a list of feed RuFaS IDs for the given animal combination that user defined to be used as the ration.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+            The combination of animals in the pen.
+
+        Returns
+        -------
+        list[RUFAS_ID]
+            A list of feed RuFaS IDs that user defined to be used as the feed for the given animal combination.
+
+        """
+        ration_formulation = cls.user_defined_rations[animal_combination]
+        return list(ration_formulation.keys())

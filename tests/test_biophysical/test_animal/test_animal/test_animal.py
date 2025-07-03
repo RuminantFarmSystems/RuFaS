@@ -52,7 +52,7 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 def mock_submodule_init(mocker: MockerFixture) -> None:
@@ -973,7 +973,7 @@ def test_setup_lactation_curve_parameters(mocker: MockerFixture) -> None:
     mock_set_lactation_parameters = mocker.patch(
         "RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.set_lactation_parameters"
     )
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
 
     Animal.setup_lactation_curve_parameters(time=mock_time)
 
@@ -1884,6 +1884,7 @@ def test_daily_nutrients_update(mock_lactating_cow: Animal, mocker: MockerFixtur
 
 def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_process_digestion = mocker.patch.object(DigestiveSystem, "process_digestion")
+    MilkProduction.set_milk_quality(fat_percent=0.0, true_protein_percent=0.0, lactose_percent=0.0)
     mock_lactating_cow._daily_digestive_system_update()
     mock_process_digestion.assert_called_once_with(
         DigestiveSystemInputs(
@@ -1914,8 +1915,10 @@ def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: Mocke
             ),
             days_in_milk=10,
             metabolizable_energy_intake=0.0,
-            fecal_phosphorus=0.0,
-            urine_phosphorus_required=0.0,
+            phosphorus_intake=0.0,
+            phosphorus_requirement=0.0,
+            phosphorus_reserves=0.0,
+            phosphorus_endogenous_loss=0.0,
             daily_milk_produced=0.0,
             fat_content=0.0,
             protein_content=0.0,
@@ -1926,7 +1929,7 @@ def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: Mocke
 def test_daily_milking_update_not_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_perform_daily_milking_update = mocker.patch.object(MilkProduction, "perform_daily_milking_update")
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
-    mock_lactating_cow.daily_milking_update(MagicMock(Time))
+    mock_lactating_cow.daily_milking_update(MagicMock(RufasTime))
     mock_perform_daily_milking_update.assert_not_called()
 
 
@@ -1938,7 +1941,7 @@ def test_daily_milking_update_is_cow(mock_lactating_cow: Animal, mocker: MockerF
         return_value=MilkProductionOutputs(events=events, days_in_milk=0),
     )
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=True)
-    mock_time = MagicMock(Time)
+    mock_time = MagicMock(RufasTime)
 
     mock_lactating_cow.daily_milking_update(mock_time)
 
@@ -1963,7 +1966,7 @@ def test_daily_growth_update(mock_lactating_cow: Animal, mocker: MockerFixture) 
     animal.calf_birth_weight = 45
     animal.calves = 2
     animal.calving_interval = 365
-    dummy_time = MagicMock(Time)
+    dummy_time = MagicMock(RufasTime)
     dummy_events = AnimalEvents()
     dummy_outputs = GrowthOutputs(body_weight=510, conceptus_weight=22, events=dummy_events)
     spy = mocker.patch.object(animal.growth, "evaluate_body_weight_change", return_value=dummy_outputs)
@@ -2027,7 +2030,7 @@ def test_determine_days_in_milk_invalid(
 
 def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.animal_type = AnimalType.CALF
-    result, _ = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=Time))
+    result, _ = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=RufasTime))
     assert result is None
 
 
@@ -2047,7 +2050,7 @@ def test_daily_reproduction_update_not_cow(mock_lactating_cow: Animal, mocker: M
         ),
     )
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
-    result, _ = animal.daily_reproduction_update(MagicMock(Time))
+    result, _ = animal.daily_reproduction_update(MagicMock(RufasTime))
 
     mock_reproduction_update.assert_called_once()
     assert animal.body_weight == 10
@@ -2093,7 +2096,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=100)
     mocker.patch.object(Animal, "calving_interval_history", new_callable=PropertyMock, return_value=[100])
     mocker.patch.object(AnimalEvents, "get_most_recent_date", return_value=2)
-    result, _ = animal.daily_reproduction_update(MagicMock(Time))
+    result, _ = animal.daily_reproduction_update(MagicMock(RufasTime))
 
     mock_reproduction_update.assert_called_once()
     mock_get_wood_parameters.assert_called_once()
@@ -2159,7 +2162,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             ),
         ),
     )
-    result = animal.daily_routines(MagicMock(Time))
+    result = animal.daily_routines(MagicMock(RufasTime))
 
     assert animal.days_born == 11
     assert animal.days_in_pregnancy == 1
@@ -2210,7 +2213,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     mock_animal_life_stage_update = mocker.patch.object(
         animal, "animal_life_stage_update", return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None)
     )
-    result = animal.daily_routines(MagicMock(Time))
+    result = animal.daily_routines(MagicMock(RufasTime))
 
     assert animal.days_born == 11
     mock_daily_growth_update.assert_called_once()
@@ -2236,7 +2239,7 @@ def test_calf_life_stage_update(
     mock_transition = mocker.patch.object(animal, "_transition_calf_to_heiferI")
     mocker.patch.object(animal, "_evaluate_calf_for_heiferI", return_value=heifer_evaluation)
 
-    result = animal._calf_life_stage_update(MagicMock(Time))
+    result = animal._calf_life_stage_update(MagicMock(RufasTime))
 
     status, output = result
     assert status == expected_status
@@ -2257,7 +2260,7 @@ def test_heiferI_life_stage_update(
     mock_transition = mocker.patch.object(animal, "_transition_heiferI_to_heiferII")
     mocker.patch.object(animal, "_evaluate_heiferI_for_heiferII", return_value=heifer_evaluation)
 
-    status, output = animal._heiferI_life_stage_update(MagicMock(Time))
+    status, output = animal._heiferI_life_stage_update(MagicMock(RufasTime))
 
     assert status == expected_status
     assert output is None
@@ -2271,7 +2274,7 @@ def test_heiferII_life_stage_update_culling(mock_lactating_cow: Animal, mocker: 
     animal = mock_lactating_cow
     mocker.patch.object(animal, "_evaluate_heiferII_for_culling", return_value=True)
 
-    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+    status, output = animal._heiferII_life_stage_update(MagicMock(RufasTime))
 
     assert status == AnimalStatus.SOLD
     assert output is None
@@ -2283,7 +2286,7 @@ def test_heiferII_life_stage_update_transition(mock_lactating_cow: Animal, mocke
     mocker.patch.object(animal, "_evaluate_heiferII_for_heiferIII", return_value=True)
     mock_transition = mocker.patch.object(animal, "_transition_heiferII_to_heiferIII")
 
-    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+    status, output = animal._heiferII_life_stage_update(MagicMock(RufasTime))
 
     mock_transition.assert_called_once()
     assert status == AnimalStatus.LIFE_STAGE_CHANGED
@@ -2298,7 +2301,7 @@ def test_heiferII_life_stage_update_non_culling_or_transition(
     mocker.patch.object(animal, "_evaluate_heiferII_for_heiferIII", return_value=False)
     mock_transition = mocker.patch.object(animal, "_transition_heiferII_to_heiferIII")
 
-    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+    status, output = animal._heiferII_life_stage_update(MagicMock(RufasTime))
 
     mock_transition.assert_not_called()
     assert status == AnimalStatus.REMAIN
@@ -2328,7 +2331,7 @@ def test_heiferIII_life_stage_update(
         ),
     )
 
-    result = animal._heiferIII_life_stage_update(MagicMock(Time))
+    result = animal._heiferIII_life_stage_update(MagicMock(RufasTime))
 
     status, output = result
     assert status == expected_status
@@ -2368,7 +2371,7 @@ def test_cow_life_stage_update(
     animal.animal_type = animal_type
     mocker.patch.object(Animal, "is_milking", new_callable=PropertyMock, return_value=is_milking)
 
-    status, output = animal._cow_life_stage_update(MagicMock(Time))
+    status, output = animal._cow_life_stage_update(MagicMock(RufasTime))
 
     assert animal.animal_type == expected_type
     assert status == expected_status
@@ -2389,8 +2392,8 @@ def test_animal_life_stage_update_not_cow(
     mock_lactating_cow.future_cull_date = future_cull_date
     mock_lactating_cow.future_death_date = future_death_date
     mock_lactating_cow.reproduction.do_not_breed = False
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=5)
-    time = Time(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=5)
+    time = RufasTime(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
     mock_update = mocker.patch.object(
         mock_lactating_cow,
         "_cow_life_stage_update",
@@ -2442,8 +2445,8 @@ def test_animal_life_stage_update_low_production(
     mock_lactating_cow.future_death_date = future_death_date
     mock_lactating_cow.reproduction.do_not_breed = True
     mock_lactating_cow.milk_production.daily_milk_produced = 5
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=5)
-    time = Time(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=5)
+    time = RufasTime(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
     mock_update = mocker.patch.object(
         mock_lactating_cow,
         "_cow_life_stage_update",
@@ -2534,7 +2537,7 @@ def test_transition_calf_to_heiferI(mock_lactating_cow: Animal) -> None:
 
 def test_transition_heiferI_to_heiferII(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_update = mocker.patch.object(Animal, "daily_reproduction_update")
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_lactating_cow._transition_heiferI_to_heiferII(mock_time)
 
     assert mock_lactating_cow.animal_type == AnimalType.HEIFER_II
@@ -2550,7 +2553,7 @@ def test_transition_heiferII_to_heiferIII(mock_lactating_cow: Animal) -> None:
 
 def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=2)
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_set = mocker.patch.object(MilkProduction, "set_wood_parameters")
     mock_wood_param = mocker.patch.object(
         LactationCurve,
@@ -2601,7 +2604,7 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
 
 def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=2)
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_set = mocker.patch.object(MilkProduction, "set_wood_parameters")
     mock_wood_param = mocker.patch.object(
         LactationCurve,
@@ -2964,11 +2967,15 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
     animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
-    animal.milk_production = type(
-        "DummyMilkProduction",
-        (),
-        {"fat_percent": 3.5, "true_protein_percent": 3.0, "lactose_percent": 4.5, "daily_milk_produced": 30.0},
-    )()
+    MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
+    milk_prod = MilkProduction()
+    milk_prod._daily_milk_produced = 30.0
+    milk_prod._milk_production_variance = 0.0
+    milk_prod.milk_production_reduction = 0.0
+
+    assert milk_prod.daily_milk_produced == 30.0
+
+    animal.milk_production = milk_prod
     animal.nutrient_standard = NutrientStandard.NASEM
     animal.previous_nutrition_supply = None
     mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
@@ -3017,11 +3024,15 @@ def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
     animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
-    animal.milk_production = type(
-        "DummyMilkProduction",
-        (),
-        {"fat_percent": 3.5, "true_protein_percent": 3.0, "lactose_percent": 4.5, "daily_milk_produced": 30.0},
-    )()
+    MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
+    milk_prod = MilkProduction()
+    milk_prod._daily_milk_produced = 30.0
+    milk_prod._milk_production_variance = 0.0
+    milk_prod.milk_production_reduction = 0.0
+
+    assert milk_prod.daily_milk_produced == 30.0
+
+    animal.milk_production = milk_prod
     animal.nutrient_standard = NutrientStandard.NRC
     supply = MagicMock(spec=NutritionSupply)
     supply.configure_mock(dry_matter=10.0, ndf_supply=5.0, tdn_supply=4.0, metabolizable_energy=20.0)

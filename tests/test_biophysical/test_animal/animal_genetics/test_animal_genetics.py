@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -1209,7 +1209,7 @@ def test_assign_net_merit_value_to_newborn_calf(
         wraps=AnimalGenetics._clamp_birth_year_month_in_data_range,
     )
 
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mock_time.current_calendar_year = int(birth_date[:4])
     mock_time.current_month = int(birth_date[5:7])
 

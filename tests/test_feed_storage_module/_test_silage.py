@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.silage import Bag, Bunker, Pile, Silage
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -49,7 +49,7 @@ def test_process_degradations(
 ) -> None:
     """Tests the implementation of process_degradations in the Silage class."""
     mock_weather = mocker.MagicMock(autospec=Weather)
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     effluent_loss_days = mocker.patch.object(
         silage, "calculate_days_of_effluent_loss_to_process", return_value=days_of_loss
     )
@@ -103,11 +103,11 @@ def test_calculate_days_of_effluent_loss_to_process(
     expected: int,
 ) -> None:
     """Tests calculate_days_of_effluent_loss_to_process in Silage."""
-    mock_time_stored = mocker.MagicMock(autospec=Time)
+    mock_time_stored = mocker.MagicMock(autospec=RufasTime)
     mock_time_stored.simulation_day = day_stored
-    mock_last_time_degraded = mocker.MagicMock(autospec=Time)
+    mock_last_time_degraded = mocker.MagicMock(autospec=RufasTime)
     mock_last_time_degraded.simulation_day = last_day_processed
-    mock_current_time = mocker.MagicMock(autospec=Time)
+    mock_current_time = mocker.MagicMock(autospec=RufasTime)
     mock_current_time.simulation_day = current
     harvested_crop.storage_time = mock_time_stored
     harvested_crop.last_time_degraded = mock_last_time_degraded
