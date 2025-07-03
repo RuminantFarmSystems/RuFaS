@@ -862,7 +862,7 @@ class AnimalRequirements:
         else:
             calf_birth_weight = mature_body_weight * 0.06275
             gravid_uterine_weight = (calf_birth_weight * 1.825) * math.exp(
-                -0.0243 - (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy)
+                -(0.0243 - (0.0000245 * day_of_pregnancy)) * (280 - day_of_pregnancy)
             )
             if days_in_milk is None:
                 days_in_milk = 0
@@ -1140,7 +1140,10 @@ class AnimalRequirements:
             gravid_uterine_weight_gain = 0.0
         else:
             gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
-        net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        if gravid_uterine_weight_gain > 0:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        else:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14)
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
     def calculate_NRC_energy_lactation_requirements(

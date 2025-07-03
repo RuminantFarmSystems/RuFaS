@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHi
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.mark.parametrize(
@@ -106,7 +106,7 @@ def test_evaluate_body_weight_change(
     mock_growth_inputs.mature_body_weight = mature_body_weight
     mock_growth_inputs.days_born = days_born
 
-    mock_time = mocker.MagicMock(spec=Time)
+    mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_add_error = mocker.patch.object(OutputManager, "add_error")

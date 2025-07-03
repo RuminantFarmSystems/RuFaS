@@ -16,7 +16,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed import Feed
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
@@ -994,7 +994,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_end_of_simulation(
-        cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+        cls, life_cycle_manager: LifeCycleManager, time: RufasTime, heiferIIs: List[HeiferII], cows: List[Cow]
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1003,8 +1003,8 @@ class AnimalModuleReporter:
         ----------
         life_cycle_manager : LifeCycleManager
             Instance of LifeCycleManager class.
-        time : Time
-            The Time object with the current time information.
+        time : RufasTime
+            The RufasTime object with the current time information.
         heiferIIs : List[HeiferII]
             The list of HeiferIIs.
         cows : List[Cow]

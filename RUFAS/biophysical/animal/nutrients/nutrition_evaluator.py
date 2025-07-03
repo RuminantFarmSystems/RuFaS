@@ -250,6 +250,8 @@ class NutritionEvaluator:
             Percentage by which supplied NDF under- or overshoots the required NDF range (percent).
 
         """
+        if supply.dry_matter == 0.0:
+            return 0.0
         ndf_percentage = supply.ndf_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
         if ndf_percentage < AnimalModuleConstants.MINIMUM_RATION_NDF:
@@ -280,6 +282,8 @@ class NutritionEvaluator:
             Percentage by which supplied NDF undershoots the required NDF range (percent).
 
         """
+        if supply.dry_matter == 0.0:
+            return 0.0
         forage_ndf_percentage = supply.forage_ndf_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
         return forage_ndf_percentage - AnimalModuleConstants.MINIMUM_RATION_FORAGE_NDF
@@ -302,9 +306,11 @@ class NutritionEvaluator:
             Percentage by which supplied fat under- or overshoots the required fat range (percent).
 
         """
+        if supply.dry_matter == 0.0:
+            return 0.0
         fat_percentage = supply.fat_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-        return fat_percentage - AnimalModuleConstants.MINIMUM_RATION_FAT
+        return fat_percentage - AnimalModuleConstants.MAXIMUM_RATION_FAT
 
     @classmethod
     def _calculate_dry_matter_intake(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:

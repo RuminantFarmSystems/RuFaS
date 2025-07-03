@@ -25,7 +25,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal, LifeCycle
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from RUFAS.routines.feed.feed import Feed
 
@@ -1135,7 +1135,7 @@ def test_handle_new_born(
     is_calf_sold: bool,
 ) -> None:
     # Arrange
-    time = mocker.MagicMock(autospec=Time)
+    time = mocker.MagicMock(autospec=RufasTime)
     time.simulation_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
     life_cycle_manager.sold_calves_info = []
@@ -1384,7 +1384,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
 def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for _evaluate_and_update_cows in life_cycle.py"""
     # Arrange
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 1
     mock_cows = []
     num_cows = 10

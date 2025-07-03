@@ -10,14 +10,14 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 
 @pytest.fixture
-def time(mocker: MockerFixture) -> Time:
-    mocker.patch.object(Time, "__init__", return_value=None)
-    return Time()
+def time(mocker: MockerFixture) -> RufasTime:
+    mocker.patch.object(RufasTime, "__init__", return_value=None)
+    return RufasTime()
 
 
 def test_milk_production_initialization(mocker: MockerFixture) -> None:
@@ -146,7 +146,7 @@ def test_perform_daily_milking_update(
     mock_milk_inputs.is_milking = is_milking
     mock_milk_inputs.days_born = 500
 
-    mock_time = mocker.MagicMock(spec=Time)
+    mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 1000
 
     mock_add_event = mocker.patch.object(AnimalEvents, "add_event")

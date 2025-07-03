@@ -21,7 +21,7 @@ from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class Crop:
@@ -126,7 +126,7 @@ class Crop:
         return self._phosphorus_uptake
 
     def perform_daily_crop_update(
-        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
+        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData, time: RufasTime
     ) -> None:
         """
         Updates the crop for the current day.
@@ -148,7 +148,7 @@ class Crop:
             current_conditions.min_air_temperature,
             current_conditions.max_air_temperature,
         )
-        self._root_development.develop_roots()
+        self._root_development.develop_roots(time)
         self._nitrogen_uptake.uptake(soil_data)
         self._phosphorus_uptake.uptake(soil_data)
         self._growth_constraints.constrain_growth(
@@ -191,36 +191,29 @@ class Crop:
             self._data.cumulative_potential_evapotranspiration = 0.0
             self._data.cumulative_water_uptake = 0.0
 
-    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple[float, float]:
+    def handle_water_in_canopy(self, available_precipitation: float) -> float:
         """
         Handles the water addition to the crop's canopy and calculates excess water.
 
         Parameters
         ----------
-        precipitation_reaching_soil : float
+        available_precipitation : float
             Amount of water available to reach the soil after considering other crops (mm).
 
         Returns
         -------
         tuple
-            A tuple containing:
-                - Amount of precipitation that reaches the soil after this crop (float)
-                - Excess water that could not be stored in the canopy (float)
+            Amount of precipitation that reaches the soil after this crop (mm).
         """
         canopy_water_excess_capacity = self._data.water_canopy_storage_capacity - self._data.canopy_water
 
-        excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
-        if excess_water_in_canopy != 0.0:
-            self._data.canopy_water = self._data.water_canopy_storage_capacity
-
         water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
-        water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
+        water_taken_to_be_stored = min(available_precipitation, water_taken_to_be_stored)
         self._data.canopy_water += water_taken_to_be_stored
 
-        precipitation_reaching_soil -= water_taken_to_be_stored
-        excess_canopy_water = -1 * excess_water_in_canopy
+        precipitation_reaching_soil = available_precipitation - water_taken_to_be_stored
 
-        return precipitation_reaching_soil, excess_canopy_water
+        return precipitation_reaching_soil
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
         """Wrapper for the canopy evaporation routine."""
@@ -236,7 +229,7 @@ class Crop:
         harvest_op: HarvestOperation,
         field_name: str,
         field_size: float,
-        time: Time,
+        time: RufasTime,
         soil_data: SoilData,
     ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
@@ -249,8 +242,8 @@ class Crop:
             The name of the field that contains this crop.
         field_size : float
             Size of the field that contains this crop (ha)
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
 
@@ -318,7 +311,7 @@ class Crop:
         cls,
         crop_reference: str,
         use_heat_scheduled_harvesting: bool,
-        time: Time,
+        time: RufasTime,
     ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.
@@ -329,7 +322,7 @@ class Crop:
             The reference for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -350,7 +343,7 @@ class Crop:
         return crop
 
     def set_crop_planting_attributes(
-        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time
+        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: RufasTime
     ) -> None:
         """
         Initializes the crop's attributes related to planting.
@@ -361,10 +354,21 @@ class Crop:
             The reference for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
         """
         self._data.use_heat_scheduling = use_heat_scheduled_harvesting
         self._data.id = crop_reference
         self._data.planting_year = time.current_calendar_year
         self._data.planting_day = time.current_julian_day
+
+    def update_crop_max_root_depth(self, bottom_layer_depth: float) -> None:
+        """
+        Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
+        user-provided maximum rooting depth is greater than the bottom of the soil profile
+
+        Parameters
+        ----------
+
+        """
+        self.data.max_root_depth = min(bottom_layer_depth, self.data.max_root_depth)

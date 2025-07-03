@@ -19,7 +19,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -265,7 +265,7 @@ class LifeCycleManager:
 
     def daily_update(
         self,
-        time: Time,
+        time: RufasTime,
         calves: List[Calf],
         heiferIs: List[HeiferI],
         heiferIIs: List[HeiferII],
@@ -290,7 +290,7 @@ class LifeCycleManager:
             heiferIIs: list of HeiferII objects to be updated
             heiferIs: list of HeiferI objects to be updated
             calves: list of Calf objects to be updated
-            time: current Time object
+            time: current RufasTime object
 
         Returns:
             animals_added: list of animals added from replacement herd
@@ -822,7 +822,7 @@ class LifeCycleManager:
 
     def _evaluate_and_update_cows(
         self,
-        time: Time,
+        time: RufasTime,
         cows: List[Cow],
         calves_born: List[Calf],
         animals_removed: List[Cow],
@@ -833,8 +833,8 @@ class LifeCycleManager:
 
         Parameters
         ----------
-        time : Time
-            The current Time object.
+        time : RufasTime
+            The current RufasTime object.
         cows : List[Cow]
             The list of cows.
         calves_born : List[Calf]
@@ -1028,7 +1028,7 @@ class LifeCycleManager:
         self.semen_num += cow.semen_num
         self.ai_num += cow.AI_times
 
-    def _handle_new_born(self, time: Time, cow: Cow, calves_born: List[Calf]) -> None:
+    def _handle_new_born(self, time: RufasTime, cow: Cow, calves_born: List[Calf]) -> None:
         sim_day = time.simulation_day
         net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
             time, AnimalBase.config["breed"], cow.net_merit

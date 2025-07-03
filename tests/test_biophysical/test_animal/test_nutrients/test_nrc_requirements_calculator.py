@@ -32,23 +32,32 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     process_based_phosphorus_requirement: float = 0.45
 
     mock_calculate_maintenance_energy_requirements = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_maintenance_energy_requirements", return_value=(10.0, 5.0, 2.0))
+        NRCRequirementsCalculator, "_calculate_maintenance_energy_requirements", return_value=(10.0, 5.0, 2.0)
+    )
     mock_calculate_growth_energy_requirements = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_growth_energy_requirements", return_value=(8.0, 0.7, 1.5))
+        NRCRequirementsCalculator, "_calculate_growth_energy_requirements", return_value=(8.0, 0.7, 1.5)
+    )
     mock_calculate_pregnancy_energy_requirements = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_pregnancy_energy_requirements", return_value=6.0)
+        NRCRequirementsCalculator, "_calculate_pregnancy_energy_requirements", return_value=6.0
+    )
     mock_calculate_lactation_energy_requirements = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
+        NRCRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0
+    )
     mock_calculate_dry_matter_intake = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
+        NRCRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0
+    )
     mock_calculate_protein_requirement = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
+        NRCRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0
+    )
     mock_calculate_calcium_requirement = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
+        NRCRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2
+    )
     mock_calculate_phosphorus_requirement = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
+        NRCRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8
+    )
     mock_calculate_activity_energy_requirements = mocker.patch.object(
-        NRCRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
+        NRCRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0
+    )
 
     # Act
     result: NutritionRequirements = NRCRequirementsCalculator.calculate_requirements(
@@ -81,19 +90,33 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     mock_calculate_growth_energy_requirements.assert_called_once_with(
         body_weight, mature_body_weight, 5.0, animal_type, parity, calving_interval, average_daily_gain_heifer
     )
-    mock_calculate_pregnancy_energy_requirements.assert_called_once_with(
-        day_of_pregnancy, 2.0
-    )
+    mock_calculate_pregnancy_energy_requirements.assert_called_once_with(day_of_pregnancy, 2.0)
     mock_calculate_lactation_energy_requirements.assert_called_once_with(
         animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
     )
     mock_calculate_dry_matter_intake.assert_called_once_with(
-        animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat,
-        net_energy_diet_concentration, days_born
+        animal_type,
+        body_weight,
+        day_of_pregnancy,
+        days_in_milk,
+        milk_production,
+        milk_fat,
+        net_energy_diet_concentration,
+        days_born,
     )
     mock_calculate_protein_requirement.assert_called_once_with(
-        body_weight, 5.0, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
-        2.0, 8.0, 0.7, 1.5, 18.0, TDN_percentage
+        body_weight,
+        5.0,
+        day_of_pregnancy,
+        animal_type,
+        milk_production,
+        milk_true_protein,
+        2.0,
+        8.0,
+        0.7,
+        1.5,
+        18.0,
+        TDN_percentage,
     )
     mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, animal_type, 0.7, milk_production
@@ -137,12 +160,18 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         (600.0, 650.0, 200, 3, 15.0, AnimalType.LAC_COW, 9.42633, 22.3424, 40.7875),
         # Test case 3: Pregnant heifer (Day 200, different body condition score)
         (500.0, 600.0, 200, 4, 10.0, AnimalType.HEIFER_II, 9.6986, 20.6238, 37.65),
-    ]
+    ],
 )
 def test_calculate_maintenance_energy_requirements(
-    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, body_condition_score_5: int,
-    previous_temperature: float | None, animal_type: AnimalType, expected_energy: float,
-    expected_conceptus_weight: float, expected_calf_birth_weight: float
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    body_condition_score_5: int,
+    previous_temperature: float | None,
+    animal_type: AnimalType,
+    expected_energy: float,
+    expected_conceptus_weight: float,
+    expected_calf_birth_weight: float,
 ) -> None:
     """Test that maintenance energy requirements are calculated correctly."""
     assert NRCRequirementsCalculator._calculate_maintenance_energy_requirements(
@@ -166,17 +195,29 @@ def test_calculate_maintenance_energy_requirements(
         (600.0, 650.0, 0.0, AnimalType.LAC_COW, 2, 0, None, 0.0, 0.0, 393.1),
         # Test case 6: Dry cow, should result in avg_daily_gain = 0.0
         (600.0, 650.0, 0.0, AnimalType.DRY_COW, 0, None, None, 0.0, 0.0, 393.1),
-    ]
+    ],
 )
 def test_calculate_growth_energy_requirements(
-    body_weight: float, mature_body_weight: float, conceptus_weight: float, animal_type: AnimalType,
-    parity: int, calving_interval: int | None, average_daily_gain_heifer: float | None, expected_energy: float,
-    expected_avg_daily_gain: float, expected_shrunk_body_weight: float
+    body_weight: float,
+    mature_body_weight: float,
+    conceptus_weight: float,
+    animal_type: AnimalType,
+    parity: int,
+    calving_interval: int | None,
+    average_daily_gain_heifer: float | None,
+    expected_energy: float,
+    expected_avg_daily_gain: float,
+    expected_shrunk_body_weight: float,
 ) -> None:
     """Test that growth energy requirements are calculated correctly."""
     assert NRCRequirementsCalculator._calculate_growth_energy_requirements(
-        body_weight, mature_body_weight, conceptus_weight, animal_type, parity, calving_interval,
-        average_daily_gain_heifer
+        body_weight,
+        mature_body_weight,
+        conceptus_weight,
+        animal_type,
+        parity,
+        calving_interval,
+        average_daily_gain_heifer,
     ) == pytest.approx((expected_energy, expected_avg_daily_gain, expected_shrunk_body_weight), rel=1e-3)
 
 
@@ -193,10 +234,11 @@ def test_calculate_growth_energy_requirements(
         (250, 45.0, 3.4733),
         # Test case 5: Pregnancy at 280 days (near full term)
         (280, 50.0, 4.3438),
-    ]
+    ],
 )
-def test_calculate_pregnancy_energy_requirements(day_of_pregnancy: int | None, calf_birth_weight: float,
-                                                 expected_energy: float) -> None:
+def test_calculate_pregnancy_energy_requirements(
+    day_of_pregnancy: int | None, calf_birth_weight: float, expected_energy: float
+) -> None:
     """Test that pregnancy energy requirements are calculated correctly."""
     result = NRCRequirementsCalculator._calculate_pregnancy_energy_requirements(day_of_pregnancy, calf_birth_weight)
 
@@ -222,20 +264,38 @@ def test_calculate_pregnancy_energy_requirements(day_of_pregnancy: int | None, c
         (650.0, 10.0, 280, AnimalType.DRY_COW, 0.0, 0.0, 48.0, 5.5, 0.7, 390.0, 21.0, 0.7, 1124.5907),
         # Test case 7: lactating cow
         (700.0, 12.0, 180, AnimalType.LAC_COW, 28.0, 3.8, 50.0, 7.0, 0.9, 479.0, 26.0, 0.7, 2500.5975),
-    ]
+    ],
 )
 def test_calculate_protein_requirement(
-    body_weight: float, conceptus_weight: float, day_of_pregnancy: int | None, animal_type: AnimalType,
-    milk_production: float, milk_true_protein: float, calf_birth_weight: float, net_energy_growth: float,
-    average_daily_gain: float, equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float,
-    TDN_conc: float | None, expected_protein: float
+    body_weight: float,
+    conceptus_weight: float,
+    day_of_pregnancy: int | None,
+    animal_type: AnimalType,
+    milk_production: float,
+    milk_true_protein: float,
+    calf_birth_weight: float,
+    net_energy_growth: float,
+    average_daily_gain: float,
+    equivalent_shrunk_body_weight: float,
+    dry_matter_intake_estimate: float,
+    TDN_conc: float | None,
+    expected_protein: float,
 ) -> None:
     """Test that metabolizable protein requirements are correctly calculated."""
 
     result = NRCRequirementsCalculator._calculate_protein_requirement(
-        body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
-        calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight,
-        dry_matter_intake_estimate, TDN_conc
+        body_weight,
+        conceptus_weight,
+        day_of_pregnancy,
+        animal_type,
+        milk_production,
+        milk_true_protein,
+        calf_birth_weight,
+        net_energy_growth,
+        average_daily_gain,
+        equivalent_shrunk_body_weight,
+        dry_matter_intake_estimate,
+        TDN_conc,
     )
 
     assert result == pytest.approx(expected_protein, rel=1e-3)
@@ -246,37 +306,29 @@ def test_calculate_protein_requirement(
     "expected_calcium",
     [
         # Test case 1: Lactating cow, not pregnant
-        (600.0, 650.0, None, AnimalType.LAC_COW, 0.8, 30.0,
-         64.0171),
-
+        (600.0, 650.0, None, AnimalType.LAC_COW, 0.8, 30.0, 64.0171),
         # Test case 2: Lactating cow, pregnant at 200 days
-        (650.0, 700.0, 200, AnimalType.LAC_COW, 1.0, 28.0,
-         68.1289),
-
+        (650.0, 700.0, 200, AnimalType.LAC_COW, 1.0, 28.0, 68.1289),
         # Test case 3: Dry cow, not pregnant
-        (550.0, 600.0, None, AnimalType.DRY_COW, 0.6, 0.0,
-         15.1724),
-
+        (550.0, 600.0, None, AnimalType.DRY_COW, 0.6, 0.0, 15.1724),
         # Test case 4: Dry cow, pregnant at 250 days
-        (580.0, 620.0, 250, AnimalType.DRY_COW, 0.5, 0.0,
-         21.9178),
-
+        (580.0, 620.0, 250, AnimalType.DRY_COW, 0.5, 0.0, 21.9178),
         # Test case 5: Heifer, not pregnant
-        (400.0, 500.0, None, AnimalType.HEIFER_II, 1.2, 0.0,
-         19.3857),
-
+        (400.0, 500.0, None, AnimalType.HEIFER_II, 1.2, 0.0, 19.3857),
         # Test case 6: Heifer, pregnant at 280 days
-        (420.0, 510.0, 280, AnimalType.HEIFER_III, 1.0, 0.0,
-         27.7713),
-
+        (420.0, 510.0, 280, AnimalType.HEIFER_III, 1.0, 0.0, 27.7713),
         # Test case 7: Lac cow, pregnant at 150 days
-        (420.0, 510.0, 150, AnimalType.LAC_COW, 1.0, 0.0,
-         24.0424),
-    ]
+        (420.0, 510.0, 150, AnimalType.LAC_COW, 1.0, 0.0, 24.0424),
+    ],
 )
 def test_calculate_calcium_requirement(
-    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, animal_type: AnimalType,
-    average_daily_gain: float, milk_production: float, expected_calcium: float
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    animal_type: AnimalType,
+    average_daily_gain: float,
+    milk_production: float,
+    expected_calcium: float,
 ) -> None:
     """Test that calcium requirements are correctly calculated."""
 
@@ -293,35 +345,40 @@ def test_calculate_calcium_requirement(
     [
         # Test case 1: Lactating cow, not pregnant
         (600.0, 650.0, None, 30.0, AnimalType.LAC_COW, 0.8, 22.0, 55.1311),
-
         # Test case 2: Lactating cow, pregnant at 200 days
         (650.0, 700.0, 200, 28.0, AnimalType.LAC_COW, 1.0, 24.0, 58.8173),
-
         # Test case 3: Dry cow, not pregnant
         (550.0, 600.0, None, 0.0, AnimalType.DRY_COW, 0.6, 20.0, 20.8028),
-
         # Test case 4: Dry cow, pregnant at 250 days
         (580.0, 620.0, 250, 0.0, AnimalType.DRY_COW, 0.5, 21.0, 25.5116),
-
         # Test case 5: Heifer, not pregnant
         (400.0, 500.0, None, 0.0, AnimalType.HEIFER_II, 1.2, 18.0, 22.7852),
-
         # Test case 6: Heifer, pregnant at 280 days
         (420.0, 510.0, 280, 0.0, AnimalType.HEIFER_III, 1.0, 19.0, 27.6740),
-
         # Test case 7: Lactating cow, pregnant at 150 days
         (650.0, 700.0, 150, 28.0, AnimalType.LAC_COW, 1.0, 24.0, 56.6574),
-    ]
+    ],
 )
 def test_calculate_phosphorus_requirement(
-    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, milk_production: float,
-    animal_type: AnimalType, average_daily_gain: float, dry_matter_intake_estimate: float, expected_phosphorus: float
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    milk_production: float,
+    animal_type: AnimalType,
+    average_daily_gain: float,
+    dry_matter_intake_estimate: float,
+    expected_phosphorus: float,
 ) -> None:
     """Test that phosphorus requirements are correctly calculated."""
 
     result = NRCRequirementsCalculator._calculate_phosphorus_requirement(
-        body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain,
-        dry_matter_intake_estimate
+        body_weight,
+        mature_body_weight,
+        day_of_pregnancy,
+        milk_production,
+        animal_type,
+        average_daily_gain,
+        dry_matter_intake_estimate,
     )
 
     assert result == pytest.approx(expected_phosphorus, rel=1e-3)
@@ -333,35 +390,42 @@ def test_calculate_phosphorus_requirement(
     [
         # Test case 1: Lactating cow, mid-lactation
         (AnimalType.LAC_COW, 600.0, 150, 100, 30.0, 3.5, 1.2, None, 21.35),
-
         # Test case 2: Lactating cow, early lactation
         (AnimalType.LAC_COW, 650.0, 120, 30, 28.0, 4.0, 1.3, None, 17.9110),
-
         # Test case 3: Dry cow, not pregnant
         (AnimalType.DRY_COW, 550.0, 150, None, 0.0, 0.0, 1.1, None, 10.8349),
-
         # Test case 4: Dry cow, late pregnancy
         (AnimalType.DRY_COW, 580.0, 250, None, 0.0, 0.0, 1.0, None, 11.3902),
-
         # Test case 5: Heifer over 1 year old
         (AnimalType.HEIFER_II, 400.0, None, None, 0.0, 0.0, 1.2, 500, 8.3700),
-
         # Test case 6: Heifer under 1 year old
         (AnimalType.HEIFER_I, 300.0, None, None, 0.0, 0.0, 0.9, 300, 7.7675),
-
         # Test case 7: Heifer in late pregnancy
         (AnimalType.HEIFER_III, 420.0, 280, None, 0.0, 0.0, 1.1, 450, 7.4965),
-    ]
+    ],
 )
 def test_calculate_dry_matter_intake(
-    animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: int | None,
-    milk_production: float, milk_fat: float, net_energy_diet_concentration: float, days_born: float, expected_dmi: float
+    animal_type: AnimalType,
+    body_weight: float,
+    day_of_pregnancy: int,
+    days_in_milk: int | None,
+    milk_production: float,
+    milk_fat: float,
+    net_energy_diet_concentration: float,
+    days_born: float,
+    expected_dmi: float,
 ) -> None:
     """Test that dry matter intake is correctly calculated."""
 
     result = NRCRequirementsCalculator._calculate_dry_matter_intake(
-        animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat,
-        net_energy_diet_concentration, days_born
+        animal_type,
+        body_weight,
+        day_of_pregnancy,
+        days_in_milk,
+        milk_production,
+        milk_fat,
+        net_energy_diet_concentration,
+        days_born,
     )
 
     assert result == pytest.approx(expected_dmi, rel=1e-3)
@@ -372,30 +436,23 @@ def test_calculate_dry_matter_intake(
     [
         # Test case 1: Barn-housed animal, minimal walking
         (600.0, "Barn", 100, 0.027),
-
         # Test case 2: Barn-housed animal, moderate walking
         (650.0, "Barn", 500, 0.14625),
-
         # Test case 3: Barn-housed animal, extensive walking
         (700.0, "Barn", 1000, 0.315),
-
         # Test case 4: Grazing animal, minimal walking
         (600.0, "Grazing", 100, 0.747),
-
         # Test case 5: Grazing animal, moderate walking
         (650.0, "Grazing", 500, 0.9262),
-
         # Test case 6: Grazing animal, extensive walking
         (700.0, "Grazing", 1000, 1.155),
-    ]
+    ],
 )
 def test_calculate_activity_energy_requirements(
     body_weight: float, housing: str, distance: float, expected_energy: float
 ) -> None:
     """Test that activity energy requirements are correctly calculated."""
 
-    result = NRCRequirementsCalculator._calculate_activity_energy_requirements(
-        body_weight, housing, distance
-    )
+    result = NRCRequirementsCalculator._calculate_activity_energy_requirements(body_weight, housing, distance)
 
     assert result == pytest.approx(expected_energy, rel=1e-3)

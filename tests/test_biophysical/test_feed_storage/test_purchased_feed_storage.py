@@ -5,7 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage, PurchasedFeed
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -20,8 +20,8 @@ def purchased_feed_storage() -> PurchasedFeedStorage:
 
 
 @pytest.fixture
-def time() -> Time:
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 4))
+def time() -> RufasTime:
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 4))
 
 
 @pytest.mark.parametrize(
@@ -56,10 +56,10 @@ def test_remove_empty_crops(purchased_feed_storage: PurchasedFeedStorage, purcha
 
 
 @pytest.mark.parametrize("mass, num_feeds, expected", [(100.0, 3, 300.0), (50.0, 1, 50.0), (0.0, 1, 0.0)])
-def test_report_stored_feeds(
+def test_report_stored_purchased_feeds(
     purchased_feed_storage: PurchasedFeedStorage,
     purchased_feed: PurchasedFeed,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
     mass: float,
     num_feeds: int,
@@ -68,19 +68,19 @@ def test_report_stored_feeds(
     """Test that the storage can report the stored feeds."""
     expected_info_map = {
         "class": "PurchasedFeedStorage",
-        "function": "report_stored_feeds",
+        "function": "report_stored_purchased_feeds",
         "simulation_day": (expected_sim_day := 3),
         "units": MeasurementUnits.KILOGRAMS,
         "rufas_id": 1,
         "mass": expected,
     }
-    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=expected_sim_day)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=mocker.PropertyMock, return_value=expected_sim_day)
     stored_feeds = [replace(purchased_feed, dry_matter_mass=mass) for _ in range(num_feeds)]
     purchased_feed_storage.stored = stored_feeds
     expected_call = mocker.call("stored_feed_1", expected, expected_info_map)
     add_var = mocker.patch.object(purchased_feed_storage._om, "add_variable")
 
-    purchased_feed_storage.report_stored_feeds(time)
+    purchased_feed_storage.report_stored_purchased_feeds(time)
 
     assert add_var.call_args_list == [expected_call]
 

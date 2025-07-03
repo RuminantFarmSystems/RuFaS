@@ -12,7 +12,7 @@ from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -64,9 +64,10 @@ def test_perform_daily_crop_update(
     )
     mock_field_data = mocker.Mock(spec=FieldData)
     mock_soil_data = mocker.Mock(spec=SoilData)
+    mock_time = mocker.Mock(spec=RufasTime)
 
     # Call the method
-    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data)
+    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data, mock_time)
 
     # Assertions
     if should_update:
@@ -136,11 +137,11 @@ def test_cycle_water_for_crops(
 
 @pytest.mark.parametrize(
     "water_canopy_storage_capacity, initial_canopy_water, precipitation_reaching_soil,"
-    "expected_precipitation_reaching_soil, expected_excess_canopy_water",
+    "expected_precipitation_reaching_soil",
     [
-        (10.0, 5.0, 8.0, 3.0, 0.0),  # Partial canopy storage, no excess water
-        (10.0, 10.0, 5.0, 5.0, 0.0),  # Full canopy storage, no excess water
-        (10.0, 15.0, 10.0, 10.0, 5.0),  # Canopy overfilled, excess water
+        (10.0, 5.0, 8.0, 3.0),  # Partial canopy storage, no excess water
+        (10.0, 10.0, 5.0, 5.0),  # Full canopy storage, no excess water
+        (10.0, 15.0, 10.0, 10.0),  # Canopy overfilled, excess water
     ],
 )
 def test_handle_water_in_canopy(
@@ -150,7 +151,6 @@ def test_handle_water_in_canopy(
     initial_canopy_water: float,
     precipitation_reaching_soil: float,
     expected_precipitation_reaching_soil: float,
-    expected_excess_canopy_water: float,
 ) -> None:
     """Test handle_water_in_canopy() method in crop.py."""
     crop = Crop(mock_crop_data)
@@ -167,12 +167,9 @@ def test_handle_water_in_canopy(
 
     canopy_water_mock.return_value = initial_canopy_water
 
-    actual_precipitation_reaching_soil, actual_excess_canopy_water = crop.handle_water_in_canopy(
-        precipitation_reaching_soil
-    )
+    actual_precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
     assert actual_precipitation_reaching_soil == expected_precipitation_reaching_soil
-    assert actual_excess_canopy_water == expected_excess_canopy_water
 
     expected_canopy_water = min(
         water_canopy_storage_capacity,
@@ -240,7 +237,7 @@ def test_manage_crop_harvest(mocker: MockerFixture, mock_crop_data: CropData) ->
     mock_harvest_op = mocker.Mock(spec=HarvestOperation)
     field_name = "Test Field"
     field_size = 10.0  # hectares
-    mock_time = mocker.Mock(spec=Time)
+    mock_time = mocker.Mock(spec=RufasTime)
     mock_soil_data = mocker.Mock(spec=SoilData)
     mock_crop_harvest = mocker.Mock(spec=HarvestedCropStorageType)
     manage_harvest_mock = mocker.patch.object(crop._crop_management, "manage_harvest", return_value=mock_crop_harvest)
@@ -346,7 +343,7 @@ def test_create_crop(
     heat_scheduled: bool,
 ) -> None:
     """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     mock_create_crop_data = mocker.patch.object(CropDataFactory, "create_crop_data", return_value=mock_crop_data)
 
     crop = Crop.create_crop(crop_reference, heat_scheduled, mocked_time)
@@ -361,7 +358,7 @@ def test_set_crop_planting_attributes(mocker: MockerFixture, mock_crop_data: Cro
     """Test for set_crop_planting_attributes() in crop.py."""
     crop = Crop(mock_crop_data)
 
-    mock_time = mocker.Mock(spec=Time)
+    mock_time = mocker.Mock(spec=RufasTime)
     mock_time.current_calendar_year = 2024
     mock_time.current_julian_day = 150
 
@@ -373,3 +370,9 @@ def test_set_crop_planting_attributes(mocker: MockerFixture, mock_crop_data: Cro
     assert crop._data.id == crop_reference
     assert crop._data.planting_year == 2024
     assert crop._data.planting_day == 150
+
+
+def test_update_crop_max_root_depth(mock_crop_data: CropData) -> None:
+    """Tests update_crop_max_root_depth()."""
+    crop = Crop(mock_crop_data)
+    assert crop.data.max_root_depth == 3000

@@ -1,7 +1,7 @@
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .storage import Storage
@@ -54,7 +54,7 @@ class Hay(Storage):
         ]
         self.additional_dry_matter_loss_coefficient = 0.0
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in hayed crops, and calls the base class's implementation of
         `process_degradations` to process the loss of dry matter.
@@ -63,8 +63,8 @@ class Hay(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
@@ -75,7 +75,7 @@ class Hay(Storage):
         super().process_degradations(weather, time)
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: RufasTime
     ) -> float:
         """
         Calculates the base amount of gaseous dry matter lost in a hayed crop.
@@ -86,8 +86,8 @@ class Hay(Storage):
             The hayed crop to process dry matter loss in.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -120,7 +120,7 @@ class Hay(Storage):
 
         return current_loss - processed_loss + additional_loss
 
-    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: RufasTime) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
 
@@ -128,8 +128,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -158,7 +158,7 @@ class Hay(Storage):
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
-    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: RufasTime) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
 
@@ -166,8 +166,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------

@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 SLICE_START = -365
@@ -84,17 +84,17 @@ class EmissionsEstimator:
         simulation.
         """
         time_filter = {
-            "name": "Time Filter",
+            "name": "RufasTime Filter",
             "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
             "which crop yields and nutrient applications to estimate emissions for.",
-            "filters": ["Time.(day|calendar_year)"],
+            "filters": ["RufasTime.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
         }
         date_variables = self.om.filter_variables_pool(time_filter)
-        day_cutoff = date_variables["Time.day"]["values"][0]
-        year_cutoff = date_variables["Time.calendar_year"]["values"][0]
-        date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
+        day_cutoff = date_variables["RufasTime.day"]["values"][0]
+        year_cutoff = date_variables["RufasTime.calendar_year"]["values"][0]
+        date_cutoff = RufasTime.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
 
         filters: dict[str, dict[str, Any]] = {
             "homegrown feeds filter": {
@@ -483,7 +483,7 @@ class EmissionsEstimator:
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
 
         for fertilizer_application in filtered_fertilizers:
-            fertilizer_application_date = Time.convert_year_jday_to_date(
+            fertilizer_application_date = RufasTime.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
             ).date()
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
@@ -558,7 +558,7 @@ class EmissionsEstimator:
         processed_data = self._transform_outputs_to_list_of_dicts(filtered_pools)
         return list(
             filter(
-                lambda app: Time.convert_year_jday_to_date(app[year_key], app[day_key]).date() >= date_cutoff,
+                lambda app: RufasTime.convert_year_jday_to_date(app[year_key], app[day_key]).date() >= date_cutoff,
                 processed_data,
             )
         )
@@ -606,12 +606,12 @@ class EmissionsEstimator:
         Returns True if fertilizer was applied, False otherwise.
         """
         for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
+            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             next_crop_exists = index + 1 < len(sorted_crops)
 
             if next_crop_exists:
                 next_crop = sorted_crops[index + 1]
-                next_crop_planting_date = Time.convert_year_jday_to_date(
+                next_crop_planting_date = RufasTime.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
                 ).date()
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
@@ -651,8 +651,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
+            crop_planting_date = RufasTime.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
+            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops

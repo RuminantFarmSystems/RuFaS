@@ -3,7 +3,10 @@ import pytest
 from mock import MagicMock, call
 from pytest_mock import MockFixture, MockerFixture
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
@@ -652,7 +655,26 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
     mock_animal_manager = mocker.MagicMock()
     mock_animal_manager.simulation_day = simulation_day = 1
     num_pens = 3
-    mock_all_pens = [mocker.MagicMock() for _ in range(num_pens)]
+    mock_all_pens = [
+        PenManureData(
+            id=1,
+            num_animals=10,
+            num_lactating_cows=1,
+            classes_in_pen=set(),
+            animal_combination=AnimalCombination.CALF,
+            pen_type="",
+            housing_type="",
+            bedding_type="",
+            manure_handler="",
+            manure_separator="",
+            manure_treatment="",
+            manure_separator_after_digestion="",
+            num_stalls=15,
+            manure=AnimalManureExcretions(total_solids=10.0),
+        )
+        for _ in range(num_pens)
+    ]
+    mock_all_pens[-1]["num_animals"], mock_all_pens[-1]["manure"] = 0, AnimalManureExcretions(total_solids=0.0)
     mock_animal_manager.all_pens = mock_all_pens
 
     mock_animal_manager_init = mocker.MagicMock()
@@ -694,8 +716,8 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
 
     # Assert
     patch_for_configure_manure_manager_components.assert_called_once
-    assert patch_for_pen_daily_update.call_count == num_pens
-    assert patch_for_pen_daily_update.call_args_list == [mocker.call(simulation_day, pen) for pen in mock_all_pens]
+    assert patch_for_pen_daily_update.call_count == num_pens - 1
+    assert patch_for_pen_daily_update.call_args_list == [mocker.call(simulation_day, pen) for pen in mock_all_pens[:-1]]
 
 
 @pytest.mark.parametrize(

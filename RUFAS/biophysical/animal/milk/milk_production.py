@@ -9,7 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 
@@ -84,7 +84,7 @@ class MilkProduction:
         self.wood_n = wood_n
 
     def perform_daily_milking_update(
-        self, milk_production_inputs: MilkProductionInputs, time: Time
+        self, milk_production_inputs: MilkProductionInputs, time: RufasTime
     ) -> MilkProductionOutputs:
         """
         Handles an animal's daily milking update.
@@ -95,8 +95,8 @@ class MilkProduction:
             Animal properties only used to determine milk production.
         general_properties : GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
@@ -168,11 +168,72 @@ class MilkProduction:
 
         return milk_production_outputs
 
+    def perform_daily_milking_update_without_history(
+        self, milk_production_inputs: MilkProductionInputs
+    ) -> MilkProductionOutputs:
+        """
+        Handles an animal's daily milking update, without updating the milk history attributes.
+        This method is intended to be utilized only prior to the first ration formulation.
+
+        Parameters
+        ----------
+        milk_production_inputs : MilkProductionProperties
+            Animal properties only used to determine milk production.
+
+        Returns
+        -------
+        MilkProductionOutputs
+            Milking properties of the animal after milk production-related updates for the current day.
+
+        """
+        milk_production_outputs = MilkProductionOutputs(
+            events=AnimalEvents(), days_in_milk=milk_production_inputs.days_in_milk
+        )
+
+        if not milk_production_inputs.is_milking:
+            self.daily_milk_produced = 0.0
+            return milk_production_outputs
+
+        is_dry_off_day = milk_production_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy
+        if is_dry_off_day:
+            self.daily_milk_produced = 0.0
+            self.crude_protein_content = 0.0
+            self.true_protein_content = 0.0
+            self.fat_content = 0.0
+            self.lactose_content = 0.0
+            self.current_lactation_305_day_milk_produced = 0.0
+            return milk_production_outputs
+
+        milk_production_outputs.days_in_milk += 1
+        self._daily_milk_produced = self.calculate_daily_milk_production(
+            milk_production_inputs.days_in_milk,
+            self.wood_l,
+            self.wood_m,
+            self.wood_n,
+        )
+        self._milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
+        self.crude_protein_content = self._calculate_nutrient_content(
+            self.daily_milk_produced, self.crude_protein_content
+        )
+        self.true_protein_content = self._calculate_nutrient_content(
+            self.daily_milk_produced, self.true_protein_percent
+        )
+        self.fat_content = self._calculate_nutrient_content(self.daily_milk_produced, self.fat_percent)
+        self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
+
+        return milk_production_outputs
+
     @staticmethod
     @njit
     def calculate_daily_milk_production(days_in_milk: int, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
+
+        Notes
+        -----
+        [AN.MLK.9]
 
         Parameters
         ----------
@@ -202,6 +263,10 @@ class MilkProduction:
     def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
+
+        Notes
+        -----
+        [AN.MLK.10]
 
         Parameters
         ----------
@@ -265,7 +330,7 @@ class MilkProduction:
         return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
     def _update_milking_history(
-        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: Time
+        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: RufasTime
     ) -> None:
         """Updates the milking history kept in a MilkProductionProperties instance."""
         self.milk_production_history.append(

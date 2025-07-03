@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import Manur
 from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
 from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -22,7 +22,7 @@ class ManureTreatmentFactory:
     def get_instance(
         configuration_name: str,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> BaseManureTreatment:
         """Returns a manure treatment system instance for the given manure treatment type name.
@@ -33,8 +33,8 @@ class ManureTreatmentFactory:
             The name of the manure treatment configuration.
         weather : Weather
             The weather data.
-        time : Time
-            The time data.
+        time : RufasTime
+            The RufasTime object.
         manure_treatment_config : Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
             The manure treatment configuration data.
 

@@ -1,4 +1,6 @@
 import math
+import random
+from math import floor
 from typing import Callable, Union, Any, Optional
 
 from scipy.stats import truncnorm
@@ -32,7 +34,7 @@ from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import Horm
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 HEIFER_REPRODUCTION_SUB_PROTOCOLS = Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
@@ -154,7 +156,7 @@ class Reproduction:
 
         self.reproduction_statistics = AnimalReproductionStatistics(estrus_count=estrus_count)
 
-    def reproduction_update(self, reproduction_inputs: ReproductionInputs, time: Time) -> ReproductionOutputs:
+    def reproduction_update(self, reproduction_inputs: ReproductionInputs, time: RufasTime) -> ReproductionOutputs:
         """
         Update the reproduction status of the animal.
 
@@ -162,7 +164,7 @@ class Reproduction:
         ----------
         reproduction_inputs : ReproductionInputs
             The inputs for the reproduction protocol.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -205,7 +207,7 @@ class Reproduction:
         )
 
     def heiferII_reproduction_update(
-        self, reproduction_data_stream: ReproductionDataStream, time: Time
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
     ) -> ReproductionDataStream:
         """
         Update reproduction status for heiferII based on the protocol.
@@ -214,7 +216,7 @@ class Reproduction:
         ----------
         reproduction_data_stream : ReproductionDataStream
             Current reproduction datastream.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -248,7 +250,7 @@ class Reproduction:
         return reproduction_data_stream
 
     def cow_reproduction_update(
-        self, reproduction_data_stream: ReproductionDataStream, time: Time
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
     ) -> ReproductionDataStream:
         """
         Update reproduction status for cows based on the protocol.
@@ -257,7 +259,7 @@ class Reproduction:
         ----------
         reproduction_data_stream : ReproductionDataStream
             Current reproduction datastream.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -429,7 +431,9 @@ class Reproduction:
             )
         return reproduction_data_stream
 
-    def cow_give_birth(self, reproduction_data_stream: ReproductionDataStream, time: Time) -> ReproductionDataStream:
+    def cow_give_birth(
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
+    ) -> ReproductionDataStream:
         """Handle the birth of a calf, resetting reproduction states and updating outputs."""
         self.repro_state_manager.reset()
         self.calves += 1
@@ -517,6 +521,45 @@ class Reproduction:
 
         return reproduction_data_stream
 
+    def _simulate_first_estrus(
+        self,
+        reproduction_data_stream: ReproductionDataStream,
+        start_day: int,
+        simulation_day: int,
+        estrus_note: str,
+        avg_estrus_cycle: float,
+        max_cycle_length: float = math.inf,
+    ) -> ReproductionDataStream:
+        """
+        Calculate and set first next estrus day for an heiferII.
+
+        Parameters
+        ----------
+        start_day : int
+            The day to begin the estrus cycle calculation.
+        simulation_day : int
+            The current simulation day.
+        estrus_note : str
+            Note explaining the reason for estrus simulation.
+        avg_estrus_cycle : float
+            Average length of the estrus cycle.
+        max_cycle_length : float, optional
+            Maximum allowable length for the estrus cycle, by default inf.
+
+        Returns
+        -------
+        ReproductionDataStream
+            Updated reproduction datastream after estrus simulation.
+        """
+        estrus_cycle = random.randint(1, floor(avg_estrus_cycle))
+        if estrus_cycle >= max_cycle_length:
+            estrus_cycle = max_cycle_length - 1
+        self.estrus_day = start_day + estrus_cycle
+        reproduction_data_stream.events.add_event(
+            reproduction_data_stream.days_born, simulation_day, f"{estrus_note} on day {self.estrus_day}"
+        )
+        return reproduction_data_stream
+
     def _simulate_estrus(
         self,
         reproduction_data_stream: ReproductionDataStream,
@@ -574,13 +617,12 @@ class Reproduction:
         else:
             self.reproduction_statistics.ED_days = 0
         if reproduction_data_stream.days_born == AnimalConfig.heifer_breed_start_day:
-            reproduction_data_stream = self._simulate_estrus(
+            reproduction_data_stream = self._simulate_first_estrus(
                 reproduction_data_stream,
                 AnimalConfig.heifer_breed_start_day,
                 simulation_day,
                 animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                 AnimalConfig.average_estrus_cycle_heifer,
-                AnimalConfig.std_estrus_cycle_heifer,
             )
         elif reproduction_data_stream.days_born == self.estrus_day:
             reproduction_data_stream = self._handle_generic_estrus_detection(reproduction_data_stream, simulation_day)
@@ -1072,7 +1114,7 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus(
             reproduction_data_stream,
-            reproduction_data_stream.days_born,
+            reproduction_data_stream.days_born - 1,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             average_estrus_cycle,
@@ -1092,7 +1134,25 @@ class Reproduction:
         )
 
     def _calculate_calf_birth_weight(self, breed: Breed) -> float:
-        """Calculate the birth weight of the calf based on the breed."""
+        """
+         Calculates the birth weight of the calf based on the breed.
+
+        Notes
+        ------
+        [AN.BWT.6]
+
+
+         Parameters
+         ----------
+         breed: Breed
+             The breed of the animal.
+
+         Returns
+         -------
+         float
+             The birth weight for the calf (kg).
+        """
+
         average_birth_weight_by_breed = {
             Breed.HO: AnimalConfig.birth_weight_avg_ho,
             Breed.JE: AnimalConfig.birth_weight_avg_je,
@@ -1972,8 +2032,17 @@ class Reproduction:
         """Handle an open cow's status, determining next steps based on reproduction protocol and resynch program."""
 
         self.num_conception_rate_decreases += 1
+        if (
+            AnimalConfig.dry_off_day_of_pregnancy <= AnimalConfig.third_pregnancy_check_day
+            and not reproduction_data_stream.is_milking
+        ):
+            self.do_not_breed = True
+            return reproduction_data_stream
 
-        if self.cow_reproduction_program == CowReproductionProtocol.ED:
+        if (
+            self.cow_reproduction_program == CowReproductionProtocol.ED
+            or AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.NONE
+        ):
             if reproduction_data_stream.days_born > self.estrus_day:  # No estrus day scheduled yet
                 self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 reproduction_data_stream.events.add_event(

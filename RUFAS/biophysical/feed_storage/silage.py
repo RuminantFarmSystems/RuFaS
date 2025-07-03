@@ -4,7 +4,7 @@ from typing import Optional
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -22,7 +22,7 @@ class Silage(Storage):
 
     Methods
     -------
-    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: Time)
+    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
         Calculates the number of days to effluent loss needs to be processed for in the given crop.
     calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total dry matter lost to effluent that occurred over the given number of days.
@@ -41,7 +41,7 @@ class Silage(Storage):
         ]
         self.om = OutputManager()
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
         of `process_degradations` to handle the fermentative loss.
@@ -50,14 +50,15 @@ class Silage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
+            "simulation_day": time.simulation_day,
         }
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
@@ -75,7 +76,9 @@ class Silage(Storage):
 
         super().process_degradations(weather, time)
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
@@ -85,8 +88,8 @@ class Silage(Storage):
             List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance containing the date at which the state of the stored crops should be projected.
+        time : RufasTime
+            RufasTime instance containing the date at which the state of the stored crops should be projected.
 
         Returns
         -------
@@ -104,7 +107,7 @@ class Silage(Storage):
 
         return super().project_degradations(crops_projected_with_effluent_loss, weather, time)
 
-    def _calculate_effluent_loss(self, crop: HarvestedCrop, time: Time) -> dict[str, float]:
+    def _calculate_effluent_loss(self, crop: HarvestedCrop, time: RufasTime) -> dict[str, float]:
         """
         Calculates the attributes of a crop after effluent loss.
 
@@ -112,8 +115,8 @@ class Silage(Storage):
         ----------
         crop : HarvestedCrop
             HarvestedCrop to calculate effluent losses from.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         Returns
         -------
@@ -133,6 +136,7 @@ class Silage(Storage):
         if days_of_effluent_to_process == 0:
             return post_loss_values
 
+        crop.estimated_maximum_effluent = crop.estimate_maximum_effluent()
         dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
             crop.estimated_maximum_effluent, days_of_effluent_to_process
         )
@@ -153,30 +157,33 @@ class Silage(Storage):
         post_loss_values.update(mass_attributes | {"dry_matter_loss": dry_matter_loss, "moisture_loss": moisture_loss})
         return post_loss_values
 
-    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
+    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: RufasTime) -> int:
         """
-        Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
+        Calculates the number of days of effluent loss to process for an ensiled crop.
 
         Parameters
         ----------
         crop : HarvestedCrop
             Ensiled crop that is being degraded.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
+
+        Returns
+        -------
+        int
+            Number of days to calculate effluent loss for.
 
         Notes
         -----
-        Effluent loss only occurs in an ensiled crop during the first 10 days of storage, so this method calculates the
-        numbers of days which were in that initial 10-day period between the time when the crop was last degraded and
-        the current time.
-
+        - Effluent loss is fixed at 10 days if the crop is still within the first 10 days of storage.
+        - After that period, it is calculated as the number of days since the last degradation.
         """
-        time_since_last_degradation = crop.last_time_degraded - crop.storage_time
-        days_of_effluent_processed = min(EFFLUENT_CONSTRAINER, time_since_last_degradation.days)
-        time_since_storage = time.current_date.date() - crop.storage_time
-        total_days_of_effluent_since_storage = min(EFFLUENT_CONSTRAINER, time_since_storage.days)
-        days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
-        return days_of_effluent_to_process
+        days_since_storage = (time.current_date.date() - crop.storage_time).days
+
+        if days_since_storage <= 10:
+            return max(0, min(10, (time.current_date.date() - crop.last_time_degraded).days))
+        else:
+            return (time.current_date.date() - crop.last_time_degraded).days
 
     def calculate_dry_matter_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
         """
@@ -196,7 +203,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
+        .. [1] Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7
 
         """
         return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
@@ -219,7 +226,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.SIL.5
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
@@ -246,7 +253,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:
@@ -280,7 +287,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:

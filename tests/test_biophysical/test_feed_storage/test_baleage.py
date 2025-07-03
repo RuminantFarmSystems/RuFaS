@@ -7,8 +7,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
-from RUFAS.time import Time
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data
@@ -31,17 +31,17 @@ def baleage(mocker: MockerFixture) -> Baleage:
 
 
 @pytest.fixture
-def time() -> Time:
+def time() -> RufasTime:
     """
-    Pytest fixture to create a Time instance for testing.
+    Pytest fixture to create a RufasTime instance for testing.
 
     Returns
     -------
-    Time
-        An instance of the Time class.
+    RufasTime
+        An instance of the RufasTime class.
 
     """
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 @pytest.fixture
@@ -56,7 +56,7 @@ def weather(mocker: MockerFixture) -> Weather:
 
     """
     mocker.patch.object(Weather, "__init__", return_value=None)
-    return Weather({}, MagicMock(auto_spec=Time))
+    return Weather({}, MagicMock(auto_spec=RufasTime))
 
 
 @pytest.fixture
@@ -70,8 +70,7 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    return HarvestedCrop(category=category, **sample_crop_data)
 
 
 def test_acceptable_crops(baleage: Baleage) -> None:
@@ -86,7 +85,7 @@ def test_acceptable_crops(baleage: Baleage) -> None:
 def test_process_degradations(
     baleage: Baleage,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -108,7 +107,7 @@ def test_project_degradations(
     baleage: Baleage,
     harvested_crop: HarvestedCrop,
     weather: Weather,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Tests project_degradations in Hay."""

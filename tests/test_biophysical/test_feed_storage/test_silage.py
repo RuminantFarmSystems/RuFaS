@@ -5,10 +5,10 @@ from datetime import date, datetime, timedelta
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile, Silage
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -31,26 +31,25 @@ def harvested_crop() -> HarvestedCrop:
         An instance of the HarvestedCrop class.
     """
     category = CropCategory.SMALL_GRAIN
-    crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    return HarvestedCrop(category=category, **sample_crop_data)
 
 
 @pytest.fixture
-def time() -> Time:
+def time() -> RufasTime:
     """
-    Pytest fixture to create a Time instance for testing.
+    Pytest fixture to create a RufasTime instance for testing.
 
     Returns
     -------
-    Time
-        An instance of the Time class.
+    RufasTime
+        An instance of the RufasTime class.
 
     """
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 @pytest.fixture
-def weather(mocker: MockerFixture, time: Time) -> Weather:
+def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
     """Creates a Weather instance for testing."""
     mocker.patch.object(Weather, "__init__", return_value=None)
     return Weather({}, time)
@@ -71,7 +70,8 @@ def test_process_degradations(
 ) -> None:
     """Tests the implementation of process_degradations in the Silage class."""
     mock_weather = mocker.MagicMock(autospec=Weather)
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
+    mock_time.simulation_day = 15
     effluent_loss_days = mocker.patch.object(
         silage, "calculate_days_of_effluent_loss_to_process", return_value=days_of_loss
     )
@@ -96,6 +96,7 @@ def test_process_degradations(
         "class": silage.__class__.__name__,
         "function": silage.process_degradations.__name__,
         "units": MeasurementUnits.KILOGRAMS,
+        "simulation_day": mock_time.simulation_day,
     }
 
     silage.process_degradations(mock_weather, mock_time)
@@ -118,7 +119,7 @@ def test_process_degradations(
 def test_project_degradations(
     silage: Silage,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -158,12 +159,18 @@ def test_project_degradations(
 
 
 @pytest.mark.parametrize(
-    "day_stored,last_day_processed,current,expected",
-    [(1, 1, 6, 5), (1, 3, 3, 0), (40, 45, 50, 5), (40, 45, 55, 5), (10, 22, 25, 0)],
+    "day_stored, last_day_processed, current, expected",
+    [
+        (1, 1, 6, 5),
+        (1, 3, 3, 0),
+        (40, 45, 50, 5),
+        (40, 45, 55, 10),
+        (10, 22, 25, 3),
+    ],
 )
 def test_calculate_days_of_effluent_loss_to_process(
     silage: Silage,
-    time: Time,
+    time: RufasTime,
     harvested_crop: HarvestedCrop,
     day_stored: int,
     last_day_processed: int,
@@ -177,7 +184,6 @@ def test_calculate_days_of_effluent_loss_to_process(
     time.current_date = datetime(2024, 6, 1) + timedelta(days=current - 1)
 
     actual = silage.calculate_days_of_effluent_loss_to_process(harvested_crop, time)
-
     assert actual == expected
 
 
