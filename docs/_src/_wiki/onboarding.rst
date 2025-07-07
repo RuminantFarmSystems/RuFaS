@@ -5,6 +5,7 @@
 .. container:: titlepage
 
    **Welcome to RuFaS**
+    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/tree/dev/scientific_documentation>`__
 
    Introduction to RuFaS for New Team Members
 
@@ -359,11 +360,6 @@ Windows or MacOS depending on the device you are working with.
    -  Detailed tutorial by `tutorial by
       DataQuest <https://www.dataquest.io/blog/installing-python-on-mac/>`__
 
--  **Linux**
-
-   -  If you are using Linux, and you have problems, contact your
-      onboarding buddy for guidance on how to troubleshoot and resolve
-      any challenges you may come across.
 
 *Install VS Code (the IDE)*
 ---------------------------
@@ -372,8 +368,7 @@ Recall that this IDE will allow us to write, edit, debug, and pilot test
 RuFaS. VS Code is commonly used by RuFaS team members, but there are
 other options of IDEs if you wish to explore other ways to work with the
 RuFaS program. If you are not familiar with IDEs, we recommend sticking
-with VS Code so that you may reach out to your onboarding buddy or
-another RuFaS team member if you need assistance troubleshooting.
+with VS Code so a RuFaS team member can be of maximal assistance troubleshooting.
 
 -  Begin by visiting the official `VisualStudio
    website <https://code.visualstudio.com/download>`__.
@@ -411,8 +406,6 @@ another RuFaS team member if you need assistance troubleshooting.
 
                   pip install -r requirements.txt
 
-      *Important Note: if there is an issue, please stop at this point
-      and contact your onboarding buddy.*
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.
@@ -455,7 +448,7 @@ primarily through VS Code.
 
 If you wish to have more information on how to interact with RuFaS
 through other IDE’s or using Git or GitHub Desktop, please reach out to
-your onboarding buddy or another RuFaS team member for more information.
+a RuFaS team member for more information.
 
 In this section, you will review:
 
@@ -468,8 +461,7 @@ In this section, you will review:
 -  Beginner’s Simulation Worksheet
 
 After this section, if you have any remaining questions, be sure to
-reach out to your onboarding buddy or another RuFaS team member for more
-assistance.
+reach out to a RuFaS team member for more assistance.
 
 *Basic Vocabulary Used by Developers: Learning to Communicate with RuFaS*
 -------------------------------------------------------------------------
@@ -591,7 +583,7 @@ Git Desktop.
    -  Locate your terminal in the IDE you have chosen to download
       (PyCharm or VS Code).
 
-   -  Run a default scenario by typing in "python main.py". Did you get
+   -  Run a example scenario by typing in "python main.py". Did you get
       a message with the RuFaS version number and saying it was starting
       a task? Congratulations! You just simulated the RuFaS default
       farm!
@@ -614,7 +606,7 @@ Git Desktop.
 
    -  Click on that branch to check it out
 
-   -  Run the default farm scenario again to check if you were
+   -  Run the example farm scenario again to check if you were
       successful
 
 -  **Familiarize yourself with the RuFaS file structure**. Using VS Code
@@ -627,8 +619,8 @@ Git Desktop.
       that informs the program.
 
       -  Default Config Files Unless you manually adjust them, your
-         simulation will always refer to the default configuration file
-         to run. This default config file is used to configure a
+         simulation will always refer to the example configuration file
+         to run. This example config file is used to configure a
          "scenario." You can open these files and change the parameters
          with which you are working.
 
@@ -641,7 +633,7 @@ Git Desktop.
       (in quotes because the day we are referring to is in the
       simulation). You can adjust the length of time of the simulation
       to report these outputs in your config files by adjusting the
-      start and end dates. The default is 6 years. The Output section of
+      start and end dates. The example is 6 years. The Output section of
       this introduction will go into more detail.
 
       -  Metadata - One RuFaS team member once succinctly described this
@@ -664,7 +656,7 @@ Git Desktop.
          file. Select one of the available tasks. You will see that the
          code describes where the data are coming from. Unless you
          change the file yourself, the simulation will automatically
-         select a default file. You can change the source by simply
+         select a example file. You can change the source by simply
          typing an alternate file name.
 
    #. **Output** - contains "output filters," the actual output of your
@@ -757,7 +749,7 @@ open your Git Desktop and VS Code.
    .
 
 #. Select the file titled task_manager_metadata.json and observe the
-   "path" to find the default_task.json file.
+   "path" to find the example_task.json file.
 
    -  The path demonstrates how you may find the file from which RuFaS
       is receiving instruction or inputs. If no changes are made, RuFaS

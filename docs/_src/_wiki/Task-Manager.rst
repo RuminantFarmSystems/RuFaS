@@ -176,13 +176,13 @@ Example input
      "tasks": [
        {
          "task_type": "SIMULATION_SINGLE_RUN",
-         "metadata_file_path": "input/metadata/default_metadata.json",
+         "metadata_file_path": "input/metadata/example_metadata.json",
          "output_prefix": "Task 1",
          "log_verbosity": "errors"
        },
        {
          "task_type": "SIMULATION_SINGLE_RUN",
-         "metadata_file_path": "input/metadata/default_metadata.json",
+         "metadata_file_path": "input/metadata/example_metadata.json",
          "output_prefix": "Task 2",
          "log_verbosity": "errors",
          "random_seed": 42
