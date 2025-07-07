@@ -753,12 +753,12 @@ open your Git Desktop and VS Code.
 
    -  The path demonstrates how you may find the file from which RuFaS
       is receiving instruction or inputs. If no changes are made, RuFaS
-      will always run through the indicated default files.
+      will always run through the indicated example files.
 
    -  Go to the left menu of VS Code again and you may locate the file
       by selecting input then data, and finally tasks.
 
-      There you will find default_task.json.
+      There you will find example_task.json.
 
    .. figure:: /_static/defaulttask.png
       :alt: default task mngr
@@ -769,9 +769,9 @@ open your Git Desktop and VS Code.
       task_manager_metadata.json file and the location of the path for
       the next default task.
 
-#. When you select the file, default_task.json you will notice there is
-   another path pointing to a default_metadata.json file. This
-   default_metadata.json file is your first opportunity to make
+#. When you select the file, example_task.json you will notice there is
+   another path pointing to a example_metadata.json file. This
+   example_metadata.json file is your first opportunity to make
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
@@ -780,23 +780,23 @@ open your Git Desktop and VS Code.
    :name: fig:example
    :width: 80.0%
 
-When you open the default_task.json file, this is what you should
-see. Notice that the default scenario is a single run of a
+When you open the example_task.json file, this is what you should
+see. Notice that the example scenario is a single run of a
 simulation titled, "SIMULATION_SINGLE_RUN."
 
-#. In the default_metadata.json file, you will observe a long list of
+#. In the example_metadata.json file, you will observe a long list of
    paths to different input or config files. These are where you will be
    making your changes to inputs (i.e. animal numbers, manure storage
    system, etcetera).
 
    -  \**\*\ **Tip:** If you will be making changes to multiple aspects
       of animal module, feed storage, crop and soil, and/or manure
-      files, we recommend that you make a copy of default_metadata.json
+      files, we recommend that you make a copy of example_metadata.json
       (you may right click the file and copy it to the same location or
       use CTRL+C then CTRL+V).
 
       -  If you chose to make a copy, title it something easy to
-         remember. We recommend "default_metadatav1.json" or something
+         remember. We recommend "example_metadatav1.json" or something
          similar.
 
 .. figure:: /_static/defaultmeta.png
