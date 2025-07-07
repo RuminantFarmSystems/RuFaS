@@ -209,16 +209,36 @@ class AnimalPopulation:
             "heiferIIs": [dict(heiferII.get_animal_values()) for heiferII in self.heiferIIs],
             "heiferIIIs": [dict(heiferIII.get_animal_values()) for heiferIII in self.heiferIIIs],
             "cows": [dict(cow.get_animal_values()) for cow in self.cows],
-            "cows_parity_1_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(1, True)],
-            "cows_parity_2_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(2, True)],
-            "cows_parity_3_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(3, True)],
-            "cows_parity_4_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(4, True)],
-            "cows_parity_5_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(5, True)],
-            "cows_parity_1_not_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(1, False)],
-            "cows_parity_2_not_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(2, False)],
-            "cows_parity_3_not_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(3, False)],
-            "cows_parity_4_not_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(4, False)],
-            "cows_parity_5_not_milking": [dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(5, False)],
+            "cows_parity_1_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(1, True)
+            ],
+            "cows_parity_2_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(2, True)
+            ],
+            "cows_parity_3_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(3, True)
+            ],
+            "cows_parity_4_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(4, True)
+            ],
+            "cows_parity_5_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(5, True)
+            ],
+            "cows_parity_1_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(1, False)
+            ],
+            "cows_parity_2_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(2, False)
+            ],
+            "cows_parity_3_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(3, False)
+            ],
+            "cows_parity_4_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(4, False)
+            ],
+            "cows_parity_5_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.get_cows_by_parity_and_milking(5, False)
+            ],
             "replacement": [dict(replacement.get_animal_values()) for replacement in self.replacement],
         }
 
@@ -338,8 +358,11 @@ class AnimalPopulation:
             Return cows that matches the provided condition.
 
         """
-        return [cow for cow in self.cows if cow.calves == parity and cow.is_milking == is_milking and cow.days_born >=
-                days_born]
+        return [
+            cow
+            for cow in self.cows
+            if cow.calves == parity and cow.is_milking == is_milking and cow.days_born >= days_born
+        ]
 
     @property
     def cows_parity_1_milking(self) -> List[Animal]:
