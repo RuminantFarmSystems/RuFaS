@@ -470,9 +470,7 @@ def test_filter_cow_status(
         mock_cow(mocker, 6, 2, True, 50),  # cow6
     ]
 
-    population = AnimalPopulation(
-        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=cows, replacement=[]
-    )
+    population = AnimalPopulation(calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=cows, replacement=[])
 
     result = population.filter_cow_status(parity, is_milking, days_born_filter)
     result_ids = [cow.id for cow in result]
