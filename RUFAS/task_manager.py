@@ -134,7 +134,7 @@ class TaskManager:
             filters_path = Path(task["filters_directory"])
             self.output_manager.validate_filter_content(filters_path)
 
-        print(str(GeneralConstants.PROTEIN_TO_NITROGEN) + "TM") #6.18
+        print(str(GeneralConstants.PROTEIN_TO_NITROGEN) + "TM")  # 6.18
 
         if not is_data_valid:
             TaskManager.handle_post_processing(
