@@ -364,7 +364,6 @@ class AnimalPopulation:
             if cow.calves == parity and cow.is_milking == is_milking and cow.days_born >= days_born
         ]
 
-
     @staticmethod
     def _average(data: list[int | float]) -> float:
         """
