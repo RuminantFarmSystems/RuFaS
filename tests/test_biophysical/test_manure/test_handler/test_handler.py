@@ -16,16 +16,16 @@ from RUFAS.rufas_time import RufasTime
 @pytest.fixture
 def handler() -> Handler:
     """Default handler instance."""
-    return Handler("handler_name", "MANUAL_SCRAPER", 3, 0.8, False)
+    return Handler("handler_name", "ManualScraper", 3, 0.8, False)
 
 
 def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     """Tests the main process routine of handler related to parlor cleaning."""
-    handler = ParlorCleaningHandler("handler_name", "Parlor_Cleaning", 3, 0.8, False)
+    handler = ParlorCleaningHandler("handler_name", "ParlorCleaning", 3, 0.8, False)
     mock_fresh_water_volume_used_for_milking = mocker.patch.object(
         handler, "determine_fresh_water_volume_used_for_milking", return_value=0.0
     )
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
         water=0.0,
@@ -235,7 +235,7 @@ def test_determine_handler_cleaning_water_volume_parlor_use_flush(
     handler: Handler,
 ) -> None:
     """Tests the calculation of cleaning water volume."""
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     handler.use_parlor_flush = True
     assert (
         handler.determine_handler_cleaning_water_volume(
@@ -256,7 +256,7 @@ def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
     handler: Handler,
 ) -> None:
     """Tests the calculation of cleaning water volume."""
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     handler.use_parlor_flush = False
     assert (
         handler.determine_handler_cleaning_water_volume(
