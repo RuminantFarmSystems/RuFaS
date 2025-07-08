@@ -109,6 +109,8 @@ class AnimalModuleReporter:
             + herd_statistics.cow_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
+        for animal_type, deaths in herd_statistics.animals_deaths_by_stage.items():
+            om.add_variable(f"{animal_type}_deaths", deaths, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_calves", herd_statistics.calf_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_heiferIs", herd_statistics.heiferI_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
