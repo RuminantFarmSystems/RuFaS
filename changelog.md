@@ -200,6 +200,7 @@ v0.9.2
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking.
 - [2464](https://github.com/RuminantFarmSystems/MASM/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
+- [2392](https://github.com/RuminantFarmSystems/MASM/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
 
 ### v0.9.2
 
