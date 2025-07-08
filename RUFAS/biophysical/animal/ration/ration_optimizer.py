@@ -669,15 +669,21 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization.
+            Attributes are animal requirement and feed supply information required for optimization
 
         Returns
         -------
         float
-            Non-negative value indicates that supply exceeds the minimum dry matter intake.
+            Non-negative value indicates that supply is exceeds the minimum dry matter intake.
 
         """
-        return RationOptimizer._calculate_DMI_constraints(decision_vector, ration_configuration)
+        return float(
+            (sum(decision_vector))
+            - (
+                ration_configuration.animal_requirements.dry_matter
+                * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
+            )
+        )
 
     @staticmethod
     def DMI_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
@@ -690,7 +696,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization.
+            Attributes are animal requirement and feed supply information required for optimization
 
         Returns
         -------
@@ -698,33 +704,11 @@ class RationOptimizer:
             Non-negative value indicates that supply is less than the maximum dry matter intake.
 
         """
-        return RationOptimizer._calculate_DMI_constraints(decision_vector, ration_configuration) * -1
-
-    @staticmethod
-    def _calculate_DMI_constraints(
-        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
-    ) -> float:
-        """
-        Calculates the amount of dry matter intake.
-
-        Parameters
-        ----------
-        decision_vector : numpy.ndarray
-            The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization.
-
-        Returns
-        -------
-        float
-            The amount of dry matter intake.
-
-        """
         return float(
-            (sum(decision_vector))
-            - (
+            -(sum(decision_vector))
+            + (
                 ration_configuration.animal_requirements.dry_matter
-                * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
+                * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
             )
         )
 
