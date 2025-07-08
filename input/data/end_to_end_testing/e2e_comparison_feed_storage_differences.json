@@ -1,4 +1,0 @@
-{
-    "name": "feed_storage_e2e_results",
-    "filters": ["FeedStorage.*"]
-}
