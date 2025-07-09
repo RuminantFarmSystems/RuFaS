@@ -202,6 +202,7 @@ v0.9.2
 - [2464](https://github.com/RuminantFarmSystems/MASM/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
 - [2473](https://github.com/RuminantFarmSystems/MASM/pull/2473) - [minor change] [E2E] Removes TODOs related to temporary Feed/Storage E2E testing setup files and functions.
 - [2474](https://github.com/RuminantFarmSystems/MASM/pull/2474) - [minor change] [Manure] Fixes a bug in manure handlers that interfered with flushing functionality.
+- [2470](https://github.com/RuminantFarmSystems/MASM/pull/2470) - [minor change] [Feed] Adds shrink factor, buffer inputs and buffer usage logic in feed manager.
 
 ### v0.9.2
 
