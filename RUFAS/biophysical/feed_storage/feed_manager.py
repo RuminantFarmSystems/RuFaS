@@ -459,7 +459,7 @@ class FeedManager:
         }
         self._rufas_ids_purchased_today.update(feeds_to_purchase.keys())
         for rufas_id, purchase_amount in feeds_to_purchase.items():
-            # Potential multiply the amount by buffer here
+            # Potential multiply the amount by buffer here, if type matching non-daily.
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
