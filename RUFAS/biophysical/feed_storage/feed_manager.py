@@ -459,12 +459,14 @@ class FeedManager:
         }
         self._rufas_ids_purchased_today.update(feeds_to_purchase.keys())
         for rufas_id, purchase_amount in feeds_to_purchase.items():
-            # Potential multiply the amount by buffer here, if type matching non-daily.
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
             if feed_info is None:
                 raise ValueError(f"Trying to purchase unavailable feed {rufas_id}")
+
+            if purchase_type in ["ration_interval", "planning_cycle"]:
+                purchase_amount = purchase_amount * (1 + feed_info.buffer)
 
             total_cost = purchase_amount * feed_info.purchase_cost
 
@@ -763,6 +765,7 @@ class FeedManager:
             rufas_id = feed["purchased_feed"]
             price = feed["purchased_feed_cost"]
             shrink_factor = feed["shrink_factor"]
+            buffer = feed["buffer"]
             try:
                 nutritive_properties = feed_library[rufas_id]
             except KeyError:
@@ -773,6 +776,7 @@ class FeedManager:
                 on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
                 purchase_cost=price,
                 shrink_factor=shrink_factor,
+                buffer=buffer,
                 **nutritive_properties,
             )
             available_feeds.append(new_feed)
