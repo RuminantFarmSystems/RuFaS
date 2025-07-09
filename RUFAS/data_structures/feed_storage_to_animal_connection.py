@@ -165,6 +165,7 @@ class Feed:
     amount_available: float
     on_farm_cost: float
     purchase_cost: float
+    shrink_factor: float
 
 
 @dataclass

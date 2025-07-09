@@ -459,6 +459,7 @@ class FeedManager:
         }
         self._rufas_ids_purchased_today.update(feeds_to_purchase.keys())
         for rufas_id, purchase_amount in feeds_to_purchase.items():
+            # Potential multiply the amount by buffer here
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
@@ -485,7 +486,7 @@ class FeedManager:
             self._daily_purchases.append(
                 _FeedPurchase(rufas_id=rufas_id, amount_purchased=purchase_amount, purchase_type=purchase_type)
             )
-            self._store_purchased_feed(rufas_id, purchase_amount, time, purchase_type)
+            self._store_purchased_feed(rufas_id, purchase_amount, time, purchase_type, feed_info.shrink_factor)
 
     def report_daily_purchases(self, simulation_day: int) -> None:
         """
@@ -520,19 +521,17 @@ class FeedManager:
         self._rufas_ids_purchased_today.clear()
 
     def _adjust_for_shrink(
-        self, purchased_feed: PurchasedFeed, purchase_type: str, shrink_factor: float = 0.1
+        self, purchased_feed: PurchasedFeed, purchase_type: str, shrink_factor: float
     ) -> PurchasedFeed:
         """
         Adjusts the purchased feed to account for shrink loss in storage.
 
         Parameters
         ----------
-        purhased_feed : PurchasedFeed
+        purchased_feed : PurchasedFeed
             PurchasedFeed object containing the feed to be adjusted.
         purchase_type : str
             Type of purchase being made, used for output variable naming.
-        simulation_day : int
-            The current simulation day, used for tracking feed adjustments.
         shrink_factor : float, optional
             The expected fraction of feed lost due to shrink (default is 0.1 for 10%).
 
@@ -567,7 +566,8 @@ class FeedManager:
         )
 
     def _store_purchased_feed(
-        self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime, purchase_type: str
+        self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime, purchase_type: str,
+        shrink_factor: float
     ) -> None:
         """
         Stores feeds which have been purchased and adjusts for shrink.
@@ -582,10 +582,13 @@ class FeedManager:
             RufasTime object.
         purchase_type : str
             Type of purchase being made, used for output variable naming.
+        shrink_factor: float
+            The portion of loss of a purchased feed when it is put into storage (unitless).
+
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
-        if purchase_type == "ration_interval":
-            shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed, purchase_type)
+        if purchase_type in ["ration_interval", "planning_cycle"]:
+            shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed, purchase_type, shrink_factor)
         else:
             shrink_adjusted_purchased_feed = purchased_feed
         self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
@@ -759,6 +762,7 @@ class FeedManager:
         for feed in feeds_to_parse:
             rufas_id = feed["purchased_feed"]
             price = feed["purchased_feed_cost"]
+            shrink_factor = feed["shrink_factor"]
             try:
                 nutritive_properties = feed_library[rufas_id]
             except KeyError:
@@ -768,6 +772,7 @@ class FeedManager:
                 amount_available=0.0,
                 on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
                 purchase_cost=price,
+                shrink_factor=shrink_factor,
                 **nutritive_properties,
             )
             available_feeds.append(new_feed)
