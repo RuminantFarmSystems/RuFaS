@@ -566,8 +566,7 @@ class FeedManager:
         )
 
     def _store_purchased_feed(
-        self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime, purchase_type: str,
-        shrink_factor: float
+        self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime, purchase_type: str, shrink_factor: float
     ) -> None:
         """
         Stores feeds which have been purchased and adjusts for shrink.
