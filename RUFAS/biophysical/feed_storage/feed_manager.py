@@ -203,8 +203,7 @@ class FeedManager:
         for feed in self.purchased_feed_storage.stored:
             feed_id = feed.rufas_id
             feed_info = next(
-                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == feed_id)
-                , None
+                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == feed_id), None
             )
             if feed_info is None:
                 raise ValueError(f"Trying to shrink unavailable feed {feed_id} during purchased feed shrinkage.")
@@ -250,8 +249,8 @@ class FeedManager:
             tolerance = 1e-6
             is_fulfillable_with_inventory = amount_requested <= available_amount
             is_fulfillable_with_purchase = (
-                                               amount_requested - available_amount
-                                           ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
+                amount_requested - available_amount
+            ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
@@ -581,12 +580,7 @@ class FeedManager:
     #         storage_time=purchased_feed.storage_time,
     #     )
 
-    def _store_purchased_feed(
-        self,
-        rufas_id: RUFAS_ID,
-        purchase_amount: float,
-        time: RufasTime
-    ) -> None:
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
         Stores feeds which have been purchased and adjusts for shrink.
 
