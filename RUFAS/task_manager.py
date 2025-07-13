@@ -120,7 +120,7 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
-        self.check_python_version()
+
         rufas_version = self.get_rufas_version()
         self.output_manager.print_credits(rufas_version)
         info_map = {
@@ -133,8 +133,6 @@ class TaskManager:
         for task in task_config.get("tasks", []):
             filters_path = Path(task["filters_directory"])
             self.output_manager.validate_filter_content(filters_path)
-
-        print(str(GeneralConstants.PROTEIN_TO_NITROGEN) + "TM") #6.18
 
         if not is_data_valid:
             TaskManager.handle_post_processing(
@@ -173,7 +171,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -409,11 +407,13 @@ class TaskManager:
         return single_run_args
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int,
+        metadata_path: Path
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers,
+            metadata_path=metadata_path
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -441,7 +441,8 @@ class TaskManager:
 
     @staticmethod
     def task(
-        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None,
+        metadata_path: Path
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -502,6 +503,11 @@ class TaskManager:
                 return None
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
+            input_manager.start_data_processing(metadata_path)
+            task_config: dict[str, Any] = input_manager.get_data("tasks")
+            for task in task_config.get("tasks", []):
+                filters_path = Path(task["filters_directory"])
+                output_manager.validate_filter_constant_content(filters_path)
 
             if not is_data_valid:
                 output_manager.add_error(
@@ -722,7 +728,6 @@ class TaskManager:
         should_flush_im_pool: bool
             Whether to flush the input manager pool.
         """
-        print(str(GeneralConstants.PROTEIN_TO_NITROGEN) + "In handle post processing")
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_post_processing.__name__,
