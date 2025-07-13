@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @dataclass
@@ -228,6 +229,8 @@ class HerdStatistics:
     cull_reason_stats_percent: dict[str, float]
     percent_cow_for_parity: dict[str, float]
 
+    animals_deaths_by_stage: dict[AnimalType, int]
+
     def __init__(self) -> None:
         """
         Initializes a HerdStatistics object and set the default values for all dictionary and list attributes.
@@ -274,6 +277,15 @@ class HerdStatistics:
         self.sold_heiferIIs_info = []
         self.sold_cows_info = []
         self.sold_and_died_cows_info = []
+
+        self.animals_deaths_by_stage: dict[AnimalType, int] = {
+            AnimalType.CALF: 0,
+            AnimalType.HEIFER_I: 0,
+            AnimalType.HEIFER_II: 0,
+            AnimalType.HEIFER_III: 0,
+            AnimalType.LAC_COW: 0,
+            AnimalType.DRY_COW: 0,
+        }
 
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
@@ -336,6 +348,15 @@ class HerdStatistics:
         self.avg_heifer_culling_age = 0.0
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
+
+        self.animals_deaths_by_stage: dict[AnimalType, int] = {
+            AnimalType.CALF: 0,
+            AnimalType.HEIFER_I: 0,
+            AnimalType.HEIFER_II: 0,
+            AnimalType.HEIFER_III: 0,
+            AnimalType.LAC_COW: 0,
+            AnimalType.DRY_COW: 0,
+        }
 
     def reset_parity(self) -> None:
         """Resets parity-based attributes."""
