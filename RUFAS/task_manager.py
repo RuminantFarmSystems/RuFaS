@@ -120,7 +120,7 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
-
+        self.check_python_version()
         rufas_version = self.get_rufas_version()
         self.output_manager.print_credits(rufas_version)
         info_map = {
@@ -728,6 +728,7 @@ class TaskManager:
         should_flush_im_pool: bool
             Whether to flush the input manager pool.
         """
+        print(str(GeneralConstants.PROTEIN_TO_NITROGEN) + "In handle post processing")
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_post_processing.__name__,
