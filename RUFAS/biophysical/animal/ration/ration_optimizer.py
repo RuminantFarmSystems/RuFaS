@@ -221,7 +221,7 @@ class RationOptimizer:
             Non-negative value indicates that supply meets or exceeds the requirement for total net energy.
 
         """
-        feeds, intake_nutrient_discount, actual_digestible_energy, actual_metabolizable_energy = (
+        feeds, _, actual_digestible_energy, actual_metabolizable_energy = (
             RationOptimizer._calculate_NE_parameters(decision_vector, ration_configuration)
         )
 
@@ -265,7 +265,7 @@ class RationOptimizer:
             Non-negative value indicates that supply is greater than the requirements for maintenance and activity.
 
         """
-        feeds, intake_nutrient_discount, actual_digestible_energy, actual_metabolizable_energy = (
+        feeds, _, _, actual_metabolizable_energy = (
             RationOptimizer._calculate_NE_parameters(decision_vector, ration_configuration)
         )
         actual_maintenance_net_energy_supply = NutritionSupplyCalculator.calculate_actual_maintenance_net_energy(
@@ -298,7 +298,7 @@ class RationOptimizer:
             Non-negative value indicates that supply is greater than the requirements for lactation.
 
         """
-        feeds, intake_nutrient_discount, actual_digestible_energy, actual_metabolizable_energy = (
+        feeds, _, actual_digestible_energy, actual_metabolizable_energy = (
             RationOptimizer._calculate_NE_parameters(decision_vector, ration_configuration)
         )
 
@@ -333,7 +333,7 @@ class RationOptimizer:
             Non-negative value indicates that supply is greater than the requirements for growth.
 
         """
-        feeds, intake_nutrient_discount, actual_digestible_energy, actual_metabolizable_energy = (
+        feeds, _, _, actual_metabolizable_energy = (
             RationOptimizer._calculate_NE_parameters(decision_vector, ration_configuration)
         )
 
@@ -777,22 +777,20 @@ class RationOptimizer:
         """
         ration_config = RationConfig(requirements, pen_available_feeds, pen_average_body_weight)
 
-        x0 = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
+        initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
 
         bounds = self._build_bounds(ration_config)
 
-        for i in range(0, len(x0)):
-            if x0[i] < bounds[i][0] or x0[i] > bounds[i][1]:
-                x0[i] = np.clip(x0[i], bounds[i][0], bounds[i][1])
-
+        initial_decision_vector = self._check_initial_bounds(bounds, initial_decision_vector)
         arguments = (ration_config,)
+
         self.set_constraints(arguments=arguments)
 
         constraints_to_use = self._select_constraints(animal_combination)
 
         optimized_ration_attempt = minimize(
             self.objective,
-            x0,
+            initial_decision_vector,
             method="SLSQP",
             bounds=bounds,
             constraints=constraints_to_use,
@@ -800,6 +798,16 @@ class RationOptimizer:
         )
 
         return optimized_ration_attempt, ration_config
+
+    @staticmethod
+    def _check_initial_bounds(bounds: list[tuple[float, float]],
+                              initial_decision_vector: np.ndarray[tuple[int, ...], np.dtype]
+                              ) -> np.ndarray[tuple[int, ...], np.dtype]:
+        for i in range(0, len(initial_decision_vector)):
+            if initial_decision_vector[i] < bounds[i][0] or initial_decision_vector[i] > bounds[i][1]:
+                initial_decision_vector[i] = np.clip(initial_decision_vector[i], bounds[i][0], bounds[i][1])
+
+        return initial_decision_vector
 
     @staticmethod
     def _build_initial_value(

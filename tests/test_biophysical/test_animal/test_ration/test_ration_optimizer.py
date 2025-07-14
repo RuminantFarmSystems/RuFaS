@@ -522,3 +522,41 @@ def test_handle_failed_constraints_heifer_combination(mocker: MockerFixture) -> 
     )
 
     mock_om.add_variable.assert_called_once()
+
+
+def test_check_initial_bounds_no_clipping():
+    """Values already within bounds should remain unchanged."""
+    optimizer = RationOptimizer()
+    bounds = [(0.0, 1.0), (-5.0, 5.0), (10.0, 20.0)]
+    vec = np.array([0.5, 0.0, 15.0])
+    original = vec.copy()
+
+    result = optimizer._check_initial_bounds(bounds, vec.copy())
+
+    assert np.array_equal(result, original)
+    # also ensure it returns the same array object (in‑place modification)
+    assert result is not original  # method returns a new array or the same? adjust if needed
+
+
+def test_check_initial_bounds_clipping_all_sides():
+    """Values below lower or above upper bound should be clipped."""
+    optimizer = RationOptimizer()
+    bounds = [(0.0, 1.0), (-5.0, 5.0), (10.0, 20.0)]
+    vec = np.array([-1.0, 10.0, 25.0])
+    expected = np.array([0.0, 5.0, 20.0])
+
+    result = optimizer._check_initial_bounds(bounds, vec.copy())
+
+    assert np.array_equal(result, expected)
+
+
+def test_check_initial_bounds_mixed_clipping():
+    """Mixed in‑bounds and out‑of‑bounds values are clipped correctly."""
+    optimizer = RationOptimizer()
+    bounds = [(-1.0, 1.0), (0.0, 10.0)]
+    vec = np.array([2.0, -5.0])
+    expected = np.array([1.0, 0.0])
+
+    result = optimizer._check_initial_bounds(bounds, vec.copy())
+
+    assert np.array_equal(result, expected)

@@ -1342,7 +1342,6 @@ class HerdManager:
             Current temperature (C).
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
-                simulation_day : int
         simulation_day : int
             Day of simulation.
 
