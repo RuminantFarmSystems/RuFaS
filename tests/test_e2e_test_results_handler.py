@@ -45,7 +45,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, convert_variable_name if convert_variable_name else None
+        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix"
     )
 
     get_result_paths.assert_called_once()
@@ -243,10 +243,10 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
         ResultPathType("two", "expected_2", "actual_2", 0.01),
     ]
 
-    actual = E2ETestResultsHandler._get_test_result_paths()
+    actual = E2ETestResultsHandler._get_test_result_paths("dummy_prefix")
 
     assert actual == expected
-    get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths")
+    get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths.dummy_prefix")
 
 
 def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
@@ -388,6 +388,7 @@ def test_update_expected_test_results(
     output_dir = Path("output_dir")
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     results_path = mocker.MagicMock()
@@ -421,9 +422,9 @@ def test_update_expected_test_results(
     # Act
     if raise_exception:
         with pytest.raises(type(raise_exception)):
-            E2ETestResultsHandler.update_expected_test_results(output_dir)
+            E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix")
     else:
-        E2ETestResultsHandler.update_expected_test_results(output_dir)
+        E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix")
 
     # Assert
     get_result_paths.assert_called_once()
@@ -438,6 +439,8 @@ def test_update_expected_test_results(
             expected_log_count = 3 if should_update else 2
             assert add_log.call_count == expected_log_count
             mock_write_json.assert_called_once()
+            if diff:
+                add_warning.assert_called_once()
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1
