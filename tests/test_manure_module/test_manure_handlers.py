@@ -19,7 +19,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import Ma
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 # Test ManureHandlerDailyOutput
@@ -255,7 +255,7 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
 def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
     # Arrange
     expected_current_day_avg_tempC = 42.0
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mock_time.year = 10
     mock_time.day = 1
     mock_current_day_conditions = mocker.MagicMock()
@@ -364,7 +364,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
 
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -417,7 +417,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
     # --- Test pen type that does not require GHG emissions estimations. ---
     mock_pen.pen_type = "compost bedded pack barn"
@@ -521,7 +521,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
         return_value=current_day_avg_tempC,
     )
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -571,7 +571,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
 
 def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:

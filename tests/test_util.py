@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 import pytest
+from matplotlib.dates import DateFormatter, date2num
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -245,6 +246,14 @@ def test_generate_time_series_error() -> None:
         Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 1)
 
 
+@pytest.mark.parametrize("celsius, expected", [(0.0, 273.15), (-273.15, 0.0), (20.0, 293.15)])
+def test_convert_celsius_to_kelvin(celsius: float, expected: float) -> None:
+    """Test that degrees Celsius is converted to degrees Kelvin correctly."""
+    actual = Utility.convert_celsius_to_kelvin(celsius)
+
+    assert actual == expected
+
+
 @pytest.mark.parametrize(
     "year,day,expected",
     [
@@ -275,6 +284,24 @@ def test_remove_special_chars() -> None:
     charred_word = '<>:/w"o|\\r?d?*.'
     expected_result = "word"
     assert Utility.remove_special_chars(charred_word) == expected_result
+
+
+@pytest.mark.parametrize(
+    "dict_of_lists, expected",
+    [
+        (
+            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]},
+            [{"a": 1, "b": 4, "c": 7}, {"a": 2, "b": 5, "c": 8}, {"a": 3, "b": 6, "c": 9}],
+        )
+    ],
+)
+def test_convert_dict_of_lists_to_list_of_dicts(
+    dict_of_lists: dict[str, list[Any]], expected: list[dict[str, Any]]
+) -> None:
+    """Test that dictionaries of lists are converted to a list of dictionaries correctly."""
+    actual = Utility.convert_dict_of_lists_to_list_of_dicts(dict_of_lists)
+
+    assert actual == expected
 
 
 def test_flatten_keys_to_nested_structure_nested_dict() -> None:
@@ -662,7 +689,7 @@ def test_make_serializable_recursive(
 
 
 @pytest.mark.parametrize("mean,std_dev", [(20.0, 1.0), (0.0, 0.0)])
-def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: float) -> float:
+def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: float) -> None:
     """Tests that random numbers are generated properly."""
     random = mocker.patch("RUFAS.util.np.random.normal", return_value=10.0)
 
@@ -862,3 +889,187 @@ def test_combine(
     mock_list_dir.assert_called_once_with(saved_csv_working_folder)
 
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
+
+
+@pytest.mark.parametrize(
+    "test_list,length,expected",
+    [
+        ([], 3, []),
+        ([], 0, []),
+        ([1, 2], 1, [1, 2]),
+        ([1.0, 2.0], 5, [1.0, 2.0]),
+        (["test"], 4, ["test", "test", "test", "test"]),
+        ([3], 1, [3]),
+        ([5], 5, [5, 5, 5, 5, 5]),
+    ],
+)
+def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -> None:
+    """Check that lists are elongated correctly."""
+    actual = Utility.elongate_list(test_list, length)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "values, expected",
+    [
+        ([1, 3, 4], True),
+        ([0.0, 1.2, 3.8], True),
+        ([], True),
+        ([-0.1, 0.1], False),
+        ([-2, -4], False),
+    ],
+)
+def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
+    assert Utility.determine_if_all_non_negative_values(values) == expected
+
+
+@pytest.mark.parametrize(
+    "fracs,expected",
+    [
+        ([0.0, 0.3, 0.99], True),
+        ([0.5, 1.0], True),
+        ([], True),
+        ([-0.01, 0.03], False),
+        ([0.4, 1.1], False),
+    ],
+)
+def test_validate_fractions(fracs: List[float], expected: bool) -> None:
+    """Tests that all fractions passed are valid."""
+    actual = Utility.validate_fractions(fracs)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "input_data, significant_digits, expected_output",
+    [
+        # Test case 1: List of floats rounded to 3 significant digits
+        (
+            {"floats_list": [123.456789, 987.654321]},
+            3,
+            {"floats_list": [123.457, 987.654]},
+        ),
+        # Test case 2: Mixed list (contains non-numeric values) should remain unchanged
+        (
+            {"mixed_list": [123.456789, "not_a_number"]},
+            3,
+            {"mixed_list": [123.456789, "not_a_number"]},
+        ),
+        # Test case 3: List of integers should remain unchanged
+        (
+            {"integer_list": [100, 200]},
+            3,
+            {"integer_list": [100, 200]},
+        ),
+        # Test case 4: String value should remain unchanged
+        (
+            {"string_value": "test_string"},
+            3,
+            {"string_value": "test_string"},
+        ),
+        # Test case 5: Nested dictionary should remain unchanged
+        (
+            {"nested_dict": {"key": 42.42}},
+            3,
+            {"nested_dict": {"key": 42.42}},
+        ),
+        # Test case 6: Empty dictionary
+        (
+            {},
+            3,
+            {},
+        ),
+        # Test case 7: Dictionary with no numeric values
+        (
+            {"key": "value"},
+            3,
+            {"key": "value"},
+        ),
+        # Test case 8: List of floats rounded to 4 significant digits
+        (
+            {"nums": [1.23456789, 9.87654321]},
+            4,
+            {"nums": [1.2346, 9.8765]},
+        ),
+    ],
+)
+def test_round_numeric_values_in_dict(
+    input_data: dict[str, Any], significant_digits: int, expected_output: dict[str, Any]
+) -> None:
+    """Tests the round_numeric_values_in_dict() function in Utility"""
+    result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
+    assert result == expected_output, f"Expected {expected_output}, but got {result}"
+
+
+@pytest.mark.parametrize(
+    "date_format, expected_result",
+    [
+        ("%j/%Y", True),  # Valid input: Day of Year / Year
+        ("%d/%m/%Y", True),  # Valid input: Day / Month / Year
+        ("%m/%d/%Y", True),  # Valid input: Month / Day / Year
+        ("%b/%d/%Y", True),  # Valid input: Month Abbreviation / Day / Year
+        ("%B/%d/%Y", True),  # Valid input: Month full string / Day / Year
+        ("%m/%d/%y", True),  # Valid input: Month / Day / Year without century
+        ("unknown_format", False),  # Invalid input: String with no '%' directives
+        ("", False),  # Edge case: Empty string
+        (None, False),  # Edge case: None input
+        (12345, False),  # Edge case: Non-string input
+        ("This is %m-%d-%Y", True),  # Edge case: String with '%' directives
+    ],
+)
+def test_validate_date_format(date_format: str, expected_result: bool) -> None:
+    """Test the `validate_date_format` function with various inputs."""
+    assert Utility.validate_date_format(date_format) == expected_result
+
+
+@pytest.mark.parametrize(
+    "user_input, is_valid_format, expected_format",
+    [
+        ("%j/%Y", True, "%j/%Y"),  # Valid input: Day of Year / Year
+        ("%d/%m/%Y", True, "%d/%m/%Y"),  # Valid input: Day / Month / Year
+        ("%m/%d/%Y", True, "%m/%d/%Y"),  # Valid input: Month / Day / Year
+        ("%b/%d/%Y", True, "%b/%d/%Y"),  # Valid input: Month Abbreviation / Day / Year
+        ("%B/%d/%Y", True, "%B/%d/%Y"),  # Valid input: Month full string / Day / Year
+        ("%m/%d/%y", True, "%m/%d/%y"),  # Valid input: Month / Day / Year without century
+        ("unknown_format", False, "%d/%m/%Y"),  # Invalid input: Default fallback
+        ("", False, "%d/%m/%Y"),  # Edge case: Empty string
+        (None, False, "%d/%m/%Y"),  # Edge case: None input
+        (12345, False, "%d/%m/%Y"),  # Edge case: Non-string input
+    ],
+)
+def test_get_date_formatter(
+    user_input: str | None, is_valid_format: bool, expected_format: str, mocker: MockerFixture
+) -> None:
+    """Test the `get_date_formatter` function with various inputs."""
+    mock_validate_date_format = mocker.patch.object(Utility, "validate_date_format", return_value=is_valid_format)
+
+    formatter = Utility.get_date_formatter(user_input)
+
+    if user_input is not None:
+        mock_validate_date_format.assert_called_once_with(user_input)
+    else:
+        mock_validate_date_format.assert_not_called()
+
+    assert formatter.fmt == expected_format
+    assert isinstance(formatter, DateFormatter)
+    sample_date = datetime.datetime(2024, 1, 1)
+    numerical_date = date2num(sample_date)
+    formatted_date = formatter(numerical_date)
+    expected_date = sample_date.strftime(expected_format)
+    assert formatted_date == expected_date
+
+
+@pytest.mark.parametrize(
+    "reference_rate, random_value, expected_result",
+    [
+        (0.5, 0.3, True),
+        (0.5, 0.7, False),
+        (1.0, 0.9, True),
+        (0.0, 0.1, False),
+    ],
+)
+def test_compare_randomized_rate_less_than(
+    reference_rate: float, random_value: float, expected_result: bool, mocker: MockerFixture
+) -> None:
+    mocker.patch("RUFAS.util.random", return_value=random_value)
+    result = Utility.compare_randomized_rate_less_than(reference_rate)
+    assert result == expected_result

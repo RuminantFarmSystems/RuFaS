@@ -7,7 +7,7 @@ from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -70,15 +70,15 @@ class LactationCurve:
     _parity_to_std_dev_mapping: dict[int, dict[str, float]] = {}
 
     @classmethod
-    def set_lactation_parameters(cls, time: Time) -> None:
+    def set_lactation_parameters(cls, time: RufasTime) -> None:
         """
         Calculates Wood's lactation curve parameters, adjusted based on the location, production, and management
         practices of the farm being simulated.
 
         Parameters
         ----------
-        time : Time
-            Time instance that manages time in the simulation.
+        time : RufasTime
+            RufasTime instance that manages time in the simulation.
 
         """
         im = InputManager()
@@ -123,7 +123,7 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map: dict[str, Any] = {"class": cls.__class__.__name__, "function": "__init__"}
+        info_map: dict[str, Any] = {"class": cls.__name__, "function": "__init__"}
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             cls._om.add_log(
@@ -146,11 +146,13 @@ class LactationCurve:
                 cls._om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
     @classmethod
-    def _get_year_adjustments(cls, year_adjustment_values: dict[str, dict[str, float]], time: Time) -> dict[str, float]:
+    def _get_year_adjustments(
+        cls, year_adjustment_values: dict[str, dict[str, float]], time: RufasTime
+    ) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
         end_year = time.end_date.year
 
-        info_map = {"class": cls.__class__.__name__, "function": cls._get_year_adjustments.__name__}
+        info_map = {"class": cls.__name__, "function": cls._get_year_adjustments.__name__}
         if not 2006 <= end_year <= 2016:
             bounded_end_year = min(2016, max(2006, end_year))
             cls._om.add_warning(
@@ -191,6 +193,10 @@ class LactationCurve:
     ) -> dict[str, float]:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
+
+        Notes
+        -----
+        Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
 
         Parameters
         ----------
@@ -255,7 +261,11 @@ class LactationCurve:
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         parity_1_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["1"]
         parity_2_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["2"]
-        parity_3_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["3"]
+        parity_3_percentage: float = (
+            animal_inputs["herd_information"]["parity_fractions"]["3"]
+            + animal_inputs["herd_information"]["parity_fractions"]["4"]
+            + animal_inputs["herd_information"]["parity_fractions"]["5"]
+        )
         parity_2_milk_yield_adjustment: float = lactation_curve_inputs["parity_milk_yield_adjustments"][
             "parity_2_305_day_milk_yield_adjustment"
         ]
@@ -296,6 +306,11 @@ class LactationCurve:
         """
         Calculates the 305-day milk yield for each lactation group based on total farm milk production.
 
+        Notes
+        -----
+        Herd average 305-day milk yield: [AN.MLK.4]
+        Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
+
         Parameters
         ----------
         annual_milk_yield : float
@@ -331,7 +346,7 @@ class LactationCurve:
                 f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and "
                 f"{PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS} as the fractions of parity 1, 2 and 3+ cows in the "
                 "milking herd, respectively",
-                {"class": cls.__class__.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
+                {"class": cls.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
             )
             parity_1_frac = PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
@@ -342,7 +357,7 @@ class LactationCurve:
                 f" difference is within the accepted tolerance of {ACCEPTABLE_PARITY_FRACTION_ERROR}",
                 f"Will use {parity_1_frac}, {parity_2_frac} and {parity_3_frac} as the fractions of parity 1, 2, and 3+"
                 " cows in the milking herd, respectively.",
-                {"class": cls.__class__.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
+                {"class": cls.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
             )
 
         parity_1_305_day_milk_yield = milk_yield_305_day / (
@@ -370,6 +385,10 @@ class LactationCurve:
     ) -> float:
         """
         Modifies Wood's l parameter to best fit a given 305 day milk yield.
+
+        Notes
+        -----
+        [AN.MLK.8]
 
         Parameters
         ----------
@@ -400,7 +419,7 @@ class LactationCurve:
                     f"Captured warning during optimization of type {warning.category.__name__}",
                     f"{warning.message}. Warning generated in {warning.filename}",
                     {
-                        "class": cls.__class__.__name__,
+                        "class": cls.__name__,
                         "function": cls._fit_wood_l_param_to_milk_yield.__name__,
                         "full_warning": warning,
                     },

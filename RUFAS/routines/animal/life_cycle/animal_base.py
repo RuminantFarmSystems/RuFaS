@@ -8,7 +8,7 @@ from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHisto
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class AnimalBase:
@@ -29,7 +29,7 @@ class AnimalBase:
         AnimalBase.config["ration"] = im.get_data("animal.ration")
 
     @classmethod
-    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+    def setup_lactation_curve_parameters(cls, time: RufasTime) -> None:
         """Initializes the LactationCurve class attribute."""
         cls.lactation_curve = LactationCurve(time)
 

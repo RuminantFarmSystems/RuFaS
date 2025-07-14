@@ -10,11 +10,11 @@ from RUFAS.routines.manure.constants_and_units.manure_constants import ManureCon
 
 class GasEmissionsCalculator:
     @classmethod
-    def methane_emission_from_slurry_storage(
+    def calculate_liquid_storage_methane(
         cls,
         accumulated_liquid_manure_total_degradable_volatile_solids: float,
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
-        temp: float = GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+        stored_manure_temperature: float,
     ) -> Tuple[float, float]:
         """
         Calculate the methane emission from manure storage using total volatile solids.
@@ -54,9 +54,8 @@ class GasEmissionsCalculator:
             Total degradable volatile solids in manure (kg).
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
             Total non-degradable volatile solids in manure (kg).
-        temp : float
-            Temperature in Celsius (:math:`^\\circ C`). Default is set to 20 degrees Celsius. This value is
-            listed as :attr:`DEFAULT_SLURRY_STORAGE_TEMPERATURE` in :class:`GasEmissionConstants`.
+        stored_manure_temperature : float
+            Temperature of the manure in storage in Celsius (:math:`^\\circ C`).
 
         Returns
         -------
@@ -76,7 +75,7 @@ class GasEmissionsCalculator:
                 f"{accumulated_liquid_manure_total_degradable_volatile_solids}"
             )
 
-        arrhenius_exponent = cls._arrhenius_exponent(temp)
+        arrhenius_exponent = cls._arrhenius_exponent(stored_manure_temperature)
 
         methane_emission_from_degradable_volatile_solids = (
             GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR
@@ -448,18 +447,18 @@ class GasEmissionsCalculator:
         return max(0.0, total_ammonia_loss)
 
     @classmethod
-    def storage_ammonia_emission(
+    def calculate_liquid_storage_ammonia_emission(
         cls,
         num_animals: int,
         manure_total_ammoniacal_nitrogen: float,
         manure_volume: float,
         manure_density: float,
-        temp: float,
+        storage_temperature: float,
         storage_area_per_animal: float = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
         pH: float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
     ) -> float:
         """
-        Calculate storage ammonia emissions for manure treatments.
+        Calculate storage ammonia emissions for liquidmanure treatments.
 
         Notes
         -----
@@ -555,7 +554,7 @@ class GasEmissionsCalculator:
             Density of the manure (kg/:math:`m^3`).
         total_solids : float
             Total solids present in the manure (kg).
-        temp : float
+        storage_temperature : float
             Current storage area temperature (:math:`^{\\circ}C`).
         storage_area_per_animal : float, optional
             Storage area per animal based on manure treatment type (:math:`m^2`).
@@ -606,7 +605,7 @@ class GasEmissionsCalculator:
             return 0.0
 
         total_storage_area = num_animals * storage_area_per_animal
-        temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
+        temp_kelvin = cls._convert_temperature_celsius_to_kelvin(storage_temperature)
         total_manure_mass = (manure_volume * manure_density) / total_storage_area
         manure_total_ammoniacal_nitrogen_per_area = manure_total_ammoniacal_nitrogen / total_storage_area
         storage_area_resistance = GasEmissionConstants.STORAGE_HSC

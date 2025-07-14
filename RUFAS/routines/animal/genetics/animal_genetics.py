@@ -2,7 +2,8 @@ from numpy import sqrt
 from datetime import date
 
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -22,6 +23,10 @@ BASE_CHANGE_LOOKUP_TABLE = {
 }
 
 
+"""The only breed currently supported in this module is Holsteins."""
+SUPPORTED_BREED: str = "HO"
+
+
 class AnimalGenetics:
     """
     Attributes
@@ -35,6 +40,10 @@ class AnimalGenetics:
 
     net_merit: dict[str, dict[str, dict[str, float]]] = {}
     top_semen: dict[str, dict[str, float]] = {}
+    year_month_of_first_net_merit_value: str
+    year_month_of_last_net_merit_value: str
+    year_month_of_first_top_semen_value: str
+    year_month_of_last_top_semen_value: str
 
     @classmethod
     def initialize_class_variables(cls) -> None:
@@ -44,7 +53,7 @@ class AnimalGenetics:
         top_listing_semen_HO: dict[str, list[str | float]] = im.get_data("animal_top_listing_semen")
 
         cls.net_merit = {
-            "HO": {
+            SUPPORTED_BREED: {
                 net_merit_HO["year_month"][i]: {"average": net_merit_HO["average"][i], "std": net_merit_HO["std"][i]}
                 for i in range(len(net_merit_HO["year_month"]))
             }
@@ -52,16 +61,22 @@ class AnimalGenetics:
         cls.net_merit = cls.net_merit_base_change(cls.net_merit)
         cls.net_merit = cls.net_merit_fill_gap(cls.net_merit)
 
+        cls.year_month_of_first_net_merit_value = min(cls.net_merit[SUPPORTED_BREED].keys())
+        cls.year_month_of_last_net_merit_value = max(cls.net_merit[SUPPORTED_BREED].keys())
+
         cls.top_semen = {
-            "HO": {
+            SUPPORTED_BREED: {
                 top_listing_semen_HO["year_month"][i]: top_listing_semen_HO["estimated_PTA"][i]
                 for i in range(len(top_listing_semen_HO["year_month"]))
             }
         }
 
+        cls.year_month_of_first_top_semen_value = min(cls.top_semen[SUPPORTED_BREED].keys())
+        cls.year_month_of_last_top_semen_value = max(cls.top_semen[SUPPORTED_BREED].keys())
+
     @staticmethod
     def net_merit_base_change(
-        original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]],
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         This function performs the base change for the net merit data.
@@ -112,7 +127,7 @@ class AnimalGenetics:
 
     @staticmethod
     def net_merit_fill_gap(
-        original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]],
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         The input net merit data only has three entries per year, this function fills in the gap in between entries by
@@ -197,19 +212,20 @@ class AnimalGenetics:
         of the net merit value, then generates a random value from the distribution as the net merit value.
         """
         birth_year_month = birth_date[:7]
+        birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=True)
         average = AnimalGenetics.net_merit[breed][birth_year_month]["average"]
         std = AnimalGenetics.net_merit[breed][birth_year_month]["std"]
         return Utility.generate_random_number(average, std)
 
     @staticmethod
-    def assign_net_merit_value_to_newborn_calf(time: Time, breed: str, dam_net_merit_value: float) -> float:
+    def assign_net_merit_value_to_newborn_calf(time: RufasTime, breed: str, dam_net_merit_value: float) -> float:
         """
         This function calculates the net merit value for the newborn calves.
 
         Parameters
         ----------
-        time: Time
-            The Time instance that contains the birthdate of the newborn calf.
+        time: RufasTime
+            The RufasTime instance that contains the birthdate of the newborn calf.
             This function will be called on the day of birth for the newborn calf; therefore, the current date will be
             the birthdate of the calf.
         breed: str
@@ -231,7 +247,62 @@ class AnimalGenetics:
         population variance.
         """
         birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
-        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][birth_year_month]
+        net_merit_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
+            birth_year_month, is_for_net_merit=True
+        )
+        top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
+            birth_year_month, is_for_net_merit=False
+        )
+        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][top_semen_birth_year_month]
         average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
-        variance = ((AnimalGenetics.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
+        variance = ((AnimalGenetics.net_merit[breed][net_merit_birth_year_month]["std"]) ** 2) / 2
         return Utility.generate_random_number(average_net_merit, sqrt(variance))
+
+    @staticmethod
+    def _clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool) -> str:
+        """
+        Checks if the birth month of an animal is available in either the net merit or top semen data, and clamps the
+        month to the earliest or latest date if the date is not available.
+
+        Parameters
+        ----------
+        birth_year_month : str
+            The year and month of an animal's birth, in the format "YYYY-MM".
+        is_for_net_merit : bool
+            True if the birth month is being checked against the net merit data, False if it is being checked against
+            the top semen data.
+
+        Returns
+        -------
+        str
+            The birth month of the animal, clamped between the earliest and latest dates available.
+
+        """
+        if is_for_net_merit:
+            earliest_date = AnimalGenetics.year_month_of_first_net_merit_value
+            latest_date = AnimalGenetics.year_month_of_last_net_merit_value
+            data_type = "net merit"
+        else:
+            earliest_date = AnimalGenetics.year_month_of_first_top_semen_value
+            latest_date = AnimalGenetics.year_month_of_last_top_semen_value
+            data_type = "top semen"
+        is_birth_date_in_range = earliest_date <= birth_year_month <= latest_date
+        if not is_birth_date_in_range:
+            clamped_birth_year_month = min(max(earliest_date, birth_year_month), latest_date)
+            om = OutputManager()
+            info_map = {
+                "class": AnimalGenetics.__class__.__name__,
+                "function": AnimalGenetics._clamp_birth_year_month_in_data_range.__name__,
+                "birth_year_month": birth_year_month,
+                "date_of_earliest_data": earliest_date,
+                "date_of_latest_data": latest_date,
+                "type_of_genetic_data": data_type,
+            }
+            om.add_error(
+                "Animal birthdate out of range for animal genetics data",
+                f"No {data_type} data for {birth_year_month}, using data from closest available date: "
+                f"{clamped_birth_year_month}",
+                info_map,
+            )
+            birth_year_month = clamped_birth_year_month
+        return birth_year_month

@@ -1,16 +1,20 @@
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
-from .enums import CropCategory
-from .harvested_crop import HarvestedCrop
 from .storage import Storage
+from RUFAS.input_manager import InputManager
 
 """
-This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
+This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
 Documentation equation 1.2.6.
 """
-FINAL_MOISTURE_FRACTION = 0.12
+FINAL_MOISTURE_PERCENTAGE = 12
+
+"""Number of days after a hayed crop is stored during which it experiences increased dry matter and moisture loss."""
+INITIAL_LOSS_PERIOD = 30
 
 """
 These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
@@ -21,28 +25,27 @@ PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
 UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 
-# TODO: remove this default as part of issue #1960
-DEFAULT_BALE_DIAMETER = 1.5
-
-
 class Hay(Storage):
     """
     Represents a Hay storage subclass of Storage.
 
     Attributes
     ----------
-    bale_density : float
-        Density of the hay bale calculated based on its moisture content.
     bale_size : float
         Diameter of the hay bale in meters.
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
 
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss in the hay.
+
     """
 
     def __init__(self, capacity: float = float("inf")) -> None:
+        im = InputManager()
+        self.bale_size: float = im.get_data("feed_management.hay_bale_diameter")
         super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
@@ -51,20 +54,28 @@ class Hay(Storage):
         ]
         self.additional_dry_matter_loss_coefficient = 0.0
 
-    @property
-    def bale_size(self) -> float:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
-        Return the size (diameter) of the hay bale.
+        Processes the loss of moisture in hayed crops, and calls the base class's implementation of
+        `process_degradations` to process the loss of dry matter.
 
-        Returns
-        -------
-        float
-            The diameter of the hay bale (meters).
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
+
         """
-        return DEFAULT_BALE_DIAMETER
+        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
+        total_dry_mass = sum([crop.dry_matter_mass for crop in self.stored])
+        total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
+        self.crude_protein_loss_coefficient = 0.4 * total_crude_protein / total_dry_mass
+
+        super().process_degradations(weather, time)
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: RufasTime
     ) -> float:
         """
         Calculates the base amount of gaseous dry matter lost in a hayed crop.
@@ -75,8 +86,14 @@ class Hay(Storage):
             The hayed crop to process dry matter loss in.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
+            (kg).
 
         References
         ----------
@@ -103,7 +120,7 @@ class Hay(Storage):
 
         return current_loss - processed_loss + additional_loss
 
-    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: RufasTime) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
 
@@ -111,8 +128,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -125,21 +142,23 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_in_window = min(days_stored, 30)
-        fraction_of_total_loss = days_in_window / 30
+        days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
+        fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
-        dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        moisture_fraction = 1 - dry_fraction
+        initial_moisture_percentage = 100 - crop.initial_dry_matter_percentage
 
         numerator = crop.total_sensible_heat_generated + 2433 * (
-            moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
+            initial_moisture_percentage
+            - (FINAL_MOISTURE_PERCENTAGE * crop.initial_dry_matter_percentage) / (1 - FINAL_MOISTURE_PERCENTAGE)
         )
-        denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+        denominator = crop.initial_dry_matter_percentage * (
+            14206 - 2433 * FINAL_MOISTURE_PERCENTAGE / (1 - FINAL_MOISTURE_PERCENTAGE)
+        )
 
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
-    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: RufasTime) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
 
@@ -147,8 +166,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -161,7 +180,7 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_past_30_day_window = max(0, days_stored - 30)
+        days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
 
@@ -212,7 +231,8 @@ class ProtectedIndoors(Hay):
     Represents protected indoors hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
 
 
 class ProtectedWrapped(Hay):
@@ -249,4 +269,3 @@ class Unprotected(Hay):
         super().__init__(capacity)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
-        self.crude_protein_loss_coefficient = 0.4

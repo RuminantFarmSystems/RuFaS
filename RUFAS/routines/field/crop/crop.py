@@ -1,29 +1,27 @@
 from __future__ import annotations
 
-from copy import copy
-from typing import Any, Optional
+from typing import Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.heat_units import HeatUnits
 from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
-from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
+from RUFAS.routines.field.crop.phosphorus_uptake import PhosphorusUptake
 from RUFAS.routines.field.crop.root_development import RootDevelopment
-from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class Crop:
@@ -49,9 +47,9 @@ class Crop:
         Process component controlling plant water dynamics.
     _water_uptake : WaterUptake
         Process component controlling water uptake from soil.
-    _nitrogen_incorporation : NitrogenIncorporation
+    _nitrogen_uptake : NitrogenUptake
         Process component controlling plant nitrogen incorporation, including uptake and fixation.
-    _phosphorus_incorporation : PhosphorusIncorporation
+    _phosphorus_uptake : PhosphorusUptake
         Process component controlling plant phosphorus uptake and incorporation.
     _heat_units : HeatUnits
         Process component controlling plant heat accumulation.
@@ -79,8 +77,8 @@ class Crop:
         self._biomass_allocation = BiomassAllocation(self._data)
         self._water_dynamics = WaterDynamics(self._data)
         self._water_uptake = WaterUptake(self._data)
-        self._nitrogen_incorporation = NitrogenIncorporation(self._data)
-        self._phosphorus_incorporation = PhosphorusIncorporation(self._data)
+        self._nitrogen_uptake = NitrogenUptake(self._data)
+        self._phosphorus_uptake = PhosphorusUptake(self._data)
         self._heat_units = HeatUnits(self._data)
         self._leaf_area_index = LeafAreaIndex(self._data)
         self._root_development = RootDevelopment(self._data)
@@ -92,8 +90,43 @@ class Crop:
         """Provides access to the CropData object."""
         return self._data
 
+    @property
+    def growth_constraints(self) -> GrowthConstraints:
+        """Provides access to the GrowthConstraints object."""
+        return self._growth_constraints
+
+    @property
+    def biomass_allocation(self) -> BiomassAllocation:
+        """Provides access to the BiomassAllocation object."""
+        return self._biomass_allocation
+
+    @property
+    def nitrogen_uptake(self) -> NitrogenUptake:
+        """Provides access to the NitrogenUptake object."""
+        return self._nitrogen_uptake
+
+    @property
+    def leaf_area_index(self) -> LeafAreaIndex:
+        """Provides access to the LeafAreaIndex object."""
+        return self._leaf_area_index
+
+    @property
+    def water_dynamics(self) -> WaterDynamics:
+        """Provides access to the WaterDynamics object."""
+        return self._water_dynamics
+
+    @property
+    def crop_management(self) -> CropManagement:
+        """Provides access to the CropManagement object."""
+        return self._crop_management
+
+    @property
+    def phosphorus_incorporation(self) -> PhosphorusUptake:
+        """Provides access to the PhosphorusUptake object."""
+        return self._phosphorus_uptake
+
     def perform_daily_crop_update(
-        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
+        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData, time: RufasTime
     ) -> None:
         """
         Updates the crop for the current day.
@@ -115,9 +148,9 @@ class Crop:
             current_conditions.min_air_temperature,
             current_conditions.max_air_temperature,
         )
-        self._root_development.develop_roots()
-        self._nitrogen_incorporation.incorporate_nitrogen(soil_data)
-        self._phosphorus_incorporation.incorporate_phosphorus(soil_data)
+        self._root_development.develop_roots(time)
+        self._nitrogen_uptake.uptake(soil_data)
+        self._phosphorus_uptake.uptake(soil_data)
         self._growth_constraints.constrain_growth(
             self._data.max_transpiration,
             current_conditions.mean_air_temperature,
@@ -146,7 +179,7 @@ class Crop:
         """
 
         if self._data.in_growing_season:
-            self._water_uptake.uptake_water(soil_data)
+            self._water_uptake.uptake(soil_data)
             self._water_dynamics.cycle_water(
                 actual_evaporation,
                 self._data.water_uptake,
@@ -158,36 +191,29 @@ class Crop:
             self._data.cumulative_potential_evapotranspiration = 0.0
             self._data.cumulative_water_uptake = 0.0
 
-    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple[float, float]:
+    def handle_water_in_canopy(self, available_precipitation: float) -> float:
         """
         Handles the water addition to the crop's canopy and calculates excess water.
 
         Parameters
         ----------
-        precipitation_reaching_soil : float
+        available_precipitation : float
             Amount of water available to reach the soil after considering other crops (mm).
 
         Returns
         -------
         tuple
-            A tuple containing:
-                - Amount of precipitation that reaches the soil after this crop (float)
-                - Excess water that could not be stored in the canopy (float)
+            Amount of precipitation that reaches the soil after this crop (mm).
         """
         canopy_water_excess_capacity = self._data.water_canopy_storage_capacity - self._data.canopy_water
 
-        excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
-        if excess_water_in_canopy != 0.0:
-            self._data.canopy_water = self._data.water_canopy_storage_capacity
-
         water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
-        water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
+        water_taken_to_be_stored = min(available_precipitation, water_taken_to_be_stored)
         self._data.canopy_water += water_taken_to_be_stored
 
-        precipitation_reaching_soil -= water_taken_to_be_stored
-        excess_canopy_water = -1 * excess_water_in_canopy
+        precipitation_reaching_soil = available_precipitation - water_taken_to_be_stored
 
-        return precipitation_reaching_soil, excess_canopy_water
+        return precipitation_reaching_soil
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
         """Wrapper for the canopy evaporation routine."""
@@ -203,10 +229,9 @@ class Crop:
         harvest_op: HarvestOperation,
         field_name: str,
         field_size: float,
-        time: Time,
+        time: RufasTime,
         soil_data: SoilData,
-        feed_manager: FeedManager,
-    ) -> None:
+    ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -217,14 +242,18 @@ class Crop:
             The name of the field that contains this crop.
         field_size : float
             Size of the field that contains this crop (ha)
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
-        feed_manager : FeedManager
-            Instance of the FeedManager that receives harvested crops.
+
+        Returns
+        -------
+        HarvestedCropStorageType | None
+            Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
+
         """
-        self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
+        return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""
@@ -281,9 +310,8 @@ class Crop:
     def create_crop(
         cls,
         crop_reference: str,
-        custom_crop_specifications: dict[str, dict[str, Any]],
         use_heat_scheduled_harvesting: bool,
-        time: Time,
+        time: RufasTime,
     ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.
@@ -292,11 +320,9 @@ class Crop:
         ----------
         crop_reference : str
             The reference for the crop to be planted.
-        custom_crop_specifications : dict[str, dict[str, Any]]
-            Dictionary of custom crop specifications, if any.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -304,34 +330,20 @@ class Crop:
         Crop
             A fully initialized Crop instance.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is for a custom crop that does not exist in the specifications.
-
         Notes
         -----
         This method starts by trying to determine if the crop is of a supported species, if so it passes
         it to the supported crop creation method. If not, it passes it to the custom crop creation method.
+
         """
-        supported_species = set(item.value for item in CropSpecies)
-        if crop_reference in supported_species:
-            crop = cls.make_supported_crop(crop_reference)
-        else:
-            try:
-                crop_specifications = copy(custom_crop_specifications[crop_reference])
-            except KeyError:
-                raise KeyError(
-                    f"Expected to have crop specification for '{crop_reference}', "
-                    f"received specifications for '{tuple(custom_crop_specifications.keys())}' crop types."
-                )
-            crop = cls().make_crop_from_config_dict(crop_specifications)
+        crop_data = CropDataFactory.create_crop_data(crop_reference)
+        crop = Crop(crop_data=crop_data)
 
         crop.set_crop_planting_attributes(crop_reference, use_heat_scheduled_harvesting, time)
         return crop
 
     def set_crop_planting_attributes(
-        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time
+        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: RufasTime
     ) -> None:
         """
         Initializes the crop's attributes related to planting.
@@ -342,7 +354,7 @@ class Crop:
             The reference for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
         """
         self._data.use_heat_scheduling = use_heat_scheduled_harvesting
@@ -350,76 +362,13 @@ class Crop:
         self._data.planting_year = time.current_calendar_year
         self._data.planting_day = time.current_julian_day
 
-    def make_crop_from_config_dict(self, config: dict[str, Any]) -> Crop:
+    def update_crop_max_root_depth(self, bottom_layer_depth: float) -> None:
         """
-        Initialize a new crop from a configuration dictionary.
+        Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
+        user-provided maximum rooting depth is greater than the bottom of the soil profile
 
         Parameters
         ----------
-        config : dict[str, Any]
-            A dictionary containing specifications for the crop to be initialized.
 
-        Details
-        -------
-        If the "species" key is present in the dictionary, that value is checked against the supported
-        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-        created (with 'custom' prepended to the species name, if given).
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
         """
-        if "species" in config.keys():
-            accepted_species = set(item.value for item in CropSpecies)
-            species = config.pop("species")
-
-            if species in accepted_species:
-                return self.make_supported_crop(species=species, **config)
-            else:
-                config["species"] = "custom " + str(species)
-
-        return self._make_custom_crop(**config)
-
-    @staticmethod
-    def make_supported_crop(species: str, **specs: dict[str, Any]) -> Crop:
-        """
-        Create a crop instance with attributes determined by the species of the crop.
-
-        Parameters
-        ----------
-        species : str
-            One of the supported species.
-        **specs : dict[str, Any] optional
-            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
-
-        Details
-        -------
-        Species attributes are read from species configuration files/classes. This method of creating a crop
-        does not allow for customizing crop values. It is limited to creating the default crops supported by the
-        CropSpecies Enum.
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-        crop_species = CropSpecies(species)
-        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
-        return Crop(crop_data)
-
-    @staticmethod
-    def _make_custom_crop(**specs) -> Crop:
-        """creates a crop instance with customized attributes.
-
-        Parameters
-        ----------
-        **specs
-            an optional set of arguments, passed to CropData that customizes the crop species.
-
-        Details
-        -------
-        This method can be used to create a new ('unsupported') crop species/type.
-        """
-        crop_data = CropData(**specs)
-        return Crop(crop_data)
+        self.data.max_root_depth = min(bottom_layer_depth, self.data.max_root_depth)

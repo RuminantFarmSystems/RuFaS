@@ -1,16 +1,17 @@
 import pytest
 
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(
     "nutrients,expected_result",
     [
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=50.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=100,
                 phosphorus=40.909,
@@ -20,7 +21,9 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=40.0, manure_type=ManureType.SOLID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=40.0, manure_type=ManureType.SOLID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=80.0005924,
                 phosphorus=40.0,
@@ -30,7 +33,9 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.SOLID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.SOLID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=100.0,
                 phosphorus=49.99962972,
@@ -40,7 +45,9 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=0.0, phosphorus=33.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=0.0, phosphorus=33.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=80.66684202,
                 phosphorus=33.0,

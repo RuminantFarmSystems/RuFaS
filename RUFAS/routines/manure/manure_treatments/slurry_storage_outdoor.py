@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -21,19 +21,19 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     Attributes:
         All attributes inherited from BaseManureTreatment.
         In addition, the following attributes are defined:
-        storage_time_period: Time in days that the manure is stored in the manure
+        storage_time_period: RufasTime in days that the manure is stored in the manure
             treatment system, days.
         freeboard_input: Empty storage space above the manure in the treatment system.
             onto the treatment system.
 
     """
 
-    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
             weather: A Weather object.
-            time: A Time object.
+            time: A RufasTime object.
             manure_treatment_config: A ManureTreatmentConfig object containing
                 the configuration data for the manure treatment system.
         """
@@ -229,15 +229,16 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             (kg :math:`CH_4`/day).
 
         """
-        temperature_celsius = self._get_current_day_average_temperature_celsius()
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = (
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
                 accumulated_liquid_manure_total_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_degradable_volatile_solids),
                 accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_non_degradable_volatile_solids),
-                temp=temperature_celsius,
+                stored_manure_temperature=stored_manure_temperature,
             )
         )
         # fmt: on
@@ -268,12 +269,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The ammonia emission from the outdoor slurry storage in kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        ammonia_loss = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals=num_animals,
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            temp=self._get_current_day_average_temperature_celsius(),
+            storage_temperature=storage_temperature,
         )
 
         return ammonia_loss

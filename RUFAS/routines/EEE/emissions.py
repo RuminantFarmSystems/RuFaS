@@ -4,34 +4,8 @@ from typing import Any, Literal
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-CROP_SPECIES_TO_PURCHASED_FEED_ID = {
-    CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],
-    CropSpecies.ALFALFA_SILAGE: ["104", "109", "110"],
-    CropSpecies.ALFALFA_BALEAGE: [],
-    CropSpecies.CEREAL_RYE_HAY: [],
-    CropSpecies.CEREAL_RYE_GRAIN: [],
-    CropSpecies.CEREAL_RYE_SILAGE: ["144"],
-    CropSpecies.CEREAL_RYE_BALEAGE: [],
-    CropSpecies.CORN_GRAIN: ["40", "43", "44", "46", "47"],
-    CropSpecies.CORN_SILAGE: ["50", "51", "52"],
-    CropSpecies.SOYBEAN_HAY: [],
-    CropSpecies.SOYBEAN_GRAIN: ["169", "170"],
-    CropSpecies.TALL_FESCUE_HAY: ["18", "88", "89", "94", "95", "99"],
-    CropSpecies.TALL_FESCUE_SILAGE: ["91", "97", "100"],
-    CropSpecies.TALL_FESCUE_BALEAGE: [],
-    CropSpecies.TRITICALE_HAY: [],
-    CropSpecies.TRITICALE_GRAIN: [],
-    CropSpecies.TRITICALE_SILAGE: ["187"],
-    CropSpecies.TRITICALE_BALEAGE: [],
-    CropSpecies.WINTER_WHEAT_HAY: ["200"],
-    CropSpecies.WINTER_WHEAT_GRAIN: ["194"],
-    CropSpecies.WINTER_WHEAT_SILAGE: ["198"],
-    CropSpecies.WINTER_WHEAT_BALEAGE: ["195"],
-}
 
 SLICE_START = -365
 SLICE_END = -364
@@ -48,9 +22,28 @@ EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR: float = 1.30
 
 
 class EmissionsEstimator:
+    """
+    Estimates emissions associated with purchased feeds used for animals.
+
+    Attributes
+    ----------
+    im : InputManager
+        An instance of the InputManager class.
+    om : OutputManager
+        An instance of the OutputManager class.
+    crop_species_to_purchased_feed_id : dict[str, list[str]]
+        A dictionary mapping crop species to their corresponding RuFaS feed IDs.
+
+    """
+
     def __init__(self) -> None:
         self.im = InputManager()
         self.om = OutputManager()
+
+        crop_configurations: list[dict[str, Any]] = self.im.get_data("crop_configurations.crop_configurations")
+        self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {
+            config["name"]: [str(rufas_id) for rufas_id in config["rufas_ids"]] for config in crop_configurations
+        }
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
@@ -91,17 +84,17 @@ class EmissionsEstimator:
         simulation.
         """
         time_filter = {
-            "name": "Time Filter",
+            "name": "RufasTime Filter",
             "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
             "which crop yields and nutrient applications to estimate emissions for.",
-            "filters": ["Time.(day|calendar_year)"],
+            "filters": ["RufasTime.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
         }
         date_variables = self.om.filter_variables_pool(time_filter)
-        day_cutoff = date_variables["Time.day"]["values"][0]
-        year_cutoff = date_variables["Time.calendar_year"]["values"][0]
-        date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
+        day_cutoff = date_variables["RufasTime.day"]["values"][0]
+        year_cutoff = date_variables["RufasTime.calendar_year"]["values"][0]
+        date_cutoff = RufasTime.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
 
         filters: dict[str, dict[str, Any]] = {
             "homegrown feeds filter": {
@@ -198,7 +191,7 @@ class EmissionsEstimator:
         actual_purchased_feeds = {}
         for feed_id, amount in purchased_feeds.items():
             homegrown_alternatives = [
-                crop for crop in homegrown_totals.keys() if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
+                crop for crop in homegrown_totals.keys() if feed_id in self.crop_species_to_purchased_feed_id[crop]
             ]
 
             for homegrown_alternative in homegrown_alternatives:
@@ -213,9 +206,9 @@ class EmissionsEstimator:
 
     def _calculate_total_homegrown_feed_amounts_by_crop_type(
         self, homegrown_feeds: list[dict[str, Any]]
-    ) -> dict[CropSpecies, float]:
+    ) -> dict[str, float]:
         """Calculates the total amount of each crop species grown on the farm."""
-        homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
+        homegrown_totals = {key: 0.0 for key in list(self.crop_species_to_purchased_feed_id)}
         for crop_species in homegrown_totals:
             yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
             homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
@@ -490,9 +483,9 @@ class EmissionsEstimator:
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
 
         for fertilizer_application in filtered_fertilizers:
-            fertilizer_application_date = Time.convert_year_jday_to_date(
+            fertilizer_application_date = RufasTime.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
-            )
+            ).date()
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
             applied = False
 
@@ -565,7 +558,7 @@ class EmissionsEstimator:
         processed_data = self._transform_outputs_to_list_of_dicts(filtered_pools)
         return list(
             filter(
-                lambda app: Time.convert_year_jday_to_date(app[year_key], app[day_key]) >= date_cutoff,
+                lambda app: RufasTime.convert_year_jday_to_date(app[year_key], app[day_key]).date() >= date_cutoff,
                 processed_data,
             )
         )
@@ -613,12 +606,12 @@ class EmissionsEstimator:
         Returns True if fertilizer was applied, False otherwise.
         """
         for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
+            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             next_crop_exists = index + 1 < len(sorted_crops)
 
             if next_crop_exists:
                 next_crop = sorted_crops[index + 1]
-                next_crop_planting_date = Time.convert_year_jday_to_date(
+                next_crop_planting_date = RufasTime.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
                 ).date()
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
@@ -658,8 +651,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
+            crop_planting_date = RufasTime.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
+            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops

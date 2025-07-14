@@ -3,14 +3,6 @@ from math import exp, log
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.field.crop_and_soil_constants import (
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    KILOGRAMS_TO_MILLIGRAMS,
-    MEGAGRAMS_TO_KILOGRAMS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
 
 
 @dataclass
@@ -230,20 +222,6 @@ class LayerData:
         Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
     dinitrogen_emissions : float, default 0.0
         Amount of dinitrogen emitted from this soil layer on the current day (kg/ha).
-    humus_mineralization_rate_factor : float, default 0.0003
-        Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
-        Reference: SWAT Input .BSN file, see "CMN" on page 101.
-    denitrification_rate_coefficient : float, default 1.4
-        Controls the rate of denitrification in this layer of soil (unitless).
-        Note: acceptable values for this attribute are in the range [0.0, 3.0].
-        Reference: SWAT Input .BSN file, see "CDN" on page 101.
-    denitrification_threshold_water_content : float, default 1.10
-        Fraction of field capacity water content above which denitrification takes place (unitless).
-        Reference: SWAT Input .BSN file, see "SDNCO" on page 102.
-    residue_fresh_organic_mineralization_rate : float, default 0.05
-        Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
-        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
-        205).
     ammonium_volatilization_cation_exchange_factor : float, default 0.15
         Exchange factor that accounts for the soil's cation exchange capacity (unitless).
         Reference: SWAT Theoretical documentation eqn. 3:1.3.5.
@@ -374,7 +352,6 @@ class LayerData:
     active_inorganic_phosphorus_content: float = 0
     stable_inorganic_phosphorus_content: float = 0
     fresh_organic_phosphorus_content: float = 0
-    # TODO: organic phosphorus still needs to be implemented - issue #444
 
     active_inorganic_unbalanced_counter: int = 0
     labile_inorganic_unbalanced_counter: int = 0
@@ -415,10 +392,6 @@ class LayerData:
 
     dinitrogen_emissions: float = 0.0
 
-    humus_mineralization_rate_factor: float = 0.0003
-    denitrification_rate_coefficient: float = 1.4
-    denitrification_threshold_water_content: float = 1.10
-    residue_fresh_organic_mineralization_rate: float = 0.05
     ammonium_volatilization_cation_exchange_factor: float = 0.15
 
     ammonia_emissions: float = 0.0
@@ -559,10 +532,10 @@ class LayerData:
         )
 
         initial_active_organic_nitrogen_concentration = (
-            humic_organic_nitrogen_concentration * FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            humic_organic_nitrogen_concentration * GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.3
         initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * (
-            1 - FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            1 - GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.4
 
         self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
@@ -601,9 +574,11 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            self.layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        soil_mass_in_kg = self.bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         self.total_soil_carbon_amount = soil_mass_in_kg * (self.organic_carbon_fraction) / field_size
 
         if self.top_depth == 0:
@@ -751,10 +726,12 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = nutrient_content * field_size * KILOGRAMS_TO_MILLIGRAMS
+        soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        soil_phosphorus_mass_in_mg = nutrient_content * field_size * GeneralConstants.KG_TO_MILLIGRAMS
         return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
@@ -785,10 +762,12 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
+        soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * GeneralConstants.MILLIGRAMS_TO_KG
         return total_nutrient_mass_in_kg / field_size
 
     @property

@@ -16,6 +16,7 @@ jobs:
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
+      unauthorized_files: ${{ steps.unauthorized_files.outputs.unauthorized_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,10 +24,10 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -42,8 +43,9 @@ jobs:
             BASE_BRANCH="dev"
             git fetch origin $BASE_BRANCH
           fi
-          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
-          echo "All Changed Files: $ALL_CHANGED_FILES"
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
 
           MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
           echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
@@ -55,9 +57,26 @@ jobs:
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
+        id: unauthorized_files
         run: |
           paths_to_protect=(
             "input/data/tasks/default_task.json"
+            "input/metadata/default_metadata.json"
+            "input/data/animal/default_animal.json"
+            "input/data/config/default_config.json"
+            "input/data/crop/default_rotation.json"
+            "input/data/crop/no_crop.json"
+            "input/data/EEE/default_costs.json"
+            "input/data/EEE/default_emissions.json"
+            "input/data/feed/default_feed.json"
+            "input/data/feed/default_feed_2.json"
+            "input/data/feed_management/default_feed_management.json"
+            "input/data/fertilizer_schedule/default_fertilizer_schedule.json"
+            "input/data/field/default_field.json"
+            "input/data/manure_schedule/default_manure_schedule.json"
+            "input/data/soil/default_soil.json"
+            "input/data/soil/default_soil_2.json"
+            "input/data/tillage_schedule/default_tillage_schedule.json"
           )
           unauthorized_changes=false
           unauthorized_paths=""
@@ -73,9 +92,10 @@ jobs:
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
-            exit 1
+            echo "unauthorized_files=true" >> $GITHUB_OUTPUT
           else
             echo "No unauthorized changes detected."
+            echo "unauthorized_files=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Record if changelog has been updated
@@ -129,10 +149,10 @@ jobs:
         with:
           ref: ${{ needs.format_code.outputs.pushed_commit_sha }}
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -241,13 +261,15 @@ jobs:
         if: ${{ steps.flake8.outcome == 'failure' }}
         run: |
           echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Check for Pytest Errors
         if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
           echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Comment on Coverage and Mypy Errors
         env:
@@ -280,17 +302,35 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-      - name: Notify User of Missing Changelog Updates
-        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
+      - name: Final Aggregated Check
         run: |
-          if [ -n "$URL" ]; then
-            curl \
+          MESSAGE=""
+          CURRENT_BRANCH="${GITHUB_REF##*/}"
+          echo "Current branch: $CURRENT_BRANCH"
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
+          fi
+          if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
+            MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
+          fi
+          if [ "${{ steps.flake8.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
+          fi
+          if [ "${{ steps.coverage.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Some tests have failed."
+          fi
+      
+          if [ -n "$MESSAGE" ]; then
+            if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
+              curl \
                 -X POST \
-                $URL \
+                "${{ github.event.pull_request.comments_url }}" \
                 -H "Content-Type: application/json" \
                 -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+                --data "{\"body\": \"$MESSAGE\"}"
+            fi
+            echo "$MESSAGE"
             exit 1
+          else
+            echo "All checks passed."
           fi

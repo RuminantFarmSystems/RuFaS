@@ -16,7 +16,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed import Feed
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
@@ -275,6 +275,7 @@ class AnimalModuleReporter:
                 "DMIest_requirement": MeasurementUnits.KILOGRAMS,
                 "avg_BW": MeasurementUnits.KILOGRAMS,
                 "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
             }
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
@@ -993,7 +994,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_end_of_simulation(
-        cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+        cls, life_cycle_manager: LifeCycleManager, time: RufasTime, heiferIIs: List[HeiferII], cows: List[Cow]
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1002,8 +1003,8 @@ class AnimalModuleReporter:
         ----------
         life_cycle_manager : LifeCycleManager
             Instance of LifeCycleManager class.
-        time : Time
-            The Time object with the current time information.
+        time : RufasTime
+            The RufasTime object with the current time information.
         heiferIIs : List[HeiferII]
             The list of HeiferIIs.
         cows : List[Cow]
@@ -1061,7 +1062,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,
         }
         for animal in animals:
@@ -1078,7 +1079,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_heiferIIs_conception_rate.__name__,
         }
         om.add_variable(
@@ -1172,7 +1173,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_cows_conception_rate.__name__,
         }
         om.add_variable(

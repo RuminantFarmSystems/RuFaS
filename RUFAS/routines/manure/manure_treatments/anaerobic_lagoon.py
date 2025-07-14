@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -21,7 +21,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     LAGOON_SLOPE = 2.0
     """The slope of the lagoon (unitless). Default is set to 2.0."""
 
-    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
@@ -44,14 +44,16 @@ class AnaerobicLagoon(BaseManureTreatment):
             (kg :math:`CH_4`/day).
 
         """
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
         # fmt: off
         methane_emission, methane_emission_from_degradable_volatile_solids = (
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
                 accumulated_liquid_manure_total_degradable_volatile_solids=(
                     accumulated_output.liquid_manure_total_degradable_volatile_solids),
                 accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                     accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
-                temp=self._get_current_day_average_temperature_celsius(),
+                stored_manure_temperature=stored_manure_temperature,
             )
         )
         # fmt: on
@@ -76,12 +78,14 @@ class AnaerobicLagoon(BaseManureTreatment):
             Update the `storage_ammonia` attribute of the accumulated output object.
 
         """
-        storage_ammonia_emission = GasEmissionsCalculator.storage_ammonia_emission(
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        storage_ammonia_emission = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
             manure_volume=self._accumulated_output.liquid_manure_daily_volume,
             manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
-            temp=self._get_current_day_average_temperature_celsius(),
+            storage_temperature=storage_temperature,
         )
         daily_output.storage_ammonia = storage_ammonia_emission
 

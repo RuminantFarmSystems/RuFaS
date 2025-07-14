@@ -37,58 +37,44 @@ class MineralizationDecomposition:
         gets transferred to the nitrate and active inorganic pools).
 
         """
-        self._correct_fresh_organic_nitrogen_pools()
+        for layer_num in range(len(self.data.soil_layers)):
 
-        if self.data.soil_layers[0].temperature <= 0:
-            return
+            if self.data.soil_layers[layer_num].temperature <= 0:
+                return
 
-        carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].carbon_residue_amount,
-            self.data.soil_layers[0].fresh_organic_nitrogen_content,
-            self.data.soil_layers[0].nitrate_content,
-        )
-        carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].carbon_residue_amount,
-            self.data.soil_layers[0].fresh_organic_phosphorus_content,
-            self.data.soil_layers[0].labile_inorganic_phosphorus_content,
-        )
+            carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
+                self.data.soil_layers[layer_num].carbon_residue_amount,
+                self.data.soil_layers[layer_num].fresh_organic_nitrogen_content,
+                self.data.soil_layers[layer_num].nitrate_content,
+            )
+            carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
+                self.data.soil_layers[layer_num].carbon_residue_amount,
+                self.data.soil_layers[layer_num].fresh_organic_phosphorus_content,
+                self.data.soil_layers[layer_num].labile_inorganic_phosphorus_content,
+            )
 
-        residue_composition_factor = self._calculate_nutrient_cycling_residue_composition_factor(
-            carbon_nitrogen_ratio, carbon_phosphorus_ratio
-        )
+            residue_composition_factor = self._calculate_nutrient_cycling_residue_composition_factor(
+                carbon_nitrogen_ratio, carbon_phosphorus_ratio
+            )
 
-        decay_rate_constant = self._calculate_decay_rate_constant(
-            self.data.soil_layers[0].residue_fresh_organic_mineralization_rate,
-            residue_composition_factor,
-            self.data.soil_layers[0].nutrient_cycling_temp_factor,
-            self.data.soil_layers[0].nutrient_cycling_water_factor,
-        )
+            decay_rate_constant = self._calculate_decay_rate_constant(
+                self.data.residue_fresh_organic_mineralization_rate,
+                residue_composition_factor,
+                self.data.soil_layers[layer_num].nutrient_cycling_temp_factor,
+                self.data.soil_layers[layer_num].nutrient_cycling_water_factor,
+            )
 
-        fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[0].fresh_organic_nitrogen_content
-        fresh_organic_nitrogen_removed = min(
-            self.data.soil_layers[0].fresh_organic_nitrogen_content,
-            fresh_organic_nitrogen_removed,
-        )
+            fresh_organic_nitrogen_removed = (
+                decay_rate_constant * self.data.soil_layers[layer_num].fresh_organic_nitrogen_content
+            )
+            fresh_organic_nitrogen_removed = min(
+                self.data.soil_layers[layer_num].fresh_organic_nitrogen_content,
+                fresh_organic_nitrogen_removed,
+            )
 
-        self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
-        self.data.soil_layers[0].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
-        self.data.soil_layers[0].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
-
-    def _correct_fresh_organic_nitrogen_pools(self) -> None:
-        """
-        Ensures that no fresh organic nitrogen is kept in subsurface pools.
-
-        Notes
-        -----
-        SWAT only simulates fresh organic nitrogen in the surface soil layer. This method ensures that RuFaS transfers
-        any fresh organic nitrogen that makes it below the surface soil layer into the active organic nitrogen pool.
-        This behavior is consistent with the way that sub-surface nitrogen from plant residue is handled in :class
-        CropManagement:.
-
-        """
-        for layer in self.data.soil_layers[1:]:
-            layer.active_organic_nitrogen_content += layer.fresh_organic_nitrogen_content
-            layer.fresh_organic_nitrogen_content = 0.0
+            self.data.soil_layers[layer_num].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
+            self.data.soil_layers[layer_num].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
+            self.data.soil_layers[layer_num].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
 
     # --- Static methods ---
     @staticmethod
@@ -121,10 +107,6 @@ class MineralizationDecomposition:
         The equations for determining the carbon-nitrogen ratio and carbon-phosphorus ratio are identical in structure
         so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
         there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.
-
-        TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58
-            to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
-            for residue in LayerData - issue #481
 
         """
         nutrient_total = organic_nutrient + inorganic_nutrient
