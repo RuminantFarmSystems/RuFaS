@@ -111,8 +111,8 @@ def test_create_consolidated_feed_report(
 
     assert report == expected
 
-def test_project_shrinkage(purchased_feed_storage: PurchasedFeedStorage,
-                           purchased_feed: PurchasedFeed) -> None:
+
+def test_project_shrinkage(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
     """Test that project_shrinkage applies shrink when days_interval > 3 and does not mutate original."""
     purchased_feed.dry_matter_mass = 10.0
     feed_info = MagicMock(NASEMFeed)
@@ -128,8 +128,9 @@ def test_project_shrinkage(purchased_feed_storage: PurchasedFeedStorage,
     assert purchased_feed_storage.stored[0].dry_matter_mass == original_stored[0].dry_matter_mass
 
 
-def test_project_shrinkage_no_shrink(purchased_feed_storage: PurchasedFeedStorage,
-                                     purchased_feed: PurchasedFeed) -> None:
+def test_project_shrinkage_no_shrink(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed
+) -> None:
     """Test that project_shrinkage does not apply shrink when days_interval ≤ 3."""
     purchased_feed.dry_matter_mass = 10.0
     feed_info = MagicMock(NASEMFeed)
@@ -143,8 +144,7 @@ def test_project_shrinkage_no_shrink(purchased_feed_storage: PurchasedFeedStorag
     assert result[0].dry_matter_mass == 10.0
 
 
-def test_project_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage,
-                                 purchased_feed: PurchasedFeed) -> None:
+def test_project_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
     """Test that project_shrinkage raises ValueError when feed_info is missing."""
     purchased_feed.dry_matter_mass = 10.0
     missing_feed_info = MagicMock(NASEMFeed)
@@ -157,9 +157,9 @@ def test_project_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage,
         purchased_feed_storage.project_shrinkage(days_interval=5, available_feeds=available_feeds)
 
 
-def test_process_shrinkage(purchased_feed_storage: PurchasedFeedStorage,
-                           purchased_feed: PurchasedFeed,
-                           time: RufasTime) -> None:
+def test_process_shrinkage(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed, time: RufasTime
+) -> None:
     """Test the function process_shrinkage()."""
     purchased_feed.dry_matter_mass = 10.0
     feed = MagicMock(NASEMFeed)
@@ -173,8 +173,9 @@ def test_process_shrinkage(purchased_feed_storage: PurchasedFeedStorage,
     assert purchased_feed_storage.stored[0].dry_matter_mass == 9.0
 
 
-def test_process_shrinkage_no_shrink(purchased_feed_storage: PurchasedFeedStorage,
-                           purchased_feed: PurchasedFeed) -> None:
+def test_process_shrinkage_no_shrink(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed
+) -> None:
     """Test the function process_shrinkage()."""
     purchased_feed.dry_matter_mass = 10.0
     feed = MagicMock(NASEMFeed)
@@ -189,8 +190,7 @@ def test_process_shrinkage_no_shrink(purchased_feed_storage: PurchasedFeedStorag
     assert purchased_feed_storage.stored[0].dry_matter_mass == 10.0
 
 
-def test_process_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage,
-                           purchased_feed: PurchasedFeed) -> None:
+def test_process_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
     """Test the function process_shrinkage()."""
     purchased_feed.dry_matter_mass = 10.0
     feed = MagicMock(NASEMFeed)

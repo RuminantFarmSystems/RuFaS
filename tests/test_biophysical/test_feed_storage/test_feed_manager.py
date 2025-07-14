@@ -547,8 +547,9 @@ def test_query_available_feed_totals_with_projection(feed_manager: FeedManager, 
     time = MagicMock(RufasTime)
     feed = [PurchasedFeed(1, 1, time), PurchasedFeed(2, 10, time), PurchasedFeed(3, 1, time)]
 
-    result = feed_manager._query_available_feed_totals([1, 2, 3], mock_all_farmgrown_feeds_held,
-                                                       projected_shrunk_storage=feed)
+    result = feed_manager._query_available_feed_totals(
+        [1, 2, 3], mock_all_farmgrown_feeds_held, projected_shrunk_storage=feed
+    )
 
     assert result == expected_feed_totals
 
