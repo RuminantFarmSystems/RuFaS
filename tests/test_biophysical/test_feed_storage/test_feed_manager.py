@@ -911,3 +911,14 @@ def test_process_feed_library(
         },
     }
     get_data.assert_called_once_with(expected)
+
+
+def test_process_shrinkage(feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Any]) -> None:
+    """Tests the function process_shrinkage()."""
+    time = MagicMock(spec=RufasTime)
+    feed_manager._available_feeds = mock_available_feeds
+    mock_process = mocker.patch.object(PurchasedFeedStorage, "process_shrinkage")
+
+    feed_manager.process_shrinkage(time)
+
+    mock_process.assert_called_once()
