@@ -143,7 +143,7 @@ class GraphGenerator:
     def generate_graph(
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
-        graph_details: dict[str, str | list[str]],
+        graph_details: dict[str, Any],
         filter_file_name: str,
         graphics_dir: Path,
         produce_graphics: bool,
