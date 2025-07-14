@@ -51,7 +51,9 @@ class PurchasedFeedStorage:
                 (available_feed for available_feed in available_feeds if available_feed.rufas_id == feed_id), None
             )
             if feed_info is None:
-                raise ValueError(f"Trying to shrink unavailable feed {feed_id} during projection of purchased feed shrinkage.")
+                raise ValueError(
+                    f"Trying to shrink unavailable feed {feed_id} during projection of purchased feed shrinkage."
+                )
             shrink_factor = feed_info.shrink_factor
             if days_interval > 3:
                 feed.dry_matter_mass = feed.dry_matter_mass * (1 - shrink_factor)
