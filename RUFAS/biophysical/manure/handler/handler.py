@@ -217,7 +217,7 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+        if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
             return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
         else:
             if self.use_parlor_flush:

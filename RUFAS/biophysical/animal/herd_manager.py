@@ -388,6 +388,8 @@ class HerdManager:
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
+            if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
+                self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
