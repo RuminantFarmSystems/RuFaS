@@ -14,7 +14,7 @@ from RUFAS.rufas_time import RufasTime
 @pytest.fixture
 def handler() -> ParlorCleaningHandler:
     """Default handler instance."""
-    return ParlorCleaningHandler("handler_name", "PARLOR_CLEANING", 3, 0.8, False)
+    return ParlorCleaningHandler("handler_name", "ParlorCleaning", 3, 0.8, False)
 
 
 def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -> None:

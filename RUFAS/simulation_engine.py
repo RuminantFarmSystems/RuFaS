@@ -18,24 +18,11 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
-"""
-Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
-TODO: remove this constant after Animal and Feed Storage modules are connected - #1878
-"""
-FEED_DEGRADATION_INTERVAL_LENGTH = 15
-
-
 class SimulationEngine:
     """
     The SimulationEngine class is responsible for orchestrating the entire simulation
     process for RuFaS. It manages the simulation's lifecycle, advancing time, executing daily
     and annual routines, and logging simulation progress.
-
-    Parameters
-    ----------
-    is_end_to_end_test_run : bool
-        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-        Indicates if a simulation is being run for end-to-end testing.
 
     Attributes
     ----------
@@ -52,10 +39,6 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
-    is_end_to_end_test_run : bool
-        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-        Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
-        found in the Input Manager.
 
     Methods
     -------
@@ -63,16 +46,13 @@ class SimulationEngine:
         Execute the simulation process.
     """
 
-    def __init__(self, is_end_to_end_test_run: bool) -> None:
+    def __init__(self) -> None:
         """
         Initializes the simulation engine.
         """
         self.om = OutputManager()
         self.im = InputManager()
         self.time = RufasTime()
-
-        # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-        self.is_end_to_end_test_run = is_end_to_end_test_run
 
         self._initialize_simulation()
 
