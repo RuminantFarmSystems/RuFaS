@@ -641,7 +641,7 @@ def test_task(
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
     mocker.patch.object(InputManager, "start_data_processing")
     mocker.patch.object(InputManager, "get_data")
-    task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path('metadata/path'))
+    task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -684,7 +684,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 1, 10, metadata_path=Path('metadata/path'))
+    result = task_manager.task(args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"))
 
     assert result is None
 
@@ -739,8 +739,7 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 2, 10,
-                               metadata_path=Path('metadata/path'))
+    result = task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
     assert result == "test (1)"
 
 
@@ -1568,13 +1567,21 @@ def test_run_tasks(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1,
-        metadata_path=Path("metadata/path")
+        single_run_tasks,
+        produce_graphics=produce_graphics,
+        metadata_depth_limit=metadata_depth_limit,
+        workers=1,
+        metadata_path=Path("metadata/path"),
     )
 
     mock_task_call_list = [
-        call(single_run_task, metadata_path=Path('metadata/path'), produce_graphics=produce_graphics,
-             metadata_depth_limit=metadata_depth_limit, workers=1)
+        call(
+            single_run_task,
+            metadata_path=Path("metadata/path"),
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=1,
+        )
         for single_run_task in single_run_tasks
     ]
     mock_task.assert_has_calls(mock_task_call_list)
@@ -1698,8 +1705,11 @@ def test_run_tasks_fail(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1,
-        metadata_path=Path("metadata/path")
+        single_run_tasks,
+        produce_graphics=produce_graphics,
+        metadata_depth_limit=metadata_depth_limit,
+        workers=1,
+        metadata_path=Path("metadata/path"),
     )
 
     mock_om_init.assert_called_once()
