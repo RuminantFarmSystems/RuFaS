@@ -94,14 +94,14 @@
     "manure_management": {
       "title": "Manure Processor Configurations",
       "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
-      "path": "input/data/manure/manure_processor_configs.json",
+      "path": "input/data/manure/example_freestall_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "manure_processor_connection": {
       "title": "Manure Processor Connections",
       "description": "The connection configs for all manure processors.",
-      "path": "input/data/manure/manure_processor_connections.json",
+      "path": "input/data/manure/example_freestall_processor_connections.json",
       "type": "json",
       "properties": "manure_processor_connection_properties"
     },

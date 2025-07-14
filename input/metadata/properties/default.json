@@ -864,7 +864,7 @@
           "nullable": true
         },
         "first_parlor_processor": {
-          "description": "Name of the parlor cleaning manure handler assigned to this pen. Must be a parlor cleaning handler listed in the manure processors configuration input file  (default file name: manure_processor_configs.json).",
+          "description": "Name of the parlor cleaning manure handler assigned to this pen. Must be a parlor cleaning handler listed in the manure processors configuration input file  (default file name: example_freestall_processor_configs.json).",
           "type": "string",
           "nullable": true
         },
