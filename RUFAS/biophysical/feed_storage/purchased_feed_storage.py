@@ -1,7 +1,8 @@
-from dataclasses import dataclass
+from copy import deepcopy
+from dataclasses import dataclass, replace
 from datetime import date
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, NRCFeed, NASEMFeed
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.rufas_time import RufasTime
@@ -40,6 +41,63 @@ class PurchasedFeedStorage:
     def __init__(self) -> None:
         self.stored: list[PurchasedFeed] = []
         self._om = OutputManager()
+
+    def project_shrinkage(
+            self,
+            days_interval: int,
+            available_feeds: list[NASEMFeed | NRCFeed]
+    ) -> list[PurchasedFeed]:
+        """
+        Projects the state of purchased feeds at a given future date,
+        without mutating self.stored.
+
+        Parameters
+        ----------
+        days_interval: int
+            Days to project.
+        available_feeds : list[NASEMFeed | NRCFeed]
+            List of feed metadata to look up shrink factors.
+
+        Returns
+        -------
+        list[PurchasedFeed]
+            Cloned feeds in their projected post‑shrinkage state.
+        """
+        projected_feeds: list[PurchasedFeed] = []
+
+        for feed in self.stored:
+            feed_info = next(
+                (af for af in available_feeds if af.rufas_id == feed.rufas_id),
+                None
+            )
+            if feed_info is None:
+                raise ValueError(
+                    f"Trying to shrink unavailable feed {feed.rufas_id}."
+                )
+            if days_interval > 3:
+                new_dm = feed.dry_matter_mass * (1 - feed_info.shrink_factor)
+                new_feed = replace(feed, dry_matter_mass=new_dm)
+            else:
+                new_feed = replace(feed)
+
+            projected_feeds.append(new_feed)
+
+        return projected_feeds
+
+    def process_shrinkage(self, time: RufasTime, available_feeds: list[NASEMFeed | NRCFeed]) -> None:
+        """Process the shrinkage of purchased feed."""
+        for feed in self.stored:
+            feed_id = feed.rufas_id
+            feed_info = next(
+                (available_feed for available_feed in available_feeds if available_feed.rufas_id == feed_id), None
+            )
+            if feed_info is None:
+                raise ValueError(f"Trying to shrink unavailable feed {feed_id} during purchased feed shrinkage.")
+
+            shrink_factor = feed_info.shrink_factor
+            delta = time.current_date.date() - feed.storage_time
+            if delta.days > 3:
+                feed.dry_matter_mass = feed.dry_matter_mass * (1 - shrink_factor)
 
     def receive_feed(self, purchased_feed: PurchasedFeed) -> None:
         self.stored.append(purchased_feed)

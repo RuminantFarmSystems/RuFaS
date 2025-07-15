@@ -1,10 +1,13 @@
+from copy import deepcopy
 from dataclasses import replace
 from datetime import date, datetime
+from unittest.mock import MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage, PurchasedFeed
+from RUFAS.data_structures.feed_storage_to_animal_connection import NASEMFeed
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -107,3 +110,95 @@ def test_create_consolidated_feed_report(
     report = purchased_feed_storage.create_consolidated_feed_report()
 
     assert report == expected
+
+
+def test_project_shrinkage(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
+    """Test that project_shrinkage applies shrink when days_interval > 3 and does not mutate original."""
+    purchased_feed.dry_matter_mass = 10.0
+    feed_info = MagicMock(NASEMFeed)
+    feed_info.rufas_id = 1
+    feed_info.shrink_factor = 0.1
+    available_feeds = [feed_info]
+    purchased_feed_storage.stored = [purchased_feed]
+    original_stored = deepcopy(purchased_feed_storage.stored)
+
+    result = purchased_feed_storage.project_shrinkage(days_interval=4, available_feeds=available_feeds)
+
+    assert result[0].dry_matter_mass == 9.0
+    assert purchased_feed_storage.stored[0].dry_matter_mass == original_stored[0].dry_matter_mass
+
+
+def test_project_shrinkage_no_shrink(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed
+) -> None:
+    """Test that project_shrinkage does not apply shrink when days_interval ≤ 3."""
+    purchased_feed.dry_matter_mass = 10.0
+    feed_info = MagicMock(NASEMFeed)
+    feed_info.rufas_id = 1
+    feed_info.shrink_factor = 0.1
+    available_feeds = [feed_info]
+    purchased_feed_storage.stored = [purchased_feed]
+
+    result = purchased_feed_storage.project_shrinkage(days_interval=3, available_feeds=available_feeds)
+
+    assert result[0].dry_matter_mass == 10.0
+
+
+def test_project_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
+    """Test that project_shrinkage raises ValueError when feed_info is missing."""
+    purchased_feed.dry_matter_mass = 10.0
+    missing_feed_info = MagicMock(NASEMFeed)
+    missing_feed_info.rufas_id = 16
+    missing_feed_info.shrink_factor = 0.1
+    available_feeds = [missing_feed_info]
+    purchased_feed_storage.stored = [purchased_feed]
+
+    with pytest.raises(ValueError):
+        purchased_feed_storage.project_shrinkage(days_interval=5, available_feeds=available_feeds)
+
+
+def test_process_shrinkage(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed, time: RufasTime
+) -> None:
+    """Test the function process_shrinkage()."""
+    purchased_feed.dry_matter_mass = 10.0
+    feed = MagicMock(NASEMFeed)
+    feed.rufas_id = 1
+    feed.shrink_factor = 0.1
+    available_feed = [feed]
+    purchased_feed_storage.stored = [purchased_feed]
+
+    purchased_feed_storage.process_shrinkage(time, available_feed)
+
+    assert purchased_feed_storage.stored[0].dry_matter_mass == 9.0
+
+
+def test_process_shrinkage_no_shrink(
+    purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed
+) -> None:
+    """Test the function process_shrinkage()."""
+    purchased_feed.dry_matter_mass = 10.0
+    feed = MagicMock(NASEMFeed)
+    feed.rufas_id = 1
+    feed.shrink_factor = 0.1
+    available_feed = [feed]
+    purchased_feed_storage.stored = [purchased_feed]
+    time = RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2024, 6, 2))
+
+    purchased_feed_storage.process_shrinkage(time, available_feed)
+
+    assert purchased_feed_storage.stored[0].dry_matter_mass == 10.0
+
+
+def test_process_shrinkage_error(purchased_feed_storage: PurchasedFeedStorage, purchased_feed: PurchasedFeed) -> None:
+    """Test the function process_shrinkage()."""
+    purchased_feed.dry_matter_mass = 10.0
+    feed = MagicMock(NASEMFeed)
+    feed.rufas_id = 16
+    feed.shrink_factor = 0.1
+    available_feed = [feed]
+    purchased_feed_storage.stored = [purchased_feed]
+    time = RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2024, 6, 2))
+
+    with pytest.raises(ValueError):
+        purchased_feed_storage.process_shrinkage(time, available_feed)

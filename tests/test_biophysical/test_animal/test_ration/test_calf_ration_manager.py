@@ -295,6 +295,8 @@ def test_calc_requirements(
                     Abs_magnesium=0.0,
                     Abs_manganesum=0.0,
                     Abs_zinc=0.0,
+                    shrink_factor=0.0,
+                    buffer=0.0,
                 ),
                 NASEMFeed(
                     rufas_id=MILK_REPLACER_ID,
@@ -390,6 +392,8 @@ def test_calc_requirements(
                     Abs_magnesium=0.0,
                     Abs_manganesum=0.0,
                     Abs_zinc=0.0,
+                    shrink_factor=0.0,
+                    buffer=0.0,
                 ),
                 NASEMFeed(
                     rufas_id=STARTER_ID,
@@ -485,6 +489,8 @@ def test_calc_requirements(
                     Abs_magnesium=0.0,
                     Abs_manganesum=0.0,
                     Abs_zinc=0.0,
+                    shrink_factor=0.0,
+                    buffer=0.0,
                 ),
             ],
             NutrientStandard.NASEM,
@@ -626,6 +632,8 @@ def whole_milk() -> NASEMFeed:
         Abs_magnesium=0.0,
         Abs_manganesum=0.0,
         Abs_zinc=0.0,
+        shrink_factor=0.0,
+        buffer=0.0,
     )
 
 
@@ -725,6 +733,8 @@ def milk_replacer() -> NASEMFeed:
         Abs_magnesium=0.0,
         Abs_manganesum=0.0,
         Abs_zinc=0.0,
+        shrink_factor=0.0,
+        buffer=0.0,
     )
 
 
@@ -824,6 +834,8 @@ def starter() -> NASEMFeed:
         Abs_magnesium=0.0,
         Abs_manganesum=0.0,
         Abs_zinc=0.0,
+        shrink_factor=0.0,
+        buffer=0.0,
     )
 
 
