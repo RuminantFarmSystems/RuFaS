@@ -46,6 +46,7 @@ class InputManager:
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
+            self.__delete_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
             self.data_validator = DataValidator()
@@ -726,6 +727,33 @@ class InputManager:
 
         return data_keys
 
+    def delete_data(self, data_address: str) -> bool:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.delete_data.__name__,
+        }
+        keys = data_address.split(".")
+
+        try:
+            data_parent = self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1])
+            removed_value = data_parent.pop(keys[-1])
+            ts = Utility.get_timestamp(include_millis=True)
+            self.__delete_data_logs_pool[ts] = f"InputManager.delete_data() called for {keys}"
+        except KeyError as ke:
+            self.om.add_error("Validation: data not found", str(ke), info_map)
+            removed_value = None
+
+        try:
+            file_key = keys[0]
+            props_blob_key = self.__metadata["files"][file_key]["properties"]
+            meta_keys = ["properties", props_blob_key] + keys[1:]
+            meta_parent = reduce(lambda d, k: d[k], meta_keys[:-1], self.__metadata)
+            meta_parent.pop(meta_keys[-1], None)
+        except KeyError as ke:
+            self.om.add_error("Validation: metadata not found", str(ke), info_map)
+
+        return removed_value is not None
+
     def flush_pool(self) -> None:
         """
         Clear the variable pool.
@@ -1106,6 +1134,21 @@ class InputManager:
         file_path = path / file_name
         self.om.create_directory(path)
         self.om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def dump_delete_data_logs(self, path: Path) -> None:
+        """
+        Dumps the stored get data logs to a JSON file at the specified path.
+
+        Parameters
+        ----------
+        path : Path
+            The directory path where the JSON file will be saved.
+
+        """
+        file_name = self.om.generate_file_name(base_name="InputManager_delete_data_log", extension="json")
+        file_path = path / file_name
+        self.om.create_directory(path)
+        self.om.dict_to_file_json(self.__delete_data_logs_pool, file_path)
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
