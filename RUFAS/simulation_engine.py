@@ -248,7 +248,6 @@ class SimulationEngine:
         """
         Instantiates the simulation object by requesting data from the Input Manager.
         """
-
         weather_data = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
