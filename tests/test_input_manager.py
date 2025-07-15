@@ -3171,8 +3171,7 @@ def test_delete_data_with_invalid_data_address(
 
 
 def test_delete_data_metadata_not_found(
-    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]],
-    mocker: MockerFixture
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
 ) -> None:
     """delete_data should remove data, return True, but log metadata-not-found if metadata path missing."""
     pool, metadata = simple_pool_and_meta
