@@ -599,7 +599,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
         E2ETestResultsHandler.compare_actual_and_expected_test_results(
-            args["json_output_directory"], args["convert_variable_table_path"]
+            args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         )
 
         TaskManager.handle_post_processing(
@@ -640,7 +640,7 @@ class TaskManager:
             should_flush_im_pool=should_flush_im_pool,
         )
 
-        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"], args["output_prefix"])
 
         output_manager.add_log(
             "End-to-end testing", "Completed generation of new set of end-to-end expected test results", info_map

@@ -864,19 +864,16 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     result = NutrientRequestResults(nitrogen=10.0, phosphorus=5.0, total_manure_mass=50.0)
     supplemental_result = NutrientRequestResults(nitrogen=5.0, phosphorus=2.5, total_manure_mass=25.0)
     mock_nutrient_request = mocker.MagicMock()
-    mock_request = mocker.patch.object(ManureNutrientManager,
-                                       "handle_nutrient_request",
-                                       return_value=(result, not use_supplemental_manure))
+    mock_request = mocker.patch.object(
+        ManureNutrientManager, "handle_nutrient_request", return_value=(result, not use_supplemental_manure)
+    )
 
     mock_record = mocker.patch.object(ManureManager, "_record_manure_request_results")
-    mock_field_request = mocker.patch.object(FieldManureSupplier,
-                                             "request_nutrients",
-                                             return_value=supplemental_result)
+    mock_field_request = mocker.patch.object(FieldManureSupplier, "request_nutrients", return_value=supplemental_result)
     mock_remove = mocker.patch.object(ManureManager, "_remove_nutrients_from_storage")
-    mock_calculate = (
-        mocker.patch.object(manure_manager,
-                            "_calculate_supplemental_manure_needed",
-                            return_value=mocker.MagicMock()))
+    mock_calculate = mocker.patch.object(
+        manure_manager, "_calculate_supplemental_manure_needed", return_value=mocker.MagicMock()
+    )
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request, animals_simulated, mock_time)
@@ -894,11 +891,9 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
                 "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
                 {"class": manure_manager.__class__.__name__, "function": manure_manager.request_nutrients.__name__},
             )
-            mock_calculate.assert_called_once_with(
-                result, mock_nutrient_request
-            )
+            mock_calculate.assert_called_once_with(result, mock_nutrient_request)
             mock_field_request.assert_called_once()
-            mock_record.assert_any_call(supplemental_result, "off_farm_manure")
+            mock_record.assert_any_call(supplemental_result, "off_farm_manure", mock_time)
             combined_result = result + supplemental_result
             assert actual_results == combined_result
     else:
@@ -906,31 +901,24 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
         assert actual_results == supplemental_result
 
 
-@pytest.mark.parametrize(
-    "is_nitrogen_limiting_nutrient",
-    [
-        True,
-        False
-    ]
-)
-def test_remove_nutrients_from_storage(manure_manager: ManureManager,
-                                       is_nitrogen_limiting_nutrient: bool,
-                                       mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("is_nitrogen_limiting_nutrient", [True, False])
+def test_remove_nutrients_from_storage(
+    manure_manager: ManureManager, is_nitrogen_limiting_nutrient: bool, mocker: MockerFixture
+) -> None:
     """Tests the function _remove_nutrients_from_storage()."""
-    mock_determine_limiting_nutrient = mocker.patch.object(ManureManager,
-                                                           "_determine_limiting_nutrient",
-                                                           return_value=is_nitrogen_limiting_nutrient)
-    mock_proportion = mocker.patch.object(manure_manager,
-                                          "_determine_nutrient_proportion_to_be_removed",
-                                          return_value=0.8)
+    mock_determine_limiting_nutrient = mocker.patch.object(
+        ManureManager, "_determine_limiting_nutrient", return_value=is_nitrogen_limiting_nutrient
+    )
+    mock_proportion = mocker.patch.object(
+        manure_manager, "_determine_nutrient_proportion_to_be_removed", return_value=0.8
+    )
     mock_remove = mocker.patch.object(ManureNutrientManager, "remove_nutrients")
-    mock_compute = mocker.patch.object(ManureManager, "_compute_stream_after_removal",
-                                       return_value=(MagicMock(ManureStream), {"nitrogen": 50}))
+    mock_compute = mocker.patch.object(
+        ManureManager, "_compute_stream_after_removal", return_value=(MagicMock(ManureStream), {"nitrogen": 50})
+    )
     composting = MagicMock(Composting)
     composting.stored_manure = MagicMock(ManureStream)
-    manure_manager.all_processors = {"non_storage": MagicMock(Digester),
-                                     "storage": composting
-                                     }
+    manure_manager.all_processors = {"non_storage": MagicMock(Digester), "storage": composting}
 
     manure_manager._remove_nutrients_from_storage(NutrientRequestResults(nitrogen=10, phosphorus=20), ManureType.LIQUID)
 
@@ -1024,9 +1012,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         (1.0, 50.0, 50.0),
     ],
 )
-def test_determine_non_limiting_nutrient_removal_amount(portion: float,
-                                                        non_limiting: float,
-                                                        expected_removed: float):
+def test_determine_non_limiting_nutrient_removal_amount(portion: float, non_limiting: float, expected_removed: float):
     removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
         limiting_nutrient_proportion_to_be_removed=portion,
         non_limiting_nutrients_amount=non_limiting,
@@ -1050,9 +1036,7 @@ def test_determine_limiting_nutrient_with_patched_scaling(
 ):
     seq = [n_mass, p_mass]
     mocker.patch.object(
-        ManureNutrientManager,
-        "calculate_projected_manure_mass",
-        side_effect=lambda requested, fraction: seq.pop(0)
+        ManureNutrientManager, "calculate_projected_manure_mass", side_effect=lambda requested, fraction: seq.pop(0)
     )
 
     is_nitrogen_limiting = ManureManager._determine_limiting_nutrient(

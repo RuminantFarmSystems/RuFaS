@@ -850,7 +850,7 @@ class ManureManager:
                 )
                 amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
                 supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
-                self._record_manure_request_results(supplemental_manure, "off_farm_manure")
+                self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
                 combined_manure = request_result + supplemental_manure
                 return combined_manure
             return request_result
