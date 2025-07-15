@@ -39,7 +39,7 @@ def test_input_manager_singleton() -> None:
 
 @pytest.fixture
 def input_manager_original_method_states(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of InputManager"""
     return {
@@ -143,8 +143,8 @@ def test_load_properties_unexpected_error(mock_input_manager: InputManager, mock
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch(
-            "builtins.open",
-            mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'),
+        "builtins.open",
+        mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_metadata("path/dummy_metadata.json")
@@ -168,7 +168,7 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
 
 
 def test_load_data_from_json(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with valid json file in file input_manager.py"""
     dummy_data = {"files": {"dummy_data_file": {"path": "dummy_data.json", "type": "json"}}}
@@ -184,7 +184,7 @@ def test_load_data_from_json(
 
 
 def test_load_data_from_json_missing_file_raises_error(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
@@ -195,7 +195,7 @@ def test_load_data_from_json_missing_file_raises_error(
 
 
 def test_load_data_from_json_invalid_data_raises_error(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data="invalid_json_data")):
@@ -206,7 +206,7 @@ def test_load_data_from_json_invalid_data_raises_error(
 
 
 def test_load_data_from_csv(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_csv with valid csv file in file input_manager.py"""
     dummy_csv_data = "key1,key2\na,1\nb,2\n"
@@ -221,7 +221,7 @@ def test_load_data_from_csv(
 
 
 def test_load_data_from_csv_missing_file_raises_error(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_csv with missing csv file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
@@ -232,7 +232,7 @@ def test_load_data_from_csv_missing_file_raises_error(
 
 
 def test_load_data_from_csv_invalid_data_raises_error(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data="invalid_csv_data")):
@@ -244,8 +244,8 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 
 def test_start_data_processing(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
@@ -289,8 +289,8 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 
 
 def test_populate_pool_valid(
-        mock_metadata: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for valid data for function _populate_pool in file input_manager.py"""
 
@@ -319,8 +319,8 @@ def test_populate_pool_valid(
 
 
 def test_populate_pool_invalid(
-        mock_metadata: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
 
@@ -350,8 +350,8 @@ def test_populate_pool_invalid(
 
 
 def test_populate_pool_partial_invalid(
-        mock_metadata: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
 
@@ -384,8 +384,8 @@ def test_populate_pool_partial_invalid(
 
 
 def test_populate_pool_eager_termination(
-        mock_metadata: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data with eager termination for function
     _populate_pool in file input_manager.py"""
@@ -413,8 +413,8 @@ def test_populate_pool_eager_termination(
 
 
 def test_populate_pool_raises_keyerror(
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for invalid data file type for function _populate_pool in file input_manager.py"""
     mock_input_manager.meta_data = {
@@ -677,26 +677,26 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3"),
         ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4"),
         (
-                "module1",
-                {
-                    "integer_var": 5,
-                    "float_var": 0.5,
-                    "string_var": "dummyvalue1",
-                    "boolean_var": True,
-                    "integer_array_var": [1, 2, 3],
-                    "float_array_var": [0.1, 0.2, 3.14159],
-                    "string_array_var": ["1", "2", "3", "4", "5"],
-                    "boolean_array_var": [True, False],
-                    "submodule1": {"nested_var": "dummyvalue2"},
-                },
+            "module1",
+            {
+                "integer_var": 5,
+                "float_var": 0.5,
+                "string_var": "dummyvalue1",
+                "boolean_var": True,
+                "integer_array_var": [1, 2, 3],
+                "float_array_var": [0.1, 0.2, 3.14159],
+                "string_array_var": ["1", "2", "3", "4", "5"],
+                "boolean_array_var": [True, False],
+                "submodule1": {"nested_var": "dummyvalue2"},
+            },
         ),
     ],
 )
 def test_get_data_with_valid_key(
-        dummy_data_path: str,
-        mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-        expected_result: Any,
-        mocker: MockerFixture,
+    dummy_data_path: str,
+    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+    expected_result: Any,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for get_data function in file input_manager.py with a valid data_path key"""
 
@@ -721,10 +721,10 @@ def test_get_data_with_valid_key(
     ],
 )
 def test_get_data_returns_none(
-        dummy_data_path: str,
-        error_key: str,
-        mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    dummy_data_path: str,
+    error_key: str,
+    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function get_data raising an exception in file input_manager.py"""
 
@@ -815,137 +815,137 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
     [
         ("properties.dummy_animal_properties.herd_information.calf_num.default", 8, 0),
         (
-                "properties.dummy_animal_properties.herd_information.calf_num",
-                {
-                    "type": "number",
-                    "description": "Number of Calves (head)",
-                    "default": 8,
-                    "minimum": 0,
-                },
-                0,
+            "properties.dummy_animal_properties.herd_information.calf_num",
+            {
+                "type": "number",
+                "description": "Number of Calves (head)",
+                "default": 8,
+                "minimum": 0,
+            },
+            0,
         ),
         (
-                "properties.dummy_animal_properties.herd_information.cow_repro_method.type",
-                "string",
-                0,
+            "properties.dummy_animal_properties.herd_information.cow_repro_method.type",
+            "string",
+            0,
         ),
         (
-                "properties.dummy_animal_properties.herd_information.cow_repro_method.pattern",
-                "^{TAI|ED|ED-TAI}$",
-                0,
+            "properties.dummy_animal_properties.herd_information.cow_repro_method.pattern",
+            "^{TAI|ED|ED-TAI}$",
+            0,
         ),
         (
-                "properties.dummy_animal_properties.herd_information.simulate_animals.type",
-                "boolean",
-                0,
+            "properties.dummy_animal_properties.herd_information.simulate_animals.type",
+            "boolean",
+            0,
         ),
         (
-                "properties.dummy_animal_properties.herd_information.dummy_cow_array",
-                {
-                    "type": "array",
-                    "description": "dummy array for testing purposes",
-                    "default": [1, 2, 3, 4],
-                    "maximum_length": 7,
-                },
-                0,
+            "properties.dummy_animal_properties.herd_information.dummy_cow_array",
+            {
+                "type": "array",
+                "description": "dummy array for testing purposes",
+                "default": [1, 2, 3, 4],
+                "maximum_length": 7,
+            },
+            0,
         ),
         (
-                "properties.dummy_crop_properties.crop_species.description",
-                "Name of the crop being grown.",
-                0,
+            "properties.dummy_crop_properties.crop_species.description",
+            "Name of the crop being grown.",
+            0,
         ),
         ("properties.dummy_crop_properties.harvest_years.type", "array", 0),
         (
-                "properties.dummy_crop_properties.harvest_years",
-                {
-                    "type": "array",
-                    "description": "Calendar years in which the harvesting occurs",
-                    "minimum_length": 0,
-                    "default": [],
-                    "properties": {"type": "number", "minimum": 1},
-                },
-                0,
+            "properties.dummy_crop_properties.harvest_years",
+            {
+                "type": "array",
+                "description": "Calendar years in which the harvesting occurs",
+                "minimum_length": 0,
+                "default": [],
+                "properties": {"type": "number", "minimum": 1},
+            },
+            0,
         ),
         ("properties.dummy_crop_properties.pattern_skip.minimum", 0, 0),
         (
-                "properties.dummy_crop_properties.simulate_crops",
-                {
-                    "type": "boolean",
-                    "description": "Dummy boolean variable for testing",
-                    "default": False,
-                },
-                0,
+            "properties.dummy_crop_properties.simulate_crops",
+            {
+                "type": "boolean",
+                "description": "Dummy boolean variable for testing",
+                "default": False,
+            },
+            0,
         ),
         (
-                "properties",
-                {
-                    "dummy_animal_properties": {
+            "properties",
+            {
+                "dummy_animal_properties": {
+                    "type": "object",
+                    "description": "Animal data",
+                    "herd_information": {
                         "type": "object",
-                        "description": "Animal data",
-                        "herd_information": {
-                            "type": "object",
-                            "description": "Herd Demographics",
-                            "calf_num": {
-                                "type": "number",
-                                "description": "Number of Calves (head)",
-                                "default": 8,
-                                "minimum": 0,
-                            },
-                            "cow_repro_method": {
-                                "type": "string",
-                                "description": "Cow Reproductive Program (select one)",
-                                "default": "ED",
-                                "pattern": "^{TAI|ED|ED-TAI}$",
-                            },
-                            "simulate_animals": {
-                                "type": "boolean",
-                                "description": "Whether or not to simulate animals during the simulation",
-                                "default": True,
-                            },
-                            "dummy_cow_array": {
-                                "type": "array",
-                                "description": "dummy array for testing purposes",
-                                "default": [1, 2, 3, 4],
-                                "maximum_length": 7,
-                            },
-                        },
-                    },
-                    "dummy_crop_properties": {
-                        "crop_species": {
-                            "type": "string",
-                            "description": "Name of the crop being grown.",
-                            "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$",
-                        },
-                        "harvest_years": {
-                            "type": "array",
-                            "description": "Calendar years in which the harvesting occurs",
-                            "minimum_length": 0,
-                            "default": [],
-                            "properties": {"type": "number", "minimum": 1},
-                        },
-                        "pattern_skip": {
+                        "description": "Herd Demographics",
+                        "calf_num": {
                             "type": "number",
-                            "description": "Number of years to be skipped between schedule repetitions.",
+                            "description": "Number of Calves (head)",
+                            "default": 8,
                             "minimum": 0,
-                            "default": 0,
                         },
-                        "simulate_crops": {
+                        "cow_repro_method": {
+                            "type": "string",
+                            "description": "Cow Reproductive Program (select one)",
+                            "default": "ED",
+                            "pattern": "^{TAI|ED|ED-TAI}$",
+                        },
+                        "simulate_animals": {
                             "type": "boolean",
-                            "description": "Dummy boolean variable for testing",
-                            "default": False,
+                            "description": "Whether or not to simulate animals during the simulation",
+                            "default": True,
+                        },
+                        "dummy_cow_array": {
+                            "type": "array",
+                            "description": "dummy array for testing purposes",
+                            "default": [1, 2, 3, 4],
+                            "maximum_length": 7,
                         },
                     },
                 },
-                0,
+                "dummy_crop_properties": {
+                    "crop_species": {
+                        "type": "string",
+                        "description": "Name of the crop being grown.",
+                        "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$",
+                    },
+                    "harvest_years": {
+                        "type": "array",
+                        "description": "Calendar years in which the harvesting occurs",
+                        "minimum_length": 0,
+                        "default": [],
+                        "properties": {"type": "number", "minimum": 1},
+                    },
+                    "pattern_skip": {
+                        "type": "number",
+                        "description": "Number of years to be skipped between schedule repetitions.",
+                        "minimum": 0,
+                        "default": 0,
+                    },
+                    "simulate_crops": {
+                        "type": "boolean",
+                        "description": "Dummy boolean variable for testing",
+                        "default": False,
+                    },
+                },
+            },
+            0,
         ),
     ],
 )
 def test_get_metadata_with_valid_key(
-        dummy_metadata_path: str,
-        mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
-        expected_result: Any,
-        expected_warning_call_count: int,
-        mock_input_manager: InputManager,
+    dummy_metadata_path: str,
+    mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+    expected_result: Any,
+    expected_warning_call_count: int,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for get_metadata function in file input_manager.py with a valid metadata_path key"""
 
@@ -962,39 +962,39 @@ def test_get_metadata_with_valid_key(
     "dummy_metadata_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count",
     [
         (
-                "dummy_animal_properties.herd_information.calf_num.dummy_key",
-                "dummy_animal_properties.herd_information.calf_num",
-                "dummy_key",
-                1,
+            "dummy_animal_properties.herd_information.calf_num.dummy_key",
+            "dummy_animal_properties.herd_information.calf_num",
+            "dummy_key",
+            1,
         ),
         (
-                "dummy_animal_properties.herd_information.dummy_key",
-                "dummy_animal_properties.herd_information",
-                "dummy_key",
-                1,
+            "dummy_animal_properties.herd_information.dummy_key",
+            "dummy_animal_properties.herd_information",
+            "dummy_key",
+            1,
         ),
         (
-                "dummy_crop_properties.crop_species.dummy_key",
-                "dummy_crop_properties.crop_species",
-                "dummy_key",
-                1,
+            "dummy_crop_properties.crop_species.dummy_key",
+            "dummy_crop_properties.crop_species",
+            "dummy_key",
+            1,
         ),
         ("dummy_crop_properties.dummy_key", "dummy_crop_properties", "dummy_key", 1),
         (
-                "dummy_crop_properties.pattern_skip.dummy_key",
-                "dummy_crop_properties.pattern_skip",
-                "dummy_key",
-                1,
+            "dummy_crop_properties.pattern_skip.dummy_key",
+            "dummy_crop_properties.pattern_skip",
+            "dummy_key",
+            1,
         ),
     ],
 )
 def test_get_metadata_raises_exception(
-        dummy_metadata_path: str,
-        expected_error_parent_address: str,
-        expected_error_invalid_key: str,
-        mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
-        expected_warning_call_count: int,
-        mock_input_manager: InputManager,
+    dummy_metadata_path: str,
+    expected_error_parent_address: str,
+    expected_error_invalid_key: str,
+    mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+    expected_warning_call_count: int,
+    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function get_metadata raising an exception in file input_manager.py"""
 
@@ -1006,16 +1006,15 @@ def test_get_metadata_raises_exception(
 
         error_message = key_error.value.__str__().strip("'")
         assert (
-                error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-                                 f'"{expected_error_parent_address}" does not have attribute '
-                                 f'"{expected_error_invalid_key}".'
+            error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
+            f'"{expected_error_parent_address}" does not have attribute '
+            f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
 
 def test_get_data_by_properties_no_data(
-        mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable],
-        mocker: MockerFixture
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable], mocker: MockerFixture
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
@@ -1034,34 +1033,34 @@ def test_get_data_by_properties_no_data(
     "data,expected_keys",
     [
         (
-                {
-                    "key_1": {"properties": "properties_1"},
-                    "key_2": {"properties": "properties_2"},
-                    "key_3": {"properties": "target_properties"},
-                    "key_4": {"properties": "target_properties"},
-                    "key_5": {"properties": "target_properties"},
-                },
-                ["key_3", "key_4", "key_5"],
+            {
+                "key_1": {"properties": "properties_1"},
+                "key_2": {"properties": "properties_2"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "target_properties"},
+                "key_5": {"properties": "target_properties"},
+            },
+            ["key_3", "key_4", "key_5"],
         ),
         (
-                {
-                    "key_1": {"properties": "target_properties"},
-                    "key_2": {"properties": "value"},
-                    "key_3": {"properties": "target_properties"},
-                    "key_4": {"properties": "properties_4"},
-                    "key_5": {"properties": "properties_5"},
-                },
-                ["key_1", "key_3"],
+            {
+                "key_1": {"properties": "target_properties"},
+                "key_2": {"properties": "value"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "properties_4"},
+                "key_5": {"properties": "properties_5"},
+            },
+            ["key_1", "key_3"],
         ),
         ({"key_1": {"properties": "value"}, "key_2": {"properties": "value"}, "key_3": {"properties": "value"}}, []),
         ({}, []),
     ],
 )
 def test_get_data_keys_by_properties(
-        data: dict[str, dict[str, str]],
-        expected_keys: list[str],
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    data: dict[str, dict[str, str]],
+    expected_keys: list[str],
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test that Input Manager gets data keys by properties correctly."""
     mock_input_manager.get_metadata = MagicMock(return_value=data)
@@ -1087,9 +1086,9 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 
 @pytest.mark.parametrize("properties_blob_key", ["properties1", "properties2"])
 def test_metadata_properties_exist(
-        properties_blob_key: str,
-        mock_input_manager: InputManager,
-        mock_metadata: Dict[str, Dict[str, Any]],
+    properties_blob_key: str,
+    mock_input_manager: InputManager,
+    mock_metadata: Dict[str, Dict[str, Any]],
 ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
@@ -1101,7 +1100,7 @@ def test_metadata_properties_exist(
 
 
 def test_metadata_properties_exist_no_metadata(
-        mock_input_manager: InputManager,
+    mock_input_manager: InputManager,
 ) -> None:
     mock_input_manager._InputManager__metadata = {}
 
@@ -1117,10 +1116,10 @@ def test_metadata_properties_exist_no_metadata(
     [("variable1", "propertiesA"), ("variable2", "propertiesB")],
 )
 def test_metadata_properties_exists_invalid_properties_blob_key(
-        variable_name: str,
-        properties_blob_key: str,
-        mock_input_manager: InputManager,
-        mock_metadata: Dict[str, Dict[str, Any]],
+    variable_name: str,
+    properties_blob_key: str,
+    mock_input_manager: InputManager,
+    mock_metadata: Dict[str, Dict[str, Any]],
 ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
@@ -1173,100 +1172,100 @@ def mock_metadata_for_add_variable_to_pool() -> Dict[str, Dict[str, Any]]:
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {},
         ),
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {"dict_data": {"1": 1}},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {"dict_data": {"1": 1}},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {"array_of_int_data": [-1, 0, 1]},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {"array_of_float_data": [-1.0, 0.0, 1.0]},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {"array_of_str_data": ["a", "b", "c"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {"dict_of_array_data": {"a": [1, 2, 3]}},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_valid(
-        variable_name: str,
-        data: Any,
-        properties_blob_key: str,
-        starting_im_pool: Dict[str, Any],
-        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    variable_name: str,
+    data: Any,
+    properties_blob_key: str,
+    starting_im_pool: Dict[str, Any],
+    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for add_variable_to_pool() method in file input_manager.py with valid data."""
 
@@ -1310,100 +1309,100 @@ def test_add_variable_to_pool_valid(
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {},
         ),
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {"dict_data": {"1": 1}},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {"dict_data": {"1": 1}},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {"array_of_int_data": [-1, 0, 1]},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {"array_of_float_data": [-1.0, 0.0, 1.0]},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {"array_of_str_data": ["a", "b", "c"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {"dict_of_array_data": {"a": [1, 2, 3]}},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_invalid(
-        variable_name: str,
-        data: Any,
-        properties_blob_key: str,
-        starting_im_pool: Dict[str, Any],
-        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    variable_name: str,
+    data: Any,
+    properties_blob_key: str,
+    starting_im_pool: Dict[str, Any],
+    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for add_variable_to_pool() method in file input_manager.py with invalid data.
@@ -1443,100 +1442,100 @@ def test_add_variable_to_pool_invalid(
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {},
         ),
         (
-                "dict_data",
-                {
-                    "int": 0,
-                    "str": "",
-                    "float": 0.0,
-                    "int_array": [0, 1, 2],
-                    "float_array": [0.0, 1.1, 2.2],
-                    "str_arr": ["example_str1", "example_str2", "example_str3"],
-                },
-                "dict_data",
-                {"dict_data": {"1": 1}},
+            "dict_data",
+            {
+                "int": 0,
+                "str": "",
+                "float": 0.0,
+                "int_array": [0, 1, 2],
+                "float_array": [0.0, 1.1, 2.2],
+                "str_arr": ["example_str1", "example_str2", "example_str3"],
+            },
+            "dict_data",
+            {"dict_data": {"1": 1}},
         ),
         (
-                "array_of_int_data",
-                {"array_of_int_data": [0, 1, 2]},
-                "array_of_int_data",
-                {"array_of_int_data": [-1, 0, 1]},
+            "array_of_int_data",
+            {"array_of_int_data": [0, 1, 2]},
+            "array_of_int_data",
+            {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-                "array_of_float_data",
-                {"array_of_float_data": [0.0, 1.1, 2.2]},
-                "array_of_float_data",
-                {"array_of_float_data": [-1.0, 0.0, 1.0]},
+            "array_of_float_data",
+            {"array_of_float_data": [0.0, 1.1, 2.2]},
+            "array_of_float_data",
+            {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-                "array_of_str_data",
-                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-                "array_of_str_data",
-                {"array_of_str_data": ["a", "b", "c"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+            "array_of_str_data",
+            {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-                "array_of_dict_data",
-                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+            "array_of_dict_data",
+            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-                "dict_of_array_data",
-                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-                "dict_of_array_data",
-                {"dict_of_array_data": {"a": [1, 2, 3]}},
+            "dict_of_array_data",
+            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+            "dict_of_array_data",
+            {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_eager_termination(
-        variable_name: str,
-        data: Any,
-        properties_blob_key: str,
-        starting_im_pool: Dict[str, Any],
-        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-        mocker: MockerFixture,
+    variable_name: str,
+    data: Any,
+    properties_blob_key: str,
+    starting_im_pool: Dict[str, Any],
+    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for add_variable_to_pool() method in file input_manager.py with eager_termination=True.
@@ -1581,11 +1580,11 @@ def test_add_variable_to_pool_eager_termination(
     ],
 )
 def test_add_runtime_variable_to_pool(
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    variable_name: str,
+    data: Dict[str, Any],
+    properties_blob_key: str,
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
@@ -1624,11 +1623,11 @@ def test_add_runtime_variable_to_pool(
     ],
 )
 def test_add_runtime_variable_to_pool_type_error(
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    variable_name: str,
+    data: Dict[str, Any],
+    properties_blob_key: str,
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
@@ -1662,11 +1661,11 @@ def test_add_runtime_variable_to_pool_type_error(
     ],
 )
 def test_add_runtime_variable_to_pool_invalid_data(
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    variable_name: str,
+    data: Dict[str, Any],
+    properties_blob_key: str,
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
@@ -1699,8 +1698,8 @@ def test_add_runtime_variable_to_pool_invalid_data(
 
 
 def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
-        mock_input_manager: InputManager,
-        input_manager_original_method_states: Dict[str, Callable],
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=False)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
@@ -1737,10 +1736,10 @@ def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
     ],
 )
 def test_get_variable_modifiability(
-        variable_name: str,
-        variable_properties: Dict[str, Any],
-        expected_modifiability: Modifiability,
-        mock_input_manager: InputManager,
+    variable_name: str,
+    variable_properties: Dict[str, Any],
+    expected_modifiability: Modifiability,
+    mock_input_manager: InputManager,
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(
@@ -1761,9 +1760,9 @@ def test_get_variable_modifiability(
     ],
 )
 def test_get_variable_modifiability_unknown_modifiability(
-        variable_name: str,
-        variable_properties: Dict[str, Any],
-        mock_input_manager: InputManager,
+    variable_name: str,
+    variable_properties: Dict[str, Any],
+    mock_input_manager: InputManager,
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         mock_input_manager._get_variable_modifiability(
@@ -1783,10 +1782,10 @@ def test_get_variable_modifiability_unknown_modifiability(
     ],
 )
 def test_log_missing_data_initialization_input_not_required(
-        variable_name: str,
-        variable_properties: Dict[str, Any],
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    variable_name: str,
+    variable_properties: Dict[str, Any],
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -1809,10 +1808,10 @@ def test_log_missing_data_initialization_input_not_required(
     ],
 )
 def test_log_missing_data_initialization_key_error(
-        variable_name: str,
-        variable_properties: Dict[str, Any],
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    variable_name: str,
+    variable_properties: Dict[str, Any],
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -1836,10 +1835,10 @@ def test_log_missing_data_initialization_key_error(
     ],
 )
 def test_log_missing_data_runtime_key_error(
-        variable_name: str,
-        variable_properties: Dict[str, Any],
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    variable_name: str,
+    variable_properties: Dict[str, Any],
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -2202,35 +2201,35 @@ def mock_pool_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any] | Li
         ("dict_data_runtime_modifiable.nested_dict.a.b.c.d", {"d": 11}, "dict_data_runtime_modifiable", True, False, 0),
         ("dict_data_runtime_modifiable.nested_dict.A.B.C", {"C": None}, "dict_data_runtime_modifiable", True, False, 0),
         (
-                "dict_data_runtime_unmodifiable.nested_dict.a.b.c.d",
-                {"d": 11},
-                "dict_data_runtime_unmodifiable",
-                False,
-                False,
-                1,
+            "dict_data_runtime_unmodifiable.nested_dict.a.b.c.d",
+            {"d": 11},
+            "dict_data_runtime_unmodifiable",
+            False,
+            False,
+            1,
         ),
         (
-                "dict_data_runtime_unmodifiable.nested_dict.A.B.C",
-                {"C": "CCCCC!"},
-                "dict_data_runtime_unmodifiable",
-                False,
-                False,
-                1,
+            "dict_data_runtime_unmodifiable.nested_dict.A.B.C",
+            {"C": "CCCCC!"},
+            "dict_data_runtime_unmodifiable",
+            False,
+            False,
+            1,
         ),
         ("dict_data_runtime_unmodifiable.nested_dict.a.b.c.d", 10, "dict_data_runtime_unmodifiable", False, True, 0),
         ("dict_data_runtime_unmodifiable.nested_dict.A.B.C", "10", "dict_data_runtime_unmodifiable", False, True, 0),
     ],
 )
 def test_add_variable_to_pool_nested(
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        is_modifiable_during_runtime: bool,
-        eager_termination: bool,
-        expected_add_warning_call_count: int,
-        mock_metadata_for_add_variable_to_pool_nested: Dict[str, Any],
-        mock_pool_for_add_variable_to_pool_nested: Dict[str, Any],
-        mocker: MockerFixture,
+    variable_name: str,
+    data: Dict[str, Any],
+    properties_blob_key: str,
+    is_modifiable_during_runtime: bool,
+    eager_termination: bool,
+    expected_add_warning_call_count: int,
+    mock_metadata_for_add_variable_to_pool_nested: Dict[str, Any],
+    mock_pool_for_add_variable_to_pool_nested: Dict[str, Any],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _add_variable_to_pool method of the InputManager class for nested data.
@@ -2274,8 +2273,8 @@ def test_add_variable_to_pool_nested(
 
 
 def test_dump_get_data_logs(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -2301,8 +2300,8 @@ def test_dump_get_data_logs(
 
 
 def test_dump_delete_data_logs(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__delete_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -2335,7 +2334,7 @@ def test_dump_delete_data_logs(
     ],
 )
 def test_check_property_exists_in_pool(
-        mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
+    mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
 ) -> None:
     """
     Unit test for the check_property_exists_in_pool() method of the InputManager class.
@@ -2383,10 +2382,10 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
 )
 def test_save_metadata_properties_errors(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
-        exception: Type[FileNotFoundError | PermissionError | OSError],
-        error_message: str,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    exception: Type[FileNotFoundError | PermissionError | OSError],
+    error_message: str,
 ) -> None:
     output_dir = Path("/example/dir")
     generated_filename = "file.csv"
@@ -2416,44 +2415,43 @@ def test_save_metadata_properties_errors(
     "nested_data, expected_primitive_call_counts, expected_create_record_call_count, expected_results",
     [
         (
-                {
-                    "level1": {
-                        "level2": {
-                            "property1": {"type": "string", "value": "Hello"},
-                            "property2": {"type": "number", "value": 42},
-                        },
-                        "description": "Level 1 description",
-                    }
-                },
-                {"True": 2, "False": 2},
-                2,
-                [{"mocked": "record"}, {"mocked": "record"}],
+            {
+                "level1": {
+                    "level2": {
+                        "property1": {"type": "string", "value": "Hello"},
+                        "property2": {"type": "number", "value": 42},
+                    },
+                    "description": "Level 1 description",
+                }
+            },
+            {"True": 2, "False": 2},
+            2,
+            [{"mocked": "record"}, {"mocked": "record"}],
         ),
         (
-                {
-                    "level1": {
-                        "level2": {
-                            "nestedProperty": {
-                                "type": "object",
-                                "innerProperty": {"type": "string", "value": "Nested",
-                                                  "description": "Deep description"},
-                            }
-                        },
-                        "description": "Level 1 description",
-                    }
-                },
-                {"True": 2, "False": 3},
-                2,
-                [{"mocked": "record"}],
+            {
+                "level1": {
+                    "level2": {
+                        "nestedProperty": {
+                            "type": "object",
+                            "innerProperty": {"type": "string", "value": "Nested", "description": "Deep description"},
+                        }
+                    },
+                    "description": "Level 1 description",
+                }
+            },
+            {"True": 2, "False": 3},
+            2,
+            [{"mocked": "record"}],
         ),
     ],
 )
 def test_parse_metadata_properties(
-        mock_input_manager: InputManager,
-        nested_data: Dict[str, Any],
-        expected_primitive_call_counts: Dict[str, int],
-        expected_create_record_call_count: int,
-        expected_results: List[Dict[str, str]],
+    mock_input_manager: InputManager,
+    nested_data: Dict[str, Any],
+    expected_primitive_call_counts: Dict[str, int],
+    expected_create_record_call_count: int,
+    expected_results: List[Dict[str, str]],
 ) -> None:
     """Tests _parse_metadata_properties() function in InputManager."""
 
@@ -2501,7 +2499,7 @@ def test_parse_metadata_properties(
     ],
 )
 def test_check_property_type_primitive(
-        mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
+    mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
 ) -> None:
     """Tests _check_property_type_primitive() function in InputManager."""
     result = mock_input_manager._check_property_type_primitive(property_dict)
@@ -2512,44 +2510,44 @@ def test_check_property_type_primitive(
     "data_entry, name, expected_record",
     [
         (
-                {
-                    "type": "string",
-                    "description": "A simple string",
-                    "pattern": "[A-Za-z]+",
-                    "default": "example",
-                    "maximum": "",
-                    "minimum": "",
-                },
-                "user_details_properties_name",
-                {
-                    "properties_group": "user_details_properties",
-                    "name": "name",
-                    "type": "string",
-                    "description": "A simple string",
-                    "pattern": "[A-Za-z]+",
-                    "default": "example",
-                    "maximum": "",
-                    "minimum": "",
-                },
+            {
+                "type": "string",
+                "description": "A simple string",
+                "pattern": "[A-Za-z]+",
+                "default": "example",
+                "maximum": "",
+                "minimum": "",
+            },
+            "user_details_properties_name",
+            {
+                "properties_group": "user_details_properties",
+                "name": "name",
+                "type": "string",
+                "description": "A simple string",
+                "pattern": "[A-Za-z]+",
+                "default": "example",
+                "maximum": "",
+                "minimum": "",
+            },
         ),
         (
-                {"type": "number", "description": "A simple number"},
-                "config_properties_version",
-                {
-                    "properties_group": "config_properties",
-                    "name": "version",
-                    "type": "number",
-                    "description": "A simple number",
-                    "pattern": "",
-                    "default": "",
-                    "maximum": "",
-                    "minimum": "",
-                },
+            {"type": "number", "description": "A simple number"},
+            "config_properties_version",
+            {
+                "properties_group": "config_properties",
+                "name": "version",
+                "type": "number",
+                "description": "A simple number",
+                "pattern": "",
+                "default": "",
+                "maximum": "",
+                "minimum": "",
+            },
         ),
     ],
 )
 def test_create_record(
-        mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
+    mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
 ) -> None:
     """Tests _create_record() function in InputManager."""
     result = mock_input_manager._create_record(data_entry, name)
@@ -2560,36 +2558,36 @@ def test_create_record(
     "file_exists, error, file_content, modified_properties, expected_diff",
     [
         (
-                True,
-                None,
-                '{"key1": "value1", "key3": "value3"}',
-                {"key1": "value1_changed", "key3": "value3"},
-                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+            True,
+            None,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (
-                False,
-                OSError,
-                '{"key1": "value1", "key3": "value3"}',
-                {"key1": "value1_changed", "key3": "value3"},
-                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+            False,
+            OSError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (
-                False,
-                PermissionError,
-                '{"key1": "value1", "key3": "value3"}',
-                {"key1": "value1_changed", "key3": "value3"},
-                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+            False,
+            PermissionError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (True, None, '{"key1": "value1", "key2": "value2"}', {"key1": "value1", "key2": "value2"}, {}),
     ],
 )
 def test_compare_metadata_properties(
-        mocker: MockerFixture,
-        file_exists: bool,
-        error: Type[PermissionError | OSError],
-        file_content: str,
-        modified_properties: dict[str, str],
-        expected_diff: dict[str, dict[str, str]],
+    mocker: MockerFixture,
+    file_exists: bool,
+    error: Type[PermissionError | OSError],
+    file_content: str,
+    modified_properties: dict[str, str],
+    expected_diff: dict[str, dict[str, str]],
 ) -> None:
     dummy_properties = {"key1": "value1", "key2": "value2"}
     dummy_properties_modified = modified_properties
@@ -2801,35 +2799,35 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
     "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,is_nested",
     [
         (
-                "example_property",
-                {"key": "value"},
-                "example_blob_key",
-                {"key": "value"},
-                {
-                    "example_property": {"description": "An example property", "type": "string"},
-                    "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
-                },
-                False,
+            "example_property",
+            {"key": "value"},
+            "example_blob_key",
+            {"key": "value"},
+            {
+                "example_property": {"description": "An example property", "type": "string"},
+                "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
+            },
+            False,
         ),
         (
-                "example_property.object_property.nested_property",
-                {"nested_key": "nested_value"},
-                "example_blob_key",
-                {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
-                {"type": "string", "description": "An example property"},
-                True,
+            "example_property.object_property.nested_property",
+            {"nested_key": "nested_value"},
+            "example_blob_key",
+            {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
+            {"type": "string", "description": "An example property"},
+            True,
         ),
     ],
 )
 def test_prepare_data(
-        mock_metadata_prepare_data: dict[Any, Any],
-        variable_name: str,
-        input_data: dict[Any, Any],
-        properties_blob_key: str,
-        expected_data: dict[Any, Any],
-        expected_metadata_properties: dict[str, Any],
-        mocker: MockerFixture,
-        is_nested: bool,
+    mock_metadata_prepare_data: dict[Any, Any],
+    variable_name: str,
+    input_data: dict[Any, Any],
+    properties_blob_key: str,
+    expected_data: dict[Any, Any],
+    expected_metadata_properties: dict[str, Any],
+    mocker: MockerFixture,
+    is_nested: bool,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
@@ -2850,11 +2848,11 @@ def test_prepare_data(
     [("test", {"test": 12}, False, True)],
 )
 def test_check_modifiability_valid(
-        variable_name: str,
-        metadata_properties: dict[Any, Any],
-        eager_termination: bool,
-        modifiable: bool,
-        mocker: MockerFixture,
+    variable_name: str,
+    metadata_properties: dict[Any, Any],
+    eager_termination: bool,
+    modifiable: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _check_modifiability to ensure right warnings or errors were thrown"""
     input_manager = InputManager()
@@ -2879,11 +2877,11 @@ def test_check_modifiability_valid(
     [("test", {"test": 12}, True, False)],
 )
 def test_check_modifiability_error(
-        variable_name: str,
-        metadata_properties: dict[Any, Any],
-        eager_termination: bool,
-        modifiable: bool,
-        mocker: MockerFixture,
+    variable_name: str,
+    metadata_properties: dict[Any, Any],
+    eager_termination: bool,
+    modifiable: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _check_modifiability to ensure right errors were thrown"""
     input_manager = InputManager()
@@ -2908,11 +2906,11 @@ def test_check_modifiability_error(
     [("test", {"test": 12}, False, False)],
 )
 def test_check_modifiability_warning(
-        variable_name: str,
-        metadata_properties: dict[str, int],
-        eager_termination: bool,
-        modifiable: bool,
-        mocker: MockerFixture,
+    variable_name: str,
+    metadata_properties: dict[str, int],
+    eager_termination: bool,
+    modifiable: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _check_modifiability to ensure right warnings were thrown"""
     input_manager = InputManager()
@@ -2937,40 +2935,40 @@ def elements_counter() -> ElementsCounter:
     "data,metadata_properties,eager_termination,properties_blob_key,expected_validated_data,expected_invalid_elements",
     [
         (
-                {"prop1": "value1", "prop2": "value2"},
-                {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
-                False,
-                "example_blob_key",
-                {"prop1": "value1", "prop2": "value2"},
-                0,
+            {"prop1": "value1", "prop2": "value2"},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1", "prop2": "value2"},
+            0,
         ),
         (
-                {"prop1": "value1", "prop2": None},
-                {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
-                False,
-                "example_blob_key",
-                {"prop1": "value1"},
-                1,
+            {"prop1": "value1", "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1"},
+            1,
         ),
         (
-                {"prop1": None, "prop2": None},
-                {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
-                False,
-                "example_blob_key",
-                {},
-                2,
+            {"prop1": None, "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {},
+            2,
         ),
     ],
 )
 def test_validate_data(
-        mocker: MockerFixture,
-        elements_counter: ElementsCounter,
-        data: dict[str, str],
-        metadata_properties: dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        expected_validated_data: dict[str, str],
-        expected_invalid_elements: int,
+    mocker: MockerFixture,
+    elements_counter: ElementsCounter,
+    data: dict[str, str],
+    metadata_properties: dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_validated_data: dict[str, str],
+    expected_invalid_elements: int,
 ) -> None:
     """Unit test for _validate_data to ensure proper validation"""
     input_manager = InputManager()
@@ -3024,8 +3022,7 @@ def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
 
 @pytest.mark.parametrize("variable_name,validated_data", [("module1", {"test": "random"})])
 def test_add_to_pool(
-        variable_name: str, validated_data: dict[str, Any], mocker: MockerFixture,
-        mock_pool_for_add_pool: Dict[str, Any]
+    variable_name: str, validated_data: dict[str, Any], mocker: MockerFixture, mock_pool_for_add_pool: Dict[str, Any]
 ) -> None:
     """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
@@ -3073,10 +3070,10 @@ def test_export_pool_to_csv(mock_input_manager: InputManager, mocker: MockerFixt
     [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
 )
 def test_export_pool_to_csv_errors(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture,
-        exception: Type[FileNotFoundError | PermissionError | OSError],
-        error_message: str,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    exception: Type[FileNotFoundError | PermissionError | OSError],
+    error_message: str,
 ) -> None:
     """Tests all the possible errors in export_pool_to_csv() function of InputManager."""
     mock_pool = {"a": {"A": 1}, "b": {"B": 2}, "c": {"C": 3}, "d": {"D": [1, 2, 3]}, "animal_population": {}}
@@ -3105,82 +3102,46 @@ import pytest
 
 @pytest.fixture
 def simple_pool_and_meta() -> tuple[dict[Any, Any], dict[Any, Any]]:
-    pool = {
-        'a': 1,
-        'b': 2,
-        'c': {
-            'nested': {
-                'level1': 3,
-                'another': 4
-            }
-        }
-    }
+    pool = {"a": 1, "b": 2, "c": {"nested": {"level1": 3, "another": 4}}}
 
     metadata = {
-        'files': {
-            'a': {
-                'properties': 'blob_a',
-                'type': 'json',
-                'path': 'data/a.json'
+        "files": {
+            "a": {"properties": "blob_a", "type": "json", "path": "data/a.json"},
+            "b": {"properties": "blob_b", "type": "csv", "delimiter": ","},
+            "c": {
+                "properties": "blob_c",
+                "type": "json",
+                "versions": {"v1": "2021-01", "v2": "2022-02"},
+                "schema": {"required": ["x", "y"], "optional": ["z"]},
             },
-            'b': {
-                'properties': 'blob_b',
-                'type': 'csv',
-                'delimiter': ','
-            },
-            'c': {
-                'properties': 'blob_c',
-                'type': 'json',
-                'versions': {
-                    'v1': '2021-01',
-                    'v2': '2022-02'
-                },
-                'schema': {
-                    'required': ['x', 'y'],
-                    'optional': ['z']
-                }
-            }
         },
-        'properties': {
-            'blob_a': {
-                'format': 'json',
-                'description': 'first blob'
+        "properties": {
+            "blob_a": {"format": "json", "description": "first blob"},
+            "blob_b": {"format": "csv", "has_header": True},
+            "blob_c": {
+                "format": "json",
+                "complex": True,
+                "nested": {
+                    "level1": {"properties": "blob_level1", "type": "number"},
+                    "another": {"properties": "blob_another", "type": "number"},
+                },
             },
-            'blob_b': {
-                'format': 'csv',
-                'has_header': True
-            },
-            'blob_c': {
-                'format': 'json',
-                'complex': True,
-                'nested': {
-                    'level1': {
-                        'properties': 'blob_level1',
-                        'type': 'number'},
-                    'another': {
-                        'properties': 'blob_another',
-                        'type': 'number'}
-                }
-            }
-        }
+        },
     }
 
     return pool, metadata
 
 
-def test_delete_data_with_valid_key(simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]],
-                                    mocker: MockerFixture) -> None:
+def test_delete_data_with_valid_key(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
     """delete_data should remove both data and its metadata and return True."""
     pool, metadata = simple_pool_and_meta
 
     im = InputManager()
     im.pool = pool
     im.meta_data = metadata
-    mocker.patch.object(
-        im.data_validator,
-        "extract_value_by_key_list",
-        return_value=pool['c']['nested']
-    )
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
 
     result = im.delete_data("c.nested.level1")
 
@@ -3189,54 +3150,48 @@ def test_delete_data_with_valid_key(simple_pool_and_meta: tuple[dict[Any, Any], 
     assert "level1" not in im.meta_data["properties"]["blob_c"]["nested"]
 
 
-def test_delete_data_with_invalid_data_address(simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]],
-                                               mocker: MockerFixture) -> None:
+def test_delete_data_with_invalid_data_address(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
     """delete_data should return False and log a data-not-found error when key is invalid."""
     pool, metadata = simple_pool_and_meta
 
     im = InputManager()
     im.pool = pool.copy()
     im.meta_data = metadata.copy()
-    mocker.patch.object(
-        im.data_validator,
-        "extract_value_by_key_list",
-        side_effect=KeyError('missing')
-    )
-    mocker.spy(im.om, 'add_error')
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", side_effect=KeyError("missing"))
+    mocker.spy(im.om, "add_error")
 
     result = im.delete_data("c.nested.unknown")
 
     assert result is False
-    assert pool['c']['nested']['level1'] == 3
-    blob_key = metadata['files']['c']['properties']
-    assert 'level1' in metadata['properties'][blob_key]['nested']
+    assert pool["c"]["nested"]["level1"] == 3
+    blob_key = metadata["files"]["c"]["properties"]
+    assert "level1" in metadata["properties"][blob_key]["nested"]
     im.om.add_error.assert_called_once()
     args, kwargs = im.om.add_error.call_args
-    assert 'Validation: data not found' in args[0]
+    assert "Validation: data not found" in args[0]
 
 
-def test_delete_data_metadata_not_found(simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]],
-                                        mocker: MockerFixture) -> None:
+def test_delete_data_metadata_not_found(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
     """delete_data should remove data, return True, but log metadata-not-found if metadata path missing."""
     pool, metadata = simple_pool_and_meta
 
     im = InputManager()
     im.pool = pool
-    blob_key = metadata['files']['c']['properties']
-    metadata['properties'][blob_key].pop('nested')
+    blob_key = metadata["files"]["c"]["properties"]
+    metadata["properties"][blob_key].pop("nested")
     im.meta_data = metadata
 
-    mocker.patch.object(
-        im.data_validator,
-        "extract_value_by_key_list",
-        return_value=pool['c']['nested']
-    )
-    mocker.spy(im.om, 'add_error')
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
+    mocker.spy(im.om, "add_error")
 
     result = im.delete_data("c.nested.another")
 
     assert result is True
-    assert 'another' not in im.pool['c']['nested']
+    assert "another" not in im.pool["c"]["nested"]
     im.om.add_error.assert_called_once()
     args, kwargs = im.om.add_error.call_args
-    assert 'Validation: metadata not found' in args[0]
+    assert "Validation: metadata not found" in args[0]
