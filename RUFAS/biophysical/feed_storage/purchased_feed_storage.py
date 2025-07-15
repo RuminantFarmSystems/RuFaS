@@ -41,11 +41,7 @@ class PurchasedFeedStorage:
         self.stored: list[PurchasedFeed] = []
         self._om = OutputManager()
 
-    def project_shrinkage(
-            self,
-            days_interval: int,
-            available_feeds: list[NASEMFeed | NRCFeed]
-    ) -> list[PurchasedFeed]:
+    def project_shrinkage(self, days_interval: int, available_feeds: list[NASEMFeed | NRCFeed]) -> list[PurchasedFeed]:
         """
         Projects the state of purchased feeds at a given future date,
         without mutating self.stored.
@@ -65,14 +61,9 @@ class PurchasedFeedStorage:
         projected_feeds: list[PurchasedFeed] = []
 
         for feed in self.stored:
-            feed_info = next(
-                (af for af in available_feeds if af.rufas_id == feed.rufas_id),
-                None
-            )
+            feed_info = next((af for af in available_feeds if af.rufas_id == feed.rufas_id), None)
             if feed_info is None:
-                raise ValueError(
-                    f"Trying to shrink unavailable feed {feed.rufas_id}."
-                )
+                raise ValueError(f"Trying to shrink unavailable feed {feed.rufas_id}.")
             if days_interval > 3:
                 new_dm = feed.dry_matter_mass * (1 - feed_info.shrink_factor)
                 new_feed = replace(feed, dry_matter_mass=new_dm)
