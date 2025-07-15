@@ -248,7 +248,6 @@ class SimulationEngine:
         """
         Instantiates the simulation object by requesting data from the Input Manager.
         """
-
         weather_data = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
@@ -257,6 +256,10 @@ class SimulationEngine:
         crop_config_to_rufas_ids_map = self.field_manager.get_crop_configs_to_rufas_ids()
 
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
+        # Uncomment the below three lines for testing pup
+        # self.im.delete_data("config.nutrient_standard")
+        # print(self.im.get_data("config.nutrient_standard"))
+        # print(self.im.get_metadata("properties.config_properties.nutrient_standard"))
         feed_class_config = self.im.get_data("feed")
         self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
