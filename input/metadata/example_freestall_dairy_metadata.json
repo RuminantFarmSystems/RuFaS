@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/example_config.json",
+      "path": "input/data/config/example_freestall_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -115,7 +115,7 @@
     "field_1": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/example_field_1_corn_alf.json",
+      "path": "input/data/field/example_small_field_corn_alf_silage.json",
       "type": "json",
       "properties": "field_properties"
     }, 
@@ -136,14 +136,14 @@
     "fertilizer_schedule_1": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json",
+      "path": "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule_1": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
+      "path": "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
@@ -157,7 +157,7 @@
     "field_2": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/example_field_2_corn_alf.json",
+      "path": "input/data/field/example_small_field_corn_grain_alf_hay.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -178,14 +178,14 @@
     "fertilizer_schedule_2": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json",
+      "path": "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule_2": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
+      "path": "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },

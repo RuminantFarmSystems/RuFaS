@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/example_config.json",
+      "path": "input/data/config/example_open_lot_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -158,7 +158,7 @@
     "field_2": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/example_field_2_corn_alf.json",
+      "path": "input/data/field/example_field_corn_grain_alf_hay.json",
       "type": "json",
       "properties": "field_properties"
     },
