@@ -307,9 +307,7 @@ class FeedManager:
 
         available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
 
-        available_feed_totals = self._query_available_feed_totals(
-            available_feed_rufas_ids, projected_crops
-        )
+        available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids, projected_crops)
 
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
@@ -349,9 +347,7 @@ class FeedManager:
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
 
     def _query_available_feed_totals(
-        self,
-        query_feed_ids: list[RUFAS_ID],
-        stored_crops: list[HarvestedCrop] | None = None
+        self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
     ) -> dict[RUFAS_ID, float]:
         """
         Gets the current dry matter mass of each feed ID currently in storage.
