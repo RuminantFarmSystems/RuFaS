@@ -40,10 +40,11 @@ RuFaS is grounded in peer-reviewed science and collaborative development. It is 
 
 ### 🚀 Getting Started
 
-1. **Fork the repository** and create a feature branch following the [branching strategy in RuFaS](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Branching-Strategy-in-RuFaS.html) and [RuFaS GitHub Actions](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) 
-2. **Open an issue** to discuss your idea or bug report.
-3. **Submit a pull request** with a clear description of your changes.
-4. **Tag relevant maintainers** for review.
+1. **Read through the introductory material** on our GitHub Pages site: https://ruminantfarmsystems.github.io/RuFaS/
+2.  **Fork the repository** and create a feature branch following the [branching strategy in RuFaS](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Branching-Strategy-in-RuFaS.html) and [RuFaS GitHub Actions](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) 
+3. **Open an issue** to discuss your idea or bug report.
+4. **Submit a pull request** with a clear description of your changes.
+5. **Tag relevant maintainers** for review.
 
 > Please follow the guidance in [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1)
 
