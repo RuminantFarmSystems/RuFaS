@@ -118,6 +118,7 @@ def mock_NASEM_feed() -> dict[str, Any]:
         "Abs_magnesium": 0.94,
         "Abs_manganesum": 0.95,
         "Abs_zinc": 0.96,
+        "buffer": 0.0,
     }
 
 
@@ -125,7 +126,7 @@ def mock_NASEM_feed() -> dict[str, Any]:
 def mock_NRC_feed() -> dict[str, Any]:
     """Values of a mock NRC feed instance."""
 
-    return {"non_fiber_carb": 0.97, "PAF": 0.98}
+    return {"non_fiber_carb": 0.97, "PAF": 0.98, "buffer": 0.0}
 
 
 def test_feed_categorization() -> None:
