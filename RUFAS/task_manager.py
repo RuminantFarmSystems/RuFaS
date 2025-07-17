@@ -447,7 +447,7 @@ class TaskManager:
 
     @staticmethod
     def task(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         produce_graphics: bool,
         workers: int,
         metadata_depth_limit: int | None,
