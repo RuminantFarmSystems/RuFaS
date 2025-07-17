@@ -200,8 +200,10 @@ v0.9.2
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking.
 - [2464](https://github.com/RuminantFarmSystems/MASM/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
+- [2392](https://github.com/RuminantFarmSystems/MASM/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
 - [2473](https://github.com/RuminantFarmSystems/MASM/pull/2473) - [minor change] [E2E] Removes TODOs related to temporary Feed/Storage E2E testing setup files and functions.
 - [2474](https://github.com/RuminantFarmSystems/MASM/pull/2474) - [minor change] [Manure] Fixes a bug in manure handlers that interfered with flushing functionality.
+- [2293](https://github.com/RuminantFarmSystems/MASM/pull/2293) - [minor change] [Animal] Adds behavior in an animal reporter method to create an empty output variable in case where there are no sold animals for a given AnimalCombination.
 - [2479](https://github.com/RuminantFarmSystems/MASM/pull/2479) - [minor change] Removes `errors.py`
 
 ### v0.9.2
