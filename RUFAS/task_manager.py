@@ -407,7 +407,7 @@ class TaskManager:
 
     def _run_tasks(
         self,
-        single_run_args: List[Dict[str, Any]],
+        single_run_args: list[dict[str, Any]],
         produce_graphics: bool,
         metadata_depth_limit: int,
         workers: int,
