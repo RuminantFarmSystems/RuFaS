@@ -36,7 +36,7 @@
     "purchased_feeds": [
         {
             "purchased_feed": 2,
-            "purchased_feed_cost": 0.154
+            "purchased_feed_cost": 0.154,
             "buffer": 0.15
         },
         {

@@ -75,6 +75,7 @@ def purchased_feed() -> PurchasedFeed:
 def mock_available_feeds() -> list[Feed]:
     feed_1, feed_2, feed_3, feed_4, feed_5 = (MagicMock(auto_spec=Feed) for _ in range(5))
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id, feed_4.rufas_id, feed_5.rufas_id = 1, 2, 3, 4, 5
+    feed_1.buffer, feed_2.buffer, feed_3.buffer, feed_4.buffer, feed_5.buffer = 1, 2, 3, 4, 5
     return [feed_1, feed_2, feed_3, feed_4, feed_5]
 
 
@@ -493,7 +494,7 @@ def test_manage_ration_interval_purchases(
 
     feed_manager.manage_ration_interval_purchases(requested_feeds=requested, time=mock_time)
 
-    mock_purchase_feed.assert_called_once()
+    mock_purchase_feed.assert_called_once_with({1: 6.0, 2: 15.0}, mock_time, purchase_type='ration_interval')
 
 
 def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFixture) -> None:
