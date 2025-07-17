@@ -3871,6 +3871,12 @@
           "type": "number",
           "description": "Cost of Feed (US dollars/kg DM)",
           "minimum": 0
+        },
+        "buffer": {
+          "type": "number",
+          "description": "Buffer factor for purchased feed.",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     },
