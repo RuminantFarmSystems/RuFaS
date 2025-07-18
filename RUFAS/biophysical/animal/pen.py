@@ -1039,7 +1039,7 @@ class Pen:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
         ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements
+            animal_combination, self.average_nutrition_requirements.dry_matter
         )
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
@@ -1059,7 +1059,7 @@ class Pen:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
                 ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements
+                    animal_combination, self.average_nutrition_requirements.dry_matter
                 )
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1073,12 +1073,14 @@ class Pen:
 
         self.ration = ration
 
-    def handle_calf_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
+    def handle_calf_ration(self, is_ration_defined_by_user: bool, pen_available_feeds: list[Feed], temperature: float) -> None:
             """
             Calculate new ration for the pen based on the number of animals in the pen.
 
             Parameters
             ----------
+            is_ration_defined_by_user : bool
+                True if user defined ration behavior is desired.
             pen_available_feeds : list[Feed]
                 List of available feeds to be used in the ration formulation.
             temperature : float
@@ -1115,7 +1117,15 @@ class Pen:
                 intake: value / total_calves for intake, value in total_pen_calf_intake.items()}
             ration_per_calf = CalfRationManager.formulate_ration(
                 [x.rufas_id for x in pen_available_feeds], average_calf_intake
-            )
+                )
+            if is_ration_defined_by_user:
+                dry_matter_intake_requirement = 0.0
+                for key in ration_per_calf:
+                    dry_matter_intake_requirement += ration_per_calf[key]
+                ration_per_calf = UserDefinedRationManager.get_user_defined_ration(
+                    animal_combination=self.animal_combination,
+                    dry_matter_intake_requirement=dry_matter_intake_requirement
+                )
             # TODO deprecate method below if not used here
             # ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
             # udrm = udr.UserDefinedRationManager()
@@ -1123,6 +1133,7 @@ class Pen:
             #     ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
             # ration_vals = {"ME_total": animal_intake["me_intake"]}
             self.ration = ration_per_calf
+            self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration_per_calf)
 
 
     def get_requested_feed(self, ration_interval_length: int) -> RequestedFeed:
