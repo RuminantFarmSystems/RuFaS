@@ -203,6 +203,7 @@ v0.9.2
 - [2392](https://github.com/RuminantFarmSystems/MASM/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
 - [2473](https://github.com/RuminantFarmSystems/MASM/pull/2473) - [minor change] [E2E] Removes TODOs related to temporary Feed/Storage E2E testing setup files and functions.
 - [2474](https://github.com/RuminantFarmSystems/MASM/pull/2474) - [minor change] [Manure] Fixes a bug in manure handlers that interfered with flushing functionality.
+- [2491](https://github.com/RuminantFarmSystems/MASM/pull/2491) - [minor change] [Manure] Fixes a bug in manure request management when trying to supplement a request from a farm that has no on-farm manure.
 
 ### v0.9.2
 
