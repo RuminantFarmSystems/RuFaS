@@ -43,10 +43,10 @@ class InputManager:
         self.om = OutputManager()
         if InputManager.__instance is None:
             InputManager.__instance = self
-            self.__metadata: Dict[str, Any] = {}
-            self.__pool: Dict[str, Any] = {}
-            self.__get_data_logs_pool: Dict[str, str] = {}
-            self.__delete_data_logs_pool: Dict[str, str] = {}
+            self.__metadata: dict[str, Any] = {}
+            self.__pool: dict[str, Any] = {}
+            self.__get_data_logs_pool: dict[str, str] = {}
+            self.__delete_data_logs_pool: dict[str, str] = {}
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
             self.data_validator = DataValidator()
@@ -727,30 +727,49 @@ class InputManager:
 
         return data_keys
 
-    def delete_data(self, data_address: str) -> bool:
+    def delete_input_and_metadata(self, data_address: str) -> bool:
+        """
+        When given a valid address, this function removes the input data and its associated metadata.
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the input data to remove.
+
+        Returns
+        -------
+        bool
+            True if deleted, otherwise false.
+
+        """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.delete_data.__name__,
+            "function": self.delete_input_and_metadata.__name__,
         }
         keys = data_address.split(".")
+        timestamp = Utility.get_timestamp(include_millis=True)
 
         try:
             data_parent = self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1])
             removed_value = data_parent.pop(keys[-1])
-            ts = Utility.get_timestamp(include_millis=True)
-            self.__delete_data_logs_pool[ts] = f"InputManager.delete_data() called for {keys}"
-        except KeyError as ke:
-            self.om.add_error("Validation: data not found", str(ke), info_map)
+            self.__delete_data_logs_pool[timestamp] = (f"InputManager.delete_data() called for {keys}, data deleted from"
+                                                       f"{data_address}")
+        except KeyError as keyerror:
+            self.om.add_error("Validation: data not found", str(keyerror), info_map)
             removed_value = None
 
         try:
             file_key = keys[0]
             props_blob_key = self.__metadata["files"][file_key]["properties"]
-            meta_keys = ["properties", props_blob_key] + keys[1:]
-            meta_parent = reduce(lambda d, k: d[k], meta_keys[:-1], self.__metadata)
-            meta_parent.pop(meta_keys[-1], None)
-        except KeyError as ke:
-            self.om.add_error("Validation: metadata not found", str(ke), info_map)
+            metadata_keys = ["properties", props_blob_key] + keys[1:]
+            metadata_path = '.'.join(metadata_keys)
+            metadata_parent = reduce(lambda d, k: d[k], metadata_keys[:-1], self.__metadata)
+            metadata_parent.pop(metadata_keys[-1], None)
+            print(metadata_keys, metadata_parent)
+            self.__delete_data_logs_pool[timestamp] = (f"Deleted metadata for {data_address} and removed it"
+                                                       f" from {metadata_path}.")
+        except KeyError as keyerror:
+            self.om.add_error("Validation: metadata not found", str(keyerror), info_map)
 
         return removed_value is not None
 
