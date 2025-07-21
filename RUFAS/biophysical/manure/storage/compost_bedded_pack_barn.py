@@ -47,10 +47,25 @@ class CompostBeddedPackBarn(Storage):
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
-        storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
-            self._manure_to_process.total_volatile_solids,
-            self._determine_barn_temperature(current_day_conditions.mean_air_temperature),
-        )
+        manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
+
+        if manure_annual_temperature:
+            storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
+                self._manure_to_process.total_volatile_solids,
+                self._determine_barn_temperature(manure_annual_temperature),
+            )
+        else:
+            storage_methane = 0
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+            }
+            self._om.add_error(
+                "No annual mean temperature",
+                "No data of annual mean temperature available in current day condition to calculate MCF.",
+                info_map=info_map,
+            )
+
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             ManureConstants.DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,

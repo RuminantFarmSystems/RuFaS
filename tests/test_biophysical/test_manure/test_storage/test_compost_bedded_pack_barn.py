@@ -70,14 +70,14 @@ def compost_bedded_pack_barn() -> CompostBeddedPackBarn:
     """Returns a fixture CBPB."""
     return CompostBeddedPackBarn(name="dummy_name", storage_time_period=18, surface_area=6.6)
 
-
-def test_process_manure_runs_expected_steps(
+def test_process_manure_runs_no_annual_temperature(
     stored_manure: ManureStream,
     received_manure: ManureStream,
     compost_bedded_pack_barn: CompostBeddedPackBarn,
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     compost_bedded_pack_barn.stored_manure = stored_manure
     compost_bedded_pack_barn._received_manure = received_manure
     mock_calc_comp_meth_emission = mocker.patch.object(
@@ -110,7 +110,70 @@ def test_process_manure_runs_expected_steps(
         side_effect=mock_process_manure_side_effect,
     )
 
-    mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
+    mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0,
+                                       annual_mean_air_temperature=None)
+    mock_time = mocker.MagicMock(spec=RufasTime)
+    mock_time.simulation_day = 50
+
+    result = compost_bedded_pack_barn.process_manure(mock_conditions, mock_time)
+
+    mock_calc_comp_meth_emission.assert_not_called()
+    mock_calc_carb_decomp.assert_called_once()
+    mock_apply_dml.assert_called_once()
+    mock_calc_n2o.assert_called_once()
+    mock_calc_leaching.assert_called_once()
+    mock_calc_ammonia.assert_called_once()
+    mock_apply_n_loss.assert_called_once()
+    mock_add_error.assert_called_once()
+
+    assert mock_report_output.call_count == 5
+    assert mock_report_stream.call_count == 2
+
+    assert result == {}
+
+
+def test_process_manure_runs_expected_steps(
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    compost_bedded_pack_barn: CompostBeddedPackBarn,
+    mocker: MockerFixture,
+) -> None:
+    """Test that the process_manure method runs the expected steps."""
+    compost_bedded_pack_barn.stored_manure = stored_manure
+    compost_bedded_pack_barn._received_manure = received_manure
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    mock_calc_comp_meth_emission = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_ifsm_methane_emission", return_value=1.0
+    )
+    mock_calc_carb_decomp = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
+    )
+    mock_apply_dml = mocker.patch.object(compost_bedded_pack_barn, "_apply_dry_matter_loss")
+    mock_calc_n2o = mocker.patch.object(
+        compost_bedded_pack_barn, "_calculate_cbpb_nitrous_oxide_emission", return_value=0.5
+    )
+    mock_calc_leaching = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
+    )
+    mock_calc_ammonia = mocker.patch.object(
+        compost_bedded_pack_barn, "_calculate_cbpb_ammonia_emission", return_value=0.5
+    )
+    mock_apply_n_loss = mocker.patch.object(compost_bedded_pack_barn, "_apply_nitrogen_losses")
+    mock_report_output = mocker.patch.object(compost_bedded_pack_barn, "_report_processor_output")
+    mock_report_stream = mocker.patch.object(compost_bedded_pack_barn, "_report_manure_stream")
+
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
+        compost_bedded_pack_barn.stored_manure += compost_bedded_pack_barn._received_manure
+        compost_bedded_pack_barn._received_manure = ManureStream.make_empty_manure_stream()
+        return {}
+
+    mocker.patch(
+        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure",
+        side_effect=mock_process_manure_side_effect,
+    )
+
+    mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0,
+                                       annual_mean_air_temperature=15)
     mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 50
 
@@ -123,6 +186,7 @@ def test_process_manure_runs_expected_steps(
     mock_calc_leaching.assert_called_once()
     mock_calc_ammonia.assert_called_once()
     mock_apply_n_loss.assert_called_once()
+    mock_add_error.assert_not_called()
 
     assert mock_report_output.call_count == 5
     assert mock_report_stream.call_count == 2
