@@ -752,8 +752,9 @@ class InputManager:
         try:
             data_parent = self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1])
             removed_value = data_parent.pop(keys[-1])
-            self.__delete_data_logs_pool[timestamp] = (f"InputManager.delete_data() called for {keys}, data deleted from"
-                                                       f"{data_address}")
+            self.__delete_data_logs_pool[timestamp] = (
+                f"InputManager.delete_data() called for {keys}, data deleted from" f"{data_address}"
+            )
         except KeyError as keyerror:
             self.om.add_error("Validation: data not found", str(keyerror), info_map)
             removed_value = None
@@ -762,12 +763,13 @@ class InputManager:
             file_key = keys[0]
             props_blob_key = self.__metadata["files"][file_key]["properties"]
             metadata_keys = ["properties", props_blob_key] + keys[1:]
-            metadata_path = '.'.join(metadata_keys)
+            metadata_path = ".".join(metadata_keys)
             metadata_parent = reduce(lambda d, k: d[k], metadata_keys[:-1], self.__metadata)
             metadata_parent.pop(metadata_keys[-1], None)
             print(metadata_keys, metadata_parent)
-            self.__delete_data_logs_pool[timestamp] = (f"Deleted metadata for {data_address} and removed it"
-                                                       f" from {metadata_path}.")
+            self.__delete_data_logs_pool[timestamp] = (
+                f"Deleted metadata for {data_address} and removed it" f" from {metadata_path}."
+            )
         except KeyError as keyerror:
             self.om.add_error("Validation: metadata not found", str(keyerror), info_map)
 
