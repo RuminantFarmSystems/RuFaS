@@ -727,7 +727,7 @@ class InputManager:
 
         return data_keys
 
-    def delete_input_and_metadata(self, data_address: str) -> bool:
+    def delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
         """
         When given a valid address, this function removes the input data and its associated metadata.
 
@@ -738,8 +738,8 @@ class InputManager:
 
         Returns
         -------
-        bool
-            True if deleted, otherwise false.
+        tuple[bool, bool]
+            First value for indication of data removal, second value for indication of metadata removal.
 
         """
         info_map = {
@@ -750,14 +750,14 @@ class InputManager:
         timestamp = Utility.get_timestamp(include_millis=True)
 
         try:
-            data_parent = self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1])
-            removed_value = data_parent.pop(keys[-1])
+            self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1]).pop(keys[-1])
+            removed_data = True
             self.__delete_data_logs_pool[timestamp] = (
-                f"InputManager.delete_data() called for {keys}, data deleted from" f"{data_address}"
+                f"InputManager.delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
             )
         except KeyError as keyerror:
             self.om.add_error("Validation: data not found", str(keyerror), info_map)
-            removed_value = None
+            removed_data = False
 
         try:
             file_key = keys[0]
@@ -766,14 +766,15 @@ class InputManager:
             metadata_path = ".".join(metadata_keys)
             metadata_parent = reduce(lambda d, k: d[k], metadata_keys[:-1], self.__metadata)
             metadata_parent.pop(metadata_keys[-1], None)
-            print(metadata_keys, metadata_parent)
+            removed_metadata = True
             self.__delete_data_logs_pool[timestamp] = (
-                f"Deleted metadata for {data_address} and removed it" f" from {metadata_path}."
+                f"Deleted metadata for {data_address} and removed it from {metadata_path}."
             )
         except KeyError as keyerror:
             self.om.add_error("Validation: metadata not found", str(keyerror), info_map)
+            removed_metadata = False
 
-        return removed_value is not None
+        return removed_data, removed_metadata
 
     def flush_pool(self) -> None:
         """
