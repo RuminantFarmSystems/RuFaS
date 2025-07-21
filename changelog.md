@@ -207,6 +207,7 @@ v0.9.2
 - [2470](https://github.com/RuminantFarmSystems/MASM/pull/2470) - [minor change] [Feed] Adds shrink factor, buffer inputs and buffer usage logic in feed manager.
 - [2293](https://github.com/RuminantFarmSystems/MASM/pull/2293) - [minor change] [Animal] Adds behavior in an animal reporter method to create an empty output variable in case where there are no sold animals for a given AnimalCombination.
 - [2479](https://github.com/RuminantFarmSystems/MASM/pull/2479) - [minor change] Removes `errors.py`
+- [2492](https://github.com/RuminantFarmSystems/MASM/pull/2492) - [minor change] [Manure] Use annual mea temperature for CBPB's MCF factor calculation.
 
 ### v0.9.2
 
