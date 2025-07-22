@@ -458,23 +458,6 @@ class FeedManager:
 
         return results
 
-    def query_available_purchased_feeds(self) -> dict[RUFAS_ID, float]:
-        """
-        Queries the available amount of purchased feed in storage.
-
-        Returns
-        -------
-        dict[RUFAS_ID, float]
-            The amount of available purchased feed.
-        """
-        results: dict[RUFAS_ID, float] = {}
-        for purchased_feed in self.purchased_feed_storage.stored:
-            results[purchased_feed.rufas_id] = purchased_feed.dry_matter_mass
-        for feed in self._available_feeds:
-            if feed.rufas_id not in results:
-                results[feed.rufas_id] = 0.0
-        return results
-
     def purchase_feed(
         self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime, purchase_type: PurchaseType
     ) -> None:

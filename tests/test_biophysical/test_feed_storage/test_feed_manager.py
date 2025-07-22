@@ -643,39 +643,6 @@ def test_query_available_feeds_combinations(
     assert results[0]["amount"] == 300
 
 
-def test_query_available_purchased_feeds(
-    feed_manager: FeedManager,
-    mock_available_feeds: list[Feed],
-) -> None:
-    """Test that purchased feed availability is reported correctly."""
-    stored_purchased_feed_1 = MagicMock()
-    stored_purchased_feed_1.rufas_id = 1
-    stored_purchased_feed_1.dry_matter_mass = 100.0
-
-    stored_purchased_feed_3 = MagicMock()
-    stored_purchased_feed_3.rufas_id = 3
-    stored_purchased_feed_3.dry_matter_mass = 300.0
-
-    feed_manager.purchased_feed_storage.stored = [
-        stored_purchased_feed_1,
-        stored_purchased_feed_3,
-    ]
-
-    feed_manager._available_feeds = mock_available_feeds
-
-    result = feed_manager.query_available_purchased_feeds()
-
-    expected = {
-        1: 100.0,
-        2: 0.0,
-        3: 300.0,
-        4: 0.0,
-        5: 0.0,
-    }
-
-    assert result == expected
-
-
 def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture) -> None:
     """Test that feeds are purchased correctly."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
