@@ -107,6 +107,7 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         manure_applications = self.generate_daily_manure_applications()
+        self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
@@ -127,7 +128,7 @@ class SimulationEngine:
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
-            total_inventory = self.feed_manager.get_total_inventory(
+            total_projected_inventory = self.feed_manager.get_total_projected_inventory(
                 self.time.current_date.date(), self.weather, self.time
             )
 
@@ -135,7 +136,7 @@ class SimulationEngine:
                 next_harvest_dates
             )
             ideal_feeds_to_purchase = self.herd_manager.update_all_max_daily_feeds(
-                total_inventory, next_harvest_dates_with_rufas_ids, self.time
+                total_projected_inventory, next_harvest_dates_with_rufas_ids, self.time
             )
             self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
 
@@ -150,7 +151,9 @@ class SimulationEngine:
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
-        total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
+        total_inventory = self.feed_manager.get_total_projected_inventory(
+            self.time.current_date.date(), self.weather, self.time
+        )
 
         all_manure_data = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
@@ -159,8 +162,6 @@ class SimulationEngine:
         self.manure_manager.run_daily_update(
             all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
         )
-
-        self.feed_manager.report_daily_purchases(self.time.simulation_day)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -171,19 +172,23 @@ class SimulationEngine:
         """Formulates the ration for the animals."""
         self.feed_manager.process_degradations(self.weather, self.time)
         self.next_ration_reformulation = (self.time.current_date + self.ration_formulation_interval_length).date()
-        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation, self.weather, self.time)
+        total_projected_inventory = self.feed_manager.get_total_projected_inventory(
+            self.next_ration_reformulation, self.weather, self.time
+        )
         current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds,
             current_temperature,
             self.ration_formulation_interval_length.days,
-            total_inventory,
+            total_projected_inventory,
             self.time.simulation_day,
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
         for pen in self.herd_manager.all_pens:
             AnimalModuleReporter.report_ration_interval_data(pen, self.time.simulation_day)
+
+        self.feed_manager.report_feed_manager_balance(self.time.simulation_day)
 
     def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
         """Requests nutrients from the manure manager for each field in the simulation.
@@ -256,12 +261,12 @@ class SimulationEngine:
         crop_config_to_rufas_ids_map = self.field_manager.get_crop_configs_to_rufas_ids()
 
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
-        # Uncomment the below three lines for testing pup
-        # self.im.delete_data("config.nutrient_standard")
-        # print(self.im.get_data("config.nutrient_standard"))
-        # print(self.im.get_metadata("properties.config_properties.nutrient_standard"))
         feed_class_config = self.im.get_data("feed")
-        self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
+        self.feed_manager: FeedManager = FeedManager(
+            feed_class_config,
+            nutrient_standard,
+            crop_config_to_rufas_ids_map,
+        )
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
