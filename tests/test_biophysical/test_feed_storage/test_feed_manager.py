@@ -523,8 +523,9 @@ def test_manage_ration_interval_purchases(
     mock_purchase_feed.assert_called_once_with({1: 6.0, 2: 15.0}, mock_time, purchase_type="ration_interval")
 
 
-def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFixture,
-                                     mock_available_feeds: list[Feed]) -> None:
+def test_query_available_feed_totals(
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Feed]
+) -> None:
     """Test that totals of available feeds are calculated correctly."""
     mock_all_farmgrown_feeds_held: list[HarvestedCrop] = [
         feed_1 := MagicMock(auto_spec=HarvestedCrop),
@@ -551,8 +552,9 @@ def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFi
     assert result == expected_feed_totals
 
 
-def test_query_available_feed_totals_no_stored_crops_input(feed_manager: FeedManager, mocker: MockerFixture,
-                                                           mock_available_feeds: list[Feed]) -> None:
+def test_query_available_feed_totals_no_stored_crops_input(
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Feed]
+) -> None:
     """Test that totals of available feeds are calculated correctly when user did not specify the stored_crops input."""
     feed_1, feed_2, feed_3 = (MagicMock(auto_spec=HarvestedCrop) for _ in range(3))
     feed_1.rufas_ids, feed_2.rufas_ids, feed_3.rufas_ids = ([1, 5, 7], [2, 4, 6], [3, 8, 10])
