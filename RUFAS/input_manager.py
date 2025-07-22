@@ -43,9 +43,10 @@ class InputManager:
         self.om = OutputManager()
         if InputManager.__instance is None:
             InputManager.__instance = self
-            self.__metadata: Dict[str, Any] = {}
-            self.__pool: Dict[str, Any] = {}
-            self.__get_data_logs_pool: Dict[str, str] = {}
+            self.__metadata: dict[str, Any] = {}
+            self.__pool: dict[str, Any] = {}
+            self.__get_data_logs_pool: dict[str, str] = {}
+            self.__delete_data_logs_pool: dict[str, str] = {}
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
             self.data_validator = DataValidator()
@@ -726,6 +727,55 @@ class InputManager:
 
         return data_keys
 
+    def delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
+        """
+        When given a valid address, this function removes the input data and its associated metadata.
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the input data to remove.
+
+        Returns
+        -------
+        tuple[bool, bool]
+            First value for indication of data removal, second value for indication of metadata removal.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.delete_input_and_metadata.__name__,
+        }
+        keys = data_address.split(".")
+        timestamp = Utility.get_timestamp(include_millis=True)
+
+        try:
+            self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1]).pop(keys[-1])
+            removed_data = True
+            self.__delete_data_logs_pool[timestamp] = (
+                f"InputManager.delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
+            )
+        except KeyError as keyerror:
+            self.om.add_error("Validation: data not found", str(keyerror), info_map)
+            removed_data = False
+
+        try:
+            file_key = keys[0]
+            props_blob_key = self.__metadata["files"][file_key]["properties"]
+            metadata_keys = ["properties", props_blob_key] + keys[1:]
+            metadata_path = ".".join(metadata_keys)
+            metadata_parent = reduce(lambda d, k: d[k], metadata_keys[:-1], self.__metadata)
+            metadata_parent.pop(metadata_keys[-1], None)
+            removed_metadata = True
+            self.__delete_data_logs_pool[timestamp] = (
+                f"Deleted metadata for {data_address} and removed it from {metadata_path}."
+            )
+        except KeyError as keyerror:
+            self.om.add_error("Validation: metadata not found", str(keyerror), info_map)
+            removed_metadata = False
+
+        return removed_data, removed_metadata
+
     def flush_pool(self) -> None:
         """
         Clear the variable pool.
@@ -1106,6 +1156,21 @@ class InputManager:
         file_path = path / file_name
         self.om.create_directory(path)
         self.om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def dump_delete_data_logs(self, path: Path) -> None:
+        """
+        Dumps the stored get data logs to a JSON file at the specified path.
+
+        Parameters
+        ----------
+        path : Path
+            The directory path where the JSON file will be saved.
+
+        """
+        file_name = self.om.generate_file_name(base_name="InputManager_delete_data_log", extension="json")
+        file_path = path / file_name
+        self.om.create_directory(path)
+        self.om.dict_to_file_json(self.__delete_data_logs_pool, file_path)
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
