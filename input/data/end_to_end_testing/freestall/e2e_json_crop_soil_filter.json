@@ -1,0 +1,11 @@
+{
+    "name": "e2e_crop_and_soil",
+    "filters": [
+        ".*FieldDataReporter.*",
+        ".*harvest_yield.*",
+        ".*daylength.*",
+        "Field._record_manure_application.*"
+    ],
+    "expected_results_last_updated": "22-Jul-2025_Tue_18-22-04",
+    "expected_results": {"DISCLAIMER":"Under construction, use the results with caution."}
+}
