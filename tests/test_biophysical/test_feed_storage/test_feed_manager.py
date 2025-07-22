@@ -1,4 +1,3 @@
-from typing import Any
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -80,7 +79,7 @@ def mock_available_feeds() -> list[Feed]:
 
 
 @pytest.fixture
-def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> FeedManager:
+def feed_manager(mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | NRCFeed]) -> FeedManager:
     """Pytest fixture to create a FeedManager instance for testing."""
     mocker.patch.object(FeedManager, "__init__", return_value=None)
     feed_manager = FeedManager.__new__(FeedManager)
@@ -140,14 +139,14 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
     ]
 
 
-def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
+def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed]) -> None:
     """Test for FeedManager available_feeds property."""
     feed_manager._available_feeds = mock_available_feeds
     assert feed_manager.available_feeds == mock_available_feeds
 
 
 def test_update_available_feed_amounts(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:
     """Test that amounts of available feeds in Feed Manager are updated correctly."""
     feed_manager._available_feeds = mock_available_feeds
@@ -288,7 +287,7 @@ def test_report_feed_storage_levels(feed_manager: FeedManager, mocker: MockerFix
 
 
 def test_report_stored_farmgrown_feeds(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:
     """Test that the Feed Manager reports stored feeds correctly."""
     mock_time = MagicMock(auto_spec=RufasTime)
@@ -323,7 +322,7 @@ def test_report_stored_farmgrown_feeds(
 
 def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that daily feed requests are managed correctly."""
-    feed_manager._om.add_variable = mocker.Mock()
+    mocker.patch.object(feed_manager._om, "add_variable")
 
     mock_query_available_feed_totals = mocker.patch.object(
         feed_manager,
@@ -357,7 +356,7 @@ def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mock
     """Test that daily feed requests that cannot be fulfilled are handled correctly."""
     mock_om = MagicMock(auto_spec=OutputManager)
     feed_manager._om = mock_om
-    feed_manager._om.add_variable = mocker.Mock()
+    feed_manager._om.add_variable = mocker.patch.object(feed_manager._om, "add_variable")
 
     mock_query_available_feed_totals = mocker.patch.object(
         feed_manager,
@@ -388,7 +387,7 @@ def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mock
 
 
 def test_get_total_projected_inventory(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:
     """Test that the total projected inventory is collected correctly."""
     storage_1, storage_2, storage_3 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile), MagicMock(auto_spec=Bag))
@@ -436,7 +435,7 @@ def test_get_total_projected_inventory(
 
 
 def test_get_total_projected_inventory_zero_day_in_the_future(
-    feed_manager: FeedManager, mock_available_feeds: list[Any], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:
     """Test that the total projected inventory is collected correctly when the requested inventory date
     is the current date."""
@@ -471,7 +470,7 @@ def test_get_total_projected_inventory_zero_day_in_the_future(
     assert result.inventory_date == inventory_date
 
 
-def test_get_total_projected_inventory_value_error(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
+def test_get_total_projected_inventory_value_error(feed_manager: FeedManager) -> None:
     """Test that get_total_projected_inventory correctly raises a ValueError when the inventory_date is in the past."""
     expected_days_in_the_future = -3
     mock_time = MagicMock(auto_spec=RufasTime)
@@ -504,7 +503,7 @@ def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: Mock
 
 
 def test_manage_ration_interval_purchases(
-    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Any]
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | NRCFeed]
 ) -> None:
     """Test that requests for feed made at beginning of a ration interval are handled correctly."""
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed")
@@ -524,7 +523,7 @@ def test_manage_ration_interval_purchases(
 
 
 def test_query_available_feed_totals(
-    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Feed]
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | NRCFeed]
 ) -> None:
     """Test that totals of available feeds are calculated correctly."""
     mock_all_farmgrown_feeds_held: list[HarvestedCrop] = [
@@ -553,7 +552,7 @@ def test_query_available_feed_totals(
 
 
 def test_query_available_feed_totals_no_stored_crops_input(
-    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Feed]
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | NRCFeed]
 ) -> None:
     """Test that totals of available feeds are calculated correctly when user did not specify the stored_crops input."""
     feed_1, feed_2, feed_3 = (MagicMock(auto_spec=HarvestedCrop) for _ in range(3))
@@ -643,19 +642,18 @@ def test_query_available_feeds_combinations(
     assert results[0]["amount"] == 300
 
 
-def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture) -> None:
+def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed],
+                       mocker: MockerFixture) -> None:
     """Test that feeds are purchased correctly."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
     feed_manager._available_feeds = mock_available_feeds
-    feed_manager._rufas_ids_purchased_today = set()
-    feed_manager._daily_purchases = []
     feed_manager._om = MagicMock(auto_spec=OutputManager)
 
     mock_om_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
     mock_store_purchased_feed = mocker.patch.object(feed_manager, "_store_purchased_feed")
 
     feed_manager.purchase_feed(
-        feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="test_purchase"
+        feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="daily_feed_request"
     )
 
     assert mock_om_add_variable.call_count == 10
@@ -663,13 +661,11 @@ def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Fee
 
 
 def test_purchase_feed_error(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:
     """Test that trying to purchase an unavailable feed raises an error."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 7: 7.7}
     feed_manager._available_feeds = mock_available_feeds
-    feed_manager._rufas_ids_purchased_today = set()
-    feed_manager._daily_purchases = []
     feed_manager._om = MagicMock(auto_spec=OutputManager)
 
     mocker.patch.object(feed_manager._om, "add_variable")
@@ -677,7 +673,7 @@ def test_purchase_feed_error(
 
     with pytest.raises(ValueError, match="Trying to purchase unavailable feed 7"):
         feed_manager.purchase_feed(
-            feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="test_purchase"
+            feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="daily_feed_request"
         )
 
 

@@ -69,7 +69,7 @@ class PurchasedFeedStorage:
             if feed.rufas_id not in report:
                 report[feed.rufas_id] = 0.0
             report[feed.rufas_id] += feed.dry_matter_mass
-        for feed in self.available_feeds:
-            if feed.rufas_id not in report:
-                report[feed.rufas_id] = 0.0
+        for available_feed in self.available_feeds:
+            if available_feed.rufas_id not in report:
+                report[available_feed.rufas_id] = 0.0
         return report
