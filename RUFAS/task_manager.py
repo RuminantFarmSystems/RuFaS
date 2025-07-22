@@ -128,6 +128,11 @@ class TaskManager:
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
+        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
+        for task in task_config.get("tasks", []):
+            filters_path = Path(task["filters_directory"])
+            self.output_manager.validate_filter_content(filters_path)
+
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 args={
@@ -142,10 +147,6 @@ class TaskManager:
                 should_flush_im_pool=True,
             )
             raise Exception("Task Manager's input data is invalid.")
-        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
-        for task in task_config.get("tasks", []):
-            filters_path = Path(task["filters_directory"])
-            self.output_manager.validate_filter_content(filters_path)
 
         workers: int = task_config["parallel_workers"]
         self.output_manager.add_log(
@@ -169,7 +170,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -405,11 +406,20 @@ class TaskManager:
         return single_run_args
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
+        self,
+        single_run_args: list[dict[str, Any]],
+        produce_graphics: bool,
+        metadata_depth_limit: int,
+        workers: int,
+        metadata_path: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
+            self.task,
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=workers,
+            metadata_path=metadata_path,
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -437,7 +447,11 @@ class TaskManager:
 
     @staticmethod
     def task(
-        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+        args: dict[str, Any],
+        produce_graphics: bool,
+        workers: int,
+        metadata_depth_limit: int | None,
+        metadata_path: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -507,6 +521,12 @@ class TaskManager:
                 )
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
                 return None
+
+            input_manager.start_data_processing(metadata_path)
+            task_config: dict[str, Any] = input_manager.get_data("tasks")
+            for task in task_config.get("tasks", []):
+                filters_path = Path(task["filters_directory"])
+                output_manager.validate_filter_constant_content(filters_path)
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
@@ -747,6 +767,7 @@ class TaskManager:
 
         if not args["suppress_log_files"]:
             input_manager.dump_get_data_logs(args["logs_directory"])
+            input_manager.dump_delete_data_logs(args["logs_directory"])
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )

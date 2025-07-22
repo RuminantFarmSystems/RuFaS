@@ -105,7 +105,7 @@ class AnimalModuleReporter:
             herd_statistics.calf_num
             + herd_statistics.heiferI_num
             + herd_statistics.heiferII_num
-            + herd_statistics.heiferII_num
+            + herd_statistics.heiferIII_num
             + herd_statistics.cow_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
@@ -1251,6 +1251,7 @@ class AnimalModuleReporter:
         cows : List[Animal]
             The list of Cows
         """
+        empty_sold_animals: List[SoldAnimalTypedDict] = [{"sold_at_day": 0, "body_weight": 0}]
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
         if herd_statistics.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1258,13 +1259,31 @@ class AnimalModuleReporter:
                 "sold_calves",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_calves",
+                time.simulation_day,
+            )
         if herd_statistics.sold_heiferIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_heiferIIs_info, "heiferII", time.simulation_day
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferII",
+                time.simulation_day,
+            )
         if herd_statistics.sold_heiferIIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_heiferIIIs_info, "heiferIII", time.simulation_day
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferIII",
+                time.simulation_day,
             )
         if herd_statistics.sold_and_died_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1272,9 +1291,21 @@ class AnimalModuleReporter:
                 "sold_and_died_cows",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_and_died_cows",
+                time.simulation_day,
+            )
         if herd_statistics.sold_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_cows_info,
+                "sold_cows",
+                time.simulation_day,
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
                 "sold_cows",
                 time.simulation_day,
             )

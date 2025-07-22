@@ -58,7 +58,8 @@
         },
         {
             "purchased_feed": 94,
-            "purchased_feed_cost": 0.01
+            "purchased_feed_cost": 0.01,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 95,

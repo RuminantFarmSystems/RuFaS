@@ -34,7 +34,6 @@ from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
-
 # Defines the compatibility between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: dict[CropCategory, list[type[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
@@ -43,7 +42,6 @@ CROP_TO_STORAGE_MAPPING: dict[CropCategory, list[type[Storage]]] = {
     CropCategory.SMALL_GRAIN: [Hay, Grain, Silage, Baleage],
     CropCategory.SOY: [Grain],
 }
-
 
 """Maps each StorageType enum element to the associated Storage subclass."""
 STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
@@ -59,12 +57,10 @@ STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
     StorageType.BAG: Bag,
 }
 
-
 """Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 QUERY_RESULT_DATA_TYPE = dict[str, CropCategory | float]
-
 
 """A type alias representing the context in which a feed purchase was initiated."""
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
@@ -338,9 +334,14 @@ class FeedManager:
         current_feed_totals = self._query_available_feed_totals(list(requested_feeds.requested_feed.keys()))
         feeds_to_purchase = {id: 0.0 for id in requested_feeds.requested_feed.keys()}
         for feed_id, amount_requested in requested_feeds.requested_feed.items():
+            feed_info = next(
+                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == feed_id), None
+            )
+            if feed_info is None:
+                raise ValueError(f"Trying to purchase unavailable feed {feed_id} during ration interval purchases.")
             available_amount = current_feed_totals[feed_id]
 
-            amount_to_purchase = max(amount_requested - available_amount, 0.0)
+            amount_to_purchase = max(amount_requested - available_amount, 0.0) * (1 + feed_info.buffer)
             feeds_to_purchase[feed_id] = amount_to_purchase
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
@@ -485,7 +486,7 @@ class FeedManager:
             self._daily_purchases.append(
                 _FeedPurchase(rufas_id=rufas_id, amount_purchased=purchase_amount, purchase_type=purchase_type)
             )
-            self._store_purchased_feed(rufas_id, purchase_amount, time, purchase_type)
+            self._store_purchased_feed(rufas_id, purchase_amount, time)
 
     def report_daily_purchases(self, simulation_day: int) -> None:
         """
@@ -519,56 +520,7 @@ class FeedManager:
         self._daily_purchases.clear()
         self._rufas_ids_purchased_today.clear()
 
-    def _adjust_for_shrink(
-        self, purchased_feed: PurchasedFeed, purchase_type: str, shrink_factor: float = 0.1
-    ) -> PurchasedFeed:
-        """
-        Adjusts the purchased feed to account for shrink loss in storage.
-
-        Parameters
-        ----------
-        purhased_feed : PurchasedFeed
-            PurchasedFeed object containing the feed to be adjusted.
-        purchase_type : str
-            Type of purchase being made, used for output variable naming.
-        simulation_day : int
-            The current simulation day, used for tracking feed adjustments.
-        shrink_factor : float, optional
-            The expected fraction of feed lost due to shrink (default is 0.1 for 10%).
-
-        References
-        ----------
-        Feed Storage Scientific Documentation equation FS.CON.1.
-
-        Returns
-        -------
-        PurchasedFeed
-            Adjusted PurchasedFeed object with the dry matter mass reduced by the shrink factor.
-        """
-        # TODO get shrink factor from appropriate feed library source when that data becomes available.
-        # Default 10% shrink factor for all purchased feeds for now.
-        adjusted_mass = purchased_feed.dry_matter_mass * (1 - shrink_factor)
-        loss_to_shrink = purchased_feed.dry_matter_mass - adjusted_mass
-        self._om.add_variable(
-            f"{purchase_type}_purchased_feed_{purchased_feed.rufas_id}_amount_lost_to_shrink",
-            loss_to_shrink,
-            {
-                "class": self.__class__.__name__,
-                "function": self._adjust_for_shrink.__name__,
-                "units": MeasurementUnits.DRY_KILOGRAMS,
-                "rufas_id": purchased_feed.rufas_id,
-                "shrink_factor": shrink_factor,
-            },
-        )
-        return PurchasedFeed(
-            rufas_id=purchased_feed.rufas_id,
-            dry_matter_mass=adjusted_mass,
-            storage_time=purchased_feed.storage_time,
-        )
-
-    def _store_purchased_feed(
-        self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime, purchase_type: str
-    ) -> None:
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
         Stores feeds which have been purchased and adjusts for shrink.
 
@@ -580,15 +532,10 @@ class FeedManager:
             Amount of feed that was purchased (kg dry matter).
         time : RufasTime
             RufasTime object.
-        purchase_type : str
-            Type of purchase being made, used for output variable naming.
+
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
-        if purchase_type == "ration_interval":
-            shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed, purchase_type)
-        else:
-            shrink_adjusted_purchased_feed = purchased_feed
-        self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
+        self.purchased_feed_storage.receive_feed(purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float], simulation_day: int) -> None:
         """
@@ -759,6 +706,7 @@ class FeedManager:
         for feed in feeds_to_parse:
             rufas_id = feed["purchased_feed"]
             price = feed["purchased_feed_cost"]
+            buffer = feed["buffer"]
             try:
                 nutritive_properties = feed_library[rufas_id]
             except KeyError:
@@ -768,6 +716,7 @@ class FeedManager:
                 amount_available=0.0,
                 on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
                 purchase_cost=price,
+                buffer=buffer,
                 **nutritive_properties,
             )
             available_feeds.append(new_feed)
