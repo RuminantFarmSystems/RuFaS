@@ -34,6 +34,23 @@ def mock_animal(animal_type: AnimalType, id: int, mocker: MockerFixture) -> Anim
     return animal
 
 
+def mock_cow(
+    mocker: MockerFixture,
+    id_: int,
+    parity: int,
+    is_milking: bool,
+    days_born: int,
+) -> Animal:
+    cow = MagicMock(spec=Animal)
+    cow.id = id_
+    cow.calves = parity
+    cow.is_milking = is_milking
+    cow.days_born = days_born
+    cow.type = AnimalType.LAC_COW
+    mocker.patch.object(cow, "get_animal_values", return_value={"dummy": "animal"})
+    return cow
+
+
 def average(data: list[float | int]) -> float:
     return sum(data) / len(data) if len(data) > 0 else 0.0
 
@@ -418,5 +435,46 @@ def test_post_init(
 
     actual = AnimalPopulation.current_animal_id
     assert actual == expected
+
+    AnimalPopulation.set_current_max_animal_id(0)
+
+
+@pytest.mark.parametrize(
+    "parity, is_milking, days_born_filter, expected_ids",
+    [
+        (1, True, 0, [0]),  # cow0
+        (1, False, 0, [1]),  # cow1
+        (2, False, 100, [2]),  # cow2
+        (3, True, 400, [3]),  # cow3
+        (3, True, 0, [3, 4]),  # cow3 and cow4
+        (2, True, 1000, []),  # none
+    ],
+)
+def test_filter_cow_status(
+    parity: int,
+    is_milking: bool,
+    days_born_filter: int,
+    expected_ids: list[int],
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for filter_cow_status() with expected result control"""
+    AnimalPopulation.set_current_max_animal_id(0)
+
+    cows = [
+        mock_cow(mocker, 0, 1, True, 50),  # cow0
+        mock_cow(mocker, 1, 1, False, 50),  # cow1
+        mock_cow(mocker, 2, 2, False, 150),  # cow2
+        mock_cow(mocker, 3, 3, True, 600),  # cow3
+        mock_cow(mocker, 4, 3, True, 200),  # cow4
+        mock_cow(mocker, 5, 3, False, 700),  # cow5
+        mock_cow(mocker, 6, 2, True, 50),  # cow6
+    ]
+
+    population = AnimalPopulation(calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=cows, replacement=[])
+
+    result = population.filter_cow_status(parity, is_milking, days_born_filter)
+    result_ids = [cow.id for cow in result]
+
+    assert sorted(result_ids) == sorted(expected_ids)
 
     AnimalPopulation.set_current_max_animal_id(0)
