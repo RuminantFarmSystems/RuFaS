@@ -1,0 +1,10 @@
+{
+    "years": [2014],
+    "days": [107],
+    "incorporation_fractions": [0.9],
+    "mixing_fractions": [0.5],
+    "tillage_depths": [100],
+    "implements": ["moldboard-plow"],
+    "pattern_repeat": 7,
+    "pattern_skip": 0
+}
