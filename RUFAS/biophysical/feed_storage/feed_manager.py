@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal
 
@@ -66,25 +65,6 @@ QUERY_RESULT_DATA_TYPE = dict[str, CropCategory | float]
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
 
 
-@dataclass
-class _FeedPurchase:
-    """
-    Represents a feed purchase with its RuFaS ID, amount purchased, and purchase type.
-
-    Attributes
-    ----------
-    rufas_id : RUFAS_ID
-        The RuFaS ID of the purchased feed.
-    amount_purchased : float
-        The amount of feed purchased (kg dry matter).
-    purchase_type : PurchaseType
-        The type of purchase being made.
-    """
-
-    rufas_id: RUFAS_ID
-    amount_purchased: float
-
-
 class FeedManager:
     """
     Manages the feed storage, handling crop reception, purchasing, degradation processing, feed distribution,
@@ -101,7 +81,6 @@ class FeedManager:
         feed_config: dict[str, list[Any]],
         nutrient_standard: NutrientStandard,
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
-        simulation_day: int,
     ) -> None:
         self.active_storages: dict[StorageType, Storage] = {}
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
