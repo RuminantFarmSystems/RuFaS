@@ -25,7 +25,7 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def compare_actual_and_expected_test_results(
-        json_output_path: Path, convert_variable_table_path: str | None
+        json_output_path: Path, convert_variable_table_path: str | None, output_prefix: str
     ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
@@ -37,6 +37,8 @@ class E2ETestResultsHandler:
         convert_variable_table_path : str | None
             String path to the csv look up table to convert the variable names in the expected results to match the
             variable names in the actual results.
+        output_prefix : str
+            The output prefix for the current e2e run.
 
         """
         om = OutputManager()
@@ -44,7 +46,7 @@ class E2ETestResultsHandler:
             "class": E2ETestResultsHandler.__class__.__name__,
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
-        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths()
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -245,10 +247,12 @@ class E2ETestResultsHandler:
         return len(duplicates_in_original_column) > 0 or len(duplicates_in_new_column) > 0
 
     @staticmethod
-    def _get_test_result_paths() -> list[ResultPathType]:
+    def _get_test_result_paths(output_prefix: str) -> list[ResultPathType]:
         """Retrieves the paths to test results and associated information from the InputManager."""
         im = InputManager()
-        result_paths: list[dict[str, str]] = im.get_data("end_to_end_testing_result_paths.end_to_end_test_result_paths")
+        result_paths: list[dict[str, str]] = im.get_data(
+            f"end_to_end_testing_result_paths.end_to_end_test_result_paths.{output_prefix}"
+        )
         test_result_paths: list[ResultPathType] = []
         for path_set in result_paths:
             test_result_paths.append(
@@ -346,7 +350,7 @@ class E2ETestResultsHandler:
         return diff_result
 
     @staticmethod
-    def update_expected_test_results(output_dir: Path) -> None:
+    def update_expected_test_results(output_dir: Path, output_prefix: str) -> None:
         """
         Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
         results in the appropriate domain filter file if differences are found.
@@ -355,13 +359,15 @@ class E2ETestResultsHandler:
         ----------
         output_dir : str
             The directory to which the actual results are written to.
+        output_prefix : str
+            The prefix to give the output file names.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__class__.__name__,
             "function": E2ETestResultsHandler.update_expected_test_results.__name__,
         }
-        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths()
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
             om.add_log(
