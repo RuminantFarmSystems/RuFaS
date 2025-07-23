@@ -240,6 +240,7 @@ v0.9.2
 - [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
+- [2496](https://github.com/RuminantFarmSystems/MASM/pull/2496) - [minor change] [EEE] Adds economic map file to generate partial budget analysis.
 
 ### v0.9.2
 
