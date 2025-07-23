@@ -1,20 +1,50 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "RUFAS"
+name = "RuFaS"
 version = "0.9.2"
 description = "Ruminant Farm Systems Model"
 readme = "README.md"
+license = "GPL-3.0-only"
 authors = [
-{"name" = "Kristan Foster Reed", "email" = "Kristan.Reed@usda.gov"},
+{"name" = "RuFaS Team", "email" = "contact@rufas.org"},
 ]
 requires-python = ">=3.12, <3.14"
+dependencies = [
+    "flake8>=7.1.1",
+    "matplotlib>=3.10.0",
+    "mock>=5.1.0",
+    "numpy==2.2.0",
+    "pandas>=2.2.3",
+    "pytest==7.4.4",
+    "pytest-mock>=3.14.0",
+    "scipy>=1.15.1",
+    "pytest-lazy-fixture>=0.6.3",
+    "argparse>=1.4.0",
+    "typing_extensions>=4.12.2",
+    "sphinx>=8.1.3",
+    "sphinxawesome-theme>=5.3.2",
+    "juliandate>=1.0.5",
+    "freezegun>=1.5.1",
+    "salib>=1.5.1",
+    "tqdm>=4.67.1",
+    "mypy>=1.15.0",
+    "black>=25.1.0",
+    "coverage>=7.6.11",
+    "deepdiff>=8.2.0",
+    "psutil>=6.1.1",
+    "numba>=0.61.0"
+]
 
 [project.urls]
 Homepage = "https://rufas.org"
-Repository = "https://github.com/RuminantFarmSystems/MASM"
+Repository = "https://github.com/RuminantFarmSystems/RuFaS"
+Documentation = "https://ruminantfarmsystems.github.io/RuFaS/"
+
+[tool.setuptools]
+packages = ["RUFAS"]
 
 [tool.black]
 target-version = ["py312"]
