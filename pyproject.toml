@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools.=61.0"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "RuFaS"
 version = "0.9.2"
 description = "Ruminant Farm Systems Model"
 readme = "README.md"
-license = "GPLv3"
+license = "GPL-3.0-or-later"
 authors = [
 {"name" = "RuFaS Team", "email" = "contact@rufas.org"},
 ]
@@ -42,6 +42,9 @@ dependencies = [
 Homepage = "https://rufas.org"
 Repository = "https://github.com/RuminantFarmSystems/RuFaS"
 Documentation = "https://ruminantfarmsystems.github.io/RuFaS/"
+
+[tool.setuptools]
+packages = ["RUFAS"]
 
 [tool.black]
 target-version = ["py312"]
