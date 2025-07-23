@@ -16,24 +16,24 @@ from RUFAS.units import MeasurementUnits
 
 
 class Mixing(Enum):
-    MIXED   = True
+    MIXED = True
     UNMIXED = False
 
 
 BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
     Mixing.MIXED: {
-        ( -math.inf,   4.6 ):  0.5,
-        (  4.6,        5.8 ):  0.5,
-        (  5.8,       13.9 ):  1.0,
-        ( 13.9,       25.1 ):  1.0,
-        (25.1, math.inf):  1.5,
+        (-math.inf, 4.6): 0.5,
+        (4.6, 5.8): 0.5,
+        (5.8, 13.9): 1.0,
+        (13.9, 25.1): 1.0,
+        (25.1, math.inf): 1.5,
     },
     Mixing.UNMIXED: {
-        ( -math.inf,   4.6 ): 21.0,
-        (  4.6,        5.8 ): 26.0,
-        (  5.8,       13.9 ): 37.0,
-        ( 13.9,       25.1 ): 41.0,
-        ( 25.1,   math.inf ): 74.0,
+        (-math.inf, 4.6): 21.0,
+        (4.6, 5.8): 26.0,
+        (5.8, 13.9): 37.0,
+        (13.9, 25.1): 41.0,
+        (25.1, math.inf): 74.0,
     },
 }
 
@@ -54,7 +54,6 @@ class BeddedPack(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
-        print(is_mixed)
         self.is_mixed = is_mixed
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
@@ -354,8 +353,8 @@ class BeddedPack(Storage):
         methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(is_mixed,
                                                                                                manure_temperature)
         methane_emissions_in_kg = (
-            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
-        ) / 100
+                                      manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+                                  ) / 100
         return methane_emissions_in_kg
 
     @staticmethod

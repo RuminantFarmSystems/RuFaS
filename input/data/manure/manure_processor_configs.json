@@ -82,6 +82,30 @@
   ],
   "storage": [
     {
+      "name": "calf_BP",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 180,
+      "is_mixed": true
+    },
+    {
+      "name": "grow_BP",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 180,
+      "is_mixed": true
+    },
+        {
+      "name": "close_BP",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 180,
+      "is_mixed": true
+    },
+    {
+      "name": "lac_BP",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 180,
+      "is_mixed": true
+    },
+    {
       "name": "slurry_storage_outdoor_growing",
       "processor_type": "SlurryStorageOutdoor",
       "capacity": 1e10,
