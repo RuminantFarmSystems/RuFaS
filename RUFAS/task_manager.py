@@ -767,6 +767,7 @@ class TaskManager:
 
         if not args["suppress_log_files"]:
             input_manager.dump_get_data_logs(args["logs_directory"])
+            input_manager.dump_delete_data_logs(args["logs_directory"])
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )
