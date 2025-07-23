@@ -29,7 +29,7 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
         ("SlurryStorageOutdoor", SlurryStorageOutdoor),
         ("SlurryStorageUnderfloor", SlurryStorageUnderfloor),
         ("Composting", Composting),
-        ("CompostBeddedPackBarn", BeddedPack),
+        ("BeddedPack", BeddedPack),
         ("OpenLot", OpenLot),
     ],
 )

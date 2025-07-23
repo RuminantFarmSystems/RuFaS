@@ -20,7 +20,6 @@ class Mixing(Enum):
     UNMIXED = False
 
 
-
 BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
     Mixing.MIXED: {
         ( -math.inf,   4.6 ):  0.5,
