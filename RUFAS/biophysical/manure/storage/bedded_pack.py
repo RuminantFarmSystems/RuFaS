@@ -23,17 +23,17 @@ class Mixing(Enum):
 BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
     Mixing.MIXED: {
         ( -math.inf,   4.6 ):  0.5,
-        (  4.7,        5.8 ):  0.5,
+        (  4.6,        5.8 ):  0.5,
         (  5.8,       13.9 ):  1.0,
-        ( 14.0,       25.1 ):  1.0,
-        (5.2, math.inf):  1.5,
+        ( 13.9,       25.1 ):  1.0,
+        (25.1, math.inf):  1.5,
     },
     Mixing.UNMIXED: {
         ( -math.inf,   4.6 ): 21.0,
-        (  4.7,        5.8 ): 26.0,
+        (  4.6,        5.8 ): 26.0,
         (  5.8,       13.9 ): 37.0,
-        ( 14.0,       25.1 ): 41.0,
-        ( 25.2,   math.inf ): 74.0,
+        ( 13.9,       25.1 ): 41.0,
+        ( 25.1,   math.inf ): 74.0,
     },
 }
 
@@ -382,6 +382,6 @@ class BeddedPack(Storage):
         """
         mix = Mixing.MIXED if is_mixed else Mixing.UNMIXED
         for (lower_bound, upper_bound), mcf in BEDDED_PACK_MCF_TABLE[mix].items():
-            if lower_bound <= manure_temperature <= upper_bound:
+            if lower_bound < manure_temperature <= upper_bound:
                 return mcf
         raise ValueError(f"Temperature {manure_temperature}°C out of any defined bin")

@@ -1,3 +1,4 @@
+import math
 from copy import copy
 
 import pytest
@@ -405,6 +406,6 @@ def test_calculate_bedded_pack_mcf_returns_expected(
 def test_calculate_bedded_pack_mcf_raises_for_temperature_gap(bedded_pack: BeddedPack) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected() for fall back cases."""
     with pytest.raises(ValueError) as excinfo:
-        bedded_pack.calculate_bedded_pack_methane_conversion_factor(True, 4.65)
+        bedded_pack.calculate_bedded_pack_methane_conversion_factor(True, math.nan)
 
     assert "out of any defined bin" in str(excinfo.value)
