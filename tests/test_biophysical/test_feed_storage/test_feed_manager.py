@@ -588,6 +588,7 @@ def test_query_available_feeds_no_parameters(
     feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
     results = feed_manager.query_available_feeds()
     assert len(results) == 2
+    print(results)
     assert results[0]["feed"] == CropCategory.ALFALFA
     assert results[1]["feed"] == CropCategory.CORN
 

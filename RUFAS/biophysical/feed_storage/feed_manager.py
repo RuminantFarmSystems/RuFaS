@@ -425,7 +425,7 @@ class FeedManager:
         self,
         query_crop_categories: list[CropCategory] | None = None,
         query_storage_types: list[StorageType] | None = None,
-    ) -> list[dict[CropCategory | int, float]]:
+    ) -> list[dict[str, CropCategory | int | float]]:
         """
         Queries the available amount of feed in storage.
 
@@ -443,7 +443,7 @@ class FeedManager:
         """
         query_all_crop_categories = query_crop_categories is None
         query_all_storage_types = query_storage_types is None
-        results: list[dict[CropCategory | int, float]] = []
+        results: list[dict[str, CropCategory | int | float]] = []
 
         for storage_type, storage in self.active_storages.items():
             is_storage_queryable: bool = query_all_storage_types or (
