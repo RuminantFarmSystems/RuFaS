@@ -131,10 +131,12 @@ class FeedManager:
             self.crop_to_rufas_id[crop] = rufas_id
 
         self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
-        self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0
-                                                                       for feed in self.available_feeds}
-        self._cumulative_farmgrown_feeds_fed: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0
-                                                                       for feed in self.available_feeds}
+        self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
+            feed.rufas_id: 0.0 for feed in self.available_feeds
+        }
+        self._cumulative_farmgrown_feeds_fed: dict[RUFAS_ID, float] = {
+            feed.rufas_id: 0.0 for feed in self.available_feeds
+        }
         self._cumulative_purchased_feeds: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
 
     @property
