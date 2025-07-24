@@ -978,6 +978,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 

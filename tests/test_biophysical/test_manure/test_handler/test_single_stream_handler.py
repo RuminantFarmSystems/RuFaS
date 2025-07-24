@@ -30,6 +30,7 @@ def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
@@ -51,6 +52,7 @@ def test_receive_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
@@ -77,6 +79,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     mock_barn_temp = mocker.patch.object(handler, "_determine_barn_temperature", return_value=16)
@@ -108,6 +111,7 @@ def test_process_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
