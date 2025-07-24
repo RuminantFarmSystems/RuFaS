@@ -86,10 +86,10 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | N
 
     # Manually set required attributes (mirroring __init__)
     feed_manager._available_feeds = mock_available_feeds
-    feed_manager._feed_requests = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
-    feed_manager._purchased_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
-    feed_manager._farmgrown_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
-    feed_manager._purchased_feeds = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
+    feed_manager._cumulative_feed_requests = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
+    feed_manager._cumulative_purchased_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
+    feed_manager._cumulative_farmgrown_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
+    feed_manager._cumulative_purchased_feeds = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
 
     feed_manager.active_storages = {StorageType.PILE: Pile()}
     feed_manager.purchased_feed_storage = PurchasedFeedStorage(mock_available_feeds)
@@ -169,10 +169,10 @@ def test_report_feed_manager_balance(
     mocker: MockerFixture,
 ) -> None:
     """Test that feed manager reports correct balance data."""
-    feed_manager._feed_requests = {1: 10.0, 2: 20.0}
-    feed_manager._purchased_feeds_fed = {1: 5.0, 2: 15.0}
-    feed_manager._farmgrown_feeds_fed = {1: 3.0, 2: 4.0}
-    feed_manager._purchased_feeds = {1: 12.0, 2: 22.0}
+    feed_manager._cumulative_feed_requests = {1: 10.0, 2: 20.0}
+    feed_manager._cumulative_purchased_feeds_fed = {1: 5.0, 2: 15.0}
+    feed_manager._cumulative_farmgrown_feeds_fed = {1: 3.0, 2: 4.0}
+    feed_manager._cumulative_purchased_feeds = {1: 12.0, 2: 22.0}
 
     add_var = mocker.patch.object(feed_manager._om, "add_variable")
     mock_report_levels = mocker.patch.object(feed_manager, "report_feed_storage_levels")
