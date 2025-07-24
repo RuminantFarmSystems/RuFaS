@@ -1,7 +1,7 @@
 {
   "processor_connections": [
     {
-      "processor_name": "calf_manual_scraper",
+      "processor_name": "calf_BP",
       "destinations": [
         {
           "receiving_processor_name": "compost",
@@ -10,69 +10,40 @@
       ]
     },
     {
-      "processor_name": "growing_alley_scraper",
+      "processor_name": "grow_BP",
       "destinations": [
         {
-          "receiving_processor_name": "slurry_storage_outdoor_growing",
+          "receiving_processor_name": "compost",
           "proportion": 1.0
         }
       ]
     },
     {
-      "processor_name": "closeup_manual_scraper",
+      "processor_name": "close_BP",
       "destinations": [
         {
-          "receiving_processor_name": "screw_press_1",
+          "receiving_processor_name": "compost",
           "proportion": 1.0
         }
       ]
     },
     {
-      "processor_name": "lac_alley_scraper",
+      "processor_name": "lac_BP",
       "destinations": [
         {
-          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "receiving_processor_name": "compost",
           "proportion": 1.0
         }
       ]
-    },
-    {
-      "processor_name": "parlor_cleaning_handler",
-      "destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_lac",
-          "proportion": 1.0
-        }
-      ]
-    },
-    {
-      "processor_name": "slurry_storage_outdoor_lac",
-      "destinations": []
     },
     {
       "processor_name": "compost",
       "destinations": []
     },
     {
-      "processor_name": "slurry_storage_outdoor_growing",
+      "processor_name": "parlor_cleaning_handler",
       "destinations": []
     }
   ],
-  "separator_connections": [
-    {
-      "processor_name": "screw_press_1",
-      "liquid_output_destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_growing",
-          "proportion": 1.0
-        }
-      ],
-      "solid_output_destinations": [
-        {
-          "receiving_processor_name": "compost",
-          "proportion": 1.0
-        }
-      ]
-    }
-  ]
+  "separator_connections": []
 }
