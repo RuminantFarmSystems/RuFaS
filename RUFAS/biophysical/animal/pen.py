@@ -630,16 +630,29 @@ class Pen:
         animal_manure_streams: dict[str, ManureStream] = {}
         if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
             total_animals_in_pen = len(self.animals_in_pen)
-            num_growing = len([animal for animal in self.animals_in_pen.values()
-                               if animal.animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II]])
-            num_close_up = len([animal for animal in self.animals_in_pen.values()
-                                if animal.animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW]])
+            num_growing = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II]
+                ]
+            )
+            num_close_up = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW]
+                ]
+            )
             methane_production_potential = (
-                    0.17 * num_growing / total_animals_in_pen + 0.24 * num_close_up / total_animals_in_pen
-            ) if total_animals_in_pen > 0 else 0.0
+                (0.17 * num_growing / total_animals_in_pen + 0.24 * num_close_up / total_animals_in_pen)
+                if total_animals_in_pen > 0
+                else 0.0
+            )
         else:
-            methane_production_potential = 0.17 \
-                if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
+            methane_production_potential = (
+                0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
+            )
 
         pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = PenManureData(

@@ -153,7 +153,8 @@ class ContinuousMix(Digester):
             GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_methane_volume = self._calculate_CSTR_methane_volume(
-            self._manure_in_digester.total_volatile_solids, self._manure_in_digester.methane_production_potential)
+            self._manure_in_digester.total_volatile_solids, self._manure_in_digester.methane_production_potential
+        )
         generated_methane_mass = generated_methane_volume * methane_density
         return generated_methane_mass, generated_methane_volume
 

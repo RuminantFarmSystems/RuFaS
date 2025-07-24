@@ -111,7 +111,7 @@ class Composting(Storage):
                 manure_annual_temperature,
                 self._manure_to_process.total_volatile_solids,
                 self._composting_type,
-                self._manure_to_process.methane_production_potential
+                self._manure_to_process.methane_production_potential,
             )
         else:
             storage_methane = 0
@@ -310,7 +310,7 @@ class Composting(Storage):
         manure_temperature: float,
         manure_volatile_solids: float,
         composting_type: CompostingType,
-        methane_production_potential: float
+        methane_production_potential: float,
     ) -> float:
         """
         This function calculates the composting solid manure methane emission on the current day.

@@ -225,8 +225,8 @@ class ManureStream:
             total_solids=self.total_solids + other.total_solids,
             volume=self.volume + other.volume,
             methane_production_potential=(
-                    self.methane_production_potential * self_vs_proportion
-                    + other.methane_production_potential * other_vs_proportion
+                self.methane_production_potential * self_vs_proportion
+                + other.methane_production_potential * other_vs_proportion
             ),
             pen_manure_data=(
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None

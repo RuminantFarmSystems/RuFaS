@@ -280,10 +280,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
     )
 
     result = composting_instance._calculate_composting_methane_emissions(
-        manure_temperature,
-        manure_volatile_solids,
-        CompostingType.PASSIVE_WINDROW,
-        dummy_methane_production_potential
+        manure_temperature, manure_volatile_solids, CompostingType.PASSIVE_WINDROW, dummy_methane_production_potential
     )
 
     assert result == pytest.approx(expected)

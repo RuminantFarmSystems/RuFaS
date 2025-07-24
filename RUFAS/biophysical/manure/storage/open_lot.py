@@ -49,7 +49,7 @@ class OpenLot(Storage):
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids,
             current_day_conditions.mean_air_temperature,
-            self._manure_to_process.methane_production_potential
+            self._manure_to_process.methane_production_potential,
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             ManureConstants.DEFAULT_LAYER_TEMPERATURE,
