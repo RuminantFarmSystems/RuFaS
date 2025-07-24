@@ -329,8 +329,8 @@ class BeddedPack(Storage):
                                                manure_volatile_solids: float,
                                                manure_temperature: float) -> float:
         """
-        Calculates emission of methane on the current day using an adaptation of the tier 2 approach
-        of the IPCC (2006), based on a temperature-dependent methane conversion factor.
+        Calculates emission of methane on the current day based on methodology from IPCC 2019
+        for mixed and unmixed bedded pack barns.
 
         Parameters
         ----------
