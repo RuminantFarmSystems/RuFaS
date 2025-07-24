@@ -31,6 +31,7 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     conditions = CurrentDayConditions(
@@ -57,6 +58,7 @@ def test_process_manure_error(handler: ParlorCleaningHandler, mocker: MockerFixt
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
@@ -84,6 +86,7 @@ def test_receive_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
@@ -101,10 +104,11 @@ def test_receive_manure_multiple_streams(handler: ParlorCleaningHandler, mocker:
         phosphorus=0.0,
         potassium=2.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=15.0,
+        degradable_volatile_solids=10.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
@@ -117,10 +121,11 @@ def test_receive_manure_multiple_streams(handler: ParlorCleaningHandler, mocker:
         phosphorus=0.0,
         potassium=4.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=30.0,
+        degradable_volatile_solids=20.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_receive.assert_called_once()

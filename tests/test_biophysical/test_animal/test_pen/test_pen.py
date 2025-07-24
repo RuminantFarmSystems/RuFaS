@@ -854,6 +854,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -876,6 +877,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -899,6 +901,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -921,6 +924,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -944,6 +948,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -966,6 +971,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -1038,6 +1044,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         degradable_volatile_solids=81.8,
         total_solids=258.0,
         volume=12.80,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
