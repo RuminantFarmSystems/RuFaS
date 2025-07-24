@@ -21,7 +21,7 @@ def test_bedded_pack_init(mocker: MockerFixture) -> None:
         name=(dummy_name := "dummy_name"),
         is_mixed=True,
         storage_time_period=(dummy_storage_time_period := 18),
-        surface_area=10
+        surface_area=10,
     )
 
     mock_processor_init.assert_called_once_with(
@@ -78,7 +78,7 @@ def bedded_pack() -> BeddedPack:
 def test_process_manure_runs_no_annual_temperature(
     stored_manure: ManureStream,
     received_manure: ManureStream,
-        bedded_pack: BeddedPack,
+    bedded_pack: BeddedPack,
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
@@ -92,15 +92,11 @@ def test_process_manure_runs_no_annual_temperature(
         SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
     )
     mock_apply_dml = mocker.patch.object(bedded_pack, "_apply_dry_matter_loss")
-    mock_calc_n2o = mocker.patch.object(
-        bedded_pack, "_calculate_bedded_pack_nitrous_oxide_emission", return_value=0.5
-    )
+    mock_calc_n2o = mocker.patch.object(bedded_pack, "_calculate_bedded_pack_nitrous_oxide_emission", return_value=0.5)
     mock_calc_leaching = mocker.patch.object(
         SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_ammonia = mocker.patch.object(
-        bedded_pack, "_calculate_bedded_pack_ammonia_emission", return_value=0.5
-    )
+    mock_calc_ammonia = mocker.patch.object(bedded_pack, "_calculate_bedded_pack_ammonia_emission", return_value=0.5)
     mock_apply_n_loss = mocker.patch.object(bedded_pack, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(bedded_pack, "_report_processor_output")
     mock_report_stream = mocker.patch.object(bedded_pack, "_report_manure_stream")
@@ -141,7 +137,7 @@ def test_process_manure_runs_no_annual_temperature(
 def test_process_manure_runs_expected_steps(
     stored_manure: ManureStream,
     received_manure: ManureStream,
-        bedded_pack: BeddedPack,
+    bedded_pack: BeddedPack,
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
@@ -155,15 +151,11 @@ def test_process_manure_runs_expected_steps(
         SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
     )
     mock_apply_dml = mocker.patch.object(bedded_pack, "_apply_dry_matter_loss")
-    mock_calc_n2o = mocker.patch.object(
-        bedded_pack, "_calculate_bedded_pack_nitrous_oxide_emission", return_value=0.5
-    )
+    mock_calc_n2o = mocker.patch.object(bedded_pack, "_calculate_bedded_pack_nitrous_oxide_emission", return_value=0.5)
     mock_calc_leaching = mocker.patch.object(
         SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_ammonia = mocker.patch.object(
-        bedded_pack, "_calculate_bedded_pack_ammonia_emission", return_value=0.5
-    )
+    mock_calc_ammonia = mocker.patch.object(bedded_pack, "_calculate_bedded_pack_ammonia_emission", return_value=0.5)
     mock_apply_n_loss = mocker.patch.object(bedded_pack, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(bedded_pack, "_report_processor_output")
     mock_report_stream = mocker.patch.object(bedded_pack, "_report_manure_stream")
@@ -202,7 +194,7 @@ def test_process_manure_runs_expected_steps(
 
 
 def test_apply_dry_matter_loss_valid(
-        bedded_pack: BeddedPack,
+    bedded_pack: BeddedPack,
     stored_manure: ManureStream,
     received_manure: ManureStream,
     mocker: MockerFixture,
@@ -231,7 +223,7 @@ def test_apply_dry_matter_loss_valid(
 
 
 def test_apply_dry_matter_loss_raises_value_error(
-        bedded_pack: BeddedPack,
+    bedded_pack: BeddedPack,
     stored_manure: ManureStream,
     received_manure: ManureStream,
     mocker: MockerFixture,
@@ -265,9 +257,7 @@ def test_apply_dry_matter_loss_raises_value_error(
     )
 
 
-def test_apply_nitrogen_losses_valid(
-        bedded_pack: BeddedPack, received_manure: ManureStream
-) -> None:
+def test_apply_nitrogen_losses_valid(bedded_pack: BeddedPack, received_manure: ManureStream) -> None:
     """Ensure nitrogen losses are applied correctly without error."""
     bedded_pack._manure_to_process = copy(received_manure)
     original_nitrogen = received_manure.nitrogen
@@ -282,13 +272,11 @@ def test_apply_nitrogen_losses_valid(
     expected_nitrogen = original_nitrogen - 3.0
     expected_ammoniacal_nitrogen = original_ammoniacal_nitrogen - 1.0
     assert bedded_pack._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
-    assert bedded_pack._manure_to_process.ammoniacal_nitrogen == pytest.approx(
-        expected_ammoniacal_nitrogen
-    )
+    assert bedded_pack._manure_to_process.ammoniacal_nitrogen == pytest.approx(expected_ammoniacal_nitrogen)
 
 
 def test_apply_nitrogen_losses_raises_value_error_for_nitrogen_losses(
-        bedded_pack: BeddedPack,
+    bedded_pack: BeddedPack,
     received_manure: ManureStream,
     mocker: MockerFixture,
 ) -> None:
@@ -318,7 +306,7 @@ def test_apply_nitrogen_losses_raises_value_error_for_nitrogen_losses(
     ],
 )
 def test_nitrous_oxide_emission(
-        bedded_pack: BeddedPack, received_nitrogen: float, is_tilled: bool, expected: float
+    bedded_pack: BeddedPack, received_nitrogen: float, is_tilled: bool, expected: float
 ) -> None:
     result: float = bedded_pack._calculate_bedded_pack_nitrous_oxide_emission(received_nitrogen, is_tilled)
     assert result == pytest.approx(expected, rel=1e-6)
@@ -336,9 +324,7 @@ def test_nitrous_oxide_negative_input(bedded_pack: BeddedPack) -> None:
         (200.0, False, 50),
     ],
 )
-def test_ammonia_emission(
-        bedded_pack: BeddedPack, received_nitrogen: float, is_tilled: bool, expected: float
-) -> None:
+def test_ammonia_emission(bedded_pack: BeddedPack, received_nitrogen: float, is_tilled: bool, expected: float) -> None:
     result: float = bedded_pack._calculate_bedded_pack_ammonia_emission(received_nitrogen, is_tilled)
     assert result == pytest.approx(expected, rel=1e-6)
 
@@ -358,36 +344,33 @@ def test_calculate_bedded_pack_methane_emission(bedded_pack: BeddedPack, mocker:
     manure_volatile_solids = 1000.0
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
-    actual = bedded_pack.calculate_bedded_pack_methane_emission(True,
-                                                                manure_volatile_solids,
-                                                                1.0)
+    actual = bedded_pack.calculate_bedded_pack_methane_emission(True, manure_volatile_solids, 1.0)
 
     mock_conversion_factor.assert_called_once_with(True, 1.0)
     assert actual == pytest.approx(expected)
-
 
 
 @pytest.mark.parametrize(
     "is_mixed, manure_temperature, expected_mcf",
     [
         # mixed
-        (True,  -10.0,  0.5),   # Falls in (-inf, 4.6]
-        (True,    0.0,  0.5),   # “
-        (True,    4.6,  0.5),   # upper bound bin 1
-        (True,    4.7,  0.5),   # lower bound bin 2
-        (True,    5.8,  0.5),   # upper bound bin 2 (first match)
-        (True,   10.0,  1.0),   # middle bin 3
-        (True,   14.0,  1.0),   # lower bound bin 4
-        (True,   25.2,  1.5),   # lower bound bin 5
+        (True, -10.0, 0.5),  # Falls in (-inf, 4.6]
+        (True, 0.0, 0.5),  # “
+        (True, 4.6, 0.5),  # upper bound bin 1
+        (True, 4.7, 0.5),  # lower bound bin 2
+        (True, 5.8, 0.5),  # upper bound bin 2 (first match)
+        (True, 10.0, 1.0),  # middle bin 3
+        (True, 14.0, 1.0),  # lower bound bin 4
+        (True, 25.2, 1.5),  # lower bound bin 5
         # unmixed
         (False, -10.0, 21.0),
-        (False,   0.0, 21.0),
-        (False,   4.6, 21.0),
-        (False,   4.7, 26.0),
-        (False,   5.8, 26.0),
-        (False,  10.0, 37.0),
-        (False,  14.0, 41.0),
-        (False,  25.2, 74.0),
+        (False, 0.0, 21.0),
+        (False, 4.6, 21.0),
+        (False, 4.7, 26.0),
+        (False, 5.8, 26.0),
+        (False, 10.0, 37.0),
+        (False, 14.0, 41.0),
+        (False, 25.2, 74.0),
     ],
 )
 def test_calculate_bedded_pack_mcf_returns_expected(
@@ -397,9 +380,7 @@ def test_calculate_bedded_pack_mcf_returns_expected(
     expected_mcf: float,
 ) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected()."""
-    result = bedded_pack.calculate_bedded_pack_methane_conversion_factor(
-        is_mixed, manure_temperature
-    )
+    result = bedded_pack.calculate_bedded_pack_methane_conversion_factor(is_mixed, manure_temperature)
     assert result == expected_mcf
 
 
