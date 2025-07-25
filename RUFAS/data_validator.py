@@ -794,7 +794,6 @@ class DataValidator:
                         "info_map": info_map,
                     }
                 )
-                elements_counter.increment(ElementState.INVALID)
             return is_valid
 
         if is_valid:
