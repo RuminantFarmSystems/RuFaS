@@ -2724,7 +2724,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
 
 
 def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
-    """Unit test for __init__() in CompostBeddedPackBarn in compost_bedded_pack_barn.py"""
+    """Unit test for __init__() in CompostBeddedPackBarn in bedded_pack.py"""
     # Arrange
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
@@ -2788,7 +2788,7 @@ def test_calc_dry_matter_changes_in_compost_bedded_pack_barn(
     expected_outputs: tuple[float, float, float],
 ) -> None:
     """
-    Unit test for _calc_dry_matter_changes() in CompostBeddedPackBarn in compost_bedded_pack_barn.py
+    Unit test for _calc_dry_matter_changes() in CompostBeddedPackBarn in bedded_pack.py
 
     This test verifies that the method correctly calculates changes in dry matter based on various parameters.
     """
@@ -2836,7 +2836,7 @@ def test_calc_dry_matter_changes_in_compost_bedded_pack_barn(
 
 def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> None:
     """
-    Unit test for _daily_update_helper() in CompostBeddedPackBarn in compost_bedded_pack_barn.py
+    Unit test for _daily_update_helper() in CompostBeddedPackBarn in bedded_pack.py
     """
 
     # Arrange
