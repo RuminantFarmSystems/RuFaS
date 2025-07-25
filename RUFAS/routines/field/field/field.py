@@ -781,18 +781,17 @@ class Field:
             self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
             return
 
-        if method == ManureSupplementMethod.NONE:
+        if method in [ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.MANURE]:
             warning_msg = f"Manure nitrogen deficient by {unmet_n} kg, phosphorus deficient by {unmet_p} kg."
             self.om.add_warning("Nutrient deficient manure application", warning_msg, info_map)
             return
         elif method in [
             ManureSupplementMethod.SYNTHETIC_FERTILIZER,
-            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
-            ManureSupplementMethod.MANURE,
-        ]:
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE]:
             self.om.add_log(
                 "Manure Application Log",
-                f"Manure did not fulfill all nutrient requests. Supplementing with {method.value}.",
+                f"Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
                 info_map,
             )
 

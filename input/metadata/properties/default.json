@@ -83,6 +83,13 @@
         "default": 100,
         "minimum": 6
       },
+      "lactating_fraction":{
+        "type":"number",
+        "description": "The fraction of cows that are lactating",
+        "default": 0.8,
+        "minimum":0.01,
+        "maximum": 1.0
+      },
       "breed": {
         "type": "string",
         "default": "HO",
