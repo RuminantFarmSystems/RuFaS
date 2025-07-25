@@ -788,10 +788,11 @@ class Field:
         elif method in [
             ManureSupplementMethod.SYNTHETIC_FERTILIZER,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+            ManureSupplementMethod.MANURE
         ]:
             self.om.add_log(
                 "Manure Application Log",
-                "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
+                f"Manure did not fulfill all nutrient requests. Supplementing with {method.value}.",
                 info_map,
             )
 
