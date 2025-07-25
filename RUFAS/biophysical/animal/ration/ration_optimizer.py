@@ -2,7 +2,7 @@ import random
 from scipy.optimize import OptimizeResult, minimize
 import numpy as np
 import numpy.typing as npt
-from typing import List, Tuple, Dict, Callable, Any, Sequence, Optional
+from typing import Callable, Any, Sequence, Optional
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
 from RUFAS.enums import AnimalCombination
 from RUFAS.units import MeasurementUnits
@@ -26,19 +26,19 @@ class RationConfig:
         Nutrition requirements for pen, used in constraint methods.
     pen_average_body_weight : float
         Average body weight in pen, used in constraint methods.
-    feeds_used : List[Feed]
+    feeds_used : list[Feed]
         List of Feeds used in ration formulation.
-    price_list : List[float]
+    price_list : list[float]
         Price for each feed used in ration formulation.
-    feed_minimum_list : List[float]
+    feed_minimum_list : list[float]
         Minimum amount allowed for each feed used in formulation, kg.
-    feed_maximum_list : List[float]
+    feed_maximum_list : list[float]
         Maxmimum amount allowed for each feed used in formulation, kg.
-    TDN_list : List[float]
+    TDN_list : list[float]
         TDN for each feed used in ration formulation.
-    NDF_list: List[float]
+    NDF_list: list[float]
         NDF for each feed used in ration formulation.
-    EE_list : List[float]
+    EE_list : list[float]
         EE for each feed used in ration formulation.
     """
 
@@ -56,7 +56,7 @@ class RationConfig:
         ----------
         animal_requirements : NutritionRequirements
             Nutrition requirements for pen, used in constraint methods.
-        pen_available_feeds : List[Feed]
+        pen_available_feeds : list[Feed], optional
             List of Feeds used in ration formulation.
         pen_average_body_weight : float
             Average body weight in pen, used in constraint methods.
@@ -65,16 +65,15 @@ class RationConfig:
             pen_available_feeds = []
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
-        self.print_print = False
 
         self.feeds_used = pen_available_feeds
 
-        self.price_list: List[float] = [feed.purchase_cost for feed in self.feeds_used]
-        self.feed_minimum_list: List[float] = [feed.lower_limit for feed in self.feeds_used]
-        self.feed_maximum_list: List[float] = [feed.limit for feed in self.feeds_used]
-        self.TDN_list: List[float] = [feed.TDN for feed in self.feeds_used]
-        self.NDF_list: List[float] = [feed.NDF for feed in self.feeds_used]
-        self.EE_list: List[float] = [feed.EE for feed in self.feeds_used]
+        self.price_list: list[float] = [feed.purchase_cost for feed in self.feeds_used]
+        self.feed_minimum_list: list[float] = [feed.lower_limit for feed in self.feeds_used]
+        self.feed_maximum_list: list[float] = [feed.limit for feed in self.feeds_used]
+        self.TDN_list: list[float] = [feed.TDN for feed in self.feeds_used]
+        self.NDF_list: list[float] = [feed.NDF for feed in self.feeds_used]
+        self.EE_list: list[float] = [feed.EE for feed in self.feeds_used]
 
 
 class RationOptimizer:
@@ -98,17 +97,17 @@ class RationOptimizer:
     def __init__(self) -> None:
         """Initializes RationOptimizer object"""
 
-        self.constraint_functions: List[Callable[[Any, Any], float]] = []
-        self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
-        self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+        self.constraint_functions: list[Callable[[Any, Any], float]] = []
+        self.cow_constraints: list[dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str] = []
+        self.heifer_constraints: list[dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str] = []
 
-    def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
+    def set_constraints(self, arguments: tuple[RationConfig]) -> None:
         """
         Defines lists of constraint methods to use for different pens.
 
         Parameters
         ----------
-        arguments : Tuple[RationConfig]
+        arguments : tuple[RationConfig]
             RationConfig used in constraint methods.
 
         """
@@ -141,7 +140,7 @@ class RationOptimizer:
     @staticmethod
     def convert_decision_vec_to_feeds(
         ration_configuration: RationConfig, decision_vector: npt.NDArray[np.float64]
-    ) -> List[FeedInRation]:
+    ) -> list[FeedInRation]:
         """
         Converts the decision vector to a Feeds object for use in NutritionSupplyCalculator methods.
 
@@ -154,7 +153,7 @@ class RationOptimizer:
 
         Returns
         -------
-        List[FeedInRation]
+        list[FeedInRation]
             List of feeds and their attributes used in ration formulation.
         """
         decision_vector_dict = dict(
@@ -173,7 +172,7 @@ class RationOptimizer:
     @classmethod
     def make_ration_from_solution(
         cls,
-        pen_available_feeds: List[Feed],
+        pen_available_feeds: list[Feed],
         solution: OptimizeResult,
     ) -> dict[str, float | str]:
         """
@@ -181,18 +180,18 @@ class RationOptimizer:
 
         Parameters
         ----------
-        pen_available_feeds : List[Feed]
+        pen_available_feeds : list[Feed]
             List of Feeds used in ration formulation.
         solution : OptimizeResult
             Object from scipy package.
 
         Returns
         -------
-        Dict[str, float | str]
+        dict[str, float | str]
             Formulated ration, with keys as feed IDs, values as kg fed per animal.
 
         """
-        ration: Dict[str, float | str] = {}
+        ration: dict[str, float | str] = {}
         for position_in_list in range(len(pen_available_feeds)):
             kg_to_feed = solution.x[position_in_list]
             ration[getattr(pen_available_feeds[position_in_list], "rufas_id")] = round(kg_to_feed, 6)
@@ -212,7 +211,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -257,7 +256,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -290,7 +289,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -325,7 +324,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -349,14 +348,14 @@ class RationOptimizer:
         decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
     ) -> tuple[list[FeedInRation], float, dict[int, float], dict[int, float]]:
         """
-        Calculates the necessary NE related parameters for all NE constraints.
+        Calculates the necessary net energy related parameters for all net energy constraints.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -386,7 +385,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -414,7 +413,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -440,7 +439,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -461,13 +460,14 @@ class RationOptimizer:
         decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
     ) -> tuple[float, float]:
         """
+        Calculates the necessary parameters for protein constraints.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -502,7 +502,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -589,7 +589,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -619,7 +619,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization.
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -647,7 +647,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -674,7 +674,7 @@ class RationOptimizer:
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
         ration_configuration: RationConfig
-            Attributes are animal requirement and feed supply information required for optimization
+            Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
@@ -719,10 +719,10 @@ class RationOptimizer:
         self,
         pen_average_body_weight: float,
         requirements: NutritionRequirements,
-        pen_available_feeds: List[Feed],
+        pen_available_feeds: list[Feed],
         animal_combination: AnimalCombination,
-        previous_ration: Dict[RUFAS_ID | str, float | str] | None = None,
-    ) -> Tuple[OptimizeResult | None, RationConfig]:
+        previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
+    ) -> tuple[OptimizeResult | None, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for non-linear optimization.
@@ -733,11 +733,11 @@ class RationOptimizer:
             Average body weight of animals in pen.
         requirements : AnimalRequirements
             Summary of requirements for a group of animals.
-        pen_available_feeds : List[Feed]
+        pen_available_feeds : list[Feed]
             A list of Feeds available during ration formulation.
         animal_combination : AnimalCombination
             The animal combination to optimize the ration for.
-        previous_ration : Dict[RUFAS_ID, str | float] | None
+        previous_ration : dict[RUFAS_ID, str | float] | None
             Ration from previous formulation interval, if available.
 
         Returns
@@ -798,11 +798,11 @@ class RationOptimizer:
         return [1.0] + [random.random() * 10 for _ in range(n - 1)]
 
     @staticmethod
-    def _build_bounds(ration_config: RationConfig) -> List[Tuple[float, float]]:
+    def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:
         """Zips min/max lists into solver bounds."""
         return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
 
-    def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[Dict[str, Any]]:
+    def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""
         if animal_combination is AnimalCombination.LAC_COW:
             return self.cow_constraints
@@ -861,7 +861,7 @@ class RationOptimizer:
             solution.x is from minimize function used in ration_NLP.py,
                 solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
 
-        constraints: List[dict[str, Callable]]
+        constraints: list[dict[str, Callable]]
             list of constraint functions as defined in ration_NLP.py
 
         ration_config : RationConfig object
@@ -869,7 +869,7 @@ class RationOptimizer:
 
         Returns
         -------
-        List[dict[str,Callable]]
+        list[dict[str,Callable]]
             the same type of list as the constraints themselves
                 just filtered such that the ones that failed are returned
         """
@@ -918,7 +918,7 @@ class RationOptimizer:
             The pen's average (or other summary statistic) requirements used in ration formulation.
         sim_day : int
             Day of simulation.
-        info_map : Dict[str, Any]
+        info_map : dict[str, Any]
             A dictionary containing additional information to be logged with the failed
             constraints summary.
 
