@@ -4,6 +4,7 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -89,7 +90,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        # EEEManager.estimate_all()
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
