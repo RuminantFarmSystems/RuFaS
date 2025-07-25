@@ -522,11 +522,8 @@ class TaskManager:
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
                 return None
 
-            input_manager.start_data_processing(metadata_path)
-            task_config: dict[str, Any] = input_manager.get_data("tasks")
-            for task in task_config.get("tasks", []):
-                filters_path = Path(task["filters_directory"])
-                output_manager.validate_filter_constant_content(filters_path)
+            filters_path = Path(args["filters_directory"])
+            output_manager.validate_filter_constant_content(filters_path)
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
