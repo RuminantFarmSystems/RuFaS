@@ -788,7 +788,7 @@ class Field:
         elif method in [
             ManureSupplementMethod.SYNTHETIC_FERTILIZER,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
-            ManureSupplementMethod.MANURE
+            ManureSupplementMethod.MANURE,
         ]:
             self.om.add_log(
                 "Manure Application Log",
