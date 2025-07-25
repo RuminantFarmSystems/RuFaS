@@ -1014,7 +1014,7 @@ def test_get_metadata_raises_exception(
 
 
 def test_get_data_by_properties_no_data(
-    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable], mocker: MockerFixture
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Any], mocker: MockerFixture
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
@@ -2299,6 +2299,33 @@ def test_dump_get_data_logs(
     )
 
 
+def test_dump_delete_data_logs(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+) -> None:
+    mock_input_manager._InputManager__delete_data_logs_pool = {
+        "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
+        "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
+        "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
+    }
+    mock_dir_path = Path("dummy_path")
+    mock_generated_file_name = "dummy_file_name.json"
+    patch_for_generate_file_name = mocker.patch.object(
+        mock_input_manager.om, "generate_file_name", return_value=mock_generated_file_name
+    )
+    patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
+
+    mock_dict_to_file_json = mocker.patch.object(mock_input_manager.om, "dict_to_file_json")
+
+    mock_input_manager.dump_delete_data_logs(path=mock_dir_path)
+
+    patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_delete_data_log", extension="json")
+    patch_create_dir.assert_called_once_with(mock_dir_path)
+    mock_dict_to_file_json.assert_called_once_with(
+        mock_input_manager._InputManager__delete_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+    )
+
+
 @pytest.mark.parametrize(
     "data_address,expected_result,raise_key_error",
     [
@@ -2428,7 +2455,7 @@ def test_parse_metadata_properties(
 ) -> None:
     """Tests _parse_metadata_properties() function in InputManager."""
 
-    def side_effect_check_property_type_primitive(value) -> bool:
+    def side_effect_check_property_type_primitive(value: Any) -> bool:
         """Function to mock check_property_type_primitive dynamically."""
         return value.get("type") in ["string", "number"]
 
@@ -3068,3 +3095,104 @@ def test_export_pool_to_csv_errors(
     mock_add_error.assert_called_once_with(
         "Save CSV failure.", f"Unable to save to {output_dir} because of {error_message}.", ANY
     )
+
+
+@pytest.fixture
+def simple_pool_and_meta() -> tuple[dict[Any, Any], dict[Any, Any]]:
+    pool = {"a": 1, "b": 2, "c": {"nested": {"level1": 3, "another": 4}}}
+
+    metadata = {
+        "files": {
+            "a": {"properties": "blob_a", "type": "json", "path": "data/a.json"},
+            "b": {"properties": "blob_b", "type": "csv", "delimiter": ","},
+            "c": {
+                "properties": "blob_c",
+                "type": "json",
+                "versions": {"v1": "2021-01", "v2": "2022-02"},
+                "schema": {"required": ["x", "y"], "optional": ["z"]},
+            },
+        },
+        "properties": {
+            "blob_a": {"format": "json", "description": "first blob"},
+            "blob_b": {"format": "csv", "has_header": True},
+            "blob_c": {
+                "format": "json",
+                "complex": True,
+                "nested": {
+                    "level1": {"properties": "blob_level1", "type": "number"},
+                    "another": {"properties": "blob_another", "type": "number"},
+                },
+            },
+        },
+    }
+
+    return pool, metadata
+
+
+def test_delete_data_with_valid_key(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
+    """delete_data should remove both data and its metadata and return True."""
+    pool, metadata = simple_pool_and_meta
+
+    im = InputManager()
+    im.pool = pool
+    im.meta_data = metadata
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
+
+    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.level1")
+
+    assert data_delete
+    assert metadata_delete
+    assert "level1" not in im.pool["c"]["nested"]
+    assert "level1" not in im.meta_data["properties"]["blob_c"]["nested"]
+
+
+def test_delete_data_with_invalid_data_address(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
+    """delete_data should return False and log a data-not-found error when key is invalid."""
+    pool, metadata = simple_pool_and_meta
+
+    im = InputManager()
+    im.pool = pool.copy()
+    im.meta_data = metadata.copy()
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", side_effect=KeyError("missing"))
+    mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
+
+    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.unknown")
+
+    assert not data_delete
+    assert metadata_delete
+    assert pool["c"]["nested"]["level1"] == 3
+    blob_key = metadata["files"]["c"]["properties"]
+    assert "level1" in metadata["properties"][blob_key]["nested"]
+    mock_add_error.assert_called_once()
+    args, kwargs = mock_add_error.call_args
+    assert "Validation: data not found" in args[0]
+
+
+def test_delete_data_metadata_not_found(
+    simple_pool_and_meta: tuple[dict[Any, Any], dict[Any, Any]], mocker: MockerFixture
+) -> None:
+    """delete_data should remove data, return True, but log metadata-not-found if metadata path missing."""
+    pool, metadata = simple_pool_and_meta
+
+    im = InputManager()
+    im.pool = pool
+    im.meta_data = metadata
+
+    blob_key = metadata["files"]["c"]["properties"]
+    metadata["properties"][blob_key].pop("nested", None)
+
+    mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
+    mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
+
+    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.another")
+
+    assert data_delete
+    assert not metadata_delete
+
+    mock_add_error.assert_called_once()
+    args, kwargs = mock_add_error.call_args
+    assert args[0] == "Validation: metadata not found"

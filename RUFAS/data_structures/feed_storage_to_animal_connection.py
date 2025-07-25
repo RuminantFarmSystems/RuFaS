@@ -126,6 +126,8 @@ class Feed:
         Price of using the feed that is already on-farm ($ / kg).
     purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
+    buffer : float
+        Fraction of extra feed purchases to account for shrinkage.
 
     """
 
@@ -165,6 +167,7 @@ class Feed:
     amount_available: float
     on_farm_cost: float
     purchase_cost: float
+    buffer: float
 
 
 @dataclass

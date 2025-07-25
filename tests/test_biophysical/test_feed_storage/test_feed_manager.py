@@ -1,4 +1,4 @@
-from typing import get_args
+from typing import get_args, Any
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -75,6 +75,7 @@ def purchased_feed() -> PurchasedFeed:
 def mock_available_feeds() -> list[Feed]:
     feed_1, feed_2, feed_3, feed_4, feed_5 = (MagicMock(auto_spec=Feed) for _ in range(5))
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id, feed_4.rufas_id, feed_5.rufas_id = 1, 2, 3, 4, 5
+    feed_1.buffer, feed_2.buffer, feed_3.buffer, feed_4.buffer, feed_5.buffer = 1, 2, 3, 4, 5
     return [feed_1, feed_2, feed_3, feed_4, feed_5]
 
 
@@ -410,7 +411,7 @@ def test_get_total_inventory(
 
 
 def test_get_total_inventory_zero_day_in_the_future(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+    feed_manager: FeedManager, mock_available_feeds: list[Any], mocker: MockerFixture
 ) -> None:
     """Test that the total inventory is collected correctly when the requested inventory date is the current date."""
     storage_1, storage_2, storage_3 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile), MagicMock(auto_spec=Bag))
@@ -476,7 +477,9 @@ def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: Mock
     mock_purchase_feed.assert_called_once_with(expected_feeds_to_purchase, mock_time, purchase_type="planning_cycle")
 
 
-def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+def test_manage_ration_interval_purchases(
+    feed_manager: FeedManager, mocker: MockerFixture, mock_available_feeds: list[Any]
+) -> None:
     """Test that requests for feed made at beginning of a ration interval are handled correctly."""
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed")
     mocker.patch.object(
@@ -484,14 +487,14 @@ def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: Moc
         "_query_available_feed_totals",
         return_value={1: 0.0, 2: 0.0},
     )
+    feed_manager._available_feeds = mock_available_feeds
 
     requested = RequestedFeed(requested_feed={1: 3.0, 2: 5.0})
     mock_time = mocker.Mock(spec=RufasTime)
 
     feed_manager.manage_ration_interval_purchases(requested_feeds=requested, time=mock_time)
 
-    expected = {1: 3.0, 2: 5.0}
-    mock_purchase_feed.assert_called_once_with(expected, mock_time, purchase_type="ration_interval")
+    mock_purchase_feed.assert_called_once_with({1: 6.0, 2: 15.0}, mock_time, purchase_type="ration_interval")
 
 
 def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -706,7 +709,7 @@ def test_report_daily_purchases_no_purchases(feed_manager: FeedManager, mocker: 
     "purchase_type, expected_dry_matter_mass",
     [
         ("test_purchase", 100.0),
-        ("ration_interval", 90.0),
+        ("ration_interval", 100.0),
     ],
 )
 def test_store_purchased_feed(
@@ -722,7 +725,7 @@ def test_store_purchased_feed(
     mock_om = MagicMock(auto_spec=OutputManager)
     feed_manager._om = mock_om
 
-    feed_manager._store_purchased_feed(rufas_id=1, purchase_amount=100.0, time=time, purchase_type=purchase_type)
+    feed_manager._store_purchased_feed(rufas_id=1, purchase_amount=100.0, time=time)
 
     received_feed = receive_feed.call_args.args[0]
     assert received_feed.rufas_id == 1
@@ -830,8 +833,8 @@ def test_setup_available_feeds(
     mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
     feed_config = {
         "purchased_feeds": [
-            {"purchased_feed": 1, "purchased_feed_cost": 1.0},
-            {"purchased_feed": 2, "purchased_feed_cost": 2.0},
+            {"purchased_feed": 1, "purchased_feed_cost": 1.0, "buffer": 0.0},
+            {"purchased_feed": 2, "purchased_feed_cost": 2.0, "buffer": 0.0},
         ]
     }
     first_expected_call_args = {
@@ -839,12 +842,14 @@ def test_setup_available_feeds(
         "amount_available": 0.0,
         "on_farm_cost": 0.01,
         "purchase_cost": 1.0,
+        "buffer": 0.0,
     } | feed_lib[1]
     second_expected_call_args = {
         "rufas_id": 2,
         "amount_available": 0.0,
         "on_farm_cost": 0.02,
         "purchase_cost": 2.0,
+        "buffer": 0.0,
     } | feed_lib[2]
     expected_calls = [mocker.call(**first_expected_call_args), mocker.call(**second_expected_call_args)]
     feed_rep_init = mocker.patch.object(feed_rep, "__init__", return_value=None)
