@@ -148,9 +148,9 @@ class Modifiability(Enum):
         Indicates the variable does not need to be initialized with a value and can be modified during runtime.
     """
 
-    REQUIRED_LOCKED: str = "required locked"
-    REQUIRED_UNLOCKED: str = "required unlocked"
-    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
+    REQUIRED_LOCKED = "required locked"
+    REQUIRED_UNLOCKED = "required unlocked"
+    UNREQUIRED_UNLOCKED = "unrequired unlocked"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -694,7 +694,6 @@ class DataValidator:
         )
         return True, ""
 
-    # Validate input by type related
     def validate_data_by_type(
         self,
         variable_properties: dict[str, Any],
@@ -778,18 +777,45 @@ class DataValidator:
             fixable_data_types,
         )
 
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_data_by_type.__name__,
+        }
+        path = ",".join(str(level) for level in variable_path)
         if data_type not in fixable_data_types:
+            if not is_valid:
+                error_message = (
+                    f"Variable: '{path}' has invalid values and its data type is not fixable. Please check the inputs."
+                )
+                self.event_logs.append(
+                    {
+                        "error": "Validation: invalid data not able to be fixed",
+                        "message": error_message,
+                        "info_map": info_map,
+                    }
+                )
             return is_valid
 
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True
+
         is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
+
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
             return True
-        elements_counter.increment(ElementState.INVALID)
-        return False
+        else:
+            error_message = f"Variable: '{path}' has invalid values and failed to fix. Please check the inputs."
+            self.event_logs.append(
+                {
+                    "error": "Validation: invalid data not able to be fixed",
+                    "message": error_message,
+                    "info_map": info_map,
+                }
+            )
+            elements_counter.increment(ElementState.INVALID)
+            return False
 
     def _validate_array_container_properties(
         self,
