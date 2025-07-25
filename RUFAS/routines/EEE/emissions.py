@@ -76,7 +76,7 @@ class EmissionsEstimator:
         purchased_feed_totals: dict[str, float] = defaultdict(float)
 
         for key, value in feeds.items():
-            if match := re.search(r'_(\d+)_amount_purchased$', key):
+            if match := re.search(r"_(\d+)_amount_purchased$", key):
                 feed_id = match.group(1)
                 purchased_feed_totals[feed_id] += sum(value.get("values", []))
         self.om.add_variable(
