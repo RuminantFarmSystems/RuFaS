@@ -209,6 +209,7 @@ v0.9.2
 - [2470](https://github.com/RuminantFarmSystems/MASM/pull/2470) - [minor change] [Feed] Adds shrink factor, buffer inputs and buffer usage logic in feed manager.
 - [2293](https://github.com/RuminantFarmSystems/MASM/pull/2293) - [minor change] [Animal] Adds behavior in an animal reporter method to create an empty output variable in case where there are no sold animals for a given AnimalCombination.
 - [2479](https://github.com/RuminantFarmSystems/MASM/pull/2479) - [minor change] Removes `errors.py`.
+- [2504](https://github.com/RuminantFarmSystems/MASM/pull/2504) - [minor change] [Data Validator] Raise helpful error messages when object level data validations failed.
 - [2499](https://github.com/RuminantFarmSystems/MASM/pull/2499) - [minor change] Updates `pyproject.toml` and added check for user meeting dependency requirements.
 
 ### v0.9.2
