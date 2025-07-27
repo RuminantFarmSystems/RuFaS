@@ -20,7 +20,6 @@
 *.pyc
 
 # folders
-build
 others
 
 input/data/tasks/default_task.json
@@ -46,6 +45,11 @@ output/output_filters/*
 .idea/**
 env/
 venv/
+
+# ignore build files
+dist/
+*.egg-info/
+build/
 
 # ignore .DS_store
 .DS_store
