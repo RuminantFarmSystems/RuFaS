@@ -784,7 +784,8 @@ class DataValidator:
         path = ",".join(str(level) for level in variable_path)
         if data_type not in fixable_data_types:
             if not is_valid:
-                error_message = f"Variable: '{path}' has invalid or missing values and its data type is not fixable. Please check the inputs."
+                error_message = (f"Variable: '{path}' has invalid or missing values and its data type is not fixable."
+                                 f" Please check the inputs.")
                 self.event_logs.append(
                     {
                         "error": "Validation: invalid input data not able to be fixed",
