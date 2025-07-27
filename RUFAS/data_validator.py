@@ -806,7 +806,7 @@ class DataValidator:
             elements_counter.increment(ElementState.FIXED)
             return True
         else:
-            error_message = f"Variable: '{path}' has invalid values and failed to fix. Please check the inputs."
+            error_message = f"Variable: '{path}' has invalid or missing values and failed to fix. Please check the inputs."
             self.event_logs.append(
                 {
                     "error": "Validation: invalid input data not able to be fixed",
