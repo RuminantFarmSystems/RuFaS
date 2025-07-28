@@ -1,4 +1,7 @@
 from copy import copy
+from enum import Enum
+
+import math
 from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
@@ -7,17 +10,42 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
-class CompostBeddedPackBarn(Storage):
+class Mixing(Enum):
+    MIXED = True
+    UNMIXED = False
+
+
+BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
+    Mixing.MIXED: {
+        (-math.inf, 4.6): 0.5,
+        (4.6, 5.8): 0.5,
+        (5.8, 13.9): 1.0,
+        (13.9, 25.1): 1.0,
+        (25.1, math.inf): 1.5,
+    },
+    Mixing.UNMIXED: {
+        (-math.inf, 4.6): 21.0,
+        (4.6, 5.8): 26.0,
+        (5.8, 13.9): 37.0,
+        (13.9, 25.1): 41.0,
+        (25.1, math.inf): 74.0,
+    },
+}
+
+
+class BeddedPack(Storage):
     def __init__(
         self,
         name: str,
+        is_mixed: bool,
         storage_time_period: int | None,
         surface_area: float = inf,
-        cover: StorageCover = StorageCover.NO_COVER,
+        cover: StorageCover = StorageCover.NO_COVER
     ):
         super().__init__(
             name=name,
@@ -26,10 +54,11 @@ class CompostBeddedPackBarn(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
+        self.is_mixed = is_mixed
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
-        Processes manure in compost bedded pack.
+        Processes manure in bedded pack.
 
         Parameters
         ----------
@@ -47,10 +76,26 @@ class CompostBeddedPackBarn(Storage):
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
-        storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
-            self._manure_to_process.total_volatile_solids,
-            self._determine_barn_temperature(current_day_conditions.mean_air_temperature),
-        )
+        manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
+
+        if manure_annual_temperature:
+            storage_methane = BeddedPack.calculate_bedded_pack_methane_emission(
+                self.is_mixed,
+                self._manure_to_process.total_volatile_solids,
+                self._determine_barn_temperature(manure_annual_temperature),
+            )
+        else:
+            storage_methane = 0
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+            }
+            self._om.add_error(
+                "No annual mean temperature",
+                "No data of annual mean temperature available in current day condition to calculate MCF.",
+                info_map=info_map,
+            )
+
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             ManureConstants.DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,
@@ -58,14 +103,14 @@ class CompostBeddedPackBarn(Storage):
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
-        storage_nitrous_oxide_N = self._calculate_cbpb_nitrous_oxide_emission(
-            received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=True
+        storage_nitrous_oxide_N = self._calculate_bedded_pack_nitrous_oxide_emission(
+            received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=self.is_mixed
         )
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
             ManureConstants.LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
-        storage_ammonia_N = self._calculate_cbpb_ammonia_emission(
-            received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=True
+        storage_ammonia_N = self._calculate_bedded_pack_ammonia_emission(
+            received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=self.is_mixed
         )
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
@@ -214,9 +259,9 @@ class CompostBeddedPackBarn(Storage):
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
-    def _calculate_cbpb_nitrous_oxide_emission(received_nitrogen: float, is_bedding_tilled: bool) -> float:
+    def _calculate_bedded_pack_nitrous_oxide_emission(received_nitrogen: float, is_bedding_tilled: bool) -> float:
         """
-        Calculate the nitrogen loss from nitrous oxide emission in a compost bedded pack barn.
+        Calculate the nitrogen loss from nitrous oxide emission in a bedded pack barn.
 
         Parameters
         ----------
@@ -228,7 +273,7 @@ class CompostBeddedPackBarn(Storage):
         Returns
         -------
         float
-            The nitrogen lost to nitrous oxide emissions in the compost bedded pack barn (kg).
+            The nitrogen lost to nitrous oxide emissions in the bedded pack barn (kg).
 
         Raises
         ------
@@ -247,9 +292,9 @@ class CompostBeddedPackBarn(Storage):
         return coefficient * received_nitrogen
 
     @staticmethod
-    def _calculate_cbpb_ammonia_emission(received_nitrogen: float, is_bedding_tilled: bool) -> float:
+    def _calculate_bedded_pack_ammonia_emission(received_nitrogen: float, is_bedding_tilled: bool) -> float:
         """
-        Calculate the nitrogen loss from ammonia emission in the compost bedded pack barn.
+        Calculate the nitrogen loss from ammonia emission in the bedded pack barn.
 
         Parameters
         ----------
@@ -261,7 +306,7 @@ class CompostBeddedPackBarn(Storage):
         Returns
         -------
         float
-            The nitrogen lost to ammonia emission in the compost bedded pack barn (kg).
+            The nitrogen lost to ammonia emission in the bedded pack barn (kg).
 
         Raises
         ------
@@ -278,3 +323,64 @@ class CompostBeddedPackBarn(Storage):
             coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
 
         return coefficient * received_nitrogen
+
+    @staticmethod
+    def calculate_bedded_pack_methane_emission(is_mixed: bool,
+                                               manure_volatile_solids: float,
+                                               manure_temperature: float) -> float:
+        """
+        Calculates emission of methane on the current day based on methodology from IPCC 2019
+        for mixed and unmixed bedded pack barns.
+
+        Parameters
+        ----------
+        is_mixed : bool
+            Indicates whether this bedded pack is mixed or not.
+        manure_volatile_solids : float
+            The volatile solids (kg).
+        manure_temperature : float
+            The annual average temperature of the barn (Celsius).
+
+        Returns
+        -------
+        float
+            The calculated methane emissions for the given day (kg).
+
+        """
+        if manure_volatile_solids < 0:
+            raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
+        Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
+        methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(is_mixed,
+                                                                                               manure_temperature)
+        methane_emissions_in_kg =\
+            (manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+        return methane_emissions_in_kg
+
+    @staticmethod
+    def calculate_bedded_pack_methane_conversion_factor(is_mixed: bool, manure_temperature: float) -> float:
+        """
+        Calculates the Methane Conversion Factor (MCF) for the bedded pack based on annual temperature and
+        whether or not the bedded pack is mixed.
+
+        Parameters
+        ----------
+        is_mixed : bool
+            Indicates whether this bedded pack is mixed or not.
+        manure_temperature : float
+            The annual average temperature of the barn (Celsius).
+
+        Returns
+        -------
+        float
+            The calculated Methane Conversion Factor (MCF) for the given annual average temperature (unitless).
+
+        References
+        ----------
+        2024 USDA GHG inventory methods table 4-9.
+
+        """
+        mix = Mixing.MIXED if is_mixed else Mixing.UNMIXED
+        for (lower_bound, upper_bound), mcf in BEDDED_PACK_MCF_TABLE[mix].items():
+            if lower_bound < manure_temperature <= upper_bound:
+                return mcf
+        raise ValueError(f"Temperature {manure_temperature}°C out of any defined bin")
