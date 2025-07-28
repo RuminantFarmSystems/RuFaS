@@ -742,9 +742,13 @@ class DataValidator:
         Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
 
         """
-
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_data_by_type.__name__,
+        }
         if "type" not in variable_properties:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
+
         data_type = variable_properties["type"]
 
         type_to_validator_map: dict[
@@ -759,10 +763,11 @@ class DataValidator:
             "number": self._number_type_validator,
             "bool": self._bool_type_validator,
         }
+        path = self.convert_variable_path_to_str(variable_path)
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{self.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{path}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -777,11 +782,6 @@ class DataValidator:
             fixable_data_types,
         )
 
-        info_map = {
-            "class": DataValidator.__name__,
-            "function": DataValidator.validate_data_by_type.__name__,
-        }
-        path = ",".join(str(level) for level in variable_path)
         if data_type not in fixable_data_types:
             if not is_valid:
                 error_message = (
