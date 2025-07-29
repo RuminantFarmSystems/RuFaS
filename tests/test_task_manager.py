@@ -100,6 +100,7 @@ def test_task_manager_start(
     )
     mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
     mock_get_rufas_version = mocker.patch.object(mock_task_manager, "get_rufas_version", return_value="1.0.0")
+    mock_check_dependencies = mocker.patch.object(mock_task_manager, "check_dependencies")
     mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
@@ -167,6 +168,7 @@ def test_task_manager_start(
         [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers, Path("metadata/path")
     )
     mock_get_rufas_version.assert_called_once()
+    mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
     mock_print_credits.assert_called_once_with("1.0.0")
 
@@ -174,6 +176,8 @@ def test_task_manager_start(
 def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
     """Test TaskManager.start() with invalid input data."""
     mock_task_manager = TaskManager()
+    mocker.patch.object(mock_task_manager, "check_python_version")
+    mocker.patch.object(mock_task_manager, "check_dependencies")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
