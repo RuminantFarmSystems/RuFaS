@@ -352,7 +352,7 @@ class BeddedPack(Storage):
         Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(is_mixed,
                                                                                                manure_temperature)
-        methane_emissions_in_kg =\
+        methane_emissions_in_kg = \
             (manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg
 

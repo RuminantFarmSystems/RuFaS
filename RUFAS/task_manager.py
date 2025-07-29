@@ -1,9 +1,11 @@
+from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
 import sys
 import traceback
 from enum import Enum
 from functools import partial
+from packaging.requirements import Requirement, InvalidRequirement
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from pathlib import Path
@@ -120,6 +122,7 @@ class TaskManager:
             is_end_to_end_testing_run=False,
         )
         self.check_python_version()
+        self.check_dependencies()
         rufas_version = self.get_rufas_version()
         self.output_manager.print_credits(rufas_version)
         info_map = {
@@ -213,6 +216,58 @@ class TaskManager:
             )
             return "Unknown"
         return str(rufas_version)
+
+    def check_dependencies(self) -> None:
+        """
+        Checks if the required dependencies are installed.
+
+        Raises
+        ------
+        ImportError
+            If a required dependency is not installed.
+        """
+        import tomllib
+
+        with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+            project_data = tomllib.load(pyproject_file)
+
+        dependencies = project_data.get("project", {}).get("dependencies", [])
+        for dependency in dependencies:
+            try:
+                requirement = Requirement(dependency)
+            except InvalidRequirement as e:
+                self.output_manager.add_error(
+                    "Invalid requirement syntax",
+                    f"The dependency string '{dependency}' is invalid. Error: {e}",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(f"Invalid dependency string in pyproject.toml: {dependency!r}") from e
+
+            package_name = requirement.name
+
+            try:
+                installed_version = get_installed_version(package_name)
+            except PackageNotFoundError as e:
+                self.output_manager.add_error(
+                    "Missing dependency",
+                    f"Required package '{package_name}' is not installed. We suggest running 'pip install .'"
+                    " to install all dependencies at required minimum levels.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(f"[ERROR] Required package '{package_name}' is not installed.") from e
+
+            if requirement.specifier and not requirement.specifier.contains(installed_version):
+                self.output_manager.add_error(
+                    "Dependency version doesn't meet requirements",
+                    f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
+                    f"Required: {requirement.specifier}. We suggest running 'pip install .' to install all"
+                    " dependencies at required minimum levels.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(
+                    f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
+                    f" {requirement.specifier}"
+                )
 
     def check_python_version(self) -> None:
         """
