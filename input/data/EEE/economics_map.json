@@ -109,7 +109,8 @@
                     "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferII_sold_weight"
                 ],
                 "economics_files": [
-                    "commodity_prices.cow_dairy_heifer_open.dollar_per_animal.csv"],
+                    "commodity_prices.cow_dairy_heifer_open.dollar_per_animal.csv"
+                ],
                 "preprocessing": "sum weight sold, requires SME input for logic to select from economics_files options"
             },
             "Sold heifer IIIs": {
@@ -256,12 +257,12 @@
             },
             "Digester operational costs": {
                 "biophysical_simulation": "TODO: user inputs? Economic_preprocessing",
-                "economics_files": 
-                ["commodity_prices.natgas_industrial.dollar_per_megajoule.csv",
-                "commodity_prices.elec_industrial.dollar_per_kwh.csv",                "commodity_prices.digester_carbon_credits_dollar_per_tonne.csv"],
-            "notes": "requires SME input to develop Economic input structure"
-                }
-
+                "economics_files": [
+                    "commodity_prices.natgas_industrial.dollar_per_megajoule.csv",
+                    "commodity_prices.elec_industrial.dollar_per_kwh.csv",
+                    "commodity_prices.digester_carbon_credits_dollar_per_tonne.csv"
+                ],
+                "notes": "requires SME input to develop Economic input structure"
             },
             "Manure disposal quantity": {
                 "biophysical_simulation": "Economic_preprocessing.Manure.manure_disposal",
@@ -279,7 +280,7 @@
                 "biophysical_simulation": "Economic_preprocessing.Manure.manure_sales",
                 "economics_files": "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv",
                 "preprocessing": "TODO SME input Economic_inputs and/or Manure module output"
-        },
+            },
             "Digester fertilizer production": {
                 "biophysical_simulation": "Economic_preprocessing.Manure.digester_fertilizer",
                 "economics_files": [
@@ -315,7 +316,7 @@
                 "notes": "requires SME input to develop Economic input structure"
             }
         }
-    ,
+    },
     "Feed": {
         "Costs": {
             "Purchased feed costs": {
