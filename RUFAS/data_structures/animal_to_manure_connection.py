@@ -192,7 +192,6 @@ class ManureStream:
         "volume": MeasurementUnits.CUBIC_METERS,
         "mass": MeasurementUnits.KILOGRAMS,
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "methane_production_potential": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
         "pen_manure_data": None,
     }
 
