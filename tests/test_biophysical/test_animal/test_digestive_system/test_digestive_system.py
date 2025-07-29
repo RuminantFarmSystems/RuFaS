@@ -7,7 +7,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.output_manager import OutputManager
 
 

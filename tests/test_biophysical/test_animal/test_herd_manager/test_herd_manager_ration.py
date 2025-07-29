@@ -19,7 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
 )
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (

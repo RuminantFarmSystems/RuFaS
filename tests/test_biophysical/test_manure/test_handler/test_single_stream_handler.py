@@ -7,7 +7,7 @@ from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamH
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 
 

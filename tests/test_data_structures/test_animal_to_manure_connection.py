@@ -1,5 +1,5 @@
 from typing import Optional, Type
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 import pytest
 from pytest_mock import MockerFixture
 

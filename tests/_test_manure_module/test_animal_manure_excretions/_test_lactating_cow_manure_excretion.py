@@ -4,7 +4,7 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import manure_calculations, methane_mitigation
