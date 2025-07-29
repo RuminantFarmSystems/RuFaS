@@ -320,7 +320,7 @@ class FeedManager:
         Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
         future harvests, budget, etc.
         """
-        # TODO: respect things other than the Planning Allowance
+        # TODO: respect things other than the Planning Allowance. Issue #2483.
         feeds_to_purchase = {
             rufas_id: min(
                 ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0)

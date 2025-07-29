@@ -108,9 +108,8 @@ def manure_calculations(
     ) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-        urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation GitHub Issue # 1216
+        urea=9.52,  # 0.340 mol/L
         urine=urine,
-        # TODO: Implement with correct equation GitHub Issue # 1216
         manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,

@@ -375,8 +375,6 @@ class HeiferII(HeiferI):
         replacement time. Culling for reproduction problem occur when heifer
         doesn't get pregnant for a long time.
 
-        # TODO: Refactor this method. Git issue #1038.
-
         Returns:
             cull_stage: culling for reproduction failure
             third_stage: move to next stage -- heiferIII stage when time comes

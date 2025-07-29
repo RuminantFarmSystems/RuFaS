@@ -459,7 +459,6 @@ class Feed:
                 self.P += crop.P_yield
                 self.DM_percent = self.DM / crop.yield_actual
                 self.NDF_percent = self.NDF / crop.yield_actual
-                # TODO: no Carbon Cycle currently implemented
                 self.C += crop.yield_actual * self.C_percent
 
                 # "pseudocode_feed" F.1.2
@@ -479,7 +478,6 @@ class Feed:
             """
             carbon_loss.update_all(self)
             nitrogen_loss.update_all(self)
-            # TODO: No protein degradation currently implemented
             protein_degradation.update_all()
 
         def reset_storage(self):
@@ -611,9 +609,6 @@ class Feed:
         Args:
             storage: the storage object containing the forage being assessed
         """
-        # TODO: Incorporate user specified input for frequency of inventory plan
-        # TODO: Raise warning for when additional forage needs to be purchased
-        # TODO: Add remaining forage to other silos with same forage type
 
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
@@ -861,7 +856,6 @@ class Feed:
             else:
                 silo.days_since_feedout += 1
         # yearly reset of silos
-        # TODO: How often do we want to reset?
         # When ration formulation is in, the silos will automatically be fed out
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout > 365:

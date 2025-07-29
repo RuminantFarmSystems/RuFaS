@@ -57,15 +57,15 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_potassium_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_potassium
     housing_methane: float
-        Methane emissions from ..., kg.  # TODO: Fill in.
+        Methane emissions from ..., kg.
     housing_methane_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_methane
     housing_carbon_dioxide: float
-        Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
+        Carbon dioxide emissions from ..., kg.
     housing_carbon_dioxide_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_carbon_dioxide
     housing_ammonia: float
-        Ammonia emissions from ..., kg.  # TODO: Fill in.
+        Ammonia emissions from ..., kg.
     housing_ammonia_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_ammonia
     manure_volume: float
