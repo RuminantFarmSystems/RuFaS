@@ -11,6 +11,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -65,7 +66,7 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
-        original_stream.water + expected_total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        original_stream.water + expected_total_cleaning_water_volume * UserConstants.WATER_DENSITY_KG_PER_M3
     )
 
     expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - 0.0)
@@ -126,7 +127,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
-        original_stream.water + expected_total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        original_stream.water + expected_total_cleaning_water_volume * UserConstants.WATER_DENSITY_KG_PER_M3
     )
 
     expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - 0.0)

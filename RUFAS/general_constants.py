@@ -66,14 +66,14 @@ class GeneralConstants:
     HOURS_PER_DAY = 24
 
     # Density-related
-    WATER_DENSITY_KG_PER_LITER = 0.997
-    WATER_DENSITY_KG_PER_M3 = WATER_DENSITY_KG_PER_LITER * LITERS_TO_CUBIC_METERS
+    # WATER_DENSITY_KG_PER_LITER = 0.997
+    # WATER_DENSITY_KG_PER_M3 = WATER_DENSITY_KG_PER_LITER * LITERS_TO_CUBIC_METERS
 
     # Biochemistry-related
-    PROTEIN_TO_NITROGEN = 0.16
-    NITROGEN_TO_PROTEIN = 6.25
-    MILK_FAT_WEIGHT = 12.2
-    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL = 0.02
+    # PROTEIN_TO_NITROGEN = 0.16
+    # NITROGEN_TO_PROTEIN = 6.25
+    # MILK_FAT_WEIGHT = 12.2
+    # FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL = 0.02
     """Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4."""
     KCAL_TO_MJ = 4.184
     MJ_CH4_TO_G_CH4 = 0.05565
@@ -102,16 +102,16 @@ class GeneralConstants:
     AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
     """The mole fraction of oxygen in ambient air."""
 
-    METHANE_FACTOR: float = 0.67
+    # METHANE_FACTOR: float = 0.67
     """Unit conversion factor for methane from :math:`m^3` to kg at 20 degrees C (kg/m3)."""
 
     GAS_CONSTANT: float = 8.314
     """The ideal gas constant (J/mol * K)."""
 
-    GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
+    # GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
     """General temperature lower bound (degrees C)."""
 
-    GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
+    # GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
     """General temperature upper bound (degrees C)."""
 
     IDEAL_GAS_LAW_R = 0.0821
@@ -138,11 +138,11 @@ class GeneralConstants:
         "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
         "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
         "HOURS_PER_DAY": MeasurementUnits.HOURS_PER_DAY,
-        "WATER_DENSITY_KG_PER_LITER": MeasurementUnits.KILOGRAMS_PER_LITER,
-        "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
-        "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
-        "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
-        "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
+        # "WATER_DENSITY_KG_PER_LITER": MeasurementUnits.KILOGRAMS_PER_LITER,
+        # "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
+        # "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
+        # "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
+        # "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
         "KCAL_TO_MJ": MeasurementUnits.MCAL_PER_MJ,
         "MJ_CH4_TO_G_CH4": MeasurementUnits.MJ_CH4_PER_G_CH4,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
@@ -155,7 +155,7 @@ class GeneralConstants:
         "SQUARE_CENTIMETERS_TO_HECTARES": MeasurementUnits.HECTARES_PER_SQUARE_CENTIMETER,
         "SQUARE_KILOMETERS_TO_HECTARES": MeasurementUnits.HECTARES_PER_SQUARE_KILOMETER,
         "HECTARES_TO_SQUARE_KILOMETERS": MeasurementUnits.SQUARE_KILOMETERS_PER_HECTARE,
-        "FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL": MeasurementUnits.UNITLESS,
+        # "FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL": MeasurementUnits.UNITLESS,
         "HECTARES_PER_SQUARE_METER": MeasurementUnits.HECTARES_PER_SQUARE_METER,
         "SQUARE_METERS_TO_HECTARES": MeasurementUnits.SQUARE_METERS_PER_HECTARE,
     }

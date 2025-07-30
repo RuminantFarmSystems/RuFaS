@@ -3,6 +3,7 @@ from math import exp, log
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 @dataclass
@@ -532,10 +533,10 @@ class LayerData:
         )
 
         initial_active_organic_nitrogen_concentration = (
-            humic_organic_nitrogen_concentration * GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            humic_organic_nitrogen_concentration * UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.3
         initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * (
-            1 - GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            1 - UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.4
 
         self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(

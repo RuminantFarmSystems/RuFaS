@@ -2,6 +2,7 @@ import math
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 class SolidsStorageCalculator:
@@ -213,7 +214,7 @@ class SolidsStorageCalculator:
         Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
         methane_emissions_in_kg = (
-            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+            manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor
         ) / 100
         return methane_emissions_in_kg
 

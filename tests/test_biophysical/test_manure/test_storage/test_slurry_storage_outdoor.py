@@ -13,6 +13,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -116,7 +117,7 @@ def test_process_manure(
         precipitation_volume = (
             dummy_current_day_conditions.precipitation * GeneralConstants.MM_TO_M * slurry_storage_outdoor._surface_area
         )
-        precipitation_mass = precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        precipitation_mass = precipitation_volume * UserConstants.WATER_DENSITY_KG_PER_M3
         expected_total_manure = replace(
             expected_total_manure,
             volume=(expected_total_manure.volume + precipitation_volume),
