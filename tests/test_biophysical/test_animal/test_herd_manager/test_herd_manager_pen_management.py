@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, Feed
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager

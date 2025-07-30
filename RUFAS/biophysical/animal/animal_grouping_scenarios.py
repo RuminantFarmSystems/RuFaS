@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 
 
 class AnimalGroupingScenario(Enum):

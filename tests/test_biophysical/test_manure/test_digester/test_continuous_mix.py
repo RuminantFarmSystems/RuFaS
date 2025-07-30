@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 

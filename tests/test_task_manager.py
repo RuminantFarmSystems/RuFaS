@@ -763,7 +763,7 @@ def test_handle_herd_initialization(
 ) -> None:
     """Unit test for TaskManager.handle_herd_initializaition()"""
     args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
-    mock_herd_factory = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory")
+    mock_herd_factory = mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory")
     mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
     mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
 
