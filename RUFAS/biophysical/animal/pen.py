@@ -959,7 +959,7 @@ class Pen:
             # For lac cow
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
-                    print("hit the lac limit") # TODO remove before merge
+                    print("hit the lac limit")  # TODO remove before merge
                     break
             else:
                 self._reduce_on_lactation_failure(info_map=info_map)
@@ -1005,7 +1005,7 @@ class Pen:
             animal_combination=self.animal_combination,
             previous_ration=previous_ration,
             user_defined_ration_dictionary=user_defined_ration_dictionary,
-            user_defined_ration_tolerance=tolerance
+            user_defined_ration_tolerance=tolerance,
         )
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
