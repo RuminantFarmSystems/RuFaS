@@ -732,6 +732,8 @@ class RationOptimizer:
         pen_available_feeds: list[Feed],
         animal_combination: AnimalCombination,
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float] | None = None,
+        user_defined_ration_tolerance: float = None,
     ) -> tuple[OptimizeResult, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -739,6 +741,8 @@ class RationOptimizer:
 
         Parameters
         ----------
+        is_ration_defined_by_user : bool
+            True if user defined ration methodology to be used.
         pen_average_body_weight : float
             Average body weight of animals in pen.
         requirements : AnimalRequirements
@@ -767,7 +771,14 @@ class RationOptimizer:
 
         initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
 
-        bounds = self._build_bounds(ration_config)
+        if user_defined_ration_dictionary:
+            bounds = self._build_bounds_user_defined_ration(
+                ration_config=ration_config,
+                user_defined_ration_dictionary=user_defined_ration_dictionary,
+                user_defined_ration_tolerance=user_defined_ration_tolerance,
+            )
+        else:
+            bounds = self._build_bounds(ration_config)
 
         initial_decision_vector = self._check_initial_bounds(bounds, initial_decision_vector)
         arguments = (ration_config,)
@@ -811,6 +822,49 @@ class RationOptimizer:
     def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:
         """Zips min/max lists into solver bounds."""
         return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+
+    @staticmethod
+    def _build_bounds_user_defined_ration(
+        ration_config: RationConfig,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float],
+        user_defined_ration_tolerance: float,
+    ) -> list[tuple[float, float]]:
+        """
+        Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
+        user_defined_ration_tolerance : float
+            Allowable +/- variance in each of the defined ration inclusion percentage values.
+        """
+        feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+        user_defined_boundlist = []
+        udr_tolerance = user_defined_ration_tolerance
+        ration_key_list = sorted([int(key) for key in user_defined_ration_dictionary.keys()])
+        for key in ration_key_list:
+            target_lower = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 - udr_tolerance)
+                * (ration_config.animal_requirements.dry_matter * 1.1)
+            )
+            target_upper = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 + udr_tolerance)
+                * (ration_config.animal_requirements.dry_matter * 1.1 + 0.0001)
+            )
+            targetbounds = (max(0.0, target_lower), target_upper)
+            user_defined_boundlist.append(targetbounds)
+
+        user_defined_boundlist_trimmed = [
+            (max(t1[0], t2[0]), min(t1[1], t2[1])) for t1, t2 in zip(feed_bound_list, user_defined_boundlist)
+        ]
+        return user_defined_boundlist_trimmed
 
     def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""
