@@ -941,7 +941,6 @@ class Pen:
                 pen_available_feeds, temperature, previous_ration
             )
 
-
             if not solution.success:
                 self.ration_optimizer.handle_failed_constraints(
                     num_attempts=num_attempts,
@@ -1022,7 +1021,14 @@ class Pen:
         )
 
     def _apply_user_defined_ration(self, pen_feeds: list[Feed]) -> None:
-        """Applies the optimizer solution to the pen."""
+        """
+        Generates and applies a user defined ration to a pen.
+
+        Parameters
+        ----------
+        pen_feeds : list[Feed]
+            Feeds available in a given pen.
+        """
         self.ration = UserDefinedRationManager.get_user_defined_ration(
             self.animal_combination, self.average_nutrition_requirements
         )
@@ -1058,8 +1064,13 @@ class Pen:
 
     def _reduce_on_lactation_failure_user_defined(self, info_map: dict[str, str]) -> bool:
         """Processes failures and attempts milk reduction if needed for lactating cows.
+        Returns True if the ration formulation loop needs to be broken, modified for user defined ration logic,
+        returning True instead of raising errors, while logging said outcome.
 
-        Returns True if the ration formulation loop needs to be broken.
+        Parameters
+        ----------
+        info_map : dict[str, Any]
+            The info map to be added to the output pool.
         """
         if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
             self.om.add_log(

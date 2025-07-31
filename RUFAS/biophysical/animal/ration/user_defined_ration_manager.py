@@ -28,7 +28,7 @@ class UserDefinedRationManager:
     _om = OutputManager()
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
     tolerance: float
-    
+
     @classmethod
     def set_user_defined_ration_tolerance(
         cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
