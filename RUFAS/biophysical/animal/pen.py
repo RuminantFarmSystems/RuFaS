@@ -937,8 +937,7 @@ class Pen:
         while True:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(
-                is_ration_defined_by_user,
-                pen_available_feeds, temperature, previous_ration
+                is_ration_defined_by_user, pen_available_feeds, temperature, previous_ration
             )
 
             if not solution.success:
@@ -988,13 +987,10 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, is_ration_defined_by_user: bool,
-        pen_feeds: list[Feed], temperature: float, previous_ration: Any
+        self, is_ration_defined_by_user: bool, pen_feeds: list[Feed], temperature: float, previous_ration: Any
     ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
-        self.set_animal_nutritional_requirements(
-            temperature=temperature, available_feeds=pen_feeds
-        )
+        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
         if is_ration_defined_by_user:
             user_defined_ration_dictionary = UserDefinedRationManager.user_defined_rations[self.animal_combination]
             tolerance = UserDefinedRationManager.tolerance
@@ -1037,9 +1033,7 @@ class Pen:
         self.ration = UserDefinedRationManager.get_user_defined_ration(
             self.animal_combination, self.average_nutrition_requirements
         )
-        self.set_animal_nutritional_supply(
-            feeds_used=pen_feeds, ration_formulation=self.ration
-        )
+        self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
         _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
             self.average_nutrition_requirements,
             self.average_nutrition_supply,

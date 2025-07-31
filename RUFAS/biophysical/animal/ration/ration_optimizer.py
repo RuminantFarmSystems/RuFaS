@@ -733,7 +733,7 @@ class RationOptimizer:
         animal_combination: AnimalCombination,
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
         user_defined_ration_dictionary: dict[RUFAS_ID, float] | None = None,
-        user_defined_ration_tolerance: float = None
+        user_defined_ration_tolerance: float = None,
     ) -> tuple[OptimizeResult, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -774,8 +774,8 @@ class RationOptimizer:
         if user_defined_ration_dictionary:
             bounds = self._build_bounds_user_defined_ration(
                 ration_config=ration_config,
-                user_defined_ration_dictionary= user_defined_ration_dictionary,
-                user_defined_ration_tolerance=user_defined_ration_tolerance
+                user_defined_ration_dictionary=user_defined_ration_dictionary,
+                user_defined_ration_tolerance=user_defined_ration_tolerance,
             )
         else:
             bounds = self._build_bounds(ration_config)
@@ -821,16 +821,14 @@ class RationOptimizer:
     @staticmethod
     def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:
         """Zips min/max lists into solver bounds."""
-        return list(zip(
-            ration_config.feed_minimum_list,
-            ration_config.feed_maximum_list
-            ))
+        return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
 
     @staticmethod
     def _build_bounds_user_defined_ration(
         ration_config: RationConfig,
         user_defined_ration_dictionary: dict[RUFAS_ID, float],
-        user_defined_ration_tolerance: float) -> list[tuple[float, float]]:
+        user_defined_ration_tolerance: float,
+    ) -> list[tuple[float, float]]:
         """
         Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
 
@@ -843,10 +841,7 @@ class RationOptimizer:
         user_defined_ration_tolerance : float
             Allowable +/- variance in each of the defined ration inclusion percentage values.
         """
-        feed_bound_list = list(zip(
-            ration_config.feed_minimum_list,
-            ration_config.feed_maximum_list
-            ))
+        feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
         user_defined_boundlist = []
         udr_tolerance = user_defined_ration_tolerance
         ration_key_list = sorted([int(key) for key in user_defined_ration_dictionary.keys()])
@@ -867,10 +862,9 @@ class RationOptimizer:
             user_defined_boundlist.append(targetbounds)
 
         user_defined_boundlist_trimmed = [
-            (max(t1[0], t2[0]), min(t1[1], t2[1]))
-            for t1, t2 in zip(feed_bound_list, user_defined_boundlist)]
+            (max(t1[0], t2[0]), min(t1[1], t2[1])) for t1, t2 in zip(feed_bound_list, user_defined_boundlist)
+        ]
         return user_defined_boundlist_trimmed
-
 
     def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""

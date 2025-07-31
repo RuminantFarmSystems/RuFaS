@@ -40,7 +40,7 @@ class UserDefinedRationManager:
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
             List of dictionaries containing the user-defined rations for each animal combination.
-        
+
         """
         cls.tolerance = ration_config["user_defined_ration_percentages"]["tolerance"]
 
