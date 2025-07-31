@@ -40,6 +40,16 @@ class RationConfig:
         NDF for each feed used in ration formulation.
     EE_list : list[float]
         EE for each feed used in ration formulation.
+
+    Parameters
+    ----------
+    animal_requirements : NutritionRequirements
+        Nutrition requirements for pen, used in constraint methods.
+    pen_available_feeds : list[Feed], optional
+        List of available feeds in pen.
+    pen_average_body_weight : float
+        Average body weight in pen, used in constraint methods.
+
     """
 
     def __init__(
@@ -794,8 +804,8 @@ class RationOptimizer:
         """Builds the initial decision vector (`x0`) for the optimizer."""
         if previous_ration:
             return [value for key, value in previous_ration.items() if key not in ("status", "objective")]
-        n = len(ration_config.price_list)
-        return [1.0] + [random.random() * 10 for _ in range(n - 1)]
+        price_list_length = len(ration_config.price_list)
+        return [1.0] + [random.random() * 10 for _ in range(price_list_length - 1)]
 
     @staticmethod
     def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:

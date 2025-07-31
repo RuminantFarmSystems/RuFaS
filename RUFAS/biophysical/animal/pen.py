@@ -903,7 +903,7 @@ class Pen:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(pen_available_feeds, temperature, previous_ration)
 
-            if solution and not solution.success:
+            if not solution.success:
                 self.ration_optimizer.handle_failed_constraints(
                     num_attempts=num_attempts,
                     solution=solution,
@@ -916,13 +916,13 @@ class Pen:
                 )
 
             # Lac cow success exit and non lac cow one time run only exit
-            if solution and solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
+            if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
             # For lac cow
             self._reduce_on_lactation_failure(info_map=info_map)
 
-        if solution is not None and solution.success:
+        if solution.success:
             self._apply_successful_solution(solution, pen_available_feeds)
         elif self.ration == {}:
             self.om.add_error(
