@@ -103,9 +103,7 @@ class UserDefinedRationManager:
         ration_formulation = cls.user_defined_rations[animal_combination]
 
         ration: dict[RUFAS_ID, float] = {
-            rufas_id: (
-                dry_matter_intake_requirement * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-            )
+            rufas_id: (dry_matter_intake_requirement * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION)
             for rufas_id, percentage in ration_formulation.items()
         }
 
