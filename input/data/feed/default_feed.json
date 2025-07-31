@@ -208,7 +208,7 @@
                 "ration_percentage": 1.7
             }
         ],
-        "tolerance": 0.0,
+        "tolerance": 0.1,
         "milk_reduction_maximum": 15
     },
     "allowances": [
