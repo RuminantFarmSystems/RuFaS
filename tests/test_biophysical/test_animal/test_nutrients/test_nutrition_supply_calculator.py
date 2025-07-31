@@ -191,18 +191,18 @@ def test_calculate_nutrient_supply(
 ) -> None:
     """Test that the nutritive and energy content of a ration is calculated correctly."""
 
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_intake_discount", return_value=0.3)
     mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
+        NutritionSupplyCalculator, "calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
     )
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_maintenance_net_energy", return_value=1000.0)
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_lactation_net_energy", return_value=1100.0)
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0)
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5)
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6)
-    mocker.patch.object(NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_actual_maintenance_net_energy", return_value=1000.0)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_actual_lactation_net_energy", return_value=1100.0)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_actual_growth_net_energy", return_value=1200.0)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_calcium_supply", return_value=1.5)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_phosphorus_supply", return_value=1.6)
+    mocker.patch.object(NutritionSupplyCalculator, "calculate_metabolizable_protein_supply", return_value=1.7)
     mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_forage_neutral_detergent_fiber_content", return_value=12.0
+        NutritionSupplyCalculator, "calculate_forage_neutral_detergent_fiber_content", return_value=12.0
     )
     mocker.patch.object(NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=28.0)
     mocker.patch.object(NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=1.0)
@@ -276,7 +276,7 @@ def test_calculate_nutrient_intake_discount(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_nutrient_intake_discount(feeds_in_ration, weight)
+    actual = NutritionSupplyCalculator.calculate_nutrient_intake_discount(feeds_in_ration, weight)
 
     assert pytest.approx(actual) == expected
 
@@ -325,7 +325,7 @@ def test_calculate_actual_metabolizable_energy(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_actual_metabolizable_energy(feeds_in_ration, actual_digestible)
+    actual = NutritionSupplyCalculator.calculate_actual_metabolizable_energy(feeds_in_ration, actual_digestible)
 
     assert pytest.approx(actual) == expected
 
@@ -362,7 +362,7 @@ def test_calculate_actual_maintenance_net_energy(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_actual_maintenance_net_energy(feeds_in_ration, actual_metabolizable)
+    actual = NutritionSupplyCalculator.calculate_actual_maintenance_net_energy(feeds_in_ration, actual_metabolizable)
 
     assert pytest.approx(actual) == expected
 
@@ -410,7 +410,7 @@ def test_calculate_actual_lactation_net_energy(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_actual_lactation_net_energy(
+    actual = NutritionSupplyCalculator.calculate_actual_lactation_net_energy(
         feeds_in_ration, actual_metabolizable, actual_digestible
     )
 
@@ -453,7 +453,7 @@ def test_calculate_actual_growth_net_energy(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_actual_growth_net_energy(feeds_in_ration, actual_metabolizable_energy)
+    actual = NutritionSupplyCalculator.calculate_actual_growth_net_energy(feeds_in_ration, actual_metabolizable_energy)
 
     assert pytest.approx(actual) == expected
 
@@ -497,7 +497,7 @@ def test_calculate_calcium_supply(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_calcium_supply(feeds_in_ration)
+    actual = NutritionSupplyCalculator.calculate_calcium_supply(feeds_in_ration)
 
     assert pytest.approx(actual) == expected
 
@@ -541,7 +541,7 @@ def test_calculate_phosphorus_supply(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_phosphorus_supply(feeds_in_ration)
+    actual = NutritionSupplyCalculator.calculate_phosphorus_supply(feeds_in_ration)
 
     assert actual == expected
 
@@ -584,7 +584,7 @@ def test_calculate_metabolizable_protein_supply(
         return_value={1: 10.0, 2: 15.0, 3: 17.0},
     )
 
-    actual = NutritionSupplyCalculator._calculate_metabolizable_protein_supply(
+    actual = NutritionSupplyCalculator.calculate_metabolizable_protein_supply(
         feeds_in_ration, dry_matter, actual_tdn, weight
     )
 
@@ -753,7 +753,7 @@ def test_calculate_ndf_content(
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
+    actual = NutritionSupplyCalculator.calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
 
     assert pytest.approx(actual) == expected
 
@@ -797,7 +797,7 @@ def test_calculate_forage_neutral_detergent_fiber_content(
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
+    actual = NutritionSupplyCalculator.calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
 
     assert pytest.approx(actual) == expected
 

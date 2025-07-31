@@ -247,7 +247,7 @@ def test_add_animal_to_pen_and_id_map(
     mock_feed = MagicMock(auto_spec=Feed)
     for animal in animals:
         herd_manager._add_animal_to_pen_and_id_map(
-            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date())
+            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date()), 15
         )
         mock_pen_update_animals.assert_called_with(
             [animal],
@@ -304,7 +304,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mock_pen_avail_feeds = mocker.MagicMock()
         mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds)
 
-        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, total_inventory)
+        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, total_inventory, 15)
 
         mock_pen_insert_animal_into_animals_in_pen_map.assert_called_with(animal)
         mock_pen_set_animal_nutritional_requirements.assert_called_with(
@@ -315,6 +315,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
             pen_available_feeds=mock_pen_avail_feeds,
             current_temperature=mock_current_day_conditions.mean_air_temperature,
             total_inventory=total_inventory,
+            simulation_day=15,
         )
         assert animal.id in herd_manager.animal_to_pen_id_map
         assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
