@@ -26,6 +26,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
@@ -1052,7 +1053,7 @@ class Pen:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
         ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements
+            animal_combination, self.average_nutrition_requirements.dry_matter
         )
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
@@ -1072,7 +1073,7 @@ class Pen:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
                 ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements
+                    animal_combination, self.average_nutrition_requirements.dry_matter
                 )
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1085,6 +1086,69 @@ class Pen:
         )
 
         self.ration = ration
+
+    def handle_calf_ration(self, is_ration_defined_by_user: bool, pen_available_feeds: list[Feed], temperature: float) -> None:
+            """
+            Calculate new ration for the pen based on the number of animals in the pen.
+
+            Parameters
+            ----------
+            is_ration_defined_by_user : bool
+                True if user defined ration behavior is desired.
+            pen_available_feeds : list[Feed]
+                List of available feeds to be used in the ration formulation.
+            temperature : float
+                Temperature of the animals' environment (°C).
+
+            Notes
+            -----
+            """
+            self.set_animal_nutritional_requirements(
+                temperature=temperature,
+                available_feeds=pen_available_feeds
+            )
+            total_pen_calf_intake = {"whole_milk_intake": 0.0,
+                                   "milk_replacer_intake": 0.0,
+                                   "starter_intake": 0.0}
+            # wean_day = AnimalBase.config["wean_day"]
+            # wean_length = AnimalBase.config["wean_length"]
+            # if 202 in pen_available_feeds["feed_id"]:
+            #     milk_type = "whole"
+            # else:
+            #     milk_type = "replacer"
+            for calf in list(self.animals_in_pen.values()):
+                total_pen_calf_intake["whole_milk_intake"] += calf.calf_nutrition_requirements["whole_milk_intake"]
+                total_pen_calf_intake["milk_replacer_intake"] + calf.calf_nutrition_requirements["milk_replacer_intake"]
+                total_pen_calf_intake["starter_intake"] += calf.calf_nutrition_requirements["starter_intake"]
+                # TODO consider reporting the below in AnimalReporter
+                # TODO if reported: report for individual, or avg?
+                # calf_requirements = CalfRationManager.calc_requirements(
+                #     pen.animals_in_pen[calf_id], feed, temp=15, animal_intake=animal_intake
+                # )
+                # TODO Check if we should average the intake, or formulated individual rations
+            total_calves = len(list(self.animals_in_pen.values()))
+            average_calf_intake = {
+                intake: value / total_calves for intake, value in total_pen_calf_intake.items()}
+            ration_per_calf = CalfRationManager.formulate_ration(
+                [x.rufas_id for x in pen_available_feeds], average_calf_intake
+                )
+            if is_ration_defined_by_user:
+                dry_matter_intake_requirement = 0.0
+                for key in ration_per_calf:
+                    dry_matter_intake_requirement += ration_per_calf[key]
+                ration_per_calf = UserDefinedRationManager.get_user_defined_ration(
+                    animal_combination=self.animal_combination,
+                    dry_matter_intake_requirement=dry_matter_intake_requirement
+                )
+            # TODO deprecate method below if not used here
+            # ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
+            # udrm = udr.UserDefinedRationManager()
+            # if udrm.use_user_defined_ration:
+            #     ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
+            # ration_vals = {"ME_total": animal_intake["me_intake"]}
+            self.ration = ration_per_calf
+            self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration_per_calf)
+
 
     def get_requested_feed(self, ration_interval_length: int) -> RequestedFeed:
         """
