@@ -266,3 +266,95 @@ class CalfRationManager:
         }
 
         return animal_intake
+
+    @classmethod
+    def formulate_ration(cls, calf_feed_ids: list[int], animal_intake: dict[str, float]) -> dict[int, float]:
+        """
+        Generates formulated ration dictionary per calf.
+
+        Parameters
+        ----------
+        calf_feed_ids : List[int]
+            List of feed ids available to calves.
+        animal_intake : Dict[str, int]
+            Information calculated on a per animal basis for intake required.
+
+        Returns
+        -------
+        Dict[str, float]
+            Formulated ration.
+        """
+        # TODO update the NASEM library to code in the milk/starter/etc options, use those and RuFaS IDs instead
+        milk_options = [203, 204, 205, 206, 207]
+        starter_options = [213, 214, 215, 216, 217, 218]
+        ration_per_animal = {}
+
+        replacers_selected = [id for id in calf_feed_ids if id in milk_options]
+        starters_selected = [id for id in calf_feed_ids if id in starter_options]
+
+        for feed_id in calf_feed_ids:
+            if feed_id == 202:
+                ration_per_animal[feed_id] = animal_intake["whole_milk_intake"]
+            elif feed_id in replacers_selected:
+                ration_per_animal[feed_id] = animal_intake["milk_replacer_intake"] / len(replacers_selected)
+            elif feed_id in starter_options:
+                ration_per_animal[feed_id] = animal_intake["starter_intake"] / len(starters_selected)
+        return ration_per_animal
+
+    @classmethod
+    def get_average_calf_ration(cls, individual_calf_rations: list[dict[str, float]]) -> dict[str, float | str]:
+        """
+        Get average calf ration for feedout.
+
+        Parameters
+        ----------
+        individual_calf_rations : List[Dict[str, float]]
+            Each calf's ration.
+
+        Returns
+        -------
+        ration_per_animal : Dict[str, float | str]
+            Average ration per animal for given calf pen.
+        """
+        ration_per_animal: dict[str, float | str] = {}
+        for key in individual_calf_rations[0]:
+            ration_per_animal[key] = 0.0
+        for calf_ration in individual_calf_rations:
+            for key in individual_calf_rations[0]:
+                ration_per_animal[key] += calf_ration[key]
+        for key in individual_calf_rations[0]:
+            ration_per_animal[key] = ration_per_animal[key] / len(individual_calf_rations)
+        ration_per_animal["status"] = "Optimal"
+        ration_per_animal["objective"] = 4.5
+        return ration_per_animal
+
+    @classmethod
+    def make_ration_from_user_values(cls, average_calf_ration: dict[str, float]) -> dict[str, float]:
+        """
+        Generate ration dict from user ration percents input,
+        scaled to their estimated dry matter intake (DMI)
+
+        Parameters
+        ----------
+        average_calf_ration : Dict[str, float]
+            Formulated ration on a per animal basis using automated methods, for reference to dm total.
+
+        Returns
+        -------
+        Dict[str, float]
+            dictionary of formulated ration
+
+        """
+        ration_per_animal: dict[str, float | str] = {}
+        total_dm = 0.0
+        for key in average_calf_ration:
+            if key not in ["status", "objective"]:
+                total_dm += average_calf_ration[key]
+        # TODO get this working
+        udrm = udr.UserDefinedRationManager()
+        for key in udrm.calf_ration:
+            ration_per_animal[key] = udrm.calf_ration[key] / 100 * total_dm
+        # TODO check if this needs to be added back
+        # ration_per_animal["status"] = "Optimal"
+        # ration_per_animal["objective"] = 0.0
+        return ration_per_animal

@@ -109,6 +109,8 @@ class Animal:
         The reproduction submodule that handles the daily reproduction update of the animal.
     nutrition_requirements: NutrientsRequirements
         The nutrition requirement for the animal.
+    calf_nutrition_requirements: dict[str, float]
+        The nutrition requirement for the calf.
     nutrition_supply: NutritionSupply
         The supplied nutrition in the current ration interval for the animal.
     previous_nutrition_supply: NutritionSupply
@@ -193,6 +195,7 @@ class Animal:
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
         self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
+        self.calf_nutrition_requirements: dict[str, float] = {}
         self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
         self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
@@ -2248,6 +2251,9 @@ class Animal:
             calf_requirements = CalfRationManager.calc_requirements(
                 self.days_born, self.body_weight, previous_temperature, calf_intake
             )
+            self.calf_nutrition_requirements["whole_milk_intake"] = calf_intake["whole_milk_intake"]
+            self.calf_nutrition_requirements["milk_replacer_intake"] = calf_intake["milk_replacer_intake"]
+            self.calf_nutrition_requirements["starter_intake"] = calf_intake["starter_intake"]
             # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
             return NutritionRequirements(
                 maintenance_energy=calf_requirements["ne_maint"],
