@@ -211,10 +211,12 @@ class ManureStream:
             The combined ManureStream instance.
         """
         total_volatile_solids = self.total_volatile_solids + other.total_volatile_solids
-        self_volatile_solids_proportion = self.total_volatile_solids / total_volatile_solids \
-            if total_volatile_solids else 0.0
-        other_volatile_solids_proportion = other.total_volatile_solids / total_volatile_solids \
-            if total_volatile_solids else 0.0
+        self_volatile_solids_proportion = (
+            self.total_volatile_solids / total_volatile_solids if total_volatile_solids else 0.0
+        )
+        other_volatile_solids_proportion = (
+            other.total_volatile_solids / total_volatile_solids if total_volatile_solids else 0.0
+        )
         return ManureStream(
             water=self.water + other.water,
             ammoniacal_nitrogen=self.ammoniacal_nitrogen + other.ammoniacal_nitrogen,
