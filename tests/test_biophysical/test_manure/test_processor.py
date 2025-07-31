@@ -15,7 +15,7 @@ def test_processor_init_error() -> None:
         Processor(name="test processor", is_housing_emissions_calculator=True)  # type: ignore[abstract]
 
 
-# TODO: test with a grandchild of Processor in #2102, #2103, #2104, or #2105
+# TODO: test with a Storage processor object. Issue #2515.
 def test_check_manure_stream_compatibility() -> None:
     """Tests that ManureStreams are correctly checked for compatibility."""
     pass

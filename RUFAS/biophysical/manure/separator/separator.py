@@ -85,7 +85,7 @@ class Separator(Processor):
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
         # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
-        #  Issue #2281
+        #  Issue #2513
         self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:

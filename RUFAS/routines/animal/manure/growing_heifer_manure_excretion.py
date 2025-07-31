@@ -52,7 +52,6 @@ def manure_calculations(
         "N": "percent of DM",
     }
     """
-    # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]

@@ -17,9 +17,6 @@ def mock_crop_data() -> CropData:
     return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
-# TODO: Since, these will be updated/replaced along with Issue #450, these tests are simple and won't test wrappers
-
-
 @pytest.mark.parametrize("pot,avail,wilt", [(1, 2, 3)])
 def test_determine_actual_layer_uptake(pot: float, avail: float, wilt: float) -> None:
     """checks that layer uptake is correct"""
