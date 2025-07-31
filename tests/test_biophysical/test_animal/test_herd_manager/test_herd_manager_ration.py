@@ -235,7 +235,7 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
     mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     expected_reformulate_ration_single_pen_call_args_list = [
-        call(pen, available_feeds, current_temperature, mock_total_inventory) for pen in herd_manager.all_pens
+        call(pen, available_feeds, current_temperature, mock_total_inventory, 15) for pen in herd_manager.all_pens
     ]
     assert mock_reformulate_ration_single_pen.call_args_list == expected_reformulate_ration_single_pen_call_args_list
 
@@ -332,7 +332,9 @@ def test_reformulate_ration_single_pen(
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, mock_total_inventory)
+    herd_manager._reformulate_ration_single_pen(
+        mock_pen, available_feeds, current_temperature, mock_total_inventory, 15
+    )
 
     if use_user_defined_ration:
         mock_use_user_defined_ration.assert_called_once_with(available_feeds, current_temperature)
@@ -345,4 +347,5 @@ def test_reformulate_ration_single_pen(
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
             mock_total_inventory,
+            15,
         )
