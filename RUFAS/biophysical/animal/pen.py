@@ -944,7 +944,7 @@ class Pen:
 
     def _attempt_formulation(
         self, pen_feeds: list[Feed], temperature: float, previous_ration: Any
-    ) -> tuple[OptimizeResult | None, RationConfig]:
+    ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
         return self.ration_optimizer.attempt_optimization(

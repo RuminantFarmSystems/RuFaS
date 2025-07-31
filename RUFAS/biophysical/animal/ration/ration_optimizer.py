@@ -732,7 +732,7 @@ class RationOptimizer:
         pen_available_feeds: list[Feed],
         animal_combination: AnimalCombination,
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
-    ) -> tuple[OptimizeResult | None, RationConfig]:
+    ) -> tuple[OptimizeResult, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for non-linear optimization.
