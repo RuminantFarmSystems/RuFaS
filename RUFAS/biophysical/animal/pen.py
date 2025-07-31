@@ -961,7 +961,7 @@ class Pen:
             # For lac cow
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
-                    print("hit the lac limit")
+                    print("hit the lac limit") # TODO remove before merge
                     break
             else:
                 self._reduce_on_lactation_failure(info_map=info_map)
@@ -1004,7 +1004,7 @@ class Pen:
             requirements=self.average_nutrition_requirements,
             pen_available_feeds=pen_feeds,
             animal_combination=self.animal_combination,
-            previous_ration=previous_ration,    user_defined_ration_dictionary=user_defined_ration_dictionary,
+            previous_ration=previous_ration, user_defined_ration_dictionary=user_defined_ration_dictionary,
             user_defined_ration_tolerance=UserDefinedRationManager.tolerance
         )
 
