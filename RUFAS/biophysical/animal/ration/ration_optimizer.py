@@ -821,6 +821,18 @@ class RationOptimizer:
         ration_config: RationConfig,
         user_defined_ration_dictionary: dict[RUFAS_ID, float],
         user_defined_ration_tolerance: float) -> list[tuple[float, float]]:
+        """
+        Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
+        user_defined_ration_tolerance : float
+            Allowable +/- variance in each of the defined ration inclusion percentage values.
+        """
         feed_bound_list = list(zip(
             ration_config.feed_minimum_list,
             ration_config.feed_maximum_list

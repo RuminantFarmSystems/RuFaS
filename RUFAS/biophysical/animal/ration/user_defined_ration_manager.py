@@ -33,6 +33,15 @@ class UserDefinedRationManager:
     def set_user_defined_ration_tolerance(
         cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
     ) -> None:
+        """
+        Collects the tolerance value for user defined rations.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
+        
+        """
         cls.tolerance = ration_config["user_defined_ration_percentages"]["tolerance"]
 
     @classmethod
