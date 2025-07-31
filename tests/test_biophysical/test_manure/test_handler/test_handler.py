@@ -38,6 +38,7 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     original_stream = handler.manure_stream
@@ -56,7 +57,7 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 17
+    assert add_variable_patch.call_count == 18
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -99,6 +100,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     original_stream = handler.manure_stream
@@ -117,7 +119,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 15
+    assert add_variable_patch.call_count == 16
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -158,6 +160,7 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
@@ -188,6 +191,7 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     if compatible:
@@ -293,6 +297,7 @@ def test_check_manure_stream_compatibility(
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen_data,
     )
     assert handler.check_manure_stream_compatibility(empty_stream) == expected

@@ -149,6 +149,7 @@ class Separator(Processor):
             degradable_volatile_solids=self.held_manure.degradable_volatile_solids * self.volatile_solids_efficiency,
             total_solids=solid_manure_total_solids,
             volume=solid_manure_volume,
+            methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
         )
         solid_stream_name = "SeparatedSolids"
@@ -175,6 +176,7 @@ class Separator(Processor):
             * (1 - self.volatile_solids_efficiency),
             total_solids=liquid_manure_total_solids,
             volume=liquid_manure_volume,
+            methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
         )
         liquid_stream_name = "SeparatedLiquid"

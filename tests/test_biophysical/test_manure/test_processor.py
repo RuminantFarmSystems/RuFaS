@@ -118,6 +118,7 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=25.0,
         total_solids=50.0,
         volume=1.5,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -169,6 +170,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasT
         "volume": 1.5,
         "mass": 1050.0,
         "total_volatile_solids": 40.0,
+        "methane_production_potential": 0.24,
         "pen_manure_data": None,
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)

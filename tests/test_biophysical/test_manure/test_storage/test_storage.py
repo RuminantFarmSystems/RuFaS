@@ -102,6 +102,7 @@ def test_storage_init() -> None:
                     degradable_volatile_solids=30.0,
                     total_solids=1000.0,
                     volume=1500.0,
+                    methane_production_potential=0.24,
                     pen_manure_data=None,
                 ),
                 ManureStream(
@@ -115,6 +116,7 @@ def test_storage_init() -> None:
                     degradable_volatile_solids=30.0,
                     total_solids=1000.0,
                     volume=1500.0,
+                    methane_production_potential=0.24,
                     pen_manure_data=None,
                 ),
             ],
@@ -129,6 +131,7 @@ def test_storage_init() -> None:
                 degradable_volatile_solids=60.0,
                 total_solids=2000.0,
                 volume=3000.0,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -207,6 +210,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             degradable_volatile_solids=8.90,
             total_solids=29.01,
             volume=10.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     )
@@ -222,6 +226,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             degradable_volatile_solids=80.88,
             total_solids=290.01,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     )

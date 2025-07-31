@@ -51,6 +51,7 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=12.0,
         total_solids=50.0,
         volume=500.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -228,10 +229,15 @@ def test_report_continuous_mix_outputs(digester: ContinuousMix, time: RufasTime,
     ]
 
 
-@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
-def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
+@pytest.mark.parametrize(
+    "total_vol_sols, methane_production_potential, expected",
+    [(100.0, 0.24, 24.0), (0.0, 0.24, 0.0), (100.0, 0.17, 17.0), (0.0, 0.17, 0.0)],
+)
+def test_calculate_CSTR_methane_volume(
+    total_vol_sols: float, methane_production_potential: float, expected: float
+) -> None:
     """Test that the generated methane volume is calculated correctly."""
-    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols)
+    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols, methane_production_potential)
 
     assert actual == expected
 
