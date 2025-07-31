@@ -214,6 +214,7 @@ v0.9.2
 - [2504](https://github.com/RuminantFarmSystems/MASM/pull/2504) - [minor change] [Data Validator] Raise helpful error messages when object level data validations failed.
 - [2499](https://github.com/RuminantFarmSystems/MASM/pull/2499) - [minor change] Updates `pyproject.toml` and added check for user meeting dependency requirements.
 - [2500](https://github.com/RuminantFarmSystems/MASM/pull/2500) - [minor change] Moves `AnimalCombination`, `AnimalManureExcretions`, and removes the old `PenManureData`.
+- [2518](https://github.com/RuminantFarmSystems/MASM/pull/2518) - [minor change] Cleanup all TODOs in the codebase.
 
 ### v0.9.2
 

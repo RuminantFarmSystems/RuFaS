@@ -2248,7 +2248,7 @@ class Animal:
             calf_requirements = CalfRationManager.calc_requirements(
                 self.days_born, self.body_weight, previous_temperature, calf_intake
             )
-            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue pending.
+            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
             return NutritionRequirements(
                 maintenance_energy=calf_requirements["ne_maint"],
                 growth_energy=calf_requirements["ne_gain"],

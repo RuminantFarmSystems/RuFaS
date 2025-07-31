@@ -122,7 +122,7 @@ def test_allocate_biomass(
     max_growth = BiomassAllocation._determine_max_accumulation(energy, conv)
     growth = BiomassAllocation._determine_accumulated_biomass(gfact, max_growth)
     mass = 89.0 + growth
-    # TODO: test photosynthesize() and partition_biomass() separately?
+    # TODO: test photosynthesize() and partition_biomass() separately? Issue #2514.
     # partition_biomass
     green = BiomassAllocation._determine_above_ground_biomass(rfrac, mass)
     root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
