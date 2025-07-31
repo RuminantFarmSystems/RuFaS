@@ -10,12 +10,12 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits

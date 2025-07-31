@@ -27,6 +27,7 @@ def stored_manure() -> ManureStream:
         degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -45,6 +46,7 @@ def received_manure() -> ManureStream:
         degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -188,6 +190,7 @@ def test_process_manure(
             degradable_volatile_solids=59.32749999999999,
             total_solids=251.0675,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     ],
@@ -238,6 +241,7 @@ def test_apply_methane_emissions(
             degradable_volatile_solids=80.88,
             total_solids=290.01,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     ],
@@ -284,6 +288,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -300,6 +305,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -316,6 +322,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -332,6 +339,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),

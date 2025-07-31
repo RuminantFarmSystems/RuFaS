@@ -25,7 +25,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
@@ -36,7 +36,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
     AdvancePurchaseAllowance,
 )
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -478,6 +478,7 @@ class HerdManager:
         graduated_animals += graduated_heiferIIs
         removed_animals += sold_heiferIIs
 
+        # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
         (graduated_heiferIIIs, sold_heiferIIIs, sold_newborn_calves_from_heiferIIIs, newborn_calves_from_heiferIIIs) = (
             self._perform_daily_routines_for_animals(time, self.heiferIIIs)
         )
@@ -1240,7 +1241,7 @@ class HerdManager:
         for rufas_id in next_harvest_dates.keys():
             self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
-        # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs"
+        # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs". Issue #2483.
         return IdealFeeds({})
 
     def _update_single_max_daily_feed(

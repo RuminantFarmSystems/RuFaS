@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
 )
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import (
     ManureStream,
     PenManureData,
@@ -27,7 +27,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 
@@ -624,9 +624,39 @@ class Pen:
         specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
         it reaches the manure module.
         - The function validates that all general stream proportions sum to 1.0 (or 100% of the general portion).
+        - Manure methane potential is assigned according to animal combination. Manure from lactating, dry and close up
+        animals are assigned a value of 0.24 m3 methane per kg of manure volatile solids, and calves and heifers are
+        assigned a value of 0.17, based on the 2024 USDA method for entity scale inventory. If a pen contains heifers,
+        dry and close up animals, methane potential is assigned as a weighted average based on number of dry/close up
+        vs. heifers.
 
         """
         animal_manure_streams: dict[str, ManureStream] = {}
+        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+            total_animals_in_pen = len(self.animals_in_pen)
+            num_growing = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II]
+                ]
+            )
+            num_close_up = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW]
+                ]
+            )
+            methane_production_potential = (
+                (0.17 * num_growing / total_animals_in_pen + 0.24 * num_close_up / total_animals_in_pen)
+                if total_animals_in_pen > 0
+                else 0.0
+            )
+        else:
+            methane_production_potential = (
+                0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
+            )
 
         pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = PenManureData(
@@ -650,6 +680,7 @@ class Pen:
             degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
             total_solids=pen_animal_excretions.total_solids,
             volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
+            methane_production_potential=methane_production_potential,
             pen_manure_data=total_pen_manure_data,
         )
 
@@ -731,6 +762,7 @@ class Pen:
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
             total_solids=manure_stream.total_solids + total_bedding_dry_solids,
             volume=manure_stream.volume + total_bedding_volume,
+            methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
         )
 
@@ -910,7 +942,7 @@ class Pen:
             )
 
 
-            if solution and not solution.success:
+            if not solution.success:
                 self.ration_optimizer.handle_failed_constraints(
                     num_attempts=num_attempts,
                     solution=solution,
@@ -923,7 +955,7 @@ class Pen:
                 )
 
             # Lac cow success exit and non lac cow one time run only exit
-            if solution and solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
+            if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
             # For lac cow
@@ -934,7 +966,7 @@ class Pen:
             else:
                 self._reduce_on_lactation_failure(info_map=info_map)
 
-        if solution is not None and solution.success:
+        if solution.success:
             self._apply_successful_solution(solution, pen_available_feeds)
         elif is_ration_defined_by_user:
             self._apply_user_defined_ration(pen_available_feeds)
@@ -958,8 +990,8 @@ class Pen:
 
     def _attempt_formulation(
         self, is_ration_defined_by_user: bool,
-        pen_feeds: list[Feed], temperature: float, previous_ration: dict[RUFAS_ID, float] | None
-    ) -> tuple[OptimizeResult | None, RationConfig]:
+        pen_feeds: list[Feed], temperature: float, previous_ration: Any
+    ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(
             temperature=temperature, available_feeds=pen_feeds

@@ -108,7 +108,10 @@ class Composting(Storage):
         manure_temperature = current_day_conditions.mean_air_temperature
         if manure_annual_temperature:
             storage_methane = self._calculate_composting_methane_emissions(
-                manure_annual_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
+                manure_annual_temperature,
+                self._manure_to_process.total_volatile_solids,
+                self._composting_type,
+                self._manure_to_process.methane_production_potential,
             )
         else:
             storage_methane = 0
@@ -304,7 +307,10 @@ class Composting(Storage):
 
     @staticmethod
     def _calculate_composting_methane_emissions(
-        manure_temperature: float, manure_volatile_solids: float, composting_type: CompostingType
+        manure_temperature: float,
+        manure_volatile_solids: float,
+        composting_type: CompostingType,
+        methane_production_potential: float,
     ) -> float:
         """
         This function calculates the composting solid manure methane emission on the current day.
@@ -317,6 +323,8 @@ class Composting(Storage):
             The manure volatile solids of the received manure, kg.
         composting_type : CompostingType
             The type of composting being used.
+        methane_production_potential : float
+            Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
 
         Returns
         -------
@@ -327,7 +335,7 @@ class Composting(Storage):
             Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
-        return manure_volatile_solids * (ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
+        return manure_volatile_solids * (methane_production_potential * 0.67 * methane_conversion_factor)
 
     @staticmethod
     def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:

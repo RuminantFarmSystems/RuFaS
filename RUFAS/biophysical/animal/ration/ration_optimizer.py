@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 from typing import Callable, Any, Sequence, Optional
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -40,6 +40,16 @@ class RationConfig:
         NDF for each feed used in ration formulation.
     EE_list : list[float]
         EE for each feed used in ration formulation.
+
+    Parameters
+    ----------
+    animal_requirements : NutritionRequirements
+        Nutrition requirements for pen, used in constraint methods.
+    pen_available_feeds : list[Feed], optional
+        List of available feeds in pen.
+    pen_average_body_weight : float
+        Average body weight in pen, used in constraint methods.
+
     """
 
     def __init__(
@@ -724,7 +734,7 @@ class RationOptimizer:
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
         user_defined_ration_dictionary: dict[RUFAS_ID, float] | None = None,
         user_defined_ration_tolerance: float = None
-    ) -> tuple[OptimizeResult | None, RationConfig]:
+    ) -> tuple[OptimizeResult, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for non-linear optimization.
@@ -805,8 +815,8 @@ class RationOptimizer:
         """Builds the initial decision vector (`x0`) for the optimizer."""
         if previous_ration:
             return [value for key, value in previous_ration.items() if key not in ("status", "objective")]
-        n = len(ration_config.price_list)
-        return [1.0] + [random.random() * 10 for _ in range(n - 1)]
+        price_list_length = len(ration_config.price_list)
+        return [1.0] + [random.random() * 10 for _ in range(price_list_length - 1)]
 
     @staticmethod
     def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:

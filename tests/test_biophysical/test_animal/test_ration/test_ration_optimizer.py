@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, patch
 from pytest_mock import MockerFixture
 from scipy.optimize import OptimizeResult
 
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
-from RUFAS.enums import AnimalCombination
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, FeedComponentType, FeedCategorization
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.units import MeasurementUnits
@@ -498,7 +498,7 @@ def test_handle_failed_constraints_heifer_combination(mocker: MockerFixture) -> 
     mock_om.add_variable.assert_called_once()
 
 
-def test_check_initial_bounds_no_clipping():
+def test_check_initial_bounds_no_clipping() -> None:
     """Values already within bounds should remain unchanged."""
     optimizer = RationOptimizer()
     bounds = [(0.0, 1.0), (-5.0, 5.0), (10.0, 20.0)]
@@ -512,7 +512,7 @@ def test_check_initial_bounds_no_clipping():
     assert result is not original  # method returns a new array or the same? adjust if needed
 
 
-def test_check_initial_bounds_clipping_all_sides():
+def test_check_initial_bounds_clipping_all_sides() -> None:
     """Values below lower or above upper bound should be clipped."""
     optimizer = RationOptimizer()
     bounds = [(0.0, 1.0), (-5.0, 5.0), (10.0, 20.0)]
@@ -524,7 +524,7 @@ def test_check_initial_bounds_clipping_all_sides():
     assert np.array_equal(result, expected)
 
 
-def test_check_initial_bounds_mixed_clipping():
+def test_check_initial_bounds_mixed_clipping() -> None:
     """Mixed in‑bounds and out‑of‑bounds values are clipped correctly."""
     optimizer = RationOptimizer()
     bounds = [(-1.0, 1.0), (0.0, 10.0)]

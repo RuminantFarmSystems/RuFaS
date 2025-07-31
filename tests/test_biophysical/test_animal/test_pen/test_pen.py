@@ -26,14 +26,14 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
     Feed,
 )
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -857,6 +857,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -879,6 +880,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -902,6 +904,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -924,6 +927,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -947,6 +951,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=258.0,
                 volume=12.80,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -969,6 +974,7 @@ def test_get_manure_streams(
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
+                methane_production_potential=0.24,
                 pen_manure_data=PenManureData(
                     num_animals=10,
                     manure_deposition_surface_area=0.0,
@@ -1041,6 +1047,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         degradable_volatile_solids=81.8,
         total_solids=258.0,
         volume=12.80,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
