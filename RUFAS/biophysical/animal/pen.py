@@ -1005,7 +1005,7 @@ class Pen:
             animal_combination=self.animal_combination,
             previous_ration=previous_ration,
             user_defined_ration_dictionary=user_defined_ration_dictionary,
-            user_defined_ration_tolerance=tolerance
+            user_defined_ration_tolerance=tolerance,
         )
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
