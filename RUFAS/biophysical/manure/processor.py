@@ -136,7 +136,7 @@ class Processor(ABC):
             raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly report it.")
 
         for key, value in manure_stream_dict.items():
-            if key != "pen_manure_data":
+            if key not in ["pen_manure_data", "manure_production_potential"]:
                 self._om.add_variable(
                     f"{stream_name}_manure_{key}" if stream_name != "" else f"manure_{key}",
                     value,

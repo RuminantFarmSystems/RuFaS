@@ -2254,7 +2254,7 @@ class Animal:
             self.calf_nutrition_requirements["whole_milk_intake"] = calf_intake["whole_milk_intake"]
             self.calf_nutrition_requirements["milk_replacer_intake"] = calf_intake["milk_replacer_intake"]
             self.calf_nutrition_requirements["starter_intake"] = calf_intake["starter_intake"]
-            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue pending.
+            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
             return NutritionRequirements(
                 maintenance_energy=calf_requirements["ne_maint"],
                 growth_energy=calf_requirements["ne_gain"],

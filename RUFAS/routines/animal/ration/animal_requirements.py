@@ -1438,8 +1438,6 @@ class AnimalRequirements:
         NPMilk: Net protein in milk, or milk true protein yield, g
         TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
 
-        # TODO Include equations for estimating requirement for Non-Essential Aminoacids (NEAA) GitHub Issue #1210
-
         References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,

@@ -45,6 +45,7 @@ def stored_manure() -> ManureStream:
         degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -63,6 +64,7 @@ def received_manure() -> ManureStream:
         degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -269,6 +271,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
     manure_volatile_solids = 100.0
     dummy_mcf = 0.01
     expected = manure_volatile_solids * (0.24 * 0.67 * dummy_mcf) / 100
+    dummy_methane_production_potential = 0.24
 
     mocker.patch.object(
         Composting,
@@ -277,9 +280,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
     )
 
     result = composting_instance._calculate_composting_methane_emissions(
-        manure_temperature,
-        manure_volatile_solids,
-        CompostingType.PASSIVE_WINDROW,
+        manure_temperature, manure_volatile_solids, CompostingType.PASSIVE_WINDROW, dummy_methane_production_potential
     )
 
     assert result == pytest.approx(expected)

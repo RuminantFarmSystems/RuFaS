@@ -1,4 +1,5 @@
 import multiprocessing
+from importlib.metadata import PackageNotFoundError
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Generator, Type
@@ -99,6 +100,7 @@ def test_task_manager_start(
     )
     mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
     mock_get_rufas_version = mocker.patch.object(mock_task_manager, "get_rufas_version", return_value="1.0.0")
+    mock_check_dependencies = mocker.patch.object(mock_task_manager, "check_dependencies")
     mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
@@ -163,9 +165,10 @@ def test_task_manager_start(
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
     mock_run_tasks.assert_called_once_with(
-        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers
+        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers, Path("metadata/path")
     )
     mock_get_rufas_version.assert_called_once()
+    mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
     mock_print_credits.assert_called_once_with("1.0.0")
 
@@ -173,6 +176,8 @@ def test_task_manager_start(
 def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
     """Test TaskManager.start() with invalid input data."""
     mock_task_manager = TaskManager()
+    mocker.patch.object(mock_task_manager, "check_python_version")
+    mocker.patch.object(mock_task_manager, "check_dependencies")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
@@ -638,7 +643,10 @@ def test_task(
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
-    task_manager.task(args, produce_graphics, 2, 10)
+    mocker.patch.object(OutputManager, "validate_filter_constant_content")
+    mocker.patch.object(InputManager, "start_data_processing")
+    mocker.patch.object(InputManager, "get_data")
+    task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -681,7 +689,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 1, 10)
+    result = task_manager.task(args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"))
 
     assert result is None
 
@@ -736,7 +744,7 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 2, 10)
+    result = task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
     assert result == "test (1)"
 
 
@@ -759,7 +767,7 @@ def test_handle_herd_initialization(
 ) -> None:
     """Unit test for TaskManager.handle_herd_initializaition()"""
     args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
-    mock_herd_factory = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory")
+    mock_herd_factory = mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory")
     mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
     mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
 
@@ -1564,11 +1572,21 @@ def test_run_tasks(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1
+        single_run_tasks,
+        produce_graphics=produce_graphics,
+        metadata_depth_limit=metadata_depth_limit,
+        workers=1,
+        metadata_path=Path("metadata/path"),
     )
 
     mock_task_call_list = [
-        call(single_run_task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1)
+        call(
+            single_run_task,
+            metadata_path=Path("metadata/path"),
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=1,
+        )
         for single_run_task in single_run_tasks
     ]
     mock_task.assert_has_calls(mock_task_call_list)
@@ -1692,7 +1710,11 @@ def test_run_tasks_fail(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1
+        single_run_tasks,
+        produce_graphics=produce_graphics,
+        metadata_depth_limit=metadata_depth_limit,
+        workers=1,
+        metadata_path=Path("metadata/path"),
     )
 
     mock_om_init.assert_called_once()
@@ -1801,6 +1823,80 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
 
 
 @pytest.mark.parametrize(
+    "dependencies, installed_versions, missing_package, expected_error, error_message_part",
+    [
+        # Case 1: all dependencies are satisfied
+        (
+            ["numpy==2.2.0"],
+            {"numpy": "2.2.0"},
+            None,
+            None,
+            None,
+        ),
+        # Case 2: missing package
+        (
+            ["numpy>=1.24.0"],
+            {},
+            "numpy",
+            RuntimeError,
+            "Required package 'numpy' is not installed",
+        ),
+        # Case 3: wrong version
+        (
+            ["numpy>=2.0.0"],
+            {"numpy": "1.24.0"},
+            None,
+            RuntimeError,
+            "does not satisfy required version",
+        ),
+    ],
+)
+def test_check_dependencies(
+    dependencies: list[str],
+    installed_versions: dict[str, str],
+    missing_package: str | None,
+    expected_error: type[Exception] | None,
+    error_message_part: str | None,
+    mocker: MockerFixture,
+) -> None:
+    """Test the check_dependencies method of TaskManager."""
+    task_manager = TaskManager()
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
+    mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_tomllib_load.return_value = {"project": {"dependencies": dependencies}}
+
+    mocker.patch(
+        "RUFAS.task_manager.get_installed_version",
+        side_effect=lambda pkg: (
+            (_ for _ in ()).throw(PackageNotFoundError()) if pkg == missing_package else installed_versions[pkg]
+        ),
+    )
+
+    if expected_error:
+        with pytest.raises(expected_error, match=error_message_part):
+            task_manager.check_dependencies()
+        assert mock_log_error.called
+    else:
+        task_manager.check_dependencies()
+        mock_log_error.assert_not_called()
+
+
+def test_check_dependencies_invalid_requirement(mocker: MockerFixture) -> None:
+    """Test that check_dependencies raises an error for invalid dependency strings."""
+    task_manager = TaskManager()
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
+    mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_tomllib_load.return_value = {"project": {"dependencies": ["numpy>>1.0"]}}
+
+    with pytest.raises(RuntimeError, match="Invalid dependency string"):
+        task_manager.check_dependencies()
+
+    mock_log_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
     "python_version, pyproject_data, open_side_effect, load_side_effect, expected_error, error_message",
     [
         # Valid case, no exception expected
@@ -1856,6 +1952,7 @@ def test_check_python_version(
     expected_error: Type[Exception] | None,
     error_message: str | None,
 ) -> None:
+    """Test the check_python_version method of TaskManager."""
     task_manager = TaskManager()
     version_mock = SimpleNamespace(major=python_version[0], minor=python_version[1], micro=python_version[2])
     mocker.patch("sys.version_info", version_mock)
@@ -1914,13 +2011,12 @@ def test_get_rufas_version(
     expected_version: str,
     expected_log_error: str | None,
 ) -> None:
-    # Arrange
+    """Test the get_rufas_version method of TaskManager."""
     task_manager = TaskManager()
     mock_tomllib_load = mocker.patch("tomllib.load")
     mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
     mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
 
-    # Simulate side effects
     if open_side_effect:
         mock_open.side_effect = open_side_effect
     if load_side_effect:
@@ -1928,10 +2024,8 @@ def test_get_rufas_version(
     if pyproject_data:
         mock_tomllib_load.return_value = pyproject_data
 
-    # Act
     version = task_manager.get_rufas_version()
 
-    # Assert
     assert version == expected_version
 
     if expected_log_error:

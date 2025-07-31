@@ -148,9 +148,9 @@ class Modifiability(Enum):
         Indicates the variable does not need to be initialized with a value and can be modified during runtime.
     """
 
-    REQUIRED_LOCKED: str = "required locked"
-    REQUIRED_UNLOCKED: str = "required unlocked"
-    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
+    REQUIRED_LOCKED = "required locked"
+    REQUIRED_UNLOCKED = "required unlocked"
+    UNREQUIRED_UNLOCKED = "unrequired unlocked"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -694,7 +694,6 @@ class DataValidator:
         )
         return True, ""
 
-    # Validate input by type related
     def validate_data_by_type(
         self,
         variable_properties: dict[str, Any],
@@ -743,9 +742,13 @@ class DataValidator:
         Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
 
         """
-
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_data_by_type.__name__,
+        }
         if "type" not in variable_properties:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
+
         data_type = variable_properties["type"]
 
         type_to_validator_map: dict[
@@ -760,10 +763,11 @@ class DataValidator:
             "number": self._number_type_validator,
             "bool": self._bool_type_validator,
         }
+        path = self.convert_variable_path_to_str(variable_path)
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{self.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{path}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -779,17 +783,42 @@ class DataValidator:
         )
 
         if data_type not in fixable_data_types:
+            if not is_valid:
+                error_message = (
+                    f"Variable: '{path}' has invalid or missing values and its data type is not fixable."
+                    f" Please check the inputs."
+                )
+                self.event_logs.append(
+                    {
+                        "error": "Validation: invalid input data not able to be fixed",
+                        "message": error_message,
+                        "info_map": info_map,
+                    }
+                )
             return is_valid
 
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True
+
         is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
+
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
             return True
-        elements_counter.increment(ElementState.INVALID)
-        return False
+        else:
+            error_message = (
+                f"Variable: '{path}' has invalid or missing values and failed to fix. Please check the inputs."
+            )
+            self.event_logs.append(
+                {
+                    "error": "Validation: invalid input data not able to be fixed",
+                    "message": error_message,
+                    "info_map": info_map,
+                }
+            )
+            elements_counter.increment(ElementState.INVALID)
+            return False
 
     def _validate_array_container_properties(
         self,

@@ -3,10 +3,10 @@ import pytest
 from mock import MagicMock, call
 from pytest_mock import MockFixture, MockerFixture
 
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.pen_manure_data import PenManureData
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper

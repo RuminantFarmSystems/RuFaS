@@ -393,7 +393,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
     def update_classes_in_pen(self) -> None:
         """
         Updates the classes contained within the pen
@@ -525,7 +524,6 @@ class Pen:
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
-    # TODO: Fix this to use AnimalType enum GitHub Issue #1209
     def calc_daily_walking_dist(self):
         """
         Sets the daily walking distance for the cows in the pen (if any).
@@ -558,7 +556,6 @@ class Pen:
             for animal in list(self.animals_in_pen.values()):
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
-            # TODO: Add warning if total_p_animal < 0 GitHub Issue #1212
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 

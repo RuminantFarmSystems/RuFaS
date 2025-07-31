@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
 
 
