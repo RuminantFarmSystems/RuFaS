@@ -993,7 +993,7 @@ def test_task_post_processing_runs_emission_estimates(mocker: MockerFixture) -> 
         "produce_graphics": False,
     }
 
-    tm.task(args, False, 10)
+    tm.task(args, False, 4,10, metadata_path=Path("metadata/path"))
     mock_estimate_all.assert_called_once()
 
 
