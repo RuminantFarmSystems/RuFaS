@@ -22,6 +22,7 @@ from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -43,6 +44,7 @@ class TaskType(Enum):
     INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
+    POST_PROCESSING_EEE = "Run emission estimation before post-processing"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
     DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
     UPDATE_E2E_TEST_RESULTS = "Updates end-to-end expected test results with new actual results"
@@ -525,6 +527,7 @@ class TaskManager:
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
+            TaskType.POST_PROCESSING_EEE: TaskManager._handle_postprocessing_eee_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
             TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
             TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
@@ -941,6 +944,20 @@ class TaskManager:
             task_id=task_id,
             should_flush_im_pool=should_flush_im_pool,
             produce_graphics=produce_graphics,
+        )
+
+    @staticmethod
+    def _handle_postprocessing_eee_tasks(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
+        """Runs emission estimates before standard postprocessing."""
+        EEEManager.estimate_all()
+        TaskManager._handle_postprocessing_tasks(
+            args, input_manager, output_manager, task_id, produce_graphics
         )
 
     @staticmethod

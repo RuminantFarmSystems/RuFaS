@@ -40,6 +40,7 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
         ("input data Audit", TaskType.INPUT_DATA_AUDIT),
         ("end to END testing", TaskType.END_TO_END_TESTING),
         ("post_processing", TaskType.POST_PROCESSING),
+        ("post_processing_eee", TaskType.POST_PROCESSING_EEE),
         ("Compare metadata properties", TaskType.COMPARE_METADATA_PROPERTIES),
         ("data collection app update", TaskType.DATA_COLLECTION_APP_UPDATE),
         ("update e2e test results", TaskType.UPDATE_E2E_TEST_RESULTS),
@@ -608,6 +609,7 @@ def test_input_data_audit(
         [TaskType.HERD_INITIALIZATION, False],
         [TaskType.SIMULATION_SINGLE_RUN, False],
         [TaskType.POST_PROCESSING, False],
+        [TaskType.POST_PROCESSING_EEE, False],
         [TaskType.END_TO_END_TESTING, False],
     ],
 )
@@ -643,6 +645,7 @@ def test_task(
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
+    mocker.patch("RUFAS.task_manager.EEEManager.estimate_all")
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
     mocker.patch.object(InputManager, "start_data_processing")
     mocker.patch.object(InputManager, "get_data")
@@ -962,6 +965,36 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
         should_flush_im_pool=True,
         produce_graphics=produce_graphics,
     )
+
+def test_task_post_processing_runs_emission_estimates(mocker: MockerFixture) -> None:
+    """Ensure POST_PROCESSING_EEE tasks trigger emission estimation."""
+    tm = TaskManager()
+    mock_estimate_all = mocker.patch("RUFAS.task_manager.EEEManager.estimate_all")
+    mocker.patch.object(InputManager, "__init__", return_value=None)
+    mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
+
+    def fake_call(handler, args, input_manager, output_manager, task_id, produce_graphics):
+        handler(args, input_manager, output_manager, task_id, produce_graphics)
+
+    mocker.patch.object(TaskManager, "call_handler", side_effect=fake_call)
+    mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
+
+    args = {
+        "task_type": TaskType.POST_PROCESSING_EEE,
+        "log_verbosity": LogVerbosity.LOGS,
+        "exclude_info_maps": False,
+        "output_prefix": "test",
+        "logs_directory": Path("/fake/logs"),
+        "task_id": 1,
+        "random_seed": 123,
+        "suppress_log_files": True,
+        "metadata_file_path": Path("/fake/logs"),
+        "properties_file_path": Path("more/fake/paths"),
+        "produce_graphics": False,
+    }
+
+    tm.task(args, False, 4,10, metadata_path=Path("metadata/path"))
+    mock_estimate_all.assert_called_once()
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning", "ignore::UserWarning")

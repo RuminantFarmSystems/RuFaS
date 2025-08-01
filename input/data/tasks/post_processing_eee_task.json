@@ -1,0 +1,12 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "POST_PROCESSING_EEE",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "postprocess_eee",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}
