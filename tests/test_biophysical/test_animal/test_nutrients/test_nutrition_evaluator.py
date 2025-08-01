@@ -429,7 +429,7 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (lazy_fixture("nutrition_supply_base"), 9.6667),
+        (lazy_fixture("nutrition_supply_base"), -9.6667),
         # Low fat case (fat supply is below the required amount)
         (
             NutritionSupply(
@@ -455,7 +455,7 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
                 starch_supply=2.0,
                 byproduct_supply=1.0,
             ),
-            -2.83333,
+            2.83333,
         ),
         # Sufficient fat case (meets the minimum requirement)
         (
@@ -482,7 +482,7 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
                 starch_supply=2.0,
                 byproduct_supply=1.0,
             ),
-            9.6667,
+            -9.6667,
         ),
     ],
 )
