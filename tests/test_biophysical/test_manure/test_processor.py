@@ -15,7 +15,7 @@ def test_processor_init_error() -> None:
         Processor(name="test processor", is_housing_emissions_calculator=True)  # type: ignore[abstract]
 
 
-# TODO: test with a grandchild of Processor in #2102, #2103, #2104, or #2105
+# TODO: test with a Storage processor object. Issue #2515.
 def test_check_manure_stream_compatibility() -> None:
     """Tests that ManureStreams are correctly checked for compatibility."""
     pass
@@ -118,6 +118,7 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=25.0,
         total_solids=50.0,
         volume=1.5,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -169,6 +170,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasT
         "volume": 1.5,
         "mass": 1050.0,
         "total_volatile_solids": 40.0,
+        "methane_production_potential": 0.24,
         "pen_manure_data": None,
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)

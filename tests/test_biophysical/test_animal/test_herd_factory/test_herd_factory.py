@@ -797,10 +797,6 @@ def test_generate_animals(
     mock_time.current_date = datetime.today()
 
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=None)
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__",
-        return_value=None,
-    )
     mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
         "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
