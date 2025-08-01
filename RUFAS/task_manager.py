@@ -956,9 +956,7 @@ class TaskManager:
     ) -> None:
         """Runs emission estimates before standard postprocessing."""
         EEEManager.estimate_all()
-        TaskManager._handle_postprocessing_tasks(
-            args, input_manager, output_manager, task_id, produce_graphics
-        )
+        TaskManager._handle_postprocessing_tasks(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
     def _handle_data_collection_app_update(

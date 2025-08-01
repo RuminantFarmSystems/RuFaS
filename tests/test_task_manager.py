@@ -966,6 +966,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
         produce_graphics=produce_graphics,
     )
 
+
 def test_task_post_processing_runs_emission_estimates(mocker: MockerFixture) -> None:
     """Ensure POST_PROCESSING_EEE tasks trigger emission estimation."""
     tm = TaskManager()
@@ -993,7 +994,7 @@ def test_task_post_processing_runs_emission_estimates(mocker: MockerFixture) -> 
         "produce_graphics": False,
     }
 
-    tm.task(args, False, 4,10, metadata_path=Path("metadata/path"))
+    tm.task(args, False, 4, 10, metadata_path=Path("metadata/path"))
     mock_estimate_all.assert_called_once()
 
 
