@@ -61,18 +61,18 @@ class ManureNutrientManager:
 
         category_amount_after_renewal = ManureNutrients(
             manure_type=current_pool_by_category.manure_type,
-            nitrogen=max(0.0, current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0)),
-            phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0)),
-            potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0)),
+            nitrogen=max(0.0, current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0.0)),
+            phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0.0)),
+            potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0.0)),
             total_manure_mass=max(
                 0.0,
                 (
                     current_pool_by_category.total_manure_mass
-                    - removal_details.get("water", 0)
-                    - removal_details.get("total_solids", 0)
+                    - removal_details.get("water", 0.0)
+                    - removal_details.get("total_solids", 0.0)
                 ),
             ),
-            dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0)),
+            dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0.0)),
         )
 
         self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
@@ -129,7 +129,7 @@ class ManureNutrientManager:
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
         )
         info_map = {"class": self.__class__.__name__, "function": self._evaluate_nutrient_request.__name__}
-        if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
+        if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-5):
             self.om.add_warning(
                 "Unable to fulfill request with on-farm manure", "Projected manure mass is zero kg.", info_map
             )
