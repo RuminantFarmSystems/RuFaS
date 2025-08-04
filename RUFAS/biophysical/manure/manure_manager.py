@@ -687,7 +687,7 @@ class ManureManager:
             processor_type = processor_config["processor_type"]
 
             processor_initializer = ProcessorType.get_processor_class(processor_type)
-            if not issubclass(processor_initializer, Handler):
+            if not (issubclass(processor_initializer, Handler) or issubclass(processor_initializer, Separator)):
                 del processor_config["processor_type"]
             processor = processor_initializer(**processor_config)
             self.all_processors[processor_name] = processor
