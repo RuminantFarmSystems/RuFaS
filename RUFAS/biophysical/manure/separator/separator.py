@@ -72,7 +72,7 @@ class Separator(Processor):
         ash_efficiency: float,
         volatile_solids_efficiency: float,
         total_solids_efficiency: float,
-        processor_type: str
+        processor_type: str,
     ) -> None:
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
