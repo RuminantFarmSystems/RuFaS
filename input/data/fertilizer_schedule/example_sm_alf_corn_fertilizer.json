@@ -1,0 +1,72 @@
+{
+  "available_fertilizer_mixes": [
+    {
+      "name": "0_0_60",
+      "N": 0.0,
+      "P": 0.0,
+      "K": 0.6, 
+      "ammonium_fraction": 0.5
+    },
+    {
+      "name": "6_10_20",
+      "N": 0.0672511,
+      "P": 0.112085,
+      "K": 0.22417, 
+      "ammonium_fraction": 0.5
+    },
+    {
+      "name": "5_4_27",
+      "N": 0.0560426,
+      "P": 0.0493175,
+      "K": 0.2790919, 
+      "ammonium_fraction": 0.5
+    },
+    {
+      "name": "5_6_40",
+      "N": 0.0560426,
+      "P": 0.06904443,
+      "K": 0.39, 
+      "ammonium_fraction": 0.5
+    },
+    {
+      "name": "82_0_0",
+      "N": 0.82,
+      "P": 0.0,
+      "K": 0.0, 
+      "ammonium_fraction": 0.5
+    }
+  ],
+  "mix_names": [
+    "82_0_0",
+    "82_0_0"
+  ],
+  "years": [
+    2013,
+    2017
+  ],
+  "days": [
+    126,
+    126
+  ],
+  "nitrogen_masses": [
+    500,
+    500
+  ],
+  "phosphorus_masses": [
+    0,
+    0
+  ],
+  "potassium_masses": [
+    0,
+    0],
+  "application_depths": [
+    0.0,
+    0.0
+  ],
+  "surface_remainder_fractions": [
+    1.0,
+    1.0
+  ],
+  "pattern_repeat": 0,
+  "pattern_skip": 0
+}
