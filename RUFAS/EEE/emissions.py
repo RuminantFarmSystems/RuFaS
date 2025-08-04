@@ -48,8 +48,8 @@ class EmissionsEstimator:
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_purchased_feed_emissions_old(fertilizer_apps["Homegrown Feeds"])
-        self._calculate_purchased_feed_emissions_refreshed()
+        # self._calculate_purchased_feed_emissions_old(fertilizer_apps["Homegrown Feeds"])
+        self._calculate_purchased_feed_emissions()
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
             fertilizer_apps["Fertilizer Applications"],
@@ -57,96 +57,145 @@ class EmissionsEstimator:
             fertilizer_apps["Manure Requests"],
         )
 
-    def _calculate_purchased_feed_emissions_refreshed(self) -> None:
-        """Calculates purchased feed emissions.
+    def _calculate_purchased_feed_emissions(self) -> None:
+        """Calculates emissions associated with purchased feeds."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._calculate_purchased_feed_emissions.__name__,
+        }
 
-        the information that a user would want to know for a given time period is:
-        emissions of purchased feed in inventory at the start of the time period
-        + the emissions of what was purchased during that time period
-        - emissions in inventory at the end of the time period
+        stored_feeds = self._get_stored_purchased_feeds()
+        if not stored_feeds:
+            return
 
+        starting_purchased_storage_totals, ending_purchased_storage_totals = \
+            self._calculate_purchased_storage_totals(stored_feeds)
+        purchased_feeds_totals = self._calculate_purchased_feed_amounts()
+
+        purchased_feeds_fed_totals = self._calculate_total_purchased_feed_fed(starting_purchased_storage_totals,
+                                                                              ending_purchased_storage_totals,
+                                                                              purchased_feeds_totals)
+        self.om.add_variable(
+            "purchased_feed_fed_totals", purchased_feeds_fed_totals,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+
+        total_emissions, land_use_emissions = self._calculate_emissions(purchased_feeds_fed_totals)
+        emissions_info = {**info_map, "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
+        self.om.add_variable("total_purchased_feed_emissions", total_emissions, emissions_info)
+        self.om.add_variable("total_land_use_change_emissions", land_use_emissions, emissions_info)
+
+    def _get_stored_purchased_feeds(self) -> dict[str, Any]:
+        """Gathers the amounts of purchased feeds in storage on a particular day.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary containing the storage levels of purchased feeds.
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._calculate_purchased_feed_emissions_refreshed.__name__
-                    }
-        feeds_in_storage_filter = {
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._get_stored_purchased_feeds.__name__,
+        }
+        filter_config = {
             "name": "Feeds in Storage",
             "description": "Gathers the amounts of purchased feeds in storage on a particular day.",
             "filters": [
                 "PurchasedFeedStorage.report_stored_purchased_feeds.stored_feed_.*daily_storage_levels.*"
             ],
-            "slice_start": SLICE_START
+            "slice_start": SLICE_START,
         }
-        stored_feeds = self.om.filter_variables_pool(feeds_in_storage_filter)
+        stored_feeds = self.om.filter_variables_pool(filter_config)
         if not stored_feeds:
             self.om.add_warning("No Purchased Feeds in Storage", "No purchased feeds were found in storage.", info_map)
-            return
+        return stored_feeds
 
-        purchased_storage_starting_totals: dict[str, float] = defaultdict(float)
-        purchased_storage_ending_totals: dict[str, float] = defaultdict(float)
+    def _calculate_purchased_storage_totals(self, stored_feeds: dict[str, Any]
+                                            ) -> tuple[dict[str, float], dict[str, float]]:
+        """Calculates the starting and ending storage levels of purchased feeds.
+
+        Parameters
+        ----------
+        stored_feeds : dict[str, Any]
+            A dictionary containing the storage levels of purchased feeds.
+
+        Returns
+        -------
+        tuple[dict[str, float], dict[str, float]]
+            A tuple containing the starting and ending storage levels of purchased feeds.
+        """
+        start_totals = defaultdict(float)
+        end_totals = defaultdict(float)
         for key, value in stored_feeds.items():
             if match := re.search(r"_(\d+).daily_storage_levels$", key):
                 feed_id = match.group(1)
-                purchased_storage_starting_totals[feed_id] = (value.get("values") or [0.0])[0]
-                purchased_storage_ending_totals[feed_id] = (value.get("values") or [0.0])[-1]
+                values = value.get("values") or [0.0]
+                start_totals[feed_id] = values[0]
+                end_totals[feed_id] = values[-1]
+        return start_totals, end_totals
 
-        purchased_feed_filter = {
+    def _calculate_purchased_feed_amounts(self) -> dict[str, float]:
+        filter_config = {
             "name": "Purchased Feed Totals",
             "description": "Gathers the amounts of feeds purchased in final year.",
             "filters": ["FeedManager.report_cumulative_purchased_feeds.*_purchased_to_date.*"],
-            "slice_start": SLICE_START
+            "slice_start": SLICE_START,
         }
-        purchased_feeds_amounts = self.om.filter_variables_pool(purchased_feed_filter)
-        purchased_feed_amounts_total: dict[str, float] = defaultdict(float)
-        for key, value in purchased_feeds_amounts.items():
+        purchased_feeds = self.om.filter_variables_pool(filter_config)
+        totals = defaultdict(float)
+        for key, value in purchased_feeds.items():
             if match := re.search(r"_(\d+)_purchased_to_date.*", key):
                 feed_id = match.group(1)
-                purchased_feed_amounts_start = (value.get("values") or [0.0])[0]
-                purchased_feed_amounts_end = (value.get("values") or [0.0])[-1]
-                purchased_feed_amounts_total[feed_id] = (
-                    purchased_feed_amounts_end - purchased_feed_amounts_start
-                )
+                values = value.get("values") or [0.0]
+                totals[feed_id] = values[-1] - values[0]
+        return totals
 
-        purchased_feeds_fed: dict[str, float] = defaultdict(float)
-        for feed_id, amount in purchased_storage_starting_totals.items():
-            purchased_feeds_fed[feed_id] = amount \
-                + purchased_feed_amounts_total.get(feed_id, 0.0) - purchased_storage_ending_totals.get(feed_id, 0.0)
-        self.om.add_variable(
-            "purchased_feed_fed_totals",
-            purchased_feeds_fed,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
-        )
-        (
-            total_purchased_feed_emissions,
-            total_land_use_change_emissions,
-        ) = self._calculate_purchased_feed_emissions(purchased_feeds_fed)
+    def _calculate_total_purchased_feed_fed(
+        self,
+        start: dict[str, float],
+        end: dict[str, float],
+        purchased: dict[str, float],
+    ) -> dict[str, float]:
+        """Calculates the total amount of purchased feed fed during the time period.
+        Parameters
+        ----------
+        start : dict[str, float]
+            A dictionary containing the starting storage levels of purchased feeds.
+        end : dict[str, float]
+            A dictionary containing the ending storage levels of purchased feeds.
+        purchased : dict[str, float]
+            A dictionary containing the amounts of purchased feeds.
 
-        emissions_info_map = dict(
-            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
-        )
-        self.om.add_variable("total_purchased_feed_emissions", total_purchased_feed_emissions, emissions_info_map)
-        self.om.add_variable("total_land_use_change_emissions", total_land_use_change_emissions, emissions_info_map)
+            Returns
+            -------
+            dict[str, float]
+                A dictionary containing the total amount of purchased feed fed during the time period.
+        """
+        fed = defaultdict(float)
+        for feed_id, start_amount in start.items():
+            fed[feed_id] = start_amount + purchased.get(feed_id, 0.0) - end.get(feed_id, 0.0)
+        return fed
 
-    def _calculate_purchased_feed_emissions_old(self, homegrown_feeds: list[dict[str, Any]]) -> None:
-        info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions_old.__name__}
-        purchased_feeds = self._gather_ration_feed_totals()
-        actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-        self.om.add_variable(
-            "actual_purchased_feed_totals",
-            actual_purchased_feed_totals,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-        )
-        (
-            actual_purchased_feed_emissions,
-            actual_land_use_change_emissions,
-        ) = self._calculate_purchased_feed_emissions(actual_purchased_feed_totals)
-        emissions_info_map = dict(
-            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
-        )
-        self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
-        self.om.add_variable(
-            "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
-        )
+    # def _calculate_purchased_feed_emissions_old(self, homegrown_feeds: list[dict[str, Any]]) -> None:
+    #     info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions_old.__name__}
+    #     purchased_feeds = self._gather_ration_feed_totals()
+    #     actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
+    #     self.om.add_variable(
+    #         "actual_purchased_feed_totals",
+    #         actual_purchased_feed_totals,
+    #         dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+    #     )
+    #     (
+    #         actual_purchased_feed_emissions,
+    #         actual_land_use_change_emissions,
+    #     ) = self._calculate_emissions(actual_purchased_feed_totals)
+    #     emissions_info_map = dict(
+    #         info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
+    #     )
+    #     self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
+    #     self.om.add_variable(
+    #         "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
+    #     )
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
@@ -210,26 +259,26 @@ class EmissionsEstimator:
 
         return results
 
-    def _gather_ration_feed_totals(self) -> dict[str, float]:
-        """
-        Collects totals of feeds from rations given to animals in the last 365 days of the simulation and collapses them
-        into single set of numbers.
-        """
-        filter = {
-            "name": "Feed Ration Totals",
-            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-            "filters": ["AnimalModuleReporter._report_daily_ration_per_pen.ration_daily_feed_totals.*"],
-            "slice_start": SLICE_START,
-        }
-        feeds = self.om.filter_variables_pool(filter)
+    # def _gather_ration_feed_totals(self) -> dict[str, float]:
+    #     """
+    #     Collects totals of feeds from rations given to animals in the last 365 days of the simulation and collapses them
+    #     into single set of numbers.
+    #     """
+    #     filter = {
+    #         "name": "Feed Ration Totals",
+    #         "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
+    #         "filters": ["AnimalModuleReporter._report_daily_ration_per_pen.ration_daily_feed_totals.*"],
+    #         "slice_start": SLICE_START,
+    #     }
+    #     feeds = self.om.filter_variables_pool(filter)
 
-        processed_feeds: dict[str, float] = defaultdict(float)
-        for feed_data in feeds.values():
-            for value in feed_data.get("values", []):
-                for feed_id, amount in value.items():
-                    processed_feeds[feed_id] += amount
+    #     processed_feeds: dict[str, float] = defaultdict(float)
+    #     for feed_data in feeds.values():
+    #         for value in feed_data.get("values", []):
+    #             for feed_id, amount in value.items():
+    #                 processed_feeds[feed_id] += amount
 
-        return processed_feeds
+    #     return processed_feeds
 
     def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """
@@ -255,29 +304,29 @@ class EmissionsEstimator:
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
 
-    def _calculate_actual_purchased_feeds(
-        self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]
-    ) -> dict[str, float]:
-        """
-        Calculates the difference between the purchased feeds and feeds grown on the farm.
-        """
-        homegrown_totals = self._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
+    # def _calculate_actual_purchased_feeds(
+    #     self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]
+    # ) -> dict[str, float]:
+    #     """
+    #     Calculates the difference between the purchased feeds and feeds grown on the farm.
+    #     """
+    #     homegrown_totals = self._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
 
-        actual_purchased_feeds = {}
-        for feed_id, amount in purchased_feeds.items():
-            homegrown_alternatives = [
-                crop for crop in homegrown_totals.keys() if feed_id in self.crop_species_to_purchased_feed_id[crop]
-            ]
+    #     actual_purchased_feeds = {}
+    #     for feed_id, amount in purchased_feeds.items():
+    #         homegrown_alternatives = [
+    #             crop for crop in homegrown_totals.keys() if feed_id in self.crop_species_to_purchased_feed_id[crop]
+    #         ]
 
-            for homegrown_alternative in homegrown_alternatives:
-                alternative_amount_available = homegrown_totals[homegrown_alternative]
-                amount_used = min(amount, alternative_amount_available)
-                amount -= amount_used
-                homegrown_totals[homegrown_alternative] -= amount_used
+    #         for homegrown_alternative in homegrown_alternatives:
+    #             alternative_amount_available = homegrown_totals[homegrown_alternative]
+    #             amount_used = min(amount, alternative_amount_available)
+    #             amount -= amount_used
+    #             homegrown_totals[homegrown_alternative] -= amount_used
 
-            actual_purchased_feeds[feed_id] = amount
+    #         actual_purchased_feeds[feed_id] = amount
 
-        return actual_purchased_feeds
+    #     return actual_purchased_feeds
 
     def _calculate_total_homegrown_feed_amounts_by_crop_type(
         self, homegrown_feeds: list[dict[str, Any]]
@@ -298,7 +347,7 @@ class EmissionsEstimator:
         )
         return homegrown_totals
 
-    def _calculate_purchased_feed_emissions(
+    def _calculate_emissions(
         self,
         purchased_feeds: dict[str, float],
     ) -> tuple[dict[str, float], dict[str, float]]:
@@ -322,7 +371,7 @@ class EmissionsEstimator:
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
-                    "function": self._calculate_purchased_feed_emissions.__name__,
+                    "function": self._calculate_emissions.__name__,
                 }
                 self.om.add_warning(
                     "Missing Purchased Feed Emissions",
@@ -335,7 +384,7 @@ class EmissionsEstimator:
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
-                    "function": self._calculate_purchased_feed_emissions.__name__,
+                    "function": self._calculate_emissions.__name__,
                 }
                 self.om.add_warning(
                     "Missing Land Use Change Purchased Feed Emissions",
