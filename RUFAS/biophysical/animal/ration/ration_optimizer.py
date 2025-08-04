@@ -851,14 +851,16 @@ class RationOptimizer:
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 - udr_tolerance)
-                * (ration_config.animal_requirements.dry_matter * 1.1)
+                * (ration_config.animal_requirements.dry_matter)
+                # TODO consider increasing/decreasing dry matter intake requirement using a constant, e.g. 1.1
             )
             target_upper = (
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 + udr_tolerance)
-                * (ration_config.animal_requirements.dry_matter * 1.1 + 0.0001)
+                * (ration_config.animal_requirements.dry_matter + 0.0001)
             )
+            # TODO consider increasing/decreasing dry matter intake requirement using a constant, e.g. 1.1
             targetbounds = (max(0.0, target_lower), target_upper)
             user_defined_boundlist.append(targetbounds)
 
