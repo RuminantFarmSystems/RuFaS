@@ -174,6 +174,7 @@ v0.9.2
 - [2399](https://github.com/RuminantFarmSystems/RuFaS/pull/2399) - [minor change] [Crop and Soil] Change infiltration value in ManureApplication to default of 0.4.
 - [2400](https://github.com/RuminantFarmSystems/RuFaS/pull/2400) - [minor change] [Animal] Fixes the bug in heifer first estrus day calculation.
 - [2409](https://github.com/RuminantFarmSystems/RuFaS/pull/2409) - [minor change] [Animal] Adds back code we did not want removed in #2404 and implements original fix in #2404 - fixes incorrect attribute reference in heifer enteric methane calculation and updates references to MilkProduction class attributes.
+- [2374](https://github.com/RuminantFarmSystems/MASM/pull/2374) - [minor change] [Report Generator] Validate and overwrite the constants in report filter.
 - [2412](https://github.com/RuminantFarmSystems/RuFaS/pull/2412) - [minor change] [Crop and Soil] Update docstrings in cut_crop
 - [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [Animal] Uses utf-8 encoding for saving CSVs from OutputManager.
 - [2415](https://github.com/RuminantFarmSystems/RuFaS/pull/2415) - [minor change] [Animal] Add "None" as valid cow repro sub methods.
@@ -199,6 +200,22 @@ v0.9.2
 - [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking
+- [2381](https://github.com/RuminantFarmSystems/MASM/pull/2381) - [minor change] [Animal] Refactor ration formulation.
+- [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking.
+- [2472](https://github.com/RuminantFarmSystems/MASM/pull/2472) - [minor change] [Animal] Removed duplicate logics to filter animals.
+- [2464](https://github.com/RuminantFarmSystems/MASM/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
+- [2392](https://github.com/RuminantFarmSystems/MASM/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
+- [2473](https://github.com/RuminantFarmSystems/MASM/pull/2473) - [minor change] [E2E] Removes TODOs related to temporary Feed/Storage E2E testing setup files and functions.
+- [2474](https://github.com/RuminantFarmSystems/MASM/pull/2474) - [minor change] [Manure] Fixes a bug in manure handlers that interfered with flushing functionality.
+- [2486](https://github.com/RuminantFarmSystems/MASM/pull/2486) - [minor change] [Input Manager] Add data deletion function in input manager.
+- [2470](https://github.com/RuminantFarmSystems/MASM/pull/2470) - [minor change] [Feed] Adds shrink factor, buffer inputs and buffer usage logic in feed manager.
+- [2293](https://github.com/RuminantFarmSystems/MASM/pull/2293) - [minor change] [Animal] Adds behavior in an animal reporter method to create an empty output variable in case where there are no sold animals for a given AnimalCombination.
+- [2479](https://github.com/RuminantFarmSystems/MASM/pull/2479) - [minor change] Removes `errors.py`.
+- [2504](https://github.com/RuminantFarmSystems/MASM/pull/2504) - [minor change] [Data Validator] Raise helpful error messages when object level data validations failed.
+- [2499](https://github.com/RuminantFarmSystems/MASM/pull/2499) - [minor change] Updates `pyproject.toml` and added check for user meeting dependency requirements.
+- [2500](https://github.com/RuminantFarmSystems/MASM/pull/2500) - [minor change] Moves `AnimalCombination`, `AnimalManureExcretions`, and removes the old `PenManureData`.
+- [2518](https://github.com/RuminantFarmSystems/MASM/pull/2518) - [minor change] Cleanup all TODOs in the codebase.
+- [2502](https://github.com/RuminantFarmSystems/MASM/pull/2502) - [minor change] [Manure] Implement Manure Methane Potential Tracking.
 
 ### v0.9.2
 

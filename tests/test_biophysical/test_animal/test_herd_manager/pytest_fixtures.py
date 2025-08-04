@@ -18,7 +18,7 @@ from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime

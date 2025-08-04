@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
@@ -155,6 +155,8 @@ class ManureStream:
         Mass of total solids in the manure stream (kg).
     volume : float
         Volume of the manure stream (m^3).
+    methane_production_potential : float
+        Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
 
@@ -174,6 +176,7 @@ class ManureStream:
     degradable_volatile_solids: float
     total_solids: float
     volume: float
+    methane_production_potential: float
     pen_manure_data: PenManureData | None
 
     MANURE_STREAM_UNITS = {
@@ -189,6 +192,7 @@ class ManureStream:
         "volume": MeasurementUnits.CUBIC_METERS,
         "mass": MeasurementUnits.KILOGRAMS,
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "methane_production_potential": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
         "pen_manure_data": None,
     }
 
@@ -206,6 +210,13 @@ class ManureStream:
         ManureStream
             The combined ManureStream instance.
         """
+        total_volatile_solids = self.total_volatile_solids + other.total_volatile_solids
+        self_volatile_solids_proportion = (
+            self.total_volatile_solids / total_volatile_solids if total_volatile_solids else 0.0
+        )
+        other_volatile_solids_proportion = (
+            other.total_volatile_solids / total_volatile_solids if total_volatile_solids else 0.0
+        )
         return ManureStream(
             water=self.water + other.water,
             ammoniacal_nitrogen=self.ammoniacal_nitrogen + other.ammoniacal_nitrogen,
@@ -217,6 +228,10 @@ class ManureStream:
             degradable_volatile_solids=self.degradable_volatile_solids + other.degradable_volatile_solids,
             total_solids=self.total_solids + other.total_solids,
             volume=self.volume + other.volume,
+            methane_production_potential=(
+                self.methane_production_potential * self_volatile_solids_proportion
+                + other.methane_production_potential * other_volatile_solids_proportion
+            ),
             pen_manure_data=(
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
             ),
@@ -272,6 +287,7 @@ class ManureStream:
             degradable_volatile_solids=0.0,
             total_solids=0.0,
             volume=0.0,
+            methane_production_potential=0.0,
             pen_manure_data=None,
         )
 
@@ -330,5 +346,6 @@ class ManureStream:
             degradable_volatile_solids=self.degradable_volatile_solids * split_ratio,
             total_solids=self.total_solids * split_ratio,
             volume=self.volume * split_ratio,
+            methane_production_potential=self.methane_production_potential,
             pen_manure_data=split_pen_manure_data,
         )

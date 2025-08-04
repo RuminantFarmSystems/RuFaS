@@ -25,6 +25,5 @@ class PenHistory(TypedDict):
 
     start_date: int
     end_date: int
-    # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793
     pen: int
     animal_types_in_pen: list[AnimalType]

@@ -16,9 +16,6 @@ class ManureConstants:
     SOLID_MANURE_DENSITY = 700
     """The density of solid manure (kg/:math:`m^3`)."""
 
-    ACHIEVABLE_METHANE_EMISSION = 0.24
-    """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
-
     # Handler-related constants
     HOUSING_SPECIFIC_CONSTANT = 260.0
     """

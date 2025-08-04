@@ -8,7 +8,7 @@ from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandl
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 
@@ -16,16 +16,16 @@ from RUFAS.rufas_time import RufasTime
 @pytest.fixture
 def handler() -> Handler:
     """Default handler instance."""
-    return Handler("handler_name", "MANUAL_SCRAPER", 3, 0.8, False)
+    return Handler("handler_name", "ManualScraper", 3, 0.8, False)
 
 
 def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     """Tests the main process routine of handler related to parlor cleaning."""
-    handler = ParlorCleaningHandler("handler_name", "Parlor_Cleaning", 3, 0.8, False)
+    handler = ParlorCleaningHandler("handler_name", "ParlorCleaning", 3, 0.8, False)
     mock_fresh_water_volume_used_for_milking = mocker.patch.object(
         handler, "determine_fresh_water_volume_used_for_milking", return_value=0.0
     )
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
         water=0.0,
@@ -38,6 +38,7 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     original_stream = handler.manure_stream
@@ -56,7 +57,7 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 17
+    assert add_variable_patch.call_count == 18
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -99,6 +100,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen,
     )
     original_stream = handler.manure_stream
@@ -117,7 +119,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 15
+    assert add_variable_patch.call_count == 16
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -158,6 +160,7 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
@@ -188,6 +191,7 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     if compatible:
@@ -235,7 +239,7 @@ def test_determine_handler_cleaning_water_volume_parlor_use_flush(
     handler: Handler,
 ) -> None:
     """Tests the calculation of cleaning water volume."""
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     handler.use_parlor_flush = True
     assert (
         handler.determine_handler_cleaning_water_volume(
@@ -256,7 +260,7 @@ def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
     handler: Handler,
 ) -> None:
     """Tests the calculation of cleaning water volume."""
-    handler.handler_type = "PARLOR_CLEANING"
+    handler.handler_type = "ParlorCleaning"
     handler.use_parlor_flush = False
     assert (
         handler.determine_handler_cleaning_water_volume(
@@ -293,6 +297,7 @@ def test_check_manure_stream_compatibility(
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=pen_data,
     )
     assert handler.check_manure_stream_compatibility(empty_stream) == expected

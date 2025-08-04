@@ -48,67 +48,83 @@
     "purchased_feeds": [
         {
             "purchased_feed": 15,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 31,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 42,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 44,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 51,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 66,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 94,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 100,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         }, 
         {
             "purchased_feed": 110,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 172,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 197,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 202,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 210,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 216,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 231,
-            "purchased_feed_cost": 0.1 
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         },
         {
             "purchased_feed": 234,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.1,
+            "buffer": 0.15
         }
     ],
     "user_defined_ration_percentages": {

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
@@ -53,23 +54,23 @@ class NutritionSupplyCalculator:
             for rufas_id, amount in ration_formulation.items()
         ]
 
-        intake_nutrient_discount = cls._calculate_nutrient_intake_discount(feeds, body_weight)
+        intake_nutrient_discount = cls.calculate_nutrient_intake_discount(feeds, body_weight)
         actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * intake_nutrient_discount for feed in feeds}
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
 
-        metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
+        metabolizable_energy = cls.calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
         total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
 
-        maintenance_energy = cls._calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
-        lactation_energy = cls._calculate_actual_lactation_net_energy(
+        maintenance_energy = cls.calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
+        lactation_energy = cls.calculate_actual_lactation_net_energy(
             feeds, metabolizable_energy, actual_digestible_energy
         )
-        growth_energy = cls._calculate_actual_growth_net_energy(feeds, metabolizable_energy)
-        calcium = cls._calculate_calcium_supply(feeds)
-        phosphorus = cls._calculate_phosphorus_supply(feeds)
+        growth_energy = cls.calculate_actual_growth_net_energy(feeds, metabolizable_energy)
+        calcium = cls.calculate_calcium_supply(feeds)
+        phosphorus = cls.calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
         wet_matter = sum([feed.amount / (feed.info.DM * GeneralConstants.PERCENTAGE_TO_FRACTION) for feed in feeds])
-        protein = cls._calculate_metabolizable_protein_supply(
+        protein = cls.calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
         nutrient_contents = {
@@ -77,7 +78,7 @@ class NutritionSupplyCalculator:
         }
         digestible_energy = cls._calculate_digestible_energy(feeds)
         total_byproducts = cls._calculate_byproducts_supply(feeds)
-        forage_ndf_content = cls._calculate_forage_neutral_detergent_fiber_content(feeds)
+        forage_ndf_content = cls.calculate_forage_neutral_detergent_fiber_content(feeds)
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -104,7 +105,7 @@ class NutritionSupplyCalculator:
         )
 
     @classmethod
-    def _calculate_nutrient_intake_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
+    def calculate_nutrient_intake_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
         """
         Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
 
@@ -152,7 +153,7 @@ class NutritionSupplyCalculator:
         return max(discount, AnimalModuleConstants.MINIMUM_TDN_DISCOUNT)
 
     @classmethod
-    def _calculate_actual_metabolizable_energy(
+    def calculate_actual_metabolizable_energy(
         cls, feeds: list[FeedInRation], actual_digestible_energy: dict[RUFAS_ID, float]
     ) -> dict[RUFAS_ID, float]:
         """
@@ -194,7 +195,7 @@ class NutritionSupplyCalculator:
         return actual_metabolizable_energy
 
     @classmethod
-    def _calculate_actual_maintenance_net_energy(
+    def calculate_actual_maintenance_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
@@ -241,7 +242,7 @@ class NutritionSupplyCalculator:
         return total
 
     @classmethod
-    def _calculate_actual_lactation_net_energy(
+    def calculate_actual_lactation_net_energy(
         cls,
         feeds: list[FeedInRation],
         actual_metabolizable_energy: dict[RUFAS_ID, float],
@@ -256,7 +257,7 @@ class NutritionSupplyCalculator:
             List of feeds in ration, including the amount and nutritive properties.
         actual_digestible_energy : dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the feed.
-        actual_metabolizable : dict[RUFAS_ID, float]
+        actual_metabolizable_energy : dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
@@ -294,7 +295,7 @@ class NutritionSupplyCalculator:
         return total
 
     @classmethod
-    def _calculate_actual_growth_net_energy(
+    def calculate_actual_growth_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
@@ -341,7 +342,7 @@ class NutritionSupplyCalculator:
         return total
 
     @classmethod
-    def _calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
+    def calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
         """
         Calculates the calcium supply in the ration.
 
@@ -389,7 +390,7 @@ class NutritionSupplyCalculator:
         return total * GeneralConstants.KG_TO_GRAMS
 
     @classmethod
-    def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
+    def calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """
          Calculates the phosphorus supply in the ration.
 
@@ -434,7 +435,7 @@ class NutritionSupplyCalculator:
         return total * GeneralConstants.KG_TO_GRAMS
 
     @classmethod
-    def _calculate_metabolizable_protein_supply(
+    def calculate_metabolizable_protein_supply(
         cls,
         feeds: list[FeedInRation],
         dry_matter_intake: float,
@@ -677,7 +678,7 @@ class NutritionSupplyCalculator:
         return rup_percentages
 
     @classmethod
-    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> float:
+    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> Any:
         """
         Calculates the content of a specific nutrient in a ration.
 
@@ -699,7 +700,7 @@ class NutritionSupplyCalculator:
         )
 
     @classmethod
-    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> float:
+    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> Any:
         """
         Calculates the amount of digestible energy in a ration.
 
@@ -744,7 +745,7 @@ class NutritionSupplyCalculator:
         )
 
     @classmethod
-    def _calculate_forage_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+    def calculate_forage_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
         """
         Calculates the neutral detergent fiber (NDF) content supplied by forages in a ration.
 
