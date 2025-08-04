@@ -935,7 +935,6 @@ def test_request_nutrients(
     mock_remove = mocker.patch.object(ManureManager, "_remove_nutrients_from_storage")
     mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value="calculated_supplemental")
 
-
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request, animals_simulated, mock_time)
 
