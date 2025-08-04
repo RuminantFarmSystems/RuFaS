@@ -10,12 +10,16 @@ class UserDefinedRationManager:
     """
     Handles the initialization and management of user-defined animal rations.
 
+    Each ration formulation is represented as a dictionary, where the key is the
+    RuFaS ID of a feed and the value is the percentage it contributes to the ration.
+
     Attributes
     ----------
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
         A mapping of animal groupings to their respective ration formulations.
-    Each ration formulation is represented as a dictionary, where the key is the
-    RuFaS ID of a feed and the value is the percentage it contributes to the ration.
+    ration_tolerance : float
+        Fraction +/- of target user defined ration value (as a fraction of dry matter intake estimate) allowable in
+        ration formulation.
 
     """
 
@@ -23,6 +27,22 @@ class UserDefinedRationManager:
 
     _om = OutputManager()
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
+    tolerance: float
+
+    @classmethod
+    def set_user_defined_ration_tolerance(
+        cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
+    ) -> None:
+        """
+        Collects the tolerance value for user defined rations.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
+
+        """
+        cls.tolerance = ration_config["user_defined_ration_percentages"]["tolerance"]
 
     @classmethod
     def set_user_defined_rations(
