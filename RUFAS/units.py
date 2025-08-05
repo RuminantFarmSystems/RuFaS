@@ -74,6 +74,7 @@ class MeasurementUnits(Enum):
     METERS_PER_KILOMETER = "m/km"
     METERS_PER_MILLIMETER = "m/mm"
     METRIC_TONS = "metric ton"
+    MILLIGRAMS_PER_KILOGRAM = "mg/kg"
     MILLIMETERS = "mm"
     MILLIMETERS_PER_CENTIMETER = "mm/cm"
     MILLIMETERS_PER_HECTARE = "mm/ha"
