@@ -22,6 +22,7 @@ def mock_separator() -> Separator:
         ash_efficiency=0.3,
         volatile_solids_efficiency=0.2,
         total_solids_efficiency=0.1,
+        processor_type="ScrewPress",
     )
     return separator
 
@@ -29,7 +30,7 @@ def mock_separator() -> Separator:
 def test_separator_init_with_params(mock_separator: Separator) -> None:
     """Test the initialization of the Separator class with parameters."""
     assert mock_separator.name == "TestSeparator"
-    assert mock_separator._prefix == "Manure.Separator.separator_type.TestSeparator"
+    assert mock_separator._prefix == "Manure.Separator.ScrewPress.TestSeparator"
     assert mock_separator.held_manure is None
     assert mock_separator.separated_solids_dry_matter == 0.8
     assert mock_separator.ammoniacal_nitrogen_efficiency == 0.7
@@ -159,7 +160,7 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
         {
             "class": "Separator",
             "function": "process_manure",
-            "prefix": "Manure.Separator.separator_type.TestSeparator",
+            "prefix": "Manure.Separator.ScrewPress.TestSeparator",
             "simulation_day": mock_time.simulation_day,
             "units": MeasurementUnits.UNITLESS,
         },

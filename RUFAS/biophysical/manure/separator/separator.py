@@ -72,6 +72,7 @@ class Separator(Processor):
         ash_efficiency: float,
         volatile_solids_efficiency: float,
         total_solids_efficiency: float,
+        processor_type: str,
     ) -> None:
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
@@ -84,9 +85,8 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
-        # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
-        #  Issue #2513
-        self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
+        self.separator_type = processor_type
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.separator_type}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
