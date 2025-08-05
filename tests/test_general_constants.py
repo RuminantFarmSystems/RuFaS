@@ -41,16 +41,6 @@ def test_general_constants() -> None:
     assert constants.SECONDS_PER_DAY == 86400
     assert constants.HOURS_PER_DAY == 24
 
-    # Density-related
-    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
-    assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
-
-    # Biochemistry-related
-    assert constants.PROTEIN_TO_NITROGEN == approx(0.16)
-    assert constants.NITROGEN_TO_PROTEIN == approx(6.25)
-    assert constants.MILK_FAT_WEIGHT == approx(12.2)
-    assert constants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL == approx(0.02)
-
     # Earth-related data
     assert constants.EARTH_ANGULAR_VELOCITY == approx(0.2618)
 

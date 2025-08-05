@@ -5,6 +5,7 @@ from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretion
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
+from RUFAS.user_constants import UserConstants
 
 
 def methane_mitigation(
@@ -169,7 +170,7 @@ def manure_calculations(
         20.3
         + 0.654
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+        * (CP_concentration * UserConstants.PROTEIN_TO_NITROGEN)
         / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
