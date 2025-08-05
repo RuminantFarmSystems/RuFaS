@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from datetime import date
-from typing import Any, Literal, get_args
+from typing import Any, Literal
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
@@ -66,35 +65,46 @@ QUERY_RESULT_DATA_TYPE = dict[str, CropCategory | float]
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
 
 
-@dataclass
-class _FeedPurchase:
-    """
-    Represents a feed purchase with its RuFaS ID, amount purchased, and purchase type.
-
-    Attributes
-    ----------
-    rufas_id : RUFAS_ID
-        The RuFaS ID of the purchased feed.
-    amount_purchased : float
-        The amount of feed purchased (kg dry matter).
-    purchase_type : PurchaseType
-        The type of purchase being made.
-    """
-
-    rufas_id: RUFAS_ID
-    amount_purchased: float
-    purchase_type: PurchaseType
-
-
 class FeedManager:
     """
     Manages the feed storage, handling crop reception, purchasing, degradation processing, feed distribution,
-    and querying available feeds.
+    feed purchase management and reporting, and querying available feeds.
+
+    Parameters
+    ----------
+    feed_config : dict[str, list[Any]]
+        Configuration for the feeds available in the simulation.
+    nutrient_standard : NutrientStandard
+        Nutrient standard used in the simulation (NASEM or NRC).
+    crop_to_rufas_ids_mapping : dict[str, list[RUFAS_ID]]
+        Mapping from crops to their corresponding RUFAS IDs.
 
     Attributes
     ----------
-    dict[StorageType, Storage]
-        Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
+    _om : OutputManager
+        Output manager for reporting feed-related data.
+    _available_feeds : list[NASEMFeed | NRCFeed]
+        List of feeds available for purchase and feeding in the simulation, including their nutritional properties
+        and prices.
+    active_storages : dict[StorageType, Storage]
+        Contains the list of active farmgrown crop storage units in the simulation and their mapping from StorageType.
+    purchased_feed_storage : PurchasedFeedStorage
+        Storage for purchased feeds.
+    planning_cycle_allowance : PlanningCycleAllowance
+        Represents the allowances for feed purchases during a planning cycle.
+    runtime_purchase_allowance : RuntimePurchaseAllowance
+        Represents the allowances for feed purchases during runtime.
+    crop_to_rufas_id : dict[str, RUFAS_ID]
+        Maps crop configurations to their corresponding RUFAS IDs for harvested crops.
+    _cumulative_feed_requests : dict[RUFAS_ID, float]
+        Total amount of each feed requested over time (kg dry matter).
+    _cumulative_purchased_feeds_fed : dict[RUFAS_ID, float]
+        Total amount of purchased feeds fed to animals to date (kg dry matter).
+    _cumulative_farmgrown_feeds_fed : dict[RUFAS_ID, float]
+        Total amount of farmgrown feeds fed to animals to date (kg dry matter).
+    _cumulative_purchased_feeds : dict[RUFAS_ID, float]
+        Total amount of purchased feeds acquired to date (kg dry matter).
+
     """
 
     def __init__(
@@ -103,15 +113,14 @@ class FeedManager:
         nutrient_standard: NutrientStandard,
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
-        self.active_storages: dict[StorageType, Storage] = {}
+        self._om = OutputManager()
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
-        self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
+        self.active_storages: dict[StorageType, Storage] = {}
+        self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
+
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
-        self._daily_purchases: list[_FeedPurchase] = []
-        self._rufas_ids_purchased_today: set[RUFAS_ID] = set()
-        self._om = OutputManager()
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -121,10 +130,37 @@ class FeedManager:
                 continue
             self.crop_to_rufas_id[crop] = rufas_id
 
+        self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
+        self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
+            feed.rufas_id: 0.0 for feed in self.available_feeds
+        }
+        self._cumulative_farmgrown_feeds_fed: dict[RUFAS_ID, float] = {
+            feed.rufas_id: 0.0 for feed in self.available_feeds
+        }
+        self._cumulative_purchased_feeds: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
+
     @property
     def available_feeds(self) -> list[NASEMFeed | NRCFeed]:
         """Returns the list of available feeds."""
         return self._available_feeds
+
+    def report_feed_manager_balance(self, simulation_day: int) -> None:
+        """Reports the balance of feed purchased, requested, and fed to date."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.report_feed_manager_balance.__name__,
+            "simulation_day": simulation_day,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        for rufas_id, amount in self._cumulative_feed_requests.items():
+            self._om.add_variable(f"feed_{rufas_id}_requested_to_date", amount, info_map)
+        for rufas_id, amount in self._cumulative_purchased_feeds_fed.items():
+            self._om.add_variable(f"purchased_feed_{rufas_id}_fed_to_date", amount, info_map)
+        for rufas_id, amount in self._cumulative_farmgrown_feeds_fed.items():
+            self._om.add_variable(f"farmgrown_feed_{rufas_id}_fed_to_date", amount, info_map)
+        for rufas_id, amount in self._cumulative_purchased_feeds.items():
+            self._om.add_variable(f"purchased_feed_{rufas_id}_purchased_to_date", amount, info_map)
+        self.report_feed_storage_levels(simulation_day, "balance_storage_levels")
 
     def update_available_feed_amounts(self) -> None:
         """Updates the amounts feeds available based on what is currently stored."""
@@ -144,12 +180,6 @@ class FeedManager:
             if crop_config in self.crop_to_rufas_id:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
-
-    def _query_result_factory(self, crop_category: CropCategory, amount: float) -> QUERY_RESULT_DATA_TYPE:
-        return {
-            "category": crop_category,
-            "amount": amount,
-        }
 
     def receive_crop(
         self,
@@ -198,13 +228,14 @@ class FeedManager:
         for _, storage in self.active_storages.items():
             storage.process_degradations(weather, time)
 
-    def execute_daily_routine(self, time: RufasTime) -> None:
-        """Executes daily routine of the Feed Manager."""
-        self.report_stored_feeds(time)
+    def report_feed_storage_levels(self, simulation_day: int, reporting_suffix: str) -> None:
+        """Reports the daily storage levels of farm grown and purchased feeds."""
+        self.report_stored_farmgrown_feeds(simulation_day, reporting_suffix)
+        self.purchased_feed_storage.report_stored_purchased_feeds(simulation_day, reporting_suffix)
 
-    def report_stored_feeds(self, time: RufasTime) -> None:
-        """Outputs total amounts of feeds currently stored by the FeedManager."""
-        feed_report: dict[RUFAS_ID, float] = self.purchased_feed_storage.create_consolidated_feed_report()
+    def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
+        """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
+        feed_report: dict[RUFAS_ID, float] = {}
         available_feed_ids = [feed.rufas_id for feed in self._available_feeds]
         for storage in self.active_storages.values():
             for crop in storage.stored:
@@ -217,12 +248,16 @@ class FeedManager:
                     feed_report[rufas_id] = crop.dry_matter_mass
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.report_stored_feeds.__name__,
-            "simulation_day": time.simulation_day,
+            "function": self.report_stored_farmgrown_feeds.__name__,
+            "simulation_day": simulation_day,
             "units": MeasurementUnits.DRY_KILOGRAMS,
+            "suffix": reporting_suffix,
         }
+        for feed in self._available_feeds:
+            if feed.rufas_id not in feed_report.keys():
+                feed_report[feed.rufas_id] = 0.0
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass})
+            self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
 
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: RufasTime) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
@@ -249,6 +284,7 @@ class FeedManager:
                     "simulation_day": time.simulation_day,
                 },
             )
+            self._cumulative_feed_requests[feed_id] += amount_requested
             self._om.add_variable(
                 f"{feed_id}_available_amount",
                 available_amount,
@@ -265,13 +301,12 @@ class FeedManager:
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="daily_feed_request")
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory, time.simulation_day)
-        self.report_stored_feeds(time)
         for storage in self.active_storages.values():
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
         return True
 
-    def get_total_inventory(self, inventory_date: date, weather: Weather, time: RufasTime) -> TotalInventory:
+    def get_total_projected_inventory(self, inventory_date: date, weather: Weather, time: RufasTime) -> TotalInventory:
         """
         Gets the inventory expected to be held in storage at the specified date.
 
@@ -390,7 +425,7 @@ class FeedManager:
         self,
         query_crop_categories: list[CropCategory] | None = None,
         query_storage_types: list[StorageType] | None = None,
-    ) -> list[QUERY_RESULT_DATA_TYPE]:
+    ) -> list[dict[str, CropCategory | int | float]]:
         """
         Queries the available amount of feed in storage.
 
@@ -403,12 +438,12 @@ class FeedManager:
 
         Returns
         -------
-        list[QUERY_RESULT_DATA_TYPE]
-            The amount of available feed, either as a total or for a specific crop type.
+        list[dict[CropCategory | int, float]]
+            The amount of available feed, either as a total or for a specific crop category.
         """
         query_all_crop_categories = query_crop_categories is None
         query_all_storage_types = query_storage_types is None
-        results: list[QUERY_RESULT_DATA_TYPE] = []
+        results: list[dict[str, CropCategory | int | float]] = []
 
         for storage_type, storage in self.active_storages.items():
             is_storage_queryable: bool = query_all_storage_types or (
@@ -423,15 +458,15 @@ class FeedManager:
                 if not is_crop_category_queryable:
                     continue
                 for previous_result in results:
-                    if stored_crop.category == previous_result["category"]:
+                    if stored_crop.category == previous_result["feed"]:
                         previous_result["amount"] += stored_crop.fresh_mass
                         break
                 else:
                     results.append(
-                        self._query_result_factory(
-                            stored_crop.category,
-                            stored_crop.fresh_mass,
-                        )
+                        {
+                            "feed": stored_crop.category,
+                            "amount": stored_crop.fresh_mass,
+                        }
                     )
 
         return results
@@ -458,7 +493,6 @@ class FeedManager:
             "units": MeasurementUnits.DOLLARS,
             "simulation_day": time.simulation_day,
         }
-        self._rufas_ids_purchased_today.update(feeds_to_purchase.keys())
         for rufas_id, purchase_amount in feeds_to_purchase.items():
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
@@ -475,7 +509,7 @@ class FeedManager:
             }
             self._om.add_variable(
                 f"{purchase_type}_{rufas_id}_cost",
-                purchase_amount * feed_info.purchase_cost,
+                total_cost,
                 info_map | {"units": MeasurementUnits.DOLLARS},
             )
             self._om.add_variable(
@@ -483,42 +517,8 @@ class FeedManager:
                 purchase_amount,
                 info_map | {"units": MeasurementUnits.KILOGRAMS},
             )
-            self._daily_purchases.append(
-                _FeedPurchase(rufas_id=rufas_id, amount_purchased=purchase_amount, purchase_type=purchase_type)
-            )
+            self._cumulative_purchased_feeds[rufas_id] += purchase_amount
             self._store_purchased_feed(rufas_id, purchase_amount, time)
-
-    def report_daily_purchases(self, simulation_day: int) -> None:
-        """
-        Reports the total amounts of feeds purchased today, and resets the daily purchases.
-
-        Parameters
-        ----------
-        simulation_day : int
-            The current simulation day.
-        """
-        if not self._rufas_ids_purchased_today:
-            return
-
-        totals: dict[tuple[PurchaseType, int], float] = {}
-
-        for entry in self._daily_purchases:
-            key = (entry.purchase_type, entry.rufas_id)
-            totals[key] = totals.get(key, 0.0) + entry.amount_purchased
-
-        for purchase_type in get_args(PurchaseType):
-            for rufas_id in self._rufas_ids_purchased_today:
-                amount = totals.get((purchase_type, rufas_id), 0.0)
-                info_map = {
-                    "class": self.__class__.__name__,
-                    "function": "report_daily_purchases",
-                    "simulation_day": simulation_day,
-                    "units": MeasurementUnits.DRY_KILOGRAMS,
-                }
-                self._om.add_variable(f"{purchase_type}_{rufas_id}_amount_purchased", amount, info_map)
-
-        self._daily_purchases.clear()
-        self._rufas_ids_purchased_today.clear()
 
     def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
@@ -580,44 +580,26 @@ class FeedManager:
                     total_purchased_feed_deductions[rufas_id] = (
                         total_purchased_feed_deductions.get(rufas_id, 0.0) + amount_to_deduct
                     )
-                else:
+                    self._cumulative_purchased_feeds_fed[rufas_id] += amount_to_deduct
+                elif isinstance(feed, HarvestedCrop):
                     feed.remove_feed_mass(amount_to_deduct)
                     harvested_rufas_id = self._select_rufas_id_for_harvested_crop(
                         feed.rufas_ids, list(feeds_to_deduct.keys())
                     )
+                    if harvested_rufas_id is None:
+                        raise ValueError("Could not resolve a valid harvested_rufas_id from feed.rufas_ids")
                     total_farmgrown_feed_deductions[harvested_rufas_id] = (
                         total_farmgrown_feed_deductions.get(harvested_rufas_id, 0.0) + amount_to_deduct
                     )
+                    self._cumulative_farmgrown_feeds_fed[harvested_rufas_id] += amount_to_deduct
+                else:
+                    raise TypeError(f"Unsupported feed type: {type(feed)}")
 
                 if amount == 0.0:
                     break
 
             if amount != 0.0:
                 raise ValueError(f"Was not able to deduct remaining {amount} of feed {rufas_id}.")
-
-        for feed_id, amount_deducted in total_farmgrown_feed_deductions.items():
-            self._om.add_variable(
-                f"farmgrown_feed_{feed_id}_total_amount_deducted",
-                amount_deducted,
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._deduct_feeds_from_inventory.__name__,
-                    "units": MeasurementUnits.DRY_KILOGRAMS,
-                    "simulation_day": simulation_day,
-                },
-            )
-
-        for feed_id, amount_deducted in total_purchased_feed_deductions.items():
-            self._om.add_variable(
-                f"purchased_feed_{feed_id}_total_amount_deducted",
-                amount_deducted,
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._deduct_feeds_from_inventory.__name__,
-                    "units": MeasurementUnits.DRY_KILOGRAMS,
-                    "simulation_day": simulation_day,
-                },
-            )
 
     def _check_feed_availability(
         self, feeds_to_deduct: dict[RUFAS_ID, float], rufas_id: int, feed: HarvestedCrop | PurchasedFeed
