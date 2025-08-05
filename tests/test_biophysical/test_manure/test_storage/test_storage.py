@@ -155,7 +155,7 @@ def test_receive_manure(storage: Storage, manure_received: list[ManureStream], e
             (
                 "Processor 'fixture' received a ManureStream without pen manure data, "
                 "which is required for housing emissions calculations. Cannot place a handler "
-                "before Open Lot/Compost Bedded Pack in the manure processor connection chain."
+                "before Open Lot/Bedded Pack in the manure processor connection chain."
             ),
         ),
         (
