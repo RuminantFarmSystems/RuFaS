@@ -200,6 +200,8 @@ v0.9.2
 - [2426](https://github.com/RuminantFarmSystems/RuFaS/pull/2426) - [minor change] [Animal] Adds a warning when the days_in_preg_when_dry is set to less than or equal to the 3rd preg check day.
 - [2369](https://github.com/RuminantFarmSystems/MASM/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking
+- [2381](https://github.com/RuminantFarmSystems/MASM/pull/2381) - [minor change] [Animal] Refactor ration formulation.
+- [2462](https://github.com/RuminantFarmSystems/MASM/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking.
 - [2472](https://github.com/RuminantFarmSystems/MASM/pull/2472) - [minor change] [Animal] Removed duplicate logics to filter animals.
 - [2464](https://github.com/RuminantFarmSystems/MASM/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
 - [2392](https://github.com/RuminantFarmSystems/MASM/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
@@ -214,6 +216,8 @@ v0.9.2
 - [2500](https://github.com/RuminantFarmSystems/MASM/pull/2500) - [minor change] Moves `AnimalCombination`, `AnimalManureExcretions`, and removes the old `PenManureData`.
 - [2518](https://github.com/RuminantFarmSystems/MASM/pull/2518) - [minor change] Cleanup all TODOs in the codebase.
 - [2502](https://github.com/RuminantFarmSystems/MASM/pull/2502) - [minor change] [Manure] Implement Manure Methane Potential Tracking.
+- [2491](https://github.com/RuminantFarmSystems/MASM/pull/2491) - [minor change] [Manure] Fixes a bug in manure request management when trying to supplement a request from a farm that has no on-farm manure.
+- [2461](https://github.com/RuminantFarmSystems/MASM/pull/2461) [Input] Create Example Input files.
 - [2521](https://github.com/RuminantFarmSystems/MASM/pull/2521) - [minor change] Separate `UserConstants` from `GeneralConstants`.
 
 ### v0.9.2

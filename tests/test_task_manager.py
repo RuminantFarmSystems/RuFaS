@@ -409,7 +409,11 @@ def test_handle_end_to_end_testing(
     """Test that end-to-end testing is executed correctly."""
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
     post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
-    args = {"json_output_directory": "json_path", "convert_variable_table_path": "compare_path"}
+    args = {
+        "json_output_directory": "json_path",
+        "convert_variable_table_path": "compare_path",
+        "output_prefix": "dummy_prefix",
+    }
     compare_outputs = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
     )
@@ -426,7 +430,9 @@ def test_handle_end_to_end_testing(
         produce_graphics=True,
         should_flush_im_pool=True,
     )
-    compare_outputs.assert_called_once_with(args["json_output_directory"], args["convert_variable_table_path"])
+    compare_outputs.assert_called_once_with(
+        args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
+    )
     assert add_log.call_count == 2
     assert post_processing.call_count == 1
 
@@ -440,7 +446,7 @@ def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskM
     add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     mock_input_manager = MagicMock()
-    args = {"json_output_directory": "json_path"}
+    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix"}
 
     # Act
     task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
@@ -455,7 +461,7 @@ def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskM
         should_flush_im_pool=True,
     )
 
-    update_test_results.assert_called_once_with(args["json_output_directory"])
+    update_test_results.assert_called_once_with(args["json_output_directory"], args["output_prefix"])
 
     assert add_log.call_count == 2
     add_log.assert_any_call(
@@ -629,6 +635,7 @@ def test_task(
         "maximum_memory_usage_percent": 0,
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
+        "filters_directory": Path("/fake/filters"),
         "task_id": 1,
         "random_seed": 924,
         "suppress_log_files": True,
@@ -644,8 +651,6 @@ def test_task(
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
-    mocker.patch.object(InputManager, "start_data_processing")
-    mocker.patch.object(InputManager, "get_data")
     task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
     mock_im_init.assert_called_once_with(10)
 
