@@ -347,6 +347,8 @@ class E2ETestResultsHandler:
         """
         values_changed = diff_result.get("values_changed", {})
         E2ETestResultsHandler.filter_nested(values_changed, tolerance)
+        if "values_changed" in diff_result and diff_result["values_changed"] == {}:
+            del diff_result["values_changed"]
         return diff_result
 
     @staticmethod
