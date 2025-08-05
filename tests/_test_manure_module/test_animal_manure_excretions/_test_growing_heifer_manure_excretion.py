@@ -5,6 +5,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.mark.skip(reason="Skipping this test as AnimalManureExcretions is modified")
@@ -47,13 +48,13 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
         15.1
         + 0.83
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / GeneralConstants.FRACTION_TO_PERCENTAGE)
+        * (CP_concentration * UserConstants.PROTEIN_TO_NITROGEN / GeneralConstants.FRACTION_TO_PERCENTAGE)
     ) * GeneralConstants.GRAMS_TO_KG
     fecal_nitrogen = (
         0.345
         + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+        * (CP_concentration * UserConstants.PROTEIN_TO_NITROGEN)
         / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = manure_nitrogen - fecal_nitrogen
