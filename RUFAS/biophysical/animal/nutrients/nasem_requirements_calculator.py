@@ -5,6 +5,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
@@ -422,7 +423,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
         scurf_net_protein_req: float = 0.20 * body_weight ** (0.60) * 0.85
-        endogenous_urine_protein_req: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        endogenous_urine_protein_req: float = 53 * UserConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
         metabolic_fecal_crude_protein_req: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         net_metabolic_fecal_crude_protein_req: float = metabolic_fecal_crude_protein_req * 0.73
         frame_growth_net_req: float = frame_weight_gain * 0.11 * 0.86

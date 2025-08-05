@@ -7,6 +7,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 class Handler(Processor):
@@ -322,4 +323,4 @@ class Handler(Processor):
         The amount of manure water (KG).
 
         """
-        return manure_stream_water + (total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3)
+        return manure_stream_water + (total_cleaning_water_volume * UserConstants.WATER_DENSITY_KG_PER_M3)

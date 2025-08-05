@@ -6,7 +6,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
 )
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -133,7 +133,7 @@ def test_make_empty_nutrition_requirements() -> None:
 
 def test_supply_post_init(supply: NutritionSupply) -> None:
     """Test that nitrogen supply is correctly calculated."""
-    assert supply.nitrogen_supply == supply.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+    assert supply.nitrogen_supply == supply.crude_protein * UserConstants.PROTEIN_TO_NITROGEN
 
 
 def test_supply_addition(supply: NutritionSupply) -> None:
