@@ -791,7 +791,7 @@ class Field:
         ]:
             self.om.add_log(
                 "Manure Application Log",
-                f"Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
+                "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
                 info_map,
             )
 
