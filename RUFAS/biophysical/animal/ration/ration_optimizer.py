@@ -440,7 +440,7 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration, False)
+            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration, use_fixed_upper=False)
         )
         # print("protein lower")
         # print(ration_configuration.protein_limit_fixed)
@@ -470,7 +470,7 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration, False)
+            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration, use_fixed_upper=False)
         )
         # print("protein upper")
         # print(ration_configuration.protein_limit_fixed)
