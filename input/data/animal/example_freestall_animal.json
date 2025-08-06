@@ -161,14 +161,14 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 15,
 			"housing_type": "open air barn",
-			"pen_type": "freestall",
+			"pen_type": "bedded pack",
 			"max_stocking_density": 1.2,
 			"manure_streams": [
 				{
 					"stream_name": "calf_pen",
-					"bedding_name": "calf_straw",
+					"bedding_name": "CBPB sawdust",
 					"stream_proportion": 1.0,
-					"first_processor": "calf_manual_scraper"
+					"first_processor": "calf_BP"
 				}
 			]
 		},
@@ -180,14 +180,14 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 90,
 			"housing_type": "open air barn",
-			"pen_type": "freestall",
+			"pen_type": "bedded pack",
 			"max_stocking_density": 1.2,
 			"manure_streams": [
 				{
 					"stream_name": "grow_pen",
-					"bedding_name": "lac_and_growing_sand",
+					"bedding_name": "CBPB sawdust",
 					"stream_proportion": 1.0,
-					"first_processor": "growing_alley_scraper"
+					"first_processor": "grow_BP"
 				}
 			]
 		},
@@ -199,14 +199,14 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 22,
 			"housing_type": "open air barn",
-			"pen_type": "freestall",
+			"pen_type": "bedded pack",
 			"max_stocking_density": 1.2,
 			"manure_streams": [
 				{
 					"stream_name": "closeup_pen",
-					"bedding_name": "closeup_sawdust",
+					"bedding_name": "CBPB sawdust",
 					"stream_proportion": 1.0,
-					"first_processor": "closeup_manual_scraper"
+					"first_processor": "close_BP"
 				}
 			]
 		},
@@ -218,7 +218,7 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 88,
 			"housing_type": "open air barn",
-			"pen_type": "freestall",
+			"pen_type": "bedded pack",
 			"max_stocking_density": 1.2,
 			"minutes_away_for_milking": 180,
 			"first_parlor_processor": "parlor_cleaning_handler",
@@ -226,9 +226,9 @@
 			"manure_streams": [
 				{
 					"stream_name": "early_lac_pen",
-					"bedding_name": "lac_and_growing_sand",
+					"bedding_name": "CBPB sawdust",
 					"stream_proportion": 1.0,
-					"first_processor": "lac_alley_scraper"
+					"first_processor": "lac_BP"
 				}
 			]
 		}

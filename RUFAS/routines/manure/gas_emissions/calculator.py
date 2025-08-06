@@ -912,7 +912,8 @@ class GasEmissionsCalculator:
 
     @classmethod
     def ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
-        """Calculates emission of methane for a day using an adaptation of the tier 2 approach
+        """
+        Calculates emission of methane for a day using an adaptation of the tier 2 approach
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
 
