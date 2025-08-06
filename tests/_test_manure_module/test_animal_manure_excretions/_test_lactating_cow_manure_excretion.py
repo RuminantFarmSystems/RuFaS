@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalM
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import manure_calculations, methane_mitigation
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.mark.parametrize(
@@ -93,7 +94,7 @@ def test_lactating_cow_manure_calculations(  # noqa
         20.3
         + 0.654
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+        * (CP_concentration * UserConstants.PROTEIN_TO_NITROGEN)
         / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
     dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)

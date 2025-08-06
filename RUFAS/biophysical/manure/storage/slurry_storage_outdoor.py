@@ -10,6 +10,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 class SlurryStorageOutdoor(Storage):
@@ -56,7 +57,7 @@ class SlurryStorageOutdoor(Storage):
         if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
             precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
             self._received_manure.volume += precipitation_volume
-            self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+            self._received_manure.water += precipitation_volume * UserConstants.WATER_DENSITY_KG_PER_M3
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
