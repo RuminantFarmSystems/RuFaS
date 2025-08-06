@@ -585,7 +585,7 @@ Git Desktop.
 
    -  Run a example scenario by typing in "python main.py". Did you get
       a message with the RuFaS version number and saying it was starting
-      a task? Congratulations! You just simulated the RuFaS default
+      a task? Congratulations! You just simulated the RuFaS example
       farm!
 
    -  You can find the details related to logs, warnings, and errors
@@ -811,7 +811,7 @@ open your Git Desktop and VS Code.
       in the file. Follow this path to the example_freestall_animal.json file in
       the metadata dropdown.
 
-   -  Create a copy of default_animal.json and give it the title
+   -  Create a copy of example_freestall_animal.json and give it the title
       **"example_freestall_animal1.json"**
 
    -  In your newly created json file, change the "cow_num" from 100 to
@@ -824,7 +824,7 @@ open your Git Desktop and VS Code.
    through are pointing to the correct files so that we can run our
    first simulation. Methodically work your way backwards through the
    steps to check that the paths are pointing to your newly created file
-   or files if you made a copy of the default_metadata file.
+   or files if you made a copy of the example_freestall_dairy_metadata file.
 
    -  Check your example_freestall_dairy_metadata.json file or the copy that you
       created. The path for the "animal data" should point to the new
