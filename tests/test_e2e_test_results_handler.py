@@ -342,7 +342,7 @@ def test_filter_insignificant_changes(
 ) -> None:
     """Integration test for filter_insignificant_changes and associated helper functions."""
     filtered_result = E2ETestResultsHandler.filter_insignificant_changes(diff_result, tolerance)
-    remaining_keys = set(filtered_result["values_changed"].keys())
+    remaining_keys = set(filtered_result["values_changed"].keys()) if "values_changed" in filtered_result else set()
 
     # Assert
     assert remaining_keys == expected_keys
