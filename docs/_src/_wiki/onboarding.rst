@@ -873,20 +873,20 @@ open your Git Desktop and VS Code.
 #. You can borrow the files for Output Filters from other team members
    or create some on your own. For more details on how to create your
    own, visit the GitHub wiki `Output
-   Manager <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#output-filters>`__.
+   Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Output-Manager.html#output-filters>`__.
 
    -  Think of output filters as an opportunity to tailor the results
       generated from your simulation to only show the variables of
       interest. You can also use filters to control the way you view
       your results. Recall **Step 9**, while CSV files are standard for
       RuFaS,
-      `Reports <https://github.com/RuminantFarmSystems/MASM/wiki/Report-Generator>`__
+      `Reports <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Report-Generator.html>`__
       and
       `Graphs <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__
       must be generated using filters.
 
    -  The `Output
-      Manager <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#output-filters>`__
+      Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Graph-Generator.html>`__
       also has some sample filters that you can use and add into your VS
       Code to help you.
 
@@ -904,13 +904,8 @@ Additional Materials
 
 -  Now that you’re familiar with the basics, we encourage you to review
    the full recording of the `onboarding
-   session <https://3.basecamp.com/3486446/buckets/5296287/uploads/6661565836>`__
+   session <https://youtu.be/Xqjse-fKQV0>`__
    for more details.
-
--  PyCharm Users can use `these videos to
-   help <https://3.basecamp.com/3486446/buckets/5296287/vaults/2713991190>`__.
-
-   -  Start with "gettingstarted.mov" before watching the other two.
 
 -  If using VS Code or PyCharm and unsure of how to proceed with setting
    up the virtual environment (or if you have any other questions or
@@ -921,5 +916,3 @@ Additional Materials
    videos <https://www.youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`__.
    Take your time and review all 6 videos in the series.
 
-   -  Please review our version control protocols
-      `here <https://3.basecamp.com/3486446/buckets/5296287/vaults/2177548970>`__.
