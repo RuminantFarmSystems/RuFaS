@@ -39,6 +39,20 @@
         "actual_results_path": "open_lot_e2e_saved_variables_e2e_manure_",
         "tolerance": 0.1
       }
+    ],
+    "no_animal_e2e": [
+      {
+        "domain": "CropAndSoil",
+        "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_crop_soil_filter.json",
+        "actual_results_path": "no_animal_e2e_saved_variables_e2e_crop_and_soil_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Manure",
+        "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_manure_filter.json",
+        "actual_results_path": "no_animal_e2e_saved_variables_e2e_manure_",
+        "tolerance": 0.1
+      }
     ]
   }
 }
