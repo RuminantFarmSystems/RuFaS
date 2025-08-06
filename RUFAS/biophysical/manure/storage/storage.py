@@ -8,6 +8,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
+from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
@@ -227,9 +228,9 @@ class Storage(Processor):
 
         """
         is_temp_invalid: bool = not (
-            GeneralConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE
             <= temperature
-            <= GeneralConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+            <= UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE
         )
         if is_temp_invalid:
             raise ValueError(

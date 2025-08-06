@@ -12,6 +12,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -140,7 +141,7 @@ def test_process_manure_cover_behaviors(
             dummy_conditions.precipitation * GeneralConstants.MM_TO_M * anaerobic_lagoon._surface_area
         )
         received_manure.volume += expected_precip_volume
-        received_manure.water += expected_precip_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        received_manure.water += expected_precip_volume * UserConstants.WATER_DENSITY_KG_PER_M3
 
     result = anaerobic_lagoon.process_manure(dummy_conditions, dummy_time)
 

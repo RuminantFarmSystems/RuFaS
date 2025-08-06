@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.user_constants import UserConstants
 
 om = OutputManager()
 
@@ -1443,7 +1444,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        NPEndUrin: float = 53 * UserConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP: float = CPMFP * 0.73
         NPGrowth: float = frame_weight_gain * 0.11 * 0.86
