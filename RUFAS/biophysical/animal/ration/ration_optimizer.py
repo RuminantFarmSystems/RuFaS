@@ -982,7 +982,7 @@ class RationOptimizer:
         pen_available_feeds : AvailableFeedsTypedDict
             A dictionary of available feeds for ration formulation.
         average_nutrient_requirements : NutritionRequirements
-            The pen's average (or other summary statistic) requirements used in ration formulation.
+            The pen's average requirements used in ration formulation.
         sim_day : int
             Day of simulation.
         info_map : dict[str, Any]
@@ -1021,17 +1021,16 @@ class RationOptimizer:
             "constraints_failed_dict": MeasurementUnits.UNITLESS,
             "ration_attempted": MeasurementUnits.UNITLESS,
             "pen requirements": {
-                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
-                "NEa_requirement": MeasurementUnits.MEGACALORIES,
-                "NEg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEl_requirement": MeasurementUnits.MEGACALORIES,
-                "MP_requirement": MeasurementUnits.GRAMS,
-                "Ca_requirement": MeasurementUnits.GRAMS,
-                "P_req": MeasurementUnits.GRAMS,
-                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
-                "avg_BW": MeasurementUnits.KILOGRAMS,
-                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
+                "maintenance_energy": MeasurementUnits.MEGACALORIES,
+                "growth_energy": MeasurementUnits.MEGACALORIES,
+                "pregnancy_energy": MeasurementUnits.MEGACALORIES,
+                "lactation_energy": MeasurementUnits.MEGACALORIES,
+                "metabolizable_protein": MeasurementUnits.GRAMS,
+                "calcium": MeasurementUnits.GRAMS,
+                "phosphorus": MeasurementUnits.GRAMS,
+                "process_based_phosphorus": MeasurementUnits.GRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "activity_energy": MeasurementUnits.MEGACALORIES
             },
         }
         info_map = {
