@@ -1,10 +1,12 @@
 from dataclasses import replace
 from datetime import date, datetime
 
+from mock import MagicMock, call
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage, PurchasedFeed
+from RUFAS.routines.feed.feed import Feed
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -15,8 +17,16 @@ def purchased_feed() -> PurchasedFeed:
 
 
 @pytest.fixture
-def purchased_feed_storage() -> PurchasedFeedStorage:
-    return PurchasedFeedStorage()
+def mock_available_feeds() -> list[Feed]:
+    feed_1, feed_2, feed_3, feed_4, feed_5 = (MagicMock(auto_spec=Feed) for _ in range(5))
+    feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id, feed_4.rufas_id, feed_5.rufas_id = 1, 2, 3, 4, 5
+    feed_1.buffer, feed_2.buffer, feed_3.buffer, feed_4.buffer, feed_5.buffer = 1, 2, 3, 4, 5
+    return [feed_1, feed_2, feed_3, feed_4, feed_5]
+
+
+@pytest.fixture
+def purchased_feed_storage(mock_available_feeds: list[Feed]) -> PurchasedFeedStorage:
+    return PurchasedFeedStorage(available_feeds=mock_available_feeds)
 
 
 @pytest.fixture
@@ -59,38 +69,48 @@ def test_remove_empty_crops(purchased_feed_storage: PurchasedFeedStorage, purcha
 def test_report_stored_purchased_feeds(
     purchased_feed_storage: PurchasedFeedStorage,
     purchased_feed: PurchasedFeed,
-    time: RufasTime,
     mocker: MockerFixture,
     mass: float,
     num_feeds: int,
     expected: float,
+    time: RufasTime,
 ) -> None:
     """Test that the storage can report the stored feeds."""
+    mock_time = time
+
     expected_info_map = {
         "class": "PurchasedFeedStorage",
         "function": "report_stored_purchased_feeds",
-        "simulation_day": (expected_sim_day := 3),
+        "simulation_day": time.simulation_day,
         "units": MeasurementUnits.KILOGRAMS,
-        "rufas_id": 1,
-        "mass": expected,
+        "suffix": "mock_suffix",
     }
-    mocker.patch.object(RufasTime, "simulation_day", new_callable=mocker.PropertyMock, return_value=expected_sim_day)
+
     stored_feeds = [replace(purchased_feed, dry_matter_mass=mass) for _ in range(num_feeds)]
     purchased_feed_storage.stored = stored_feeds
-    expected_call = mocker.call("stored_feed_1", expected, expected_info_map)
+
     add_var = mocker.patch.object(purchased_feed_storage._om, "add_variable")
 
-    purchased_feed_storage.report_stored_purchased_feeds(time)
+    purchased_feed_storage.report_stored_purchased_feeds(mock_time.simulation_day, "mock_suffix")
 
-    assert add_var.call_args_list == [expected_call]
+    assert call("stored_feed_1", expected, expected_info_map) in add_var.call_args_list
 
 
 @pytest.mark.parametrize(
     "feed_values, expected",
     [
-        ([(1, 100), (2, 50), (1, 50)], {1: 150.0, 2: 50.0}),
-        ([], {}),
-        ([(1, 75.0), (2, 100.0), (3, 50.0)], {1: 75.0, 2: 100.0, 3: 50.0}),
+        (
+            [(1, 100), (2, 50), (1, 50)],
+            {1: 150.0, 2: 50.0, 3: 0.0, 4: 0.0, 5: 0.0},
+        ),
+        (
+            [],
+            {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0},
+        ),
+        (
+            [(1, 75.0), (2, 100.0), (3, 50.0)],
+            {1: 75.0, 2: 100.0, 3: 50.0, 4: 0.0, 5: 0.0},
+        ),
     ],
 )
 def test_create_consolidated_feed_report(
