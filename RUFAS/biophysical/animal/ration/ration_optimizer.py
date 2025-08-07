@@ -1030,7 +1030,7 @@ class RationOptimizer:
                 "phosphorus": MeasurementUnits.GRAMS,
                 "process_based_phosphorus": MeasurementUnits.GRAMS,
                 "dry_matter": MeasurementUnits.KILOGRAMS,
-                "activity_energy": MeasurementUnits.MEGACALORIES
+                "activity_energy": MeasurementUnits.MEGACALORIES,
             },
         }
         info_map = {
