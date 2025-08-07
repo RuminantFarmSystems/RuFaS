@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 @dataclass
@@ -201,7 +202,7 @@ class NutritionSupply:
 
     def __post_init__(self) -> None:
         """Sets the nitrogen supply of a ration based on the crude protein supply."""
-        self.nitrogen_supply = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+        self.nitrogen_supply = self.crude_protein * UserConstants.PROTEIN_TO_NITROGEN
 
     def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
         """Add two NutritionSupply objects together."""

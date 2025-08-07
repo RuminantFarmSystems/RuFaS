@@ -18,6 +18,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
@@ -2430,15 +2431,15 @@ class OutputManager(object):
             filter_contents, direction = self._load_filter_file_content(input_path)
             for content in filter_contents:
                 for name, new_value in content.get("constants", {}).items():
-                    if not hasattr(GeneralConstants, name):
+                    if not hasattr(UserConstants, name):
                         continue
-                    old_value = getattr(GeneralConstants, name)
+                    old_value = getattr(UserConstants, name)
                     if new_value == old_value:
                         continue
 
-                    setattr(GeneralConstants, name, new_value)
+                    setattr(UserConstants, name, new_value)
                     self.add_warning(
-                        "GeneralConstants overwritten.",
+                        "UserConstants overwritten.",
                         f"{name} overwritten by report filter; now set to {new_value}",
                         info_map={
                             "class": self.__class__.__name__,
