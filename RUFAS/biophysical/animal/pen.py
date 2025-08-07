@@ -959,7 +959,6 @@ class Pen:
             # For lac cow
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
-                    print("hit the lac limit")  # TODO remove before merge
                     break
             else:
                 self._reduce_on_lactation_failure(info_map=info_map)
