@@ -10,9 +10,9 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 class Mixing(Enum):
@@ -358,7 +358,7 @@ class BeddedPack(Storage):
         methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(is_mixed,
                                                                                                manure_temperature)
         methane_emissions_in_kg = \
-            (manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+            (manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg
 
     @staticmethod
