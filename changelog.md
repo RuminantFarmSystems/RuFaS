@@ -222,6 +222,7 @@ v0.9.2
 - [2526](https://github.com/RuminantFarmSystems/MASM/pull/2526) - [minor change] Update expected e2e results and fix flake8 error.
 - [2505](https://github.com/RuminantFarmSystems/MASM/pull/2505) - [minor change] Update the wiki pages .rst files and the onboarding doc.
 - [2521](https://github.com/RuminantFarmSystems/MASM/pull/2521) - [minor change] Separate `UserConstants` from `GeneralConstants`.
+- [2534](https://github.com/RuminantFarmSystems/MASM/pull/2534) - [minor change][docs] Update rufas logo.
 
 ### v0.9.2
 
