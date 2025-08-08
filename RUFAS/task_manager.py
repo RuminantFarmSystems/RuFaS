@@ -1,9 +1,11 @@
+from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
 import sys
 import traceback
 from enum import Enum
 from functools import partial
+from packaging.requirements import Requirement, InvalidRequirement
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from pathlib import Path
@@ -120,6 +122,7 @@ class TaskManager:
             is_end_to_end_testing_run=False,
         )
         self.check_python_version()
+        self.check_dependencies()
         rufas_version = self.get_rufas_version()
         self.output_manager.print_credits(rufas_version)
         info_map = {
@@ -128,6 +131,11 @@ class TaskManager:
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
+        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
+        for task in task_config.get("tasks", []):
+            filters_path = Path(task["filters_directory"])
+            self.output_manager.validate_filter_content(filters_path)
+
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 args={
@@ -142,10 +150,6 @@ class TaskManager:
                 should_flush_im_pool=True,
             )
             raise Exception("Task Manager's input data is invalid.")
-        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
-        for task in task_config.get("tasks", []):
-            filters_path = Path(task["filters_directory"])
-            self.output_manager.validate_filter_content(filters_path)
 
         workers: int = task_config["parallel_workers"]
         self.output_manager.add_log(
@@ -169,7 +173,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -212,6 +216,58 @@ class TaskManager:
             )
             return "Unknown"
         return str(rufas_version)
+
+    def check_dependencies(self) -> None:
+        """
+        Checks if the required dependencies are installed.
+
+        Raises
+        ------
+        ImportError
+            If a required dependency is not installed.
+        """
+        import tomllib
+
+        with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+            project_data = tomllib.load(pyproject_file)
+
+        dependencies = project_data.get("project", {}).get("dependencies", [])
+        for dependency in dependencies:
+            try:
+                requirement = Requirement(dependency)
+            except InvalidRequirement as e:
+                self.output_manager.add_error(
+                    "Invalid requirement syntax",
+                    f"The dependency string '{dependency}' is invalid. Error: {e}",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(f"Invalid dependency string in pyproject.toml: {dependency!r}") from e
+
+            package_name = requirement.name
+
+            try:
+                installed_version = get_installed_version(package_name)
+            except PackageNotFoundError as e:
+                self.output_manager.add_error(
+                    "Missing dependency",
+                    f"Required package '{package_name}' is not installed. We suggest running 'pip install .'"
+                    " to install all dependencies at required minimum levels.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(f"[ERROR] Required package '{package_name}' is not installed.") from e
+
+            if requirement.specifier and not requirement.specifier.contains(installed_version):
+                self.output_manager.add_error(
+                    "Dependency version doesn't meet requirements",
+                    f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
+                    f"Required: {requirement.specifier}. We suggest running 'pip install .' to install all"
+                    " dependencies at required minimum levels.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
+                )
+                raise RuntimeError(
+                    f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
+                    f" {requirement.specifier}"
+                )
 
     def check_python_version(self) -> None:
         """
@@ -405,11 +461,20 @@ class TaskManager:
         return single_run_args
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
+        self,
+        single_run_args: list[dict[str, Any]],
+        produce_graphics: bool,
+        metadata_depth_limit: int,
+        workers: int,
+        metadata_path: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
+            self.task,
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=workers,
+            metadata_path=metadata_path,
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -437,7 +502,11 @@ class TaskManager:
 
     @staticmethod
     def task(
-        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+        args: dict[str, Any],
+        produce_graphics: bool,
+        workers: int,
+        metadata_depth_limit: int | None,
+        metadata_path: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -508,6 +577,9 @@ class TaskManager:
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
                 return None
 
+            filters_path = Path(args["filters_directory"])
+            output_manager.validate_filter_constant_content(filters_path)
+
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
             handler = simulation_and_analysis_handlers.get(task_type)
@@ -561,15 +633,8 @@ class TaskManager:
         }
         TaskManager.handle_herd_initializaition(args, output_manager)
 
-        # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
-        # completed - #1878.
-        if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
-            is_end_to_end_test_run = True
-        else:
-            is_end_to_end_test_run = False
-
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
+        simulator = SimulationEngine()
 
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
@@ -606,7 +671,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
         E2ETestResultsHandler.compare_actual_and_expected_test_results(
-            args["json_output_directory"], args["convert_variable_table_path"]
+            args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         )
 
         TaskManager.handle_post_processing(
@@ -647,7 +712,7 @@ class TaskManager:
             should_flush_im_pool=should_flush_im_pool,
         )
 
-        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"], args["output_prefix"])
 
         output_manager.add_log(
             "End-to-end testing", "Completed generation of new set of end-to-end expected test results", info_map
@@ -754,6 +819,7 @@ class TaskManager:
 
         if not args["suppress_log_files"]:
             input_manager.dump_get_data_logs(args["logs_directory"])
+            input_manager.dump_delete_data_logs(args["logs_directory"])
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )

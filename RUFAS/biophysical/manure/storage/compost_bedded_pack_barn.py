@@ -1,4 +1,5 @@
 from copy import copy
+from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
@@ -15,12 +16,12 @@ class CompostBeddedPackBarn(Storage):
         self,
         name: str,
         storage_time_period: int | None,
-        surface_area: float,
+        surface_area: float = inf,
         cover: StorageCover = StorageCover.NO_COVER,
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=False,
+            is_housing_emissions_calculator=True,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
@@ -49,6 +50,7 @@ class CompostBeddedPackBarn(Storage):
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids,
             self._determine_barn_temperature(current_day_conditions.mean_air_temperature),
+            self._manure_to_process.methane_production_potential,
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             ManureConstants.DEFAULT_LAYER_TEMPERATURE,
@@ -105,7 +107,9 @@ class CompostBeddedPackBarn(Storage):
             MeasurementUnits.KILOGRAMS,
             simulation_day,
         )
-        self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
+
+        accumulated_manure = manure_to_return["manure"] if "manure" in manure_to_return else self.stored_manure
+        self._report_manure_stream(accumulated_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", simulation_day)
 
         return manure_to_return

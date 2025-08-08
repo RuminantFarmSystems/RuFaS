@@ -1134,7 +1134,25 @@ class Reproduction:
         )
 
     def _calculate_calf_birth_weight(self, breed: Breed) -> float:
-        """Calculate the birth weight of the calf based on the breed."""
+        """
+         Calculates the birth weight of the calf based on the breed.
+
+        Notes
+        ------
+        [AN.BWT.6]
+
+
+         Parameters
+         ----------
+         breed: Breed
+             The breed of the animal.
+
+         Returns
+         -------
+         float
+             The birth weight for the calf (kg).
+        """
+
         average_birth_weight_by_breed = {
             Breed.HO: AnimalConfig.birth_weight_avg_ho,
             Breed.JE: AnimalConfig.birth_weight_avg_je,
@@ -2014,8 +2032,17 @@ class Reproduction:
         """Handle an open cow's status, determining next steps based on reproduction protocol and resynch program."""
 
         self.num_conception_rate_decreases += 1
+        if (
+            AnimalConfig.dry_off_day_of_pregnancy <= AnimalConfig.third_pregnancy_check_day
+            and not reproduction_data_stream.is_milking
+        ):
+            self.do_not_breed = True
+            return reproduction_data_stream
 
-        if self.cow_reproduction_program == CowReproductionProtocol.ED:
+        if (
+            self.cow_reproduction_program == CowReproductionProtocol.ED
+            or AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.NONE
+        ):
             if reproduction_data_stream.days_born > self.estrus_day:  # No estrus day scheduled yet
                 self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 reproduction_data_stream.events.add_event(

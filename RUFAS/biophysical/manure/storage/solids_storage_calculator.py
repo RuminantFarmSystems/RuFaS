@@ -2,6 +2,7 @@ import math
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 class SolidsStorageCalculator:
@@ -189,7 +190,9 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def calculate_ifsm_methane_emission(manure_volatile_solids: float, manure_temperature: float) -> float:
+    def calculate_ifsm_methane_emission(
+        manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float
+    ) -> float:
         """Calculates emission of methane on the current day using an adaptation of the tier 2 approach
         of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent
         methane conversion factor.
@@ -198,9 +201,10 @@ class SolidsStorageCalculator:
         ----------
         manure_volatile_solids : float
             The volatile solids (kg).
-
         manure_temperature : float
             The manure temperature (Celsius).
+        methane_production_potential : float
+            Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
 
         Returns
         -------
@@ -210,10 +214,10 @@ class SolidsStorageCalculator:
         """
         if manure_volatile_solids < 0:
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
-        Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
+        Bo = methane_production_potential
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
         methane_emissions_in_kg = (
-            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+            manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor
         ) / 100
         return methane_emissions_in_kg
 
@@ -236,7 +240,9 @@ class SolidsStorageCalculator:
         return max(0.0, ManureConstants.MCF_CONSTANT_A * manure_temperature - ManureConstants.MCF_CONSTANT_B)
 
     @staticmethod
-    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
+    def calculate_degradable_volatile_solids_fraction(
+        degradable_volatile_solids: float, total_volatile_solids: float
+    ) -> float:
         """
         Calculates the fraction of degradable volatile solids.
 
@@ -244,8 +250,8 @@ class SolidsStorageCalculator:
         ----------
         degradable_volatile_solids : float
             Mass of degradable volatile solids in the manure stream (kg).
-        total_solids : float
-            Mass of total solids in the manure stream (kg).
+        total_volatile_solids : float
+            Mass of total volatile solids in the manure stream (kg).
 
         Returns
         -------
@@ -253,4 +259,7 @@ class SolidsStorageCalculator:
             The fraction of degradable volatile solids (unitless).
 
         """
-        return degradable_volatile_solids / total_solids
+        if total_volatile_solids == 0:
+            return 0
+        else:
+            return degradable_volatile_solids / total_volatile_solids

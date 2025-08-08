@@ -27,6 +27,7 @@ def stored_manure() -> ManureStream:
         degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -45,6 +46,7 @@ def received_manure() -> ManureStream:
         degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -91,13 +93,13 @@ def test_process_manure(
     received_manure: ManureStream,
 ) -> None:
     """Tests manure processing in the underfloor slurry storage."""
-    slurry_storage_underfloor._stored_manure = stored_manure
+    slurry_storage_underfloor.stored_manure = stored_manure
     slurry_storage_underfloor._received_manure = received_manure
     expected_total_manure = stored_manure + received_manure
 
     def process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         slurry_storage_underfloor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_underfloor._stored_manure = (
+        slurry_storage_underfloor.stored_manure = (
             ManureStream.make_empty_manure_stream() if is_emptying_day else expected_total_manure
         )
         return {"manure": copy(expected_total_manure)} if is_emptying_day else {}
@@ -126,6 +128,7 @@ def test_process_manure(
     expected_data_origin_name = slurry_storage_underfloor.process_manure.__name__
     expected_units = MeasurementUnits.KILOGRAMS
 
+    mock_report_manure_stream = mocker.patch.object(slurry_storage_underfloor, "_report_manure_stream")
     mock_report_processor_output = mocker.patch.object(slurry_storage_underfloor, "_report_processor_output")
 
     result = slurry_storage_underfloor.process_manure(
@@ -140,6 +143,7 @@ def test_process_manure(
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure.nitrogen)
+    assert mock_report_manure_stream.call_count == 2
     assert mock_report_processor_output.call_args_list == [
         call(
             "storage_methane",
@@ -165,10 +169,10 @@ def test_process_manure(
     ]
     assert slurry_storage_underfloor._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
-        assert slurry_storage_underfloor._stored_manure == ManureStream.make_empty_manure_stream()
+        assert slurry_storage_underfloor.stored_manure == ManureStream.make_empty_manure_stream()
         assert result == {"manure": expected_total_manure}
     else:
-        assert slurry_storage_underfloor._stored_manure == expected_total_manure
+        assert slurry_storage_underfloor.stored_manure == expected_total_manure
         assert result == {}
 
 
@@ -186,6 +190,7 @@ def test_process_manure(
             degradable_volatile_solids=59.32749999999999,
             total_solids=251.0675,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     ],
@@ -236,6 +241,7 @@ def test_apply_methane_emissions(
             degradable_volatile_solids=80.88,
             total_solids=290.01,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     ],
@@ -257,7 +263,7 @@ def test_apply_ammonia_emissions(
     assert slurry_storage_underfloor._manure_to_process == expected_stored_manure
     mock_calculate_ammonia_emissions.assert_called_once_with(
         total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-        volume=stored_manure.volume,
+        mass=stored_manure.volume * ManureConstants.SLURRY_MANURE_DENSITY,
         density=ManureConstants.SLURRY_MANURE_DENSITY,
         temperature=dummy_manure_temperature,
         ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
@@ -282,6 +288,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -298,6 +305,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -314,6 +322,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -330,6 +339,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),

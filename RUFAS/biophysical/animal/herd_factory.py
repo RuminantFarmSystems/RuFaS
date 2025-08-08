@@ -536,16 +536,16 @@ class HerdFactory:
             "heiferII": self.pre_animal_population.heiferIIs,
             "heiferIII": self.pre_animal_population.heiferIIIs,
             "cow": self.pre_animal_population.cows,
-            "cows_parity_1_milking": self.pre_animal_population.cows_parity_1_milking,
-            "cows_parity_2_milking": self.pre_animal_population.cows_parity_2_milking,
-            "cows_parity_3_milking": self.pre_animal_population.cows_parity_3_milking,
-            "cows_parity_4_milking": self.pre_animal_population.cows_parity_4_milking,
-            "cows_parity_5_milking": self.pre_animal_population.cows_parity_5_milking,
-            "cows_parity_1_not_milking": self.pre_animal_population.cows_parity_1_not_milking,
-            "cows_parity_2_not_milking": self.pre_animal_population.cows_parity_2_not_milking,
-            "cows_parity_3_not_milking": self.pre_animal_population.cows_parity_3_not_milking,
-            "cows_parity_4_not_milking": self.pre_animal_population.cows_parity_4_not_milking,
-            "cows_parity_5_not_milking": self.pre_animal_population.cows_parity_5_not_milking,
+            "cows_parity_1_milking": self.pre_animal_population.filter_cow_status(1, True),
+            "cows_parity_2_milking": self.pre_animal_population.filter_cow_status(2, True),
+            "cows_parity_3_milking": self.pre_animal_population.filter_cow_status(3, True),
+            "cows_parity_4_milking": self.pre_animal_population.filter_cow_status(4, True),
+            "cows_parity_5_milking": self.pre_animal_population.filter_cow_status(5, True),
+            "cows_parity_1_not_milking": self.pre_animal_population.filter_cow_status(1, False),
+            "cows_parity_2_not_milking": self.pre_animal_population.filter_cow_status(2, False),
+            "cows_parity_3_not_milking": self.pre_animal_population.filter_cow_status(3, False),
+            "cows_parity_4_not_milking": self.pre_animal_population.filter_cow_status(4, False),
+            "cows_parity_5_not_milking": self.pre_animal_population.filter_cow_status(5, False),
             "replacement": self.pre_animal_population.replacement,
         }
         pre_animals = PRE_ANIMAL_DATA[animal_type]
@@ -576,14 +576,14 @@ class HerdFactory:
             }
 
             parity_input_name = "animal.herd_information.parity_fractions." + str(PARITY_KEY[animal_type][0])
-            parity_fraction_to_use = self.im.get_data("animal.herd_information.lactating_fraction")
+            milking_cow_fraction = self.im.get_data("lactation.milking_cow_fraction")
             if not PARITY_KEY[animal_type][1]:
-                parity_fraction_to_use = 1 - parity_fraction_to_use
+                milking_cow_fraction = 1 - milking_cow_fraction
 
             animal_num = int(
                 round(
                     (self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
-                    * parity_fraction_to_use
+                    * milking_cow_fraction
                 )
             )
         else:

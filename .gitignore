@@ -20,7 +20,6 @@
 *.pyc
 
 # folders
-build
 others
 
 input/data/tasks/default_task.json
@@ -47,6 +46,11 @@ output/output_filters/*
 env/
 venv/
 
+# ignore build files
+dist/
+*.egg-info/
+build/
+
 # ignore .DS_store
 .DS_store
 
@@ -58,3 +62,5 @@ tests/__pycache__/test_user_prompt.cpython-311-pytest-7.2.2.pyc.27508
 # Ignore Data Collection App schemas
 DataCollectionApp/schema/*
 !DataCollectionApp/schema/.keep
+
+docs/_build/

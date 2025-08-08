@@ -156,7 +156,6 @@ class ReportGenerator:
         """
         Initializes the ReportGenerator.
         """
-
         self.reports: dict[str, dict[str, list[Any]]] = {}
         self.time = time
 

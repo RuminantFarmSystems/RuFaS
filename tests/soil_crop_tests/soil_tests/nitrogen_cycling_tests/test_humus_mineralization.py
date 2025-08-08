@@ -2,10 +2,10 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.user_constants import UserConstants
 
 
 # --- Static method tests ---
@@ -14,7 +14,7 @@ def test_determine_intra_organic_mineralization(active: float, stable: float) ->
     """Tests that the amount of nitrogen determined to be transferred from the active organic to stable organic pool are
     calculated correctly."""
     observed = HumusMineralization._determine_intra_organic_mineralization(active, stable)
-    expect = (10 ** (-5)) * (active * ((1 / GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable)
+    expect = (10 ** (-5)) * (active * ((1 / UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable)
     if expect > 0:
         expect = min(active, expect)
     elif expect < 0:

@@ -4,8 +4,9 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.user_constants import UserConstants
 
 
 def test_calculate_calf_manure(mocker: MockerFixture) -> None:
@@ -74,7 +75,7 @@ def test_calculate_heifer_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
 
     phosphorus_excreted, manure_excretion = ManureExcretionCalculator.calculate_heifer_manure(
         body_weight=body_weight,
@@ -186,7 +187,7 @@ def test_calculate_lactating_cow_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT", 5.0)
 
     phosphorus_excreted, manure_excretion = ManureExcretionCalculator._calculate_lactating_cow_manure(
@@ -244,7 +245,7 @@ def test_calculate_dry_cow_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
     mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY", 5.0)
 

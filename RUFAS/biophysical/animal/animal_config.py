@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferSynchEDSubProtocol,
 )
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 
 
 class AnimalConfig:
@@ -504,3 +505,16 @@ class AnimalConfig:
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
         cls.milk_reduction_maximum = im.get_data("feed.user_defined_ration_percentages.milk_reduction_maximum")
+
+        if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
+            om = OutputManager()
+            om.add_warning(
+                "3rd pregnancy check day >= Dry-off day",
+                "Typically, the 3rd pregnancy check day should happen before the dry-off day."
+                "The configured animal input has the 3rd pregnancy check day set to on or after the dry-off day."
+                "This may cause the animal to be stuck in an unexpected state.",
+                {
+                    "class": AnimalConfig.__class__.__name__,
+                    "function": "initialize_animal_config",
+                },
+            )

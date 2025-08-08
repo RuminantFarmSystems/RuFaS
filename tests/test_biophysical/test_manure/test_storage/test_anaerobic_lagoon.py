@@ -12,6 +12,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -28,6 +29,7 @@ def stored_manure() -> ManureStream:
         degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -46,6 +48,7 @@ def received_manure() -> ManureStream:
         degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -55,7 +58,7 @@ def anaerobic_lagoon() -> AnaerobicLagoon:
     """Returns a fixture AnaerobicLagoon."""
     return AnaerobicLagoon(
         name="dummy_name",
-        cover=StorageCover.NO_COVER,
+        cover="no_crust_or_cover",
         storage_time_period=18,
         surface_area=6.6,
         capacity=123456.789,
@@ -103,11 +106,11 @@ def test_process_manure_cover_behaviors(
 ) -> None:
     """Tests anaerobic lagoon behavior under various cover types."""
     anaerobic_lagoon._cover = cover
-    anaerobic_lagoon._stored_manure = stored_manure
+    anaerobic_lagoon.stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
-        anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
+        anaerobic_lagoon.stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
 
@@ -138,7 +141,7 @@ def test_process_manure_cover_behaviors(
             dummy_conditions.precipitation * GeneralConstants.MM_TO_M * anaerobic_lagoon._surface_area
         )
         received_manure.volume += expected_precip_volume
-        received_manure.water += expected_precip_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        received_manure.water += expected_precip_volume * UserConstants.WATER_DENSITY_KG_PER_M3
 
     result = anaerobic_lagoon.process_manure(dummy_conditions, dummy_time)
 
@@ -151,7 +154,7 @@ def test_process_manure_cover_behaviors(
 
     mock_report_manure_stream.assert_has_calls(
         [
-            call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time.simulation_day),
+            call(anaerobic_lagoon.stored_manure, "accumulated", dummy_time.simulation_day),
             call(expected_received_manure, "received", dummy_time.simulation_day),
         ]
     )
@@ -175,14 +178,14 @@ def test_process_manure_cover_behaviors(
 
     if expect_precip_added:
         assert anaerobic_lagoon._received_manure.volume == 0.0
-        assert anaerobic_lagoon._stored_manure.volume == pytest.approx(
+        assert anaerobic_lagoon.stored_manure.volume == pytest.approx(
             stored_manure.volume + received_manure.volume,
             rel=1e-6,
         )
-        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+        assert anaerobic_lagoon.stored_manure.water >= stored_manure.water + received_manure.water
     else:
-        assert anaerobic_lagoon._stored_manure.volume >= stored_manure.volume + received_manure.volume
-        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+        assert anaerobic_lagoon.stored_manure.volume >= stored_manure.volume + received_manure.volume
+        assert anaerobic_lagoon.stored_manure.water >= stored_manure.water + received_manure.water
 
     assert result == {}
     assert anaerobic_lagoon._received_manure == ManureStream.make_empty_manure_stream()
@@ -216,6 +219,7 @@ def test_apply_methane_emissions_no_flare(
         degradable_volatile_solids=20.0,
         total_solids=35.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
@@ -256,15 +260,25 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=5.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
-
-    expected_emissions = 3.0
-    mocker.patch.object(anaerobic_lagoon, "_calculate_ammonia_emissions", return_value=expected_emissions)
+    mock_calculate_ammonia_emissions = mocker.patch.object(
+        anaerobic_lagoon, "_calculate_ammonia_emissions", return_value=1.23
+    )
 
     result = anaerobic_lagoon._apply_ammonia_emissions(manure_temp)
 
-    assert result == expected_emissions
-    assert stored_manure.ammoniacal_nitrogen == pytest.approx(7.0, rel=1e-6)
-    assert stored_manure.nitrogen == pytest.approx(9.0, rel=1e-6)
+    assert result == 1.23
+    assert stored_manure.ammoniacal_nitrogen == pytest.approx(8.77)
+    assert stored_manure.nitrogen == pytest.approx(10.77)
+    mock_calculate_ammonia_emissions.assert_called_once_with(
+        total_ammoniacal_nitrogen=10.0,
+        mass=stored_manure.volume * ManureConstants.SLURRY_MANURE_DENSITY,
+        density=ManureConstants.SLURRY_MANURE_DENSITY,
+        temperature=manure_temp,
+        ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
+        surface_area=anaerobic_lagoon._surface_area,
+        pH=ManureConstants.DEFAULT_STORED_MANURE_PH,
+    )

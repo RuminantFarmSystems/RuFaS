@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -31,7 +31,7 @@ def digester() -> ContinuousMix:
     """Anaerobic Digester fixture for testing."""
     return ContinuousMix(
         name="test",
-        temperature_set_point=20.0,
+        anaerobic_digestion_temperature_set_point=20.0,
         hydraulic_retention_time=25,
         biogas_leakage_fraction=0.02,
     )
@@ -51,6 +51,7 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=12.0,
         total_solids=50.0,
         volume=500.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -65,7 +66,7 @@ def test_anaerobic_digester_init() -> None:
     """Test that an Anaerobic Digester is initialized correctly."""
     actual = ContinuousMix(
         name="actual",
-        temperature_set_point=10.0,
+        anaerobic_digestion_temperature_set_point=10.0,
         hydraulic_retention_time=25,
         biogas_leakage_fraction=0.01,
     )
@@ -228,10 +229,15 @@ def test_report_continuous_mix_outputs(digester: ContinuousMix, time: RufasTime,
     ]
 
 
-@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
-def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
+@pytest.mark.parametrize(
+    "total_vol_sols, methane_production_potential, expected",
+    [(100.0, 0.24, 24.0), (0.0, 0.24, 0.0), (100.0, 0.17, 17.0), (0.0, 0.17, 0.0)],
+)
+def test_calculate_CSTR_methane_volume(
+    total_vol_sols: float, methane_production_potential: float, expected: float
+) -> None:
     """Test that the generated methane volume is calculated correctly."""
-    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols)
+    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols, methane_production_potential)
 
     assert actual == expected
 

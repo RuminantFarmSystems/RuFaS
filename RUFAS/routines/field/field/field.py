@@ -781,7 +781,7 @@ class Field:
             self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
             return
 
-        if method == ManureSupplementMethod.NONE:
+        if method in [ManureSupplementMethod.NONE, ManureSupplementMethod.MANURE]:
             warning_msg = f"Manure nitrogen deficient by {unmet_n} kg, phosphorus deficient by {unmet_p} kg."
             self.om.add_warning("Nutrient deficient manure application", warning_msg, info_map)
             return
@@ -1436,7 +1436,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
+            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data, time)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
@@ -1653,13 +1653,11 @@ class Field:
         canopy of another.
         """
         precipitation_reaching_soil = precipitation_total
-        excess_canopy_water = 0.0
 
         for crop in self.crops:
-            precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
-            excess_canopy_water += excess_water
+            precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
-        return precipitation_reaching_soil + excess_canopy_water
+        return precipitation_reaching_soil
 
     def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
         """

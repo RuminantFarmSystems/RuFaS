@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
@@ -23,7 +24,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     NutrientRequestResults,
     ManureEventNutrientRequest,
 )
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
     HarvestedCropStorageType,
@@ -35,7 +35,7 @@ from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
@@ -46,7 +46,7 @@ def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     mocker.patch("RUFAS.simulation_engine.RufasTime")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
 
-    simulation_engine = SimulationEngine(is_end_to_end_test_run=False)
+    simulation_engine = SimulationEngine()
 
     simulation_engine.herd_manager = MagicMock(auto_spec=HerdManager)
     simulation_engine.manure_manager = MagicMock(auto_spec=ManureManager)
@@ -56,8 +56,7 @@ def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     return simulation_engine
 
 
-@pytest.mark.parametrize("is_end_to_end_test_run", [True, False])
-def test_simulation_engine_init(is_end_to_end_test_run: bool, mocker: MockerFixture) -> None:
+def test_simulation_engine_init(mocker: MockerFixture) -> None:
     """
     Unit test for the __init__ method in the SimulationEngine class.
     """
@@ -68,12 +67,11 @@ def test_simulation_engine_init(is_end_to_end_test_run: bool, mocker: MockerFixt
     mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=mock_time)
 
     # Act
-    simulation_engine = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
+    simulation_engine = SimulationEngine()
 
     # Assert
     mock_initialize_simulation.assert_called_once()
     assert simulation_engine.time == mock_time
-    assert simulation_engine.is_end_to_end_test_run is is_end_to_end_test_run
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
@@ -157,6 +155,11 @@ def test_daily_simulation(
     # Arrange
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
+    mock_weather_get_current_day_conditions = mocker.patch.object(
+        mock_weather,
+        "get_current_day_conditions",
+        return_value=(mock_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
+    )
 
     simulation_engine.time.current_date = datetime.today()
     simulation_engine.time.simulation_day = 15
@@ -222,7 +225,6 @@ def test_daily_simulation(
     mock_feed_manage_daily_feed_request = mocker.patch.object(
         simulation_engine.feed_manager, "manage_daily_feed_request", return_value=is_ok_to_feed_animals
     )
-    mock_feed_execute_daily_routine = mocker.patch.object(simulation_engine.feed_manager, "execute_daily_routine")
 
     mock_herd_update_all_max_daily_feeds = mocker.patch.object(
         simulation_engine.herd_manager,
@@ -234,14 +236,18 @@ def test_daily_simulation(
         "collect_daily_feed_request",
         return_value=(mock_requested_feed := MagicMock(auto_spec=RequestedFeed)),
     )
-    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
     mock_herd_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
         "daily_routines",
-        return_value=[{"pen_manure_data": mock_pen_manure_data}],
+        return_value=(
+            mock_manure_streams := {
+                "stream_1": MagicMock(auto_spec=ManureStream),
+                "stream_2": MagicMock(auto_spec=ManureStream),
+            }
+        ),
     )
 
-    mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "daily_update")
+    mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "run_daily_update")
 
     mock_om_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     mock_record_time = mocker.patch.object(mock_time, "record_time")
@@ -252,9 +258,11 @@ def test_daily_simulation(
 
     # Assert
     mock_generate_daily_manure_applications.assert_called_once_with()
+    mock_weather_get_current_day_conditions.assert_called_once_with(mock_time)
     mock_field_daily_update_routine.assert_called_once_with(mock_weather, mock_time, mock_manure_applications)
     assert mock_field_receive_crop.call_args_list == [
-        call(harvested_crop.harvested_crop, harvested_crop.storage_type) for harvested_crop in mock_harvested_crops
+        call(harvested_crop.harvested_crop, harvested_crop.storage_type, simulation_engine.time.simulation_day)
+        for harvested_crop in mock_harvested_crops
     ]
 
     not_harvested_feeds_config_names = [
@@ -295,8 +303,7 @@ def test_daily_simulation(
     mock_herd_daily_routines.assert_called_once_with(
         simulation_engine.feed_manager.available_feeds, mock_time, mock_weather, mock_total_inventory
     )
-    mock_manure_daily_update.assert_called_once_with([mock_pen_manure_data], mock_time.simulation_day)
-    mock_feed_execute_daily_routine.assert_called_once_with(mock_time)
+    mock_manure_daily_update.assert_called_once_with(mock_manure_streams, mock_time, mock_current_day_conditions)
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
     mock_advance_time.assert_called_once_with()
@@ -413,18 +420,16 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
     ]
     mock_check_manure_schedules.assert_any_call(field_1, mock_time)
     mock_check_manure_schedules.assert_any_call(field_2, mock_time)
-    mock_request_nutrients.assert_called_once_with(mock_nutrient_request_result)
+    mock_request_nutrients.assert_called_once()
 
 
-@pytest.mark.parametrize("is_end_to_end_test_run", [True, False])
-def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixture) -> None:
+def test_initialize_simulation(mocker: MockerFixture) -> None:
     """
     Unit test for function _initialize_simulation in file RUFAS/simulation_engine.py
     """
     # Arrange
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
-    simulation_engine = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
-    simulation_engine.is_end_to_end_test_run = is_end_to_end_test_run
+    simulation_engine = SimulationEngine()
 
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.current_date = datetime.today()
@@ -438,11 +443,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
             (mock_weather_data := {"dummy": "weather data"}),
             (mock_config_nutrient_standard := "NASEM"),
             (mock_feed_config := {"dummy": "feed config"}),
-            (mock_manure_class_config := {"manure_management_scenarios": {"dummy": "manure"}}),
             (mock_ration_interval_length := 30),
             (mock_is_ration_defined_by_user := True),
-            (mock_simulate_animals := True),
-            (mock_end_to_end_testing_inputs := {"dummy": {"end_to_end": "testing inputs"}}),
         ],
     )
 
@@ -464,16 +466,9 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
 
     mock_feed_manager = MagicMock(auto_spec=FeedManager)
     mock_feed_manager_init = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
-    mock_feed_manager_setup_stored_feeds = mocker.patch.object(mock_feed_manager, "setup_stored_feeds")
 
     mock_herd_manager = MagicMock(auto_spec=HerdManager)
     mock_herd_manager_init = mocker.patch("RUFAS.simulation_engine.HerdManager", return_value=mock_herd_manager)
-    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
-    mock_herd_manager_collect_pen_manure_data = mocker.patch.object(
-        mock_herd_manager,
-        "collect_pen_manure_data",
-        return_value=[{"pen_manure_data": mock_pen_manure_data}],
-    )
 
     mock_manure_manager = MagicMock(auto_spec=ManureManager)
     mock_manure_manager_init = mocker.patch("RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager)
@@ -486,13 +481,9 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         call("weather"),
         call("config.nutrient_standard"),
         call("feed"),
-        call("manure_management"),
         call("animal.ration.formulation_interval"),
         call("animal.ration.user_input"),
-        call("config.simulate_animals"),
     ]
-    if is_end_to_end_test_run:
-        expected_get_data_call_args_list.append(call("end_to_end_testing_inputs"))
     assert mock_im_get_data.call_args_list == expected_get_data_call_args_list
     assert simulation_engine.om.time == mock_time
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
@@ -516,16 +507,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds
     )
     assert simulation_engine.herd_manager == mock_herd_manager
-    mock_herd_manager_collect_pen_manure_data.assert_called_once()
-    mock_manure_manager_init.assert_called_once_with(
-        [mock_pen_manure_data], mock_weather, mock_time, mock_manure_class_config, mock_simulate_animals
-    )
+    mock_manure_manager_init.assert_called_once_with()
     assert simulation_engine.manure_manager == mock_manure_manager
-
-    if is_end_to_end_test_run:
-        mock_feed_manager_setup_stored_feeds.assert_called_once_with(mock_end_to_end_testing_inputs, mock_time)
-    else:
-        mock_feed_manager_setup_stored_feeds.assert_not_called()
 
 
 @pytest.mark.parametrize(

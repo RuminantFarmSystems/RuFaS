@@ -25,8 +25,8 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
     IdealFeeds,
@@ -36,7 +36,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
     AdvancePurchaseAllowance,
 )
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -100,9 +100,6 @@ class HerdManager:
         self.om = OutputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
         animal_config_data: dict[str, Any] = self.im.get_data("animal")
-        manure_management_config_data: list[dict[str, Any]] = self.im.get_data("manure_management")[
-            "manure_management_scenarios"
-        ]
 
         AnimalConfig.initialize_animal_config()
 
@@ -149,7 +146,7 @@ class HerdManager:
         Animal.set_nutrient_standard(nutrient_standard)
         NutritionSupplyCalculator.nutrient_standard = nutrient_standard
 
-        self.initialize_pens(animal_config_data["pen_information"], manure_management_config_data)
+        self.initialize_pens(animal_config_data["pen_information"])
 
         if self.simulate_animals:
             herd_population = HerdFactory.post_animal_population
@@ -282,18 +279,6 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
-        """
-        Returns the manure information from all pens in PenManureData.
-
-        Returns
-        -------
-        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
-            A list of dictionaries containing the PenManureData and the ManureStreams.
-
-        """
-        return [pen.get_manure_data() for pen in self.all_pens]
-
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
         Collects total amount of feeds needed for all animals on the current day.
@@ -403,6 +388,8 @@ class HerdManager:
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
+            if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
+                self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
@@ -426,18 +413,25 @@ class HerdManager:
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
         total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> None:
         """Call the corresponding functions to update the herd structure and reassign animals to new pens."""
-        self._handle_graduated_animals(graduated_animals, available_feeds, current_day_conditions, total_inventory)
-        self._handle_newly_added_animals(newborn_calves, available_feeds, current_day_conditions, total_inventory)
-        self._handle_newly_added_animals(newly_added_animals, available_feeds, current_day_conditions, total_inventory)
+        self._handle_graduated_animals(
+            graduated_animals, available_feeds, current_day_conditions, total_inventory, simulation_day
+        )
+        self._handle_newly_added_animals(
+            newborn_calves, available_feeds, current_day_conditions, total_inventory, simulation_day
+        )
+        self._handle_newly_added_animals(
+            newly_added_animals, available_feeds, current_day_conditions, total_inventory, simulation_day
+        )
 
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
     def daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
-    ) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
+    ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -458,7 +452,7 @@ class HerdManager:
 
         Returns
         -------
-        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+        dict[str, ManureStream]
             A list of dictionaries containing manure data for each pen in the herd.
 
         """
@@ -483,6 +477,7 @@ class HerdManager:
         graduated_animals += graduated_heiferIIs
         removed_animals += sold_heiferIIs
 
+        # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
         (graduated_heiferIIIs, sold_heiferIIIs, sold_newborn_calves_from_heiferIIIs, newborn_calves_from_heiferIIIs) = (
             self._perform_daily_routines_for_animals(time, self.heiferIIIs)
         )
@@ -516,21 +511,23 @@ class HerdManager:
             available_feeds=available_feeds,
             current_day_conditions=weather.get_current_day_conditions(time),
             total_inventory=total_inventory,
+            simulation_day=time.simulation_day,
         )
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]] = [
-            pen.get_manure_data() for pen in self.all_pens
-        ]
-
-        enteric_methane_emission_by_pen: dict[str, float] = {
-            f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
-        }
+        animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
+        herd_manager_output: dict[str, ManureStream] = {}
+        enteric_methane_emission_by_pen: dict[str, float] = {}
+        for pen in self.all_pens:
+            animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
+            herd_manager_output.update(pen.get_manure_streams())
+            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
 
-        AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
+        AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
+        AnimalModuleReporter.report_manure_streams(herd_manager_output, time.simulation_day)
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
 
@@ -704,6 +701,7 @@ class HerdManager:
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
         total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> None:
         """
         Reassigns animals that have graduated to a new pen, and updates the pen id map.
@@ -718,12 +716,16 @@ class HerdManager:
             Object representing the current conditions of the day.
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
+        simulation_day : int
+            Day of simulation.
 
         """
         for animal in graduated_animals:
             self._remove_animal_from_pen_and_id_map(animal)
             self._update_animal_array(animal)
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
+            self._add_animal_to_pen_and_id_map(
+                animal, available_feeds, current_day_conditions, total_inventory, simulation_day
+            )
 
     def _handle_newly_added_animals(
         self,
@@ -731,6 +733,7 @@ class HerdManager:
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
         total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> None:
         """
         Adds newly added animals to their appropriate pen and updates the pen id map.
@@ -745,10 +748,14 @@ class HerdManager:
             Object representing the current conditions of the day.
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
+        simulation_day: int
+            Day of simulation.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
+            self._add_animal_to_pen_and_id_map(
+                animal, available_feeds, current_day_conditions, total_inventory, simulation_day
+            )
             self._add_animal_to_new_array(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -772,6 +779,7 @@ class HerdManager:
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
         total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> None:
         """
         Adds animal to pen with the lowest stocking density, and updates the pen id map accordingly.
@@ -786,6 +794,8 @@ class HerdManager:
             Object representing the current conditions of the day.
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
+        simulation_day : int
+            Day of simulation.
 
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
@@ -809,13 +819,12 @@ class HerdManager:
                 pen_available_feeds=pen_available_feeds,
                 current_temperature=current_day_conditions.mean_air_temperature,
                 total_inventory=total_inventory,
+                simulation_day=simulation_day,
             )
 
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def initialize_pens(
-        self, all_pen_data: list[dict[str, Any]], manure_management_scenarios: list[dict[str, Any]]
-    ) -> None:
+    def initialize_pens(self, all_pen_data: list[dict[str, Any]]) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -823,8 +832,6 @@ class HerdManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        manure_management_scenarios : dict[str, Any]
-            Dictionary containing information about the manure management scenarios.
 
         """
         for pen_data in all_pen_data:
@@ -839,34 +846,10 @@ class HerdManager:
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
             minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120)
-            first_parlor_stream = pen_data.get("first_parlor_stream", None)
+            first_parlor_processor = pen_data.get("first_parlor_processor", None)
             parlor_stream_name = pen_data.get("parlor_stream_name", None)
-            manure_streams = pen_data.get(
-                "manure_streams",
-                # TODO remove this default value when metadata properties are updated in issue #2272
-                [
-                    {
-                        "stream_name": "general_pen",
-                        "bedding_name": "sand",
-                        "stream_proportion": 1.0,
-                        "first_processor": "general_handler",
-                    }
-                ],
-            )
-            # TODO Remove the old way of extracting manure management configs when manure manager refresh is done #2290
-            manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
-            manure_management_scenario = [
-                scenario
-                for scenario in manure_management_scenarios
-                if scenario["scenario_id"] == manure_management_scenario_id
-            ][0]
-            bedding_type = manure_management_scenario["bedding_type"]
-            manure_handling = manure_management_scenario["manure_handler"]
-            manure_separator = manure_management_scenario["manure_separator"]
-            manure_separator_after_digestion = manure_management_scenario["manure_separator_after_digestion"]
-            manure_storage = manure_management_scenario["manure_treatment"]
+            manure_streams = pen_data.get("manure_streams")
 
-            # TODO Remove the old manure info from Pen when manure manager refresh is done #2290
             pen = Pen(
                 pen_id=pen_id,
                 pen_name=pen_name,
@@ -877,13 +860,8 @@ class HerdManager:
                 pen_type=pen_type,
                 max_stocking_density=max_stocking_density,
                 animal_combination=animal_combination,
-                bedding_type=bedding_type,
-                manure_handling=manure_handling,
-                manure_separator=manure_separator,
-                manure_separator_after_digestion=manure_separator_after_digestion,
-                manure_storage=manure_storage,
                 minutes_away_for_milking=minutes_away_for_milking,
-                first_parlor_stream=first_parlor_stream,
+                first_parlor_processor=first_parlor_processor,
                 parlor_stream_name=parlor_stream_name,
                 manure_streams=manure_streams,
             )
@@ -1262,7 +1240,7 @@ class HerdManager:
         for rufas_id in next_harvest_dates.keys():
             self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
-        # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs"
+        # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs". Issue #2483.
         return IdealFeeds({})
 
     def _update_single_max_daily_feed(
@@ -1317,6 +1295,8 @@ class HerdManager:
             Length of the ration interval (days).
         total_inventory : TotalInventory
             The total inventory of all available feeds.
+        simulation_day : int
+            Day of simulation.
 
         Returns
         -------
@@ -1338,12 +1318,19 @@ class HerdManager:
                 pen.animal_combination
             )
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
-            self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, total_inventory)
+            self._reformulate_ration_single_pen(
+                pen, pen_available_feeds, current_temperature, total_inventory, simulation_day
+            )
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
 
     def _reformulate_ration_single_pen(
-        self, pen: Pen, pen_available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
+        self,
+        pen: Pen,
+        pen_available_feeds: list[Feed],
+        current_temperature: float,
+        total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> None:
         """
         Reformulates ration for a single pen.
@@ -1358,6 +1345,8 @@ class HerdManager:
             Current temperature (C).
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
+        simulation_day : int
+            Day of simulation.
 
         """
         if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
@@ -1372,6 +1361,7 @@ class HerdManager:
                 self._max_daily_feeds,
                 self.advance_purchase_allowance,
                 total_inventory,
+                simulation_day,
             )
 
     def update_herd_statistics(self) -> None:

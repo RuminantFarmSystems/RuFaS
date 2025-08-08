@@ -1298,8 +1298,10 @@ class Animal:
             nutrients=self.nutrition_supply,
             days_in_milk=self.days_in_milk,
             metabolizable_energy_intake=self.nutrition_supply.metabolizable_energy,
-            fecal_phosphorus=self.nutrients.fecal_phosphorus,
-            urine_phosphorus_required=self.nutrients.urine_phosphorus_required,
+            phosphorus_intake=self.nutrients.phosphorus_intake,
+            phosphorus_requirement=self.nutrients.phosphorus_requirement,
+            phosphorus_reserves=self.nutrients.phosphorus_reserves,
+            phosphorus_endogenous_loss=self.nutrients.phosphorus_endogenous_loss,
             daily_milk_produced=self.milk_production.daily_milk_produced,
             fat_content=MilkProduction.fat_percent,
             protein_content=self.milk_production.true_protein_content,
@@ -2058,6 +2060,10 @@ class Animal:
         int
             Calculated future death date in simulation days.
 
+        Notes
+        -------
+        [AN.ANM.1]
+
         """
         if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
@@ -2094,6 +2100,10 @@ class Animal:
         -------
         tuple[int, str]
             Future cull date in simulation days and reason for culling.
+
+        Notes
+        -------
+        [AN.ANM.2]
 
         """
         cull_reason = ""
@@ -2238,7 +2248,7 @@ class Animal:
             calf_requirements = CalfRationManager.calc_requirements(
                 self.days_born, self.body_weight, previous_temperature, calf_intake
             )
-            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue pending.
+            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
             return NutritionRequirements(
                 maintenance_energy=calf_requirements["ne_maint"],
                 growth_energy=calf_requirements["ne_gain"],

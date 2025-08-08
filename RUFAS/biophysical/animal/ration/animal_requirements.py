@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.user_constants import UserConstants
 
 om = OutputManager()
 
@@ -1436,8 +1437,6 @@ class AnimalRequirements:
         NPMilk: Net protein in milk, or milk true protein yield, g
         TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
 
-        # TODO Include equations for estimating requirement for Non-Essential Aminoacids (NEAA) GitHub Issue #1210
-
         References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
@@ -1445,7 +1444,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        NPEndUrin: float = 53 * UserConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP: float = CPMFP * 0.73
         NPGrowth: float = frame_weight_gain * 0.11 * 0.86
