@@ -159,7 +159,7 @@ In the ``input/data/end_to_end_testing`` directory:
    python main.py -p input/metadata/end_to_end_testing_tm_metadata.json
 
 5. Confirm your domain E2E test passes. If the test doesn't pass, review
-   steps 1–4 or contact a member of the dev team for help.
+   steps 1–4 or contact a member of the RuFaS maintainer team for help.
 
 --------------
 
