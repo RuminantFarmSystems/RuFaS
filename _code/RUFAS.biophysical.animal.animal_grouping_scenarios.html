@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -159,7 +157,7 @@ Each scenario is a dictionary of the form: { AnimalCombination: [List of animal 
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.enums.html#RUFAS.enums.AnimalCombination" title="RUFAS.enums.AnimalCombination"><span class="pre">AnimalCombination</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalCombination</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__'"><span>#</span></a></dt>
 <dd><p>Initialize the AnimalGroupingScenario.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
@@ -285,7 +283,7 @@ Each scenario is a dictionary of the form: { AnimalCombination: [List of animal 
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination">
-<span class="sig-name descname"><span class="pre">find_animal_combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.enums.html#RUFAS.enums.AnimalCombination" title="RUFAS.enums.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">find_animal_combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">AnimalCombination</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination'"><span>#</span></a></dt>
 <dd><p>Find the animal combination that the given animal belongs to.</p>
 <section id="id12">
 <h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>

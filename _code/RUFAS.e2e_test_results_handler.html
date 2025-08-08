@@ -15,7 +15,7 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.enums.html" rel="next" title="RUFAS.enums module"/>
+<link href="RUFAS.general_constants.html" rel="next" title="RUFAS.general_constants module"/>
 <link href="RUFAS.data_validator.html" rel="prev" title="RUFAS.data_validator module"/>
 <script>
     <!-- Prevent Flash of wrong theme -->
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -197,7 +195,7 @@
 RuFaS modules.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_actual_and_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_actual_and_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results'"><span>#</span></a></dt>
 <dd><p>Orchestrates the comparison between the expected and actual end-to-end testing results.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
@@ -206,6 +204,8 @@ RuFaS modules.</p>
 </dd>
 <dt>convert_variable_table_path<span class="classifier">str | None</span></dt><dd><p>String path to the csv look up table to convert the variable names in the expected results to match the
 variable names in the actual results.</p>
+</dd>
+<dt>output_prefix<span class="classifier">str</span></dt><dd><p>The output prefix for the current e2e run.</p>
 </dd>
 </dl>
 </section>
@@ -311,7 +311,7 @@ variable names, and no new variable name is mapped from multiple original variab
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_test_result_paths</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_test_result_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths'"><span>#</span></a></dt>
 <dd><p>Retrieves the paths to test results and associated information from the InputManager.</p>
 </dd></dl>
 <dl class="py method">
@@ -383,13 +383,15 @@ to ensure the tolerance comparison remains meaningful.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results'"><span>#</span></a></dt>
 <dd><p>Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
 results in the appropriate domain filter file if differences are found.</p>
 <section id="id14">
 <h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>output_dir<span class="classifier">str</span></dt><dd><p>The directory to which the actual results are written to.</p>
+</dd>
+<dt>output_prefix<span class="classifier">str</span></dt><dd><p>The prefix to give the output file names.</p>
 </dd>
 </dl>
 </section>

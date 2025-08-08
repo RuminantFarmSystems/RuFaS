@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,145 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.animal.life_cycle.heiferI module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.animal.life_cycle.heiferI">
-<span id="rufas-routines-animal-life-cycle-heiferi-module"></span><h1>RUFAS.routines.animal.life_cycle.heiferI module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.heiferI" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.heiferI.</span></span><span class="sig-name descname"><span class="pre">HeiferI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><code class="xref py py-class docutils literal notranslate"><span class="pre">Calf</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__'"><span>#</span></a></dt>
-<dd><p>initialize the 1st heifer group from calf information</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<p>args.id: id of the animal
-args.breed: breed of the animal
-args.birth_date: the date of the simulation when the calf was born
-args.daysBorn: age of the animal
-(optional: include the following to assign animal information)
-args.birth_weight: the birth weight of the animal
-args.body_weight: current body weight of the animal
-args.wean_weight: the wean weight of the animal
-args.mature_body_weight: the mature body weight of the animal
-args.events: events of the animal</p>
+<section id="rufas-routines-animal-life-cycle-heiferi-module">
+<h1>RUFAS.routines.animal.life_cycle.heiferI module<a class="headerlink" href="#rufas-routines-animal-life-cycle-heiferi-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_heiferI_values">
-<span class="sig-name descname"><span class="pre">get_heiferI_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_heiferI_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_heiferI_values'"><span>#</span></a></dt>
-<dd><p>Get current information from the heiferI</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.set_nutrient_rqmts">
-<span class="sig-name descname"><span class="pre">set_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_grouping_scenario</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15.625</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_DMI</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.set_nutrient_rqmts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.set_nutrient_rqmts'"><span>#</span></a></dt>
-<dd><p>Calculates this heiferI’s nutrient requirements.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.calc_manure_excretion">
-<span class="sig-name descname"><span class="pre">calc_manure_excretion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.calc_manure_excretion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.calc_manure_excretion'"><span>#</span></a></dt>
-<dd><p>Calculates and sets the manure excretion components.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including Boadi, IPCC.</p>
-</dd>
-<dt>nutrient_amount<span class="classifier">Dict[str, float]</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
-</dd>
-<dt>nutrient_conc<span class="classifier">Dict[str, float]</span></dt><dd><p>Concentrations of nutrients in pen ration, calculated per animal, percentages.</p>
-</dd>
-</dl>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>nutrient_amount_units = {</dt><dd><p>“dm”: “kg/animal”,
-“CP”: “percent of DM”,
-“ADF”: “percent of DM”,
-“NDF”: “percent of DM”,
-“lignin”: “percent of DM”,
-“ash”: “percent of DM”,
-“phosphorus”: “percent of DM”,
-“potassium”: “percent of DM”,
-“N”: “percent of DM”,
-}</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.phosphorus_rqmts">
-<span class="sig-name descname"><span class="pre">phosphorus_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DMI</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.phosphorus_rqmts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.phosphorus_rqmts'"><span>#</span></a></dt>
-<dd><p>Calculates and sets the animal’s phosphorus requirement.</p>
-<section id="id2">
-<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>DMI<span class="classifier">float</span></dt><dd><p>Dry Matter Intake (kg).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_non_preg_bw_change">
-<span class="sig-name descname"><span class="pre">get_non_preg_bw_change</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_non_preg_bw_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_non_preg_bw_change'"><span>#</span></a></dt>
-<dd><p>Calculates the body weight change for a heifer that is not pregnant.
-If the days_born of the animal is equal to 400,
-the difference is set to 1 (otherwise results in a division by 0 error).</p>
-<section id="id3">
-<h2>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
-<p>Calculation is [A.1A.C.6] in pseudocode, itself from  Fox et al. 1999 and NRC 2001.
-However, for animals over 55% of their mature body weight, the equation results in a negative return.
-Therefore when the result is negative, the minimum BW change constant is returned instead.</p>
-</section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>The daily body weight change for a heifer that is not pregnant.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferI.HeiferI.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.update'"><span>#</span></a></dt>
-<dd><p>Controls heifer’s grow with average daily gain based on non-preg ADG based on NRC.
-Here is the place to change growth rate with heifer feeding methods later
-when we have heifer nutrition from the ration formulation module.
-Once reach the breeding start day,
-this heifer would be move to next stage, the heiferII stage.</p>
-<section id="id4">
-<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>sim_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
-</dd>
-</dl>
-</section>
-<section id="id5">
-<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>bool</dt><dd><p>True if should be moved to second stage of heifer – breeding stage starts.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><code class="docutils literal notranslate"><span class="pre">HeiferI</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__"><code class="docutils literal notranslate"><span class="pre">HeiferI.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_heiferI_values'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_heiferI_values"><code class="docutils literal notranslate"><span class="pre">HeiferI.get_heiferI_values()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.set_nutrient_rqmts'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.set_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">HeiferI.set_nutrient_rqmts()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.calc_manure_excretion'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.calc_manure_excretion"><code class="docutils literal notranslate"><span class="pre">HeiferI.calc_manure_excretion()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.phosphorus_rqmts'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.phosphorus_rqmts"><code class="docutils literal notranslate"><span class="pre">HeiferI.phosphorus_rqmts()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_non_preg_bw_change'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.get_non_preg_bw_change"><code class="docutils literal notranslate"><span class="pre">HeiferI.get_non_preg_bw_change()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI.update"><code class="docutils literal notranslate"><span class="pre">HeiferI.update()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

@@ -7,16 +7,14 @@
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>RUFAS.enums module | Ruminant Farm Simulation (RuFaS)  documentation</title>
-<meta content="RUFAS.enums module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
-<meta content="RUFAS.enums module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<title>RUFAS.user_constants module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.user_constants module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.user_constants module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.errors.html" rel="next" title="RUFAS.errors module"/>
-<link href="RUFAS.e2e_test_results_handler.html" rel="prev" title="RUFAS.e2e_test_results_handler module"/>
 <script>
     <!-- Prevent Flash of wrong theme -->
       const userPreference = localStorage.getItem('darkMode');
@@ -72,8 +70,8 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
@@ -93,6 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -113,9 +112,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
-</ul>
 </nav>
 </div>
 </div>
@@ -134,51 +130,80 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.enums module</span>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.user_constants module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.enums">
-<span id="rufas-enums-module"></span><h1>RUFAS.enums module<a class="headerlink" href="#module-RUFAS.enums" title="Link to this heading"><span>#</span></a></h1>
+<section id="module-RUFAS.user_constants">
+<span id="rufas-user-constants-module"></span><h1>RUFAS.user_constants module<a class="headerlink" href="#module-RUFAS.user_constants" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.enums.</span></span><span class="sig-name descname"><span class="pre">AnimalCombination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.enums.AnimalCombination" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>Enumeration that represents the valid combinations of animals in a pen.</p>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.user_constants.</span></span><span class="sig-name descname"><span class="pre">UserConstants</span></span><a class="headerlink" href="#RUFAS.user_constants.UserConstants" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains user-overridable constants for RUFAS.</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>CALF<span class="classifier">str</span></dt><dd><p>Represents a calf-only pen.</p>
+<dt>WATER_DENSITY_KG_PER_LITER<span class="classifier">float</span></dt><dd><p>Density of water (kg/L).</p>
 </dd>
-<dt>GROWING<span class="classifier">str</span></dt><dd><p>Represents a pen with growing heiferI and heiferII only.</p>
+<dt>WATER_DENSITY_KG_PER_M3<span class="classifier">float</span></dt><dd><p>Density of water (kg/m^3).</p>
 </dd>
-<dt>CLOSE_UP<span class="classifier">str</span></dt><dd><p>Represents a pen with heiferIII and dry cows only.</p>
+<dt>PROTEIN_TO_NITROGEN<span class="classifier">float</span></dt><dd><p>Conversion factor from protein to nitrogen (unitless).</p>
 </dd>
-<dt>LAC_COW<span class="classifier">str</span></dt><dd><p>Represents a pen with lactating cows only.</p>
+<dt>NITROGEN_TO_PROTEIN<span class="classifier">float</span></dt><dd><p>Conversion factor from nitrogen to protein (unitless).</p>
 </dd>
-<dt>GROWING_AND_CLOSE_UP<span class="classifier">str</span></dt><dd><p>Represents a pen with heifer Is, IIs, IIIs and dry cows.</p>
+<dt>MILK_FAT_WEIGHT<span class="classifier">float</span></dt><dd><p>Average weight of milk fat (unitless).</p>
+</dd>
+<dt>FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL<span class="classifier">float</span></dt><dd><p>Fraction of humic nitrogen in an active pool (unitless).
+Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4.</p>
+</dd>
+<dt>METHANE_FACTOR<span class="classifier">float</span></dt><dd><p>Conversion factor for methane from <span class="math notranslate nohighlight">\(m^3\)</span> to kg at 20 °C (kg/m³).</p>
+</dd>
+<dt>GENERAL_LOWER_BOUND_TEMPERATURE<span class="classifier">float</span></dt><dd><p>General temperature lower bound (°C).</p>
+</dd>
+<dt>GENERAL_UPPER_BOUND_TEMPERATURE<span class="classifier">float</span></dt><dd><p>General temperature upper bound (°C).</p>
+</dd>
+<dt>CONSTANTS_TO_UNITS<span class="classifier">dict[str, MeasurementUnits]</span></dt><dd><p>A dictionary mapping constant names to their respective measurement units.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination.CALF">
-<span class="sig-name descname"><span class="pre">CALF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'calf'</span></em><a class="headerlink" href="#RUFAS.enums.AnimalCombination.CALF" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination.CALF'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_LITER">
+<span class="sig-name descname"><span class="pre">WATER_DENSITY_KG_PER_LITER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.997</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_LITER" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_LITER'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination.GROWING">
-<span class="sig-name descname"><span class="pre">GROWING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'growing'</span></em><a class="headerlink" href="#RUFAS.enums.AnimalCombination.GROWING" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination.GROWING'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_M3">
+<span class="sig-name descname"><span class="pre">WATER_DENSITY_KG_PER_M3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.000997</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_M3" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_M3'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination.CLOSE_UP">
-<span class="sig-name descname"><span class="pre">CLOSE_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'close_up'</span></em><a class="headerlink" href="#RUFAS.enums.AnimalCombination.CLOSE_UP" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination.CLOSE_UP'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.PROTEIN_TO_NITROGEN">
+<span class="sig-name descname"><span class="pre">PROTEIN_TO_NITROGEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.16</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.PROTEIN_TO_NITROGEN" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.PROTEIN_TO_NITROGEN'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination.LAC_COW">
-<span class="sig-name descname"><span class="pre">LAC_COW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lac_cow'</span></em><a class="headerlink" href="#RUFAS.enums.AnimalCombination.LAC_COW" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination.LAC_COW'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN">
+<span class="sig-name descname"><span class="pre">NITROGEN_TO_PROTEIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.25</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.enums.AnimalCombination.GROWING_AND_CLOSE_UP">
-<span class="sig-name descname"><span class="pre">GROWING_AND_CLOSE_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'growing</span> <span class="pre">and</span> <span class="pre">close_up'</span></em><a class="headerlink" href="#RUFAS.enums.AnimalCombination.GROWING_AND_CLOSE_UP" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.enums.AnimalCombination.GROWING_AND_CLOSE_UP'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.MILK_FAT_WEIGHT">
+<span class="sig-name descname"><span class="pre">MILK_FAT_WEIGHT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12.2</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.MILK_FAT_WEIGHT" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.MILK_FAT_WEIGHT'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL">
+<span class="sig-name descname"><span class="pre">FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.METHANE_FACTOR">
+<span class="sig-name descname"><span class="pre">METHANE_FACTOR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.67</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.METHANE_FACTOR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.METHANE_FACTOR'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">GENERAL_LOWER_BOUND_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-40.0</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">GENERAL_UPPER_BOUND_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60.0</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS">
+<span class="sig-name descname"><span class="pre">CONSTANTS_TO_UNITS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'GENERAL_LOWER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'GENERAL_UPPER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'METHANE_FACTOR':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,</span> <span class="pre">'MILK_FAT_WEIGHT':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'NITROGEN_TO_PROTEIN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'PROTEIN_TO_NITROGEN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'WATER_DENSITY_KG_PER_LITER':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_LITER,</span> <span class="pre">'WATER_DENSITY_KG_PER_M3':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER}</span></em><a class="headerlink" href="#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS'"><span>#</span></a></dt>
 <dd></dd></dl>
 </section>
 </dd></dl>
@@ -186,12 +211,17 @@
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination'" class="reference internal" href="#RUFAS.enums.AnimalCombination"><code class="docutils literal notranslate"><span class="pre">AnimalCombination</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination.CALF'" class="reference internal" href="#RUFAS.enums.AnimalCombination.CALF"><code class="docutils literal notranslate"><span class="pre">AnimalCombination.CALF</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination.GROWING'" class="reference internal" href="#RUFAS.enums.AnimalCombination.GROWING"><code class="docutils literal notranslate"><span class="pre">AnimalCombination.GROWING</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination.CLOSE_UP'" class="reference internal" href="#RUFAS.enums.AnimalCombination.CLOSE_UP"><code class="docutils literal notranslate"><span class="pre">AnimalCombination.CLOSE_UP</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination.LAC_COW'" class="reference internal" href="#RUFAS.enums.AnimalCombination.LAC_COW"><code class="docutils literal notranslate"><span class="pre">AnimalCombination.LAC_COW</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.enums.AnimalCombination.GROWING_AND_CLOSE_UP'" class="reference internal" href="#RUFAS.enums.AnimalCombination.GROWING_AND_CLOSE_UP"><code class="docutils literal notranslate"><span class="pre">AnimalCombination.GROWING_AND_CLOSE_UP</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants'" class="reference internal" href="#RUFAS.user_constants.UserConstants"><code class="docutils literal notranslate"><span class="pre">UserConstants</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_LITER'" class="reference internal" href="#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_LITER"><code class="docutils literal notranslate"><span class="pre">UserConstants.WATER_DENSITY_KG_PER_LITER</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_M3'" class="reference internal" href="#RUFAS.user_constants.UserConstants.WATER_DENSITY_KG_PER_M3"><code class="docutils literal notranslate"><span class="pre">UserConstants.WATER_DENSITY_KG_PER_M3</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.PROTEIN_TO_NITROGEN'" class="reference internal" href="#RUFAS.user_constants.UserConstants.PROTEIN_TO_NITROGEN"><code class="docutils literal notranslate"><span class="pre">UserConstants.PROTEIN_TO_NITROGEN</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN'" class="reference internal" href="#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN"><code class="docutils literal notranslate"><span class="pre">UserConstants.NITROGEN_TO_PROTEIN</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.MILK_FAT_WEIGHT'" class="reference internal" href="#RUFAS.user_constants.UserConstants.MILK_FAT_WEIGHT"><code class="docutils literal notranslate"><span class="pre">UserConstants.MILK_FAT_WEIGHT</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL'" class="reference internal" href="#RUFAS.user_constants.UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL"><code class="docutils literal notranslate"><span class="pre">UserConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.METHANE_FACTOR'" class="reference internal" href="#RUFAS.user_constants.UserConstants.METHANE_FACTOR"><code class="docutils literal notranslate"><span class="pre">UserConstants.METHANE_FACTOR</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE'" class="reference internal" href="#RUFAS.user_constants.UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">UserConstants.GENERAL_LOWER_BOUND_TEMPERATURE</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE'" class="reference internal" href="#RUFAS.user_constants.UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS'" class="reference internal" href="#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS"><code class="docutils literal notranslate"><span class="pre">UserConstants.CONSTANTS_TO_UNITS</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -211,5 +241,6 @@
 <script src="../_static/doctools.js?v=9bcbadda"></script>
 <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
+<script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>

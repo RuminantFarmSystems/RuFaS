@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,107 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.manure.manure_treatments.open_lots module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.manure.manure_treatments.open_lots">
-<span id="rufas-routines-manure-manure-treatments-open-lots-module"></span><h1>RUFAS.routines.manure.manure_treatments.open_lots module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.open_lots" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.open_lots.OpenLots">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.open_lots.</span></span><span class="sig-name descname"><span class="pre">OpenLots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
-<p>Class for the open lots manure treatment system.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<p>All attributes inherited from BaseManureTreatment.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.open_lots.OpenLots.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots.__init__'"><span>#</span></a></dt>
-<dd><p>Initialize the open lots manure treatment system.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>The weather object used for getting the current day’s average temperature.</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object used for checking the last simulation day.</p>
-</dd>
-<dt>manure_treatment_config<span class="classifier">ManureTreatmentConfig</span></dt><dd><p>The configuration data object for the compost bedded pack barn.</p>
-</dd>
-</dl>
+<section id="rufas-routines-manure-manure-treatments-open-lots-module">
+<h1>RUFAS.routines.manure.manure_treatments.open_lots module<a class="headerlink" href="#rufas-routines-manure-manure-treatments-open-lots-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._calc_dry_matter_changes">
-<span class="sig-name descname"><span class="pre">_calc_dry_matter_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_last_tillage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_fraction_available_in_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_fraction_available_in_bedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._calc_dry_matter_changes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._calc_dry_matter_changes'"><span>#</span></a></dt>
-<dd><p>Calculate the changes in dry-matter for the manure-bedding mixture.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>manure_total_solids<span class="classifier">float</span></dt><dd><p>The total mass of the manure (kg).</p>
-</dd>
-<dt>bedding_total_solids<span class="classifier">float</span></dt><dd><p>The mass of the bedding material (kg).</p>
-</dd>
-<dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>The mass of manure volatile solids (kg).</p>
-</dd>
-<dt>days_since_last_tillage<span class="classifier">float</span></dt><dd><p>The number of days since the manure-bedding mixture was last tilled.
-The default value can be found in ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE.</p>
-</dd>
-<dt>lag<span class="classifier">int</span></dt><dd><p>The lag time used in the calculation of the carbon decomposition rate (days).
-The default value can be found in ManureConstants.DEFAULT_LAG_TIME.</p>
-</dd>
-<dt>moisture_effect<span class="classifier">float</span></dt><dd><p>The effect of moisture on microbial decomposition (unitless).
-The default value can be found in ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP.</p>
-</dd>
-<dt>carbon_fraction_available_in_manure<span class="classifier">float</span></dt><dd><p>The proportion of carbon available in manure (unitless).
-The default value can be found in ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE.</p>
-</dd>
-<dt>carbon_fraction_available_in_bedding<span class="classifier">float</span></dt><dd><p>The proportion of carbon available in the bedding material (unitless).
-The default value can be found in GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The total volatile solids in the manure-bedding mixture after emissions (kg).</p>
-</dd>
-<dt>float</dt><dd><p>The total solids in the manure-bedding mixture after emissions (kg).</p>
-</dd>
-<dt>float</dt><dd><p>The dry matter lost from carbon and methane emissions (kg).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._daily_update_helper">
-<span class="sig-name descname"><span class="pre">_daily_update_helper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._daily_update_helper" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._daily_update_helper'"><span>#</span></a></dt>
-<dd><p>Calculate the daily output of the open lots manure treatment system.</p>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>ManureTreatmentDailyOutput</dt><dd><p>A ManureTreatmentDailyOutput object containing the daily output of the
-open lots manure treatment system.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._abc_impl">
-<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._abc_impl'"><span>#</span></a></dt>
-<dd></dd></dl>
-</section>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots"><code class="docutils literal notranslate"><span class="pre">OpenLots</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots.__init__'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots.__init__"><code class="docutils literal notranslate"><span class="pre">OpenLots.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._calc_dry_matter_changes'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._calc_dry_matter_changes"><code class="docutils literal notranslate"><span class="pre">OpenLots._calc_dry_matter_changes()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._daily_update_helper'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._daily_update_helper"><code class="docutils literal notranslate"><span class="pre">OpenLots._daily_update_helper()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._abc_impl'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.open_lots.OpenLots._abc_impl"><code class="docutils literal notranslate"><span class="pre">OpenLots._abc_impl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

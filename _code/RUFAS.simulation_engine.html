@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -143,19 +141,11 @@
 <span id="rufas-simulation-engine-module"></span><h1>RUFAS.simulation_engine module<a class="headerlink" href="#module-RUFAS.simulation_engine" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.simulation_engine.</span></span><span class="sig-name descname"><span class="pre">SimulationEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_end_to_end_test_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.simulation_engine.</span></span><span class="sig-name descname"><span class="pre">SimulationEngine</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The SimulationEngine class is responsible for orchestrating the entire simulation
 process for RuFaS. It manages the simulation’s lifecycle, advancing time, executing daily
 and annual routines, and logging simulation progress.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>is_end_to_end_test_run<span class="classifier">bool</span></dt><dd><p>TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-Indicates if a simulation is being run for end-to-end testing.</p>
-</dd>
-</dl>
-</section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
@@ -172,10 +162,6 @@ handlers, reception pits, manure separators, and manure storage treatments.</p>
 </dd>
 <dt>field_manager: FieldManager</dt><dd><p>The FieldManager object that manages all fields in the simulation.</p>
 </dd>
-<dt>is_end_to_end_test_run<span class="classifier">bool</span></dt><dd><p>TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
-found in the Input Manager.</p>
-</dd>
 </dl>
 </section>
 <section id="methods">
@@ -186,7 +172,7 @@ found in the Input Manager.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_end_to_end_test_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.__init__'"><span>#</span></a></dt>
 <dd><p>Initializes the simulation engine.</p>
 </dd></dl>
 <dl class="py method">

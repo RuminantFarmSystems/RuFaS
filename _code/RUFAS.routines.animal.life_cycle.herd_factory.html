@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,136 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.animal.life_cycle.herd_factory module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.animal.life_cycle.herd_factory">
-<span id="rufas-routines-animal-life-cycle-herd-factory-module"></span><h1>RUFAS.routines.animal.life_cycle.herd_factory module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.herd_factory" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.herd_factory.</span></span><span class="sig-name descname"><span class="pre">HerdFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_animals_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('output')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to initialize herd for simulation.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>breed<span class="classifier">str</span></dt><dd><p>The breed of the animals in the simulation, retrieved from input data.</p>
-</dd>
-<dt>CI<span class="classifier">int</span></dt><dd><p>Calving interval from the animal configuration, retrieved from input data.</p>
-</dd>
-<dt>initial_animal_num<span class="classifier">int</span></dt><dd><p>The initial number of animals in the simulation, retrieved from input data.</p>
-</dd>
-<dt>simulation_days<span class="classifier">int</span></dt><dd><p>The number of days the simulation will run to generate herd, retrieved from input data.</p>
-</dd>
-<dt>pre_animal_population<span class="classifier">AnimalPopulation</span></dt><dd><p>An instance of AnimalPopulation representing the animal population
-before random sampling with replacement.</p>
-</dd>
-<dt>post_animal_population<span class="classifier">AnimalPopulation</span></dt><dd><p>An instance of AnimalPopulation representing the animal population
-after random sampling with replacement.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_animals_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('output')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__'"><span>#</span></a></dt>
-<dd><p>Initializes HerdFactory.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>init_herd<span class="classifier">bool, default=False</span></dt><dd><p>A flag to indicate whether to initialize through simulation or from input data.</p>
-</dd>
-<dt>save_animals<span class="classifier">bool, default=False</span></dt><dd><p>Indicates whether to save the generated animals to JSON files.</p>
-</dd>
-<dt>save_animals_path<span class="classifier">Path, default=Path(“output/”)</span></dt><dd><p>The directory path where the animal data JSON files will be saved if
-save_animals is True.</p>
-</dd>
-</dl>
+<section id="rufas-routines-animal-life-cycle-herd-factory-module">
+<h1>RUFAS.routines.animal.life_cycle.herd_factory module<a class="headerlink" href="#rufas-routines-animal-life-cycle-herd-factory-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._calves_update">
-<span class="sig-name descname"><span class="pre">_calves_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._calves_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._calves_update'"><span>#</span></a></dt>
-<dd><p>Calves update for generating herd simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIs_update">
-<span class="sig-name descname"><span class="pre">_heiferIs_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIs_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIs_update'"><span>#</span></a></dt>
-<dd><p>heiferIs update for generating herd simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIs_update">
-<span class="sig-name descname"><span class="pre">_heiferIIs_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIs_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIs_update'"><span>#</span></a></dt>
-<dd><p>HeiferIIs update for generating herd simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIIs_update">
-<span class="sig-name descname"><span class="pre">_heiferIIIs_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIIs_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIIs_update'"><span>#</span></a></dt>
-<dd><p>HeiferIIIs update for generating herd simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._cows_update">
-<span class="sig-name descname"><span class="pre">_cows_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._cows_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._cows_update'"><span>#</span></a></dt>
-<dd><p>Cows update for generating herd simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._generate_animals">
-<span class="sig-name descname"><span class="pre">_generate_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.animal_population.html#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation" title="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation"><span class="pre">AnimalPopulation</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._generate_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._generate_animals'"><span>#</span></a></dt>
-<dd><p>Function to generate an AnimalPopulation object through simulation</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._backtrack_animal_birth_date">
-<span class="sig-name descname"><span class="pre">_backtrack_animal_birth_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._backtrack_animal_birth_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._backtrack_animal_birth_date'"><span>#</span></a></dt>
-<dd><p>Function to backtrack the birth date of an animal loaded from data by subtracting the age of the animal
-from the simulation start date.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._init_animal_from_data">
-<span class="sig-name descname"><span class="pre">_init_animal_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._init_animal_from_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._init_animal_from_data'"><span>#</span></a></dt>
-<dd><p>Function to initialize an animal object from input data</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._initialize_herd_from_data">
-<span class="sig-name descname"><span class="pre">_initialize_herd_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.animal_population.html#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation" title="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation"><span class="pre">AnimalPopulation</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._initialize_herd_from_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._initialize_herd_from_data'"><span>#</span></a></dt>
-<dd><p>Function to initialize an AnimalPopulation object from input data</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement">
-<span class="sig-name descname"><span class="pre">_random_sample_with_replacement</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.animal_population.html#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation" title="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation"><span class="pre">AnimalPopulation</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement'"><span>#</span></a></dt>
-<dd><p>Function to randomly sample the herd with replacement</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement_by_type">
-<span class="sig-name descname"><span class="pre">_random_sample_with_replacement_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement_by_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement_by_type'"><span>#</span></a></dt>
-<dd><p>Function to randomly sample a specific animal type with replacement</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.initialize_herd">
-<span class="sig-name descname"><span class="pre">initialize_herd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.initialize_herd" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.initialize_herd'"><span>#</span></a></dt>
-<dd><p>Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
-function also optionally saves the generated herd data into a JSON file.
-The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.</p>
-</dd></dl>
-</section>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory"><code class="docutils literal notranslate"><span class="pre">HerdFactory</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__"><code class="docutils literal notranslate"><span class="pre">HerdFactory.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._calves_update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._calves_update"><code class="docutils literal notranslate"><span class="pre">HerdFactory._calves_update()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIs_update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIs_update"><code class="docutils literal notranslate"><span class="pre">HerdFactory._heiferIs_update()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIs_update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIs_update"><code class="docutils literal notranslate"><span class="pre">HerdFactory._heiferIIs_update()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIIs_update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._heiferIIIs_update"><code class="docutils literal notranslate"><span class="pre">HerdFactory._heiferIIIs_update()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._cows_update'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._cows_update"><code class="docutils literal notranslate"><span class="pre">HerdFactory._cows_update()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._generate_animals'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._generate_animals"><code class="docutils literal notranslate"><span class="pre">HerdFactory._generate_animals()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._backtrack_animal_birth_date'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._backtrack_animal_birth_date"><code class="docutils literal notranslate"><span class="pre">HerdFactory._backtrack_animal_birth_date()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._init_animal_from_data'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._init_animal_from_data"><code class="docutils literal notranslate"><span class="pre">HerdFactory._init_animal_from_data()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._initialize_herd_from_data'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._initialize_herd_from_data"><code class="docutils literal notranslate"><span class="pre">HerdFactory._initialize_herd_from_data()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement"><code class="docutils literal notranslate"><span class="pre">HerdFactory._random_sample_with_replacement()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement_by_type'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory._random_sample_with_replacement_by_type"><code class="docutils literal notranslate"><span class="pre">HerdFactory._random_sample_with_replacement_by_type()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.initialize_herd'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.initialize_herd"><code class="docutils literal notranslate"><span class="pre">HerdFactory.initialize_herd()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

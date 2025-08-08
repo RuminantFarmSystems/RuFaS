@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -141,73 +139,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.feed_storage.baleage module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.feed_storage.baleage">
-<span id="rufas-routines-feed-storage-baleage-module"></span><h1>RUFAS.routines.feed_storage.baleage module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.baleage" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.baleage.</span></span><span class="sig-name descname"><span class="pre">Baleage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.baleage.Baleage'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.feed_storage.storage.html#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
-<p>Class representing Baleage storage, a subclass of Storage.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>bale_density<span class="classifier">float</span></dt><dd><p>Density of the bale, calculated based on the dry matter.</p>
-</dd>
-<dt>post_wilting_moisture_percentage<span class="classifier">float</span></dt><dd><p>The post-wilting moisture level that baleage will dry down to (unitless).</p>
-</dd>
-<dt>acceptable_crops<span class="classifier">list[CropCategory]</span></dt><dd><p>The list of acceptable crops for this storage type.</p>
-</dd>
-</dl>
+<section id="rufas-routines-feed-storage-baleage-module">
+<h1>RUFAS.routines.feed_storage.baleage module<a class="headerlink" href="#rufas-routines-feed-storage-baleage-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>calculate_protein_loss():</dt><dd><p>Calculates the protein loss specific to Baleage storage.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.baleage.Baleage.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage.process_degradations">
-<span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage.process_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.baleage.Baleage.process_degradations'"><span>#</span></a></dt>
-<dd><p>Processes the loss of moisture in baled crops, and calls the base class’s implementation of
-<cite>process_degradations</cite> to process the loss of dry matter.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather information for the simulation.</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance tracking the current time of the simulation.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss">
-<span class="sig-name descname"><span class="pre">calculate_protein_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss'"><span>#</span></a></dt>
-<dd><p>Calculate the protein loss specific to Baleage storage.</p>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<p>None</p>
-</section>
-</dd></dl>
-</section>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.baleage.Baleage'" class="reference internal" href="#RUFAS.routines.feed_storage.baleage.Baleage"><code class="docutils literal notranslate"><span class="pre">Baleage</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.baleage.Baleage.__init__'" class="reference internal" href="#RUFAS.routines.feed_storage.baleage.Baleage.__init__"><code class="docutils literal notranslate"><span class="pre">Baleage.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.baleage.Baleage.process_degradations'" class="reference internal" href="#RUFAS.routines.feed_storage.baleage.Baleage.process_degradations"><code class="docutils literal notranslate"><span class="pre">Baleage.process_degradations()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss'" class="reference internal" href="#RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss"><code class="docutils literal notranslate"><span class="pre">Baleage.calculate_protein_loss()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

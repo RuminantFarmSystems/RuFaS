@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -141,53 +139,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.feed_storage.grain module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.feed_storage.grain">
-<span id="rufas-routines-feed-storage-grain-module"></span><h1>RUFAS.routines.feed_storage.grain module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.grain" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.Grain">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">Grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.Grain" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.grain.Grain'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.feed_storage.storage.html#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
-<p>Represents grain storage and manages its specific attributes and behaviors.
-Inherits from Storage.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>acceptable_crops<span class="classifier">list[CropCategory]</span></dt><dd><p>The list of acceptable crops for this storage type.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.Grain.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.Grain.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.grain.Grain.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
+<section id="rufas-routines-feed-storage-grain-module">
+<h1>RUFAS.routines.feed_storage.grain module<a class="headerlink" href="#rufas-routines-feed-storage-grain-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.Dry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">Dry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.Dry" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.grain.Dry'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain" title="RUFAS.routines.feed_storage.grain.Grain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grain</span></code></a></p>
-<p>Represents dry grain storage and manages its specific attributes and behaviors.</p>
-<p>Inherits from Grain.</p>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.HighMoisture">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">HighMoisture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.HighMoisture" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.grain.HighMoisture'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain" title="RUFAS.routines.feed_storage.grain.Grain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grain</span></code></a></p>
-<p>Represents high-moisture grain storage and manages its specific attributes and behaviors.</p>
-<p>Inherits from Grain.</p>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.grain.Grain'" class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain"><code class="docutils literal notranslate"><span class="pre">Grain</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.grain.Grain.__init__'" class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain.__init__"><code class="docutils literal notranslate"><span class="pre">Grain.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.grain.Dry'" class="reference internal" href="#RUFAS.routines.feed_storage.grain.Dry"><code class="docutils literal notranslate"><span class="pre">Dry</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.grain.HighMoisture'" class="reference internal" href="#RUFAS.routines.feed_storage.grain.HighMoisture"><code class="docutils literal notranslate"><span class="pre">HighMoisture</span></code></a></li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

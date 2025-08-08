@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,50 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.manure.manure_treatments.manure_treatment_factory module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory">
-<span id="rufas-routines-manure-manure-treatments-manure-treatment-factory-module"></span><h1>RUFAS.routines.manure.manure_treatments.manure_treatment_factory module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_factory.</span></span><span class="sig-name descname"><span class="pre">ManureTreatmentFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for creating different types of manure treatment systems.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configuration_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><span class="pre">BaseManureTreatment</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance'"><span>#</span></a></dt>
-<dd><p>Returns a manure treatment system instance for the given manure treatment type name.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>configuration_name<span class="classifier">str</span></dt><dd><p>The name of the manure treatment configuration.</p>
-</dd>
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>The weather data.</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object.</p>
-</dd>
-<dt>manure_treatment_config<span class="classifier">Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]</span></dt><dd><p>The manure treatment configuration data.</p>
-</dd>
-</dl>
+<section id="rufas-routines-manure-manure-treatments-manure-treatment-factory-module">
+<h1>RUFAS.routines.manure.manure_treatments.manure_treatment_factory module<a class="headerlink" href="#rufas-routines-manure-manure-treatments-manure-treatment-factory-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>BaseManureTreatment</dt><dd><p>A manure treatment system instance for the given manure treatment type name.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentFactory</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentFactory.get_instance()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

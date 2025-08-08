@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,265 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor">
-<span id="rufas-routines-manure-manure-treatments-slurry-storage-outdoor-module"></span><h1>RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.</span></span><span class="sig-name descname"><span class="pre">SlurryStorageOutdoor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
-<p>Class for the outdoor slurry storage.</p>
-<dl>
-<dt>Attributes:</dt><dd><p>All attributes inherited from BaseManureTreatment.
-In addition, the following attributes are defined:
-storage_time_period: RufasTime in days that the manure is stored in the manure</p>
-<blockquote>
-<div><p>treatment system, days.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>freeboard_input: Empty storage space above the manure in the treatment system.</dt><dd><p>onto the treatment system.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.__init__'"><span>#</span></a></dt>
-<dd><p>Initializes the outdoor slurry storage manure treatment.</p>
-<dl>
-<dt>Args:</dt><dd><p>weather: A Weather object.
-time: A RufasTime object.
-manure_treatment_config: A ManureTreatmentConfig object containing</p>
-<blockquote>
-<div><p>the configuration data for the manure treatment system.</p>
-</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wastewater_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the volume of wastewater in the treatment system.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The volume of wastewater in the treatment system, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">treatment_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the minimum treatment volume.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The minimum treatment volume, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_pit_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the total pit volume.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The total lagoon pit, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth'"><span>#</span></a></dt>
-<dd><p>Returns the depth of the pit.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The depth of the pit, m.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_slope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope'"><span>#</span></a></dt>
-<dd><p>Returns the slope of the pit.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The slope of the pit, dimensionless.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._calc_abc">
-<span class="sig-name descname"><span class="pre">_calc_abc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._calc_abc" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._calc_abc'"><span>#</span></a></dt>
-<dd><p>Calculates the coefficients a, b, and c for volume calculations.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>A tuple containing the coefficients a, b, and c for volume calculations.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width'"><span>#</span></a></dt>
-<dd><p>Calculates the width of the pit.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The width of the pit, m.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length'"><span>#</span></a></dt>
-<dd><p>Calculate the length of the pit.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The length of the pit, m.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_surface_area</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area'"><span>#</span></a></dt>
-<dd><p>Calculate the surface area of the pit.</p>
-<p>The surface area is calculated as the product of the number of animals in the pen
-and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The surface area of the pit, m^2.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the volume of the pit.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The volume of the pit, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precipitation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the additional pit volume needed for precipitation.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The additional pit volume needed for precipitation, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">freeboard_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume'"><span>#</span></a></dt>
-<dd><p>Calculates the additional pit volume needed for freeboard.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>The additional pit volume needed for freeboard, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._adjust_final_manure_volume">
-<span class="sig-name descname"><span class="pre">_adjust_final_manure_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_day_final_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._adjust_final_manure_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._adjust_final_manure_volume'"><span>#</span></a></dt>
-<dd><p>Adjust the final manure volume to account for the precipitation and the storage time period.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>current_day_final_manure_volume<span class="classifier">float</span></dt><dd><p>The final manure volume for the current simulation day (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
-</dd>
-</dl>
+<section id="rufas-routines-manure-manure-treatments-slurry-storage-outdoor-module">
+<h1>RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor module<a class="headerlink" href="#rufas-routines-manure-manure-treatments-slurry-storage-outdoor-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>The adjusted final manure volume.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission">
-<span class="sig-name descname"><span class="pre">calc_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission'"><span>#</span></a></dt>
-<dd><p>Calculates the CH4 emission from the outdoor slurry storage treatment system.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>accumulated_liquid_manure_total_volatile_solids: float</dt><dd><p>The accumulated total VS in the treatment system, kg VS.</p>
-</dd>
-<dt>accumulated_liquid_manure_total_degradable_volatile_solids: float</dt><dd><p>The accumulated total degradable VS in the treatment system, kg VSd.</p>
-</dd>
-<dt>accumulated_liquid_manure_total_non_degradable_volatile_solids: float</dt><dd><p>The accumulated total non-degradable VS in the treatment system, kg VSnd.</p>
-</dd>
-</dl>
-</section>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>methane_loss: methane emission from the outdoor slurry storage treatment system, (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
-</dd>
-<dt>float</dt><dd><p>methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
-(kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission">
-<span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission'"><span>#</span></a></dt>
-<dd><p>Calculates the ammonia emission from the outdoor slurry storage treatment system.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the barn.</p>
-</dd>
-<dt>accumulated_manure_volume<span class="classifier">float</span></dt><dd><p>The accumulated manure volume in the treatment system, m^3.</p>
-</dd>
-<dt>accumulated_manure_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>The accumulated TAN in the treatment system, kg.</p>
-</dd>
-<dt>accumulated_manure_total_solids<span class="classifier">float</span></dt><dd><p>The accumulated total solids in the treatment system, kg.</p>
-</dd>
-</dl>
-</section>
-<section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>The ammonia emission from the outdoor slurry storage in kg.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._daily_update_helper">
-<span class="sig-name descname"><span class="pre">_daily_update_helper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._daily_update_helper" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._daily_update_helper'"><span>#</span></a></dt>
-<dd><p>Returns the daily output of the outdoor slurry storage treatment system.</p>
-<section id="id5">
-<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>ManureTreatmentDailyOutput</dt><dd><p>An object containing the daily output of the slurry storage outdoor treatment system.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl">
-<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl'"><span>#</span></a></dt>
-<dd></dd></dl>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.__init__'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.__init__"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.wastewater_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.treatment_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.total_pit_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_depth</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_slope</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._calc_abc'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._calc_abc"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor._calc_abc()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_width</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_length</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_surface_area</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.pit_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.precipitation_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.freeboard_volume</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._adjust_final_manure_volume'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._adjust_final_manure_volume"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor._adjust_final_manure_volume()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.calc_methane_emission()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor.calc_ammonia_emission()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._daily_update_helper'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._daily_update_helper"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor._daily_update_helper()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl"><code class="docutils literal notranslate"><span class="pre">SlurryStorageOutdoor._abc_impl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
@@ -415,6 +158,5 @@ and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.</p>
 <script src="../_static/doctools.js?v=9bcbadda"></script>
 <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script defer="defer" src="../_static/theme.js?v=073f68d9"></script>
-<script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>

@@ -1,7 +1,0 @@
-RUFAS.data\_structures.pen\_manure\_data module
-===============================================
-
-.. automodule:: RUFAS.data_structures.pen_manure_data
-   :members:
-   :show-inheritance:
-   :undoc-members:

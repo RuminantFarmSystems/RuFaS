@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -258,7 +256,7 @@ non-degradable volatile solids, degradable volatile solids, or total solids.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.composting.Composting._calculate_composting_methane_emissions">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_composting_methane_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">composting_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.composting_type.html#RUFAS.biophysical.manure.storage.composting_type.CompostingType" title="RUFAS.biophysical.manure.storage.composting_type.CompostingType"><span class="pre">CompostingType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.composting.Composting._calculate_composting_methane_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.composting.Composting._calculate_composting_methane_emissions'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_composting_methane_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">composting_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.composting_type.html#RUFAS.biophysical.manure.storage.composting_type.CompostingType" title="RUFAS.biophysical.manure.storage.composting_type.CompostingType"><span class="pre">CompostingType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_production_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.composting.Composting._calculate_composting_methane_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.composting.Composting._calculate_composting_methane_emissions'"><span>#</span></a></dt>
 <dd><p>This function calculates the composting solid manure methane emission on the current day.</p>
 <section id="id7">
 <h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
@@ -268,6 +266,8 @@ non-degradable volatile solids, degradable volatile solids, or total solids.</p>
 <dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>The manure volatile solids of the received manure, kg.</p>
 </dd>
 <dt>composting_type<span class="classifier">CompostingType</span></dt><dd><p>The type of composting being used.</p>
+</dd>
+<dt>methane_production_potential<span class="classifier">float</span></dt><dd><p>Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).</p>
 </dd>
 </dl>
 </section>

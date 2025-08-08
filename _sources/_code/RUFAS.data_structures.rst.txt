@@ -7,7 +7,6 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
-   RUFAS.data_structures.animal_manure_excretions
    RUFAS.data_structures.animal_to_manure_connection
    RUFAS.data_structures.crop_soil_to_feed_storage_connection
    RUFAS.data_structures.events
@@ -16,7 +15,6 @@ Submodules
    RUFAS.data_structures.manure_supplement_methods
    RUFAS.data_structures.manure_to_crop_soil_connection
    RUFAS.data_structures.manure_types
-   RUFAS.data_structures.pen_manure_data
    RUFAS.data_structures.tillage_implements
 
 Module contents

@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -290,7 +288,7 @@ but the equation and set values are included below for reference.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_ifsm_methane_emission">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_ifsm_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_ifsm_methane_emission" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_ifsm_methane_emission'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_ifsm_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_production_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_ifsm_methane_emission" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_ifsm_methane_emission'"><span>#</span></a></dt>
 <dd><p>Calculates emission of methane on the current day using an adaptation of the tier 2 approach
 of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent
 methane conversion factor.</p>
@@ -300,6 +298,8 @@ methane conversion factor.</p>
 <dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>The volatile solids (kg).</p>
 </dd>
 <dt>manure_temperature<span class="classifier">float</span></dt><dd><p>The manure temperature (Celsius).</p>
+</dd>
+<dt>methane_production_potential<span class="classifier">float</span></dt><dd><p>Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).</p>
 </dd>
 </dl>
 </section>

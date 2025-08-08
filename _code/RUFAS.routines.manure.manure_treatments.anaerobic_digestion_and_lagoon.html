@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,83 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon">
-<span id="rufas-routines-manure-manure-treatments-anaerobic-digestion-and-lagoon-module"></span><h1>RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.</span></span><span class="sig-name descname"><span class="pre">AnaerobicDigestionAndLagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon'"><span>#</span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
-<p>A class that models the coupling of the anaerobic digestion and lagoon manure treatments.</p>
-<p>There are two distinct scenarios that this class models: (1) This combination of manure treatments
-is preceded by a manure separator, and (2) this combination of manure treatments sandwiches
-a manure separator.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>Same as BaseManureTreatment.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon.__init__'"><span>#</span></a></dt>
-<dd><p>Initializes the BaseManureTreatment class.</p>
-<dl>
-<dt>Args:</dt><dd><p>weather: A Weather object.
-time: A RufasTime object.
-manure_treatment_config: A ManureTreatmentConfig object containing the</p>
-<blockquote>
-<div><p>configuration for the manure treatment.</p>
-</div></blockquote>
-</dd>
-<dt>Private attributes:</dt><dd><p>_sim_day: The current simulation day.
-_current_pen: The current pen object.
-_manure_handler_daily_output: The daily output of the manure handler.
-_current_manure_treatment_daily_input: The current input data assigned based on the</p>
-<blockquote>
-<div><p>input data passed into the daily_update() method.</p>
-</div></blockquote>
-<p>_manure_separator: Present in the separator - digester - separator - lagoon scenario.
-_manure_separator_daily_output: Only present in the digester - separator - lagoon scenario.
-_accumulated_output: Summation of all daily outputs.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output">
-<span class="sig-name descname"><span class="pre">_create_anaerobic_digestion_daily_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output'"><span>#</span></a></dt>
-<dd><p>Creates the daily output for the anaerobic digestion model.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>A ManureTreatmentDailyOutput object containing the daily output for the anaerobic digestion model.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._daily_update_helper">
-<span class="sig-name descname"><span class="pre">_daily_update_helper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._daily_update_helper" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._daily_update_helper'"><span>#</span></a></dt>
-<dd><p>Returns the manure treatment daily output.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>A ManureTreatmentDailyOutput object containing the daily output for
-the anaerobic digestion and lagoon model.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._abc_impl">
-<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._abc_impl'"><span>#</span></a></dt>
-<dd></dd></dl>
-</dd></dl>
+<section id="rufas-routines-manure-manure-treatments-anaerobic-digestion-and-lagoon-module">
+<h1>RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module<a class="headerlink" href="#rufas-routines-manure-manure-treatments-anaerobic-digestion-and-lagoon-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon"><code class="docutils literal notranslate"><span class="pre">AnaerobicDigestionAndLagoon</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon.__init__'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon.__init__"><code class="docutils literal notranslate"><span class="pre">AnaerobicDigestionAndLagoon.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output"><code class="docutils literal notranslate"><span class="pre">AnaerobicDigestionAndLagoon._create_anaerobic_digestion_daily_output()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._daily_update_helper'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._daily_update_helper"><code class="docutils literal notranslate"><span class="pre">AnaerobicDigestionAndLagoon._daily_update_helper()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._abc_impl'" class="reference internal" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon._abc_impl"><code class="docutils literal notranslate"><span class="pre">AnaerobicDigestionAndLagoon._abc_impl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

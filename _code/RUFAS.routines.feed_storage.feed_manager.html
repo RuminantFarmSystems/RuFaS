@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -141,134 +139,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.feed_storage.feed_manager module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.feed_storage.feed_manager">
-<span id="rufas-routines-feed-storage-feed-manager-module"></span><h1>RUFAS.routines.feed_storage.feed_manager module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.feed_manager" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.feed_manager.</span></span><span class="sig-name descname"><span class="pre">CROP_TO_STORAGE_MAPPING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory"><span class="pre">CropCategory</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.feed_storage.storage.html#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><span class="pre">Storage</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CropCategory.ALFALFA:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.CORN:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.grain.Grain'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.silage.Silage'&gt;],</span> <span class="pre">CropCategory.GRASS:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.SMALL_GRAIN:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.hay.Hay'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.grain.Grain'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.silage.Silage'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.baleage.Baleage'&gt;],</span> <span class="pre">CropCategory.SOY:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.feed_storage.grain.Grain'&gt;]}</span></em><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING'"><span>#</span></a></dt>
-<dd><p>Maps each StorageType enum element to the associated Storage subclass.</p>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.feed_manager.</span></span><span class="sig-name descname"><span class="pre">FeedManager</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Manages the feed storage, handling crop reception, purchasing, degradation processing, feed distribution,
-and querying available feeds.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>active_storages<span class="classifier">Dict[StorageType, Storage]</span></dt><dd><p>A dictionary mapping storage types to their corresponding active storage objects.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager._query_result_factory">
-<span class="sig-name descname"><span class="pre">_query_result_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory"><span class="pre">CropCategory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType"><span class="pre">CropType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory"><span class="pre">CropCategory</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType"><span class="pre">CropType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager._query_result_factory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager._query_result_factory'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.receive_crop">
-<span class="sig-name descname"><span class="pre">receive_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvested_crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.StorageType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.StorageType"><span class="pre">StorageType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.receive_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.receive_crop'"><span>#</span></a></dt>
-<dd><p>Receives a harvested crop and assigns it to a storage unit.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>harvested_crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The harvested crop to be stored.</p>
-</dd>
-<dt>storage_type<span class="classifier">StorageType</span></dt><dd><p>The type of storage to use for this crop.</p>
-</dd>
-</dl>
+<section id="rufas-routines-feed-storage-feed-manager-module">
+<h1>RUFAS.routines.feed_storage.feed_manager module<a class="headerlink" href="#rufas-routines-feed-storage-feed-manager-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the crop type is not compatible with the storage type.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.process_degradations">
-<span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.process_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.process_degradations'"><span>#</span></a></dt>
-<dd><p>Processes the degradation of all stored feeds over time.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.give_feed">
-<span class="sig-name descname"><span class="pre">give_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType"><span class="pre">CropType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.give_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.give_feed'"><span>#</span></a></dt>
-<dd><p>Distributes feed to the Animal module based on the FIFO principle.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>amount<span class="classifier">float</span></dt><dd><p>The amount of feed to distribute.</p>
-</dd>
-<dt>crop_type<span class="classifier">CropType</span></dt><dd><p>The type of crop to distribute.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The actual amount of feed distributed.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.query_available_feeds">
-<span class="sig-name descname"><span class="pre">query_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_crop_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType"><span class="pre">CropType</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_crop_categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory"><span class="pre">CropCategory</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_storage_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.StorageType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.StorageType"><span class="pre">StorageType</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropCategory"><span class="pre">CropCategory</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.CropType"><span class="pre">CropType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.query_available_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.query_available_feeds'"><span>#</span></a></dt>
-<dd><p>Queries the available amount of feed in storage.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>query_crop_types<span class="classifier">List[CropType], optional, default=None</span></dt><dd><p>The types of crop to query (if None, all crop types are queried).</p>
-</dd>
-<dt>query_crop_categories<span class="classifier">List[CropCategory], optional, default=None</span></dt><dd><p>The categories of crop to query (if None, all crop categories are queried).</p>
-</dd>
-<dt>query_storage_types<span class="classifier">List[StorageType], optional, default=None</span></dt><dd><p>The types of storage to query (if None, all storages types are queried).</p>
-</dd>
-</dl>
-</section>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[QUERY_RESULT_DATA_TYPE]</dt><dd><p>The amount of available feed, either as a total or for a specific crop type.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.purchase_feed">
-<span class="sig-name descname"><span class="pre">purchase_feed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.purchase_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.purchase_feed'"><span>#</span></a></dt>
-<dd><p>The purchase feed logic is currently in the Animal Module. We will move it to here.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.feed_manager.FeedManager.setup_stored_feeds">
-<span class="sig-name descname"><span class="pre">setup_stored_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.setup_stored_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.feed_storage.feed_manager.FeedManager.setup_stored_feeds'"><span>#</span></a></dt>
-<dd><p>Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing.</p>
-</dd></dl>
-</section>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.CROP_TO_STORAGE_MAPPING"><code class="docutils literal notranslate"><span class="pre">CROP_TO_STORAGE_MAPPING</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager"><code class="docutils literal notranslate"><span class="pre">FeedManager</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.__init__'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.__init__"><code class="docutils literal notranslate"><span class="pre">FeedManager.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager._query_result_factory'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager._query_result_factory"><code class="docutils literal notranslate"><span class="pre">FeedManager._query_result_factory()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.receive_crop'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.receive_crop"><code class="docutils literal notranslate"><span class="pre">FeedManager.receive_crop()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.process_degradations'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.process_degradations"><code class="docutils literal notranslate"><span class="pre">FeedManager.process_degradations()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.give_feed'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.give_feed"><code class="docutils literal notranslate"><span class="pre">FeedManager.give_feed()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.query_available_feeds'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.query_available_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.query_available_feeds()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.purchase_feed'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.purchase_feed"><code class="docutils literal notranslate"><span class="pre">FeedManager.purchase_feed()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.feed_storage.feed_manager.FeedManager.setup_stored_feeds'" class="reference internal" href="#RUFAS.routines.feed_storage.feed_manager.FeedManager.setup_stored_feeds"><code class="docutils literal notranslate"><span class="pre">FeedManager.setup_stored_feeds()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Report-Generator.html">Report Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Graph-Generator.html">Graph Generator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
@@ -112,9 +113,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Code-review.html">Code Review</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/best_practices.html">Best Practices</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
 </nav>
 </div>
@@ -142,214 +140,10 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.animal.life_cycle.animal_population module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.animal.life_cycle.animal_population">
-<span id="rufas-routines-animal-life-cycle-animal-population-module"></span><h1>RUFAS.routines.animal.life_cycle.animal_population module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.animal_population" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.animal_population.</span></span><span class="sig-name descname"><span class="pre">AnimalPopulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIIIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_animal_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by_random</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A data class representing the population of animals in a herd.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>calves<span class="classifier">List[Calf]</span></dt><dd><p>A list of Calf instances in the herd.</p>
-</dd>
-<dt>heiferIs<span class="classifier">List[HeiferI]</span></dt><dd><p>A list of HeiferI (stage I heifers) instances in the herd.</p>
-</dd>
-<dt>heiferIIs<span class="classifier">List[HeiferII]</span></dt><dd><p>A list of HeiferII (stage II heifers) instances in the herd.</p>
-</dd>
-<dt>heiferIIIs<span class="classifier">List[HeiferIII]</span></dt><dd><p>A list of HeiferIII (stage III heifers) instances in the herd.</p>
-</dd>
-<dt>cows<span class="classifier">List[Cow]</span></dt><dd><p>A list of Cow instances in the herd.</p>
-</dd>
-<dt>replacement<span class="classifier">List[Cow]</span></dt><dd><p>A list of replacement Cow instances in the herd.</p>
-</dd>
-<dt>current_animal_id<span class="classifier">int, default=0</span></dt><dd><p>The highest ID number among all animals in the herd.</p>
-</dd>
-<dt>order_by_random<span class="classifier">bool, default=0</span></dt><dd><p>A flag to indicate whether the animals should be ordered randomly.</p>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.calves">
-<span class="sig-name descname"><span class="pre">calves</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.calves" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.calves'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIs">
-<span class="sig-name descname"><span class="pre">heiferIs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIs'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIs">
-<span class="sig-name descname"><span class="pre">heiferIIs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIs'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIIs">
-<span class="sig-name descname"><span class="pre">heiferIIIs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIIs'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.cows">
-<span class="sig-name descname"><span class="pre">cows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.cows" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.cows'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.replacement">
-<span class="sig-name descname"><span class="pre">replacement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.replacement" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.replacement'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.current_animal_id">
-<span class="sig-name descname"><span class="pre">current_animal_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.current_animal_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.current_animal_id'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.order_by_random">
-<span class="sig-name descname"><span class="pre">order_by_random</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.order_by_random" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.order_by_random'"><span>#</span></a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.next_id">
-<span class="sig-name descname"><span class="pre">next_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.next_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.next_id'"><span>#</span></a></dt>
-<dd><p>Increment and return the next unique identifier for an animal.</p>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>int</dt><dd><p>The next unique animal_id.</p>
-</dd>
-</dl>
+<section id="rufas-routines-animal-life-cycle-animal-population-module">
+<h1>RUFAS.routines.animal.life_cycle.animal_population module<a class="headerlink" href="#rufas-routines-animal-life-cycle-animal-population-module" title="Link to this heading"><span>#</span></a></h1>
 </section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_calves">
-<span class="sig-name descname"><span class="pre">get_calves</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_calves" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_calves'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of Calf instances.</p>
-<section id="id1">
-<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[Calf]</dt><dd><p>A list of Calf instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIs">
-<span class="sig-name descname"><span class="pre">get_heiferIs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIs'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of HeiferI instances.</p>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[HeiferI]</dt><dd><p>A list of HeiferI instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIs">
-<span class="sig-name descname"><span class="pre">get_heiferIIs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIs'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of HeiferII instances.</p>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[HeiferII]</dt><dd><p>A list of HeiferII instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIIs">
-<span class="sig-name descname"><span class="pre">get_heiferIIIs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIIs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIIs'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of HeiferIII instances.</p>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[HeiferIII]</dt><dd><p>A list of HeiferIII instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_cows">
-<span class="sig-name descname"><span class="pre">get_cows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_cows" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_cows'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of Cow instances.</p>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[Cow]</dt><dd><p>A list of Cow instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_replacement_cows">
-<span class="sig-name descname"><span class="pre">get_replacement_cows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_replacement_cows" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_replacement_cows'"><span>#</span></a></dt>
-<dd><p>Retrieve a list of replacement Cow instances.</p>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>List[Cow]</dt><dd><p>A list of replacement Cow instances.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation._average">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation._average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation._average'"><span>#</span></a></dt>
-<dd><p>A custom get-average function for the given data. Returns 0 for an empty list.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>data<span class="classifier">List[int | float]</span></dt><dd><p>The input data.</p>
-</dd>
-</dl>
-</section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The average of the given data, or 0 for an empty data list.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_herd_summary">
-<span class="sig-name descname"><span class="pre">get_herd_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_herd_summary" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_herd_summary'"><span>#</span></a></dt>
-<dd><p>Returns a dictionary containing herd summary information</p>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>Dict[str, int | float]</dt><dd><p>A dictionary which stores the summary of the initialization</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.calf.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferI.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferIIIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.cow.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_animal_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by_random</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
-</section>
-</dd></dl>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.calves'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.calves"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.calves</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.heiferIs</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.heiferIIs</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.heiferIIIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.heiferIIIs</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.cows'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.cows"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.cows</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.replacement'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.replacement"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.replacement</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.current_animal_id'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.current_animal_id"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.current_animal_id</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.order_by_random'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.order_by_random"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.order_by_random</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.next_id'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.next_id"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.next_id()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_calves'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_calves"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_calves()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_heiferIs()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_heiferIIs()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIIs'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_heiferIIIs"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_heiferIIIs()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_cows'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_cows"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_cows()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_replacement_cows'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_replacement_cows"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_replacement_cows()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation._average'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation._average"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation._average()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_herd_summary'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.get_herd_summary"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.get_herd_summary()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__'" class="reference internal" href="#RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__"><code class="docutils literal notranslate"><span class="pre">AnimalPopulation.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
