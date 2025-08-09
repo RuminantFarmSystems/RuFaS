@@ -93,33 +93,33 @@ class ManureConstants:
     """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
     LEACHING_COEFFICIENT: float = 0.035
-    """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
+    """Leaching coefficient used in the calculation of leaching N loss in a bedded pack and open lot
     (unitless)."""
 
     DEFAULT_LAYER_TEMPERATURE: float = 30
-    """The default layer temperature for open lot and compost bedded pack barn."""
+    """The default layer temperature for open lot and bedded pack."""
 
     NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.07
     """
-    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Nitrous oxide coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is tilled (unitless).
     """
 
     NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.01
     """
-    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Nitrous oxide coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is not tilled (unitless).
     """
 
     AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.5
     """
-    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Ammonia emission coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is tilled (unitless).
     """
 
     AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.25
     """
-    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Ammonia emission coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is not tilled (unitless).
     """
 
@@ -162,7 +162,7 @@ class ManureConstants:
 
     DEFAULT_DAYS_SINCE_LAST_MIXING: int = 1
     """Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
-    turning. For Open Lot, this refers to lot harrowing. For Compost Bedded Pack barn, this refers to pack tillage."""
+    turning. For Open Lot, this refers to lot harrowing. For Bedded Pack, this refers to pack tillage."""
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """

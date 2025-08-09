@@ -10,7 +10,7 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.bedded_pack import BeddedPack
 from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
@@ -32,7 +32,7 @@ STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
     AnaerobicLagoon: ManureType.LIQUID,
     SlurryStorageOutdoor: ManureType.LIQUID,
     SlurryStorageUnderfloor: ManureType.LIQUID,
-    CompostBeddedPackBarn: ManureType.SOLID,
+    BeddedPack: ManureType.SOLID,
     Composting: ManureType.SOLID,
     OpenLot: ManureType.SOLID,
 }
