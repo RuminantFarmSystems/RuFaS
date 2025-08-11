@@ -225,6 +225,7 @@ v0.9.2
 - [2534](https://github.com/RuminantFarmSystems/MASM/pull/2534) - [minor change][docs] Update rufas logo.
 - [2529](https://github.com/RuminantFarmSystems/MASM/pull/2529) - [minor change] E2E Testing for No Animal C&S Run.
 
+
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
