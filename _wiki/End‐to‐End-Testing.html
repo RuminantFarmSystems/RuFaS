@@ -192,15 +192,39 @@ unexpected ways as changes are made to the code.</p>
 </section>
 <section id="how">
 <h2>How<a class="headerlink" href="#how" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how'"><span>#</span></a></h2>
-<p>As of <strong>02/01/2025</strong>, E2E testing can only be run with a dedicated set
+<p>As of <strong>08/08/2025</strong>, E2E testing can only be run with dedicated sets
 of inputs. Run E2E testing with the following command:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>main.py<span class="w"> </span>-p<span class="w"> </span>input/metadata/end_to_end_testing_tm_metadata.json
 </span></code></pre></div>
 </div>
-<p>E2E testing checks each domain (module) of RuFaS separately—for example,
-Feed Storage, Animal, Manure, etc. Each check generates a result
-(passing or failing), which is both written to an output file and
-logged.</p>
+<p>There are three sets of inputs set up:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Free Stall Dairy</dt><dd><ol class="lowerroman simple">
+<li><p>E2E testing is performed on the Crop&amp;Soil, the Animal, and the Manure domain (module) of RuFaS.</p></li>
+<li><p>The simulation time period for the Free Stall E2E is cut short to only one year.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Open Lot</dt><dd><ol class="lowerroman simple">
+<li><p>E2E testing is performed on the Crop&amp;Soil, the Animal, and the Manure domain (module) of RuFaS.</p></li>
+<li><p>The simulation time period for the Open Lot E2E is cut short to only one year.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>No Animals</dt><dd><ol class="lowerroman simple">
+<li><p>No animals are simulated in this simulation. It is mainly used to verify the stand-alone C&amp;S domain results.</p></li>
+<li><p>E2E testing is performed on the Crop&amp;Soil and the Manure domain (module) of RuFaS.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+<p>For Each E2E test run:</p>
 <ul class="simple">
 <li><p><strong>A domain’s E2E test passes if there are no differences between the
 expected and actual results.</strong></p></li>
@@ -226,15 +250,18 @@ passed or not.</p></li>
 <h2>Setting up E2E Testing<a class="headerlink" href="#setting-up-e2e-testing" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#setting-up-e2e-testing'"><span>#</span></a></h2>
 <section id="quick-setup">
 <h3>Quick Setup<a class="headerlink" href="#quick-setup" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#quick-setup'"><span>#</span></a></h3>
-<p><strong>Note</strong>: E2E Testing is already ready to running for multiple domains.
-This section is for setting up new testing for parts of the model that
-aren’t yet covered.</p>
+<p><strong>Note</strong>: E2E Testing is already ready to running on multiple domains for three sets of inputs.
+This section is for creating testing for a new sets of inputs,
+or setting up testing for an uncovered domain in an exisiting set of inputs.</p>
+<section id="new-input-set-setup">
+<h4>New Input Set Setup<a class="headerlink" href="#new-input-set-setup" title="Link to this heading"><span>#</span></a></h4>
 <p>In the <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing</span></code> directory:</p>
 <ol class="arabic">
-<li><p><strong>Create the 2 necessary E2E filter files</strong> following these formats:</p>
-<ul class="simple">
-<li><p><strong>E2E JSON Filter File</strong></p>
-<ul>
+<li><p><strong>Create a folder</strong> with its name being the name for the new input set.</p></li>
+<li><p>Go into the folder, and <strong>create the 2 necessary E2E filter files</strong> following these formats:
+- <strong>E2E JSON Filter File</strong></p>
+<blockquote>
+<div><ul class="simple">
 <li><p>File name format: <code class="docutils literal notranslate"><span class="pre">e2e_json_{domain}_filter.json</span></code>.</p></li>
 <li><p>See <a class="reference internal" href="#e2e-json-filter-file"><span class="std std-ref">E2E JSON filter file</span></a>.
 for reference.</p></li>
@@ -242,7 +269,8 @@ for reference.</p></li>
 <code class="docutils literal notranslate"><span class="pre">expected_results</span></code> section at setup time. This is expected.
 Keep following the steps.</p></li>
 </ul>
-</li>
+</div></blockquote>
+<ul class="simple">
 <li><p><strong>E2E Comparison Filter</strong></p>
 <ul>
 <li><p>File name format: <code class="docutils literal notranslate"><span class="pre">e2e_comparison_{domain}_differences.json</span></code>.</p></li>
@@ -251,16 +279,59 @@ Keep following the steps.</p></li>
 </li>
 </ul>
 </li>
-<li><p><strong>Update the ``end_to_end_testing_results_paths.json`` file</strong> in the
-same directory:</p>
+<li><p><strong>Update the ``end_to_end_testing_task.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/tasks</span></code> directory:
+- <strong>Use the existing entries as examples.</strong>, create a new object in the <code class="docutils literal notranslate"><span class="pre">"tasks"</span></code> array, specifying:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“task_type”: “END_TO_END_TESTING”</p></li>
+<li><p>“metadata_file_path”: the file path to the new input set metadata.</p></li>
+<li><p>“output_prefix”: a custom output prefix for the new set of inputs,
+preferably following the patter <code class="docutils literal notranslate"><span class="pre">{custom_name}_e2e</span></code>.
+<strong>Please NOTE DOWN this output prefix name, it will be referenced later.</strong></p></li>
+<li><p>“filters_directory”: the directory path to the new directory conataining the two newly created filters.</p></li>
+<li><p>“log_verbosity”: the desired verbosity, the suggested verbosity is “logs” for an E2E testing run.</p></li>
+<li><p>“exclude_info_maps”: true. Please set this flag to true to exclude the info maps in the outputs,
+so that we can decrease the output file size and speed up the comparison process.</p></li>
+<li><p>“random_seed”: the choice of random seed, default is set to 42.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Update the ``update_end_to_end_testing_expected_results.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/tasks</span></code> directory:
+- <strong>Use the existing entries as examples.</strong>, create a new object in the <code class="docutils literal notranslate"><span class="pre">"tasks"</span></code> array, specifying:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“task_type”: “UPDATE_E2E_TEST_RESULTS”</p></li>
+<li><p>“metadata_file_path”: the file path to the new input set metadata.</p></li>
+<li><p>“output_prefix”: the same output prefix from <code class="docutils literal notranslate"><span class="pre">end_to_end_testing_task.json</span></code>.</p></li>
+<li><p>“filters_directory”: the directory path to the new directory conataining the two newly created filters.</p></li>
+<li><p>“log_verbosity”: the desired verbosity, the suggested verbosity is “logs” for a update E2E results run.</p></li>
+<li><p>“exclude_info_maps”: true. Please set this flag to true to exclude the info maps in the outputs,
+so that we can decrease the output file size and speed up the comparison process.</p></li>
+<li><p>“random_seed”: the choice of random seed, default is set to 42.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Update the ``end_to_end_testing_results_paths.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing</span></code> directory:</p>
 <ul class="simple">
-<li><p>Specify the domain you’re testing, the path to the expected
+<li><p>Create a new key-value pair in the “end_to_end_test_result_paths” dictionary.
+The key should be the output prefix specified in step 3 and 4.</p></li>
+<li><p>Specify the domains you’re testing, the path to the expected
 outputs, and the pattern used to find the actual outputs for the
 domain module.</p></li>
 <li><p><strong>Use the existing entries as examples.</strong></p></li>
 <li><p>See <a class="reference internal" href="#e2e-testing-results-paths-file"><span class="std std-ref">E2E Testing Results Paths File</span></a> for reference.</p></li>
 <li><p><strong>Note:</strong> <em>You will not create a new results paths file. Add your
 new domain’s paths to the existing file.</em></p></li>
+</ul>
+</li>
+<li><p><strong>Update the ``default.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/metadata/properties</span></code> directory:</p>
+<ul class="simple">
+<li><p>Navigate to the <strong>“end_to_end_test_result_paths”</strong> block under the
+<strong>end_to_end_test_result_path_properties”</strong> section.</p></li>
+<li><p>Create a new entry in the “end_to_end_test_result_paths” dictionary by copying and pasting one of the existing
+input set, with the key being the output prefix specified in step 3 and 4.
+For example, copy the entire “freestall_e2e” dictionary, paste it as a new entry, and change the key to the output
+prefix.</p></li>
 </ul>
 </li>
 <li><p><strong>Run the following command:</strong></p>
@@ -286,10 +357,27 @@ assistance.</p></li>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>main.py<span class="w"> </span>-p<span class="w"> </span>input/metadata/end_to_end_testing_tm_metadata.json
 </span></code></pre></div>
 </div>
-<ol class="arabic simple" start="5">
+<ol class="arabic simple" start="9">
 <li><p>Confirm your domain E2E test passes. If the test doesn’t pass, review
 steps 1–4 or contact a member of the RuFaS maintainer team for help.</p></li>
 </ol>
+</section>
+<section id="new-domain-setup">
+<h4>New Domain Setup<a class="headerlink" href="#new-domain-setup" title="Link to this heading"><span>#</span></a></h4>
+<ol class="arabic simple">
+<li><p>Navigate to the corresponding folder for the input set you want to update in <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing</span></code>
+directory.**Create the 2 necessary E2E filter files** for the new domain by following step 2 from the
+<strong>New Input Set Setup</strong> section.</p></li>
+<li><p><strong>Update the ``end_to_end_testing_results_paths.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing</span></code> directory:</p>
+<ul class="simple">
+<li><p>Navigate to the dictionary about the input set you want to update in the “end_to_end_test_result_paths” dictionary.</p></li>
+<li><p><strong>Use the existing entries as examples</strong> to add the filter files of the new domain.</p></li>
+</ul>
+</li>
+<li><p>Follow steps 7-9 from the <strong>New Input Set Setup</strong> section to update the expected E2E results and confirm all E2E
+tests are successful.</p></li>
+</ol>
+</section>
 </section>
 <hr class="docutils"/>
 <section id="automatically-updating-e2e-results">
@@ -298,7 +386,7 @@ steps 1–4 or contact a member of the RuFaS maintainer team for help.</p></li>
 command
 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main.py</span> <span class="pre">-p</span> <span class="pre">input/metadata/update_end_to_end_testing_tm_metadata.json</span> <span class="pre">-c</span></code>
 to automatically update end-to-end-testing “expected results” for all
-domains. These expected results are the results against which end-to-end
+domains of all input sets. These expected results are the results against which end-to-end
 testing will be run.</p>
 <p>This is a powerful tool which removes some of the steps in updating the
 expected results by hand. However, there are still some safeguards
@@ -306,7 +394,7 @@ against total automation to ensure expected results aren’t being
 unknowingly updated when this is run.</p>
 <p>How does it work?</p>
 <ol class="arabic simple">
-<li><p>A simulation is run and output is filtered based on the filters in
+<li><p>For each input set, a simulation is run and output is filtered based on the filters in
 the existing E2E testing filters files.</p></li>
 <li><p>For each domain, the filtered results generated from that simulation
 are checked against the existing expected results for that domain.</p></li>
@@ -353,8 +441,11 @@ the file
 <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing/end_to_end_testing_result_paths.json</span></code>.
 This file should contain:</p>
 <ul class="simple">
-<li><p>a list of objects, each of which contains the name of the RuFaS domain
-being tested.</p></li>
+<li><dl class="simple">
+<dt>a dictionay of a list of objects, each item in the dictionary represents an input set , and each object whitn the</dt><dd><p>list contains the name of the RuFaS domain being tested.</p>
+</dd>
+</dl>
+</li>
 <li><p>the path to the expected results (which is the path to the filter file
 for that domain located within the <code class="docutils literal notranslate"><span class="pre">end_to_end_testing</span></code> directory).</p></li>
 <li><p>a pattern used to identify the actual results.</p></li>
@@ -444,15 +535,17 @@ results, and record their differences so that they can be collected
 properly. This is accomplished in the
 <code class="docutils literal notranslate"><span class="pre">end_to_end_testing_result_paths.json</span></code>.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
-</span><span id="line-2"><span class="w">    </span><span class="nt">"end_to_end_test_result_paths"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="line-3"><span class="w">        </span><span class="p">{</span>
-</span><span id="line-4"><span class="w">            </span><span class="nt">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FeedStorage"</span><span class="p">,</span>
-</span><span id="line-5"><span class="w">            </span><span class="nt">"expected_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"input/data/end_to_end_testing/e2e_json_feed_storage_filter.json"</span><span class="p">,</span>
-</span><span id="line-6"><span class="w">            </span><span class="nt">"actual_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"end-to-end-testing_saved_variables_e2e_feed_storage_"</span><span class="p">,</span>
-</span><span id="line-7"><span class="w">            </span><span class="nt">"tolerance"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span>
-</span><span id="line-8"><span class="w">        </span><span class="p">}</span>
-</span><span id="line-9"><span class="w">    </span><span class="p">]</span>
-</span><span id="line-10"><span class="p">}</span>
+</span><span id="line-2"><span class="w">    </span><span class="nt">"end_to_end_test_result_paths"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">     </span><span class="nt">"freestall_e2e"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-4"><span class="w">            </span><span class="p">{</span>
+</span><span id="line-5"><span class="w">                </span><span class="nt">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FeedStorage"</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">                </span><span class="nt">"expected_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"input/data/end_to_end_testing/e2e_json_feed_storage_filter.json"</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">                </span><span class="nt">"actual_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"end-to-end-testing_saved_variables_e2e_feed_storage_"</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">                </span><span class="nt">"tolerance"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span>
+</span><span id="line-9"><span class="w">            </span><span class="p">}</span>
+</span><span id="line-10"><span class="w">        </span><span class="p">]</span>
+</span><span id="line-11"><span class="w">     </span><span class="p">}</span>
+</span><span id="line-12"><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <p>The “expected_results_path” points to the filter file which contains the
@@ -496,7 +589,11 @@ E2E test will not be collected properly by the comparison file.</p>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#setting-up-e2e-testing'" class="reference internal" href="#setting-up-e2e-testing">Setting up E2E Testing</a><ul>
-<li><a :data-current="activeSection === '#quick-setup'" class="reference internal" href="#quick-setup">Quick Setup</a></li>
+<li><a :data-current="activeSection === '#quick-setup'" class="reference internal" href="#quick-setup">Quick Setup</a><ul>
+<li><a :data-current="activeSection === '#new-input-set-setup'" class="reference internal" href="#new-input-set-setup">New Input Set Setup</a></li>
+<li><a :data-current="activeSection === '#new-domain-setup'" class="reference internal" href="#new-domain-setup">New Domain Setup</a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#automatically-updating-e2e-results'" class="reference internal" href="#automatically-updating-e2e-results">Automatically Updating E2E Results</a></li>
 <li><a :data-current="activeSection === '#more-detailed-setup-explanation'" class="reference internal" href="#more-detailed-setup-explanation">More Detailed Setup Explanation</a></li>
 </ul>
