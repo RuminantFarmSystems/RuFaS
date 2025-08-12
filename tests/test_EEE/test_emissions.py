@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.emissions import EmissionsEstimator
+from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
