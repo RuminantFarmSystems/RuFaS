@@ -5238,7 +5238,7 @@
         "processor_type": {
           "type": "string",
           "description": "The type of storage used.",
-          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|CompostBeddedPackBarn)$"
+          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|BeddedPack)$"
         },
         "capacity": {
           "type": "number",
@@ -5268,6 +5268,11 @@
           "type": "string",
           "description": "Composting method, applicable only to the composting storage type.",
           "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "nullable": true
+        },
+        "is_mixed": {
+          "type": "bool",
+          "description": "Indicator for if the bedded pack is regularly mixed to promote composting activity.",
           "nullable": true
         }
       }
