@@ -125,9 +125,16 @@
       "storage_time_period": 365
     },
     {
+      "name": "bedded_pack_1",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 30,
+      "is_mixed": false
+    },
+    {
       "name": "compost_bedded_pack_1",
-      "processor_type": "CompostBeddedPackBarn",
-      "storage_time_period": 365
+      "processor_type": "BeddedPack",
+      "storage_time_period": 183,
+      "is_mixed": true
     }
   ]
 }
