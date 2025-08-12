@@ -284,7 +284,7 @@ class EnergyEstimator:
         diesel_consumption_tractor_implement_liter_ha = 0.0
 
         for implement in tractor.implements:
-            crop_yield_ton_ha = crop_yield/1000 #convert kg to tons
+            crop_yield_ton_ha = crop_yield / 1000  # convert kg to tons
             total_power_needed_kW = self._calculate_total_power_needed(
                 tractor,
                 implement,
@@ -292,7 +292,7 @@ class EnergyEstimator:
                 field_production_size,
                 clay_percent,
             )
-            x = total_power_needed_kW /tractor.power_available_kW  # helper function 411
+            x = total_power_needed_kW / tractor.power_available_kW  # helper function 411
             specific_fuel_consumption_liter_per_kWh = (
                 (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 173)
             )  # helper function 410
@@ -305,7 +305,7 @@ class EnergyEstimator:
                 * total_power_needed_kW
                 * tractor_implement_operation_time_hr
                 / field_production_size
-            #    / crop_yield_ton_ha
+                #    / crop_yield_ton_ha
             )
         return diesel_consumption_tractor_implement_liter_ha
 

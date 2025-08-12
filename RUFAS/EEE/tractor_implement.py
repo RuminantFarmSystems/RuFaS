@@ -81,7 +81,7 @@ class TractorImplement:
         Implements Helper Functions 418a and 418b in EEE Functions file.
         """
         if self.operation_type == OperationType.COLLECTION:  # 418b
-            return  (self.throughput / crop_yield_ton_per_ha) * self.field_efficiency
+            return (self.throughput / crop_yield_ton_per_ha) * self.field_efficiency
         return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency  # 418a
 
     def calculate_operation_time_hr(
@@ -131,8 +131,8 @@ class TractorImplement:
             self.E
             + (self.F * self.width_m)
             + (
-                self.G 
-               * crop_yield_ton_per_ha 
+                self.G
+                * crop_yield_ton_per_ha
                 * field_production_size_ha
                 / self.calculate_operation_time_hr(field_production_size_ha, crop_yield_ton_per_ha)
             )
