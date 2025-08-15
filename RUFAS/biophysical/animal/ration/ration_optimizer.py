@@ -980,7 +980,7 @@ class RationOptimizer:
         initial_dry_matter_requirement: float,
         initial_protein_requirement: float,
         sim_day: int,
-    ) -> None:
+    ) -> list[str]:
         """
         Handle and log failed constraints during the ration optimization process.
 
@@ -1015,7 +1015,8 @@ class RationOptimizer:
 
         Returns:
         --------
-        None
+        list[str]
+            List of which constraints were failed.
         """
         om = OutputManager()
 
@@ -1071,3 +1072,5 @@ class RationOptimizer:
             fail_summary,
             dict(info_map, **{"units": fail_summary_units}),
         )
+        
+        return constraints_failed_list
