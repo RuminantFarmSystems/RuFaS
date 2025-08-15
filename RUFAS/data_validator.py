@@ -1614,9 +1614,7 @@ class CrossValidator:
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
 
     def cross_validate_data(
-            self,
-            im_variable_pool: dict[str, Any],
-            cross_validation_rules: list[dict[str, Any]]
+        self, im_variable_pool: dict[str, Any], cross_validation_rules: list[dict[str, Any]]
     ) -> bool:
         """
         Performs cross-validation on the provided data using the provided cross validation rules.
