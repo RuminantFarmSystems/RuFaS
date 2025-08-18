@@ -60,9 +60,7 @@ def test_main_exception_path(monkeypatch, mocker: MockerFixture) -> None:
     mock_om = mock_om_cls.return_value
 
     mocker.patch("main.traceback.format_exc", return_value="FAKE_TRACEBACK")
-    monkeypatch.setattr(
-        sys, "argv", ["prog", "-l", "err_logs", "-i"]
-    )
+    monkeypatch.setattr(sys, "argv", ["prog", "-l", "err_logs", "-i"])
 
     with pytest.raises(RuntimeError) as excinfo:
         main()
