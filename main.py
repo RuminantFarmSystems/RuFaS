@@ -55,6 +55,7 @@ def main() -> None:
             "Unexpected early termination of the simulation. Please see logs for details.\n",
             info_map,
         )
+        raise RuntimeError(f"An error occurred during simulation: {e} - check error logs for further details.")
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
