@@ -40,15 +40,6 @@ def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     )
 
 
-import sys
-from pathlib import Path
-
-import pytest
-from pytest_mock import MockerFixture
-
-from main import main  # your main() function
-
-
 def test_main_exception_path(monkeypatch, mocker: MockerFixture) -> None:
     """
     Forces an exception in TaskManager.start() to test main exception path.
