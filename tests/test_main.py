@@ -1,10 +1,9 @@
 import argparse
 import sys
 from pathlib import Path
-from typing import Any, Generator
+from unittest.mock import MagicMock
 
 import pytest
-from mock import patch
 from pytest_mock import MockerFixture
 
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
@@ -12,12 +11,11 @@ from RUFAS.output_manager import LogVerbosity
 
 
 @pytest.fixture
-def mock_task_manager() -> Generator[Any, Any, Any]:
-    with patch("main.TaskManager") as mock:
-        yield mock
+def mock_task_manager(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("main.TaskManager", autospec=True)
 
 
-def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
+def test_main_success(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     mock_instance = mock_task_manager.return_value
     mock_instance.start.return_value = None
 
@@ -40,7 +38,7 @@ def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     )
 
 
-def test_main_exception_path(monkeypatch, mocker: MockerFixture) -> None:
+def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> None:
     """
     Forces an exception in TaskManager.start() to test main exception path.
     """
