@@ -858,3 +858,125 @@ class Utility:
             return DateFormatter("%d/%m/%Y")
 
         return DateFormatter(date_format)
+
+
+class Aggregator:
+    @staticmethod
+    def average(data: list[float]) -> float:
+        """
+        Calculates the average of a list of numbers.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers whose average is to be calculated.
+
+        Returns
+        -------
+        float
+            The average of the input numbers.
+        """
+        return sum(data) / len(data) if data else 0
+
+    @staticmethod
+    def division(data: list[float]) -> float | None:
+        """
+        Divides the first number in the list by each of the subsequent numbers.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers for the division operation.
+
+        Returns
+        -------
+        float
+            The result of dividing the first number by each subsequent number.
+            Returns None if the list is empty or has only one element.
+        """
+        if len(data) < 2:
+            return None
+        result = data[0]
+        for num in data[1:]:
+            if num == 0:  # Avoid division by zero
+                return None
+            result /= num
+        return result
+
+    @staticmethod
+    def product(data: list[float]) -> float:
+        """
+        Returns the product of a list of numbers.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers whose product is to be calculated.
+
+        Returns
+        -------
+        float
+            The product of the input numbers. Returns 1 for an empty list.
+        """
+        product = 1.0
+        for num in data:
+            product *= num
+        return product
+
+    @staticmethod
+    def standard_deviation(data: list[float]) -> float:
+        """
+        Calculates the standard deviation of a list of numbers.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers whose standard deviation is to be calculated.
+
+        Returns
+        -------
+        float
+            The standard deviation of the input numbers.
+        """
+        mean = Aggregator.average(data)
+        return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0.0
+
+    @staticmethod
+    def sum(data: list[float]) -> float:
+        """
+        Returns the sum of a list of numbers.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers whose sum is to be calculated.
+
+        Returns
+        -------
+        float
+            The sum of the input numbers.
+        """
+        return sum(data)
+
+    @staticmethod
+    def subtraction(data: list[float]) -> float | None:
+        """
+        Subtracts each subsequent number in the list from the first number.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers for the subtraction operation.
+
+        Returns
+        -------
+        float
+            The result of subtracting each subsequent number from the first number.
+            Returns None if the list is empty or has only one element.
+        """
+        if len(data) < 2:
+            return None
+        result = data[0]
+        for num in data[1:]:
+            result -= num
+        return result
