@@ -1706,11 +1706,16 @@ class CrossValidator:
         operation = expression_block.get("operation", "no_op")
         aggregator = AGGREGATION_FUNCTIONS.get(operation)
         if aggregator is None:
-            self._event_logs.append({
-                "error": "Unknown Operation",
-                "message": f"Unknown operation {operation} in cross validation rule.",
-                "info_map": {"class": CrossValidator.__name__, "function": CrossValidator._evaluate_expression.__name__}
-            })
+            self._event_logs.append(
+                {
+                    "error": "Unknown Operation",
+                    "message": f"Unknown operation {operation} in cross validation rule.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
             raise ValueError(f"Unknown operation: {operation}")
 
         ordered_variables: list[str] = expression_block.get("ordered_variables")
