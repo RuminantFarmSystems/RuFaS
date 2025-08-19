@@ -65,7 +65,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius.  In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
         non_degradable_volatile_solids : float
             The non-degradable volatile solids on the current day, kg.
@@ -99,7 +99,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
 
         Returns
@@ -156,7 +156,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
 
         Returns
