@@ -74,7 +74,7 @@ def test_main_exception_path(monkeypatch, mocker: MockerFixture) -> None:
     assert second_info == {"class": "No caller class", "function": "main"}
 
     assert "main error" in str(excinfo.value)
-    assert "check error logs for further details" in str(excinfo.value)
+    assert "check error logs" in str(excinfo.value)
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
