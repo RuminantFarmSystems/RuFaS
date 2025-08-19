@@ -1573,13 +1573,17 @@ class OutputManager(object):
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
                 if has_cross_references and has_data_significant_digits:
+                    significant_digits_limited_reports = ", ".join(
+                        f"'{report}'" for report in limited_significant_digits_reports
+                    )
+                    cross_referenced_reports = ", ".join(f"'{report}'" for report in cross_ref_reports)
                     self.add_warning(
                         "Report Generation Warning",
-                        "Reports generated have both cross references and data significant digits. Significant digits "
-                        f"were limited for the following reports: "
-                        f"{', '.join(f'\"{report}\"' for report in limited_significant_digits_reports)}. "
+                        "Reports generated have both cross references and data significant digits. "
+                        "Significant digits were limited for the following reports: "
+                        f"{significant_digits_limited_reports}. "
                         "Results may be affected for the following cross-referenced reports: "
-                        f"{', '.join(f'\"{report}\"' for report in cross_ref_reports)}.",
+                        f"{cross_referenced_reports}.",
                         info_map,
                     )
                 self.create_directory(report_dir)
