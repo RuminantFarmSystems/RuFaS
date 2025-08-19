@@ -781,7 +781,7 @@ class Pen:
         +---------------------------+-------------------+-------------------+
         | Tiestall                  | 1.2               | 1.0               |
         +---------------------------+-------------------+-------------------+
-        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        | Bedded Pack               | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
         | Open Lot                  | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
@@ -795,7 +795,7 @@ class Pen:
         ------
         ValueError
             If the pen type is not one of the following: "freestall", "tiestall",
-            "compost bedded pack barn", or "open lot".
+            "bedded pack", or "open lot".
         """
 
         ExposedManureSurfaceArea = NamedTuple(
@@ -809,7 +809,7 @@ class Pen:
         exposed_manure_surface_area_by_pen_type = {
             "freestall": freestall,
             "tiestall": tiestall,
-            "compost bedded pack barn": bedded_pack,
+            "bedded pack": bedded_pack,
             "open lot": open_lot,
         }
 
