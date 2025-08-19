@@ -7,136 +7,16 @@ import numpy as np
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
-from RUFAS.util import Utility
-
-
-def average_aggregator(data: list[float]) -> float:
-    """
-    Calculates the average of a list of numbers.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers whose average is to be calculated.
-
-    Returns
-    -------
-    float
-        The average of the input numbers.
-    """
-    return sum(data) / len(data) if data else 0
-
-
-def division_aggregator(data: list[float]) -> float | None:
-    """
-    Divides the first number in the list by each of the subsequent numbers.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers for the division operation.
-
-    Returns
-    -------
-    float
-        The result of dividing the first number by each subsequent number.
-        Returns None if the list is empty or has only one element.
-    """
-    if len(data) < 2:
-        return None
-    result = data[0]
-    for num in data[1:]:
-        if num == 0:  # Avoid division by zero
-            return None
-        result /= num
-    return result
-
-
-def product_aggregator(data: list[float]) -> float:
-    """
-    Returns the product of a list of numbers.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers whose product is to be calculated.
-
-    Returns
-    -------
-    float
-        The product of the input numbers. Returns 1 for an empty list.
-    """
-    product = 1.0
-    for num in data:
-        product *= num
-    return product
-
-
-def sd_aggregator(data: list[float]) -> float:
-    """
-    Calculates the standard deviation of a list of numbers.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers whose standard deviation is to be calculated.
-
-    Returns
-    -------
-    float
-        The standard deviation of the input numbers.
-    """
-    mean = average_aggregator(data)
-    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0.0
-
-
-def sum_aggregator(data: list[float]) -> float:
-    """
-    Returns the sum of a list of numbers.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers whose sum is to be calculated.
-
-    Returns
-    -------
-    float
-        The sum of the input numbers.
-    """
-    return sum(data)
-
-
-def subtraction_aggregator(data: list[float]) -> float | None:
-    """
-    Subtracts each subsequent number in the list from the first number.
-
-    Parameters
-    ----------
-    data : list[float]
-        A list of numbers for the subtraction operation.
-
-    Returns
-    -------
-    float
-        The result of subtracting each subsequent number from the first number.
-        Returns None if the list is empty or has only one element.
-    """
-    if len(data) < 2:
-        return None
-    result = data[0]
-    for num in data[1:]:
-        result -= num
-    return result
+from RUFAS.util import Utility, Aggregator
 
 
 AGGREGATION_FUNCTIONS: dict[str, Callable[[list[float]], float] | Callable[[list[float]], float | None]] = {
-    "average": average_aggregator,
-    "division": division_aggregator,
-    "product": product_aggregator,
-    "SD": sd_aggregator,
-    "sum": sum_aggregator,
-    "subtraction": subtraction_aggregator,
+    "average": Aggregator.average,
+    "division": Aggregator.division,
+    "product": Aggregator.product,
+    "SD": Aggregator.standard_deviation,
+    "sum": Aggregator.sum,
+    "subtraction": Aggregator.subtraction,
 }
 
 

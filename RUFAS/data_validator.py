@@ -3,6 +3,19 @@ import re
 from enum import Enum
 from typing import Any, Callable, Union, Sequence
 
+from RUFAS.util import Aggregator
+
+AGGREGATION_FUNCTIONS: dict[
+    str, Callable[[list[float]], float] | Callable[[list[float]], float | None] | Callable[[list[Any]], Any | None]
+] = {
+    "average": Aggregator.average,
+    "division": Aggregator.division,
+    "product": Aggregator.product,
+    "standard_deviation": Aggregator.standard_deviation,
+    "sum": Aggregator.sum,
+    "difference": Aggregator.subtraction,
+}
+
 
 class ElementState(Enum):
     """
@@ -1690,7 +1703,27 @@ class CrossValidator:
         Any
             The result of the expression.
         """
-        pass
+        operation = expression_block.get("operation", "no_op")
+        aggregator = AGGREGATION_FUNCTIONS.get(operation)
+        if aggregator is None:
+            self._event_logs.append({
+                "error": "Unknown Operation",
+                "message": f"Unknown operation {operation} in cross validation rule.",
+                "info_map": {"class": CrossValidator.__name__, "function": CrossValidator._evaluate_expression.__name__}
+            })
+            raise ValueError(f"Unknown operation: {operation}")
+
+        ordered_variables: list[str] = expression_block.get("ordered_variables")
+        ordered_values: list[Any] = []
+        for alias_name in ordered_variables:
+            value = self._get_alias_value(alias_name)
+            ordered_values.append(value)
+
+        result = aggregator(ordered_values)
+
+        if "save_as" in expression_block:
+            self._save_to_alias_pool(alias_name=expression_block.get("alias_name"), value=result)
+        return result
 
     def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
         """
