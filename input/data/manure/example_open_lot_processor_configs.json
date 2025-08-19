@@ -20,31 +20,36 @@
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "growing_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "closeup_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "lac_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "parlor_cleaning_handler",
