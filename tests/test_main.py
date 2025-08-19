@@ -40,6 +40,43 @@ def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     )
 
 
+def test_main_exception_path(monkeypatch, mocker: MockerFixture) -> None:
+    """
+    Forces an exception in TaskManager.start() to test main exception path.
+    """
+    mock_tm_cls = mocker.patch("main.TaskManager")
+    mock_tm = mock_tm_cls.return_value
+    mock_tm.start.side_effect = Exception("main error")
+    mock_om_cls = mocker.patch("main.OutputManager")
+    mock_om = mock_om_cls.return_value
+
+    mocker.patch("main.traceback.format_exc", return_value="FAKE_TRACEBACK")
+    monkeypatch.setattr(sys, "argv", ["prog", "-l", "err_logs", "-i"])
+
+    with pytest.raises(RuntimeError) as excinfo:
+        main()
+
+    mock_om_cls.assert_called_once()
+
+    assert mock_om.add_error.call_count == 2
+    first_title, first_message, first_info = mock_om.add_error.call_args_list[0].args
+    assert first_title.startswith("Dumping all logs from main.py because of error 'main error'")
+    assert first_message.startswith("This terminal error occurred during runtime. ")
+    assert "FAKE_TRACEBACK" in first_message
+    assert first_info == {"class": "No caller class", "function": "main"}
+
+    mock_om.create_directory.assert_called_once_with(Path("err_logs"))
+    mock_om.dump_all_nondata_pools.assert_called_once_with(Path("err_logs"), True, "block")
+
+    second_title, second_message, second_info = mock_om.add_error.call_args_list[1].args
+    assert second_title == "Early termination"
+    assert "Unexpected early termination of the simulation." in second_message
+    assert second_info == {"class": "No caller class", "function": "main"}
+
+    assert "main error" in str(excinfo.value)
+    assert "check error logs" in str(excinfo.value)
+
+
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
     """Checks that parse_gnu_args() correctly parses the user's input."""
     # Arrange
