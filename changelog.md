@@ -225,6 +225,7 @@ v0.9.2
 - [2521](https://github.com/RuminantFarmSystems/MASM/pull/2521) - [minor change] Separate `UserConstants` from `GeneralConstants`.
 - [2534](https://github.com/RuminantFarmSystems/MASM/pull/2534) - [minor change][docs] Update rufas logo.
 - [2529](https://github.com/RuminantFarmSystems/MASM/pull/2529) - [minor change] E2E Testing for No Animal C&S Run.
+- [2552](https://github.com/RuminantFarmSystems/MASM/pull/2552) - [minor change] Reduce example run warning count.
 
 
 ### v0.9.2
