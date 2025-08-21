@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.biophysical.animal import animal_constants
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
@@ -168,7 +169,7 @@ class HerdStatistics:
     heiferIII_num = 0
     cow_num = 0
 
-    stillborn_calf_num = 0
+    # TODO: remove this
     sold_calf_num = 0
     sold_heiferIII_oversupply_num = 0
     bought_heifer_num = 0
@@ -232,6 +233,7 @@ class HerdStatistics:
     percent_cow_for_parity: dict[str, float]
 
     animals_deaths_by_stage: dict[AnimalType, int]
+    calf_num_by_status: dict[AnimalStatus, int]
 
     def __init__(self) -> None:
         """
@@ -289,6 +291,12 @@ class HerdStatistics:
             AnimalType.DRY_COW: 0,
         }
 
+        self.calf_num_by_status = {
+            AnimalStatus.STILLBORN: 0,
+            AnimalStatus.DEAD: 0,
+            AnimalStatus.SOLD: 0
+        }
+
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
         self.calf_num = 0
@@ -298,7 +306,6 @@ class HerdStatistics:
         self.cow_num = 0
 
         self.sold_calf_num = 0
-        self.stillborn_calf_num = 0
         self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
@@ -360,6 +367,12 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+        }
+
+        self.calf_num_by_status = {
+            AnimalStatus.STILLBORN: 0,
+            AnimalStatus.DEAD: 0,
+            AnimalStatus.SOLD: 0
         }
 
     def reset_parity(self) -> None:
