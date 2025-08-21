@@ -18,6 +18,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import herd_manager
 
+
 class SimulationEngine:
     """
     The SimulationEngine class is responsible for orchestrating the entire simulation
