@@ -9,7 +9,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 
@@ -102,6 +102,7 @@ def test_storage_init() -> None:
                     degradable_volatile_solids=30.0,
                     total_solids=1000.0,
                     volume=1500.0,
+                    methane_production_potential=0.24,
                     pen_manure_data=None,
                 ),
                 ManureStream(
@@ -115,6 +116,7 @@ def test_storage_init() -> None:
                     degradable_volatile_solids=30.0,
                     total_solids=1000.0,
                     volume=1500.0,
+                    methane_production_potential=0.24,
                     pen_manure_data=None,
                 ),
             ],
@@ -129,6 +131,7 @@ def test_storage_init() -> None:
                 degradable_volatile_solids=60.0,
                 total_solids=2000.0,
                 volume=3000.0,
+                methane_production_potential=0.24,
                 pen_manure_data=None,
             ),
         ),
@@ -152,7 +155,7 @@ def test_receive_manure(storage: Storage, manure_received: list[ManureStream], e
             (
                 "Processor 'fixture' received a ManureStream without pen manure data, "
                 "which is required for housing emissions calculations. Cannot place a handler "
-                "before Open Lot/Compost Bedded Pack in the manure processor connection chain."
+                "before Open Lot/Bedded Pack in the manure processor connection chain."
             ),
         ),
         (
@@ -207,6 +210,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             degradable_volatile_solids=8.90,
             total_solids=29.01,
             volume=10.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     )
@@ -222,6 +226,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             degradable_volatile_solids=80.88,
             total_solids=290.01,
             volume=100.12,
+            methane_production_potential=0.24,
             pen_manure_data=None,
         )
     )

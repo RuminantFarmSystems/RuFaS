@@ -7,6 +7,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 class Handler(Processor):
@@ -163,6 +164,7 @@ class Handler(Processor):
         degradable_volatile_solids = self.manure_stream.degradable_volatile_solids
         volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
+        methane_production_potential = self.manure_stream.methane_production_potential
 
         self.manure_stream = None
         self._report_processor_output(
@@ -183,6 +185,7 @@ class Handler(Processor):
             degradable_volatile_solids=degradable_volatile_solids,
             volume=volume,
             total_solids=total_solids,
+            methane_production_potential=methane_production_potential,
             pen_manure_data=None,
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
@@ -217,7 +220,7 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+        if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
             return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
         else:
             if self.use_parlor_flush:
@@ -320,4 +323,4 @@ class Handler(Processor):
         The amount of manure water (KG).
 
         """
-        return manure_stream_water + (total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3)
+        return manure_stream_water + (total_cleaning_water_volume * UserConstants.WATER_DENSITY_KG_PER_M3)

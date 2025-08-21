@@ -110,12 +110,6 @@ class PenManure:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
 
-        # Zero out any negative field
-        # TODO: This is a temporary fix. Need to find out why negative values are being generated
-        # from the animal module. Later, we should raise an exception if a negative value is found.  - Issue #609
-        # ***Note*** this issue is mostly resolved by PR #1133 but the code below should be updated to
-        # to raise an exception as noted above rather than zeroing out the negative values because it means there's
-        # a bigger issue that needs to be addressed somewhere else in the code.
         for fld in fields(self):
             if not fld.name.endswith("_unit"):
                 if getattr(self, fld.name) < 0:

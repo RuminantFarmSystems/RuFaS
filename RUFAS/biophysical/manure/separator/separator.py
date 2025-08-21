@@ -72,6 +72,7 @@ class Separator(Processor):
         ash_efficiency: float,
         volatile_solids_efficiency: float,
         total_solids_efficiency: float,
+        processor_type: str,
     ) -> None:
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
@@ -84,9 +85,8 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
-        # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
-        #  Issue #2281
-        self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
+        self.separator_type = processor_type
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.separator_type}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -149,6 +149,7 @@ class Separator(Processor):
             degradable_volatile_solids=self.held_manure.degradable_volatile_solids * self.volatile_solids_efficiency,
             total_solids=solid_manure_total_solids,
             volume=solid_manure_volume,
+            methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
         )
         solid_stream_name = "SeparatedSolids"
@@ -175,6 +176,7 @@ class Separator(Processor):
             * (1 - self.volatile_solids_efficiency),
             total_solids=liquid_manure_total_solids,
             volume=liquid_manure_volume,
+            methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
         )
         liquid_stream_name = "SeparatedLiquid"

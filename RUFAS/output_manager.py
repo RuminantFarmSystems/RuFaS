@@ -18,6 +18,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
@@ -1192,7 +1193,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, str | int]], str | None]:
+    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -1572,13 +1573,17 @@ class OutputManager(object):
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
                 if has_cross_references and has_data_significant_digits:
+                    significant_digits_limited_reports = ", ".join(
+                        f"'{report}'" for report in limited_significant_digits_reports
+                    )
+                    cross_referenced_reports = ", ".join(f"'{report}'" for report in cross_ref_reports)
                     self.add_warning(
                         "Report Generation Warning",
-                        "Reports generated have both cross references and data significant digits. Significant digits "
-                        f"were limited for the following reports: "
-                        f"{', '.join(f'\"{report}\"' for report in limited_significant_digits_reports)}. "
+                        "Reports generated have both cross references and data significant digits. "
+                        "Significant digits were limited for the following reports: "
+                        f"{significant_digits_limited_reports}. "
                         "Results may be affected for the following cross-referenced reports: "
-                        f"{', '.join(f'\"{report}\"' for report in cross_ref_reports)}.",
+                        f"{cross_referenced_reports}.",
                         info_map,
                     )
                 self.create_directory(report_dir)
@@ -1607,7 +1612,7 @@ class OutputManager(object):
         if "data_significant_digits" in filter_content:
             filtered_pool = {
                 key: (
-                    Utility.round_numeric_values_in_dict(value, filter_content["data_significant_digits"])
+                    Utility.round_numeric_values_in_dict(value, int(filter_content["data_significant_digits"]))
                     if isinstance(value, dict)
                     else value
                 )
@@ -2413,6 +2418,38 @@ class OutputManager(object):
             else:
                 validator = key_validators[key]
                 validator(value, key, filter_name)
+
+    def validate_filter_constant_content(self, filters_dir_path: Path) -> None:
+        """
+        Validates the content of the filters, including keys and values.
+
+        Parameters
+        ----------
+        filters_dir_path : Path
+            Path of the directory containing the files containing the keys for filtering.
+
+        """
+        list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
+        for filter_file in list_of_filter_files:
+            input_path = filters_dir_path / filter_file
+            filter_contents, direction = self._load_filter_file_content(input_path)
+            for content in filter_contents:
+                for name, new_value in content.get("constants", {}).items():
+                    if not hasattr(UserConstants, name):
+                        continue
+                    old_value = getattr(UserConstants, name)
+                    if new_value == old_value:
+                        continue
+
+                    setattr(UserConstants, name, new_value)
+                    self.add_warning(
+                        "UserConstants overwritten.",
+                        f"{name} overwritten by report filter; now set to {new_value}",
+                        info_map={
+                            "class": self.__class__.__name__,
+                            "function": self.validate_filter_content.__name__,
+                        },
+                    )
 
     def validate_direction(self, value: Any, content_name: str, filter_name: str) -> None:
         """

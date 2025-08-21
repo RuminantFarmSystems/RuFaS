@@ -16,13 +16,13 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
 )
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -114,10 +114,12 @@ class AnimalModuleReporter:
             herd_statistics.calf_num
             + herd_statistics.heiferI_num
             + herd_statistics.heiferII_num
-            + herd_statistics.heiferII_num
+            + herd_statistics.heiferIII_num
             + herd_statistics.cow_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
+        for animal_type, deaths in herd_statistics.animals_deaths_by_stage.items():
+            om.add_variable(f"{animal_type}_deaths", deaths, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_calves", herd_statistics.calf_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_heiferIs", herd_statistics.heiferI_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
@@ -1118,6 +1120,7 @@ class AnimalModuleReporter:
         cow_events_by_id : dict[str, str]
             The dictionary of Cow events.
         """
+        empty_sold_animals: List[SoldAnimalTypedDict] = [{"sold_at_day": 0, "body_weight": 0}]
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
         if herd_statistics.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1125,13 +1128,31 @@ class AnimalModuleReporter:
                 "sold_calves",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_calves",
+                time.simulation_day,
+            )
         if herd_statistics.sold_heiferIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_heiferIIs_info, "heiferII", time.simulation_day
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferII",
+                time.simulation_day,
+            )
         if herd_statistics.sold_heiferIIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_heiferIIIs_info, "heiferIII", time.simulation_day
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferIII",
+                time.simulation_day,
             )
         if herd_statistics.sold_and_died_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1139,9 +1160,21 @@ class AnimalModuleReporter:
                 "sold_and_died_cows",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_and_died_cows",
+                time.simulation_day,
+            )
         if herd_statistics.sold_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 herd_statistics.sold_cows_info,
+                "sold_cows",
+                time.simulation_day,
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
                 "sold_cows",
                 time.simulation_day,
             )

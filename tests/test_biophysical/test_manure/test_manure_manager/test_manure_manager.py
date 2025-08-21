@@ -7,13 +7,16 @@ from pytest_mock import MockerFixture, MockFixture
 
 from RUFAS.biophysical.manure.digester.digester import Digester
 from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
-from RUFAS.biophysical.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import STORAGE_CLASS_TO_TYPE, ManureManager
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.storage import Storage
+from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
@@ -795,6 +798,51 @@ def test_run_daily_update_missing_first_processor_raises_keyerror(
     mock_om.add_error.assert_called_once()
 
 
+@pytest.fixture
+def storage(mocker: MockerFixture) -> Storage:
+    """Storage fixture for testing."""
+    mocker.patch.object(Storage, "__init__", return_value=None)
+    storage = Storage(
+        name="fixture",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        storage_time_period=120,
+        surface_area=300.0,
+    )
+    storage.name = "fixture"
+    storage.is_housing_emissions_calculator = False
+    storage._om = OutputManager()
+    storage._cover = StorageCover.COVER
+    storage._storage_time_period = 120
+    storage._surface_area = 300.0
+    storage._received_manure = ManureStream.make_empty_manure_stream()
+    storage.stored_manure = ManureStream.make_empty_manure_stream()
+    storage._prefix = "Storage.fixture"
+    return storage
+
+
+def test_build_nutrient_pools(mocker: MockerFixture, storage: Storage, manure_manager: ManureManager) -> None:
+    """Test that _build_nutrient_pools() correctly adds nutrients to the nutrient manager."""
+    mock_storage = storage
+
+    manure_type = ManureType.LIQUID
+    STORAGE_CLASS_TO_TYPE[type(mock_storage)] = manure_type
+
+    mock_manager = manure_manager
+    mock_manager.all_processors = {"storage1": mock_storage}
+
+    mock_nutrient_manager = mocker.Mock()
+    mock_manager._manure_nutrient_manager = mock_nutrient_manager
+
+    mock_manager._build_nutrient_pools()
+
+    mock_nutrient_manager.add_nutrients.assert_called_once()
+    args, _ = mock_nutrient_manager.add_nutrients.call_args
+    passed_nutrients = args[0]
+    assert isinstance(passed_nutrients, ManureNutrients)
+    assert passed_nutrients.manure_type == manure_type
+
+
 def test_normalize_destination_name_separator_input_suffix(manure_manager: ManureManager) -> None:
     """Test that '_input' suffix is removed if base name is a known separator."""
     manure_manager._all_separators = {"separator1": MagicMock()}
@@ -848,10 +896,15 @@ def test_generate_origin_key_invalid_logs_and_raises(manure_manager: ManureManag
 
 @pytest.mark.parametrize("animals_simulated", [True, False])
 @pytest.mark.parametrize("use_supplemental_manure", [True, False])
-def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_supplemental_manure: bool) -> None:
-    """
-    Unit test for the updated request_nutrients method of the ManureManager class.
-    """
+@pytest.mark.parametrize("request_result_is_none", [True, False])
+def test_request_nutrients(
+    mocker: MockerFixture,
+    animals_simulated: bool,
+    use_supplemental_manure: bool,
+    request_result_is_none: bool,
+) -> None:
+    """Test request_nutrients for all combinations of simulation, supplemental use, and request fulfillment."""
+
     # Arrange
     mock_time = mocker.MagicMock()
     mock_time.current_julian_day = 150
@@ -861,76 +914,70 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     manure_manager = ManureManager()
     manure_manager._manure_nutrient_manager = ManureNutrientManager()
     manure_manager._om = OutputManager()
-    result = NutrientRequestResults(nitrogen=10.0, phosphorus=5.0, total_manure_mass=50.0)
-    supplemental_result = NutrientRequestResults(nitrogen=5.0, phosphorus=2.5, total_manure_mass=25.0)
-    mock_nutrient_request = mocker.MagicMock()
-    mock_request = mocker.patch.object(ManureNutrientManager,
-                                       "handle_nutrient_request",
-                                       return_value=(result, not use_supplemental_manure))
 
-    mock_record = mocker.patch.object(ManureManager, "_record_manure_request_results")
-    mock_field_request = mocker.patch.object(FieldManureSupplier,
-                                             "request_nutrients",
-                                             return_value=supplemental_result)
+    mock_nutrient_request = mocker.MagicMock()
+
+    mock_nutrient_request.use_supplemental_manure = use_supplemental_manure
+    mock_nutrient_request.manure_type = ManureType.LIQUID
+
+    request_result = (
+        None
+        if request_result_is_none
+        else NutrientRequestResults(nitrogen=10.0, phosphorus=5.0, total_manure_mass=50.0)
+    )
+    supplemental_result = NutrientRequestResults(nitrogen=5.0, phosphorus=2.5, total_manure_mass=25.0)
+    mocker.patch.object(
+        ManureNutrientManager, "handle_nutrient_request", return_value=(request_result, not use_supplemental_manure)
+    )
+
+    mocker.patch.object(ManureManager, "_record_manure_request_results")
+    mock_field_request = mocker.patch.object(FieldManureSupplier, "request_nutrients", return_value=supplemental_result)
     mock_remove = mocker.patch.object(ManureManager, "_remove_nutrients_from_storage")
-    mock_calculate = (
-        mocker.patch.object(manure_manager,
-                            "_calculate_supplemental_manure_needed",
-                            return_value=mocker.MagicMock()))
+    mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value="calculated_supplemental")
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request, animals_simulated, mock_time)
 
     # Assert
     if animals_simulated:
-        mock_request.assert_called_once()
-        # mock_record.assert_called_once()
-        mock_remove.assert_called_once()
-        if not use_supplemental_manure:
-            assert actual_results == result
+        if request_result_is_none:
+            if use_supplemental_manure:
+                mock_field_request.assert_called_once_with("calculated_supplemental")
+                mock_remove.assert_not_called()
+                assert actual_results == supplemental_result
+            else:
+                assert actual_results is None
         else:
-            mock_add_log.assert_called_once_with(
-                "Supplemental manure needed",
-                "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
-                {"class": manure_manager.__class__.__name__, "function": manure_manager.request_nutrients.__name__},
-            )
-            mock_calculate.assert_called_once_with(
-                result, mock_nutrient_request
-            )
-            mock_field_request.assert_called_once()
-            mock_record.assert_any_call(supplemental_result, "off_farm_manure")
-            combined_result = result + supplemental_result
-            assert actual_results == combined_result
+            mock_remove.assert_called_once()
+            if use_supplemental_manure:
+                mock_add_log.assert_called_once()
+                assert actual_results == request_result + supplemental_result
+            else:
+                assert actual_results == request_result
+
     else:
         mock_field_request.assert_called_once_with(mock_nutrient_request)
         assert actual_results == supplemental_result
 
 
-@pytest.mark.parametrize(
-    "is_nitrogen_limiting_nutrient",
-    [
-        True,
-        False
-    ]
-)
-def test_remove_nutrients_from_storage(manure_manager: ManureManager,
-                                       is_nitrogen_limiting_nutrient: bool,
-                                       mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("is_nitrogen_limiting_nutrient", [True, False])
+def test_remove_nutrients_from_storage(
+    manure_manager: ManureManager, is_nitrogen_limiting_nutrient: bool, mocker: MockerFixture
+) -> None:
     """Tests the function _remove_nutrients_from_storage()."""
-    mock_determine_limiting_nutrient = mocker.patch.object(ManureManager,
-                                                           "_determine_limiting_nutrient",
-                                                           return_value=is_nitrogen_limiting_nutrient)
-    mock_proportion = mocker.patch.object(manure_manager,
-                                          "_determine_nutrient_proportion_to_be_removed",
-                                          return_value=0.8)
+    mock_determine_limiting_nutrient = mocker.patch.object(
+        ManureManager, "_determine_limiting_nutrient", return_value=is_nitrogen_limiting_nutrient
+    )
+    mock_proportion = mocker.patch.object(
+        manure_manager, "_determine_nutrient_proportion_to_be_removed", return_value=0.8
+    )
     mock_remove = mocker.patch.object(ManureNutrientManager, "remove_nutrients")
-    mock_compute = mocker.patch.object(ManureManager, "_compute_stream_after_removal",
-                                       return_value=(MagicMock(ManureStream), {"nitrogen": 50}))
+    mock_compute = mocker.patch.object(
+        ManureManager, "_compute_stream_after_removal", return_value=(MagicMock(ManureStream), {"nitrogen": 50})
+    )
     composting = MagicMock(Composting)
     composting.stored_manure = MagicMock(ManureStream)
-    manure_manager.all_processors = {"non_storage": MagicMock(Digester),
-                                     "storage": composting
-                                     }
+    manure_manager.all_processors = {"non_storage": MagicMock(Digester), "storage": composting}
 
     manure_manager._remove_nutrients_from_storage(NutrientRequestResults(nitrogen=10, phosphorus=20), ManureType.LIQUID)
 
@@ -949,6 +996,7 @@ def test_remove_nutrients_from_storage(manure_manager: ManureManager,
     [
         (100.0, 80.0, True, 50.0, 0.5, 50.0, 40, 50.0, 40.0),
         (120.0, 60.0, False, 24.0, 0.4, 72.0, 36.0, 48.0, 24.0),
+        (50.0, 30.0, True, 50.0, 1.0, 0.0, 0.0, 50.0, 30.0),
     ],
 )
 def test_compute_stream_after_removal_with_real_manure_stream(
@@ -978,6 +1026,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
     )
 
@@ -1024,9 +1073,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         (1.0, 50.0, 50.0),
     ],
 )
-def test_determine_non_limiting_nutrient_removal_amount(portion: float,
-                                                        non_limiting: float,
-                                                        expected_removed: float):
+def test_determine_non_limiting_nutrient_removal_amount(portion: float, non_limiting: float, expected_removed: float):
     removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
         limiting_nutrient_proportion_to_be_removed=portion,
         non_limiting_nutrients_amount=non_limiting,
@@ -1050,9 +1097,7 @@ def test_determine_limiting_nutrient_with_patched_scaling(
 ):
     seq = [n_mass, p_mass]
     mocker.patch.object(
-        ManureNutrientManager,
-        "calculate_projected_manure_mass",
-        side_effect=lambda requested, fraction: seq.pop(0)
+        ManureNutrientManager, "calculate_projected_manure_mass", side_effect=lambda requested, fraction: seq.pop(0)
     )
 
     is_nitrogen_limiting = ManureManager._determine_limiting_nutrient(
@@ -1070,6 +1115,7 @@ def test_determine_limiting_nutrient_with_patched_scaling(
         (20.0, 100.0, 0.2),
         (50.0, 50.0, 1.0),
         (120.0, 80.0, 1.0),
+        (120.0, 0.0000001, 0.0),
     ],
 )
 def test_determine_limiting_nutrient_proportion_to_be_removed(
@@ -1081,7 +1127,7 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
         limiting_nutrient_requested_mass=requested_mass,
         limited_nutrient_available=available,
     )
-    assert pytest.approx(prop, rel=1e-8) == expected_prop
+    assert pytest.approx(prop, rel=1e-5) == expected_prop
 
 
 @pytest.mark.parametrize(

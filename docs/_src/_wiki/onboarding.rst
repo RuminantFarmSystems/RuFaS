@@ -5,6 +5,7 @@
 .. container:: titlepage
 
    **Welcome to RuFaS**
+    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/tree/dev/scientific_documentation>`__
 
    Introduction to RuFaS for New Team Members
 
@@ -287,7 +288,6 @@ repository for your offline repository.
    -  A step by step guide on how to do this is available at
       `GitHub <https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository>`__.
 
-   -  If more help is needed, ask your On boarding Buddy for help.
 
 *Install Python*
 ----------------
@@ -359,11 +359,6 @@ Windows or MacOS depending on the device you are working with.
    -  Detailed tutorial by `tutorial by
       DataQuest <https://www.dataquest.io/blog/installing-python-on-mac/>`__
 
--  **Linux**
-
-   -  If you are using Linux, and you have problems, contact your
-      onboarding buddy for guidance on how to troubleshoot and resolve
-      any challenges you may come across.
 
 *Install VS Code (the IDE)*
 ---------------------------
@@ -372,8 +367,7 @@ Recall that this IDE will allow us to write, edit, debug, and pilot test
 RuFaS. VS Code is commonly used by RuFaS team members, but there are
 other options of IDEs if you wish to explore other ways to work with the
 RuFaS program. If you are not familiar with IDEs, we recommend sticking
-with VS Code so that you may reach out to your onboarding buddy or
-another RuFaS team member if you need assistance troubleshooting.
+with VS Code so a RuFaS team member can be of maximal assistance troubleshooting.
 
 -  Begin by visiting the official `VisualStudio
    website <https://code.visualstudio.com/download>`__.
@@ -411,8 +405,6 @@ another RuFaS team member if you need assistance troubleshooting.
 
                   pip install -r requirements.txt
 
-      *Important Note: if there is an issue, please stop at this point
-      and contact your onboarding buddy.*
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.
@@ -455,7 +447,7 @@ primarily through VS Code.
 
 If you wish to have more information on how to interact with RuFaS
 through other IDE’s or using Git or GitHub Desktop, please reach out to
-your onboarding buddy or another RuFaS team member for more information.
+a RuFaS team member for more information.
 
 In this section, you will review:
 
@@ -468,8 +460,7 @@ In this section, you will review:
 -  Beginner’s Simulation Worksheet
 
 After this section, if you have any remaining questions, be sure to
-reach out to your onboarding buddy or another RuFaS team member for more
-assistance.
+reach out to a RuFaS team member for more assistance.
 
 *Basic Vocabulary Used by Developers: Learning to Communicate with RuFaS*
 -------------------------------------------------------------------------
@@ -591,9 +582,9 @@ Git Desktop.
    -  Locate your terminal in the IDE you have chosen to download
       (PyCharm or VS Code).
 
-   -  Run a default scenario by typing in "python main.py". Did you get
+   -  Run a example scenario by typing in "python main.py". Did you get
       a message with the RuFaS version number and saying it was starting
-      a task? Congratulations! You just simulated the RuFaS default
+      a task? Congratulations! You just simulated the RuFaS example
       farm!
 
    -  You can find the details related to logs, warnings, and errors
@@ -614,7 +605,7 @@ Git Desktop.
 
    -  Click on that branch to check it out
 
-   -  Run the default farm scenario again to check if you were
+   -  Run the example farm scenario again to check if you were
       successful
 
 -  **Familiarize yourself with the RuFaS file structure**. Using VS Code
@@ -627,8 +618,8 @@ Git Desktop.
       that informs the program.
 
       -  Default Config Files Unless you manually adjust them, your
-         simulation will always refer to the default configuration file
-         to run. This default config file is used to configure a
+         simulation will always refer to the example configuration file
+         to run. This example config file is used to configure a
          "scenario." You can open these files and change the parameters
          with which you are working.
 
@@ -641,7 +632,7 @@ Git Desktop.
       (in quotes because the day we are referring to is in the
       simulation). You can adjust the length of time of the simulation
       to report these outputs in your config files by adjusting the
-      start and end dates. The default is 6 years. The Output section of
+      start and end dates. The example is 6 years. The Output section of
       this introduction will go into more detail.
 
       -  Metadata - One RuFaS team member once succinctly described this
@@ -664,7 +655,7 @@ Git Desktop.
          file. Select one of the available tasks. You will see that the
          code describes where the data are coming from. Unless you
          change the file yourself, the simulation will automatically
-         select a default file. You can change the source by simply
+         select a example file. You can change the source by simply
          typing an alternate file name.
 
    #. **Output** - contains "output filters," the actual output of your
@@ -678,7 +669,7 @@ Git Desktop.
          "csv" and then the name of the rest of the file. All that goes
          into this file is the name of the output you want. They can be
          quite user specific, so it might be helpful to start with
-         asking for some team members to share some basic filters.
+         asking other model users to share some basic filters.
 
       Recall from the input section that some data are reported on a
       ’daily’ basis. You can set up csv files print a column with each
@@ -691,8 +682,8 @@ Git Desktop.
       \*Note, when you run a simulation, there will also be logs to tell
       you more detailed information about the simulation you ran. Some
       of these logs may be helpful, but may sometimes be difficult to
-      interpret. Don’t hesitate to reach out to a RuFaS team member or
-      your dev team experts to help you interpret logs.
+      interpret. Don’t hesitate to reach out to the RuFaS user community 
+      to help you interpret logs.
 
    #. **RuFaS** - as the name may imply, this is the home for the code
       that makes up the program. There are folders like "routines",
@@ -739,13 +730,9 @@ open your Git Desktop and VS Code.
    -  In the menu to the left select the input dropdown and then select
       metadata dropdown.
 
-   .. figure:: /_static/findmeta.png
-      :alt: The VS Code window has a menu on the left side of the screen
-      where you will spend the most time navigating between dropdowns to
-      find the files you need to change and your outcomes. You will
-      become familiar with the following: input, output, data, metadata,
-      output filters, and reports
-      :name: fig:example
+    .. figure:: /_static/findmeta.png
+      :alt: Navigating metadata
+      :name: fig:findmeta
       :width: 80.0%
 
       The VS Code window has a menu on the left side of the screen where
@@ -754,79 +741,77 @@ open your Git Desktop and VS Code.
       familiar with the following: input, output, data, metadata, output
       filters, and reports
 
-   .
-
 #. Select the file titled task_manager_metadata.json and observe the
-   "path" to find the default_task.json file.
+   "path" to find the example_freestall_task.json file.
 
    -  The path demonstrates how you may find the file from which RuFaS
       is receiving instruction or inputs. If no changes are made, RuFaS
-      will always run through the indicated default files.
+      will always run through the indicated example files.
 
    -  Go to the left menu of VS Code again and you may locate the file
       by selecting input then data, and finally tasks.
 
-      There you will find default_task.json.
+      There you will find example_freestall_task.json.
 
-   .. figure:: /_static/defaulttask.png
+   .. figure:: /_static/default_task.png
       :alt: default task mngr
       :name: fig:example
-      :width: 80.0%
+      :width: 100.0%
 
       This figure demonstrates where you may find the
       task_manager_metadata.json file and the location of the path for
       the next default task.
 
-#. When you select the file, default_task.json you will notice there is
-   another path pointing to a default_metadata.json file. This
-   default_metadata.json file is your first opportunity to make
+#. When you select the file, example_freestall_task.json you will notice there is
+   another path pointing to a example_freestall_dairy_metadata.json file. This
+   example_freestall_dairy_metadata.json file is your first opportunity to make
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-.. figure:: /_static/defaulttask.png
-   :alt: default task
-   :name: fig:example
-   :width: 80.0%
+    .. figure:: /_static/default_task.png
+       :alt: default task
+       :name: fig:example
+       :width: 100.0%
 
-When you open the default_task.json file, this is what you should
-see. Notice that the default scenario is a single run of a
-simulation titled, "SIMULATION_SINGLE_RUN."
+        When you open the example_freestall_task.json file, this is what you should
+        see. Notice that the example scenario is a single run of a
+        simulation titled, "SIMULATION_SINGLE_RUN."
 
-#. In the default_metadata.json file, you will observe a long list of
+#. In the example_freestall_dairy_metadata.json file, you will observe a long list of
    paths to different input or config files. These are where you will be
    making your changes to inputs (i.e. animal numbers, manure storage
    system, etcetera).
 
    -  \**\*\ **Tip:** If you will be making changes to multiple aspects
       of animal module, feed storage, crop and soil, and/or manure
-      files, we recommend that you make a copy of default_metadata.json
+      files, we recommend that you make a copy of example_metadata.json
       (you may right click the file and copy it to the same location or
       use CTRL+C then CTRL+V).
 
       -  If you chose to make a copy, title it something easy to
-         remember. We recommend "default_metadatav1.json" or something
+         remember. We recommend "example_metadatav1.json" or something
          similar.
 
-.. figure:: /_static/defaultmeta.png
-   :alt: default meta
-   :name: fig:example
-   :width: 80.0%
+    .. figure:: /_static/example_metadata.png
+       :alt: default meta
+       :name: fig:example
+       :width: 100.0%
 
-This is an example of what you will see when you open your default
-metadata json file. Depending on what you are looking for, you may
-use this to better understand what input or config files you will
-need to look at.
+        This is an example of what you will see when you open your example
+        metadata json file. Depending on what you are looking for, you may
+        use this to better understand what input or config files you will
+        need to look at.
 
-#. Using the paths in either the default_metadata.json file or the
+#. Using the paths in either the example_freestall_dairy_metadata.json file or the
    version of the file that you created, locate the values that you wish
    to alter for your simulation.
 
    -  For practice, navigate to the portion of text titled "Animal data"
-      in the file. Follow this path to the default_animal.json file in
+      in the file. Follow this path to the example_freestall_animal.json file in
       the metadata dropdown.
 
-   -  Create a copy of default_animal.json and give it the title
-      **"default_animal1.json."**
+   -  Create a copy of example_freestall_animal.json and give it the title
+      **"example_freestall_animal1.json"**
 
    -  In your newly created json file, change the "cow_num" from 100 to
       10000 and your "replace_num" from 500 to 3000.
@@ -838,18 +823,18 @@ need to look at.
    through are pointing to the correct files so that we can run our
    first simulation. Methodically work your way backwards through the
    steps to check that the paths are pointing to your newly created file
-   or files if you made a copy of the default_metadata file.
+   or files if you made a copy of the example_freestall_dairy_metadata file.
 
-   -  Check your default_metadata.json file or the copy that you
+   -  Check your example_freestall_dairy_metadata.json file or the copy that you
       created. The path for the "animal data" should point to the new
-      default_animal1.json file that you created in **Step 6**.
+      example_freestall_animal1.json file that you created in **Step 6**.
 
-   -  Check that your default_task.json file is indicating the correct
+   -  Check that your example_freestall_task.json file is indicating the correct
       metadata json file if you did create a copy of the file. If you
       did not, it should already be pointing to the correctly
-      default_metadata.json file.
+      example_freestall_dairy_metadata.json file.
 
-   -  You may wish to check on the default_task.json and
+   -  You may wish to check on the example_freestall_task.json and
       task_manager_metadata.json, but we did not make any changes past
       this point so all files should still be correctly indicated in the
       path.
@@ -887,20 +872,20 @@ need to look at.
 #. You can borrow the files for Output Filters from other team members
    or create some on your own. For more details on how to create your
    own, visit the GitHub wiki `Output
-   Manager <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#output-filters>`__.
+   Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Output-Manager.html#output-filters>`__.
 
    -  Think of output filters as an opportunity to tailor the results
       generated from your simulation to only show the variables of
       interest. You can also use filters to control the way you view
       your results. Recall **Step 9**, while CSV files are standard for
       RuFaS,
-      `Reports <https://github.com/RuminantFarmSystems/MASM/wiki/Report-Generator>`__
+      `Reports <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Report-Generator.html>`__
       and
       `Graphs <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__
       must be generated using filters.
 
    -  The `Output
-      Manager <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#output-filters>`__
+      Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Graph-Generator.html>`__
       also has some sample filters that you can use and add into your VS
       Code to help you.
 
@@ -918,13 +903,8 @@ Additional Materials
 
 -  Now that you’re familiar with the basics, we encourage you to review
    the full recording of the `onboarding
-   session <https://3.basecamp.com/3486446/buckets/5296287/uploads/6661565836>`__
+   session <https://youtu.be/Xqjse-fKQV0>`__
    for more details.
-
--  PyCharm Users can use `these videos to
-   help <https://3.basecamp.com/3486446/buckets/5296287/vaults/2713991190>`__.
-
-   -  Start with "gettingstarted.mov" before watching the other two.
 
 -  If using VS Code or PyCharm and unsure of how to proceed with setting
    up the virtual environment (or if you have any other questions or
@@ -935,5 +915,3 @@ Additional Materials
    videos <https://www.youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`__.
    Take your time and review all 6 videos in the series.
 
-   -  Please review our version control protocols
-      `here <https://3.basecamp.com/3486446/buckets/5296287/vaults/2177548970>`__.

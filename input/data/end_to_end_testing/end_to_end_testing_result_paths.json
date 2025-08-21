@@ -1,28 +1,58 @@
 {
-    "end_to_end_test_result_paths": [
-        {
-            "domain": "FeedStorage",
-            "expected_results_path": "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
-            "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_",
-            "tolerance": 0.1
-        },
-        {
-            "domain": "CropAndSoil",
-            "expected_results_path": "input/data/end_to_end_testing/e2e_json_crop_soil_filter.json",
-            "actual_results_path": "end-to-end-testing_saved_variables_e2e_crop_and_soil_",
-            "tolerance": 0.1
-        },
-        {
-            "domain": "Animal",
-            "expected_results_path": "input/data/end_to_end_testing/e2e_json_animal_filter.json",
-            "actual_results_path": "end-to-end-testing_saved_variables_e2e_animal_",
-            "tolerance": 0.1
-        },
-        {
-            "domain": "Manure",
-            "expected_results_path": "input/data/end_to_end_testing/e2e_json_manure_filter.json",
-            "actual_results_path": "end-to-end-testing_saved_variables_e2e_manure_",
-            "tolerance": 0.1
-        }
+  "end_to_end_test_result_paths": {
+    "freestall_e2e": [
+      {
+        "domain": "CropAndSoil",
+        "expected_results_path": "input/data/end_to_end_testing/freestall/e2e_json_crop_soil_filter.json",
+        "actual_results_path": "freestall_e2e_saved_variables_e2e_crop_and_soil_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Animal",
+        "expected_results_path": "input/data/end_to_end_testing/freestall/e2e_json_animal_filter.json",
+        "actual_results_path": "freestall_e2e_saved_variables_e2e_animal_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Manure",
+        "expected_results_path": "input/data/end_to_end_testing/freestall/e2e_json_manure_filter.json",
+        "actual_results_path": "freestall_e2e_saved_variables_e2e_manure_",
+        "tolerance": 0.1
+      }
+    ],
+    "open_lot_e2e": [
+      {
+        "domain": "CropAndSoil",
+        "expected_results_path": "input/data/end_to_end_testing/open_lot/e2e_json_crop_soil_filter.json",
+        "actual_results_path": "open_lot_e2e_saved_variables_e2e_crop_and_soil_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Animal",
+        "expected_results_path": "input/data/end_to_end_testing/open_lot/e2e_json_animal_filter.json",
+        "actual_results_path": "open_lot_e2e_saved_variables_e2e_animal_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Manure",
+        "expected_results_path": "input/data/end_to_end_testing/open_lot/e2e_json_manure_filter.json",
+        "actual_results_path": "open_lot_e2e_saved_variables_e2e_manure_",
+        "tolerance": 0.1
+      }
+    ],
+    "no_animal_e2e": [
+      {
+        "domain": "CropAndSoil",
+        "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_crop_soil_filter.json",
+        "actual_results_path": "no_animal_e2e_saved_variables_e2e_crop_and_soil_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Manure",
+        "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_manure_filter.json",
+        "actual_results_path": "no_animal_e2e_saved_variables_e2e_manure_",
+        "tolerance": 0.1
+      }
     ]
+  }
 }

@@ -47,6 +47,7 @@ Navigation
    _wiki/Report-Generator
    _wiki/Graph-Generator
    _wiki/End‐to‐End-Testing
+   _wiki/Data-Collection-App
 
 Tools
 -----
@@ -86,11 +87,6 @@ Other Resources
 - `Unit Testing Reference <https://realpython.com/python-testing/>`_
 - `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 - `Doc String Guide <https://realpython.com/documenting-python-code/>`_
-
-.. toctree::
-   :maxdepth: 1
-
-   _wiki/Data-Collection-App
 
 
 Indices and tables

@@ -148,9 +148,9 @@ class Modifiability(Enum):
         Indicates the variable does not need to be initialized with a value and can be modified during runtime.
     """
 
-    REQUIRED_LOCKED: str = "required locked"
-    REQUIRED_UNLOCKED: str = "required unlocked"
-    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
+    REQUIRED_LOCKED = "required locked"
+    REQUIRED_UNLOCKED = "required unlocked"
+    UNREQUIRED_UNLOCKED = "unrequired unlocked"
 
     @classmethod
     def values(cls) -> list[str]:
@@ -694,7 +694,6 @@ class DataValidator:
         )
         return True, ""
 
-    # Validate input by type related
     def validate_data_by_type(
         self,
         variable_properties: dict[str, Any],
@@ -743,9 +742,13 @@ class DataValidator:
         Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
 
         """
-
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_data_by_type.__name__,
+        }
         if "type" not in variable_properties:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
+
         data_type = variable_properties["type"]
 
         type_to_validator_map: dict[
@@ -760,10 +763,11 @@ class DataValidator:
             "number": self._number_type_validator,
             "bool": self._bool_type_validator,
         }
+        path = self.convert_variable_path_to_str(variable_path)
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{self.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{path}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -779,17 +783,42 @@ class DataValidator:
         )
 
         if data_type not in fixable_data_types:
+            if not is_valid:
+                error_message = (
+                    f"Variable: '{path}' has invalid or missing values and its data type is not fixable."
+                    f" Please check the inputs."
+                )
+                self.event_logs.append(
+                    {
+                        "error": "Validation: invalid input data not able to be fixed",
+                        "message": error_message,
+                        "info_map": info_map,
+                    }
+                )
             return is_valid
 
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True
+
         is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
+
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
             return True
-        elements_counter.increment(ElementState.INVALID)
-        return False
+        else:
+            error_message = (
+                f"Variable: '{path}' has invalid or missing values and failed to fix. Please check the inputs."
+            )
+            self.event_logs.append(
+                {
+                    "error": "Validation: invalid input data not able to be fixed",
+                    "message": error_message,
+                    "info_map": info_map,
+                }
+            )
+            elements_counter.increment(ElementState.INVALID)
+            return False
 
     def _validate_array_container_properties(
         self,
@@ -1577,3 +1606,120 @@ class DataValidator:
             else:
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return data
+
+
+class CrossValidator:
+    def __init__(self) -> None:
+        self._alias_pool: dict[str, Any] = {}
+        self._event_logs: list[dict[str, str | dict[str, str]]] = []
+
+    def cross_validate_data(
+        self, im_variable_pool: dict[str, Any], cross_validation_rules: list[dict[str, Any]]
+    ) -> bool:
+        """
+        Performs cross-validation on the provided data using the provided cross validation rules.
+
+        Parameters
+        ----------
+        im_variable_pool : dict[str, Any]
+            A dictionary containing the InputManager variable pool to be validated.
+        cross_validation_rules : list[dict[str, Any]]
+            A list of dictionaries containing the cross-validation rules to be applied.
+
+        Returns
+        -------
+        bool
+            A boolean indicating whether the data passed cross-validation.
+        """
+        pass
+
+    def _save_to_alias_pool(self, alias_name: str, value: Any) -> None:
+        """
+        Saves a value to the alias pool with the specified alias name.
+
+        Parameters
+        ----------
+        alias_name : str
+            The name of the alias to be saved.
+        value : Any
+            The value to be saved.
+        """
+        pass
+
+    def _get_alias_value(self, alias_name: str) -> Any:
+        """
+        Retrieves the value associated with the specified alias name from the alias pool.
+
+        Parameters
+        ----------
+        alias_name : str
+            The alias of the value to retrieve.
+
+        Returns
+        -------
+        Any
+            The value associated with the specified alias name from the alias pool.
+        """
+
+    def _target_and_save(self, target_and_save_block: dict[str, dict[str, Any]]) -> None:
+        """
+        This function handles the "target and save block" in the cross-validation rule.
+        It retrieves the value of the target variable from the InputManager variable pool
+        and saves it to the alias pool with the specified alias name. It also saves the
+        constants defined in the "constants" block to the alias pool with the specified alias.
+
+        Parameters
+        ----------
+        target_and_save_block : dict[str, dict[str, Any]]
+            A dictionary containing the "target and save block" of the cross-validation rule.
+        """
+        pass
+
+    def _evaluate_expression(self, expression_block: dict[str, Any]) -> Any:
+        """
+        Evaluates an expression based on the provided expression block. This function also
+        optionally adds to the alias pool if the "save_as" key is present in the expression block.
+
+        Parameters
+        ----------
+        expression_block : dict[str, Any]
+            A dictionary containing the expression block to be evaluated.
+
+        Returns
+        -------
+        Any
+            The result of the expression.
+        """
+        pass
+
+    def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
+        """
+        Evaluates if a single condition is satisfied based on the provided condition clause.
+
+        Parameters
+        ----------
+        condition_clause : dict[str, Any]
+            The condition clause to be evaluated.
+
+        Returns
+        -------
+        bool
+            A boolean indicating whether the condition is satisfied.
+        """
+        pass
+
+    def _evaluate_condition_clause_array(self, condition_clause_array: list[dict[str, Any]]) -> bool:
+        """
+        Evaluates if all conditions in the provided condition clause array are satisfied.
+
+        Parameters
+        ----------
+        condition_clause_array : list[dict[str, Any]]
+            An array of condition clauses to be evaluated.
+
+        Returns
+        -------
+        bool
+            A boolean indicating whether all conditions in the array are satisfied.
+        """
+        pass
