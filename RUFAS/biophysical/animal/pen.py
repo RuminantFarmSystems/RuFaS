@@ -968,9 +968,11 @@ class Pen:
 
             # TODO NOTE that below is only happening for lac cows: if this is reasonable, we can try for all classes
             if is_ration_defined_by_user and (
-                (initial_dry_matter_requirement_fixed * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION))
-                < initial_dry_matter_requirement < (
-                    initial_dry_matter_requirement_fixed * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION))):
+                (initial_dry_matter_requirement_fixed * (
+                    1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance))
+                < initial_dry_matter_requirement < 
+                (initial_dry_matter_requirement_fixed * (
+                    1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance))):
                 if bool(set(["NE_total_constraint",
                              "NE_maintenance_and_activity_constraint",
                              "NE_lactation_constraint",
