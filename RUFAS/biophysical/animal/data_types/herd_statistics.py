@@ -293,7 +293,6 @@ class HerdStatistics:
             AnimalType.DRY_COW: 0,
         }
 
-
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
         self.calf_num = 0

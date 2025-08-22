@@ -483,19 +483,26 @@ class HerdManager:
         removed_animals += sold_heiferIIs
 
         # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
-        (graduated_heiferIIIs, sold_heiferIIIs, stillborn_newborn_calves_from_heiferIIIs, newborn_calves_from_heiferIIIs,
-         sold_newborn_calves_from_heiferIIIs) = (
-            self._perform_daily_routines_for_animals(time, self.heiferIIIs)
-        )
+        (
+            graduated_heiferIIIs,
+            sold_heiferIIIs,
+            stillborn_newborn_calves_from_heiferIIIs,
+            newborn_calves_from_heiferIIIs,
+            sold_newborn_calves_from_heiferIIIs,
+        ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
         graduated_animals += graduated_heiferIIIs
         removed_animals += sold_heiferIIIs
         stillborn_newborn_calves += stillborn_newborn_calves_from_heiferIIIs
         sold_newborn_calves += sold_newborn_calves_from_heiferIIIs
         newborn_calves += newborn_calves_from_heiferIIIs
 
-        (graduated_cows, sold_and_died_cows, stillborn_newborn_calves_from_cows, newborn_calves_from_cows, sold_newborn_calves_from_cows) = (
-            self._perform_daily_routines_for_animals(time, self.cows)
-        )
+        (
+            graduated_cows,
+            sold_and_died_cows,
+            stillborn_newborn_calves_from_cows,
+            newborn_calves_from_cows,
+            sold_newborn_calves_from_cows,
+        ) = self._perform_daily_routines_for_animals(time, self.cows)
         graduated_animals += graduated_cows
         removed_animals += sold_and_died_cows
         stillborn_newborn_calves += stillborn_newborn_calves_from_cows
@@ -562,7 +569,7 @@ class HerdManager:
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
         newborn_calf: Animal = Animal(args=newborn_calf_config, simulation_day=simulation_day)
-        if not newborn_calf.sold: # TODO change to is dead by updating the statistics.
+        if not newborn_calf.sold:  # TODO change to is dead by updating the statistics.
             newborn_calf.events.add_event(newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
