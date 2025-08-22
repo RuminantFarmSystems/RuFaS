@@ -187,5 +187,6 @@ class SoldAnimalTypedDict(TypedDict):
     days_in_milk: int | str
     parity: int | str
 
+
 class StillbornCalfTypedDict(TypedDict):
     id: int

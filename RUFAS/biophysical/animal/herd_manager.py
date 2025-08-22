@@ -12,8 +12,11 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict, SoldAnimalTypedDict, \
-    StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
+    NewBornCalfValuesTypedDict,
+    SoldAnimalTypedDict,
+    StillbornCalfTypedDict,
+)
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -372,12 +375,7 @@ class HerdManager:
     def _update_stillborn_calf_statistics(self, stillborn_calves: list[Animal]) -> None:
         """Updates the statistic regarding the stillborn calves."""
         self.herd_statistics.stillborn_calf_num += len(stillborn_calves)
-        self.herd_statistics.stillborn_calf_info += [
-            StillbornCalfTypedDict(
-                id=calf.id
-            )
-            for calf in stillborn_calves
-        ]
+        self.herd_statistics.stillborn_calf_info += [StillbornCalfTypedDict(id=calf.id) for calf in stillborn_calves]
 
     def _update_sold_animal_statistics(
         self, sold_newborn_calves: list[Animal], sold_heiferIIs: list[Animal], sold_and_died_cows: list[Animal]
