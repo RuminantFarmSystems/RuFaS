@@ -163,6 +163,9 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
+			"minutes_away_for_milking" : null,
+			"first_parlor_processor": null,
+			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "calf_pen",
@@ -182,6 +185,9 @@
 			"housing_type": "open air barn",
 			"pen_type": "open lot",
 			"max_stocking_density": 1.2,
+			"minutes_away_for_milking" : null,
+			"first_parlor_processor": null,
+			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "grow_lot",
@@ -207,6 +213,9 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
+			"minutes_away_for_milking" : null,
+			"first_parlor_processor": null,
+			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "closeup_feed_alley",

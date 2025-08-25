@@ -20,31 +20,36 @@
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "growing_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "closeup_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "lac_alley_scraper",
       "processor_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "parlor_cleaning_handler",
@@ -117,24 +122,26 @@
       "name": "compost",
       "processor_type": "Composting",
       "composting_type": "intensive windrow",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     },
     {
       "name": "open_lot_1",
       "processor_type": "OpenLot",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     },
     {
       "name": "bedded_pack_1",
       "processor_type": "BeddedPack",
       "storage_time_period": 30,
-      "is_mixed": false
+      "surface_area": null
     },
     {
       "name": "compost_bedded_pack_1",
       "processor_type": "BeddedPack",
       "storage_time_period": 183,
-      "is_mixed": true
+      "surface_area": null
     }
   ]
 }
