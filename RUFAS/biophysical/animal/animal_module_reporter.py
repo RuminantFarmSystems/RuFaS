@@ -1118,10 +1118,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_stillborn_calves_information(
-        cls,
-        stillborn_calves: list[StillbornCalfTypedDict] | list[dict[str, int]],
-        report_name: str,
-        total_days: int
+        cls, stillborn_calves: list[StillbornCalfTypedDict] | list[dict[str, int]], report_name: str, total_days: int
     ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
@@ -1138,7 +1135,7 @@ class AnimalModuleReporter:
 
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter. report_stillborn_calves_information.__name__,
+            "function": AnimalModuleReporter.report_stillborn_calves_information.__name__,
         }
 
         stillborn_at_day_min: int = sys.maxsize
@@ -1170,7 +1167,9 @@ class AnimalModuleReporter:
                 stillborn_count = len(daily_stillborn[day])
                 birth_weight = sum(stillborn_calf["birth_weight"] for stillborn_calf in daily_stillborn[day])
                 om.add_variable(
-                    f"{report_name}_stillborn_count", stillborn_count, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+                    f"{report_name}_stillborn_count",
+                    stillborn_count,
+                    dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
                 )
                 om.add_variable(
                     f"{report_name}_stillborn_birth_weight",
@@ -1178,7 +1177,9 @@ class AnimalModuleReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
                 )
             else:
-                om.add_variable(f"{report_name}_stillborn_count", 0, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+                om.add_variable(
+                    f"{report_name}_stillborn_count", 0, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+                )
                 om.add_variable(
                     f"{report_name}_stillborn_birth_weight", 0, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
                 )
@@ -1384,15 +1385,11 @@ class AnimalModuleReporter:
 
         if herd_statistics.stillborn_calf_info:
             AnimalModuleReporter.report_stillborn_calves_information(
-                herd_statistics.stillborn_calf_info,
-                "stillborn_calves",
-                time.simulation_day
+                herd_statistics.stillborn_calf_info, "stillborn_calves", time.simulation_day
             )
         else:
             AnimalModuleReporter.report_stillborn_calves_information(
-                [{"stillborn_day": 0, "birth_weight": 0}],
-                "stillborn_calves",
-                time.simulation_day
+                [{"stillborn_day": 0, "birth_weight": 0}], "stillborn_calves", time.simulation_day
             )
 
         AnimalModuleReporter._record_animal_events(cows, time.simulation_day)
