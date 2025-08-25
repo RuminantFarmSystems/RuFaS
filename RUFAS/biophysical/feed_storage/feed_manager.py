@@ -236,8 +236,7 @@ class FeedManager:
     def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
         feed_report: dict[RUFAS_ID, dict[str, float]] = {
-            feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0}
-            for feed in self._available_feeds
+            feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0} for feed in self._available_feeds
         }
         available_feed_ids = set(feed_report.keys())
 
@@ -561,12 +560,8 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
         }
-        total_purchased_feed_deductions: dict[RUFAS_ID, float] = {
-            feed.rufas_id: 0.0 for feed in self._available_feeds
-        }
-        total_farmgrown_feed_deductions: dict[RUFAS_ID, float] = {
-            feed.rufas_id: 0.0 for feed in self._available_feeds
-        }
+        total_purchased_feed_deductions: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self._available_feeds}
+        total_farmgrown_feed_deductions: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self._available_feeds}
 
         all_available_feeds: list[HarvestedCrop | PurchasedFeed] = self._gather_available_feeds()
 
