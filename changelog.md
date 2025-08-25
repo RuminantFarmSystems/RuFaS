@@ -227,6 +227,7 @@ v0.9.2
 - [2529](https://github.com/RuminantFarmSystems/MASM/pull/2529) - [minor change] E2E Testing for No Animal C&S Run.
 - [2551](https://github.com/RuminantFarmSystems/MASM/pull/2551) - [minor change] Raises error in main.py to direct user to errors file for debugging.
 - [2547](https://github.com/RuminantFarmSystems/MASM/pull/2547) - [minor change] [Input Manager] 1/5 Cross Validation basic setup.
+- [2482](https://github.com/RuminantFarmSystems/MASM/pull/2554) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
 
 
 ### v0.9.2
