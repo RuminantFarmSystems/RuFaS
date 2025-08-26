@@ -4,6 +4,7 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -89,7 +90,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        # EEEManager.estimate_all()
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -107,6 +108,13 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         manure_applications = self.generate_daily_manure_applications()
+        self.feed_manager.report_cumulative_purchased_feeds(self.time.simulation_day)
+        for rufas_id, amount in self.feed_manager._cumulative_purchased_feeds_fed.items():
+            self.om.add_variable(f"purchased_feed_{rufas_id}_fed_to_date", amount,
+                                 {"class": self.__class__.__name__, "function": self._daily_simulation.__name__,
+                                  "simulation_day": self.time.simulation_day,
+                                  "units": MeasurementUnits.KILOGRAMS}
+                                 )
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
