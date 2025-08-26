@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from datetime import date
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, NASEMFeed, NRCFeed
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-from RUFAS.rufas_time import RufasTime
 
 
 @dataclass
@@ -34,10 +33,11 @@ class PurchasedFeed:
 
 class PurchasedFeedStorage:
     """
-    Storage child class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
+    Storage class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, available_feeds: list[NASEMFeed | NRCFeed]) -> None:
+        self.available_feeds: list[NASEMFeed | NRCFeed] = available_feeds
         self.stored: list[PurchasedFeed] = []
         self._om = OutputManager()
 
@@ -48,19 +48,18 @@ class PurchasedFeedStorage:
         """Removes all feeds with no dry matter mass left."""
         self.stored = [feed for feed in self.stored if feed.dry_matter_mass >= 0.000_001]
 
-    def report_stored_purchased_feeds(self, time: RufasTime) -> None:
+    def report_stored_purchased_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Reports dry matter of stored feeds."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_purchased_feeds.__name__,
-            "simulation_day": time.simulation_day,
+            "simulation_day": simulation_day,
             "units": MeasurementUnits.KILOGRAMS,
+            "suffix": reporting_suffix,
         }
         report = self.create_consolidated_feed_report()
 
         for rufas_id, mass in report.items():
-            info_map["rufas_id"] = rufas_id
-            info_map["mass"] = mass
             self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
 
     def create_consolidated_feed_report(self) -> dict[RUFAS_ID, float]:
@@ -70,4 +69,7 @@ class PurchasedFeedStorage:
             if feed.rufas_id not in report:
                 report[feed.rufas_id] = 0.0
             report[feed.rufas_id] += feed.dry_matter_mass
+        for available_feed in self.available_feeds:
+            if available_feed.rufas_id not in report:
+                report[available_feed.rufas_id] = 0.0
         return report
