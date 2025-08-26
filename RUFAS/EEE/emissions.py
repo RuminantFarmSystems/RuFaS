@@ -15,9 +15,7 @@ FINAL_DAY_SLICE_START = -1
 PURCHASED_FEED_STORAGE_FILTER = {
     "name": "Purchased Feeds in Storage",
     "description": "Gathers the amounts of purchased feeds in storage on a particular day.",
-    "filters": [
-        "PurchasedFeedStorage.report_stored_purchased_feeds.stored_feed_.*daily_storage_levels.*"
-    ],
+    "filters": ["PurchasedFeedStorage.report_stored_purchased_feeds.stored_feed_.*daily_storage_levels.*"],
     "slice_start": SLICE_START,
 }
 
@@ -128,16 +126,16 @@ class EmissionsEstimator:
         if not stored_feeds:
             return
 
-        starting_purchased_storage_totals, ending_purchased_storage_totals = \
-            self._calculate_purchased_storage_totals(stored_feeds)
+        starting_purchased_storage_totals, ending_purchased_storage_totals = self._calculate_purchased_storage_totals(
+            stored_feeds
+        )
         purchased_feeds_totals = self._calculate_purchased_feed_amounts()
 
-        purchased_feeds_fed_totals = self._calculate_total_purchased_feed_fed(starting_purchased_storage_totals,
-                                                                              ending_purchased_storage_totals,
-                                                                              purchased_feeds_totals)
+        purchased_feeds_fed_totals = self._calculate_total_purchased_feed_fed(
+            starting_purchased_storage_totals, ending_purchased_storage_totals, purchased_feeds_totals
+        )
         self.om.add_variable(
-            "purchased_feed_fed_totals", purchased_feeds_fed_totals,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS}
+            "purchased_feed_fed_totals", purchased_feeds_fed_totals, {**info_map, "units": MeasurementUnits.KILOGRAMS}
         )
 
         total_emissions, land_use_emissions = self._calculate_emissions(purchased_feeds_fed_totals)
@@ -162,8 +160,9 @@ class EmissionsEstimator:
             self.om.add_warning("No Purchased Feeds in Storage", "No purchased feeds were found in storage.", info_map)
         return stored_feeds
 
-    def _calculate_purchased_storage_totals(self, stored_feeds: dict[str, Any]
-                                            ) -> tuple[dict[str, float], dict[str, float]]:
+    def _calculate_purchased_storage_totals(
+        self, stored_feeds: dict[str, Any]
+    ) -> tuple[dict[str, float], dict[str, float]]:
         """Calculates the starting and ending storage levels of purchased feeds.
 
         Parameters
@@ -375,8 +374,9 @@ class EmissionsEstimator:
         purchased_feed_emissions_by_location = self._get_feed_emissions_data(county_code, purchased_feed_emissions_data)
 
         land_use_change_emissions_data = self.im.get_data("purchased_feed_land_use_change_emissions")
-        land_use_change_emissions_by_location = self._get_feed_emissions_data(county_code,
-                                                                              land_use_change_emissions_data)
+        land_use_change_emissions_by_location = self._get_feed_emissions_data(
+            county_code, land_use_change_emissions_data
+        )
 
         purchased_feed_emissions = {}
         land_use_change_emissions = {}
