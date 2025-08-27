@@ -201,9 +201,13 @@ def test_perform_daily_routines_for_animals(
     )
 
     mock_time = MagicMock(auto_spec=RufasTime)
-    (actual_graduated_animals, actual_sold_animal, actual_stillborn_newborn_calves, actual_newborn_calves, actual_sold_newborn_calves) = (
-        herd_manager._perform_daily_routines_for_animals(mock_time, animals)
-    )
+    (
+        actual_graduated_animals,
+        actual_sold_animal,
+        actual_stillborn_newborn_calves,
+        actual_newborn_calves,
+        actual_sold_newborn_calves,
+    ) = herd_manager._perform_daily_routines_for_animals(mock_time, animals)
 
     assert set(actual_graduated_animals) == set(expected_graduated_animals)
     assert set(actual_sold_animal) == set(expected_sold_animals)
@@ -388,14 +392,12 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_report_daily_reports.assert_called_once()
 
 
-@pytest.mark.parametrize("is_newborn_calf_sold, is_newborn_calf_stillborn",
-                         [(False, False),
-                          (True, False),
-                          (False, True)])
-def test_create_newborn_calf(is_newborn_calf_sold: bool,
-                             is_newborn_calf_stillborn: bool,
-                             herd_manager: HerdManager,
-                             mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "is_newborn_calf_sold, is_newborn_calf_stillborn", [(False, False), (True, False), (False, True)]
+)
+def test_create_newborn_calf(
+    is_newborn_calf_sold: bool, is_newborn_calf_stillborn: bool, herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
     """Unit test for _create_newborn_calf()"""
     AnimalPopulation.set_current_max_animal_id(0)
     newborn_calf_config = NewBornCalfValuesTypedDict(
@@ -407,9 +409,7 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool,
         initial_phosphorus=10.0,
         net_merit=18.8,
     )
-    animal = mock_animal(animal_type=AnimalType.CALF,
-                         sold=is_newborn_calf_sold,
-                         stillborn=is_newborn_calf_stillborn)
+    animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold, stillborn=is_newborn_calf_stillborn)
     animal.events = MagicMock(auto_spec=AnimalEvents)
     animal.events.add_event = MagicMock()
 
