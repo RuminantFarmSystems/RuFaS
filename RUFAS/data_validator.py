@@ -1419,7 +1419,7 @@ class DataValidator:
             {
                 "warning": "Validation: key not found in data -- data not required upon initialization",
                 "message": f"Key {var_name} not found in data. Data value is not required for "
-                f"this"
+                f"this "
                 "variable upon program initialization, setting the variable value "
                 "to None.",
                 "info_map": info_map,
