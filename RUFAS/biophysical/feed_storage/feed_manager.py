@@ -243,13 +243,19 @@ class FeedManager:
         }
         for rufas_id, amount in self._cumulative_purchased_feeds.items():
             self._om.add_variable(f"purchased_feed_{rufas_id}_purchased_to_date", amount, info_map)
+        for rufas_id, amount in self._cumulative_purchased_feeds_fed.items():
+            self._om.add_variable(
+                f"purchased_feed_{rufas_id}_fed_to_date",
+                amount,
+                info_map
+            )
 
     def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
         feed_report: dict[RUFAS_ID, dict[str, float]] = {
             feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0} for feed in self._available_feeds
         }
-        available_feed_ids = set(feed_report.keys())
+        available_feed_ids = list(set(feed_report.keys()))
 
         for storage in self.active_storages.values():
             for crop in storage.stored:
