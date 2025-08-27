@@ -763,32 +763,33 @@ def test_cow_update_culled_false_new_born_true(
 
 
 @pytest.mark.parametrize(
-    "initial_animal_num, simulation_days, is_calf_sold",
+    "initial_animal_num, simulation_days, is_calf_sold, is_calf_stillborn",
     [
-        (0, 0, False),
-        (1, 0, False),
-        (10000, 0, False),
-        (0, 1, False),
-        (1, 1, False),
-        (10000, 1, False),
-        (0, 5000, False),
-        (1, 5000, False),
-        (10000, 5000, False),
-        (0, 0, True),
-        (1, 0, True),
-        (10000, 0, True),
-        (0, 1, True),
-        (1, 1, True),
-        (10000, 1, True),
-        (0, 5000, True),
-        (1, 5000, True),
-        (10000, 5000, True),
+        (0, 0, False, False),
+        (1, 0, False, False),
+        (10000, 0, False, False),
+        (0, 1, False, False),
+        (1, 1, False, False),
+        (10000, 1, False, False),
+        (0, 5000, False, False),
+        (1, 5000, False, False),
+        (10000, 5000, False, False),
+        (0, 0, True, False),
+        (1, 0, True, False),
+        (10000, 0, True, False),
+        (0, 1, True, False),
+        (1, 1, True, False),
+        (10000, 1, True, False),
+        (0, 5000, True, False),
+        (1, 5000, True, False),
+        (10000, 5000, True, False),
     ],
 )
 def test_generate_animals(
     initial_animal_num: int,
     simulation_days: int,
     is_calf_sold: bool,
+    is_calf_stillborn: bool,
     mock_herd_factory: HerdFactory,
     mock_time: RufasTime,
     mocker: MockerFixture,
@@ -819,6 +820,7 @@ def test_generate_animals(
 
     mock_calf = MagicMock(auto_spec=Animal)
     mock_calf.sold = is_calf_sold
+    mock_calf.stillborn = is_calf_stillborn
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
 
     result = mock_herd_factory._generate_animals()
