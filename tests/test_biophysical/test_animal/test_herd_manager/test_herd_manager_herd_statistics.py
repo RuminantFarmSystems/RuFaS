@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
@@ -19,6 +19,7 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
     herd_manager,
     mock_animal,
     mock_sold_animal_typed_dict,
+    mock_stillborn_animal_typed_dict
 )
 
 assert config_json is not None
@@ -28,6 +29,7 @@ assert mock_get_data_side_effect is not None
 assert mock_herd is not None
 assert herd_manager is not None
 assert mock_sold_animal_typed_dict is not None
+assert mock_stillborn_animal_typed_dict is not None
 
 
 def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[list[Animal], dict[str, float]]:
@@ -672,7 +674,7 @@ def test_update_sold_and_died_cow_statistics(
 
 
 def test_update_sold_heiferII_statistics(
-    mock_sold_animal_typed_dict: SoldAnimalTypedDict, herd_manager: HerdManager
+    mock_stillborn_: SoldAnimalTypedDict, herd_manager: HerdManager
 ) -> None:
     """Unit test for _update_sold_heiferII_statistics()"""
     num_sold_heiferIIs = randint(0, 100)
@@ -762,6 +764,44 @@ def test_update_sold_newborn_calf_statistics(
 
     assert herd_manager.herd_statistics.sold_calf_num == expected_sold_calf_num
     assert herd_manager.herd_statistics.sold_calves_info == expected_sold_calves_info
+
+
+def test_update_stillborn_calf_statistics(
+    mock_stillborn_animal_typed_dict: StillbornCalfTypedDict,
+    herd_manager: HerdManager
+) -> None:
+    """Unit test for _update_stillborn_newborn_calf_statistics()"""
+    num_stillborn_calves = randint(0, 100)
+    stillborn_calves = [
+        mock_animal(
+            animal_type=AnimalType.CALF,
+            id=i,
+            stillborn_day=randint(0, 200),
+            body_weight=uniform(0.0, 350)
+        )
+        for i in range(num_stillborn_calves)
+    ]
+
+    current_stillborn_calf_num = randint(0, 500)
+    current_stillborn_calves_info = [mock_stillborn_animal_typed_dict for _ in range(current_stillborn_calf_num)]
+
+    herd_manager.herd_statistics.stillborn_calf_num = current_stillborn_calf_num
+    herd_manager.herd_statistics.stillborn_calf_info = current_stillborn_calves_info
+
+    expected_stillborn_calf_num = current_stillborn_calf_num + num_stillborn_calves
+    expected_stillborn_calves_info = current_stillborn_calves_info + [
+        StillbornCalfTypedDict(
+            id=calf.id,
+            birth_weight=calf.birth_weight,
+            stillborn_day=calf.stillborn_day
+        )
+        for calf in stillborn_calves
+    ]
+
+    herd_manager._update_stillborn_calf_statistics(stillborn_calves)
+
+    assert herd_manager.herd_statistics.stillborn_calf_num == expected_stillborn_calf_num
+    assert herd_manager.herd_statistics.stillborn_calf_info == expected_stillborn_calves_info
 
 
 def test_update_cow_reproduction_statistics(herd_manager: HerdManager) -> None:
