@@ -10,7 +10,6 @@ class DailySpread(Storage):
         name: str,
         cover: str,
         surface_area: float,
-        capacity: float,
         storage_time_period: int = 1,
     ):
         """Initialize DailySpread object."""
@@ -19,8 +18,7 @@ class DailySpread(Storage):
             is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=storage_time_period,
-            surface_area=surface_area,
-            capacity=capacity,
+            surface_area=surface_area
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
