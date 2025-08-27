@@ -509,6 +509,7 @@ def mock_animal(
     mature_body_weight: float = 100.0,
     total_phosphorus: float = 18.8,
     sold: bool = False,
+    stillborn: bool = False,
     calves: int = 0,
     calving_interval: int = 0,
     calving_to_pregnancy_time: int = 0,
@@ -542,6 +543,7 @@ def mock_animal(
     animal.nutrients = MagicMock(auto_spec=Nutrients)
     animal.nutrients.total_phosphorus_in_animal = total_phosphorus
     animal.sold = sold
+    animal.stillborn = stillborn
     animal.calves = calves
     animal.calving_interval = calving_interval
     animal.sold_at_day = sold_at_day
