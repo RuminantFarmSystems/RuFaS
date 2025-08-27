@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 from RUFAS.output_manager import LogVerbosity
+from main import CaseInsensitiveArgumentAction, main, parse_gnu_args, launch_rufas
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixt
     assert mock_om.add_error.call_count == 2
     first_title, first_message, first_info = mock_om.add_error.call_args_list[0].args
     assert first_title.startswith("Dumping all logs from main.py because of error 'main error'")
-    assert first_message.startswith("This terminal error occurred during runtime. ")
+    assert first_message.startswith("This error occurred during runtime. ")
     assert "FAKE_TRACEBACK" in first_message
     assert first_info == {"class": "No caller class", "function": "main"}
 
@@ -165,3 +165,41 @@ def test_case_insensitive_argument_action() -> None:
     for argument in arguments:
         assert hasattr(namespace, argument)
         assert getattr(namespace, argument) == value
+
+
+def test_parse_gnu_args_returns_expected_attribute_names_by_launch_rufas(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys, "argv", [""])
+    parsed_attribute_names = parse_gnu_args().__dict__.keys()
+    expected_attribute_name = ('clear_output', 'exclude_info_maps', 'logs_dir', 'metadata_depth_limit', 'no_graphics',
+                               'output_dir', 'path_to_metadata', 'suppress_log_files', 'verbose')
+    for parsed_name, expected_name in zip(sorted(parsed_attribute_names), sorted(expected_attribute_name)):
+        assert parsed_name == expected_name
+
+
+def test_launch_rufas_succeeds(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
+    mock_instance = mock_task_manager.return_value
+    mock_instance.start.return_value = None
+
+    launch_rufas(
+        path_to_metadata=Path('input/task_manager_metadata.json'),
+        verbose='errors',
+        exclude_info_maps=False,
+        output_dir=Path('output/'),
+        logs_dir=Path('test_log_dir'),
+        clear_output=False,
+        no_graphics=False,
+        suppress_log_files=True,
+        metadata_depth_limit=None,
+    )
+
+    mock_instance.start.assert_called_once_with(
+        metadata_path=Path("input/task_manager_metadata.json"),
+        verbosity=LogVerbosity.ERRORS,
+        exclude_info_maps=False,
+        output_directory=Path("output"),
+        logs_directory=Path("test_log_dir"),
+        clear_output_directory=False,
+        produce_graphics=True,
+        suppress_log_files=True,
+        metadata_depth_limit=None,
+    )
