@@ -541,7 +541,7 @@ class AnimalModuleReporter:
         units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_pen.keys()}
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_ration.__name__,
+            "function": AnimalModuleReporter._report_daily_ration_per_pen.__name__,
             "simulation_day": simulation_day,
             "units": units,
         }
