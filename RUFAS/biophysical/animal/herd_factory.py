@@ -387,7 +387,7 @@ class HerdFactory:
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args)
-            if not calf.sold:
+            if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
                 birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
                 calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
@@ -410,7 +410,7 @@ class HerdFactory:
         birth_date: datetime.datetime = simulation_start_date - datetime.timedelta(days=days_born)
         return birth_date.strftime("%Y-%m-%d")
 
-    def _init_animal_from_data(self, animal_type: str, animal_data: dict[str, Any]) -> Animal:
+    def _init_animal_from_data(self, animal_type: str, animal_data: Any) -> Animal:
         """Function to initialize an animal object from input data"""
         animal_data.update(id=self.pre_animal_population.next_id())
         if animal_type == "calf":
