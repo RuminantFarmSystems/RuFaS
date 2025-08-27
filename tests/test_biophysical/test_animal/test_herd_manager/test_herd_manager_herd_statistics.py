@@ -674,7 +674,7 @@ def test_update_sold_and_died_cow_statistics(
 
 
 def test_update_sold_heiferII_statistics(
-    mock_stillborn_: SoldAnimalTypedDict, herd_manager: HerdManager
+    mock_sold_animal_typed_dict: SoldAnimalTypedDict, herd_manager: HerdManager
 ) -> None:
     """Unit test for _update_sold_heiferII_statistics()"""
     num_sold_heiferIIs = randint(0, 100)
