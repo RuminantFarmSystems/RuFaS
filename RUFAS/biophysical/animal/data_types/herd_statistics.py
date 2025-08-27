@@ -234,7 +234,7 @@ class HerdStatistics:
     cull_reason_stats_percent: dict[str, float]
     percent_cow_for_parity: dict[str, float]
 
-    calf_num_by_status: dict[AnimalStatus, int]
+    animals_deaths_by_stage: dict[AnimalType, int]
 
     def __init__(self) -> None:
         """
