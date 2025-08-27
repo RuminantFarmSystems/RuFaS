@@ -298,7 +298,9 @@ def test_report_cumulative_purchased_feeds(feed_manager: FeedManager, mock_avail
     }
 
     feed_manager.report_cumulative_purchased_feeds(simulation_day)
-    assert feed_manager._om.add_variable.call_count == len(mock_available_feeds)
+    number_of_feeds_reported = len(mock_available_feeds)
+    number_of_feeds_fed_reported = len(mock_available_feeds)
+    assert feed_manager._om.add_variable.call_count == number_of_feeds_reported + number_of_feeds_fed_reported
 
 
 def test_report_stored_farmgrown_feeds(
