@@ -18,6 +18,7 @@ def daily_spread_instance() -> DailySpread:
     )
     return spread
 
+
 @pytest.fixture
 def received_manure() -> ManureStream:
     """Returns a fixture ManureStream instance representing received manure."""
@@ -37,7 +38,7 @@ def received_manure() -> ManureStream:
     )
 
 
-def test_daily_spread_init(mocker: MockerFixture)  -> None:
+def test_daily_spread_init(mocker: MockerFixture) -> None:
     """Tests the initialization of DailySpread by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     DailySpread(
@@ -53,10 +54,11 @@ def test_daily_spread_init(mocker: MockerFixture)  -> None:
         surface_area=100,
     )
 
-def test_process_manure(received_manure: ManureStream,
-                        daily_spread_instance: DailySpread,
-                        mocker: MockerFixture) -> None:
-    """Tests the process_manure() function """
+
+def test_process_manure(
+    received_manure: ManureStream, daily_spread_instance: DailySpread, mocker: MockerFixture
+) -> None:
+    """Tests the process_manure() function"""
     mock_conditions = mocker.MagicMock(
         spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0, annual_mean_air_temperature=15
     )
@@ -70,4 +72,3 @@ def test_process_manure(received_manure: ManureStream,
 
     mock_report.assert_called_once_with(received_manure, "received", 50)
     mock_process.assert_called_once_with(mock_conditions, mock_time)
-

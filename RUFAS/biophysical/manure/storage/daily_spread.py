@@ -17,7 +17,7 @@ class DailySpread(Storage):
             is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=1,
-            surface_area=surface_area
+            surface_area=surface_area,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
