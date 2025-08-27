@@ -1,7 +1,7 @@
 from datetime import datetime
 from random import shuffle, randint
 from typing import Any
-from unittest.mock import call, MagicMock
+from unittest.mock import call, MagicMock, PropertyMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -201,9 +201,13 @@ def test_perform_daily_routines_for_animals(
     )
 
     mock_time = MagicMock(auto_spec=RufasTime)
-    (actual_graduated_animals, actual_sold_animal, actual_sold_newborn_calves, actual_newborn_calves) = (
-        herd_manager._perform_daily_routines_for_animals(mock_time, animals)
-    )
+    (
+        actual_graduated_animals,
+        actual_sold_animal,
+        actual_stillborn_newborn_calves,
+        actual_newborn_calves,
+        actual_sold_newborn_calves,
+    ) = herd_manager._perform_daily_routines_for_animals(mock_time, animals)
 
     assert set(actual_graduated_animals) == set(expected_graduated_animals)
     assert set(actual_sold_animal) == set(expected_sold_animals)
@@ -311,11 +315,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     )
 
     mock_perform_daily_routines_for_animals_side_effect = [
-        (graduated_calves, sold_calves, [], []),
-        (graduated_heiferIs, sold_heiferIs, [], []),
-        (graduated_heiferIIs, sold_heiferIIs, [], []),
-        (graduated_heiferIIIs, sold_heiferIIIs, heiferIII_sold_newborn_calves, heiferIII_newborn_calves),
-        (graduated_cows, sold_and_died_cows, cow_sold_newborn_calves, cow_newborn_calves),
+        (graduated_calves, sold_calves, [], [], []),
+        (graduated_heiferIs, sold_heiferIs, [], [], []),
+        (graduated_heiferIIs, sold_heiferIIs, [], [], []),
+        (graduated_heiferIIIs, sold_heiferIIIs, heiferIII_sold_newborn_calves, heiferIII_newborn_calves, []),
+        (graduated_cows, sold_and_died_cows, cow_sold_newborn_calves, cow_newborn_calves, []),
     ]
 
     mock_reset_daily_statistics = mocker.patch.object(herd_manager, "_reset_daily_statistics")
@@ -367,7 +371,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         call(mock_time, herd_manager.cows),
     ]
     mock_update_sold_animal_statistics.assert_called_once_with(
-        sold_newborn_calves=sold_newborn_calves, sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=[], sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
     )
     mock_check_if_heifers_need_to_be_sold.assert_called_once_with(simulation_day=mock_time.simulation_day)
     mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
@@ -388,8 +392,12 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_report_daily_reports.assert_called_once()
 
 
-@pytest.mark.parametrize("is_newborn_calf_sold", [True, False])
-def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManager, mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "is_newborn_calf_sold, is_newborn_calf_stillborn", [(False, False), (True, False), (False, True)]
+)
+def test_create_newborn_calf(
+    is_newborn_calf_sold: bool, is_newborn_calf_stillborn: bool, herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
     """Unit test for _create_newborn_calf()"""
     AnimalPopulation.set_current_max_animal_id(0)
     newborn_calf_config = NewBornCalfValuesTypedDict(
@@ -401,7 +409,7 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
         initial_phosphorus=10.0,
         net_merit=18.8,
     )
-    animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold)
+    animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold, stillborn=is_newborn_calf_stillborn)
     animal.events = MagicMock(auto_spec=AnimalEvents)
     animal.events.add_event = MagicMock()
 
@@ -413,8 +421,8 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
     expected_newborn_calf_config["id"] = AnimalPopulation.current_animal_id
     mock_animal_init.assert_called_once_with(args=expected_newborn_calf_config, simulation_day=0)
 
-    if not is_newborn_calf_sold:
-        animal.events.add_event.assert_called_once_with(animal.days_born, 0, animal_constants.ENTER_HERD)
+    if not (is_newborn_calf_stillborn or is_newborn_calf_sold):
+        animal.events.add_event.assert_called_once()
 
 
 def test_check_if_heifers_need_to_be_sold(

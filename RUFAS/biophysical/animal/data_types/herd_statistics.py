@@ -43,6 +43,8 @@ class HerdStatistics:
         Total count of heifers categorized as "Heifer III", (unitless).
     cow_num : int
         Total count of cows in the herd, (unitless).
+    stillborn_calf_num  : int
+        Number of stillborn calves during a specific period, (unitless).
     sold_calf_num : int
         Number of calves sold during a specific period, (unitless).
     sold_heiferIII_oversupply_num : int
@@ -168,6 +170,7 @@ class HerdStatistics:
     heiferIII_num = 0
     cow_num = 0
 
+    stillborn_calf_num = 0
     sold_calf_num = 0
     sold_heiferIII_oversupply_num = 0
     bought_heifer_num = 0
@@ -273,6 +276,7 @@ class HerdStatistics:
             "greater_than_3": 0.0,
         }
 
+        self.stillborn_calf_info = []
         self.sold_calves_info = []
         self.sold_heiferIIIs_info = []
         self.sold_heiferIIs_info = []
@@ -296,6 +300,7 @@ class HerdStatistics:
         self.heiferIII_num = 0
         self.cow_num = 0
 
+        self.stillborn_calf_num = 0
         self.sold_calf_num = 0
         self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
