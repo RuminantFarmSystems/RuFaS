@@ -19,7 +19,7 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
     herd_manager,
     mock_animal,
     mock_sold_animal_typed_dict,
-    mock_stillborn_animal_typed_dict
+    mock_stillborn_animal_typed_dict,
 )
 
 assert config_json is not None
@@ -767,18 +767,12 @@ def test_update_sold_newborn_calf_statistics(
 
 
 def test_update_stillborn_calf_statistics(
-    mock_stillborn_animal_typed_dict: StillbornCalfTypedDict,
-    herd_manager: HerdManager
+    mock_stillborn_animal_typed_dict: StillbornCalfTypedDict, herd_manager: HerdManager
 ) -> None:
     """Unit test for _update_stillborn_newborn_calf_statistics()"""
     num_stillborn_calves = randint(0, 100)
     stillborn_calves = [
-        mock_animal(
-            animal_type=AnimalType.CALF,
-            id=i,
-            stillborn_day=randint(0, 200),
-            body_weight=uniform(0.0, 350)
-        )
+        mock_animal(animal_type=AnimalType.CALF, id=i, stillborn_day=randint(0, 200), body_weight=uniform(0.0, 350))
         for i in range(num_stillborn_calves)
     ]
 
@@ -790,11 +784,7 @@ def test_update_stillborn_calf_statistics(
 
     expected_stillborn_calf_num = current_stillborn_calf_num + num_stillborn_calves
     expected_stillborn_calves_info = current_stillborn_calves_info + [
-        StillbornCalfTypedDict(
-            id=calf.id,
-            birth_weight=calf.birth_weight,
-            stillborn_day=calf.stillborn_day
-        )
+        StillbornCalfTypedDict(id=calf.id, birth_weight=calf.birth_weight, stillborn_day=calf.stillborn_day)
         for calf in stillborn_calves
     ]
 
