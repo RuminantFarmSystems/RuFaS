@@ -387,7 +387,7 @@ class HerdFactory:
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args)
-            if not calf.sold:
+            if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
                 birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
                 calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
