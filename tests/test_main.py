@@ -7,12 +7,12 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity
-from main import CaseInsensitiveArgumentAction, main, parse_gnu_args, launch_rufas
+from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 
 
 @pytest.fixture
 def mock_task_manager(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("main.TaskManager", autospec=True)
+    return mocker.patch("RUFAS.launching.TaskManager", autospec=True)
 
 
 def test_main_success(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -42,13 +42,13 @@ def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixt
     """
     Forces an exception in TaskManager.start() to test main exception path.
     """
-    mock_tm_cls = mocker.patch("main.TaskManager")
+    mock_tm_cls = mocker.patch("RUFAS.launching.TaskManager")
     mock_tm = mock_tm_cls.return_value
     mock_tm.start.side_effect = Exception("main error")
-    mock_om_cls = mocker.patch("main.OutputManager")
+    mock_om_cls = mocker.patch("RUFAS.launching.OutputManager")
     mock_om = mock_om_cls.return_value
 
-    mocker.patch("main.traceback.format_exc", return_value="FAKE_TRACEBACK")
+    mocker.patch("RUFAS.launching.traceback.format_exc", return_value="FAKE_TRACEBACK")
     monkeypatch.setattr(sys, "argv", ["prog", "-l", "err_logs", "-i"])
 
     with pytest.raises(RuntimeError) as excinfo:
@@ -61,7 +61,7 @@ def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixt
     assert first_title.startswith("Dumping all logs from main.py because of error 'main error'")
     assert first_message.startswith("This error occurred during runtime. ")
     assert "FAKE_TRACEBACK" in first_message
-    assert first_info == {"class": "No caller class", "function": "main"}
+    assert first_info == {"class": "No caller class", "function": "launch_rufas"}
 
     mock_om.create_directory.assert_called_once_with(Path("err_logs"))
     mock_om.dump_all_nondata_pools.assert_called_once_with(Path("err_logs"), True, "block")
@@ -69,7 +69,7 @@ def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixt
     second_title, second_message, second_info = mock_om.add_error.call_args_list[1].args
     assert second_title == "Early termination"
     assert "Unexpected early termination of the simulation." in second_message
-    assert second_info == {"class": "No caller class", "function": "main"}
+    assert second_info == {"class": "No caller class", "function": "launch_rufas"}
 
     assert "main error" in str(excinfo.value)
     assert "check error logs" in str(excinfo.value)
@@ -174,32 +174,3 @@ def test_parse_gnu_args_returns_expected_attribute_names_by_launch_rufas(monkeyp
                                'output_dir', 'path_to_metadata', 'suppress_log_files', 'verbose')
     for parsed_name, expected_name in zip(sorted(parsed_attribute_names), sorted(expected_attribute_name)):
         assert parsed_name == expected_name
-
-
-def test_launch_rufas_succeeds(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
-    mock_instance = mock_task_manager.return_value
-    mock_instance.start.return_value = None
-
-    launch_rufas(
-        path_to_metadata=Path('input/task_manager_metadata.json'),
-        verbose='errors',
-        exclude_info_maps=False,
-        output_dir=Path('output/'),
-        logs_dir=Path('test_log_dir'),
-        clear_output=False,
-        no_graphics=False,
-        suppress_log_files=True,
-        metadata_depth_limit=None,
-    )
-
-    mock_instance.start.assert_called_once_with(
-        metadata_path=Path("input/task_manager_metadata.json"),
-        verbosity=LogVerbosity.ERRORS,
-        exclude_info_maps=False,
-        output_directory=Path("output"),
-        logs_directory=Path("test_log_dir"),
-        clear_output_directory=False,
-        produce_graphics=True,
-        suppress_log_files=True,
-        metadata_depth_limit=None,
-    )
