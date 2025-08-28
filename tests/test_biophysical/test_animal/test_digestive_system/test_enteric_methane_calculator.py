@@ -137,7 +137,7 @@ def test_calculate_cow_methane(
         nutrient_amounts=mock_nutrition,
         methane_mitigation_method=methane_mitigation_method,
         methane_mitigation_additive_amount=methane_mitigation_additive_amount,
-        methane_model="IPCC",
+        methane_models="IPCC",
     )
 
     if is_lactating:
@@ -192,7 +192,7 @@ def test_calculate_lactating_cow_enteric_methane(
         milk_fat=3.5,
         metabolizable_energy_intake=28.0,
         nutrient_amounts=mock_nutrition,
-        methane_model=methane_model,
+        methane_models=methane_model,
     )
 
     assert isinstance(result, float)
@@ -235,7 +235,7 @@ def test_calculate_dry_cow_enteric_methane(
         )
 
     result = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
-        methane_model=methane_model,
+        methane_models=methane_model,
         metabolizable_energy_intake=28.0,
         nutrient_amounts=mock_nutrition,
     )

@@ -146,7 +146,31 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "IPCC",
+	"methane_model": {
+		  "calves": {
+			"Pattanaik": true
+		  },
+		  "heiferIs": {
+			"IPCC": true
+		  },
+		  "heiferIIs": {
+			"IPCC": true
+		  },
+		  "heiferIIIs": {
+			"IPCC": true
+		  },
+          "cows": {
+            "dry cows": {
+              "IPCC": true,
+              "Mills": false
+            },
+            "lactating cows": {
+              "IPCC": true,
+              "Mutian": false,
+              "Mills": false
+            }
+          }
+	},
 	"ration": {
 		"phosphorus_requirement_buffer": 0,
 		"user_input": true,
