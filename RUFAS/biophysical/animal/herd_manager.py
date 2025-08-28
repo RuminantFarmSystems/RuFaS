@@ -520,6 +520,8 @@ class HerdManager:
         stillborn_newborn_calves += stillborn_newborn_calves_from_cows
         sold_newborn_calves += sold_newborn_calves_from_cows
         newborn_calves += newborn_calves_from_cows
+        born_calf_num = len(stillborn_newborn_calves + sold_newborn_calves + newborn_calves)
+        self.herd_statistics.born_calf_num = born_calf_num
 
         self._update_sold_animal_statistics(
             sold_newborn_calves=sold_newborn_calves,

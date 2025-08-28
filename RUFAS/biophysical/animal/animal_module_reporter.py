@@ -889,6 +889,11 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
+            "born_calf_num",
+            herd_statistics.born_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
             "stillborn_calf_num",
             herd_statistics.stillborn_calf_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),

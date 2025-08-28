@@ -57,6 +57,8 @@ class HerdStatistics:
         Number of cows that exited the herd, totalled for both sales and deaths, (unitless).
     sold_cow_num : int
         Number of cows sold during the specific period, (unitless).
+    born_calf_num : int
+        The total amount of calf born, including stillborn, newborn and sold.
     calf_percent : float
         Proportion of calves in the herd expressed as a percentage, (unitless).
     heiferI_percent : float
@@ -177,6 +179,7 @@ class HerdStatistics:
     sold_heiferII_num = 0
     cow_herd_exit_num = 0
     sold_cow_num = 0
+    born_calf_num = 0
 
     calf_percent = 0.0
     heiferI_percent = 0.0
@@ -307,6 +310,7 @@ class HerdStatistics:
         self.sold_heiferII_num = 0
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
+        self.born_calf_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
