@@ -3140,7 +3140,7 @@ def test_delete_data_with_valid_key(
     im.meta_data = metadata
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.level1")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.level1")
 
     assert data_delete
     assert metadata_delete
@@ -3160,7 +3160,7 @@ def test_delete_data_with_invalid_data_address(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", side_effect=KeyError("missing"))
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.unknown")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.unknown")
 
     assert not data_delete
     assert metadata_delete
@@ -3188,7 +3188,7 @@ def test_delete_data_metadata_not_found(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.another")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.another")
 
     assert data_delete
     assert not metadata_delete
