@@ -980,3 +980,7 @@ class Aggregator:
         for num in data[1:]:
             result -= num
         return result
+
+    @staticmethod
+    def no_op(data: list[Any]) -> Any | None:
+        return data[0] if data else None
