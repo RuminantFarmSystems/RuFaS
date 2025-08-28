@@ -934,8 +934,9 @@ class Pen:
         previous_ration = getattr(self, "ration", None)
         num_attempts = 0
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        initial_dry_matter_requirement = self.average_nutrition_requirements.dry_matter
-        initial_protein_requirement = self.average_nutrition_requirements.metabolizable_protein
+        initial_pen_average_nutrition_requirements = self.average_nutrition_requirements
+        initial_dry_matter_requirement = initial_pen_average_nutrition_requirements.dry_matter
+        initial_protein_requirement = initial_pen_average_nutrition_requirements.metabolizable_protein
 
         while True:
             num_attempts += 1
