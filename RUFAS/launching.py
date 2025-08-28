@@ -23,16 +23,27 @@ def launch_rufas(
 ) -> None:
     """Launch simulation with RuFaS.
 
-    Args:
-        path_to_metadata: Path to the metadata file that contains task management inputs.
-        verbose: verbosity type in :func:`RUFAS.output_manager.LogVerbosity`.
-        exclude_info_maps: Flag to exclude information maps.
-        output_dir: Path to the directory where outputs will be saved.
-        logs_dir: Path to the directory where logs from the Task Manager will be saved.
-        clear_output: Whether to clear the output directory.
-        no_graphics: Whether not to produce graphics
-        suppress_log_files: Whether to write logs from the Task Manager to output files.
-        metadata_depth_limit: Override value for maximum metadata properties depth set in Input Manager.
+    Parameters
+    ----------
+    path_to_metadata
+        Path to the metadata file that contains task management inputs.
+    verbose
+        verbosity type in :func:`RUFAS.output_manager.LogVerbosity`.
+    exclude_info_maps
+        Flag to exclude information maps.
+    output_dir
+        Path to the directory where outputs will be saved.
+    logs_dir
+        Path to the directory where logs from the Task Manager will be saved.
+    clear_output
+        Whether to clear the output directory.
+    no_graphics
+        Whether not to produce graphics
+    suppress_log_files
+        Whether to write logs from the Task Manager to output files.
+    metadata_depth_limit
+        Override value for maximum metadata properties depth set in Input Manager.
+
     """
 
     try:
