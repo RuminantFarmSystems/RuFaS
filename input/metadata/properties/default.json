@@ -5238,7 +5238,7 @@
         "processor_type": {
           "type": "string",
           "description": "The type of storage used.",
-          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|CompostBeddedPackBarn)$"
+          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|BeddedPack)$"
         },
         "capacity": {
           "type": "number",
@@ -5268,6 +5268,11 @@
           "type": "string",
           "description": "Composting method, applicable only to the composting storage type.",
           "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "nullable": true
+        },
+        "is_mixed": {
+          "type": "bool",
+          "description": "Indicator for if the bedded pack is regularly mixed to promote composting activity.",
           "nullable": true
         }
       }
@@ -5919,6 +5924,30 @@
         }
       },
       "open_lot_e2e": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "domain": {
+            "type": "string",
+            "description": "Indicates which domain of RuFaS is being tested with the associated paths."
+          },
+          "expected_results_path": {
+            "type": "string",
+            "description": "Path to the file with the expected results for the specified domain."
+          },
+          "actual_results_path": {
+            "type": "string",
+            "description": "Path to the file with the actual results for the specified domain."
+          },
+          "tolerance": {
+            "type": "number",
+            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "default": 0.0,
+            "minimum": 0.0
+          }
+        }
+      },
+      "no_animal_e2e": {
         "type": "array",
         "properties": {
           "type": "object",
