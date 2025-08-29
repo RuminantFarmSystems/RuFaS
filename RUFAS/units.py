@@ -65,6 +65,8 @@ class MeasurementUnits(Enum):
     LITERS_PER_CUBIC_METER = "L/m^3"
     LITERS_PER_CUBIC_MILLIMETER = "L/mm^3"
     LITERS_PER_TON = "L/ton"
+    LITERS_PER_HA = "L/ha"
+    LITERS_PER_KILOWATTS_PER_HOUR = "L/kWhr"
     MEGACALORIES = "Mcal"
     MEGACALORIES_PER_KILOGRAM = "Mcal/kg"
     MEGAGRAMS_PER_KILOGRAM = "Mg/kg"

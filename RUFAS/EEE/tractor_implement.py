@@ -82,7 +82,8 @@ class TractorImplement:
         """
         if self.operation_type == OperationType.COLLECTION:  # 418b
             return (self.throughput / crop_yield_ton_per_ha) * self.field_efficiency
-        return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency  # 418a
+        return (self.field_speed_km_per_hr * GeneralConstants.KM_TO_M * self.width_m * 
+                self.field_efficiency * GeneralConstants.SQUARE_METERS_TO_HECTARES) # 418a
 
     def calculate_operation_time_hr(
         self, field_production_size_ha: float, crop_yield_ton_per_ha: float | None

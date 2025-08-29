@@ -4,6 +4,8 @@ from typing import Any
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize
 from RUFAS.input_manager import InputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -27,7 +29,7 @@ class EnergyEstimator:
         }
         estimator = EnergyEstimator()
         diesel_consumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
-        total_diesel_consumption_tractor_implement_liter_per_ton = 0
+        total_diesel_consumption_tractor_implement_liter_per_ha = 0
         herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_consumption_data_list:
             tractor = Tractor(
@@ -37,7 +39,8 @@ class EnergyEstimator:
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
             )
-            diesel_consumption_tractor_implement_liter_per_ton = estimator.calculate_diesel_consumption(
+                        
+            diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
                 diesel_consumption_data_item.get("crop_yield", 0),
                 diesel_consumption_data_item["field_production_size"],
                 tractor,
@@ -47,15 +50,15 @@ class EnergyEstimator:
                 diesel_consumption_data_item,
                 herd_size,
                 tractor.tractor_size,
-                diesel_consumption_tractor_implement_liter_per_ton,
+                diesel_consumption_tractor_implement_liter_per_ha,
             )
-            total_diesel_consumption_tractor_implement_liter_per_ton += (
-                diesel_consumption_tractor_implement_liter_per_ton
+            total_diesel_consumption_tractor_implement_liter_per_ha = (
+                diesel_consumption_tractor_implement_liter_per_ha
             )
         om.add_variable(
             "total_diesel_consumption_tractor_implement",
-            total_diesel_consumption_tractor_implement_liter_per_ton,
-            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_TON}},
+            total_diesel_consumption_tractor_implement_liter_per_ha,
+            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_HA}},
         )
 
     def report_diesel_consumption(
@@ -284,7 +287,7 @@ class EnergyEstimator:
         diesel_consumption_tractor_implement_liter_ha = 0.0
 
         for implement in tractor.implements:
-            crop_yield_ton_ha = crop_yield / 1000  # convert kg to tons
+            crop_yield_ton_ha = crop_yield *GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
             total_power_needed_kW = self._calculate_total_power_needed(
                 tractor,
                 implement,
@@ -292,20 +295,20 @@ class EnergyEstimator:
                 field_production_size,
                 clay_percent,
             )
-            x = total_power_needed_kW / tractor.power_available_kW  # helper function 411
-            specific_fuel_consumption_liter_per_kWh = (
-                (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 173)
-            )  # helper function 410
+            tractor_implement_operation_time_hr = implement.calculate_operation_time_hr(
+                field_production_size, crop_yield_ton_ha
+            )
+            
+            specific_fuel_consumption_liter_per_kWh = UserConstants.SPECIFIC_FUEL_CONSUMPTION
 
             tractor_implement_operation_time_hr = implement.calculate_operation_time_hr(
                 field_production_size, crop_yield_ton_ha
             )
-            diesel_consumption_tractor_implement_liter_ha += (
+            diesel_consumption_tractor_implement_liter_ha = (
                 specific_fuel_consumption_liter_per_kWh
                 * total_power_needed_kW
                 * tractor_implement_operation_time_hr
                 / field_production_size
-                #    / crop_yield_ton_ha
             )
         return diesel_consumption_tractor_implement_liter_ha
 
