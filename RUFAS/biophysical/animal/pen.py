@@ -930,7 +930,6 @@ class Pen:
         }
         if self.animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
-        # print(self.animal_combination)
         previous_ration = getattr(self, "ration", None)
         num_attempts = 0
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
@@ -942,7 +941,6 @@ class Pen:
 
         while True:
             num_attempts += 1
-            # print(f"num_attempts = {num_attempts}")
             solution, ration_config = self._attempt_formulation(
                 is_ration_defined_by_user, pen_available_feeds, temperature, previous_ration,
                 initial_dry_matter_requirement,
@@ -982,18 +980,15 @@ class Pen:
                              "phosphorus_constraint",
                              "protein_constraint_lower",
                              "DMI_constraint_lower"]) & set(constraints_failed_list)):
-                    # print("Increasing the initial DMI used in the UDR attempt")
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
                 elif bool(set(["protein_constraint_upper",
                                "DMI_constraint_upper"]) & set(constraints_failed_list)):
-                    print("DECREASING the initial DMI used in the UDR attempt")
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
             # For lac cow
             if is_ration_defined_by_user:
-                print("tried reducing")
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
                     break
             else:
