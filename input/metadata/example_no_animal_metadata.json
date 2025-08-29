@@ -1,12 +1,5 @@
 {
   "files": {
-    "end_to_end_testing_result_paths": {
-      "title": "Actual and Expected end-to-end testing results paths",
-      "description": "Specifies how to find actual and expected results for end-to-end testing of different RuFaS domains.",
-      "path": "input/data/end_to_end_testing/end_to_end_testing_result_paths.json",
-      "type": "json",
-      "properties": "end_to_end_test_result_path_properties"
-    },
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
@@ -99,8 +92,8 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "Manure data",
-      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
+      "title": "Manure Processor Configurations",
+      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
       "path": "input/data/manure/example_freestall_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
@@ -125,7 +118,7 @@
       "path": "input/data/field/example_small_field_corn_alf_silage.json",
       "type": "json",
       "properties": "field_properties"
-    },
+    }, 
     "soil_1": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
