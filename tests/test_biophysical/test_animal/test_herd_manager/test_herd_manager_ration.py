@@ -326,8 +326,6 @@ def test_reformulate_ration_single_pen(
         30,
         MagicMock(auto_spec=TotalInventory),
     )
-    # TODO remove if not needed after draft review
-    # mock_use_user_defined_ration = mocker.patch.object(mock_pen, "use_user_defined_ration")
     mock_formulate_optimized_ration = mocker.patch.object(mock_pen, "formulate_optimized_ration")
 
     herd_manager.is_ration_defined_by_user = use_user_defined_ration

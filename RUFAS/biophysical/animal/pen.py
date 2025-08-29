@@ -968,7 +968,6 @@ class Pen:
             if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
-            # TODO NOTE that below is only happening for lac cows: if this is reasonable, we can try for all classes
             if is_ration_defined_by_user and (
                 (
                     initial_dry_matter_requirement_fixed
