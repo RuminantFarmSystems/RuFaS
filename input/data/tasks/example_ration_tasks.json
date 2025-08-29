@@ -1,0 +1,58 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_intermountain.json",
+      "output_prefix": "IM_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },{
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_intermountain_auto.json",
+      "output_prefix": "IM_A_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },{
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_midwest.json",
+      "output_prefix": "MW_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_midwest_auto.json",
+      "output_prefix": "MW_A_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },{
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_northeast.json",
+      "output_prefix": "NE_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_northeast_auto.json",
+      "output_prefix": "NE_A_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_southwest.json",
+      "output_prefix": "SW_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    { 
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_southwest_auto.json",
+      "output_prefix": "SW_A_42",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}

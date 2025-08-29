@@ -82,6 +82,7 @@
             "buffer": 0.15
         }
     ],
+    "milk_reduction_maximum": 30,
     "user_defined_ration_percentages": {
         "calf": [
             {
@@ -183,8 +184,7 @@
                 "ration_percentage": 0.74
             }
         ],
-        "tolerance": 0.1,
-        "milk_reduction_maximum": 0.5
+        "tolerance": 0.1
     },
      "allowances": [
         {

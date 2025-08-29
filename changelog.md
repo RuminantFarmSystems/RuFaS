@@ -230,7 +230,7 @@ v0.9.2
 - [2551](https://github.com/RuminantFarmSystems/MASM/pull/2551) - [minor change] Raises error in main.py to direct user to errors file for debugging.
 - [2547](https://github.com/RuminantFarmSystems/MASM/pull/2547) - [minor change] [Input Manager] 1/5 Cross Validation basic setup.
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
-
+- [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
 
 ### v0.9.2
 

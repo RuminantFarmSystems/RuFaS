@@ -65,8 +65,7 @@
         },
         {
             "purchased_feed": 94,
-            "purchased_feed_cost": 0.01,,
-            "buffer": 0.15
+            "purchased_feed_cost": 0.01,
             "buffer": 0.15
         },
         {
@@ -167,6 +166,7 @@
             "initial_dry_matter": 0
         }
     ],
+    "milk_reduction_maximum": 30,
     "user_defined_ration_percentages": {
         "calf": [
             {
@@ -256,8 +256,7 @@
                 "ration_percentage": 22.34
             }
         ],
-        "tolerance": 0.1,
-        "milk_reduction_maximum": 0.5
+        "tolerance": 0.1
     },
   "allowances": [
 
