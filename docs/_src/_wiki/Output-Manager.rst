@@ -434,13 +434,13 @@ Logs:
      "InputManager._load_metadata.load_metadata_attempt": {
        "info_maps": [...],
        "values": [
-         "Attempting to load metadata from input/metadata/default_metadata.json."
+         "Attempting to load metadata from input/metadata/example_freestall_dairy_metadata.json."
        ]
      },
      "InputManager._load_metadata.load_metadata_success": {
        "info_maps": [...],
        "values": [
-         "Successfully loaded metadata from input/metadata/default_metadata.json"
+         "Successfully loaded metadata from input/metadata/example_freestall_dairy_metadata.json"
        ]
      }
    }

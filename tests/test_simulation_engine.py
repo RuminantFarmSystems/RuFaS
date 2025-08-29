@@ -201,7 +201,7 @@ def test_daily_simulation(
 
     mock_feed_get_total_inventory = mocker.patch.object(
         simulation_engine.feed_manager,
-        "get_total_inventory",
+        "get_total_projected_inventory",
         return_value=(mock_total_inventory := MagicMock(auto_spec=TotalInventory)),
     )
     mock_feed_translate_crop_config_name_to_rufas_id = mocker.patch.object(
@@ -319,7 +319,6 @@ def test_formulate_ration(
     Unit test for function _formulate_ration() in file RUFAS/simulation_engine.py
     """
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
-    simulation_engine.time.simulation_day = 15
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     simulation_engine.herd_manager.all_pens = [MagicMock(auto_spec=Pen) for _ in range(number_of_pens)]
 
@@ -332,7 +331,7 @@ def test_formulate_ration(
     mock_feed_process_degradations = mocker.patch.object(simulation_engine.feed_manager, "process_degradations")
     mock_feed_get_total_inventory = mocker.patch.object(
         simulation_engine.feed_manager,
-        "get_total_inventory",
+        "get_total_projected_inventory",
         return_value=(mock_total_inventory := MagicMock(auto_spec=TotalInventory)),
     )
     mock_weather_get_current_day_conditions = mocker.patch.object(

@@ -781,7 +781,7 @@ class Pen:
         +---------------------------+-------------------+-------------------+
         | Tiestall                  | 1.2               | 1.0               |
         +---------------------------+-------------------+-------------------+
-        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        | Bedded Pack               | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
         | Open Lot                  | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
@@ -795,7 +795,7 @@ class Pen:
         ------
         ValueError
             If the pen type is not one of the following: "freestall", "tiestall",
-            "compost bedded pack barn", or "open lot".
+            "bedded pack", or "open lot".
         """
 
         ExposedManureSurfaceArea = NamedTuple(
@@ -809,7 +809,7 @@ class Pen:
         exposed_manure_surface_area_by_pen_type = {
             "freestall": freestall,
             "tiestall": tiestall,
-            "compost bedded pack barn": bedded_pack,
+            "bedded pack": bedded_pack,
             "open lot": open_lot,
         }
 
@@ -942,9 +942,12 @@ class Pen:
         while True:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(
-                is_ration_defined_by_user, pen_available_feeds, temperature, previous_ration,
+                is_ration_defined_by_user,
+                pen_available_feeds,
+                temperature,
+                previous_ration,
                 initial_dry_matter_requirement,
-                initial_protein_requirement
+                initial_protein_requirement,
             )
 
             if not solution.success:
@@ -981,8 +984,7 @@ class Pen:
                              "DMI_constraint_lower"]) & set(constraints_failed_list)):
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
-                elif bool(set(["protein_constraint_upper",
-                               "DMI_constraint_upper"]) & set(constraints_failed_list)):
+                elif bool(set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list)):
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
@@ -1016,9 +1018,13 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, is_ration_defined_by_user: bool, pen_feeds: list[Feed], temperature: float, previous_ration: Any,
+        self,
+        is_ration_defined_by_user: bool,
+        pen_feeds: list[Feed],
+        temperature: float,
+        previous_ration: Any,
         initial_dry_matter_requirement: float,
-        initial_protein_requirement: float
+        initial_protein_requirement: float,
     ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
