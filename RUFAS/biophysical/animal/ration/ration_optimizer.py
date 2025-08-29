@@ -874,13 +874,13 @@ class RationOptimizer:
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 - udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_requirement_boost)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
             )
             target_upper = (
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 + udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_requirement_boost)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
             )
             targetbounds = (max(0.0, target_lower), target_upper)
             user_defined_boundlist.append(targetbounds)
