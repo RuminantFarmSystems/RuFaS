@@ -49,7 +49,7 @@ def test_daily_spread_init(mocker: MockerFixture) -> None:
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
         is_housing_emissions_calculator=False,
-        cover="no cover",
+        cover="no_crust_or_cover",
         storage_time_period=1,
         surface_area=100,
     )
