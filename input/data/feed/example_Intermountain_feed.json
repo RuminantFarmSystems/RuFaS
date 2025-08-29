@@ -127,7 +127,7 @@
             "initial_dry_matter": 0
         }
     ],
-    "milk_reduction_maximum": 30,
+    "milk_reduction_maximum": 0.5,
     "user_defined_ration_percentages": {
         "calf": [
             {
