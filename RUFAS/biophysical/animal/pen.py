@@ -942,9 +942,12 @@ class Pen:
         while True:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(
-                is_ration_defined_by_user, pen_available_feeds, temperature, previous_ration,
+                is_ration_defined_by_user,
+                pen_available_feeds,
+                temperature,
+                previous_ration,
                 initial_dry_matter_requirement,
-                initial_protein_requirement
+                initial_protein_requirement,
             )
 
             if not solution.success:
@@ -967,23 +970,33 @@ class Pen:
 
             # TODO NOTE that below is only happening for lac cows: if this is reasonable, we can try for all classes
             if is_ration_defined_by_user and (
-                (initial_dry_matter_requirement_fixed * (
-                    1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance))
-                < initial_dry_matter_requirement < 
-                (initial_dry_matter_requirement_fixed * (
-                    1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance))):
-                if bool(set(["NE_total_constraint",
-                             "NE_maintenance_and_activity_constraint",
-                             "NE_lactation_constraint",
-                             "NE_growth_constraint"
-                             "calcium_constraint",
-                             "phosphorus_constraint",
-                             "protein_constraint_lower",
-                             "DMI_constraint_lower"]) & set(constraints_failed_list)):
+                (
+                    initial_dry_matter_requirement_fixed
+                    * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance)
+                )
+                < initial_dry_matter_requirement
+                < (
+                    initial_dry_matter_requirement_fixed
+                    * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance)
+                )
+            ):
+                if bool(
+                    set(
+                        [
+                            "NE_total_constraint",
+                            "NE_maintenance_and_activity_constraint",
+                            "NE_lactation_constraint",
+                            "NE_growth_constraint" "calcium_constraint",
+                            "phosphorus_constraint",
+                            "protein_constraint_lower",
+                            "DMI_constraint_lower",
+                        ]
+                    )
+                    & set(constraints_failed_list)
+                ):
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
-                elif bool(set(["protein_constraint_upper",
-                               "DMI_constraint_upper"]) & set(constraints_failed_list)):
+                elif bool(set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list)):
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
@@ -1017,9 +1030,13 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, is_ration_defined_by_user: bool, pen_feeds: list[Feed], temperature: float, previous_ration: Any,
+        self,
+        is_ration_defined_by_user: bool,
+        pen_feeds: list[Feed],
+        temperature: float,
+        previous_ration: Any,
         initial_dry_matter_requirement: float,
-        initial_protein_requirement: float
+        initial_protein_requirement: float,
     ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
