@@ -16,12 +16,12 @@ class DigestiveSystem:
 
     manure_excretion: AnimalManureExcretions
     phosphorus_excreted: float
-    enteric_methane_emission: float
+    enteric_methane_emission: dict[str, float] | None
 
     def __init__(self) -> None:
         self.manure_excretion = AnimalManureExcretions()
         self.phosphorus_excreted = 0.0
-        self.enteric_methane_emission = 0.0
+        self.enteric_methane_emission: dict[str, float] | None = None
 
     def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
         """
@@ -70,7 +70,7 @@ class DigestiveSystem:
         )
         if digestive_system_inputs.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calculate_calf_methane(
-                AnimalConfig.methane_model,
+                AnimalConfig.methane_model["calves"],
                 digestive_system_inputs.body_weight,
             )
             phosphorus, excretion = ManureExcretionCalculator.calculate_calf_manure(
@@ -85,8 +85,15 @@ class DigestiveSystem:
             return
 
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
+            if digestive_system_inputs.animal_type == AnimalType.HEIFER_I:
+                model_selection = "heiferIs"
+            elif digestive_system_inputs.animal_type  == AnimalType.HEIFER_II:
+                model_selection = "heiferIIs"
+            else:
+                model_selection = "heiferIIIs"
+
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
-                AnimalConfig.methane_model,
+                AnimalConfig.methane_model[model_selection],
                 digestive_system_inputs.nutrients,
             )
 

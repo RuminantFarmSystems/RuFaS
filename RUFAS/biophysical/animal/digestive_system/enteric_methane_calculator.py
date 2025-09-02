@@ -70,7 +70,7 @@ class EntericMethaneCalculator:
 
         Returns
         -------
-        float
+        dict[str, float]
             Amount of methane emission for heifer (g/day).
 
         References
@@ -147,7 +147,7 @@ class EntericMethaneCalculator:
 
         Returns
         -------
-        float
+        dict[str, float]
             The daily enteric emissions for cows (g/day).
 
         """
