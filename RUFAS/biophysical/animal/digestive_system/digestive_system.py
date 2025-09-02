@@ -87,7 +87,7 @@ class DigestiveSystem:
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             if digestive_system_inputs.animal_type == AnimalType.HEIFER_I:
                 model_selection = "heiferIs"
-            elif digestive_system_inputs.animal_type  == AnimalType.HEIFER_II:
+            elif digestive_system_inputs.animal_type == AnimalType.HEIFER_II:
                 model_selection = "heiferIIs"
             else:
                 model_selection = "heiferIIIs"
