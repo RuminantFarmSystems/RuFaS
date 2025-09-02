@@ -66,18 +66,19 @@ def test_task_manager_init(
 
 @pytest.mark.parametrize(
     "verbosity, exclude_info_maps, clear_output_directory, produce_graphics, suppress_log_files, metadata_depth_limit,"
-    "workers",
+    "workers, is_end_to_end_test_task",
     [
-        (LogVerbosity.LOGS, True, True, True, True, 8, 1),
-        (LogVerbosity.CREDITS, True, True, True, True, 8, 2),
-        (LogVerbosity.ERRORS, True, True, True, True, 8, 3),
-        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4),
-        (LogVerbosity.NONE, True, True, True, True, 8, 5),
-        (LogVerbosity.LOGS, False, True, True, True, 8, 6),
-        (LogVerbosity.CREDITS, False, True, True, True, 8, 7),
-        (LogVerbosity.ERRORS, False, True, True, True, 8, 8),
-        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9),
-        (LogVerbosity.NONE, False, True, True, True, 8, 10),
+        (LogVerbosity.LOGS, True, True, True, True, 8, 1, False),
+        (LogVerbosity.CREDITS, True, True, True, True, 8, 2, False),
+        (LogVerbosity.ERRORS, True, True, True, True, 8, 3, False),
+        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4, False),
+        (LogVerbosity.NONE, True, True, True, True, 8, 5, False),
+        (LogVerbosity.LOGS, False, True, True, True, 8, 6, False),
+        (LogVerbosity.CREDITS, False, True, True, True, 8, 7, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, False),
+        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9, False),
+        (LogVerbosity.NONE, False, True, True, True, 8, 10, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, True),
     ],
 )
 def test_task_manager_start(
@@ -88,25 +89,19 @@ def test_task_manager_start(
     suppress_log_files: bool,
     metadata_depth_limit: int,
     workers: int,
-    mocker: MockerFixture,
-    mock_output_manager: Generator[Any, Any, Any],
+    mocker,
+    mock_output_manager,
+    is_end_to_end_test_task: bool,
 ) -> None:
-    """Unit test for TaskManager.start()"""
-    # Arrange
-    mock_task_manager = TaskManager()
-    mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
-    mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-        mock_task_manager, "_expand_multi_runs_to_single_runs", return_value=[{}]
-    )
-    mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
-    mock_get_rufas_version = mocker.patch.object(mock_task_manager, "get_rufas_version", return_value="1.0.0")
-    mock_check_dependencies = mocker.patch.object(mock_task_manager, "check_dependencies")
-    mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
-    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    """Unit test for TaskManager.start() with and without the e2e summary branch."""
+    tm = TaskManager()
+    tm.output_manager = mock_output_manager
+
+    mock_im = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_im)
+    mock_start_data = mocker.patch.object(mock_im, "start_data_processing", return_value=True)
     mock_get_data = mocker.patch.object(
-        mock_input_manager,
+        mock_im,
         "get_data",
         return_value={
             "parallel_workers": workers,
@@ -115,25 +110,41 @@ def test_task_manager_start(
             "export_input_data_to_csv": False,
         },
     )
-    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
-    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
-    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
-    mock_task_manager.output_manager = mock_output_manager
 
-    # Act
-    mock_task_manager.start(
-        Path("metadata/path"),
-        verbosity,
-        exclude_info_maps,
-        Path("output/directory"),
-        Path("logs/directory"),
-        clear_output_directory,
-        produce_graphics,
-        suppress_log_files,
-        metadata_depth_limit,
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mocker.patch.object(tm, "get_rufas_version", return_value="1.0.0")
+    mocker.patch.object(tm, "check_dependencies")
+    mocker.patch.object(tm, "check_python_version")
+
+    if not is_end_to_end_test_task:
+        mocker.patch.object(tm, "_parse_input_tasks", return_value=([{}], [{}]))
+        mocker.patch.object(tm, "_expand_multi_runs_to_single_runs", return_value=[{}])
+    else:
+        e2e_task = {
+            "task_type": TaskType.END_TO_END_TESTING,
+            "output_prefix": "test_prefix",
+            "json_output_directory": Path("out/e2e"),
+        }
+        mocker.patch.object(tm, "_parse_input_tasks", return_value=([e2e_task], [{}]))
+        mocker.patch.object(tm, "_expand_multi_runs_to_single_runs", return_value=[])
+
+    mock_run_tasks = mocker.patch.object(tm, "_run_tasks")
+    mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
+
+    tm.start(
+        metadata_path=Path("metadata/path"),
+        verbosity=verbosity,
+        exclude_info_maps=exclude_info_maps,
+        output_directory=Path("output/directory"),
+        logs_directory=Path("logs/directory"),
+        clear_output_directory=clear_output_directory,
+        produce_graphics=produce_graphics,
+        suppress_log_files=suppress_log_files,
+        metadata_depth_limit=metadata_depth_limit,
     )
 
-    # Assert
     mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,
@@ -149,28 +160,50 @@ def test_task_manager_start(
         is_end_to_end_testing_run=False,
     )
 
-    info_map = {
-        "class": TaskManager.__name__,
-        "function": TaskManager.start.__name__,
-    }
+    info_map = {"class": TaskManager.__name__, "function": TaskManager.start.__name__}
+    expanded_len = 1 if is_end_to_end_test_task else 2
     expected_add_log_calls = [
         call("Task Manager Start", "Task Manager Started.", info_map),
         call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
         call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
-        call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
+        call("Task Manager expanded tasks", f"Expanded task args to {expanded_len}. Starting the tasks...", info_map),
     ]
     mock_add_log.assert_has_calls(expected_add_log_calls)
+
     mock_start_data.assert_called_once_with(Path("metadata/path"))
     mock_get_data.assert_called_once_with("tasks")
-    mock_parse_input_tasks.assert_called_once()
-    mock_expand_multi_runs_to_single_runs.assert_called_once()
-    mock_run_tasks.assert_called_once_with(
-        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers, Path("metadata/path")
-    )
-    mock_get_rufas_version.assert_called_once()
-    mock_check_dependencies.assert_called_once()
-    mock_check_python_version.assert_called_once()
+    tm._parse_input_tasks.assert_called_once()
+    tm._expand_multi_runs_to_single_runs.assert_called_once()
+
+    if not is_end_to_end_test_task:
+        mock_run_tasks.assert_called_once_with(
+            [{"task_id": "1/2"}, {"task_id": "2/2"}],
+            produce_graphics,
+            metadata_depth_limit,
+            workers,
+            Path("metadata/path"),
+        )
+        mock_summarize.assert_not_called()
+    else:
+        args, _kwargs = mock_run_tasks.call_args
+        runnable_passed = args[0]
+        assert len(runnable_passed) == 1
+        assert runnable_passed[0]["task_id"] == "1/1"
+        assert args[1] == produce_graphics
+        assert args[2] == metadata_depth_limit
+        assert args[3] == workers
+        assert args[4] == Path("metadata/path")
+
+        mock_output_manager.add_log.assert_any_call(
+            "Summarizing e2e test results",
+            "Gathering e2e results for ['test_prefix']...",
+            info_map,
+        )
+        mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"])
+
     mock_print_credits.assert_called_once_with("1.0.0")
+    tm.check_dependencies.assert_called_once()
+    tm.check_python_version.assert_called_once()
 
 
 def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
