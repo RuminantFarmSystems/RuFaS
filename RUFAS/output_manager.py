@@ -9,6 +9,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Counter, TextIO, Union, Callable
 
+import collections
 import numpy as np
 import pandas as pd
 import psutil
@@ -205,7 +206,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
-            self._variables_usage_counter: Counter[str] = Counter()
+            self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.is_first_post_processing: bool = True
 
