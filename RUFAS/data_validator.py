@@ -1746,7 +1746,7 @@ class CrossValidator:
                     {
                         "error": "Multiple Complex Variables Selected",
                         "message": "Only one list or dict variable can be selected for cross validation in "
-                                   "a single expression block.",
+                        "a single expression block.",
                         "info_map": {
                             "class": CrossValidator.__name__,
                             "function": CrossValidator._evaluate_expression.__name__,
@@ -1754,19 +1754,22 @@ class CrossValidator:
                     }
                 )
                 if eager_termination:
-                    raise ValueError("Only one list or dict variable can be selected for cross validation in "
-                                     "a single expression block.")
+                    raise ValueError(
+                        "Only one list or dict variable can be selected for cross validation in "
+                        "a single expression block."
+                    )
                 else:
                     return None, False
 
-            ordered_values = ordered_values[0] if isinstance(ordered_values[0], list) \
-                else list(ordered_values[0].values())
+            ordered_values = (
+                ordered_values[0] if isinstance(ordered_values[0], list) else list(ordered_values[0].values())
+            )
             if "apply_to" not in expression_block:
                 self._event_logs.append(
                     {
                         "error": "Missing `apply_to` key",
                         "message": "The 'apply_to' key is required in expression block "
-                                   "when a complex data structure is selected.",
+                        "when a complex data structure is selected.",
                         "info_map": {
                             "class": CrossValidator.__name__,
                             "function": CrossValidator._evaluate_expression.__name__,

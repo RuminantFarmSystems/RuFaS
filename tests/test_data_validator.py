@@ -1998,19 +1998,18 @@ def test_extract_input_data_by_key_list_key_error(
 
 
 @pytest.mark.parametrize(
-    "expression_block, eager_termination", [
+    "expression_block, eager_termination",
+    [
         ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
         ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
         ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
         ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
         ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
         ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
-    ]
+    ],
 )
 def test_evaluate_expression_unknown_operation(
-        expression_block: dict[str, Any],
-        eager_termination: bool,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for _evaluate_expression() in CrossValidator"""
     cross_validator = CrossValidator()
@@ -2029,32 +2028,30 @@ def test_evaluate_expression_unknown_operation(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, eager_termination", [
+    "expression_block, selected_variables, eager_termination",
+    [
         ({"operation": "sum", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[], []], True),
         ({"operation": "difference", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [{}, {}], True),
         (
-                {"operation": "average", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
-                [[1, 2, 3], {"a": 1, "b": 2}],
-                True),
+            {"operation": "average", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [[1, 2, 3], {"a": 1, "b": 2}],
+            True,
+        ),
         (
-                {"operation": "product", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
-                [[4, 5, 6], ["a", "b", "c"]],
-                False),
+            {"operation": "product", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [[4, 5, 6], ["a", "b", "c"]],
+            False,
+        ),
         (
-                {"operation": "division", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
-                [{"a": [], "b": []}, [{}, {}]],
-                False),
-        (
-                {"operation": "no_op", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
-                [[{}], []],
-                False),
-    ]
+            {"operation": "division", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [{"a": [], "b": []}, [{}, {}]],
+            False,
+        ),
+        ({"operation": "no_op", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[{}], []], False),
+    ],
 )
 def test_evaluate_expression_multiple_complex_variable(
-        expression_block: dict[str, Any],
-        selected_variables: list[Any],
-        eager_termination: bool,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for _evaluate_expression() in CrossValidator when multiple complex variables are selected"""
     cross_validator = CrossValidator()
@@ -2072,20 +2069,18 @@ def test_evaluate_expression_multiple_complex_variable(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, eager_termination", [
+    "expression_block, selected_variables, eager_termination",
+    [
         ({"operation": "sum", "ordered_variables": ["alias_0"]}, [[]], True),
         ({"operation": "difference", "ordered_variables": ["alias_0"]}, [{}], True),
         ({"operation": "average", "ordered_variables": ["alias_0"]}, [[1, 2, 3]], True),
         ({"operation": "product", "ordered_variables": ["alias_0"]}, [{"a": 1, "b": 2, "c": 3}], False),
         ({"operation": "division", "ordered_variables": ["alias_0"]}, [{"a": [], "b": []}], False),
         ({"operation": "no_op", "ordered_variables": ["alias_0"]}, [[{}]], False),
-    ]
+    ],
 )
 def test_evaluate_expression_no_apply_to(
-        expression_block: dict[str, Any],
-        selected_variables: list[Any],
-        eager_termination: bool,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
     """
     Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
@@ -2107,16 +2102,14 @@ def test_evaluate_expression_no_apply_to(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, eager_termination", [
+    "expression_block, selected_variables, eager_termination",
+    [
         ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], True),
         ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], False),
-    ]
+    ],
 )
 def test_evaluate_expression_unknown_apply_to_value(
-        expression_block: dict[str, Any],
-        selected_variables: list[Any],
-        eager_termination: bool,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
     """
     Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
@@ -2138,33 +2131,30 @@ def test_evaluate_expression_unknown_apply_to_value(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, expected_result", [
+    "expression_block, selected_variables, expected_result",
+    [
         ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[1, 2, 3]], [1, 2, 3]),
         ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[]], []),
         (
-                {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "abc"},
-                [{"a": 1, "b": 2, "c": 3}],
-                [1, 2, 3]),
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "abc"},
+            [{"a": 1, "b": 2, "c": 3}],
+            [1, 2, 3],
+        ),
+        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [{}], []),
         (
-                {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
-                [{}],
-                []
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "def"},
+            [{"a": [], "b": []}],
+            [[], []],
         ),
         (
-                {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "def"},
-                [{"a": [], "b": []}],
-                [[], []]),
-        (
-                {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
-                [[{}, {}, {}]],
-                [{}, {}, {}]),
-    ]
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+            [[{}, {}, {}]],
+            [{}, {}, {}],
+        ),
+    ],
 )
 def test_evaluate_expression_apply_to_individual(
-        expression_block: dict[str, Any],
-        selected_variables: list[Any],
-        expected_result: Any,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
     """
     Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
@@ -2185,34 +2175,26 @@ def test_evaluate_expression_apply_to_individual(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, expected_result", [
+    "expression_block, selected_variables, expected_result",
+    [
         ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[1, 2, 3]], 6),
         ({"operation": "difference", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[]], None),
         (
-                {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group", "save_as": "abc"},
-                [{"a": 1, "b": 2, "c": 3}],
-                6),
-        (
-                {"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"},
-                [{}],
-                None
+            {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group", "save_as": "abc"},
+            [{"a": 1, "b": 2, "c": 3}],
+            6,
         ),
+        ({"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"}, [{}], None),
+        ({"operation": "no_op", "ordered_variables": ["a", "b", "c"], "save_as": "def"}, [2, 5, 8], [2, 5, 8]),
         (
-                {"operation": "no_op", "ordered_variables": ["a", "b", "c"], "save_as": "def"},
-                [2, 5, 8],
-                [2, 5, 8]),
-        (
-                {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]},
-                [8, 7, 6, 5, 4, 3, 2, 1],
-                4.5,
-        )
-    ]
+            {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]},
+            [8, 7, 6, 5, 4, 3, 2, 1],
+            4.5,
+        ),
+    ],
 )
 def test_evaluate_expression_apply_to_group(
-        expression_block: dict[str, Any],
-        selected_variables: list[Any],
-        expected_result: Any,
-        mocker: MockerFixture
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
 
     cross_validator = CrossValidator()
