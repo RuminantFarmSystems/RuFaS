@@ -983,4 +983,4 @@ class Aggregator:
 
     @staticmethod
     def no_op(data: list[Any]) -> Any | None:
-        return data[0] if data else None
+        return data if data else None
