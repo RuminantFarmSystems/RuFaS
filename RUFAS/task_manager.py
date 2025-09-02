@@ -179,9 +179,7 @@ class TaskManager:
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
         input_data_csv_import_path: str = task_config.get("input_data_csv_import_path", "")
         is_end_to_end_test_task = (
-            True if any(
-                task["task_type"] == TaskType.END_TO_END_TESTING
-                for task in runnable_args) else False
+            True if any(task["task_type"] == TaskType.END_TO_END_TESTING for task in runnable_args) else False
         )
         if is_end_to_end_test_task:
             output_prefixes: list[str] = [runnable_args[i]["output_prefix"] for i in range(len(runnable_args))]

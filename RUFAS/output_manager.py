@@ -2131,8 +2131,7 @@ class OutputManager(object):
         self.add_log("Attempting to open e2e test results directory", "Opening e2e test results directory", info_map)
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
         e2e_results_summary: dict[str, dict[str, str]] = {
-            prefix: {header: "n/a" for header in module_headers}
-            for prefix in output_prefixes
+            prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
         }
         all_results_files = os.listdir(json_output_directory)
         for filename in all_results_files:
@@ -2148,8 +2147,9 @@ class OutputManager(object):
 
             matched_prefix = next((prefix for prefix in output_prefixes if prefix.lower() in filename.lower()), None)
             if matched_prefix is None:
-                self.add_error("Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}",
-                               info_map)
+                self.add_error(
+                    "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
+                )
                 continue
 
             for key, value in data.items():
