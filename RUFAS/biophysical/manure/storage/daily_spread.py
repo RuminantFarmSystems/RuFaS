@@ -1,4 +1,7 @@
+import math
+
 from RUFAS.biophysical.manure.storage.storage import Storage
+from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
@@ -8,15 +11,16 @@ class DailySpread(Storage):
     def __init__(
         self,
         name: str,
-        cover: str,
-        surface_area: float,
+        storage_time_period: int = 1,
+        surface_area: float = math.inf,
+        cover: StorageCover = StorageCover.NO_COVER
     ):
         """Initialize DailySpread object."""
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
             cover=cover,
-            storage_time_period=1,
+            storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
 
