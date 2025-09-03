@@ -20,31 +20,36 @@
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "growing_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "closeup_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "lac_feed_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
     },
     {
       "name": "parlor_cleaning_handler",
@@ -84,17 +89,20 @@
     {
       "name": "lac_open_lot",
       "processor_type": "OpenLot",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     }, 
     {
       "name": "closeup_open_lot",
       "processor_type": "OpenLot",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     },    
     {
       "name": "growing_open_lot",
       "processor_type": "OpenLot",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     },
     {
       "name": "anaerobic_lagoon",
@@ -108,11 +116,9 @@
       "name": "compost",
       "processor_type": "Composting",
       "composting_type": "intensive windrow",
-      "storage_time_period": 183
-    },       
-    
-
-
+      "storage_time_period": 183,
+      "surface_area": null
+    },
     {
       "name": "slurry_storage_outdoor",
       "processor_type": "SlurryStorageOutdoor",
@@ -140,7 +146,8 @@
     {
       "name": "open_lot_1",
       "processor_type": "OpenLot",
-      "storage_time_period": 365
+      "storage_time_period": 365,
+      "surface_area": null
     },
     {
       "name": "compost_bedded_pack_1",
