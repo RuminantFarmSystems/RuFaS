@@ -5238,7 +5238,7 @@
         "processor_type": {
           "type": "string",
           "description": "The type of storage used.",
-          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|BeddedPack)$"
+          "pattern": "^(SlurryStorageOutdoor|SlurryStorageUnderfloor|AnaerobicLagoon|Composting|OpenLot|BeddedPack|DailySpread)$"
         },
         "capacity": {
           "type": "number",
