@@ -2131,7 +2131,7 @@ class OutputManager(object):
         }
         self.add_log("Attempting to open e2e test results directory", "Opening e2e test results directory", info_map)
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
-        e2e_results_summary: dict[str, dict[str, str]] = {
+        e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
         }
         all_results_files = os.listdir(json_output_directory)
@@ -2161,7 +2161,7 @@ class OutputManager(object):
 
         self._print_e2e_results_summary(e2e_results_summary)
 
-    def _print_e2e_results_summary(self, e2e_results_summary):
+    def _print_e2e_results_summary(self, e2e_results_summary: dict[str, dict[str, bool | str]]) -> None:
         """
         Prints the end-to-end results summary to the console.
         """
