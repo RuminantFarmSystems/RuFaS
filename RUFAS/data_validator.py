@@ -1741,65 +1741,16 @@ class CrossValidator:
             ordered_values.append(value)
 
         if isinstance(ordered_values[0], (list, dict)):
-            if len(ordered_values) > 1:
-                self._event_logs.append(
-                    {
-                        "error": "Multiple Complex Variables Selected",
-                        "message": "Only one list or dict variable can be selected for cross validation in "
-                        "a single expression block.",
-                        "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator._evaluate_expression.__name__,
-                        },
-                    }
-                )
-                if eager_termination:
-                    raise ValueError(
-                        "Only one list or dict variable can be selected for cross validation in "
-                        "a single expression block."
-                    )
-                else:
-                    return None, False
-
+            if not self._validate_expression_block_with_complex_variable(
+                    expression_block,
+                    ordered_values,
+                    eager_termination
+            ):
+                return None, False
             ordered_values = (
                 ordered_values[0] if isinstance(ordered_values[0], list) else list(ordered_values[0].values())
             )
-            if "apply_to" not in expression_block:
-                self._event_logs.append(
-                    {
-                        "error": "Missing `apply_to` key",
-                        "message": "The 'apply_to' key is required in expression block "
-                        "when a complex data structure is selected.",
-                        "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator._evaluate_expression.__name__,
-                        },
-                    }
-                )
-                if eager_termination:
-                    raise ValueError("Missing 'apply_to' key in expression block for selected complex data structure.")
-                else:
-                    return None, False
-            apply_to = expression_block["apply_to"]
-            if apply_to == "individual":
-                result = ordered_values
-            elif apply_to == "group":
-                result = aggregator(ordered_values)
-            else:
-                self._event_logs.append(
-                    {
-                        "error": "Unknown apply_to value",
-                        "message": f"Unknown apply_to value {apply_to} in expression block.",
-                        "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator._evaluate_expression.__name__,
-                        },
-                    }
-                )
-                if eager_termination:
-                    raise ValueError(f"Unknown apply_to value: {apply_to}")
-                else:
-                    return None, False
+            result = ordered_values if expression_block["apply_to"] == "individual" else aggregator(ordered_values)
         else:
             result = aggregator(ordered_values)
 
@@ -1807,6 +1758,89 @@ class CrossValidator:
             save_as_alise_name: str = expression_block["save_as"]
             self._save_to_alias_pool(alias_name=save_as_alise_name, value=result)
         return result, True
+
+    def _validate_expression_block_with_complex_variable(
+            self,
+            expression_block: dict[str, Any],
+            ordered_values: list[Any],
+            eager_termination: bool
+    ) -> bool:
+        """
+        Validates an expression block when it contains complex variables.
+
+        This method checks the validity of an expression block if it includes complex variables
+        (such as lists or dictionaries) and ensures it adheres to predefined rules. Validation
+        errors are logged, and eager termination behavior is enforced if specified.
+
+        Parameters
+        ----------
+        expression_block : dict[str, Any]
+            A dictionary representing the expression block to be validated.
+        ordered_values : list[Any]
+            A list of variables involved in the evaluation. Only one list or dictionary variable
+            is permitted for cross-validation in a single block.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
+
+        Returns
+        -------
+        bool
+            Returns True if the expression block is valid, otherwise False if eager termination
+            is disabled.
+        """
+        if len(ordered_values) > 1:
+            self._event_logs.append(
+                {
+                    "error": "Multiple Complex Variables Selected",
+                    "message": "Only one list or dict variable can be selected for cross validation in "
+                               "a single expression block.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(
+                    "Only one list or dict variable can be selected for cross validation in "
+                    "a single expression block."
+                )
+            else:
+                return False
+
+        if "apply_to" not in expression_block:
+            self._event_logs.append(
+                {
+                    "error": "Missing `apply_to` key",
+                    "message": "The 'apply_to' key is required in expression block "
+                               "when a complex data structure is selected.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Missing 'apply_to' key in expression block for selected complex data structure.")
+            else:
+                return False
+        if apply_to := expression_block["apply_to"] not in ["individual", "group"]:
+            self._event_logs.append(
+                {
+                    "error": "Unknown apply_to value",
+                    "message": f"Unknown apply_to value {apply_to} in expression block.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(f"Unknown apply_to value: {apply_to}")
+            else:
+                return False
+        return True
 
     def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
         """
