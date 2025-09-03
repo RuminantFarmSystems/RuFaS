@@ -24,6 +24,9 @@ class DailySpread(Storage):
             surface_area=surface_area,
         )
 
+    def receive_manure(self, manure: ManureStream) -> None:
+        self._received_manure += manure
+
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
         return super().process_manure(current_day_conditions, time)
