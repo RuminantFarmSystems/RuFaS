@@ -13,7 +13,7 @@ class DailySpread(Storage):
         name: str,
         storage_time_period: int = 1,
         surface_area: float = math.inf,
-        cover: StorageCover = StorageCover.NO_COVER
+        cover: StorageCover = StorageCover.NO_COVER,
     ):
         """Initialize DailySpread object."""
         super().__init__(

@@ -36,7 +36,7 @@ STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
     BeddedPack: ManureType.SOLID,
     Composting: ManureType.SOLID,
     OpenLot: ManureType.SOLID,
-    DailySpread: ManureType.LIQUID
+    DailySpread: ManureType.LIQUID,
 }
 
 
