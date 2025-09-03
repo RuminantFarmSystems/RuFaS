@@ -1158,6 +1158,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        None,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
@@ -1187,6 +1188,7 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        None,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
@@ -1211,6 +1213,7 @@ def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixtur
 
     with pytest.raises(ValueError, match="No previous ration available"):
         pen.formulate_optimized_ration(
+            False,
             pen_available_feeds=_mock_feeds(),
             temperature=22.0,
             max_daily_feeds={},
@@ -1232,6 +1235,7 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        None,
         pen_available_feeds=_mock_feeds(),
         temperature=21.0,
         max_daily_feeds={},
@@ -1249,7 +1253,14 @@ def test_attempt_formulation(mocker: MockerFixture, pen: Pen) -> None:
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
     mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization", return_value=mock_result)
-    result = pen._attempt_formulation(_mock_feeds(), 25, None)
+    result = pen._attempt_formulation(
+        is_ration_defined_by_user=False,
+        pen_feeds=_mock_feeds(),
+        temperature=25,
+        previous_ration=None,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
+    )
     mock_set.assert_called_once()
     mock_attempt.assert_called_once()
     assert result == mock_result

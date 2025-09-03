@@ -106,7 +106,13 @@ def full_mock_requirements() -> NutritionRequirements:
 
 @pytest.fixture
 def full_config(full_mock_feed: Feed, full_mock_requirements: NutritionRequirements) -> RationConfig:
-    return RationConfig(full_mock_requirements, [full_mock_feed], pen_average_body_weight=600)
+    return RationConfig(
+        full_mock_requirements,
+        [full_mock_feed],
+        initial_dry_matter_requirement=10,
+        initial_protein_requirement=200,
+        pen_average_body_weight=600,
+    )
 
 
 @pytest.fixture
@@ -116,27 +122,37 @@ def optimizer() -> RationOptimizer:
 
 @pytest.fixture
 def ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> RationConfig:
-    return RationConfig(mock_requirements, [mock_feed], pen_average_body_weight=600)
+    return RationConfig(
+        mock_requirements,
+        [mock_feed],
+        initial_dry_matter_requirement=30,
+        initial_protein_requirement=100,
+        pen_average_body_weight=600,
+    )
 
 
 def test_ration_config_initialization(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
     """Test initialization of RationConfig and derived attributes."""
-    config = RationConfig(mock_requirements, [mock_feed], 600)
+    config = RationConfig(mock_requirements, [mock_feed], 1, 1, 600)
     assert config.animal_requirements == mock_requirements
     assert str(config.feeds_used[0].rufas_id) == "feed1"
     assert config.price_list == [2.0]
     assert config.feed_minimum_list == [0.0]
     assert config.feed_maximum_list == [10.0]
+    assert config.initial_protein_requirement == 1.0
+    assert config.initial_dry_matter_requirement == 1.0
 
 
 def test_ration_config_initialization_no_feeds(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
     """Test initialization of RationConfig and derived attributes."""
-    config = RationConfig(mock_requirements, None, 600)
+    config = RationConfig(mock_requirements, None, 1, 1, 600)
     assert config.animal_requirements == mock_requirements
     assert config.feeds_used == []
     assert config.price_list == []
     assert config.feed_minimum_list == []
     assert config.feed_maximum_list == []
+    assert config.initial_protein_requirement == 1.0
+    assert config.initial_dry_matter_requirement == 1.0
 
 
 def test_convert_decision_vec_to_feeds(ration_config: RationConfig) -> None:
@@ -386,7 +402,7 @@ def test_attempt_optimization_success(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.minimize", return_value=mock_result)
 
     result, config = optimizer.attempt_optimization(
-        pen_average_body_weight, requirements, feeds, animal_comb, previous_ration
+        pen_average_body_weight, requirements, 1, 1, feeds, animal_comb, previous_ration
     )
 
     assert result == mock_result
@@ -422,10 +438,12 @@ def test_attempt_optimization_clips_initial_values(mocker: MockerFixture) -> Non
     )
 
     optimizer.attempt_optimization(
-        pen_average_body_weight,
-        requirements,
-        feeds,
-        animal_comb,
+        pen_average_body_weight=pen_average_body_weight,
+        requirements=requirements,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
+        pen_available_feeds=feeds,
+        animal_combination=animal_comb,
         previous_ration=None,
     )
 
@@ -461,6 +479,8 @@ def test_handle_failed_constraints_lac_cow(mocker: MockerFixture) -> None:
         pen_available_feeds=pen_feeds,
         average_nutrient_requirements=requirements,
         sim_day=sim_day,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
     )
 
 
@@ -483,6 +503,8 @@ def test_handle_failed_constraints_heifer_combination(mocker: MockerFixture) -> 
     pen_feeds = [MagicMock(spec=Feed)]
     pen_id = 2
     sim_day = 12
+    initial_dry_matter_requirement = 1
+    initial_protein_requirement = 1
 
     optimizer.handle_failed_constraints(
         num_attempts=1,
@@ -493,6 +515,8 @@ def test_handle_failed_constraints_heifer_combination(mocker: MockerFixture) -> 
         pen_available_feeds=pen_feeds,
         average_nutrient_requirements=requirements,
         sim_day=sim_day,
+        initial_dry_matter_requirement=initial_dry_matter_requirement,
+        initial_protein_requirement=initial_protein_requirement,
     )
 
     mock_om.add_variable.assert_called_once()
