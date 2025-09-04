@@ -1,0 +1,105 @@
+{
+  "processor_connections": [
+    {
+      "processor_name": "calf_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "CalfStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "growing_alley_scraper1",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "HeiferStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "growing_alley_scraper2",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "HeiferStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "closeup_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "CloseupStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "lac_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "LacStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "DailySpread",
+          "proportion": 0.75
+        },
+        {
+          "receiving_processor_name": "LacStorage",
+          "proportion": 0.25
+        }
+      ]
+    },
+    {
+      "processor_name": "DailySpread",
+      "destinations": []
+    },
+    {
+      "processor_name": "CalfStorage",
+      "destinations": []
+    },
+    {
+      "processor_name": "HeiferStorage",
+      "destinations": []
+    },
+    {
+      "processor_name": "CloseupStorage",
+      "destinations": []
+    },
+    {
+      "processor_name": "LacStorage",
+      "destinations": []
+    }
+  ],
+  "separator_connections": [
+    
+  ]
+}
