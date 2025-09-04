@@ -902,7 +902,7 @@ class ManureManager:
                     stored_manure=processor.stored_manure,
                     nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
                     is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
-                    non_limiting_fields=non_limiting_fields,
+                    non_limiting_fields=non_limiting_fields.copy(),
                 )
                 removal_details["manure_type"] = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 self._manure_nutrient_manager.remove_nutrients(removal_details)
