@@ -2181,7 +2181,7 @@ class OutputManager(object):
         module = json_key.split(".", 1)[0].lower()
         if module == "animal":
             return "Animal"
-        if module in {"cropandsoil", "crop_and_soil", "cropsoil", "cropsandsoil"}:
+        if module == "crop_and_soil":
             return "CropAndSoil"
         if module == "manure":
             return "Manure"

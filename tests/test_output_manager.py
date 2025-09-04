@@ -3371,8 +3371,6 @@ def test__print_e2e_results_summary_formats_output(
     [
         ("Animal.foo", "Animal"),
         ("crop_and_soil.bar", "CropAndSoil"),
-        ("CropSoil.baz", "CropAndSoil"),
-        ("cropsandsoil.qux", "CropAndSoil"),
         ("manure.moo", "Manure"),
         ("Other.stuff", "Other"),
         ("weirdkey", "weirdkey"),
