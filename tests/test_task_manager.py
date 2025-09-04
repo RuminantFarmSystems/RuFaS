@@ -58,7 +58,7 @@ def test_invalid_task_type_from_string() -> None:
 
 def test_task_manager_init(
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
 ) -> None:
     """Unit test for TaskManager.__init__()"""
     assert task_manager.output_manager is mock_output_manager
@@ -66,18 +66,19 @@ def test_task_manager_init(
 
 @pytest.mark.parametrize(
     "verbosity, exclude_info_maps, clear_output_directory, produce_graphics, suppress_log_files, metadata_depth_limit,"
-    "workers",
+    "workers, is_end_to_end_test_task",
     [
-        (LogVerbosity.LOGS, True, True, True, True, 8, 1),
-        (LogVerbosity.CREDITS, True, True, True, True, 8, 2),
-        (LogVerbosity.ERRORS, True, True, True, True, 8, 3),
-        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4),
-        (LogVerbosity.NONE, True, True, True, True, 8, 5),
-        (LogVerbosity.LOGS, False, True, True, True, 8, 6),
-        (LogVerbosity.CREDITS, False, True, True, True, 8, 7),
-        (LogVerbosity.ERRORS, False, True, True, True, 8, 8),
-        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9),
-        (LogVerbosity.NONE, False, True, True, True, 8, 10),
+        (LogVerbosity.LOGS, True, True, True, True, 8, 1, False),
+        (LogVerbosity.CREDITS, True, True, True, True, 8, 2, False),
+        (LogVerbosity.ERRORS, True, True, True, True, 8, 3, False),
+        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4, False),
+        (LogVerbosity.NONE, True, True, True, True, 8, 5, False),
+        (LogVerbosity.LOGS, False, True, True, True, 8, 6, False),
+        (LogVerbosity.CREDITS, False, True, True, True, 8, 7, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, False),
+        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9, False),
+        (LogVerbosity.NONE, False, True, True, True, 8, 10, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, True),
     ],
 )
 def test_task_manager_start(
@@ -89,24 +90,18 @@ def test_task_manager_start(
     metadata_depth_limit: int,
     workers: int,
     mocker: MockerFixture,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
+    is_end_to_end_test_task: bool,
 ) -> None:
-    """Unit test for TaskManager.start()"""
-    # Arrange
-    mock_task_manager = TaskManager()
-    mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
-    mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-        mock_task_manager, "_expand_multi_runs_to_single_runs", return_value=[{}]
-    )
-    mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
-    mock_get_rufas_version = mocker.patch.object(mock_task_manager, "get_rufas_version", return_value="1.0.0")
-    mock_check_dependencies = mocker.patch.object(mock_task_manager, "check_dependencies")
-    mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
-    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    """Unit test for TaskManager.start() with and without the e2e summary branch."""
+    tm = TaskManager()
+    tm.output_manager = mock_output_manager
+
+    mock_im = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_im)
+    mock_start_data = mocker.patch.object(mock_im, "start_data_processing", return_value=True)
     mock_get_data = mocker.patch.object(
-        mock_input_manager,
+        mock_im,
         "get_data",
         return_value={
             "parallel_workers": workers,
@@ -115,25 +110,45 @@ def test_task_manager_start(
             "export_input_data_to_csv": False,
         },
     )
-    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
-    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
-    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
-    mock_task_manager.output_manager = mock_output_manager
 
-    # Act
-    mock_task_manager.start(
-        Path("metadata/path"),
-        verbosity,
-        exclude_info_maps,
-        Path("output/directory"),
-        Path("logs/directory"),
-        clear_output_directory,
-        produce_graphics,
-        suppress_log_files,
-        metadata_depth_limit,
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mocker.patch.object(tm, "get_rufas_version", return_value="1.0.0")
+    mock_check_dependencies = mocker.patch.object(tm, "check_dependencies")
+    mock_check_python_version = mocker.patch.object(tm, "check_python_version")
+
+    if not is_end_to_end_test_task:
+        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([{}], [{}]))
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm, "_expand_multi_runs_to_single_runs", return_value=[{}]
+        )
+    else:
+        e2e_task = {
+            "task_type": TaskType.END_TO_END_TESTING,
+            "output_prefix": "test_prefix",
+            "json_output_directory": Path("out/e2e"),
+        }
+        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([e2e_task], [{}]))
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm, "_expand_multi_runs_to_single_runs", return_value=[]
+        )
+
+    mock_run_tasks = mocker.patch.object(tm, "_run_tasks")
+    mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
+
+    tm.start(
+        metadata_path=Path("metadata/path"),
+        verbosity=verbosity,
+        exclude_info_maps=exclude_info_maps,
+        output_directory=Path("output/directory"),
+        logs_directory=Path("logs/directory"),
+        clear_output_directory=clear_output_directory,
+        produce_graphics=produce_graphics,
+        suppress_log_files=suppress_log_files,
+        metadata_depth_limit=metadata_depth_limit,
     )
 
-    # Assert
     mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,
@@ -149,31 +164,53 @@ def test_task_manager_start(
         is_end_to_end_testing_run=False,
     )
 
-    info_map = {
-        "class": TaskManager.__name__,
-        "function": TaskManager.start.__name__,
-    }
+    info_map = {"class": TaskManager.__name__, "function": TaskManager.start.__name__}
+    expanded_len = 1 if is_end_to_end_test_task else 2
     expected_add_log_calls = [
         call("Task Manager Start", "Task Manager Started.", info_map),
         call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
         call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
-        call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
+        call("Task Manager expanded tasks", f"Expanded task args to {expanded_len}. Starting the tasks...", info_map),
     ]
     mock_add_log.assert_has_calls(expected_add_log_calls)
+
     mock_start_data.assert_called_once_with(Path("metadata/path"))
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
-    mock_run_tasks.assert_called_once_with(
-        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers, Path("metadata/path")
-    )
-    mock_get_rufas_version.assert_called_once()
+
+    if not is_end_to_end_test_task:
+        mock_run_tasks.assert_called_once_with(
+            [{"task_id": "1/2"}, {"task_id": "2/2"}],
+            produce_graphics,
+            metadata_depth_limit,
+            workers,
+            Path("metadata/path"),
+        )
+        mock_summarize.assert_not_called()
+    else:
+        args, _kwargs = mock_run_tasks.call_args
+        runnable_passed = args[0]
+        assert len(runnable_passed) == 1
+        assert runnable_passed[0]["task_id"] == "1/1"
+        assert args[1] == produce_graphics
+        assert args[2] == metadata_depth_limit
+        assert args[3] == workers
+        assert args[4] == Path("metadata/path")
+
+        mock_add_log.assert_any_call(
+            "Summarizing e2e test results",
+            "Gathering e2e results for ['test_prefix']...",
+            info_map,
+        )
+        mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"])
+
+    mock_print_credits.assert_called_once_with("1.0.0")
     mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
-    mock_print_credits.assert_called_once_with("1.0.0")
 
 
-def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: OutputManager) -> None:
     """Test TaskManager.start() with invalid input data."""
     mock_task_manager = TaskManager()
     mocker.patch.object(mock_task_manager, "check_python_version")
@@ -204,7 +241,7 @@ def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_mana
     )
 
 
-def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
+def test_set_random_seed(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() with no specified random seed."""
     mock_task_manager = TaskManager()
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
@@ -217,7 +254,7 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any], mocker: 
     )
 
 
-def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
+def test_set_random_seed_zero(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
     mock_task_manager = TaskManager()
     mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
@@ -234,7 +271,7 @@ def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], moc
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
+    seed: int, expected: int, mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.set_random_seed() with specified random seed."""
     mock_task_manager = TaskManager()
@@ -318,7 +355,7 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     suppress_logs: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -338,6 +375,7 @@ def test_handle_post_processing(
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_flush_pool = mocker.patch.object(mock_input_manager, "flush_pool", return_value=None)
     mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mock_dump_all_nondata_pools = mocker.patch.object(mock_output_manager, "dump_all_nondata_pools", return_value=None)
     task_manager.handle_post_processing(
         args=args,
         input_manager=mock_input_manager,
@@ -350,19 +388,17 @@ def test_handle_post_processing(
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
     if not suppress_logs:
         mock_dump_data_logs.call_count == 1
-        mock_output_manager.dump_all_nondata_pools.assert_called_with(
-            args["logs_directory"], args["exclude_info_maps"], "verbose"
-        )
+        mock_dump_all_nondata_pools.assert_called_with(args["logs_directory"], args["exclude_info_maps"], "verbose")
     else:
         mock_dump_data_logs.assert_not_called()
-        mock_output_manager.dump_all_nondata_pools.assert_not_called()
+        mock_dump_all_nondata_pools.assert_not_called()
 
     mock_flush_pool.assert_called_once()
 
 
 def test_handle_post_processing_export_input_tocsv(
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True."""
@@ -370,8 +406,7 @@ def test_handle_post_processing_export_input_tocsv(
     mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
 
-    # mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
-    mocker.patch.object(Utility, "combine_saved_input_csv", return_value=None)
+    mock_combine_saved_input_csv = mocker.patch.object(Utility, "combine_saved_input_csv", return_value=None)
 
     args = {
         "filters_directory": Path("/fake/filters"),
@@ -396,7 +431,7 @@ def test_handle_post_processing_export_input_tocsv(
         export_input_data_to_csv=True,
     )
 
-    Utility.combine_saved_input_csv.assert_called_once_with(
+    mock_combine_saved_input_csv.assert_called_once_with(
         TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
         args["input_data_csv_export_path"],
         args["input_data_csv_import_path"],
@@ -404,7 +439,7 @@ def test_handle_post_processing_export_input_tocsv(
 
 
 def test_handle_end_to_end_testing(
-    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
@@ -437,7 +472,9 @@ def test_handle_end_to_end_testing(
     assert post_processing.call_count == 1
 
 
-def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskManager, mocker) -> None:
+def test_handle_update_e2e_test_results(
+    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
+) -> None:
     """Test that updating end-to-end expected test results executes correctly."""
 
     # Arrange
@@ -478,13 +515,18 @@ def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskM
 
 def test_handle_post_processing_load_pool(
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True."""
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools", return_value=None)
+    mock_load_variables_pool_from_file = mocker.patch.object(
+        mock_output_manager, "load_variables_pool_from_file", return_value=None
+    )
+    mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix", return_value=None)
 
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
 
@@ -509,14 +551,14 @@ def test_handle_post_processing_load_pool(
         load_pool_from_file=True,
     )
 
-    mock_output_manager.flush_pools.assert_called_once()
-    mock_output_manager.load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
-    mock_output_manager.set_metadata_prefix.assert_called_once_with("reload")
+    mock_flush_pools.assert_called_once()
+    mock_load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
+    mock_set_metadata_prefix.assert_called_once_with("reload")
 
 
 def test_handle_post_processing_save_result(
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_post_processing() when save_result is set to True."""
@@ -525,6 +567,7 @@ def test_handle_post_processing_save_result(
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
 
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
+    mock_save_results = mocker.patch.object(mock_output_manager, "save_results", return_value=None)
 
     args = {
         "filters_directory": Path("/fake/filters"),
@@ -547,7 +590,7 @@ def test_handle_post_processing_save_result(
         save_results=True,
     )
 
-    mock_output_manager.save_results.assert_called_once_with(
+    mock_save_results.assert_called_once_with(
         args["filters_directory"],
         args["exclude_info_maps"],
         False,
@@ -564,7 +607,7 @@ def test_handle_post_processing_save_result(
 def test_input_data_audit(
     suppress_logs: bool,
     export_input_data_to_csv: bool,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     task_manager: TaskManager,
     mocker: MockerFixture,
 ) -> None:
@@ -585,11 +628,12 @@ def test_input_data_audit(
     mocve_export_pool_to_csv = mocker.patch.object(mock_input_manager, "export_pool_to_csv", return_value=None)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     task_manager.input_manager = mock_input_manager
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log", return_value=None)
 
     result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
     if not suppress_logs:
-        mock_output_manager.add_log.assert_called_with(
+        mock_add_log.assert_called_with(
             "Saving metadata properties",
             f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
             {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
@@ -618,7 +662,6 @@ def test_input_data_audit(
     ],
 )
 def test_task(
-    mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
     mocker: MockerFixture,
     task_type: TaskType,
@@ -662,7 +705,7 @@ def test_task(
         mock_handler.assert_called_once()
 
 
-def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputManager) -> None:
     """Unit test for TaskManager.task() with invalid data"""
     task_manager = TaskManager()
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
@@ -729,7 +772,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     mock_handle_post_processing.assert_called_once()
 
 
-def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager) -> None:
+def test_task_failed(task_manager: TaskManager) -> None:
     """Tests that error were handled correctly"""
     args = {
         "task_type": "failure",
@@ -767,7 +810,7 @@ def test_handle_herd_initialization(
     save_animals: bool,
     save_animals_directory: Path,
     task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_herd_initializaition()"""
@@ -775,6 +818,7 @@ def test_handle_herd_initialization(
     mock_herd_factory = mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory")
     mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
     mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log", return_value=None)
 
     task_manager.handle_herd_initializaition(args, mock_output_manager)
 
@@ -787,14 +831,14 @@ def test_handle_herd_initialization(
         call("Herd initialization start", "Initializing herd data...", info_map),
         call("Herd initialization complete", "Herd data initialized.", info_map),
     ]
-    mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
+    mock_add_log.assert_has_calls(om_add_log_call_list)
 
     mock_herd_factory_init.assert_called_once_with(init_herd, save_animals, save_animals_directory)
     mock_initialize_herd.assert_called_once()
 
 
 def test_single_simulation_run(
-    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
+    task_manager: TaskManager, mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
@@ -806,6 +850,7 @@ def test_single_simulation_run(
         "RUFAS.task_manager.SimulationEngine", return_value=mock_simulation_engine
     )
     mock_simulate = mocker.patch.object(mock_simulation_engine, "simulate")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log", return_value=None)
 
     task_manager.handle_single_simulation_run(args, mock_output_manager)
 
@@ -820,7 +865,7 @@ def test_single_simulation_run(
         call("Starting the simulation", "Starting the simulation", info_map),
         call("Simulation completed", "Simulation completed", info_map),
     ]
-    mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
+    mock_add_log.assert_has_calls(om_add_log_call_list)
 
     mock_simulation_engine_init.assert_called_once()
     mock_simulate.assert_called_once()
@@ -1314,7 +1359,6 @@ def test_expand_sensitivity_analysis_args(
     multi_run_args: dict[str, Any],
     expected_output_prefixes: list[str],
     expected_input_patches: list[dict[str, dict[str, dict[str, Any]]]],
-    mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
 ) -> None:
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and sobol methods
@@ -1422,7 +1466,7 @@ def test_expand_sensitivity_analysis_args(
 )
 def test_expand_sensitivity_analysis_args_invalid_sampler(
     multi_run_args: dict[str, Any],
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     task_manager: TaskManager,
     mocker: MockerFixture,
 ) -> None:
@@ -1698,7 +1742,7 @@ def test_run_tasks_fail(
     produce_graphics: bool,
     metadata_depth_limit: int,
     task_return_values: list[str | None],
-    mock_output_manager: Generator[Any, Any, Any],
+    mock_output_manager: OutputManager,
     task_manager: TaskManager,
     mocker: MockerFixture,
 ) -> None:
@@ -1708,6 +1752,7 @@ def test_run_tasks_fail(
     mock_task.side_effect = task_return_values
 
     mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error", return_value=None)
 
     mock_pool = mocker.patch("multiprocessing.Pool")
 
@@ -1725,7 +1770,7 @@ def test_run_tasks_fail(
     mock_om_init.assert_called_once()
     info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
     failed = [fail for fail in task_return_values if fail is not None]
-    mock_output_manager.add_error.assert_called_once_with(
+    mock_add_error.assert_called_once_with(
         "Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map
     )
 
