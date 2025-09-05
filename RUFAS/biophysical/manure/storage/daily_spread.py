@@ -25,8 +25,32 @@ class DailySpread(Storage):
         )
 
     def receive_manure(self, manure: ManureStream) -> None:
+        """
+        Receives the manure.
+
+        Parameters
+        ----------
+        manure : ManureStream
+
+        """
         self._received_manure += manure
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
+        """
+        Processes manure in bedded pack.
+
+        Parameters
+        ----------
+        current_day_conditions : CurrentDayConditions
+            The current day conditions.
+        time : RufasTime
+            The time of the simulation.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            _The processed manure stream.
+
+        """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
         return super().process_manure(current_day_conditions, time)
