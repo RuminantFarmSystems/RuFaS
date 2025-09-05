@@ -72,3 +72,10 @@ def test_process_manure(
 
     mock_report.assert_called_once_with(received_manure, "received", 50)
     mock_process.assert_called_once_with(mock_conditions, mock_time)
+
+
+def test_receive_manure(received_manure: ManureStream, daily_spread_instance: DailySpread) -> None:
+    """Tests overwritten receive_manure function."""
+    daily_spread_instance.receive_manure(received_manure)
+
+    assert daily_spread_instance._received_manure == received_manure
