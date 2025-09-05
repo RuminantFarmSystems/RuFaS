@@ -154,6 +154,10 @@
       "processor_type": "BeddedPack",
       "storage_time_period": 365,
       "is_mixed": false
+    },
+    {
+      "name": "dailyspread",
+      "processor_type": "DailySpread"
     }
   ]
 }

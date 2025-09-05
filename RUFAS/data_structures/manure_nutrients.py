@@ -58,6 +58,7 @@ class ManureNutrients:
                 pass
             elif field.name == "manure_type":
                 if not isinstance(value, ManureType):
+                    print(field)
                     raise ValueError(f"Field {field.name} must be an instance of ManureType.")
             else:
                 if value < 0:
