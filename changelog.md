@@ -229,10 +229,10 @@ v0.9.2
 - [2552](https://github.com/RuminantFarmSystems/MASM/pull/2552) - [minor change] Reduce example run warning count.
 - [2551](https://github.com/RuminantFarmSystems/MASM/pull/2551) - [minor change] Raises error in main.py to direct user to errors file for debugging.
 - [2547](https://github.com/RuminantFarmSystems/MASM/pull/2547) - [minor change] [Input Manager] 1/5 Cross Validation basic setup.
+- [2559](https://github.com/RuminantFarmSystems/MASM/pull/2559) - [minor change] [Manure] Implement daily spread processor.
 - [2482](https://github.com/RuminantFarmSystems/MASM/pull/2554) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
 - [2567](https://github.com/RuminantFarmSystems/MASM/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
-
 
 ### v0.9.2
 

@@ -142,6 +142,10 @@
       "processor_type": "BeddedPack",
       "storage_time_period": 183,
       "surface_area": null
+    },
+    {
+      "name": "dailyspread",
+      "processor_type": "DailySpread"
     }
   ]
 }
