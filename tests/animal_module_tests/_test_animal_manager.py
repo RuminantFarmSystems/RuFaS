@@ -337,7 +337,7 @@ def test_init_pens(
     assert actual == expected
 
 
-def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
+def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture) -> None:
     """Unit test for function init_animals in file routines/animal/animal_manager.py"""
 
     mocker.patch(
@@ -352,7 +352,7 @@ def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
     animal_manager.life_cycle_manager.initialize_herd.assert_called_once()
 
 
-def test_print_animal_num_warnings(animal_manager: AnimalManager):
+def test_print_animal_num_warnings(animal_manager: AnimalManager) -> None:
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_manager.py"""
     with patch.object(om, "add_log") as add_log, patch.object(om, "add_warning") as add_warning:
         animal_keys = {
