@@ -781,14 +781,14 @@
       "minimum": 0,
       "default": 0
     },
-    "methane_method": {
+    "methane_model": {
       "type": "object",
       "description": "Methane emission models to use",
       "calves": {
         "type": "object",
         "description": "Methane emission models to use fro calves.",
         "Pattanaik": {
-          "type": "boolean",
+          "type": "bool",
           "default": true
         }
       },
@@ -796,7 +796,7 @@
         "type": "object",
         "description": "Methane emission models to heiferIs.",
         "IPCC": {
-          "type": "boolean",
+          "type": "bool",
           "default": true
         }
       },
@@ -804,7 +804,7 @@
         "type": "object",
         "description": "Methane emission models to heiferIIs.",
         "IPCC": {
-          "type": "boolean",
+          "type": "bool",
           "default": true
         }
       },
@@ -812,37 +812,41 @@
         "type": "object",
         "description": "Methane emission models to heiferIIIs.",
         "IPCC": {
-          "type": "boolean",
+          "type": "bool",
           "default": true
         }
       },
-      "3-NOP_additive_amount": {
-        "type": "number",
-        "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive",
-        "minimum": 40,
-        "maximum": 100,
-        "default": 70
-      },
-      "monensin_additive_amount": {
-        "type": "number",
-        "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive",
-        "minimum": 20,
-        "maximum": 36,
-        "default": 24
-      },
-      "essential_oils_additive_amount": {
-        "type": "number",
-        "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive",
-        "minimum": 0,
-        "maximum": 100,
-        "default": 0
-      },
-      "seaweed_additive_amount": {
-        "type": "number",
-        "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of seaweed mitigation additive",
-        "minimum": 0,
-        "maximum": 100,
-        "default": 0
+      "cows": {
+        "type": "object",
+        "description": "Methane emission models to cows.",
+        "dry cows": {
+          "type": "object",
+          "description": "Methane emission models to dry cows.",
+          "IPCC": {
+            "type": "bool",
+            "default": true
+          },
+          "Mills": {
+            "type": "bool",
+            "default": false
+          }
+        },
+        "lactating cows": {
+          "type": "object",
+          "description": "Methane emission models to lactating cows.",
+          "IPCC": {
+            "type": "bool",
+            "default": true
+          },
+          "Mills": {
+            "type": "bool",
+            "default": false
+          },
+          "Mutian": {
+            "type": "bool",
+            "default": false
+          }
+        }
       }
     },
     "ration": {

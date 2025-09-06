@@ -1,3 +1,5 @@
+from typing import Any
+
 from freezegun.api import real_uuid_generate_time
 from numpy import exp
 
@@ -115,7 +117,7 @@ class EntericMethaneCalculator:
         nutrient_amounts: NutritionSupply,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
-        methane_models: dict[str, dict[str, bool]],
+        methane_models: dict[str, Any],
     ) -> dict[str, float]:
         """
         Calculates the daily enteric emissions for cows.
@@ -155,6 +157,7 @@ class EntericMethaneCalculator:
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
         ethyl_ester_concentration = nutrient_amounts.fat_percentage
         starch_concentration = nutrient_amounts.starch_percentage
+        methane_models = methane_models["cows"]
 
         if is_lactating:
             methane_models = methane_models["lactating cows"]
