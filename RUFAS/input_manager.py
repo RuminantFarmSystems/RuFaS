@@ -104,7 +104,7 @@ class InputManager:
 
     def _load_metadata(self, metadata_path: Path) -> None:
         """
-        Loads metadata from json file to IM metadata dict.
+        Loads metadata from json file to IM metadata dixfct.
 
         Parameters
         ----------

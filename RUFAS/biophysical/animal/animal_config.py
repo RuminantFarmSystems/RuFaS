@@ -357,7 +357,16 @@ class AnimalConfig:
         1,
     ]
 
-    methane_model: str = "IPCC"
+    methane_model: dict[str, dict[str, bool]] = {
+        "calves": {"Pattanaik": True},
+        "heiferIs": {"IPCC": True},
+        "heiferIIs": {"IPCC": True},
+        "heiferIIIs": {"IPCC": True},
+        "cow": {
+            "dry cows": {"IPCC": True, "Mills": False},
+            "lactating cows": {"IPCC": True, "Mutian": False, "Mills": False},
+        },
+    }
     methane_mitigation_method: str = "None"
     methane_mitigation_additive_amount: float = 0.0
 
