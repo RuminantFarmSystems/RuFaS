@@ -65,7 +65,7 @@ class Storage(Processor):
         self,
         name: str,
         is_housing_emissions_calculator: bool,
-        cover: str,
+        cover: str | StorageCover,
         storage_time_period: int | None,
         surface_area: float,
         capacity: float = inf,

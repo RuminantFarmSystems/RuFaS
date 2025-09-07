@@ -1851,6 +1851,21 @@ def test_sold_property(sold_at_day: int | None, expected: bool, mock_lactating_c
 
 
 @pytest.mark.parametrize(
+    "stillborn_at_day, expected",
+    [
+        (None, False),
+        (-1, False),
+        (0, True),
+        (10, True),
+    ],
+)
+def test_stillborn_property(stillborn_at_day: int | None, expected: bool, mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal.stillborn_day = stillborn_at_day
+    assert animal.stillborn == expected
+
+
+@pytest.mark.parametrize(
     "dead_at_day, expected",
     [
         (None, False),
