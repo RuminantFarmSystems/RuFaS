@@ -186,3 +186,11 @@ class SoldAnimalTypedDict(TypedDict):
     cull_reason: str | None
     days_in_milk: int | str
     parity: int | str
+
+
+class StillbornCalfTypedDict(TypedDict):
+    """List of expected keys for stillborn calves values dictionary"""
+
+    id: int
+    stillborn_day: int | None
+    birth_weight: float
