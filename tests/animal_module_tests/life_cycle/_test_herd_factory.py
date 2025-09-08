@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Callable, Dict
+from typing import Callable, Dict, Any
 
 import mock
 import pytest
@@ -1707,8 +1707,8 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_herd_factory: HerdFactory,
     mock_input_manager: InputManager,
     mock_output_manager: OutputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    output_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Any],
+    output_manager_original_method_states: Dict[str, Any],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=True"""
@@ -1785,8 +1785,8 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_herd_factory: HerdFactory,
     mock_input_manager: InputManager,
     mock_output_manager: OutputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    output_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Any],
+    output_manager_original_method_states: Dict[str, Any],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
@@ -1855,8 +1855,8 @@ def test_initialize_herd_init_herd_false(
     mock_herd_factory: HerdFactory,
     mock_input_manager: InputManager,
     mock_output_manager: OutputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    output_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Any],
+    output_manager_original_method_states: Dict[str, Any],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=False"""
