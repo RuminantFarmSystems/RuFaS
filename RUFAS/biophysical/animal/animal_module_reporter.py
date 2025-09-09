@@ -7,6 +7,7 @@ import numpy as np
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -1303,6 +1304,29 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_pen_manure_properties(pen, simulation_day)
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, simulation_day)
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_reports.__name__,
+        }
+        if herd_statistics.total_enteric_methane:
+            om.add_variable(
+                "animal_total_enteric_methane",
+                herd_statistics.total_enteric_methane,
+                dict(info_map, **{"units": MeasurementUnits.GRAMS}),
+            )
+        else:
+            om.add_variable(
+                "animal_total_enteric_methane",
+                {
+                    AnimalType.CALF: {"Pattanaik": 0},
+                    AnimalType.HEIFER_I: {"IPCC": 0},
+                    AnimalType.HEIFER_II: {"IPCC": 0},
+                    AnimalType.HEIFER_III: {"IPCC": 0},
+                    AnimalType.LAC_COW: {"IPCC": 0, "Mills": 0, "Mutian": 0},
+                    AnimalType.DRY_COW: {"IPCC": 0, "Mills": 0},
+                },
+                dict(info_map, **{"units": MeasurementUnits.GRAMS}),
+            )
 
     @classmethod
     def report_end_of_simulation(
@@ -1418,7 +1442,6 @@ class AnimalModuleReporter:
         -------
         None
         """
-
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,

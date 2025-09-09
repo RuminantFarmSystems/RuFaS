@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.routines.animal.animal_types import AnimalType
 
 
 @dataclass
@@ -20,9 +21,13 @@ class DailyRoutinesOutput:
     newborn_calf_config : NewBornCalfValuesTypedDict or None
         Configuration data used to create a newborn calf if a calf was birthed during
         the daily routine. If no calf is born, the value is None.
+    daily_digestion_output: dict[AnimalType, dict[str, float]] | None = None
+        The output from the daily digestion result with keys indicating the animal type and values
+        contains the method-emission amount pair results.
 
     """
 
     herd_reproduction_statistics: HerdReproductionStatistics
     animal_status: AnimalStatus = AnimalStatus.REMAIN
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
+    daily_digestion_output: dict[AnimalType, dict[str, float] | None] | None = None
