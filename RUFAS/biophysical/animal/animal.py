@@ -1295,7 +1295,7 @@ class Animal:
         )
         self.nutrients.perform_daily_phosphorus_update(nutrients_inputs)
 
-    def _daily_digestive_system_update(self) -> None:
+    def _daily_digestive_system_update(self) -> dict[AnimalType, dict[str, float]]:
         """
         Performs the daily digestive system updates for the animal.
 
@@ -1320,7 +1320,8 @@ class Animal:
             fat_content=MilkProduction.fat_percent,
             protein_content=self.milk_production.true_protein_content,
         )
-        self.digestive_system.process_digestion(digestive_system_inputs)
+        digestion_output = self.digestive_system.process_digestion(digestive_system_inputs)
+        return digestion_output
 
     def daily_milking_update(self, time: RufasTime) -> None:
         """
@@ -1545,7 +1546,8 @@ class Animal:
 
         self._daily_nutrients_update()
 
-        self._daily_digestive_system_update()
+        digestion_outputs = self._daily_digestive_system_update()
+        daily_routines_output.daily_digestion_output = digestion_outputs
 
         self.daily_milking_update(time)
 

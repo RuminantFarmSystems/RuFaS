@@ -150,6 +150,9 @@ class HerdStatistics:
         Percentage statistics of culled animals, categorized by culling reasons, (unitless).
     percent_cow_for_parity : dict[str, float]
         Percentage of cows available for each parity class, calculated based on total counts, (unitless).
+    total_enteric_methane : dict[AnimalType, dict[str, float]]
+        Total amount of enteric methane, grouped by animal types and methods (g/day).
+
     """
 
     avg_calving_to_preg_time: dict[str, float]
@@ -237,6 +240,7 @@ class HerdStatistics:
     percent_cow_for_parity: dict[str, float]
 
     animals_deaths_by_stage: dict[AnimalType, int]
+    total_enteric_methane: dict[AnimalType, dict[str, float]]
 
     def __init__(self) -> None:
         """
@@ -293,6 +297,15 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+        }
+
+        self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
+            AnimalType.CALF: {"Pattanaik": 0},
+            AnimalType.HEIFER_I: {"IPCC": 0},
+            AnimalType.HEIFER_II: {"IPCC": 0},
+            AnimalType.HEIFER_III: {"IPCC": 0},
+            AnimalType.LAC_COW: {"IPCC": 0, "Mills": 0, "Mutian": 0},
+            AnimalType.DRY_COW: {"IPCC": 0, "Mills": 0},
         }
 
     def reset_daily_stats(self) -> None:
@@ -367,6 +380,15 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+        }
+
+        self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
+            AnimalType.CALF: {"Pattanaik": 0},
+            AnimalType.HEIFER_I: {"IPCC": 0},
+            AnimalType.HEIFER_II: {"IPCC": 0},
+            AnimalType.HEIFER_III: {"IPCC": 0},
+            AnimalType.LAC_COW: {"IPCC": 0, "Mills": 0, "Mutian": 0},
+            AnimalType.DRY_COW: {"IPCC": 0, "Mills": 0},
         }
 
     def reset_parity(self) -> None:
