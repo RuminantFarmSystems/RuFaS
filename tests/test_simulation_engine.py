@@ -347,7 +347,9 @@ def test_formulate_ration(
     mock_feed_manage_ration_interval_purchases = mocker.patch.object(
         simulation_engine.feed_manager, "manage_ration_interval_purchases"
     )
-    mock_report_ration_interval_data = mocker.patch.object(simulation_engine.herd_manager, "report_ration_interval_data")
+    mock_report_ration_interval_data = mocker.patch.object(
+        simulation_engine.herd_manager, "report_ration_interval_data"
+    )
 
     simulation_engine._formulate_ration()
 

@@ -18,7 +18,7 @@ def test_initialization(herd_statistics: HerdStatistics) -> None:
         "3": 0.0,
         "4": 0.0,
         "5": 0.0,
-        "greater_than_3": 0.0
+        "greater_than_3": 0.0,
     }
     assert herd_statistics.cull_reason_stats is not None
     assert all(value == 0 for value in herd_statistics.cull_reason_stats.values())

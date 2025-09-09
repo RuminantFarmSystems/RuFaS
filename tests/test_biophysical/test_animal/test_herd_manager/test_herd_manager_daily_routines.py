@@ -344,9 +344,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_report_manure_excretions = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
     )
-    mock_report_milk = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk"
-    )
+    mock_report_milk = mocker.patch("RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk")
     mock_report_305d_milk = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk"
     )
