@@ -23,9 +23,7 @@ class DigestiveSystem:
         self.phosphorus_excreted = 0.0
         self.enteric_methane_emission: dict[str, float] = {}
 
-    def process_digestion(
-        self, digestive_system_inputs: DigestiveSystemInputs
-    ) -> dict[AnimalType, dict[str, float]]:
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> dict[AnimalType, dict[str, float]]:
         """
         Processes the digestion for different types of animals by calculating methane emission
         and manure excretion based on the provided digestive system inputs.
