@@ -1677,6 +1677,7 @@ class CrossValidator:
         sections = ["variables", "constants"]
         for section in sections:
             for key, value in target_and_save_block.get(section, []):
+                self.im
                 self._alias_pool[key] = value
 
     def _evaluate_expression(self, expression_block: dict[str, Any]) -> Any:
