@@ -1,4 +1,4 @@
-from collections import defaultdict, Counter
+from collections import defaultdict
 from datetime import date, timedelta
 import math
 from typing import Any, Optional

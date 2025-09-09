@@ -1306,7 +1306,6 @@ class Animal:
         object, which simulates and calculates digestion-related processes for the day.
 
         """
-        original_type = self.animal_type
         digestive_system_inputs = DigestiveSystemInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,

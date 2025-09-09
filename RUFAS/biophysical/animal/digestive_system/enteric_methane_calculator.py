@@ -1,6 +1,5 @@
 from typing import Any
 
-from freezegun.api import real_uuid_generate_time
 from numpy import exp
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
