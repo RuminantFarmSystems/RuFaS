@@ -16,7 +16,6 @@ from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import herd_manager
 
 
 class SimulationEngine:
