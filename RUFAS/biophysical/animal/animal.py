@@ -188,6 +188,7 @@ class Animal:
         self.body_weight_history: list[BodyWeightHistory] = []
         self.pen_history: list[PenHistory] = []
         self.sold_at_day: int | None = None
+        self.stillborn_day: int | None = None
         self.dead_at_day: int | None = None
         self.events = AnimalEvents()
 
@@ -1037,6 +1038,19 @@ class Animal:
         self.reproduction.cow_resynch_program = cow_resynch_program
 
     @property
+    def stillborn(self) -> bool:
+        """
+        Checks if the object is stillborn based on the presence and value of `stillborn_day`.
+
+        Returns
+        -------
+        bool
+            True if `stillborn_day` is not None and greater than or equal to 0, otherwise False.
+
+        """
+        return True if (self.stillborn_day is not None and self.stillborn_day >= 0) else False
+
+    @property
     def sold(self) -> bool:
         """
         Checks if the object is sold based on the presence and value of `sold_at_day`.
@@ -1122,8 +1136,8 @@ class Animal:
         self._assign_sex_to_newborn_calf()
 
         if random() < AnimalConfig.still_birth_rate:
-            self.sold_at_day = simulation_day
-            self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
+            self.stillborn_day = simulation_day
+            self.events.add_event(0, simulation_day, animal_constants.STILL_BIRTH)
 
         is_sold = (
             True
@@ -1164,7 +1178,7 @@ class Animal:
 
     def _determine_heifer_reproduction_programs(
         self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
-    ) -> tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]:
+    ) -> tuple[HeiferReproductionProtocol | None, HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None]:
         """
         Determines the reproduction program and sub-program for a heifer.
 
@@ -1905,7 +1919,7 @@ class Animal:
             If the animal_type is not present in the mapping dictionary.
 
         """
-        mapping: dict[AnimalType, Callable[[], dict[str, Any]]] = {
+        mapping: dict[AnimalType, Callable[[], Any]] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
             AnimalType.HEIFER_II: self._get_heiferII_values,

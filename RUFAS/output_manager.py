@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import collections
 import json
 import os
 import sys
@@ -10,6 +9,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Counter, TextIO, Union, Callable
 
+import collections
 import numpy as np
 import pandas as pd
 import psutil
@@ -2111,6 +2111,89 @@ class OutputManager(object):
                 f"Finished task: {task_id} with {errors_count} error(s), "
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
+
+    def summarize_e2e_test_results(self, json_output_directory: Path, output_prefixes: list[str]) -> None:
+        """
+        Summarizes the end-to-end test results by gathering the results from all the e2e tests and readies them to be
+        printed out to the console.
+        This method is intended to be called at the end of an end-to-end testing run.
+
+        Parameters
+        ----------
+        json_output_directory : Path
+            The directory where the JSON output files are located.
+        output_prefixes : list[str]
+            A list of output prefixes to look for in the filenames.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.summarize_e2e_test_results.__name__,
+        }
+        self.add_log(
+            "Attempting to open e2e test results directory",
+            "Opening e2e test results directory to read results files",
+            info_map,
+        )
+        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
+        e2e_results_summary: dict[str, dict[str, bool | str]] = {
+            prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
+        }
+        all_results_files = os.listdir(json_output_directory)
+        for filename in all_results_files:
+            if "comparison" not in filename.lower() or not filename.endswith(".json"):
+                continue
+            file_path = json_output_directory / filename
+            try:
+                with open(file_path, "r") as file:
+                    data: dict[str, Any] = json.load(file)
+            except Exception as exc:
+                self.add_error("File path invalid.", f"Failed to read {file_path}: {exc}", info_map)
+                continue
+
+            matched_prefix = next((prefix for prefix in output_prefixes if prefix.lower() in filename.lower()), None)
+            if matched_prefix is None:
+                self.add_error(
+                    "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
+                )
+                continue
+
+            for key, value in data.items():
+                if key == "DISCLAIMER":
+                    continue
+                module = self._normalize_module_header(key)
+                e2e_results_summary[matched_prefix][module] = value["values"][0]
+
+        self.add_log(
+            "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
+        )
+
+        self._print_e2e_results_summary(e2e_results_summary)
+
+    def _print_e2e_results_summary(self, e2e_results_summary: dict[str, dict[str, bool | str]]) -> None:
+        """
+        Prints the end-to-end results summary to the console.
+        """
+        sys.stdout.write("Summary of e2e results:\n\n")
+        for prefix, results in e2e_results_summary.items():
+            sys.stdout.write(f"{prefix} results:\n")
+            for module, result in results.items():
+                result = "Passing" if result is True else "Failing" if result is False else result
+                sys.stdout.write(f"  {module}: {result}\n")
+            sys.stdout.write("\n")
+
+    @staticmethod
+    def _normalize_module_header(json_key: str) -> str:
+        """
+        Normalizes the module header from a JSON key.
+        """
+        module = json_key.split(".", 1)[0].lower()
+        if module == "animal":
+            return "Animal"
+        if module == "crop_and_soil":
+            return "CropAndSoil"
+        if module == "manure":
+            return "Manure"
+        return json_key.split(".", 1)[0]
 
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
