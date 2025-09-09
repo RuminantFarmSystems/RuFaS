@@ -93,8 +93,20 @@ def test_heifer_methane_with_model(nutrient_concentrations: NutritionSupply, exp
     "is_lactating, methane_mitigation_method, methane_mitigation_additive_amount, "
     "expected_methane, expected_mitigation_called",
     [
-        (True, "3-NOP", 500.0, {"Mutian": 0, "Mills": 0, "IPCC": 299.7}, True),  # Lactating cow with mitigation (methane reduced)
-        (True, "", 0.0, {"Mutian": 0, "Mills": 0, "IPCC": 300.0}, False),  # Lactating cow without mitigation (no change)
+        (
+            True,
+            "3-NOP",
+            500.0,
+            {"Mutian": 0, "Mills": 0, "IPCC": 299.7},
+            True,
+        ),  # Lactating cow with mitigation (methane reduced)
+        (
+            True,
+            "",
+            0.0,
+            {"Mutian": 0, "Mills": 0, "IPCC": 300.0},
+            False,
+        ),  # Lactating cow without mitigation (no change)
         (False, "", 0.0, {"IPCC": 180.0, "Mills": 0}, False),  # Dry cow (different calculation, no mitigation)
     ],
 )
@@ -136,8 +148,12 @@ def test_calculate_cow_methane(
         nutrient_amounts=mock_nutrition,
         methane_mitigation_method=methane_mitigation_method,
         methane_mitigation_additive_amount=methane_mitigation_additive_amount,
-        methane_models={"cows":{"lactating cows": {"Mutian": False, "Mills": False, "IPCC": True},
-                                "dry cows": {"Mills": False, "IPCC": True}}}
+        methane_models={
+            "cows": {
+                "lactating cows": {"Mutian": False, "Mills": False, "IPCC": True},
+                "dry cows": {"Mills": False, "IPCC": True},
+            }
+        },
     )
 
     if is_lactating:
@@ -157,16 +173,26 @@ def test_calculate_cow_methane(
 @pytest.mark.parametrize(
     "methane_model, expected_methane",
     [
-        ({"Mutian": True, "Mills": False, "IPCC": False},
-         {"Mutian": 393.2, "Mills": 0, "IPCC": 0}),  # Mutian model only example output
-        ({"Mutian": False, "Mills": True, "IPCC": False},
-         {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 0}),  # Mills only model example output
-        ({"Mutian": False, "Mills": False, "IPCC": True},
-         {"Mutian": 0, "Mills": 0, "IPCC": 525.2840970350404}),  # IPCC only model example output
-        ({"Mutian": False, "Mills": True, "IPCC": True},
-         {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 525.2840970350404}), # multi model usage tests
-        ({"Mutian": True, "Mills": True, "IPCC": True},
-         {"Mutian": 393.2, "Mills": 413.11769991015274, "IPCC": 525.2840970350404}) # all model usage test
+        (
+            {"Mutian": True, "Mills": False, "IPCC": False},
+            {"Mutian": 393.2, "Mills": 0, "IPCC": 0},
+        ),  # Mutian model only example output
+        (
+            {"Mutian": False, "Mills": True, "IPCC": False},
+            {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 0},
+        ),  # Mills only model example output
+        (
+            {"Mutian": False, "Mills": False, "IPCC": True},
+            {"Mutian": 0, "Mills": 0, "IPCC": 525.2840970350404},
+        ),  # IPCC only model example output
+        (
+            {"Mutian": False, "Mills": True, "IPCC": True},
+            {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 525.2840970350404},
+        ),  # multi model usage tests
+        (
+            {"Mutian": True, "Mills": True, "IPCC": True},
+            {"Mutian": 393.2, "Mills": 413.11769991015274, "IPCC": 525.2840970350404},
+        ),  # all model usage test
     ],
 )
 def test_calculate_lactating_cow_enteric_methane(
@@ -188,8 +214,8 @@ def test_calculate_lactating_cow_enteric_methane(
     mock_nutrition.starch_percentage = 21.0
 
     mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
-    mock_exp = (
-        mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp", return_value=0.5)
+    mock_exp = mocker.patch(
+        "RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp", return_value=0.5
     )
 
     result = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
@@ -213,13 +239,11 @@ def test_calculate_lactating_cow_enteric_methane(
         ({"Mills": True, "IPCC": False}, {"Mills": 413.11769991015274, "IPCC": 0}),
         ({"Mills": False, "IPCC": True}, {"IPCC": 525.2840970350404, "Mills": 0}),
         ({"Mills": True, "IPCC": True}, {"IPCC": 525.2840970350404, "Mills": 413.11769991015274}),
-        ({"Mills": False, "IPCC": False}, {"IPCC": 0, "Mills": 0})
+        ({"Mills": False, "IPCC": False}, {"IPCC": 0, "Mills": 0}),
     ],
 )
 def test_calculate_dry_cow_enteric_methane(
-    mocker: MockerFixture,
-    methane_model: dict[str, bool],
-    expected_methane: dict[str, float]
+    mocker: MockerFixture, methane_model: dict[str, bool], expected_methane: dict[str, float]
 ) -> None:
     """
     Parametrized test for _calculate_dry_cow_enteric_methane with different methane models.
