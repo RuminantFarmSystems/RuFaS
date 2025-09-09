@@ -818,15 +818,15 @@ class AnimalModuleReporter:
         parity_3 = herd_statistics.num_cow_for_parity["3"]
         parity_4 = herd_statistics.num_cow_for_parity["4"]
         parity_5 = herd_statistics.num_cow_for_parity["5"]
-        parity_greater_than_5 = herd_statistics.num_cow_for_parity["greater_than_5"]
+        parity_greater_than_3 = herd_statistics.num_cow_for_parity["greater_than_3"]
         om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_4", parity_4, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_5", parity_5, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
-            "num_cow_for_parity_greater_than_5",
-            parity_greater_than_5,
+            "num_cow_for_parity_greater_than_3",
+            parity_greater_than_3,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         calving_to_preg_time_1 = herd_statistics.avg_calving_to_preg_time["1"]
@@ -834,7 +834,7 @@ class AnimalModuleReporter:
         calving_to_preg_time_3 = herd_statistics.avg_calving_to_preg_time["3"]
         calving_to_preg_time_4 = herd_statistics.avg_calving_to_preg_time["4"]
         calving_to_preg_time_5 = herd_statistics.avg_calving_to_preg_time["5"]
-        calving_to_preg_time_greater_than_5 = herd_statistics.avg_calving_to_preg_time["greater_than_5"]
+        calving_to_preg_time_greater_than_3 = herd_statistics.avg_calving_to_preg_time["greater_than_3"]
         om.add_variable(
             "calving_to_preg_time_1", calving_to_preg_time_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
@@ -851,8 +851,8 @@ class AnimalModuleReporter:
             "calving_to_preg_time_5", calving_to_preg_time_5, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
-            "calving_to_preg_time_greater_than_5",
-            calving_to_preg_time_greater_than_5,
+            "calving_to_preg_time_greater_than_3",
+            calving_to_preg_time_greater_than_3,
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         avg_age_for_calving_1 = herd_statistics.avg_age_for_calving["1"]
@@ -860,7 +860,7 @@ class AnimalModuleReporter:
         avg_age_for_calving_3 = herd_statistics.avg_age_for_calving["3"]
         avg_age_for_calving_4 = herd_statistics.avg_age_for_calving["4"]
         avg_age_for_calving_5 = herd_statistics.avg_age_for_calving["5"]
-        avg_age_for_calving_greater_than_5 = herd_statistics.avg_age_for_calving["greater_than_5"]
+        avg_age_for_calving_greater_than_3 = herd_statistics.avg_age_for_calving["greater_than_3"]
         om.add_variable(
             "avg_age_for_calving_1", avg_age_for_calving_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
@@ -877,8 +877,8 @@ class AnimalModuleReporter:
             "avg_age_for_calving_5", avg_age_for_calving_5, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
-            "avg_age_for_calving_greater_than_5",
-            avg_age_for_calving_greater_than_5,
+            "avg_age_for_calving_greater_than_3",
+            avg_age_for_calving_greater_than_3,
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         cull_reason_stats_units = {
