@@ -20,6 +20,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
@@ -282,6 +283,73 @@ class HerdManager:
 
         """
         return len(self.heiferIIIs) + len(self.cows)
+
+    @property
+    def heiferII_events_by_id(self) -> dict[str, str]:
+        """
+        Returns a dictionary that maps unique identifiers for HeiferII objects to their corresponding events.
+
+        The unique identifier for each HeiferII object is a combination of its `animal_type.name` and `id`.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary where each key is the unique identifier of a HeiferII,
+            and the value is the string representation of the events associated with that HeiferII.
+
+        """
+        return {f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events for heiferII in self.heiferIIs}
+
+    @property
+    def cow_events_by_id(self) -> dict[str, str]:
+        """
+        Returns a dictionary that maps unique identifiers for Cow objects to their corresponding events.
+
+        The unique identifier for each Cow object is a combination of its `animal_type.name` and `id`.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary where each key is the unique identifier of a Cow,
+            and the value is the string representation of the events associated with that Cow.
+
+        """
+        return {f"{cow.animal_type.name}_{cow.id}": cow.events for cow in self.cows}
+
+    @property
+    def daily_milk_report(self) -> list[MilkProductionStatistics]:
+        """
+        Returns a list of MilkProductionStatistics for all cows in the herd.
+
+        Returns
+        -------
+        list[MilkProductionStatistics]
+            A list of MilkProductionStatistics for all cows.
+
+        """
+        return [cow.milk_statistics for cow in self.cows]
+
+    @property
+    def average_herd_305_days_milk_production(self) -> float:
+        """
+        Calculates the herd average total past 305-day milk production.
+
+        Returns
+        -------
+        float
+            The herd mean of latest_milk_production_305days.
+        """
+        lactating_cow_305_days_milk_production = list(
+            filter(
+                lambda x: x > 0,
+                [cow.milk_production.current_lactation_305_day_milk_produced for cow in self.cows if cow.is_milking],
+            )
+        )
+        return (
+            sum(lactating_cow_305_days_milk_production) / len(lactating_cow_305_days_milk_production)
+            if len(lactating_cow_305_days_milk_production) > 0
+            else 0.0
+        )
 
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
@@ -556,12 +624,65 @@ class HerdManager:
 
         self.update_herd_statistics()
 
+        AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
+        AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, time.simulation_day)
         AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
         AnimalModuleReporter.report_manure_streams(herd_manager_output, time.simulation_day)
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
-        AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
+        AnimalModuleReporter.report_milk(self.daily_milk_report, time.simulation_day)
+        AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
+        self._report_ration(time.simulation_day)
 
         return herd_manager_output
+
+    def _report_ration(self, simulation_day: int) -> None:
+        """Report the ration for all pens."""
+        herd_total_ration: dict[str, float] = {}
+        for pen in self.all_pens:
+            AnimalModuleReporter.report_daily_pen_total(
+                str(pen.id),
+                pen.animal_combination.name,
+                len(pen.animals_in_pen),
+                simulation_day,
+            )
+
+            current_pen_ration = pen.total_pen_ration
+            AnimalModuleReporter.report_daily_ration_per_pen(
+                str(pen.id), pen.animal_combination.name, current_pen_ration, simulation_day
+            )
+
+            for key, amount in current_pen_ration.items():
+                if key not in herd_total_ration.keys():
+                    herd_total_ration[key] = 0.0
+                herd_total_ration[key] += amount
+            daily_purchased_feed_emissions = (
+                self.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(current_pen_ration)
+            )
+            daily_land_use_change_feed_emissions = (
+                self.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(current_pen_ration)
+            )
+            AnimalModuleReporter.report_daily_feed_emissions(
+                daily_purchased_feed_emissions,
+                daily_land_use_change_feed_emissions,
+                pen.id,
+                pen.animal_combination.name,
+                simulation_day,
+            )
+
+        AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
+        herd_total_purchased_feed_emissions = (
+            self.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(herd_total_ration)
+        )
+        herd_total_land_use_change_feed_emissions = (
+            self.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(herd_total_ration)
+        )
+        AnimalModuleReporter.report_daily_feed_emissions(
+            herd_total_purchased_feed_emissions,
+            herd_total_land_use_change_feed_emissions,
+            "ALL",
+            "",
+            simulation_day,
+        )
 
     def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
         """
@@ -1890,3 +2011,36 @@ class HerdManager:
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
+
+    def report_ration_interval_data(self, simulation_day: int) -> None:
+        for pen in self.all_pens:
+            if not pen.is_populated:
+                continue
+
+            pen_base_name = f"{pen.animal_combination.name}_PEN_{pen.id}"
+            average_nutrition_supply = pen.average_nutrition_supply
+            total_dry_matter = average_nutrition_supply.dry_matter
+            num_animals = len(pen.animals_in_pen)
+
+            AnimalModuleReporter.report_ration_per_animal(
+                pen_base_name, pen.ration, total_dry_matter, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_nutrient_amounts(
+                pen_base_name, average_nutrition_supply, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_me_diet(
+                pen_base_name, average_nutrition_supply.metabolizable_energy, num_animals, simulation_day
+            )
+
+            if pen.animal_combination != AnimalCombination.CALF:
+                AnimalModuleReporter.report_average_nutrient_requirements(
+                    pen_base_name,
+                    pen.average_nutrition_requirements,
+                    pen.average_body_weight,
+                    pen.average_milk_production_reduction,
+                    num_animals,
+                    simulation_day,
+                )
+                AnimalModuleReporter.report_average_nutrient_evaluation_results(
+                    pen_base_name, pen.average_nutrition_evaluation, simulation_day
+                )

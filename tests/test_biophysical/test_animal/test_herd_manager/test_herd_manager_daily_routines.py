@@ -1,7 +1,7 @@
 from datetime import datetime
 from random import shuffle, randint
 from typing import Any
-from unittest.mock import call, MagicMock
+from unittest.mock import call, MagicMock, PropertyMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -281,6 +281,8 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_time.simulation_day = 15
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
+    mocker.patch.object(HerdManager, "average_herd_305_days_milk_production", new_callable=PropertyMock)
+
     graduated_calves, graduated_heiferIs, graduated_heiferIIs, graduated_heiferIIIs, graduated_cows = (
         mock_herd["heiferIs"],
         mock_herd["heiferIIs"],
@@ -342,9 +344,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_report_manure_excretions = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
     )
-    mock_report_daily_reports = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
+    mock_report_milk = mocker.patch("RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk")
+    mock_report_305d_milk = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk"
     )
+    mock_report_ration = mocker.patch.object(herd_manager, "_report_ration")
 
     for pen in herd_manager.all_pens:
         pen.manure_streams = [
@@ -387,7 +391,9 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_update_herd_statistics.assert_called_once_with()
     mock_report_manure_streams.assert_called_once()
     mock_report_manure_excretions.assert_called_once()
-    mock_report_daily_reports.assert_called_once()
+    mock_report_milk.assert_called_once()
+    mock_report_305d_milk.assert_called_once()
+    mock_report_ration.assert_called_once()
 
 
 @pytest.mark.parametrize(

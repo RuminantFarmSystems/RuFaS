@@ -44,8 +44,8 @@ class AnimalPopulationStatistics:
         Total number of cows that have their fourth parity.
     number_of_parity_5_cows : int
         Total number of cows that have their fifth parity.
-    number_of_parity_4_and_more_cows : int
-        Total number of cows that have their third or higher parity.
+    number_of_parity_6_and_more_cows : int
+        Total number of cows that have their sixth or higher parity.
 
     average_calf_age : float
         Average age of calves in the population, (days).
@@ -112,7 +112,7 @@ class AnimalPopulationStatistics:
     number_of_parity_3_cows: int
     number_of_parity_4_cows: int
     number_of_parity_5_cows: int
-    number_of_parity_4_and_more_cows: int
+    number_of_parity_6_and_more_cows: int
 
     average_calf_age: float
     average_heiferI_age: float
@@ -427,7 +427,7 @@ class AnimalPopulation:
         parity_3_cows = [cow for cow in self.cows if cow.calves == 3]
         parity_4_cows = [cow for cow in self.cows if cow.calves == 4]
         parity_5_cows = [cow for cow in self.cows if cow.calves == 5]
-        parity_4_and_more_cows = [cow for cow in self.cows if cow.calves > 3]
+        parity_6_and_more_cows = [cow for cow in self.cows if cow.calves > 6]
 
         num_calf = len(self.calves)
         num_heiferI = len(self.heiferIs)
@@ -442,7 +442,7 @@ class AnimalPopulation:
         num_parity_3_cow = len(parity_3_cows)
         num_parity_4_cow = len(parity_4_cows)
         num_parity_5_cow = len(parity_5_cows)
-        num_parity_4_and_more_cow = len(parity_4_and_more_cows)
+        num_parity_6_and_more_cow = len(parity_6_and_more_cows)
 
         avg_calf_age, calf_age_distributions = self.find_distribution(
             [calf.days_born for calf in self.calves], "calf_age"
@@ -488,7 +488,7 @@ class AnimalPopulation:
             number_of_parity_3_cows=num_parity_3_cow,
             number_of_parity_4_cows=num_parity_4_cow,
             number_of_parity_5_cows=num_parity_5_cow,
-            number_of_parity_4_and_more_cows=num_parity_4_and_more_cow,
+            number_of_parity_6_and_more_cows=num_parity_6_and_more_cow,
             average_calf_age=avg_calf_age,
             average_heiferI_age=avg_heiferI_age,
             average_heiferII_age=avg_heiferII_age,
