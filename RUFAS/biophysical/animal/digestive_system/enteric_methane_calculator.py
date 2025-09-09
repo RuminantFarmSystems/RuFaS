@@ -130,7 +130,7 @@ class EntericMethaneCalculator:
         ----------
         body_weight: float
             Body weight of the current cow (kg).
-        methane_models: str
+        methane_models: dict[str, Any]
             Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
         is_lactating: bool
             Indicator of cow's lactating status.

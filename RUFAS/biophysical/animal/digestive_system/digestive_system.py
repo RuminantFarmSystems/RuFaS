@@ -36,6 +36,11 @@ class DigestiveSystem:
             Contains inputs related to the digestive system of the animal, including animal type,
             body weight, nutrient details, fecal phosphorus, and urine phosphorus requirements.
 
+        Returns
+        -------
+        dict[AnimalType, dict[str, float] | None]
+            A mapping of animal type that maps to the emission results of each model used.
+
         Raises
         ------
         TypeError

@@ -19,9 +19,8 @@ def test_digestive_system_init() -> None:
 
     assert isinstance(digestive_system.manure_excretion, AnimalManureExcretions)
     assert isinstance(digestive_system.phosphorus_excreted, float)
-    assert isinstance(digestive_system.enteric_methane_emission, float)
     assert digestive_system.phosphorus_excreted == 0.0
-    assert digestive_system.enteric_methane_emission == 0.0
+    assert digestive_system.enteric_methane_emission is None
 
 
 @pytest.mark.parametrize(

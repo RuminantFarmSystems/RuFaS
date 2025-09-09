@@ -177,6 +177,8 @@ class AnimalConfig:
         The amount of additive used for methane mitigation, (kg).
     milk_reduction_maximum : float
         Maximum possible milk production reduction from a given cause, (kg).
+    methane_model: dict[str, dict[str, bool]]
+        The methods to use for each animal type.
 
     """
 
