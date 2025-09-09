@@ -390,7 +390,9 @@ class Pen:
             str(rufas_id): amount * number_of_animals_in_pen for rufas_id, amount in self.ration.items()
         }
         current_pen_ration["dry_matter_intake_total"] = sum([total_feed for total_feed in current_pen_ration.values()])
-        current_pen_ration["byproducts_total"] = self.average_nutrition_supply.byproduct_supply * number_of_animals_in_pen
+        current_pen_ration["byproducts_total"] = (
+            self.average_nutrition_supply.byproduct_supply * number_of_animals_in_pen
+        )
         return current_pen_ration
 
     def _initialize_beddings(self) -> None:

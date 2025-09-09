@@ -648,10 +648,7 @@ class HerdManager:
 
             current_pen_ration = pen.total_pen_ration
             AnimalModuleReporter.report_daily_ration_per_pen(
-                str(pen.id),
-                pen.animal_combination.name,
-                current_pen_ration,
-                simulation_day
+                str(pen.id), pen.animal_combination.name, current_pen_ration, simulation_day
             )
 
             for key, amount in current_pen_ration.items():

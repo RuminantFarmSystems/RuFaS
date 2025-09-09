@@ -382,7 +382,7 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_herd_total_ration(cls, herd_total_ration : dict[str, float], simulation_day: int) -> None:
+    def report_daily_herd_total_ration(cls, herd_total_ration: dict[str, float], simulation_day: int) -> None:
         """
         Adds the daily total ration of the herd to the OutputManager.
 
@@ -404,11 +404,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_daily_ration_per_pen(
-            cls,
-            pen_id: str,
-            pen_animal_name: str,
-            pen_ration: dict[str, float],
-            simulation_day: int
+        cls, pen_id: str, pen_animal_name: str, pen_ration: dict[str, float], simulation_day: int
     ) -> None:
         """
         Calculates and reports the total amounts of feed fed to animals in a pen in a given day.
@@ -432,9 +428,7 @@ class AnimalModuleReporter:
             "units": units,
         }
 
-        cls._om.add_variable(
-            f"ration_daily_feed_totals_for_pen_{pen_id}_{pen_animal_name}", pen_ration, info_map
-        )
+        cls._om.add_variable(f"ration_daily_feed_totals_for_pen_{pen_id}_{pen_animal_name}", pen_ration, info_map)
 
     @classmethod
     def report_daily_feed_emissions(
@@ -911,11 +905,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_daily_pen_total(
-            cls,
-            pen_id: str,
-            pen_animal_name: str,
-            number_of_animals_in_pen: int,
-            simulation_day: int
+        cls, pen_id: str, pen_animal_name: str, number_of_animals_in_pen: int, simulation_day: int
     ) -> None:
         """
         Reports the pen total animal numbers.
@@ -937,9 +927,7 @@ class AnimalModuleReporter:
             "units": MeasurementUnits.ANIMALS,
             "simulation_day": simulation_day,
         }
-        variable_to_add = (
-            f"{class_name}.{function_name}.number_of_animals_in_pen_{pen_id}_{pen_animal_name}"
-        )
+        variable_to_add = f"{class_name}.{function_name}.number_of_animals_in_pen_{pen_id}_{pen_animal_name}"
         reference_variable = f"{class_name}.{function_name}.number_of_animals_in_pen_0_CALF"
         AnimalModuleReporter.data_padder(
             reference_variable, variable_to_add, 0, simulation_day, info_map, MeasurementUnits.ANIMALS
