@@ -453,8 +453,8 @@ class Storage:
                 "simulation_day": simulation_day,
             }
             if simulation_day in crop.recorded_days:
-                self.om.add_warning(
-                    "Crop Already Recorded Warning",
+                self.om.add_log(
+                    "Crop Already Recorded",
                     f"Crop {crop.config_name} on day {simulation_day} has already been recorded, skipping.",
                     info_map | {"crop": crop.config_name},
                 )
