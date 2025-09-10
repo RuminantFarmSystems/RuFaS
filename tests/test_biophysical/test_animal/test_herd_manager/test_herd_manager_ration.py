@@ -326,7 +326,6 @@ def test_reformulate_ration_single_pen(
         30,
         MagicMock(auto_spec=TotalInventory),
     )
-    mock_use_user_defined_ration = mocker.patch.object(mock_pen, "use_user_defined_ration")
     mock_formulate_optimized_ration = mocker.patch.object(mock_pen, "formulate_optimized_ration")
 
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
@@ -337,11 +336,18 @@ def test_reformulate_ration_single_pen(
     )
 
     if use_user_defined_ration:
-        mock_use_user_defined_ration.assert_called_once_with(available_feeds, current_temperature)
-        mock_formulate_optimized_ration.assert_not_called()
-    else:
-        mock_use_user_defined_ration.assert_not_called()
         mock_formulate_optimized_ration.assert_called_once_with(
+            True,
+            available_feeds,
+            current_temperature,
+            herd_manager._max_daily_feeds,
+            herd_manager.advance_purchase_allowance,
+            mock_total_inventory,
+            15,
+        )
+    else:
+        mock_formulate_optimized_ration.assert_called_once_with(
+            False,
             available_feeds,
             current_temperature,
             herd_manager._max_daily_feeds,
