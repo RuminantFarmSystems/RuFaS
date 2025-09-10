@@ -106,7 +106,6 @@ class EmissionsEstimator:
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        # self._calculate_purchased_feed_emissions_old(fertilizer_apps["Homegrown Feeds"])
         self._calculate_purchased_feed_emissions()
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
@@ -229,28 +228,6 @@ class EmissionsEstimator:
             fed[feed_id] = start_amount + purchased.get(feed_id, 0.0) - end.get(feed_id, 0.0)
         return fed
 
-    # def _calculate_purchased_feed_emissions_old(self, homegrown_feeds: list[dict[str, Any]]) -> None:
-    #     info_map = {"class": self.__class__.__name__,
-    # "function": self._calculate_purchased_feed_emissions_old.__name__}
-    #     purchased_feeds = self._gather_ration_feed_totals()
-    #     actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-    #     self.om.add_variable(
-    #         "actual_purchased_feed_totals",
-    #         actual_purchased_feed_totals,
-    #         dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-    #     )
-    #     (
-    #         actual_purchased_feed_emissions,
-    #         actual_land_use_change_emissions,
-    #     ) = self._calculate_emissions(actual_purchased_feed_totals)
-    #     emissions_info_map = dict(
-    #         info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
-    #     )
-    #     self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
-    #     self.om.add_variable(
-    #         "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
-    #     )
-
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
     ) -> dict[str, list[dict[str, Any]]]:
@@ -273,27 +250,6 @@ class EmissionsEstimator:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         return results
-
-    # def _gather_ration_feed_totals(self) -> dict[str, float]:
-    #     """
-    #     Collects totals of feeds from rations given to animals in the last 365 days of the simulation and collapses
-    #     them into single set of numbers.
-    #     """
-    #     filter = {
-    #         "name": "Feed Ration Totals",
-    #         "description": "Gathers amounts of purchased feeds fed to animals in the last year of the simulation.",
-    #         "filters": ["AnimalModuleReporter._report_daily_ration_per_pen.ration_daily_feed_totals.*"],
-    #         "slice_start": SLICE_START,
-    #     }
-    #     feeds = self.om.filter_variables_pool(filter)
-
-    #     processed_feeds: dict[str, float] = defaultdict(float)
-    #     for feed_data in feeds.values():
-    #         for value in feed_data.get("values", []):
-    #             for feed_id, amount in value.items():
-    #                 processed_feeds[feed_id] += amount
-
-    #     return processed_feeds
 
     def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """
@@ -318,30 +274,6 @@ class EmissionsEstimator:
             )
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
-
-    # def _calculate_actual_purchased_feeds(
-    #     self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]
-    # ) -> dict[str, float]:
-    #     """
-    #     Calculates the difference between the purchased feeds and feeds grown on the farm.
-    #     """
-    #     homegrown_totals = self._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
-
-    #     actual_purchased_feeds = {}
-    #     for feed_id, amount in purchased_feeds.items():
-    #         homegrown_alternatives = [
-    #             crop for crop in homegrown_totals.keys() if feed_id in self.crop_species_to_purchased_feed_id[crop]
-    #         ]
-
-    #         for homegrown_alternative in homegrown_alternatives:
-    #             alternative_amount_available = homegrown_totals[homegrown_alternative]
-    #             amount_used = min(amount, alternative_amount_available)
-    #             amount -= amount_used
-    #             homegrown_totals[homegrown_alternative] -= amount_used
-
-    #         actual_purchased_feeds[feed_id] = amount
-
-    #     return actual_purchased_feeds
 
     def _calculate_total_homegrown_feed_amounts_by_crop_type(
         self, homegrown_feeds: list[dict[str, Any]]
