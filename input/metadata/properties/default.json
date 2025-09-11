@@ -782,10 +782,72 @@
       "default": 0
     },
     "methane_model": {
-      "description": "Methane Model (select one) -- The method used to estimate enteric methane emissions for lactating cows",
-      "type": "string",
-      "default": "IPCC",
-      "pattern": "^(Mills|Mutian|IPCC)$"
+      "type": "object",
+      "description": "Methane emission models to use",
+      "calves": {
+        "type": "object",
+        "description": "Methane emission models to use fro calves.",
+        "Pattanaik": {
+          "type": "bool",
+          "default": true
+        }
+      },
+      "heiferIs": {
+        "type": "object",
+        "description": "Methane emission models to heiferIs.",
+        "IPCC": {
+          "type": "bool",
+          "default": true
+        }
+      },
+      "heiferIIs": {
+        "type": "object",
+        "description": "Methane emission models to heiferIIs.",
+        "IPCC": {
+          "type": "bool",
+          "default": true
+        }
+      },
+      "heiferIIIs": {
+        "type": "object",
+        "description": "Methane emission models to heiferIIIs.",
+        "IPCC": {
+          "type": "bool",
+          "default": true
+        }
+      },
+      "cows": {
+        "type": "object",
+        "description": "Methane emission models to cows.",
+        "dry cows": {
+          "type": "object",
+          "description": "Methane emission models to dry cows.",
+          "IPCC": {
+            "type": "bool",
+            "default": true
+          },
+          "Mills": {
+            "type": "bool",
+            "default": false
+          }
+        },
+        "lactating cows": {
+          "type": "object",
+          "description": "Methane emission models to lactating cows.",
+          "IPCC": {
+            "type": "bool",
+            "default": true
+          },
+          "Mills": {
+            "type": "bool",
+            "default": false
+          },
+          "Mutian": {
+            "type": "bool",
+            "default": false
+          }
+        }
+      }
     },
     "ration": {
       "type": "object",
