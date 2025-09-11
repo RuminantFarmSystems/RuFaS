@@ -20,7 +20,6 @@
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "growing_alley_scraper",
