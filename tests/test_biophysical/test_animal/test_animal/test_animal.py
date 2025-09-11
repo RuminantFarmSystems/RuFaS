@@ -2142,7 +2142,9 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     animal.animal_type = AnimalType.HEIFER_III
     mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
     mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
-    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
+    mock_daily_digestive_system_update = mocker.patch.object(
+        animal, "_daily_digestive_system_update", return_value={AnimalType.CALF: {"Pattanaik": 0}}
+    )
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_reproduction_update = mocker.patch.object(
@@ -2199,6 +2201,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             net_merit=75.1,
         ),
         herd_reproduction_statistics=HerdReproductionStatistics(),
+        daily_digestion_output={AnimalType.CALF: {"Pattanaik": 0}},
     )
 
 
@@ -2206,7 +2209,9 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     animal = mock_lactating_cow
     animal.animal_type = AnimalType.DRY_COW
     mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
-    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
+    mock_daily_digestive_system_update = mocker.patch.object(
+        animal, "_daily_digestive_system_update", return_value={AnimalType.CALF: {"Pattanaik": 0}}
+    )
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_reproduction_update = mocker.patch.object(
@@ -2241,6 +2246,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
         animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
         newborn_calf_config=mock_new_born_calf_config,
         herd_reproduction_statistics=HerdReproductionStatistics(),
+        daily_digestion_output={AnimalType.CALF: {"Pattanaik": 0}},
     )
 
 
