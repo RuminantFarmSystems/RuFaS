@@ -10,7 +10,7 @@ from RUFAS.general_constants import GeneralConstants
 def test_calf_methane_no_model() -> None:
     """Test the calf methane result without model provided."""
     actual = EntericMethaneCalculator.calculate_calf_methane({"Pattanaik": False}, 30)
-    assert actual == {"Pattanaik": 0}
+    assert actual == {}
 
 
 @pytest.mark.parametrize("body_weight,expected", [(30, {"Pattanaik": 12.52883}), (195.45, {"Pattanaik": 51.09126})])
@@ -48,7 +48,7 @@ def test_heifer_methane_no_model() -> None:
             byproduct_supply=5.0,
         ),
     )
-    assert actual == {"IPCC": 0}
+    assert actual == {}
 
 
 @pytest.mark.parametrize(
@@ -78,7 +78,7 @@ def test_heifer_methane_no_model() -> None:
                 starch_supply=5.0,
                 byproduct_supply=5.0,
             ),
-            {"IPCC": 0},
+            {},
         )
     ],
 )
@@ -93,9 +93,9 @@ def test_heifer_methane_with_model(nutrient_concentrations: NutritionSupply, exp
     "is_lactating, methane_mitigation_method, methane_mitigation_additive_amount, "
     "expected_methane, expected_mitigation_called",
     [
-        (True, "3-NOP", 500.0, {"Mutian": 0, "Mills": 0, "IPCC": 299.7}, True),
-        (True, "", 0.0, {"Mutian": 0, "Mills": 0, "IPCC": 300.0}, False),
-        (False, "", 0.0, {"IPCC": 180.0, "Mills": 0}, False),
+        (True, "3-NOP", 500.0, {"IPCC": 299.7}, True),
+        (True, "", 0.0, {"IPCC": 300.0}, False),
+        (False, "", 0.0, {"IPCC": 180.0}, False),
     ],
 )
 def test_calculate_cow_methane(
@@ -115,8 +115,8 @@ def test_calculate_cow_methane(
     mock_nutrition.fat_percentage = 5.0
     mock_nutrition.starch_percentage = 15.0
 
-    mock_lactating_methane = {"Mutian": 0, "Mills": 0, "IPCC": 300.0}
-    mock_dry_methane = {"IPCC": 180.0, "Mills": 0}
+    mock_lactating_methane = {"IPCC": 300.0}
+    mock_dry_methane = {"IPCC": 180.0}
     mock_methane_yield_reduction = -0.1
     mock_lactating_methane_calc = mocker.patch.object(
         EntericMethaneCalculator, "_calculate_lactating_cow_enteric_methane", return_value=mock_lactating_methane
@@ -163,19 +163,19 @@ def test_calculate_cow_methane(
     [
         (
             {"Mutian": True, "Mills": False, "IPCC": False},
-            {"Mutian": 393.2, "Mills": 0, "IPCC": 0},
+            {"Mutian": 393.2},
         ),  # Mutian model only example output
         (
             {"Mutian": False, "Mills": True, "IPCC": False},
-            {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 0},
+            {"Mills": 413.11769991015274},
         ),  # Mills only model example output
         (
             {"Mutian": False, "Mills": False, "IPCC": True},
-            {"Mutian": 0, "Mills": 0, "IPCC": 525.2840970350404},
+            {"IPCC": 525.2840970350404},
         ),  # IPCC only model example output
         (
             {"Mutian": False, "Mills": True, "IPCC": True},
-            {"Mutian": 0, "Mills": 413.11769991015274, "IPCC": 525.2840970350404},
+            {"Mills": 413.11769991015274, "IPCC": 525.2840970350404},
         ),  # multi model usage tests
         (
             {"Mutian": True, "Mills": True, "IPCC": True},
@@ -224,10 +224,10 @@ def test_calculate_lactating_cow_enteric_methane(
 @pytest.mark.parametrize(
     "methane_model, expected_methane",
     [
-        ({"Mills": True, "IPCC": False}, {"Mills": 413.11769991015274, "IPCC": 0}),
-        ({"Mills": False, "IPCC": True}, {"IPCC": 525.2840970350404, "Mills": 0}),
+        ({"Mills": True, "IPCC": False}, {"Mills": 413.11769991015274}),
+        ({"Mills": False, "IPCC": True}, {"IPCC": 525.2840970350404}),
         ({"Mills": True, "IPCC": True}, {"IPCC": 525.2840970350404, "Mills": 413.11769991015274}),
-        ({"Mills": False, "IPCC": False}, {"IPCC": 0, "Mills": 0}),
+        ({"Mills": False, "IPCC": False}, {}),
     ],
 )
 def test_calculate_dry_cow_enteric_methane(
