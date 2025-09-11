@@ -36,8 +36,7 @@ class EntericMethaneCalculator:
 
         """
         methane_results = {}
-        for model, selected\
-                in methane_models.items():
+        for model, selected in methane_models.items():
             if selected:
                 methane_emission = (
                     0.013 * (body_weight**0.75) * GeneralConstants.KCAL_TO_MJ

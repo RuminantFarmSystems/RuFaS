@@ -234,7 +234,7 @@ v0.9.2
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
 - [2567](https://github.com/RuminantFarmSystems/MASM/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
 - [2563](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] Changed calculations to support multi method calculations and update inputs.
-
+- [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
 
 ### v0.9.2
 
