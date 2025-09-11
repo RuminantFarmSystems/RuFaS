@@ -457,18 +457,26 @@ class AnimalModuleReporter:
             om.add_variable(
                 "purchased_feed_emissions_across_pens",
                 daily_purchased_feed_emissions,
-                dict(info_map, **{
-                    "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
-                    "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ
-                }),
+                dict(
+                    info_map,
+                    **{
+                        "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
+                        "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
+                    },
+                ),
             )
             om.add_variable(
                 "land_use_change_feed_emissions_across_pens",
                 daily_land_use_change_feed_emissions,
-                dict(info_map, **{
-                    "data_origin": [("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")],
-                    "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ
-                }),
+                dict(
+                    info_map,
+                    **{
+                        "data_origin": [
+                            ("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")
+                        ],
+                        "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
+                    },
+                ),
             )
         else:
             AnimalModuleReporter.data_padder(
@@ -482,18 +490,26 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"purchased_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
                 daily_purchased_feed_emissions,
-                dict(info_map, **{
-                    "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
-                    "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ
-                }),
+                dict(
+                    info_map,
+                    **{
+                        "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
+                        "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
+                    },
+                ),
             )
             om.add_variable(
                 f"land_use_change_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
                 daily_land_use_change_feed_emissions,
-                dict(info_map, **{
-                    "data_origin": [("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")],
-                    "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ
-                }),
+                dict(
+                    info_map,
+                    **{
+                        "data_origin": [
+                            ("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")
+                        ],
+                        "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
+                    },
+                ),
             )
 
     @classmethod
@@ -1029,7 +1045,7 @@ class AnimalModuleReporter:
             stillborn_at_day_max,
             dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
-        for day in range(total_days+1):
+        for day in range(total_days + 1):
             if daily_stillborn.get(day):
                 stillborn_count = len(daily_stillborn[day])
                 birth_weight = sum(stillborn_calf["birth_weight"] for stillborn_calf in daily_stillborn[day])
@@ -1098,7 +1114,7 @@ class AnimalModuleReporter:
             sold_at_day_max,
             dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
-        for day in range(total_days+1):
+        for day in range(total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal["body_weight"] for sold_animal in daily_sell[day])
