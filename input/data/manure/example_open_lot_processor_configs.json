@@ -19,26 +19,22 @@
     {
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_use_amount": 0.0
     },
     {
       "name": "growing_feed_alley_scraper",
       "processor_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_use_amount": 0.0
     },
     {
       "name": "closeup_feed_alley_scraper",
       "processor_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_use_amount": 0.0
     },
     {
       "name": "lac_feed_alley_scraper",
       "processor_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8
+      "cleaning_water_use_amount": 0.0
     },
     {
       "name": "flush_system_1",
