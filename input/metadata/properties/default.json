@@ -5970,12 +5970,12 @@
   },
   "feed_storage_input_properties": {
     "data_collection_app_compatible": false,
-    "storage": {
+    "dry_grain": {
       "type": "array",
-      "description": "A list of all configurations for feed storage units.",
+      "description": "A list of dry grain types that can be stored in a dry grain storage unit.",
       "properties": {
         "type": "object",
-        "description": "Configuration for a feed storage unit.",
+        "description": "Dry grain storage unit.",
         "name": {
           "type": "string",
           "description": "User defined name of the feed storage unit."
@@ -5992,14 +5992,7 @@
           "type": "string",
           "description": "Type of feed storage unit.",
           "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
-        }
-      },
-    "dry_grain": {
-      "type": "array",
-      "description": "A list of dry grain types that can be stored in a dry grain storage unit.",
-      "properties": {
-        "type": "object",
-        "description": "Dry grain storage unit.",
+        },
         "dry_grain_dm_loss_coefficient": {
           "type": "number",
           "description": "Dry matter loss coefficient for dry grain storage (unitless).",
@@ -6015,6 +6008,23 @@
       "properties": {
         "type": "object",
         "description": "High moisture grain storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
+        },
         "high_moisture_grain_dm_loss_coefficient": {
           "type": "number",
           "description": "Dry matter loss coefficient for high moisture grain storage (unitless).",
@@ -6030,6 +6040,23 @@
       "properties": {
         "type": "object",
         "description": "Hay storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
+        },
         "hay_bale_diameter": {
           "type": "number",
           "description": "Diameter of hay bales (meters).",
@@ -6059,6 +6086,23 @@
       "properties": {
         "type": "object",
         "description": "Baleage storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
+        },
         "baleage_initial_storage_dry_matter": {
           "type": "number",
           "description": "Initial dry matter content of baleage at time of storage (unitless).",
@@ -6081,6 +6125,23 @@
       "properties": {
         "type": "object",
         "description": "Silage storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
+        },
         "silage_initial_storage_dry_matter": {
           "type": "number",
           "description": "Initial dry matter content of silage at time of storage (unitless).",
@@ -6092,5 +6153,5 @@
     }
   }
 }
-}
+
 
