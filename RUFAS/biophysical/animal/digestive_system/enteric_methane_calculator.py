@@ -282,7 +282,6 @@ class EntericMethaneCalculator:
                 )
                 methane_results[model] = methane_emission
 
-
         return methane_results
 
     @staticmethod
