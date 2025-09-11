@@ -46,13 +46,13 @@ class CropConfiguration(TypedDict):
     minimum_harvest_index: float
     dry_matter_percentage: float
     lignin_dry_matter_percentage: float
-    crude_protein_percent: float
-    non_protein_nitrogen: float
-    starch: float
-    adf: float
-    ndf: float
-    sugar: float
-    ash: float
+    crude_protein_percent_at_harvest: float
+    non_protein_nitrogen_at_harvest: float
+    starch_at_harvest: float
+    adf_at_harvest: float
+    ndf_at_harvest: float
+    sugar_at_harvest: float
+    ash_at_harvest: float
     yield_nitrogen_fraction: float
     yield_phosphorus_fraction: float
 

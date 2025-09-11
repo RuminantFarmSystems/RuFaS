@@ -2318,45 +2318,45 @@
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "crude_protein_percent": {
+        "crude_protein_percent_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is dietary crude protein (unitless).",
+          "description": "Percentage of dry matter mass that is dietary crude protein at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "non_protein_nitrogen": {
+        "non_protein_nitrogen_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is non-protein nitrogen (unitless).",
+          "description": "Percentage of dry matter mass that is non-protein nitrogen at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "starch": {
+        "starch_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is starch (unitless).",
+          "description": "Percentage of dry matter mass that is starch at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "adf": {
+        "adf_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is acid detergent fiber (unitless).",
+          "description": "Percentage of dry matter mass that is acid detergent fiber at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "ndf": {
+        "ndf_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is neutral detergent fiber (unitless).",
+          "description": "Percentage of dry matter mass that is neutral detergent fiber at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "sugar": {
+        "sugar_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is labile carbohydrate (unitless).",
+          "description": "Percentage of dry matter mass that is labile carbohydrate at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "ash": {
+        "ash_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is ash (unitless).",
+          "description": "Percentage of dry matter mass that is ash at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },

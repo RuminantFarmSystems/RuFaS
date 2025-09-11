@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import Any
 from datetime import date
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -38,7 +38,7 @@ class FieldManager:
 
     Attributes
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
     output_gatherer : FieldDataReporter
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
@@ -51,7 +51,7 @@ class FieldManager:
         info_map = {"class": self.__class__.__name__, "function": "__init__"}
         self.im = InputManager()
         self.om = OutputManager()
-        self.fields: List[Field] = []
+        self.fields: list[Field] = []
         fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
@@ -273,7 +273,7 @@ class FieldManager:
     @staticmethod
     def _setup_fertilizer_events(
         fertilizer_schedule: str,
-    ) -> Tuple[dict[str, dict[str, float]], list[FertilizerEvent]]:
+    ) -> tuple[dict[str, dict[str, float]], list[FertilizerEvent]]:
         """
         Sets up a list of fertilizer events from fertilizer schedule and the list of available fertilizer mixes.
 
@@ -284,7 +284,7 @@ class FieldManager:
 
         Returns
         -------
-        Tuple[dict[str, dict[str, float], FertilizerSchedule]
+        tuple[dict[str, dict[str, float], FertilizerSchedule]
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
@@ -393,7 +393,7 @@ class FieldManager:
         return tillage_events
 
     @staticmethod
-    def _setup_crop_schedules(crop_rotation: str, available_crop_configurations: list[str]) -> List[CropSchedule]:
+    def _setup_crop_schedules(crop_rotation: str, available_crop_configurations: list[str]) -> list[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
 
@@ -406,7 +406,7 @@ class FieldManager:
 
         Returns
         -------
-        List[CropSchedule]
+        list[CropSchedule]
             List of all crop schedules that have been created from the input specifications.
 
         Raises

@@ -89,20 +89,20 @@ class CropData:
         Minimum harvest index under drought conditions (unitless).
     yield_phosphorus_fraction : Optional[float]
         Fraction of phosphorus in yield (unitless).
-    crude_protein_percent : float
-        Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float
-        Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float
-        Percentage of dry matter mass that is starch (unitless).
-    adf : float
-        Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float
-        Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float
-        Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float
-        Percentage of dry matter mass that is ash (unitless).
+    crude_protein_percent_at_harvest : float
+        Percentage of dry matter mass that is dietary crude protein at the point of harvest (unitless).
+    non_protein_nitrogen_at_harvest : float
+        Percentage of dry matter mass that is non-protein nitrogen at the point of harvest (unitless).
+    starch_at_harvest : float
+        Percentage of dry matter mass that is starch at the point of harvest (unitless).
+    adf_at_harvest : float
+        Percentage of dry matter mass that is acid detergent fiber at the point of harvest (unitless).
+    ndf_at_harvest : float
+        Percentage of dry matter mass that is neutral detergent fiber at the point of harvest (unitless).
+    sugar_at_harvest : float
+        Percentage of dry matter mass that is labile carbohydrate at the point of harvest (unitless).
+    ash_at_harvest : float
+        Percentage of dry matter mass that is ash at the point of harvest (unitless).
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
     optimal_temperature : float
@@ -258,13 +258,13 @@ class CropData:
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
     yield_phosphorus_fraction: Optional[float] = 0.0
-    crude_protein_percent: float = 12.481
-    non_protein_nitrogen: float = 2.518
-    starch: float = 72.586
-    adf: float = 3.934
-    ndf: float = 6.134
-    sugar: float = 2.235
-    ash: float = 2.496
+    crude_protein_percent_at_harvest: float = 12.481
+    non_protein_nitrogen_at_harvest: float = 2.518
+    starch_at_harvest: float = 72.586
+    adf_at_harvest: float = 3.934
+    ndf_at_harvest: float = 6.134
+    sugar_at_harvest: float = 2.235
+    ash_at_harvest: float = 2.496
 
     # SWAT Table A-3
     minimum_temperature: float = 0

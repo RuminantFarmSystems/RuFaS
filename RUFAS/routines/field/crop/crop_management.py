@@ -364,14 +364,14 @@ class CropManagement:
             fresh_mass=self.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-            crude_protein_percent=self.data.crude_protein_percent,
-            non_protein_nitrogen=self.data.non_protein_nitrogen,
-            starch=self.data.starch,
-            adf=self.data.adf,
-            ndf=self.data.ndf,
-            sugar=self.data.sugar,
+            crude_protein_percent=self.data.crude_protein_percent_at_harvest,
+            non_protein_nitrogen=self.data.non_protein_nitrogen_at_harvest,
+            starch=self.data.starch_at_harvest,
+            adf=self.data.adf_at_harvest,
+            ndf=self.data.ndf_at_harvest,
+            sugar=self.data.sugar_at_harvest,
             lignin=self.data.lignin_dry_matter_percentage,
-            ash=self.data.ash,
+            ash=self.data.ash_at_harvest,
         )
         return harvested_crop
 
