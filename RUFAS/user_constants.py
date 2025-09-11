@@ -47,7 +47,7 @@ class UserConstants:
     GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
     GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
 
-    #Energy use related
+    # Energy use related
     SPECIFIC_FUEL_CONSUMPTION: float = 0.2234
 
     CONSTANTS_TO_UNITS = {
@@ -60,7 +60,5 @@ class UserConstants:
         "METHANE_FACTOR": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
         "GENERAL_LOWER_BOUND_TEMPERATURE": MeasurementUnits.DEGREES_CELSIUS,
         "GENERAL_UPPER_BOUND_TEMPERATURE": MeasurementUnits.DEGREES_CELSIUS,
-        "SPECIFIC_FUEL_CONSUMPTION": MeasurementUnits.LITERS_PER_KILOWATTS_PER_HOUR
+        "SPECIFIC_FUEL_CONSUMPTION": MeasurementUnits.LITERS_PER_KILOWATTS_PER_HOUR,
     }
-
-

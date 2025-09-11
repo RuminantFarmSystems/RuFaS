@@ -76,9 +76,7 @@ class TractorImplement:
                 break
 
     def field_capacity_ha_per_hr(
-            self,
-            crop_yield_ton_per_ha: float | None,
-            application_mass: float | None = None
+        self, crop_yield_ton_per_ha: float | None, application_mass: float | None = None
     ) -> float:
         """
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
@@ -93,14 +91,19 @@ class TractorImplement:
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
         ]:
             return (self.throughput / application_mass) * self.field_efficiency
-        return (self.field_speed_km_per_hr * GeneralConstants.KM_TO_M * self.width_m * 
-                self.field_efficiency * GeneralConstants.SQUARE_METERS_TO_HECTARES) # 418a
+        return (
+            self.field_speed_km_per_hr
+            * GeneralConstants.KM_TO_M
+            * self.width_m
+            * self.field_efficiency
+            * GeneralConstants.SQUARE_METERS_TO_HECTARES
+        )  # 418a
 
     def calculate_operation_time_hr(
-            self,
-            field_production_size_ha: float,
-            crop_yield_ton_per_ha: float | None,
-            application_mass: float | None = None
+        self,
+        field_production_size_ha: float,
+        crop_yield_ton_per_ha: float | None,
+        application_mass: float | None = None,
     ) -> float:
         """
         Calculates the number of hours taken by a tractor given other factors like implement size to perform the
@@ -137,21 +140,26 @@ class TractorImplement:
         )
 
     def calculate_needed_PTO(
-            self,
-            crop_yield_ton_per_ha: float,
-            field_production_size_ha: float,
-            application_mass: float | None = None,
+        self,
+        crop_yield_ton_per_ha: float,
+        field_production_size_ha: float,
+        application_mass: float | None = None,
     ) -> float:
         """
         Calculates PTO_Power (kW) from the tractor to power the implement's operation.
         Implements Helper Function 415 in EEE Functions file.
         """
-        coefficient_to_use = application_mass if self.operation_type in [
-            OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
-            OperationType.FERTILIZER_APPLICATION_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
-        ] else crop_yield_ton_per_ha
+        coefficient_to_use = (
+            application_mass
+            if self.operation_type
+            in [
+                OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
+                OperationType.FERTILIZER_APPLICATION_SURFACE,
+                OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
+                OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
+            ]
+            else crop_yield_ton_per_ha
+        )
 
         return (
             self.E

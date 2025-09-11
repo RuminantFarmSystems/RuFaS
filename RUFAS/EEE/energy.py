@@ -39,7 +39,7 @@ class EnergyEstimator:
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
             )
-                        
+
             diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
                 diesel_consumption_data_item.get("crop_yield", 0),
                 diesel_consumption_data_item["field_production_size"],
@@ -53,9 +53,7 @@ class EnergyEstimator:
                 tractor.tractor_size,
                 diesel_consumption_tractor_implement_liter_per_ha,
             )
-            total_diesel_consumption_tractor_implement_liter_per_ha = (
-                diesel_consumption_tractor_implement_liter_per_ha
-            )
+            total_diesel_consumption_tractor_implement_liter_per_ha = diesel_consumption_tractor_implement_liter_per_ha
         om.add_variable(
             "total_diesel_consumption_tractor_implement",
             total_diesel_consumption_tractor_implement_liter_per_ha,
@@ -293,14 +291,9 @@ class EnergyEstimator:
         for implement in tractor.implements:
             crop_yield_ton_ha = crop_yield * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
             total_power_needed_kW = self._calculate_total_power_needed(
-                tractor,
-                implement,
-                crop_yield_ton_ha,
-                field_production_size,
-                clay_percent,
-                application_mass
+                tractor, implement, crop_yield_ton_ha, field_production_size, clay_percent, application_mass
             )
-            
+
             specific_fuel_consumption_liter_per_kWh = UserConstants.SPECIFIC_FUEL_CONSUMPTION
 
             tractor_implement_operation_time_hr = implement.calculate_operation_time_hr(
