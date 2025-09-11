@@ -2,7 +2,6 @@
 
 import time as timer
 from datetime import date, timedelta
-from enum import Enum
 
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
@@ -14,7 +13,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
-from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -75,20 +73,6 @@ class SimulationEngine:
             self.herd_manager.heiferIIs,
             self.herd_manager.cows,
         )
-        available_feeds_on_final_day = [
-            {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
-            for feed in self.feed_manager.query_available_feeds()
-        ]
-        available_feeds_units = {
-            "category": MeasurementUnits.UNITLESS,
-            "amount": MeasurementUnits.KILOGRAMS,
-        }
-        for available_feed in available_feeds_on_final_day:
-            self.om.add_variable(
-                "available_feeds_on_final_day",
-                available_feed,
-                dict(info_map, **{"units": available_feeds_units}),
-            )
         # EEEManager.estimate_all()
         t_end_sim = timer.time()
 

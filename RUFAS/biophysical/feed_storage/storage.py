@@ -3,7 +3,7 @@ from datetime import date
 from typing import Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -104,7 +104,6 @@ class Storage:
     """
 
     def __init__(self, capacity: float = float("inf")):
-        self.acceptable_crops: list[CropCategory] = []
         self.capacity = capacity
         self.stored: list[HarvestedCrop] = []
         self.crude_protein_loss_coefficient = 0.0
@@ -523,28 +522,30 @@ class Storage:
         interface to remain uniform across all implementations of `calculate_dry_matter_loss_to_gas`.
 
         """
-        dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        # dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
-        is_alfalfa = crop.category is CropCategory.ALFALFA
-        constants = ALFALFA_FERMENTATION_CONSTANTS if is_alfalfa else NON_ALFALFA_FERMENTATION_CONSTANTS
-        lower_temp_limit = constants["lower_temp_limit"]
-        upper_temp_limit = constants["upper_temp_limit"]
-        lower_dry_matter_limit = constants["lower_dry_matter_limit"]
-        upper_dry_matter_limit = constants["upper_dry_matter_limit"]
-        loss_coefficient = constants["loss_coefficient"]
-        base_loss_fraction = constants["base_loss_fraction"]
+        # TODO see what calculation needs to be done to determine if a crop is alfalfa and redo all this stuff
+        # accordingly
+        # is_alfalfa = crop.category is CropCategory.ALFALFA
+        # constants = ALFALFA_FERMENTATION_CONSTANTS if is_alfalfa else NON_ALFALFA_FERMENTATION_CONSTANTS
+        # lower_temp_limit = constants["lower_temp_limit"]
+        # upper_temp_limit = constants["upper_temp_limit"]
+        # lower_dry_matter_limit = constants["lower_dry_matter_limit"]
+        # upper_dry_matter_limit = constants["upper_dry_matter_limit"]
+        # loss_coefficient = constants["loss_coefficient"]
+        # base_loss_fraction = constants["base_loss_fraction"]
 
         dry_matter_loss_fraction = 0.0
 
-        for day in weather_conditions:
-            outside_temp_range = not lower_temp_limit <= day.mean_air_temperature <= upper_temp_limit
-            outside_dry_fraction_range = not lower_dry_matter_limit <= dry_matter_fraction <= upper_dry_matter_limit
-            if outside_temp_range or outside_dry_fraction_range:
-                continue
+        # for day in weather_conditions:
+        #     outside_temp_range = not lower_temp_limit <= day.mean_air_temperature <= upper_temp_limit
+        #     outside_dry_fraction_range = not lower_dry_matter_limit <= dry_matter_fraction <= upper_dry_matter_limit
+        #     if outside_temp_range or outside_dry_fraction_range:
+        #         continue
 
-            fraction_lost = base_loss_fraction - loss_coefficient * (dry_matter_fraction - lower_dry_matter_limit)
-            dry_matter_loss_fraction += fraction_lost
-            dry_matter_fraction -= fraction_lost
+        #     fraction_lost = base_loss_fraction - loss_coefficient * (dry_matter_fraction - lower_dry_matter_limit)
+        #     dry_matter_loss_fraction += fraction_lost
+        #     dry_matter_fraction -= fraction_lost
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
 

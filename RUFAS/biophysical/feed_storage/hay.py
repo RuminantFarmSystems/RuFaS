@@ -1,7 +1,7 @@
 from datetime import date
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
@@ -46,11 +46,6 @@ class Hay(Storage):
         im = InputManager()
         self.bale_size: float = im.get_data("feed_management.hay_bale_diameter")
         super().__init__(capacity)
-        self.acceptable_crops = [
-            CropCategory.ALFALFA,
-            CropCategory.GRASS,
-            CropCategory.SMALL_GRAIN,
-        ]
         self.additional_dry_matter_loss_coefficient = 0.0
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:

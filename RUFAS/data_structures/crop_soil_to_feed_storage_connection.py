@@ -9,32 +9,6 @@ from RUFAS.rufas_time import RufasTime
 from .feed_storage_to_animal_connection import RUFAS_ID
 
 
-class CropCategory(Enum):
-    """
-    Enum for Crop Categories.
-
-    Attributes
-    ----------
-    SMALL_GRAIN : str
-        Represents small grain crops.
-    CORN : str
-        Represents corn crops.
-    SOY : str
-        Represents soy crops.
-    GRASS : str
-        Represents grass crops.
-    ALFALFA : str
-        Represents alfalfa crops.
-
-    """
-
-    SMALL_GRAIN = "Small grain"
-    CORN = "Corn"
-    SOY = "Soy"
-    GRASS = "Grass"
-    ALFALFA = "Alfalfa"
-
-
 class StorageType(Enum):
     """
     Maps each storage type to its respective class.
@@ -63,8 +37,6 @@ class HarvestedCrop:
 
     Attributes
     ----------
-    category : CropCategory
-        The category of the crop (enum).
     config_name : str
         Name of the crop configuration that produced this harvested crop.
     field_name : str
@@ -127,7 +99,6 @@ class HarvestedCrop:
 
     """
 
-    category: CropCategory
     config_name: str
     rufas_ids: list[RUFAS_ID]
     harvest_time: date

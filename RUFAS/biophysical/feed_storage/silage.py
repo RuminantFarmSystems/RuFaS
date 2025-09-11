@@ -2,7 +2,7 @@ from dataclasses import replace
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -33,12 +33,6 @@ class Silage(Storage):
 
     def __init__(self, capacity: float = float("inf")):
         super().__init__(capacity)
-        self.acceptable_crops = [
-            CropCategory.ALFALFA,
-            CropCategory.CORN,
-            CropCategory.GRASS,
-            CropCategory.SMALL_GRAIN,
-        ]
         self.om = OutputManager()
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:

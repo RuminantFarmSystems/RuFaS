@@ -2174,11 +2174,6 @@
           "description": "Plant category of the crop configuration.",
           "pattern": "^(warm_annual_legume|cool_annual_legume|perennial_legume|warm_annual|cool_annual|perennial|tree)$"
         },
-        "crop_category": {
-          "type": "string",
-          "description": "Crop category of the crop configuration.",
-          "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
-        },
         "rufas_ids": {
           "type": "array",
           "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
@@ -5975,19 +5970,127 @@
   },
   "feed_storage_input_properties": {
     "data_collection_app_compatible": false,
-    "hay_bale_diameter": {
-        "type": "number",
-        "description": "Diameter of hay bales (meters).",
-        "minimum": 0.5,
-        "maximum": 4,
-        "default": 1.8
+    "storage": {
+      "type": "array",
+      "description": "A list of all configurations for feed storage units.",
+      "properties": {
+        "type": "object",
+        "description": "Configuration for a feed storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(DryGrain|HighMoistureGrain|HayProtectedIndoor|HayProtectedWrapped|HayProtectedTarped|HayUnprotected|Baleage|SilageBag|SilageBunker|SilagePile)$"
+        }
+      },
+    "dry_grain": {
+      "type": "array",
+      "description": "A list of dry grain types that can be stored in a dry grain storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Dry grain storage unit.",
+        "dry_grain_dm_loss_coefficient": {
+          "type": "number",
+          "description": "Dry matter loss coefficient for dry grain storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 0.1,
+          "default": 0.1
+        }
+      }
     },
-    "post_wilting_moisture_percentage": {
-        "type": "number",
-        "description": "The post-wilting moisture level that baleage will dry down to.",
-        "minimum": 30,
-        "maximum": 60,
-        "default": 45
+    "high_moisture_grain": {
+      "type": "array",
+      "description": "A list of high moisture grain types that can be stored in a high moisture grain storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "High moisture grain storage unit.",
+        "high_moisture_grain_dm_loss_coefficient": {
+          "type": "number",
+          "description": "Dry matter loss coefficient for high moisture grain storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 0.1,
+          "default": 0.05
+        }
+      }
+    },
+    "hay": {
+      "type": "array",
+      "description": "A list of hay types that can be stored in a hay storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Hay storage unit.",
+        "hay_bale_diameter": {
+          "type": "number",
+          "description": "Diameter of hay bales (meters).",
+          "minimum": 0.5,
+          "maximum": 4,
+          "default": 1.8
+        },
+        "hay_initial_storage_dry_matter" :{
+          "type": "number",
+          "description": "Initial dry matter content of hay at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.75
+        },
+        "hay_target_dry_matter": {
+          "type": "number",
+          "description": "Target dry matter content of hay after drying down in storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.88
+        }
+      }
+    },
+    "baleage": {
+      "type": "array",
+      "description": "A list of baleage types that can be stored in a baleage storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Baleage storage unit.",
+        "baleage_initial_storage_dry_matter": {
+          "type": "number",
+          "description": "Initial dry matter content of baleage at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.6
+        },
+        "post_wilting_moisture_percentage": {
+          "type": "number",
+          "description": "The post-wilting moisture level that baleage will dry down to.",
+          "minimum": 30,
+          "maximum": 60,
+          "default": 45
+        }
+      }
+    },
+    "silage": {
+      "type": "array",
+      "description": "A list of silage types that can be stored in a silage storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Silage storage unit.",
+        "silage_initial_storage_dry_matter": {
+          "type": "number",
+          "description": "Initial dry matter content of silage at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.35
+        }
+      }
     }
   }
 }
+}
+

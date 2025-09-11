@@ -3,7 +3,6 @@
         {
             "name": "alfalfa_silage",
             "plant_category": "perennial_legume",
-            "crop_category": "Alfalfa",
             "rufas_ids": [104, 109, 110],
             "is_nitrogen_fixer": true,
             "minimum_temperature": 4.0,
@@ -43,7 +42,6 @@
         {
             "name": "alfalfa_baleage",
             "plant_category": "perennial_legume",
-            "crop_category": "Alfalfa",
             "is_nitrogen_fixer": true,
             "rufas_ids": [],
             "minimum_temperature": 4.0,
@@ -83,7 +81,6 @@
         {
             "name": "alfalfa_hay",
             "plant_category": "perennial_legume",
-            "crop_category": "Alfalfa",
             "is_nitrogen_fixer": true,
             "rufas_ids": [100, 103, 106, 107, 108],
             "minimum_temperature": 4.0,
@@ -123,7 +120,6 @@
         {
             "name": "cereal_rye_grain",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0,
@@ -163,7 +159,6 @@
         {
             "name": "cereal_rye_silage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "is_nitrogen_fixer": false,
             "rufas_ids": [144],
             "minimum_temperature": 0,
@@ -203,7 +198,6 @@
         {
             "name": "cereal_rye_baleage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "is_nitrogen_fixer": false,
             "rufas_ids": [],
             "minimum_temperature": 0,
@@ -243,7 +237,6 @@
         {
             "name": "cereal_rye_hay",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0,
@@ -283,7 +276,6 @@
         {
             "name": "corn_grain",
             "plant_category": "warm_annual",
-            "crop_category": "Corn",
             "rufas_ids": [40, 43, 44, 46, 47],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 8.0,
@@ -323,7 +315,6 @@
         {
             "name": "corn_silage",
             "plant_category": "warm_annual",
-            "crop_category": "Corn",
             "rufas_ids": [50, 51, 52],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 8.0,
@@ -363,7 +354,6 @@
         {
             "name": "soybean_grain",
             "plant_category": "warm_annual_legume",
-            "crop_category": "Soy",
             "is_nitrogen_fixer": true,
             "rufas_ids": [169, 170],
             "minimum_temperature": 10.0,
@@ -403,7 +393,6 @@
         {
             "name": "soybean_hay",
             "plant_category": "warm_annual_legume",
-            "crop_category": "Soy",
             "is_nitrogen_fixer": true,
             "rufas_ids": [],
             "minimum_temperature": 10.0,
@@ -443,7 +432,6 @@
         {
             "name": "tall_fescue_silage",
             "plant_category": "perennial",
-            "crop_category": "Grass",
             "rufas_ids": [91, 97, 100],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -483,7 +471,6 @@
         {
             "name": "tall_fescue_baleage",
             "plant_category": "perennial",
-            "crop_category": "Grass",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -523,7 +510,6 @@
         {
             "name": "tall_fescue_hay",
             "plant_category": "perennial",
-            "crop_category": "Grass",
             "rufas_ids": [18, 88, 89, 94, 95, 99],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -563,7 +549,6 @@
         {
             "name": "triticale_grain",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -603,7 +588,6 @@
         {
             "name": "triticale_silage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [187],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -643,7 +627,6 @@
         {
             "name": "triticale_baleage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -683,7 +666,6 @@
         {
             "name": "triticale_hay",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -723,7 +705,6 @@
         {
             "name": "winter_wheat_grain",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [194],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -763,7 +744,6 @@
         {
             "name": "winter_wheat_silage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [198],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -803,7 +783,6 @@
         {
             "name": "winter_wheat_baleage",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [195],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,
@@ -843,7 +822,6 @@
         {
             "name": "winter_wheat_hay",
             "plant_category": "cool_annual",
-            "crop_category": "Small grain",
             "rufas_ids": [200],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 0.0,

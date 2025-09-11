@@ -1,7 +1,7 @@
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from .storage import Storage
 from RUFAS.input_manager import InputManager
 
@@ -30,11 +30,6 @@ class Baleage(Storage):
         super().__init__(capacity)
         im = InputManager()
         self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
-        self.acceptable_crops = [
-            CropCategory.ALFALFA,
-            CropCategory.GRASS,
-            CropCategory.SMALL_GRAIN,
-        ]
         self.bale_density: float = 0
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:

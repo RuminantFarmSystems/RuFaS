@@ -1,4 +1,3 @@
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from .storage import Storage
 
 
@@ -11,11 +10,6 @@ class Grain(Storage):
 
     def __init__(self, capacity: float = float("inf")):
         super().__init__(capacity)
-        self.acceptable_crops = [
-            CropCategory.CORN,
-            CropCategory.SMALL_GRAIN,
-            CropCategory.SOY,
-        ]
 
 
 class Dry(Grain):
