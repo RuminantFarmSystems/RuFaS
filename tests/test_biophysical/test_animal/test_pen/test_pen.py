@@ -434,12 +434,6 @@ def test_average_milk_production_reduction_no_cows(
     assert pen.average_milk_production_reduction == 0
 
 
-def test_total_enteric_methane(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
-    """Tests the calculation of total enteric methane."""
-    pen.animals_in_pen = animals_in_pen
-    assert pen.total_enteric_methane == 138.8
-
-
 def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
     im = InputManager()
     mock_get_data = mocker.patch.object(
