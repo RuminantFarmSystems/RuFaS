@@ -300,12 +300,12 @@ class HerdStatistics:
         }
 
         self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
-            AnimalType.CALF: {"Pattanaik": 0},
-            AnimalType.HEIFER_I: {"IPCC": 0},
-            AnimalType.HEIFER_II: {"IPCC": 0},
-            AnimalType.HEIFER_III: {"IPCC": 0},
-            AnimalType.LAC_COW: {"IPCC": 0, "Mills": 0, "Mutian": 0},
-            AnimalType.DRY_COW: {"IPCC": 0, "Mills": 0},
+            AnimalType.CALF: {},
+            AnimalType.HEIFER_I: {},
+            AnimalType.HEIFER_II: {},
+            AnimalType.HEIFER_III: {},
+            AnimalType.LAC_COW: {},
+            AnimalType.DRY_COW: {},
         }
 
     def reset_daily_stats(self) -> None:
@@ -383,12 +383,12 @@ class HerdStatistics:
         }
 
         self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
-            AnimalType.CALF: {"Pattanaik": 0},
-            AnimalType.HEIFER_I: {"IPCC": 0},
-            AnimalType.HEIFER_II: {"IPCC": 0},
-            AnimalType.HEIFER_III: {"IPCC": 0},
-            AnimalType.LAC_COW: {"IPCC": 0, "Mills": 0, "Mutian": 0},
-            AnimalType.DRY_COW: {"IPCC": 0, "Mills": 0},
+            AnimalType.CALF: {},
+            AnimalType.HEIFER_I: {},
+            AnimalType.HEIFER_II: {},
+            AnimalType.HEIFER_III: {},
+            AnimalType.LAC_COW: {},
+            AnimalType.DRY_COW: {},
         }
 
     def reset_parity(self) -> None:

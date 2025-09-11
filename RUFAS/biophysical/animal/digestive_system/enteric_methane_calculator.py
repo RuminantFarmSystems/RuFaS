@@ -42,8 +42,6 @@ class EntericMethaneCalculator:
                     0.013 * (body_weight**0.75) * GeneralConstants.KCAL_TO_MJ
                 ) / GeneralConstants.MJ_CH4_TO_G_CH4
                 methane_results[model] = methane_emission
-            else:
-                methane_results[model] = 0
 
         return methane_results
 
@@ -102,8 +100,6 @@ class EntericMethaneCalculator:
                     0.065 * gross_energy_concentration * nutrition_supply.dry_matter
                 ) / GeneralConstants.MJ_CH4_TO_G_CH4
                 methane_results[model] = methane_emission
-            else:
-                methane_results[model] = 0
 
         return methane_results
 
@@ -257,6 +253,7 @@ class EntericMethaneCalculator:
                     + 28.8 * milk_fat
                     + 0.148 * body_weight
                 )
+                methane_results[model] = methane_emission
             elif model == "Mills" and usage:
                 mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
                 mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
@@ -265,6 +262,7 @@ class EntericMethaneCalculator:
                     mitscherlich_parameter_a + mitscherlich_parameter_b
                 ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
                 methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
+                methane_results[model] = methane_emission
             elif model == "IPCC" and usage:
                 soluble_residue = (
                     GeneralConstants.FRACTION_TO_PERCENTAGE
@@ -282,9 +280,8 @@ class EntericMethaneCalculator:
                 methane_emission = (
                     0.065 * gross_energy_concentration * dry_matter_intake / GeneralConstants.MJ_CH4_TO_G_CH4
                 )
-            else:
-                methane_emission = 0
-            methane_results[model] = methane_emission
+                methane_results[model] = methane_emission
+
 
         return methane_results
 
@@ -351,6 +348,7 @@ class EntericMethaneCalculator:
                     mitscherlich_parameter_a + mitscherlich_parameter_b
                 ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
                 methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
+                methane_results[model] = methane_emission
             elif model == "IPCC" and usage:
                 gross_energy_concentration = (
                     0.263 * crude_protein_concentration
@@ -361,7 +359,6 @@ class EntericMethaneCalculator:
                 methane_emission = (
                     0.065 * gross_energy_concentration * dry_matter_intake
                 ) / GeneralConstants.MJ_CH4_TO_G_CH4
-            else:
-                methane_emission = 0
-            methane_results[model] = methane_emission
+                methane_results[model] = methane_emission
+
         return methane_results
