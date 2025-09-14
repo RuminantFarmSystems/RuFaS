@@ -7,7 +7,6 @@ import numpy as np
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
