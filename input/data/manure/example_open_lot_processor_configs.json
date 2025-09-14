@@ -40,6 +40,7 @@
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,
+      "use_parlor_flush": true,
       "cleaning_water_recycle_fraction": 0.8
     },
     {
