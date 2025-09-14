@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-# from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData

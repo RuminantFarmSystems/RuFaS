@@ -8,7 +8,7 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-# from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory

@@ -3,7 +3,6 @@ from math import exp
 from typing import Dict, List, Optional, Sequence
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-# from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.events import (
     BaseFieldManagementEvent,
