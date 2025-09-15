@@ -2,7 +2,6 @@
 
 import time as timer
 from datetime import date, timedelta
-from enum import Enum
 
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
@@ -14,7 +13,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
-from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -75,20 +73,6 @@ class SimulationEngine:
             self.herd_manager.heiferIIs,
             self.herd_manager.cows,
         )
-        available_feeds_on_final_day = [
-            {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
-            for feed in self.feed_manager.query_available_feeds()
-        ]
-        available_feeds_units = {
-            "category": MeasurementUnits.UNITLESS,
-            "amount": MeasurementUnits.KILOGRAMS,
-        }
-        for available_feed in available_feeds_on_final_day:
-            self.om.add_variable(
-                "available_feeds_on_final_day",
-                available_feed,
-                dict(info_map, **{"units": available_feeds_units}),
-            )
         # EEEManager.estimate_all()
         t_end_sim = timer.time()
 
@@ -110,13 +94,11 @@ class SimulationEngine:
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
-            self.feed_manager.receive_crop(
-                harvested_crop.harvested_crop, harvested_crop.storage_type, self.time.simulation_day
-            )
-            if harvested_crop.harvested_crop.config_name not in next_harvest_dates:
-                crop_config_name = harvested_crop.harvested_crop.config_name
+            self.feed_manager.receive_crop(harvested_crop, self.time.simulation_day)
+            if harvested_crop.config_name not in next_harvest_dates:
+                crop_config_name = harvested_crop.config_name
                 next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
-                next_harvest_dates[harvested_crop.harvested_crop.config_name] = next_harvest_date.get(crop_config_name)
+                next_harvest_dates[harvested_crop.config_name] = next_harvest_date.get(crop_config_name)
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds:
@@ -258,14 +240,16 @@ class SimulationEngine:
         self.weather = Weather(weather_data, self.time)
 
         self.field_manager: FieldManager = FieldManager()
-        crop_config_to_rufas_ids_map = self.field_manager.get_crop_configs_to_rufas_ids()
 
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
-        feed_class_config = self.im.get_data("feed")
+        feeds_config = self.im.get_data("feed")
+        feed_storage_configs = self.im.get_data("feed_storage_configurations")
+        feed_storage_instances = self.im.get_data("feed_storage_instances")
         self.feed_manager: FeedManager = FeedManager(
-            feed_class_config,
+            feeds_config,
             nutrient_standard,
-            crop_config_to_rufas_ids_map,
+            feed_storage_configs,
+            feed_storage_instances,
         )
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
