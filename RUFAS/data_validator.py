@@ -1644,7 +1644,7 @@ class CrossValidator:
         value : Any
             The value to be saved.
         """
-        pass
+        self._alias_pool[alias_name] = value
 
     def _get_alias_value(self, alias_name: str) -> Any:
         """
@@ -1660,6 +1660,7 @@ class CrossValidator:
         Any
             The value associated with the specified alias name from the alias pool.
         """
+        return self._alias_pool[alias_name]
 
     def _target_and_save(self, target_and_save_block: dict[str, dict[str, Any]]) -> None:
         """
@@ -1673,7 +1674,10 @@ class CrossValidator:
         target_and_save_block : dict[str, dict[str, Any]]
             A dictionary containing the "target and save block" of the cross-validation rule.
         """
-        pass
+        sections = ["variables", "constants"]
+        for section in sections:
+            for key, value in target_and_save_block.get(section, []):
+                self._alias_pool[key] = value
 
     def _evaluate_expression(self, expression_block: dict[str, Any]) -> Any:
         """
