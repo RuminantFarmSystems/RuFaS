@@ -6189,8 +6189,8 @@
         "size": {
           "type": "number",
           "description": "Size of the silage storage (tons).",
-          "minimum": 1.0,
-          "default": 100.0
+          "minimum": 0.0,
+          "default": 0.0
         }
       }
     }

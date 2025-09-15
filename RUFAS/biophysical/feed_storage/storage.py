@@ -100,9 +100,6 @@ class Storage:
         Recalculates a single nutrient percentage after dry matter loss.
 
     """
-
-    # TODO add feed storage config - extract all common parameters to here
-    # TODO figure out how to pass feed storage config to subclasses
     def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
         self.capacity = capacity
         self.stored: list[HarvestedCrop] = []
@@ -152,15 +149,6 @@ class Storage:
             If adding the crop exceeds the storage's capacity.
 
         """
-        if not self.acceptable_crops:
-            raise NotImplementedError(
-                "Storage.acceptable_crops is not populated, consider populating it in the child class."
-            )
-        if crop.category not in self.acceptable_crops:
-            raise ValueError(
-                f"Can't receive the crop, the compatible crop categories are {self.acceptable_crops=}, "
-                f"{crop.category} is not one of them."
-            )
         if self.stored_mass + crop.fresh_mass > self.capacity:
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
