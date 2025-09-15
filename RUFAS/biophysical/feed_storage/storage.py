@@ -100,6 +100,7 @@ class Storage:
         Recalculates a single nutrient percentage after dry matter loss.
 
     """
+
     def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
         self.capacity = capacity
         self.stored: list[HarvestedCrop] = []

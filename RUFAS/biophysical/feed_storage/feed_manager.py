@@ -224,7 +224,7 @@ class FeedManager:
             self._om.add_warning(
                 "No matching storage for crop",
                 f"No storage found for crop '{crop_name}' from field '{field_name}'. Crop will be exported",
-                info_map
+                info_map,
             )
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
@@ -520,9 +520,7 @@ class FeedManager:
         all_available_feeds: list[HarvestedCrop | PurchasedFeed] = self._gather_available_feeds()
 
         for rufas_id, amount in feeds_to_deduct.items():
-            available_feeds = [
-                feed for feed in all_available_feeds if self._check_feed_availability(rufas_id, feed)
-            ]
+            available_feeds = [feed for feed in all_available_feeds if self._check_feed_availability(rufas_id, feed)]
 
             for feed in available_feeds:
                 amount_to_deduct = min(amount, feed.dry_matter_mass)
@@ -591,9 +589,7 @@ class FeedManager:
 
         return all_available_feeds
 
-    def _check_feed_availability(
-        self, rufas_id: int, feed: HarvestedCrop | PurchasedFeed
-    ) -> bool:
+    def _check_feed_availability(self, rufas_id: int, feed: HarvestedCrop | PurchasedFeed) -> bool:
         """
         Helper function that checks if a feed can be fed to animals based on the RuFaS ID and the feeds to deduct.
 
