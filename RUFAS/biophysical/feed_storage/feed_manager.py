@@ -1,10 +1,10 @@
+from collections import Counter
 from datetime import date
 from typing import Any, Literal
 
+from RUFAS.biophysical.feed_storage.feed_storage_enum import StorageType
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
-    CropCategory,
     HarvestedCrop,
-    StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     FeedCategorization,
@@ -26,40 +26,12 @@ from RUFAS.util import Utility
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 
-from .baleage import Baleage
-from .grain import Dry, Grain, HighMoisture
-from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
-# Defines the compatibility between Crop Categories and Storage Types.
-CROP_TO_STORAGE_MAPPING: dict[CropCategory, list[type[Storage]]] = {
-    CropCategory.ALFALFA: [Hay, Silage, Baleage],
-    CropCategory.CORN: [Grain, Silage],
-    CropCategory.GRASS: [Hay, Silage, Baleage],
-    CropCategory.SMALL_GRAIN: [Hay, Grain, Silage, Baleage],
-    CropCategory.SOY: [Grain],
-}
-
-"""Maps each StorageType enum element to the associated Storage subclass."""
-STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
-    StorageType.PROTECTED_INDOORS: ProtectedIndoors,
-    StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
-    StorageType.PROTECTED_TARPED: ProtectedTarped,
-    StorageType.UNPROTECTED: Unprotected,
-    StorageType.BALEAGE: Baleage,
-    StorageType.DRY: Dry,
-    StorageType.HIGH_MOISTURE: HighMoisture,
-    StorageType.BUNKER: Bunker,
-    StorageType.PILE: Pile,
-    StorageType.BAG: Bag,
-}
 
 """Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
-
-QUERY_RESULT_DATA_TYPE = dict[str, CropCategory | float]
 
 """A type alias representing the context in which a feed purchase was initiated."""
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
@@ -78,6 +50,10 @@ class FeedManager:
         Nutrient standard used in the simulation (NASEM or NRC).
     crop_to_rufas_ids_mapping : dict[str, list[RUFAS_ID]]
         Mapping from crops to their corresponding RUFAS IDs.
+    feed_storage_configs : dict[str, Any]
+        Configurations for the feed storage units.
+    feed_storage_instances : dict[str, list[str]]
+        References to the specific feed storage units to be created.
 
     Attributes
     ----------
@@ -111,11 +87,13 @@ class FeedManager:
         self,
         feed_config: dict[str, list[Any]],
         nutrient_standard: NutrientStandard,
-        crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
+        feed_storage_configs: dict[str, Any],
+        feed_storage_instances: dict[str, list[str]],
     ) -> None:
         self._om = OutputManager()
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.active_storages: dict[StorageType, Storage] = {}
+        self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
@@ -124,12 +102,11 @@ class FeedManager:
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
-        for crop, rufas_ids in crop_to_rufas_ids_mapping.items():
-            rufas_id = self._select_rufas_id_for_harvested_crop(rufas_ids, available_feed_ids)
-            if rufas_id is None:
-                continue
-            self.crop_to_rufas_id[crop] = rufas_id
-
+        for storage in self.active_storages.values():
+            if storage.rufas_feed_id in available_feed_ids:
+                self.crop_to_rufas_id[storage.crop_name] = storage.rufas_feed_id
+        print(self.active_storages)
+        print(self.crop_to_rufas_id)
         self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
         self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
             feed.rufas_id: 0.0 for feed in self.available_feeds
@@ -143,6 +120,43 @@ class FeedManager:
     def available_feeds(self) -> list[NASEMFeed | NRCFeed]:
         """Returns the list of available feeds."""
         return self._available_feeds
+
+    def _create_all_storages(self, feed_storage_configs: dict[str, Any], feed_storage_instances: dict[str, list[str]]
+                             ) -> None:
+        """Creates all feed storage instances based on the provided configurations.
+
+        Parameters
+        ----------
+        feed_storage_configs : dict[str, Any]
+            A dictionary that contains configurations for all available feed storage types.
+        feed_storage_instances : dict[str, list[str]]
+            A dictionary that contains feed storage instance names.
+        """
+        all_configs: list[dict[str, Any]] = [
+            storage_config for storage_config_list in feed_storage_configs.values()
+            for storage_config in storage_config_list
+        ]
+        storage_name_counts = Counter(storage_config.get("name") for storage_config in all_configs)
+        duplicate_names = [name for name, count in storage_name_counts.items() if count > 1]
+        if duplicate_names:
+            raise ValueError(
+                f"Duplicate storage config names found: {duplicate_names}. Each storage config must have a unique name."
+            )
+
+        configs_by_name: dict[str, dict[str, Any]] = {
+            config["name"]: config for config in all_configs if "name" in config
+        }
+
+        instance_names: list[str] = [
+            name for names in feed_storage_instances.values() for name in names
+        ]
+
+        for instance_name in instance_names:
+            storage_config = configs_by_name.get(instance_name)
+            storage_type_str = storage_config.get("storage_type")
+            storage_class = StorageType.get_storage_class(storage_type_str)
+            storage = storage_class(storage_config)
+            self.active_storages[instance_name] = storage
 
     def report_feed_manager_balance(self, simulation_day: int) -> None:
         """Reports the balance of feed purchased, requested, and fed to date."""
@@ -184,18 +198,15 @@ class FeedManager:
     def receive_crop(
         self,
         harvested_crop: HarvestedCrop,
-        storage_type: StorageType,
         simulation_day: int,
     ) -> None:
         """
-        Receives a harvested crop and assigns it to a storage unit.
+        Receives a harvested crop and assigns it to the proper storage unit.
 
         Parameters
         ----------
         harvested_crop : HarvestedCrop
             The harvested crop to be stored.
-        storage_type : StorageType
-            The type of storage to use for this crop.
         simulation_day : int
             The current simulation day, used for tracking storage time.
 
@@ -204,22 +215,20 @@ class FeedManager:
         ValueError
             If the crop type is not compatible with the storage type.
         """
-        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
-        is_crop_compatible_with_storage = any(
-            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
-            for storage_class in compatible_storage_classes
-        )
+        # TODO map harvested crop to proper storage by storage matching crop name and field name from HarvestedCrop
+        # compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
+        # is_crop_compatible_with_storage = any(
+        #     issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
+        #     for storage_class in compatible_storage_classes
+        # )
 
-        if not is_crop_compatible_with_storage:
-            raise ValueError(
-                f"Crop of category '{harvested_crop.category}' is not compatible with storage type '{storage_type}'. "
-                f"Compatible storage types are: {', '.join([cls.__name__ for cls in compatible_storage_classes])}"
-            )
-
-        if storage_type not in self.active_storages:
-            self.active_storages[storage_type] = STORAGE_TYPE_TO_CLASS_MAP[storage_type]()
-
-        self.active_storages[storage_type].receive_crop(harvested_crop, simulation_day)
+        # if not is_crop_compatible_with_storage:
+        #     raise ValueError(
+        #         f"Crop of category '{harvested_crop.category}' is not compatible with storage type '{storage_type}'. "
+        #         f"Compatible storage types are: {', '.join([cls.__name__ for cls in compatible_storage_classes])}"
+        #     )
+        pass
+        # self.active_storages[storage_type].receive_crop(harvested_crop, simulation_day)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -420,56 +429,6 @@ class FeedManager:
                 feed_totals[purchased_feed.rufas_id] += purchased_feed.dry_matter_mass
 
         return feed_totals
-
-    def query_available_feeds(
-        self,
-        query_crop_categories: list[CropCategory] | None = None,
-        query_storage_types: list[StorageType] | None = None,
-    ) -> list[dict[str, CropCategory | int | float]]:
-        """
-        Queries the available amount of feed in storage.
-
-        Parameters
-        ----------
-        query_crop_categories : list[CropCategory], optional, default=None
-            The categories of crop to query (if None, all crop categories are queried).
-        query_storage_types : list[StorageType], optional, default=None
-            The types of storage to query (if None, all storages types are queried).
-
-        Returns
-        -------
-        list[dict[CropCategory | int, float]]
-            The amount of available feed, either as a total or for a specific crop category.
-        """
-        query_all_crop_categories = query_crop_categories is None
-        query_all_storage_types = query_storage_types is None
-        results: list[dict[str, CropCategory | int | float]] = []
-
-        for storage_type, storage in self.active_storages.items():
-            is_storage_queryable: bool = query_all_storage_types or (
-                query_storage_types is not None and storage_type in query_storage_types
-            )
-            if not is_storage_queryable:
-                continue
-            for stored_crop in storage.stored:
-                is_crop_category_queryable: bool = query_all_crop_categories or (
-                    query_crop_categories is not None and stored_crop.category in query_crop_categories
-                )
-                if not is_crop_category_queryable:
-                    continue
-                for previous_result in results:
-                    if stored_crop.category == previous_result["feed"]:
-                        previous_result["amount"] += stored_crop.fresh_mass
-                        break
-                else:
-                    results.append(
-                        {
-                            "feed": stored_crop.category,
-                            "amount": stored_crop.fresh_mass,
-                        }
-                    )
-
-        return results
 
     def purchase_feed(
         self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime, purchase_type: PurchaseType
