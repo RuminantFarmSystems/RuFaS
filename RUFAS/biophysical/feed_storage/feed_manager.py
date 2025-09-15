@@ -1,10 +1,10 @@
+from collections import Counter
 from datetime import date
 from typing import Any, Literal
 
 from RUFAS.biophysical.feed_storage.feed_storage_enum import StorageType
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
-    # StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     FeedCategorization,
@@ -26,26 +26,9 @@ from RUFAS.util import Utility
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 
-# from .baleage import Baleage
-# from .grain import Dry, HighMoisture
-# from .hay import ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-# from .silage import Bag, Bunker, Pile
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
-# """Maps each StorageType enum element to the associated Storage subclass."""
-# STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
-#     StorageType.PROTECTED_INDOORS: ProtectedIndoors,
-#     StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
-#     StorageType.PROTECTED_TARPED: ProtectedTarped,
-#     StorageType.UNPROTECTED: Unprotected,
-#     StorageType.BALEAGE: Baleage,
-#     StorageType.DRY: Dry,
-#     StorageType.HIGH_MOISTURE: HighMoisture,
-#     StorageType.BUNKER: Bunker,
-#     StorageType.PILE: Pile,
-#     StorageType.BAG: Bag,
-# }
 
 """Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
@@ -122,8 +105,8 @@ class FeedManager:
         for storage in self.active_storages.values():
             if storage.rufas_feed_id in available_feed_ids:
                 self.crop_to_rufas_id[storage.crop_name] = storage.rufas_feed_id
-        # TODO from feed storage config get all rufas IDs and complete self.crop_to_rufas_id dict for use in sim engine.
-
+        print(self.active_storages)
+        print(self.crop_to_rufas_id)
         self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
         self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
             feed.rufas_id: 0.0 for feed in self.available_feeds
@@ -149,16 +132,31 @@ class FeedManager:
         feed_storage_instances : dict[str, list[str]]
             A dictionary that contains feed storage instance names.
         """
-        for storage_instance_names in feed_storage_instances.values():
-            for storage_instance_name in storage_instance_names:
-                for storage_config_list in feed_storage_configs.keys():
-                    for storage_config in feed_storage_configs[storage_config_list]:
-                        storage_config_name = storage_config.get("name")
-                        if storage_config_name == storage_instance_name:
-                            storage_type_str = storage_config.get("storage_type")
-                            storage_initializer = StorageType.get_storage_class(storage_type_str)
-                            storage = storage_initializer(storage_config)
-                            self.active_storages[storage_instance_name] = storage
+        all_configs: list[dict[str, Any]] = [
+            storage_config for storage_config_list in feed_storage_configs.values()
+            for storage_config in storage_config_list
+        ]
+        storage_name_counts = Counter(storage_config.get("name") for storage_config in all_configs)
+        duplicate_names = [name for name, count in storage_name_counts.items() if count > 1]
+        if duplicate_names:
+            raise ValueError(
+                f"Duplicate storage config names found: {duplicate_names}. Each storage config must have a unique name."
+            )
+
+        configs_by_name: dict[str, dict[str, Any]] = {
+            config["name"]: config for config in all_configs if "name" in config
+        }
+
+        instance_names: list[str] = [
+            name for names in feed_storage_instances.values() for name in names
+        ]
+
+        for instance_name in instance_names:
+            storage_config = configs_by_name.get(instance_name)
+            storage_type_str = storage_config.get("storage_type")
+            storage_class = StorageType.get_storage_class(storage_type_str)
+            storage = storage_class(storage_config)
+            self.active_storages[instance_name] = storage
 
     def report_feed_manager_balance(self, simulation_day: int) -> None:
         """Reports the balance of feed purchased, requested, and fed to date."""

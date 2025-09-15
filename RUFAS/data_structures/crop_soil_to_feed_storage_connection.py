@@ -1,28 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import date
-from enum import Enum
-# from typing import NamedTuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
-
-
-class StorageType(Enum):
-    """
-    Maps each storage type to its respective class.
-    """
-
-    PROTECTED_INDOORS = "Protected Indoors"
-    PROTECTED_WRAPPED = "Protected Wrapped"
-    PROTECTED_TARPED = "Protected Tarped"
-    UNPROTECTED = "Unprotected"
-    BALEAGE = "Baleage"
-    DRY = "Dry"
-    HIGH_MOISTURE = "High Moisture"
-    BUNKER = "Bunker"
-    PILE = "Pile"
-    BAG = "Bag"
-
 
 """This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
 EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION = 0.3
