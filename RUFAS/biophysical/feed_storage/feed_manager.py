@@ -119,6 +119,9 @@ class FeedManager:
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
+        for storage in self.active_storages.values():
+            if storage.rufas_feed_id in available_feed_ids:
+                self.crop_to_rufas_id[storage.crop_name] = storage.rufas_feed_id
         # TODO from feed storage config get all rufas IDs and complete self.crop_to_rufas_id dict for use in sim engine.
 
         self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
@@ -156,7 +159,6 @@ class FeedManager:
                             storage_initializer = StorageType.get_storage_class(storage_type_str)
                             storage = storage_initializer(storage_config)
                             self.active_storages[storage_instance_name] = storage
-        print(self.active_storages)
 
     def report_feed_manager_balance(self, simulation_day: int) -> None:
         """Reports the balance of feed purchased, requested, and fed to date."""

@@ -108,6 +108,7 @@ class Storage:
         self.storage_name = storage_config.get("storage_name")
         self.field_name = storage_config.get("field_name")
         self.crop_name = storage_config.get("crop_name")
+        self.rufas_feed_id = storage_config.get("rufas_id")
         self.crude_protein_loss_coefficient = 0.0
         self.starch_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
