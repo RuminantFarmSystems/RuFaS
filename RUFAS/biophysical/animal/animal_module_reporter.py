@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -512,7 +513,7 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_daily_feed_emissions(ration_across_pens, "ALL", "", herd_manager, simulation_day)
 
     @classmethod
-    def _report_daily_ration_per_pen(cls, pen: Pen, simulation_day: int, herd_manager) -> dict[str, float]:
+    def _report_daily_ration_per_pen(cls, pen: Pen, simulation_day: int, herd_manager: HerdManager) -> dict[str, float]:
         """
         Calculates and reports the total amounts of feed fed to animals in a pen in a given day.
 
@@ -562,7 +563,7 @@ class AnimalModuleReporter:
         ration_total: dict[str, float],
         pen_id: int | str,
         pen_animal_name: str,
-        animal_manager,
+        herd_manager: HerdManager,
         simulation_day: int,
     ) -> None:
         """
@@ -576,8 +577,10 @@ class AnimalModuleReporter:
             The unique number identifying a pen. Use `ALL` when the given ration is the sum of mulitple pens' rations.
         pen_animal_name : str
             The name of the animal combination in a pen.
-        animal_manager : AnimalManager
+        herd_manager : HerdManager
             The AnimalManager instance being reported.
+        simulation_day : int
+            Day of simulation.
 
         """
         classname = AnimalModuleReporter.__name__
@@ -587,10 +590,10 @@ class AnimalModuleReporter:
             "function": funcname,
         }
         daily_purchased_feed_emissions = (
-            animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(ration_total)
+            herd_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(ration_total)
         )
         daily_land_use_change_feed_emissions = (
-            animal_manager.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(ration_total)
+            herd_manager.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(ration_total)
         )
         if pen_id == "ALL":
             info_map["data_origin"] = [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")]
@@ -1282,16 +1285,16 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_reports(cls, herd_manager, simulation_day: int) -> None:
+    def report_daily_reports(cls, herd_manager: HerdManager, simulation_day: int) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of AnimalManager class.
-        available_feeds : Dict[str, Dict[str, Any]]
-            Available feeds dictionary from the Feed class object.
+        herd_manager : HerdManager
+            Instance of HerdManager class.
+        simulation_day: int
+            Day of simulation.
         """
         herd_statistics = herd_manager.herd_statistics
         AnimalModuleReporter.report_daily_animal_population(herd_statistics, simulation_day)
@@ -1303,6 +1306,17 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_pen_manure_properties(pen, simulation_day)
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, simulation_day)
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_reports.__name__,
+        }
+        if herd_statistics.total_enteric_methane:
+            for animal_type, methane_amount in herd_statistics.total_enteric_methane.items():
+                om.add_variable(
+                    f"{animal_type}_total_enteric_methane",
+                    herd_statistics.total_enteric_methane[animal_type],
+                    dict(info_map, **{"units": MeasurementUnits.GRAMS}),
+                )
 
     @classmethod
     def report_end_of_simulation(
@@ -1418,7 +1432,6 @@ class AnimalModuleReporter:
         -------
         None
         """
-
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,

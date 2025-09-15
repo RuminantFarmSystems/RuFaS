@@ -192,5 +192,5 @@ class StillbornCalfTypedDict(TypedDict):
     """List of expected keys for stillborn calves values dictionary"""
 
     id: int
-    stillborn_day: int | None
+    stillborn_day: int
     birth_weight: float
