@@ -244,12 +244,15 @@ class SimulationEngine:
         self.field_manager: FieldManager = FieldManager()
 
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
-        feed_class_config = self.im.get_data("feed")
-        storage_config = self.im.get_data("feed_management")
-        print(storage_config)
+        feeds_config = self.im.get_data("feed")
+        feed_storage_configs = self.im.get_data("feed_storage_configurations")
+        feed_storage_instances = self.im.get_data("feed_storage_instances")
+        print(feed_storage_instances)
         self.feed_manager: FeedManager = FeedManager(
-            feed_class_config,
+            feeds_config,
             nutrient_standard,
+            feed_storage_configs,
+            feed_storage_instances,
         )
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")

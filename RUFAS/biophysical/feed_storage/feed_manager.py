@@ -66,6 +66,10 @@ class FeedManager:
         Nutrient standard used in the simulation (NASEM or NRC).
     crop_to_rufas_ids_mapping : dict[str, list[RUFAS_ID]]
         Mapping from crops to their corresponding RUFAS IDs.
+    feed_storage_configs : dict[str, Any]
+        Configurations for the feed storage units.
+    feed_storage_instances : dict[str, list[str]]
+        References to the specific feed storage units to be created.
 
     Attributes
     ----------
@@ -99,6 +103,8 @@ class FeedManager:
         self,
         feed_config: dict[str, list[Any]],
         nutrient_standard: NutrientStandard,
+        feed_storage_configs: dict[str, Any],
+        feed_storage_instances: dict[str, list[str]],
     ) -> None:
         self._om = OutputManager()
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
