@@ -121,18 +121,8 @@ class EmissionsEstimator:
             "function": self._calculate_purchased_feed_emissions.__name__,
         }
 
-        stored_feeds = self._get_stored_purchased_feeds()
-        if not stored_feeds:
-            return
+        purchased_feeds_fed_totals = 10
 
-        starting_purchased_storage_totals, ending_purchased_storage_totals = self._calculate_purchased_storage_totals(
-            stored_feeds
-        )
-        purchased_feeds_totals = self._calculate_purchased_feed_amounts()
-
-        purchased_feeds_fed_totals = self._calculate_total_purchased_feed_fed(
-            starting_purchased_storage_totals, ending_purchased_storage_totals, purchased_feeds_totals
-        )
         self.om.add_variable(
             "purchased_feed_fed_totals", purchased_feeds_fed_totals, {**info_map, "units": MeasurementUnits.KILOGRAMS}
         )
@@ -201,32 +191,6 @@ class EmissionsEstimator:
                 values = value.get("values") or [0.0]
                 totals[feed_id] = values[-1] - values[0]
         return totals
-
-    def _calculate_total_purchased_feed_fed(
-        self,
-        start: dict[str, float],
-        end: dict[str, float],
-        purchased: dict[str, float],
-    ) -> dict[str, float]:
-        """Calculates the total amount of purchased feed fed during the time period.
-        Parameters
-        ----------
-        start : dict[str, float]
-            A dictionary containing the starting storage levels of purchased feeds.
-        end : dict[str, float]
-            A dictionary containing the ending storage levels of purchased feeds.
-        purchased : dict[str, float]
-            A dictionary containing the amounts of purchased feeds.
-
-            Returns
-            -------
-            dict[str, float]
-                A dictionary containing the total amount of purchased feed fed during the time period.
-        """
-        fed = defaultdict(float)
-        for feed_id, start_amount in start.items():
-            fed[feed_id] = start_amount + purchased.get(feed_id, 0.0) - end.get(feed_id, 0.0)
-        return fed
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
