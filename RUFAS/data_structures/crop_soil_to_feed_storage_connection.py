@@ -128,6 +128,18 @@ class HarvestedCrop:
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         return dry_matter_fraction * self.fresh_mass
 
+    @property
+    def is_alfalfa(self) -> bool:
+        """
+        Checks if the crop is alfalfa based on its configuration name.
+
+        Returns
+        -------
+        bool
+            True if the crop is alfalfa, False otherwise.
+        """
+        return "alfalfa" in self.config_name.lower()
+
     def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
         """Removes the specified amount of dry matter mass from the crop."""
         new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
