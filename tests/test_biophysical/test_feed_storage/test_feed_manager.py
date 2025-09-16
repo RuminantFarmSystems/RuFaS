@@ -5,9 +5,7 @@ from datetime import date, datetime, timedelta
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
-    CropCategory,
     HarvestedCrop,
-    StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NASEMFeed,
@@ -45,23 +43,22 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.CORN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    return HarvestedCrop(**sample_crop_data)
 
 
 @pytest.fixture
 def alfalfa_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.ALFALFA, **sample_crop_data_no_mass, fresh_mass=50)
+    return HarvestedCrop(**sample_crop_data_no_mass, fresh_mass=50)
 
 
 @pytest.fixture
 def corn_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.CORN, **sample_crop_data_no_mass, fresh_mass=150)
+    return HarvestedCrop(**sample_crop_data_no_mass, fresh_mass=150)
 
 
 @pytest.fixture
 def grass_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.GRASS, **sample_crop_data_no_mass, fresh_mass=100)
+    return HarvestedCrop(**sample_crop_data_no_mass, fresh_mass=100)
 
 
 @pytest.fixture
@@ -91,7 +88,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | N
     feed_manager._cumulative_farmgrown_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_purchased_feeds = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
 
-    feed_manager.active_storages = {StorageType.PILE: Pile()}
+    feed_manager.active_storages = {"example_pile": Pile()}
     feed_manager.purchased_feed_storage = PurchasedFeedStorage(mock_available_feeds)
     feed_manager._om = mocker.Mock(spec=OutputManager)
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
@@ -220,47 +217,10 @@ def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: Harvest
     try:
         feed_manager.receive_crop(
             harvested_crop=harvested_crop,
-            storage_type=StorageType.DRY,
             simulation_day=15,
         )
     except ValueError:
         pytest.fail("Unexpected ValueError raised")
-
-
-def test_receive_crop_multiple(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
-    try:
-        feed_manager.receive_crop(
-            harvested_crop=harvested_crop,
-            storage_type=StorageType.DRY,
-            simulation_day=15,
-        )
-        feed_manager.receive_crop(
-            harvested_crop=harvested_crop,
-            storage_type=StorageType.DRY,
-            simulation_day=15,
-        )
-        feed_manager.receive_crop(
-            harvested_crop=harvested_crop,
-            storage_type=StorageType.BUNKER,
-            simulation_day=15,
-        )
-        assert StorageType.DRY in feed_manager.active_storages.keys()
-        assert StorageType.BUNKER in feed_manager.active_storages.keys()
-        assert len(feed_manager.active_storages[StorageType.BUNKER].stored) == 1
-        len(feed_manager.active_storages[StorageType.DRY].stored) == 2
-    except ValueError:
-        pytest.fail("Unexpected ValueError raised")
-
-
-def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
-    incompatible_storage = StorageType.PROTECTED_WRAPPED
-    with pytest.raises(ValueError) as excinfo:
-        feed_manager.receive_crop(
-            harvested_crop=harvested_crop,
-            storage_type=incompatible_storage,
-            simulation_day=15,
-        )
-    assert "is not compatible with storage type" in str(excinfo.value)
 
 
 def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -269,7 +229,7 @@ def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) 
     mock_weather = mocker.MagicMock()
     dry_storage = mocker.MagicMock(autospec=Dry)
     pile_storage = mocker.MagicMock(autospec=Pile)
-    feed_manager.active_storages = {StorageType.DRY: dry_storage, StorageType.PILE: pile_storage}
+    feed_manager.active_storages = {"example_dry": dry_storage, "example_pile": pile_storage}
 
     feed_manager.process_degradations(mock_weather, mock_time)
 
@@ -313,7 +273,7 @@ def test_report_stored_farmgrown_feeds(
     setattr(mock_crop_5, "dry_matter_mass", 10.0)
     mock_storage_1, mock_storage_2 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile))
     mock_storage_1.stored, mock_storage_2.stored = [mock_crop_1, mock_crop_2], [mock_crop_3, mock_crop_4, mock_crop_5]
-    feed_manager.active_storages = {StorageType.DRY: mock_storage_1, StorageType.PILE: mock_storage_2}
+    feed_manager.active_storages = {"example_dry": mock_storage_1, "example_pile": mock_storage_2}
 
     feed_manager.report_stored_farmgrown_feeds(mock_time, "mock_suffix")
 
@@ -391,7 +351,7 @@ def test_get_total_projected_inventory(
 ) -> None:
     """Test that the total projected inventory is collected correctly."""
     storage_1, storage_2, storage_3 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile), MagicMock(auto_spec=Bag))
-    feed_manager.active_storages = {StorageType.DRY: storage_1, StorageType.PILE: storage_2, StorageType.BAG: storage_3}
+    feed_manager.active_storages = {"example_dry": storage_1, "example_pile": storage_2, "example_bag": storage_3}
     feed_manager._available_feeds = mock_available_feeds
 
     mocker.patch.object(
@@ -440,7 +400,7 @@ def test_get_total_projected_inventory_zero_day_in_the_future(
     """Test that the total projected inventory is collected correctly when the requested inventory date
     is the current date."""
     storage_1, storage_2, storage_3 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile), MagicMock(auto_spec=Bag))
-    feed_manager.active_storages = {StorageType.DRY: storage_1, StorageType.PILE: storage_2, StorageType.BAG: storage_3}
+    feed_manager.active_storages = {"example_dry": storage_1, "example_pile": storage_2, "example_bag": storage_3}
     feed_manager._available_feeds = mock_available_feeds
 
     mocker.patch.object(storage_1, "project_degradations", return_value=[MagicMock(auto_spec=HarvestedCrop)])
@@ -561,7 +521,7 @@ def test_query_available_feed_totals_no_stored_crops_input(
 
     storage_1, storage_2 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile))
     storage_1.stored, storage_2.stored = [feed_1], [feed_2, feed_3]
-    feed_manager.active_storages = {StorageType.DRY: storage_1, StorageType.PILE: storage_2}
+    feed_manager.active_storages = {"example_dry": storage_1, "example_pile": storage_2}
 
     mocker.patch.object(feed_manager, "_select_rufas_id_for_harvested_crop", side_effect=[1, 2, None])
 
@@ -578,69 +538,6 @@ def test_query_available_feed_totals_no_stored_crops_input(
     result = feed_manager._query_available_feed_totals([1, 2, 3], None)
 
     assert result == expected_feed_totals
-
-
-def test_query_available_feeds_no_parameters(
-    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
-) -> None:
-    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    results = feed_manager.query_available_feeds()
-    assert len(results) == 2
-    print(results)
-    assert results[0]["feed"] == CropCategory.ALFALFA
-    assert results[1]["feed"] == CropCategory.CORN
-
-
-def test_query_available_feeds_specific_crop_categories(
-    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
-) -> None:
-    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    results = feed_manager.query_available_feeds(query_crop_categories=[CropCategory.CORN])
-    assert len(results) == 1
-    assert results[0]["feed"] == CropCategory.CORN
-    assert results[0]["amount"] == 300
-
-
-def test_query_available_feeds_specific_storage_types(
-    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
-) -> None:
-    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.BUNKER, simulation_day=15)
-    results = feed_manager.query_available_feeds(query_storage_types=[StorageType.DRY])
-    assert len(results) == 1
-    assert results[0]["feed"] == CropCategory.CORN
-    assert results[0]["amount"] == 300
-
-
-def test_query_available_feeds_empty_storage(feed_manager: FeedManager) -> None:
-    results = feed_manager.query_available_feeds()
-    assert len(results) == 0
-
-
-def test_query_available_feeds_combinations(
-    feed_manager: FeedManager,
-    alfalfa_crop: HarvestedCrop,
-    corn_crop: HarvestedCrop,
-    grass_crop: HarvestedCrop,
-) -> None:
-    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.DRY, simulation_day=15)
-    feed_manager.receive_crop(corn_crop, StorageType.BUNKER, simulation_day=15)
-    feed_manager.receive_crop(grass_crop, StorageType.BALEAGE, simulation_day=15)
-    results = feed_manager.query_available_feeds(
-        query_crop_categories=[CropCategory.CORN, CropCategory.GRASS],
-        query_storage_types=[StorageType.DRY, StorageType.BALEAGE],
-    )
-    assert len(results) == 2
-    assert results[0]["feed"] == CropCategory.CORN
-    assert results[0]["amount"] == 300
 
 
 def test_purchase_feed(
@@ -733,7 +630,8 @@ def test_deduct_feeds_from_inventory(
     harvested_crop.storage_time = grown_date
     purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, purchased_amount
     purchased_feed.storage_time = purchased_date
-    feed_manager.active_storages[StorageType.PILE].stored = [harvested_crop]
+    feed_manager.active_storages["example_bag"] = Bag()
+    feed_manager.active_storages["example_bag"].stored = [harvested_crop]
     feed_manager.purchased_feed_storage.stored = [purchased_feed]
     feeds_to_deduct = {1: 75.0}
     mock_time = MagicMock(auto_spec=RufasTime)
@@ -751,7 +649,7 @@ def test_deduct_feeds_from_inventory_error(
 ) -> None:
     """Test that an error is raised correctly when too much feed is deducted from inventory."""
     harvested_crop.rufas_ids, harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = [1], 100.0, 100.0
-    feed_manager.active_storages[StorageType.PILE].stored = [harvested_crop]
+    feed_manager.active_storages["example_bag"].stored = [harvested_crop]
     feeds_to_deduct = {1: 120.0}
     mock_om = MagicMock(auto_spec=OutputManager)
     mock_om_add_variable = mocker.patch.object(mock_om, "add_variable")

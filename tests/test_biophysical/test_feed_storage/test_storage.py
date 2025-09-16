@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.biophysical.feed_storage.storage import HIGH_MOISTURE_LOSS_COEFFICIENT, Storage
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -40,8 +40,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    return HarvestedCrop(**sample_crop_data)
 
 
 @pytest.fixture
@@ -65,7 +64,7 @@ def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests the stored_mass property of Storage."""
     assert storage.stored_mass == 0.0  # Initially empty
     storage.receive_crop(harvested_crop, 15)
     storage.receive_crop(harvested_crop, 15)
@@ -73,7 +72,7 @@ def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
 
 
 def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests that a crop is successfully received into storage."""
     storage.receive_crop(harvested_crop, 15)
     assert len(storage.stored) == 1
     assert storage.stored[0].fresh_mass == harvested_crop.fresh_mass
@@ -82,7 +81,7 @@ def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop
 
 
 def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests that receiving a crop exceeding capacity raises an exception."""
     storage.capacity = 50.0  # Set a smaller capacity
     with pytest.raises(Exception) as excinfo:
         storage.receive_crop(harvested_crop, 15)
@@ -90,13 +89,14 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
-    storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
+    """Tests that receiving an unacceptable crop raises an exception."""
+    incompatible_crop = HarvestedCrop(**sample_crop_data)
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop, 15)
 
 
 def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop: HarvestedCrop) -> None:
+    """Tests that receiving a crop without acceptable crops defined raises an exception."""
     storage.acceptable_crops = []
 
     with pytest.raises(NotImplementedError) as excinfo:
@@ -106,7 +106,6 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
 
 def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: MockerFixture) -> None:
     """Ensure HIGH_MOISTURE crop triggers dry matter loss logic and records storage."""
-    storage.acceptable_crops = [CropCategory.CORN]
 
     high_moisture_crop_data = {
         "harvest_time": date(2025, 3, 7),
@@ -126,8 +125,7 @@ def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: Mock
         "ash": 6.0,
     }
 
-    category = CropCategory.CORN
-    crop = HarvestedCrop(category=category, **high_moisture_crop_data)
+    crop = HarvestedCrop(**high_moisture_crop_data)
 
     mock_remove_dm = mocker.spy(crop, "remove_dry_matter_mass")
     mock_record = mocker.patch.object(storage, "_record_stored_crops")
@@ -398,17 +396,17 @@ def test_get_total_nutritive_amount(
 
 
 @pytest.mark.parametrize(
-    "dry_matter,percentage,category,temps,expected",
+    "dry_matter,percentage,temps,expected",
     [
-        (100.0, 25.0, CropCategory.ALFALFA, [20.0] * 3, 0.1379672649553659),
-        (40.0, 20.0, CropCategory.ALFALFA, [6.0, 4.0, 6.0], 0.0208),
-        (150.0, 19.0, CropCategory.ALFALFA, [10.0] * 4, 0.0),
-        (200.0, 23.0, CropCategory.ALFALFA, [46.0, 44.0, 46.0], 0.09671999999999999),
-        (140.0, 15.0, CropCategory.CORN, [30.0, 28.0, 29.0], 0.04032),
-        (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 0.44291418402941823),
-        (55.0, 66.0, CropCategory.GRASS, [25.0] * 2, 0.0),
-        (120.0, 4.0, CropCategory.SMALL_GRAIN, [15.0], 0.0),
-        (100.0, 24.0, CropCategory.GRASS, [], 0.0),
+        (100.0, 25.0, [20.0] * 3, 0.1379672649553659),
+        (40.0, 20.0, [6.0, 4.0, 6.0], 0.0208),
+        (150.0, 19.0, [10.0] * 4, 0.0),
+        (200.0, 23.0, [46.0, 44.0, 46.0], 0.09671999999999999),
+        (140.0, 15.0, [30.0, 28.0, 29.0], 0.04032),
+        (80.0, 17.0, [30.0] * 20, 0.44291418402941823),
+        (55.0, 66.0, [25.0] * 2, 0.0),
+        (120.0, 4.0, [15.0], 0.0),
+        (100.0, 24.0, [], 0.0),
     ],
 )
 def test_calculate_dry_matter_loss_to_gas(
@@ -417,7 +415,6 @@ def test_calculate_dry_matter_loss_to_gas(
     mocker: MockerFixture,
     dry_matter: float,
     percentage: float,
-    category: CropCategory,
     temps: list[float],
     expected: float,
 ) -> None:
@@ -428,7 +425,6 @@ def test_calculate_dry_matter_loss_to_gas(
         return_value=dry_matter,
     )
     harvested_crop.dry_matter_percentage = percentage
-    harvested_crop.category = category
     mock_time = mocker.MagicMock()
 
     mock_conditions = []
