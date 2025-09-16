@@ -23,7 +23,7 @@ class DigestiveSystem:
         self.phosphorus_excreted = 0.0
         self.enteric_methane_emission = 0.0
 
-    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs, skip_methane_mitigation: bool = False) -> None:
         """
         Processes the digestion for different types of animals by calculating methane emission
         and manure excretion based on the provided digestive system inputs.
@@ -102,16 +102,30 @@ class DigestiveSystem:
             return
 
         elif digestive_system_inputs.animal_type.is_cow:
-            methane_emission = EntericMethaneCalculator.calculate_cow_methane(
-                digestive_system_inputs.is_milking,
-                digestive_system_inputs.body_weight,
-                digestive_system_inputs.fat_content,
-                digestive_system_inputs.metabolizable_energy_intake,
-                digestive_system_inputs.nutrients,
-                AnimalConfig.methane_mitigation_method,
-                AnimalConfig.methane_mitigation_additive_amount,
-                AnimalConfig.methane_model,
-            )
+            if skip_methane_mitigation:
+                methane_emission = EntericMethaneCalculator.calculate_cow_methane(
+                    digestive_system_inputs.is_milking,
+                    digestive_system_inputs.body_weight,
+                    digestive_system_inputs.fat_content,
+                    digestive_system_inputs.metabolizable_energy_intake,
+                    digestive_system_inputs.nutrients,
+                    "None",
+                    0.0,
+                    AnimalConfig.methane_model,
+                )
+                # print(f'skip_methane_mitigation = {methane_emission}')
+            else:
+                methane_emission = EntericMethaneCalculator.calculate_cow_methane(
+                    digestive_system_inputs.is_milking,
+                    digestive_system_inputs.body_weight,
+                    digestive_system_inputs.fat_content,
+                    digestive_system_inputs.metabolizable_energy_intake,
+                    digestive_system_inputs.nutrients,
+                    AnimalConfig.methane_mitigation_method,
+                    AnimalConfig.methane_mitigation_additive_amount,
+                    AnimalConfig.methane_model,
+                )
+                # print(f'methane_mitigation = {methane_emission}')
 
             phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
                 digestive_system_inputs.is_milking,

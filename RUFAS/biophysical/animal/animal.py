@@ -1281,7 +1281,7 @@ class Animal:
         )
         self.nutrients.perform_daily_phosphorus_update(nutrients_inputs)
 
-    def _daily_digestive_system_update(self) -> None:
+    def _daily_digestive_system_update(self, current_month: int) -> None:
         """
         Performs the daily digestive system updates for the animal.
 
@@ -1306,6 +1306,13 @@ class Animal:
             fat_content=MilkProduction.fat_percent,
             protein_content=self.milk_production.true_protein_content,
         )
+        # if current_month in [7, 8]:
+        #     # print(current_month)
+        #     # print("11 or 12")
+        #     self.digestive_system.process_digestion(digestive_system_inputs)
+        # else:
+        #     # print(RufasTime().current_month)
+        #     self.digestive_system.process_digestion(digestive_system_inputs, skip_methane_mitigation=True)
         self.digestive_system.process_digestion(digestive_system_inputs)
 
     def daily_milking_update(self, time: RufasTime) -> None:
@@ -1531,7 +1538,7 @@ class Animal:
 
         self._daily_nutrients_update()
 
-        self._daily_digestive_system_update()
+        self._daily_digestive_system_update(time.current_month)
 
         self.daily_milking_update(time)
 
