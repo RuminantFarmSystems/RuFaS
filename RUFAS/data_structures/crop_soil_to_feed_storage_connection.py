@@ -223,10 +223,3 @@ class HarvestedCrop:
             104 * moisture_frac**2.18 * self.bale_density**0.5 + 5.72 * moisture_frac**1.23 * self.bale_density**0.94
         )
         return heat
-
-
-# class HarvestedCropStorageType(NamedTuple):
-#     """Used to couple a yield collected in the Crop and Soil module with the storage type it will be put in."""
-
-#     harvested_crop: HarvestedCrop
-#     storage_type: StorageType

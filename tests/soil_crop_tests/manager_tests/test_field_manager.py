@@ -6,13 +6,13 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
@@ -147,8 +147,8 @@ def test_daily_update_routine(
                 field,
                 "manage_field",
                 return_value=[
-                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
-                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                    HarvestedCrop(mocker.MagicMock()),
+                    HarvestedCrop(mocker.MagicMock()),
                 ],
             )
         fm.output_gatherer.send_daily_variables = MagicMock()
