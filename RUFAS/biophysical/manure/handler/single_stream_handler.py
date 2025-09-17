@@ -113,6 +113,7 @@ class SingleStreamHandler(Handler):
         )
         degradable_volatile_solid, non_degrading_volatile_solid, total_solids = self._apply_volatile_solid_loss(
             housing_methane_emissions)
+        self._received_manure = None
         output_stream = super().process_manure(conditions, time)
         output_stream["manure"].degradable_volatile_solids = degradable_volatile_solid
         output_stream["manure"].non_degradable_volatile_solids = non_degrading_volatile_solid

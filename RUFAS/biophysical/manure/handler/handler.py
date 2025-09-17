@@ -194,6 +194,7 @@ class Handler(Processor):
 
         return {"manure": output_stream}
 
+
     def determine_handler_cleaning_water_volume(
         self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
