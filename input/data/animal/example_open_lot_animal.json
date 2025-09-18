@@ -146,7 +146,31 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "IPCC",
+		"methane_model": {
+		  "calves": {
+			"Pattanaik": true
+		  },
+		  "heiferIs": {
+			"IPCC": true
+		  },
+		  "heiferIIs": {
+			"IPCC": true
+		  },
+		  "heiferIIIs": {
+			"IPCC": true
+		  },
+          "cows": {
+            "dry cows": {
+              "IPCC": true,
+              "Mills": false
+            },
+            "lactating cows": {
+              "IPCC": true,
+              "Mutian": false,
+              "Mills": false
+            }
+          }
+	},
 	"ration": {
 		"phosphorus_requirement_buffer": 0,
 		"user_input": true,
@@ -163,9 +187,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"minutes_away_for_milking" : null,
-			"first_parlor_processor": null,
-			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "calf_pen",
@@ -185,9 +206,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "open lot",
 			"max_stocking_density": 1.2,
-			"minutes_away_for_milking" : null,
-			"first_parlor_processor": null,
-			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "grow_lot",
@@ -213,9 +231,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"minutes_away_for_milking" : null,
-			"first_parlor_processor": null,
-			"parlor_stream_name": null,
 			"manure_streams": [
 				{
 					"stream_name": "closeup_feed_alley",
