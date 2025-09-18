@@ -236,6 +236,7 @@ v0.9.2
 - [2571](https://github.com/RuminantFarmSystems/MASM/pull/2571) - [minor change] Revert manure and animal input changes from PR2552.
 - [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
 - [2563](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] Changed calculations to support multi method calculations and update inputs.
+- [2573](https://github.com/RuminantFarmSystems/MASM/pull/2573) - [minor change][Manure] Additional solids calculation changes for manure handler
 
 ### v0.9.2
 
