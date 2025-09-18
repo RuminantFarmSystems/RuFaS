@@ -1,4 +1,5 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
@@ -110,7 +111,53 @@ class SingleStreamHandler(Handler):
             MeasurementUnits.KILOGRAMS,
             time.simulation_day,
         )
-        return super().process_manure(conditions, time)
+        degradable_volatile_solid, non_degrading_volatile_solid, total_solids = self._apply_volatile_solid_loss(
+            housing_methane_emissions
+        )
+        output_stream = super().process_manure(conditions, time)
+        output_stream["manure"].degradable_volatile_solids = degradable_volatile_solid
+        output_stream["manure"].non_degradable_volatile_solids = non_degrading_volatile_solid
+        output_stream["manure"].total_solids = total_solids
+        return output_stream
+
+    def _apply_volatile_solid_loss(self, housing_methane_emission: float) -> tuple[float, float, float]:
+        """
+        Calculates the loss of volatile solids to methane emissions.
+
+        Parameters
+        ----------
+        housing_methane_emission : float
+            The amount of housing emission (kg).
+
+        Returns
+        -------
+        tuple[float, float, float]
+            The updated amount of degradable volatile solids (kg).
+            The updated amount of non-degradable volatile solids (kg).
+            The updated amount of total solids (kg).
+
+        """
+        if self.manure_stream:
+            degradable_to_total_volatile_solid_ratio = 0.0
+            if self.manure_stream.total_volatile_solids != 0.0:
+                degradable_to_total_volatile_solid_ratio = (
+                    self.manure_stream.degradable_volatile_solids / self.manure_stream.total_volatile_solids
+                )
+            total_volatile_solid_loss = ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
+            degradable_volatile_solid = max(
+                0.0,
+                self.manure_stream.degradable_volatile_solids
+                - (degradable_to_total_volatile_solid_ratio * total_volatile_solid_loss),
+            )
+            non_degrading_volatile_solid = max(
+                0.0,
+                self.manure_stream.non_degradable_volatile_solids
+                - ((1 - degradable_to_total_volatile_solid_ratio) * total_volatile_solid_loss),
+            )
+            total_solids = max(0.0, self.manure_stream.total_volatile_solids - total_volatile_solid_loss)
+            return degradable_volatile_solid, non_degrading_volatile_solid, total_solids
+        else:
+            return 0.0, 0.0, 0.0
 
     @staticmethod
     def determine_housing_methane_emissions(manure_deposition_surface_area: float, barn_temperature: float) -> float:
