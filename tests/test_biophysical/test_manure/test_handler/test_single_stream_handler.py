@@ -84,6 +84,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
     )
     mock_barn_temp = mocker.patch.object(handler, "_determine_barn_temperature", return_value=16)
     mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
+    mock_apply_solids = mocker.patch.object(handler, "_apply_volatile_solid_loss", return_value=(0.0, 0.0, 0.0))
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
@@ -94,6 +95,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
 
     assert result["manure"] == stream
     assert add_variable_patch.call_count == 2
+    mock_apply_solids.assert_called_once()
     mock_process.assert_called_once()
     mock_barn_temp.assert_called_once()
 
