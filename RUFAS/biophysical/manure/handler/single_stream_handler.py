@@ -143,7 +143,9 @@ class SingleStreamHandler(Handler):
                 degradable_to_total_volatile_solid_ratio = (
                     self.manure_stream.degradable_volatile_solids / self.manure_stream.total_volatile_solids
                 )
-            total_volatile_solid_loss = ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
+            total_volatile_solid_loss = (
+                ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
+            )
             degradable_volatile_solid = max(
                 0.0,
                 self.manure_stream.degradable_volatile_solids
