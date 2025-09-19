@@ -153,7 +153,7 @@ def lactation_inputs() -> dict[str, Any]:
             "1": {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5},
             "2": {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5},
             "3": {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5},
-        }
+        },
     }
 
 
