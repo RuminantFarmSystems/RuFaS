@@ -286,6 +286,23 @@ def test_report_feed_storage_levels(feed_manager: FeedManager, mocker: MockerFix
     mock_report_stored_feeds.assert_called_once_with(mock_time, "mock_suffix")
 
 
+def test_report_cumulative_purchased_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
+    """Test that the Feed Manager reports cumulative purchased feeds correctly."""
+    simulation_day = 100
+    feed_manager._cumulative_purchased_feeds = {
+        1: 100.0,
+        2: 200.0,
+        3: 0.0,
+        4: 50.5,
+        5: 300.25,
+    }
+
+    feed_manager.report_cumulative_purchased_feeds(simulation_day)
+    number_of_feeds_reported = len(mock_available_feeds)
+    number_of_feeds_fed_reported = len(mock_available_feeds)
+    assert feed_manager._om.add_variable.call_count == number_of_feeds_reported + number_of_feeds_fed_reported
+
+
 def test_report_stored_farmgrown_feeds(
     feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed], mocker: MockerFixture
 ) -> None:

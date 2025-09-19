@@ -7,18 +7,13 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.emissions import EmissionsEstimator
+from RUFAS.EEE.emissions import PURCHASED_FEED_FED_TOTALS_FILTER, EmissionsEstimator
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
 def em(mocker: MockerFixture) -> EmissionsEstimator:
-    # mocker.patch.object(InputManager, "get_data", return_value=[
-    #     {"name": "corn_silage", "rufas_ids": ["50", "51", "52"]},
-    #     {"name": "alfalfa_hay", "rufas_ids": ["100", "103", "106", "107", "108"]},
-    #     {"name": "wheat", "rufas_ids": []},
-    # ])
     mocker.patch.object(EmissionsEstimator, "__init__", return_value=None)
     em = EmissionsEstimator()
 
@@ -181,50 +176,10 @@ def test_estimate_emissions(
 
     em.estimate_emissions()
     mock_gather.assert_called_once()
-    mock_purchase.assert_called_once_with(homegrown_feeds)
+    mock_purchase.assert_called_once_with()
     mock_homegrown.assert_called_once_with(
         homegrown_feeds, fertilizer_applications, manure_applications, manure_requests
     )
-
-
-@pytest.mark.parametrize(
-    "homegrown_feeds,purchased_feeds,actual_purchased_feeds,actual_purchased_feed_emissions,"
-    "actual_land_use_change_emissions",
-    [
-        (
-            [{"feed1": 5, "feed2": 2.6}, {"feed3": 9.24, "feed4": 7.7}],
-            {"feed5": 5.3, "feed6": 7.6},
-            {"feed7": 5.6, "feed8": 7.95},
-            {"emission1": 5.6, "emission2": 7.95},
-            {"emission1": 5.6, "emission2": 7.95},
-        )
-    ],
-)
-def test_calculate_purchased_feed_emissions(
-    homegrown_feeds: list[dict[str, Any]],
-    purchased_feeds: dict[str, float],
-    actual_purchased_feeds: dict[str, float],
-    actual_purchased_feed_emissions: dict[str, float],
-    actual_land_use_change_emissions: dict[str, float],
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-) -> None:
-    """Tests the calculation of purchased feed emissions."""
-    mock_add = mocker.patch.object(OutputManager, "add_variable")
-    mock_gather_feeds = mocker.patch.object(em, "_gather_ration_feed_totals", return_value=purchased_feeds)
-    mock_calc_actual = mocker.patch.object(em, "_calculate_actual_purchased_feeds", return_value=actual_purchased_feeds)
-    mock_calc_actual_emission = mocker.patch.object(
-        em,
-        "_calculate_actual_purchased_feed_emissions",
-        return_value=(actual_purchased_feed_emissions, actual_land_use_change_emissions),
-    )
-
-    em._calculate_purchased_feed_emissions(homegrown_feeds)
-
-    assert mock_add.call_count == 3
-    mock_gather_feeds.assert_called_once()
-    mock_calc_actual.assert_called_once_with(homegrown_feeds, purchased_feeds)
-    mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
 
 
 def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: EmissionsEstimator) -> None:
@@ -311,26 +266,69 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
     )
 
 
-def test_gather_ration_feed_totals(mocker: MockerFixture, em: EmissionsEstimator) -> None:
-    """
-    Test that the totals of feeds from rations given to animals in the last 365 days of the simulation are correct.
-    """
-    mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value={"test": {"values": [2, 3, 4]}})
-
-    expected = {"test": 9.0}
-
-    observed = em._gather_ration_feed_totals()
-
-    assert observed == expected
-    mock_filter.assert_called_once_with(
-        {
-            "name": "Feed Ration Totals",
-            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-            "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
-            "variables": [r"^\d+$"],
-            "slice_start": -365,
-        }
+@pytest.mark.parametrize(
+    "pool_input,expected_totals",
+    [
+        # Case 1: Feeds present → sums values and ignores non-matching keys
+        (
+            {
+                "whatever_50_fed_total": {"values": [100.0, 40.0]},
+                "purchased_feed_ignored_key": {"values": [1.0]},
+                "x_60_fed_daily": {"values": [10.0, 5.0, 5.0]},
+            },
+            {"50": 140.0, "60": 20.0},
+        ),
+        # Case 2: Empty pool → empty totals dict
+        (
+            {},
+            {},
+        ),
+        # Case 3: Matching key but values=None → treated as [0.0]
+        (
+            {
+                "something_42_fed_xyz": {"values": None},
+            },
+            {"42": 0.0},
+        ),
+    ],
+)
+def test_calculate_purchased_feed_emissions(
+    em: "EmissionsEstimator",
+    mocker: "MockerFixture",
+    pool_input: dict[str, Any],
+    expected_totals: dict[str, float],
+) -> None:
+    mock_filter = mocker.patch.object(
+        em.om, "filter_variables_pool", return_value=pool_input
     )
+    mock_calc_emissions = mocker.patch.object(
+        em, "_calculate_emissions", return_value=(400.0, 50.0)
+    )
+    mock_add_var = mocker.patch.object(em.om, "add_variable")
+
+    # RUN
+    em._calculate_purchased_feed_emissions()
+
+    mock_filter.assert_called_once_with(PURCHASED_FEED_FED_TOTALS_FILTER)
+    mock_calc_emissions.assert_called_once_with(expected_totals)
+    assert mock_add_var.call_count == 3
+
+    calls = mock_add_var.call_args_list
+    assert calls[0].args[0] == "purchased_feed_fed_totals"
+    assert calls[0].args[1] == expected_totals
+
+    assert calls[1].args[0] == "total_purchased_feed_emissions"
+    assert calls[1].args[1] == 400.0
+
+    assert calls[2].args[0] == "total_land_use_change_emissions"
+    assert calls[2].args[1] == 50.0
+
+    # (Optional) sanity-check that the info_map passed includes the function name
+    # while not asserting the entire dict structure.
+    for c in calls:
+        info_map = c.args[2]
+        assert isinstance(info_map, dict)
+        assert info_map.get("function") == em._calculate_purchased_feed_emissions.__name__
 
 
 def test_transform_outputs_to_list_of_dicts(em: EmissionsEstimator) -> None:
@@ -389,34 +387,6 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(
         )
 
 
-@pytest.mark.parametrize(
-    "purchased_feeds,expected",
-    [
-        ({"100": 300.0, "random": 500.0, "not in list": 50.0}, {"100": 100.0, "random": 500.0, "not in list": 50.0}),
-        ({"100": 100.0, "random": 500.0, "not in list": 50.0}, {"100": 0.0, "random": 500.0, "not in list": 50.0}),
-    ],
-)
-def test_calculate_actual_purchased_feeds(
-    purchased_feeds: dict[str, float], expected: dict[str, float], mocker: MockerFixture, em: EmissionsEstimator
-) -> None:
-    """Tests that the amount of actual purchased feeds were calculated correctly."""
-    homegrown_feeds = [
-        {"crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": "alfalfa_hay", "total_dry_yield": 10, "dry_matter_content": 0.9},
-        {"crop": "alfalfa_hay", "total_dry_yield": 10, "dry_matter_content": 0.9},
-    ]
-
-    mock_totals = mocker.patch.object(
-        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={"alfalfa_hay": 200}
-    )
-
-    observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-
-    assert observed == expected
-    mock_totals.assert_called_once_with(homegrown_feeds)
-
-
 def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests that the amount of homegrown feeds for all the crop types were calculated correctly."""
     homegrown_feeds = [
@@ -442,7 +412,7 @@ def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixtu
     )
 
 
-def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
+def test_calculate_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Test the amount of purchased feed emissions with no errors."""
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
     mock_get_feed_data = mocker.patch.object(
@@ -451,7 +421,7 @@ def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture, em: Em
 
     expected = ({"100": 263.0}, {"100": 263.0})
 
-    observed = em._calculate_actual_purchased_feed_emissions({"100": 10})
+    observed = em._calculate_emissions({"100": 10})
 
     assert observed == expected
     calls = [
@@ -482,7 +452,7 @@ def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture, em: Em
         ),
     ],
 )
-def test_calculate_actual_purchased_feed_emissions_no_key(
+def test_calculate_emissions_no_key(
     msg_name: str, message: str, emissions: list[dict[str, float]], mocker: MockerFixture, em: EmissionsEstimator
 ) -> None:
     """Test the amount of purchased feed emissions with key errors."""
@@ -491,7 +461,7 @@ def test_calculate_actual_purchased_feed_emissions_no_key(
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
     mock_get_feed_data = mocker.patch.object(em, "_get_feed_emissions_data", side_effect=emissions)
 
-    em._calculate_actual_purchased_feed_emissions({"100": 10})
+    em._calculate_emissions({"100": 10})
 
     calls = [
         call(94545, {"emission1": 1.0}),
@@ -506,7 +476,7 @@ def test_calculate_actual_purchased_feed_emissions_no_key(
     mock_get_data.assert_has_calls(calls)
     info_map = {
         "class": "EmissionsEstimator",
-        "function": "_calculate_actual_purchased_feed_emissions",
+        "function": "_calculate_emissions",
     }
     mock_add.assert_called_once_with(msg_name, message, info_map)
 
