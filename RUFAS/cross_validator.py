@@ -102,7 +102,7 @@ class CrossValidator:
                     {
                         "error": "Unsupported Target and Save Block Content",
                         "message": "Only constants or variables keys' content will be processed for retrieving and"
-                                   f" saving values. Unsupported keys {section} provided.",
+                        f" saving values. Unsupported keys {section} provided.",
                         "info_map": {
                             "class": CrossValidator.__name__,
                             "function": CrossValidator._check_target_and_save_block.__name__,
