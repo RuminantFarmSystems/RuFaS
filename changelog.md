@@ -234,6 +234,7 @@ v0.9.2
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
 - [2567](https://github.com/RuminantFarmSystems/MASM/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
 - [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
+- [2574](https://github.com/RuminantFarmSystems/MASM/pull/2574) - [minor change] [Cross Validation] Implement alias pool functions in the cross validator.
 
 ### v0.9.2
 
