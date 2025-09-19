@@ -68,22 +68,6 @@ def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]])
     assert len(cv._event_logs) == 0
 
 
-@pytest.mark.parametrize(
-    "block",
-    [
-        ({"variables": {}, "constants": {}}),
-        ({"variables": {"x": "A1"}, "constants": {}}),
-        ({"variables": {}, "constants": {"k": "K1"}}),
-        ({}),
-    ],
-)
-def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]]) -> None:
-    """Should not append errors when only allowed keys are present."""
-    cv = CrossValidator()
-    cv._check_target_and_save_block(block)
-    assert len(cv._event_logs) == 0
-
-
 def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None:
     """Sanity check: when multiple invalid keys exist, logs each (not a single aggregated one)."""
     cv = CrossValidator()
