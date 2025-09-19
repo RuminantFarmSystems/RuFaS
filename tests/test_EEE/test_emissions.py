@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.EEE.emissions import EmissionsEstimator
+from RUFAS.EEE.emissions import PURCHASED_FEED_FED_TOTALS_FILTER, EmissionsEstimator
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -267,223 +267,68 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
 
 
 @pytest.mark.parametrize(
-    "stored_feeds,expect_processing",
+    "pool_input,expected_totals",
     [
-        # Case 1: Feeds present → expect full processing
+        # Case 1: Feeds present → sums values and ignores non-matching keys
         (
-            {"stored_feed_50_daily_storage_levels": {"values": [100.0, 40.0]}},
-            True,
+            {
+                "whatever_50_fed_total": {"values": [100.0, 40.0]},
+                "purchased_feed_ignored_key": {"values": [1.0]},
+                "x_60_fed_daily": {"values": [10.0, 5.0, 5.0]},
+            },
+            {"50": 140.0, "60": 20.0},
         ),
-        # Case 2: No feeds → expect early return
+        # Case 2: Empty pool → empty totals dict
         (
             {},
-            False,
+            {},
+        ),
+        # Case 3: Matching key but values=None → treated as [0.0]
+        (
+            {
+                "something_42_fed_xyz": {"values": None},
+            },
+            {"42": 0.0},
         ),
     ],
 )
 def test_calculate_purchased_feed_emissions(
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-    stored_feeds: dict[str, Any],
-    expect_processing: bool,
-) -> None:
-    """Tests _calculate_purchased_feed_emissions() for both feed-present and feed-empty cases."""
-
-    mock_get_stored = mocker.patch.object(em, "_get_stored_purchased_feeds", return_value=stored_feeds)
-    mock_calc_totals = mocker.patch.object(em, "_calculate_purchased_storage_totals", return_value=({"50": 100.0},
-                                                                                                    {"50": 40.0}))
-    mock_calc_purchased = mocker.patch.object(em, "_calculate_purchased_feed_amounts", return_value={"50": 20.0})
-    mock_calc_fed = mocker.patch.object(em, "_calculate_total_purchased_feed_fed", return_value={"50": 80.0})
-    mock_calc_emissions = mocker.patch.object(em, "_calculate_emissions", return_value=(400.0, 50.0))
-    mock_add_var = mocker.patch.object(em.om, "add_variable")
-
-    em._calculate_purchased_feed_emissions()
-
-    mock_get_stored.assert_called_once()
-
-    if expect_processing:
-        mock_calc_totals.assert_called_once_with(stored_feeds)
-        mock_calc_purchased.assert_called_once()
-        mock_calc_fed.assert_called_once_with({"50": 100.0}, {"50": 40.0}, {"50": 20.0})
-        mock_calc_emissions.assert_called_once_with({"50": 80.0})
-        assert mock_add_var.call_count == 3
-    else:
-        mock_calc_totals.assert_not_called()
-        mock_calc_purchased.assert_not_called()
-        mock_calc_fed.assert_not_called()
-        mock_calc_emissions.assert_not_called()
-        mock_add_var.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "stored_feeds, expect_warning",
-    [
-        ({"stored_feed_50_daily_storage_levels": {"values": [100.0, 40.0]}}, False),
-        ({}, True),
-    ],
-)
-def test_get_stored_purchased_feeds(
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-    stored_feeds: dict[str, Any],
-    expect_warning: bool,
-) -> None:
-    """Tests _get_stored_purchased_feeds() with and without available stored feeds."""
-
-    mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value=stored_feeds)
-    mock_warning = mocker.patch.object(em.om, "add_warning")
-
-    result = em._get_stored_purchased_feeds()
-
-    mock_filter.assert_called_once()
-    assert result == stored_feeds
-
-    if expect_warning:
-        mock_warning.assert_called_once()
-    else:
-        mock_warning.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "stored_feeds, expected_start, expected_end",
-    [
-        (
-            # Case 1: valid key matches regex
-            {"stored_feed_50_daily_storage_levels": {"values": [100.0, 40.0]}},
-            {"50": 100.0},
-            {"50": 40.0},
-        ),
-        (
-            # Case 2: key doesn't match pattern
-            {"stored_feed_50_levels": {"values": [90.0, 20.0]}},
-            {},
-            {},
-        ),
-        (
-            # Case 3: missing or empty values list
-            {"stored_feed_99_daily_storage_levels": {"values": []}},
-            {"99": 0.0},
-            {"99": 0.0},
-        ),
-        (
-            # Case 4: no "values" key at all
-            {"stored_feed_88_daily_storage_levels": {}},
-            {"88": 0.0},
-            {"88": 0.0},
-        ),
-    ],
-)
-def test_calculate_purchased_storage_totals(
-    em: EmissionsEstimator,
-    stored_feeds: dict[str, Any],
-    expected_start: dict[str, float],
-    expected_end: dict[str, float],
-) -> None:
-    """Tests _calculate_purchased_storage_totals() with various feed data inputs."""
-    start, end = em._calculate_purchased_storage_totals(stored_feeds)
-
-    assert start == expected_start
-    assert end == expected_end
-
-
-@pytest.mark.parametrize(
-    "purchased_feeds, expected_totals",
-    [
-        (
-            # Case 1: normal case with valid key and values
-            {"feed_50_purchased_to_date": {"values": [100.0, 140.0]}},
-            {"50": 40.0},
-        ),
-        (
-            # Case 2: invalid key (doesn't match regex)
-            {"feed50_purchase_summary": {"values": [20.0, 80.0]}},
-            {},
-        ),
-        (
-            # Case 3: values list is empty
-            {"feed_51_purchased_to_date": {"values": []}},
-            {"51": 0.0},
-        ),
-        (
-            # Case 4: values key missing
-            {"feed_52_purchased_to_date": {}},
-            {"52": 0.0},
-        ),
-        (
-            # Case 5: multiple valid feeds
-            {
-                "feed_60_purchased_to_date": {"values": [50.0, 75.0]},
-                "feed_61_purchased_to_date": {"values": [0.0, 30.0]},
-            },
-            {"60": 25.0, "61": 30.0},
-        ),
-    ],
-)
-def test__calculate_purchased_feed_amounts(
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-    purchased_feeds: dict[str, Any],
+    em: "EmissionsEstimator",
+    mocker: "MockerFixture",
+    pool_input: dict[str, Any],
     expected_totals: dict[str, float],
 ) -> None:
-    """Tests _calculate_purchased_feed_amounts() for regex matching and value handling."""
-    mocker.patch.object(em.om, "filter_variables_pool", return_value=purchased_feeds)
+    mock_filter = mocker.patch.object(
+        em.om, "filter_variables_pool", return_value=pool_input
+    )
+    mock_calc_emissions = mocker.patch.object(
+        em, "_calculate_emissions", return_value=(400.0, 50.0)
+    )
+    mock_add_var = mocker.patch.object(em.om, "add_variable")
 
-    result = em._calculate_purchased_feed_amounts()
+    # RUN
+    em._calculate_purchased_feed_emissions()
 
-    assert result == expected_totals
+    mock_filter.assert_called_once_with(PURCHASED_FEED_FED_TOTALS_FILTER)
+    mock_calc_emissions.assert_called_once_with(expected_totals)
+    assert mock_add_var.call_count == 3
 
+    calls = mock_add_var.call_args_list
+    assert calls[0].args[0] == "purchased_feed_fed_totals"
+    assert calls[0].args[1] == expected_totals
 
-@pytest.mark.parametrize(
-    "start, end, purchased, expected_fed",
-    [
-        (
-            # Case 1: all values present
-            {"50": 100.0},
-            {"50": 40.0},
-            {"50": 20.0},
-            {"50": 80.0},
-        ),
-        (
-            # Case 2: purchased value missing
-            {"51": 50.0},
-            {"51": 30.0},
-            {},
-            {"51": 20.0},
-        ),
-        (
-            # Case 3: end value missing
-            {"52": 60.0},
-            {},
-            {"52": 10.0},
-            {"52": 70.0},
-        ),
-        (
-            # Case 4: multiple feed IDs
-            {"60": 30.0, "61": 40.0},
-            {"60": 10.0, "61": 20.0},
-            {"60": 5.0, "61": 15.0},
-            {"60": 25.0, "61": 35.0},
-        ),
-        (
-            # Case 5: empty inputs
-            {},
-            {},
-            {},
-            {},
-        ),
-    ],
-)
-def test_calculate_total_purchased_feed_fed(
-    em: EmissionsEstimator,
-    start: dict[str, float],
-    end: dict[str, float],
-    purchased: dict[str, float],
-    expected_fed: dict[str, float],
-) -> None:
-    """Tests _calculate_total_purchased_feed_fed() with various input combinations."""
-    result = em._calculate_total_purchased_feed_fed(start, end, purchased)
+    assert calls[1].args[0] == "total_purchased_feed_emissions"
+    assert calls[1].args[1] == 400.0
 
-    assert result == expected_fed
+    assert calls[2].args[0] == "total_land_use_change_emissions"
+    assert calls[2].args[1] == 50.0
+
+    # (Optional) sanity-check that the info_map passed includes the function name
+    # while not asserting the entire dict structure.
+    for c in calls:
+        info_map = c.args[2]
+        assert isinstance(info_map, dict)
+        assert info_map.get("function") == em._calculate_purchased_feed_emissions.__name__
 
 
 def test_transform_outputs_to_list_of_dicts(em: EmissionsEstimator) -> None:

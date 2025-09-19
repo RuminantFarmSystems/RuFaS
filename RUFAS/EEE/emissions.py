@@ -15,12 +15,6 @@ FINAL_DAY_SLICE_START = -1
 PURCHASED_FEED_FED_TOTALS_FILTER = {
     "name": "Purchased Feed Totals",
     "description": "Gathers the amounts of purchased feeds fed in final year.",
-    "filters": [".*purchased_feed_.*fed_to_date.*"],
-    "slice_start": SLICE_START,
-}
-DEDUCTED_FEED_FED_TOTALS_FILTER = {
-    "name": "Purchased Feed Totals",
-    "description": "Gathers the amounts of purchased feeds fed in final year.",
     "filters": [".*_deduct_feeds_from_inventory.purchased_feed_.*"],
     "slice_start": SLICE_START,
 }
@@ -119,26 +113,13 @@ class EmissionsEstimator:
             "function": self._calculate_purchased_feed_emissions.__name__,
         }
 
-        purchased_feeds_deducted = self.om.filter_variables_pool(DEDUCTED_FEED_FED_TOTALS_FILTER)
-        purchased_feeds_deducted_fed_totals = defaultdict(float)
-        for key, value in purchased_feeds_deducted.items():
-            if match := re.search('_(\\d+)_fed.*', key):
-                feed_id = match.group(1)
-                values = value.get("values") or [0.0]
-                purchased_feeds_deducted_fed_totals[feed_id] = sum(values)
-        print(purchased_feeds_deducted_fed_totals)
-        print("whoa")
-
         purchased_feeds_fed = self.om.filter_variables_pool(PURCHASED_FEED_FED_TOTALS_FILTER)
         purchased_feeds_fed_totals = defaultdict(float)
         for key, value in purchased_feeds_fed.items():
-            if match := re.search(PURCHASED_FEED_PATTERN, key):
+            if match := re.search('_(\\d+)_fed.*', key):
                 feed_id = match.group(1)
                 values = value.get("values") or [0.0]
-                purchased_feeds_fed_totals[feed_id] = values[-1] - values[0]
-
-        print(purchased_feeds_fed_totals)
-        print("whoa")
+                purchased_feeds_fed_totals[feed_id] = sum(values)
 
         self.om.add_variable(
             "purchased_feed_fed_totals", purchased_feeds_fed_totals, {**info_map, "units": MeasurementUnits.KILOGRAMS}
