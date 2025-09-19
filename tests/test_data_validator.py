@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator
 
 
 def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
