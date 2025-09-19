@@ -114,7 +114,7 @@ class EmissionsEstimator:
         }
 
         purchased_feeds_fed = self.om.filter_variables_pool(PURCHASED_FEED_FED_TOTALS_FILTER)
-        purchased_feeds_fed_totals = defaultdict(float)
+        purchased_feeds_fed_totals: defaultdict[str, float] = defaultdict(float)
         for key, value in purchased_feeds_fed.items():
             if match := re.search("_(\\d+)_fed.*", key):
                 feed_id = match.group(1)
