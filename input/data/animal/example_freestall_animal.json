@@ -8,7 +8,6 @@
 	"replace_num": 500,
 	"herd_num": 100,
 	"breed": "HO",
-	"lactating_fraction": 0.85,
 	"parity_fractions": {
 		"1": 0.36,
 		"2": 0.262,
