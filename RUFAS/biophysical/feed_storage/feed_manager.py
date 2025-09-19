@@ -92,7 +92,7 @@ class FeedManager:
     ) -> None:
         self._om = OutputManager()
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
-        self.active_storages: dict[StorageType, Storage] = {}
+        self.active_storages: dict[str, Storage] = {}
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
@@ -150,12 +150,23 @@ class FeedManager:
 
         instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
 
+        available_rufas_ids: list[int] = [feed.rufas_id for feed in self.available_feeds]
         for instance_name in instance_names:
             storage_config = configs_by_name.get(instance_name)
             storage_type_str = storage_config.get("storage_type")
             storage_class = StorageType.get_storage_class(storage_type_str)
             storage = storage_class(storage_config)
             self.active_storages[instance_name] = storage
+            if storage.rufas_feed_id not in available_rufas_ids:
+                self._om.add_warning(
+                    "Storage RuFaS ID Warning",
+                    f"Storage '{storage.storage_name}' has a RuFaS ID '{storage.rufas_feed_id}' that is not mapped "
+                    "to any feed listed in the available feeds. This storage will not be used for feeding.",
+                    {
+                        "class": self.__class__.__name__,
+                        "function": self.receive_crop.__name__,
+                    },
+                )
 
     def report_feed_manager_balance(self, simulation_day: int) -> None:
         """Reports the balance of feed purchased, requested, and fed to date."""

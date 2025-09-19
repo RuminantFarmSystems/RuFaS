@@ -104,7 +104,7 @@ class Storage:
     def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
         self.capacity = capacity
         self.stored: list[HarvestedCrop] = []
-        self.storage_name = storage_config.get("storage_name")
+        self.storage_name = storage_config.get("name")
         self.field_name = storage_config.get("field_name")
         self.crop_name = storage_config.get("crop_name")
         self.rufas_feed_id = storage_config.get("rufas_id")
