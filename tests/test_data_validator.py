@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator
 
 
 def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
@@ -1995,3 +1995,72 @@ def test_extract_input_data_by_key_list_key_error(
         var_name=var_name,
         called_during_initialization=called_during_initialization,
     )
+
+
+@pytest.mark.parametrize(
+    "alias_name,value,expected_pool",
+    [("test1", 16.4, {"test1": 16.4}), ("test2", 924.6, {"test1": 13, "test2": 924.6})],
+)
+def test_save_to_alias_pool(alias_name: str, value: Any, expected_pool: dict[str, Any]) -> None:
+    validator = CrossValidator()
+    validator._alias_pool = {"test1": 13}
+    validator._save_to_alias_pool(alias_name, value)
+    assert validator._alias_pool == expected_pool
+
+
+@pytest.mark.parametrize(
+    "pool,alias,expected",
+    [
+        ({"a": 1}, "a", 1),
+        ({"x": "Y", "z": 3.14}, "x", "Y"),
+    ],
+)
+def test_get_alias_value_returns(pool: dict[str, Any], alias: str, expected: Any) -> None:
+    v = CrossValidator()
+    v._alias_pool = dict(pool)
+    assert v._get_alias_value(alias) == expected
+
+
+def test_get_alias_value_raises_key_error_when_missing() -> None:
+    v = CrossValidator()
+    v._alias_pool = {"exists": 10}
+
+    result = v._get_alias_value("missing")
+
+    assert result is None
+    assert len(v._event_logs) == 1
+
+
+def test_target_and_save(mocker: MockerFixture) -> None:
+    v = CrossValidator()
+    mock_save = mocker.patch.object(v, "_save_to_alias_pool")
+    v._target_and_save({"a": 1, "b": 1, "c": "value"})
+
+    assert mock_save.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        ({"variables": {}, "constants": {}}),
+        ({"variables": {"x": "A1"}, "constants": {}}),
+        ({"variables": {}, "constants": {"k": "K1"}}),
+        ({}),
+    ],
+)
+def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]]) -> None:
+    """Should not append errors when only allowed keys are present."""
+    cv = CrossValidator()
+    cv.check_target_and_save_block(block)
+    assert len(cv._event_logs) == 0
+
+
+def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None:
+    """Sanity check: when multiple invalid keys exist, logs each (not a single aggregated one)."""
+    cv = CrossValidator()
+    block = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+
+    cv.check_target_and_save_block(block)
+
+    assert len(cv._event_logs) == 3
+    assert all(any(f"Unsupported keys {k} provided." in e["message"] for e in cv._event_logs) for k in ("a", "b", "c"))
