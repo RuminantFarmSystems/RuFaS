@@ -254,6 +254,12 @@ def test_daily_simulation(
     mocker.patch.object(simulation_engine.feed_manager, "report_feed_storage_levels")
     mocker.patch.object(simulation_engine.feed_manager, "report_cumulative_purchased_feeds")
     mock_calc_emissions = mocker.patch.object(simulation_engine.emissions_estimator, "calculate_emissions")
+    mock_report_cumulative_purchased_feeds = mocker.patch.object(
+        simulation_engine.feed_manager, "report_cumulative_purchased_feeds"
+    )
+    mock_report_feed_storage_levels = mocker.patch.object(
+        simulation_engine.feed_manager, "report_feed_storage_levels"
+    )
 
     # Act
     simulation_engine._daily_simulation()
@@ -309,10 +315,10 @@ def test_daily_simulation(
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
     mock_advance_time.assert_called_once_with()
-    simulation_engine.feed_manager.report_feed_storage_levels.assert_called_once_with(
+    mock_report_feed_storage_levels.assert_called_once_with(
         simulation_engine.time.simulation_day, "daily_storage_levels"
     )
-    simulation_engine.feed_manager.report_cumulative_purchased_feeds.assert_called_once_with(
+    mock_report_cumulative_purchased_feeds.assert_called_once_with(
         simulation_engine.time.simulation_day
     )
     mock_calc_emissions.assert_called_once_with({})
