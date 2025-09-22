@@ -295,7 +295,7 @@ class HerdManager:
         """
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
-            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen.values())
+            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen)
 
         return total_requested_feed
 
@@ -559,7 +559,6 @@ class HerdManager:
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-
         self._update_herd_structure(
             graduated_animals=graduated_animals,
             newborn_calves=newborn_calves,
