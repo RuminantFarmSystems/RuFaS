@@ -9,7 +9,7 @@ from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
-from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState
+from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState, CrossValidator
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -3196,3 +3196,17 @@ def test_delete_data_metadata_not_found(
     mock_add_error.assert_called_once()
     args, kwargs = mock_add_error.call_args
     assert args[0] == "Validation: metadata not found"
+
+
+def test_extract_target_and_save_block(mocker: MockerFixture) -> None:
+    """Tests the function to extract the target and save block."""
+    im = InputManager()
+    mock_check = mocker.patch.object(CrossValidator, "check_target_and_save_block")
+    mock_get_data = mocker.patch.object(im, "get_data", return_value=1)
+    result = im.extract_target_and_save_block(
+        {"variables": {"a": "test.address.1", "b": "test.address.2"}, "constants": {"c": "value"}}
+    )
+
+    assert result == {"a": 1, "b": 1, "c": "value"}
+    mock_check.assert_called_once()
+    assert mock_get_data.call_count == 2

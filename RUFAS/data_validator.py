@@ -1658,7 +1658,7 @@ class CrossValidator:
         value : Any
             The value to be saved.
         """
-        pass
+        self._alias_pool[alias_name] = value
 
     def _get_alias_value(self, alias_name: str) -> Any:
         """
@@ -1674,8 +1674,22 @@ class CrossValidator:
         Any
             The value associated with the specified alias name from the alias pool.
         """
+        try:
+            return self._alias_pool[alias_name]
+        except KeyError:
+            self._event_logs.append(
+                {
+                    "error": "Alias name not found.",
+                    "message": f"{alias_name} doe not exits in the alias pool of cross validator.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._get_alias_value.__name__,
+                    },
+                }
+            )
+            return None
 
-    def _target_and_save(self, target_and_save_block: dict[str, dict[str, Any]]) -> None:
+    def _target_and_save(self, target_and_save_result: dict[str, Any]) -> None:
         """
         This function handles the "target and save block" in the cross-validation rule.
         It retrieves the value of the target variable from the InputManager variable pool
@@ -1684,10 +1698,28 @@ class CrossValidator:
 
         Parameters
         ----------
-        target_and_save_block : dict[str, dict[str, Any]]
+        target_and_save_result : dict[str, dict[str, Any]]
             A dictionary containing the "target and save block" of the cross-validation rule.
+
         """
-        pass
+        for alias_key, value in target_and_save_result.items():
+            self._save_to_alias_pool(alias_key, value)
+
+    def check_target_and_save_block(self, target_and_save_block: dict[str, dict[str, Any]]) -> None:
+        """Check if the target and save block is valid."""
+        for section in target_and_save_block.keys():
+            if section not in ["variables", "constants"]:
+                self._event_logs.append(
+                    {
+                        "error": "Unsupported Target and Save Block Content",
+                        "message": "Only constants or variables keys' content will be processed for retrieving and"
+                        f" saving values. Unsupported keys {section} provided.",
+                        "info_map": {
+                            "class": CrossValidator.__name__,
+                            "function": CrossValidator.check_target_and_save_block.__name__,
+                        },
+                    }
+                )
 
     def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool) -> tuple[Any, bool]:
         """
