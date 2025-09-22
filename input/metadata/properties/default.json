@@ -3949,6 +3949,12 @@
         }
       }
     },
+    "milk_reduction_maximum": {
+      "type": "number",
+      "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
+      "minimum": 0,
+      "maximum": 50
+    },
     "user_defined_ration_percentages": {
       "type": "object",
       "description": "User Defined Ration Percentages",
@@ -4038,12 +4044,6 @@
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
-      },
-      "milk_reduction_maximum": {
-        "type": "number",
-        "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
-        "minimum": 0,
-        "maximum": 50
       }
     },
     "allowances": {
