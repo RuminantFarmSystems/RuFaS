@@ -1704,7 +1704,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            The result of the expression and a boolean indicating whether the expression was successfully evaluated.
+            The result of the expression evaluation and a boolean indicating whether the expression was
+            successfully evaluated.
 
         Notes
         -----
@@ -1722,7 +1723,8 @@ class CrossValidator:
             self._event_logs.append(
                 {
                     "error": "Unknown Operation",
-                    "message": f"Unknown operation {operation} in cross validation rule.",
+                    "message": f"Unknown operation {operation} in cross validation rule. Expected one of "
+                    f"{list(AGGREGATION_FUNCTIONS.keys())}.",
                     "info_map": {
                         "class": CrossValidator.__name__,
                         "function": CrossValidator._evaluate_expression.__name__,
@@ -1734,14 +1736,28 @@ class CrossValidator:
             else:
                 return None, False
 
-        ordered_variables: list[str] = expression_block.get("ordered_variables", [])
+        if not (ordered_variable_alias := expression_block.get("ordered_variables", [])):
+            self._event_logs.append(
+                {
+                    "error": "Missing Ordered Variables",
+                    "message": "Ordered variables list is empty or missing in cross validation rule.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Ordered variables list is empty or missing in cross validation rule.")
+            else:
+                return None, False
         ordered_values: list[Any] = []
-        for alias_name in ordered_variables:
+        for alias_name in ordered_variable_alias:
             value = self._get_alias_value(alias_name)
             ordered_values.append(value)
 
-        if isinstance(ordered_values[0], (list, dict)):
-            if not self._validate_expression_block_with_complex_variable(
+        if any(isinstance(value, (list, dict)) for value in ordered_values):
+            if not self._validate_expression_block_with_complex_variable_values(
                 expression_block, ordered_values, eager_termination
             ):
                 return None, False
@@ -1757,7 +1773,7 @@ class CrossValidator:
             self._save_to_alias_pool(alias_name=save_as_alise_name, value=result)
         return result, True
 
-    def _validate_expression_block_with_complex_variable(
+    def _validate_expression_block_with_complex_variable_values(
         self, expression_block: dict[str, Any], ordered_values: list[Any], eager_termination: bool
     ) -> bool:
         """
