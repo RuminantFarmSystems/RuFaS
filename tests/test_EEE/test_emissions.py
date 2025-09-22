@@ -75,64 +75,53 @@ def fertilizer_applications_data() -> list[dict[str, Any]]:
 
 
 def test_emissions_estimator_init(mocker: MockerFixture) -> None:
-    # Patch the classes where EmissionsEstimator imports them
-    mocker.patch("RUFAS.EEE.emissions.OutputManager")  # no-op logger in tests
+    """Tests the initialization of EmissionsEstimator, especially the crop_species_to_purchased_feed_id mapping."""
+    mocker.patch("RUFAS.EEE.emissions.OutputManager")
     im_cls = mocker.patch("RUFAS.EEE.emissions.InputManager")
     im = im_cls.return_value
-
-    # What the constructor will ask for:
-    # 1) county code (an int)
     county_code = 11111
 
-    # 2) purchased feed emissions payload
-    #    _get_feed_emissions_data(...) expects something like:
-    #    {"county_code": [11111, ...], "emissions": [ {...}, ... ]}
-    #    and it will pick the emissions dict at the index where county_code matches.
     purchased_feed_emissions_data = {
         "county_code": [county_code],
         "emissions": [
-            {"50": 1.0, "51": 2.0, "52": 3.0}  # minimal plausible mapping
+            {"50": 1.0, "51": 2.0, "52": 3.0}
         ],
     }
 
-    # 3) land use change emissions payload with the same shape
-    luc_emissions_data = {
+    land_use_change_emissions_data = {
         "county_code": [county_code],
         "emissions": [
             {"50": 0.1, "51": 0.2, "52": 0.3}
         ],
     }
 
-    # 4) crop configurations list (this is what you wanted to validate)
     crop_configs = [
         {"name": "corn_silage", "rufas_ids": ["50", "51", "52"]},
         {"name": "alfalfa_hay", "rufas_ids": ["100", "103", "106", "107", "108"]},
         {"name": "wheat", "rufas_ids": []},
     ]
 
-    def get_data_side_effect(key: str):
+    def get_data_side_effect(key: str) -> Any:
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
             return purchased_feed_emissions_data
         if key == "purchased_feed_land_use_change_emissions":
-            return luc_emissions_data
+            return land_use_change_emissions_data
         if key == "crop_configurations.crop_configurations":
             return crop_configs
         raise KeyError(key)
 
     im.get_data.side_effect = get_data_side_effect
 
-    # Act
-    est = EmissionsEstimator()
+    estimator = EmissionsEstimator()
 
-    # Assert the mapping you care about
     expected = {
         "corn_silage": ["50", "51", "52"],
         "alfalfa_hay": ["100", "103", "106", "107", "108"],
         "wheat": [],
     }
-    assert est.crop_species_to_purchased_feed_id == expected
+    assert estimator.crop_species_to_purchased_feed_id == expected
 
 
 @pytest.mark.parametrize(
@@ -417,10 +406,10 @@ def test_calculate_emissions_int_keys_stringified(em: EmissionsEstimator, mocker
     """Int feed IDs are stringified for factor lookup, but output dict keeps original key types."""
     mock_add_variable = mocker.patch.object(em.om, "add_variable")
 
-    em.calculate_emissions({50: 1.5, 100: 2.0})
+    em.calculate_emissions({"50": 1.5, "100": 2.0})
 
-    expected_purchased = {50: 1.5 * 1.0, 100: 2.0 * 26.3}
-    expected_luc = {50: 1.5 * 0.1, 100: 2.0 * 2.63}
+    expected_purchased = {"50": 1.5 * 1.0, "100": 2.0 * 26.3}
+    expected_luc = {"50": 1.5 * 0.1, "100": 2.0 * 2.63}
 
     assert mock_add_variable.call_count == 2
 
