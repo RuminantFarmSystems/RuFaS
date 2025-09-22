@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
@@ -69,17 +69,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
-
-
-def test_acceptable_crops(baleage: Baleage) -> None:
-    """Tests that Baleage has acceptable_crops set correctly."""
-    assert baleage.acceptable_crops == [
-        CropCategory.ALFALFA,
-        CropCategory.GRASS,
-        CropCategory.SMALL_GRAIN,
-    ]
+    return HarvestedCrop(**sample_crop_data)
 
 
 def test_process_degradations(

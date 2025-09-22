@@ -25,8 +25,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
 )
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
-    StorageType,
-    HarvestedCropStorageType,
     HarvestedCrop,
 )
 from RUFAS.input_manager import InputManager
@@ -182,12 +180,7 @@ def test_daily_simulation(
     mock_field_daily_update_routine = mocker.patch.object(
         simulation_engine.field_manager,
         "daily_update_routine",
-        return_value=(
-            mock_harvested_crops := [
-                HarvestedCropStorageType(crop_1, StorageType.BAG),
-                HarvestedCropStorageType(crop_2, StorageType.BALEAGE),
-            ]
-        ),
+        return_value=(mock_harvested_crops := [crop_1, crop_2]),
     )
     expected_harvested_crops_config_names = [
         [harvest_crop.harvested_crop.config_name] for harvest_crop in mock_harvested_crops

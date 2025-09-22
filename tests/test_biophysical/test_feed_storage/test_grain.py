@@ -1,6 +1,5 @@
 import pytest
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from RUFAS.biophysical.feed_storage.grain import Grain
 
 
@@ -15,11 +14,3 @@ def grain() -> Grain:
         An instance of the Grain class.
     """
     return Grain()
-
-
-def test_acceptable_crops(grain: Grain) -> None:
-    assert grain.acceptable_crops == [
-        CropCategory.CORN,
-        CropCategory.SMALL_GRAIN,
-        CropCategory.SOY,
-    ]

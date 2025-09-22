@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile, Silage
 from RUFAS.rufas_time import RufasTime
@@ -30,8 +30,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    return HarvestedCrop(**sample_crop_data)
 
 
 @pytest.fixture
@@ -53,15 +52,6 @@ def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
     """Creates a Weather instance for testing."""
     mocker.patch.object(Weather, "__init__", return_value=None)
     return Weather({}, time)
-
-
-def test_acceptable_crops(silage: Silage) -> None:
-    assert silage.acceptable_crops == [
-        CropCategory.ALFALFA,
-        CropCategory.CORN,
-        CropCategory.GRASS,
-        CropCategory.SMALL_GRAIN,
-    ]
 
 
 @pytest.mark.parametrize("days_of_loss", [0, 10, 3])

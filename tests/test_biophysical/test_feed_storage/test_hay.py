@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.hay import (
     FINAL_MOISTURE_PERCENTAGE,
@@ -48,8 +48,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    return HarvestedCrop(**sample_crop_data)
 
 
 @pytest.fixture
@@ -78,15 +77,6 @@ def weather(mocker: MockerFixture) -> Weather:
     """
     mocker.patch.object(Weather, "__init__", return_value=None)
     return Weather({}, MagicMock(auto_spec=RufasTime))
-
-
-def test_acceptable_crops(hay: Hay) -> None:
-    """Tests that Hay's acceptable crops are initialized correctly."""
-    assert hay.acceptable_crops == [
-        CropCategory.ALFALFA,
-        CropCategory.GRASS,
-        CropCategory.SMALL_GRAIN,
-    ]
 
 
 def test_process_degradations(
