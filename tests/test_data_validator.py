@@ -2041,8 +2041,7 @@ def test_evaluate_expression_unknown_operation(
 def test_evaluate_expression_no_ordered_variables(
     expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
-    """Test the behavior of _evaluate_expression when ordered_variables is missing or empty.
-    """
+    """Test the behavior of _evaluate_expression when ordered_variables is missing or empty."""
     cross_validator = CrossValidator()
     mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
@@ -2093,10 +2092,12 @@ def test_validate_expression_block_with_complex_variable_values_multiple_complex
     if eager_termination:
         with pytest.raises(ValueError):
             cross_validator._validate_expression_block_with_complex_variable_values(
-                expression_block, selected_variables, eager_termination)
+                expression_block, selected_variables, eager_termination
+            )
     else:
         result = cross_validator._validate_expression_block_with_complex_variable_values(
-            expression_block, selected_variables, eager_termination)
+            expression_block, selected_variables, eager_termination
+        )
         assert result is False
 
 
@@ -2123,10 +2124,12 @@ def test_validate_expression_block_with_complex_variable_values_no_apply_to(
     if eager_termination:
         with pytest.raises(ValueError):
             cross_validator._validate_expression_block_with_complex_variable_values(
-                expression_block, selected_variables, eager_termination)
+                expression_block, selected_variables, eager_termination
+            )
     else:
         result = cross_validator._validate_expression_block_with_complex_variable_values(
-            expression_block, selected_variables, eager_termination)
+            expression_block, selected_variables, eager_termination
+        )
         assert result is False
 
 
