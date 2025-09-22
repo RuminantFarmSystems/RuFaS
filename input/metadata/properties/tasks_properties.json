@@ -36,7 +36,7 @@
           "type": "string",
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
           "description": "The path to the metadata JSON files to load and use in the Input Manager of this task",
-          "default": "input/metadata/default_metadata.json"
+          "default": "input/metadata/example_freestall_dairy_metadata.json"
         },
         "properties_file_path": {
           "type": "string",
