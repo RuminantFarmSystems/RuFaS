@@ -45,7 +45,6 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 from RUFAS.weather import Weather
@@ -80,8 +79,7 @@ class HerdManager:
         weather: Weather,
         time: RufasTime,
         is_ration_defined_by_user: bool,
-        available_feeds: list[Feed],
-        feed_emissions_estimator: PurchasedFeedEmissionsEstimator | None = None,
+        available_feeds: list[Feed]
     ) -> None:
         """
         Initializes the pens and the animal herd in the simulation with data from
@@ -168,10 +166,6 @@ class HerdManager:
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
-
-        self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
-            feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
-        )
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
@@ -677,38 +671,7 @@ class HerdManager:
                 str(pen.id), pen.animal_combination.name, current_pen_ration, simulation_day
             )
 
-            for key, amount in current_pen_ration.items():
-                if key not in herd_total_ration.keys():
-                    herd_total_ration[key] = 0.0
-                herd_total_ration[key] += amount
-            daily_purchased_feed_emissions = (
-                self.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(current_pen_ration)
-            )
-            daily_land_use_change_feed_emissions = (
-                self.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(current_pen_ration)
-            )
-            AnimalModuleReporter.report_daily_feed_emissions(
-                daily_purchased_feed_emissions,
-                daily_land_use_change_feed_emissions,
-                pen.id,
-                pen.animal_combination.name,
-                simulation_day,
-            )
-
         AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
-        herd_total_purchased_feed_emissions = (
-            self.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(herd_total_ration)
-        )
-        herd_total_land_use_change_feed_emissions = (
-            self.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(herd_total_ration)
-        )
-        AnimalModuleReporter.report_daily_feed_emissions(
-            herd_total_purchased_feed_emissions,
-            herd_total_land_use_change_feed_emissions,
-            "ALL",
-            "",
-            simulation_day,
-        )
 
     def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
         """
