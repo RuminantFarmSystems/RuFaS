@@ -376,6 +376,25 @@ class Pen:
             return 0.0
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
+    @property
+    def total_enteric_methane(self) -> float:
+        """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
+        return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+
+    @property
+    def total_pen_ration(self) -> dict[str, float]:
+        """Returns the total ration of the pen."""
+        if (number_of_animals_in_pen := len(self.animals_in_pen)) == 0:
+            return {}
+        current_pen_ration: dict[str, float] = {
+            str(rufas_id): amount * number_of_animals_in_pen for rufas_id, amount in self.ration.items()
+        }
+        current_pen_ration["dry_matter_intake_total"] = sum([total_feed for total_feed in current_pen_ration.values()])
+        current_pen_ration["byproducts_total"] = (
+            self.average_nutrition_supply.byproduct_supply * number_of_animals_in_pen
+        )
+        return current_pen_ration
+
     def _initialize_beddings(self) -> None:
         """Initialize all beddings for manure streams in the pen."""
         im = InputManager()
