@@ -256,7 +256,7 @@ class LactationCurve:
         Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
         """
         num_milking_cows: int = (
-            animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
+            animal_inputs["herd_information"]["cow_num"] * animal_inputs["herd_information"]["milking_cow_fraction"]
         )
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         parity_1_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["1"]

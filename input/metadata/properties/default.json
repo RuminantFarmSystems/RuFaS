@@ -83,13 +83,6 @@
         "default": 100,
         "minimum": 6
       },
-      "lactating_fraction":{
-        "type":"number",
-        "description": "The fraction of cows that are lactating",
-        "default": 0.8,
-        "minimum":0.01,
-        "maximum": 1.0
-      },
       "breed": {
         "type": "string",
         "default": "HO",
@@ -129,6 +122,13 @@
           "maximum": 1.0,
           "default": 0.9
         }
+      },
+      "milking_cow_fraction": {
+        "type": "number",
+        "description": "Fraction of cows assumed to be in milk at any given time (305/365 is the default).",
+        "default": 0.8365,
+        "minimum": 0.0,
+        "maximum": 1.0
       },
       "annual_milk_yield": {
         "type": "number",
@@ -2124,13 +2124,6 @@
           "description": "The standard deviation for of Wood's parameter n."
         }
       }
-    },
-    "milking_cow_fraction": {
-      "type": "number",
-      "description": "Fraction of cows assumed to be in milk at any given time (305/365 is the default).",
-      "default": 0.8365,
-      "minimum": 0.0,
-      "maximum": 1.0
     }
   },
   "crop_schedule_properties": {
