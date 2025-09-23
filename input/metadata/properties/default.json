@@ -6042,12 +6042,19 @@
           "description": "Type of feed storage unit.",
           "pattern": "^(Dry|HighMoisture)$"
         },
-        "dry_grain_dm_loss_coefficient": {
+        "dm_loss_coefficient": {
           "type": "number",
-          "description": "Dry matter loss coefficient for dry grain storage (unitless).",
+          "description": "Dry matter loss coefficient for the grain storage (unitless).",
           "minimum": 0.0,
           "maximum": 0.1,
           "default": 0.1
+        },
+        "initial_storage_dry_matter" :{
+          "type": "number",
+          "description": "Initial dry matter content of grain at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.88
         },
         "rufas_id": {
           "type": "number",
@@ -6079,21 +6086,21 @@
           "description": "Type of feed storage unit.",
           "pattern": "^(ProtectedIndoor|ProtectedWrapped|ProtectedTarped|Unprotected)$"
         },
-        "hay_bale_diameter": {
+        "bale_size": {
           "type": "number",
           "description": "Diameter of hay bales (meters).",
           "minimum": 0.5,
           "maximum": 4,
           "default": 1.8
         },
-        "hay_initial_storage_dry_matter" :{
+        "initial_storage_dry_matter" :{
           "type": "number",
           "description": "Initial dry matter content of hay at time of storage (unitless).",
           "minimum": 0.0,
           "maximum": 1.0,
           "default": 0.75
         },
-        "hay_target_dry_matter": {
+        "target_dry_matter": {
           "type": "number",
           "description": "Target dry matter content of hay after drying down in storage (unitless).",
           "minimum": 0.0,
@@ -6130,7 +6137,14 @@
           "description": "Type of feed storage unit.",
           "pattern": "^(Baleage)$"
         },
-        "baleage_initial_storage_dry_matter": {
+        "bale_density": {
+          "type": "number",
+          "description": "Density of baleage bales (kg dry matter / cubic meter).",
+          "minimum": 100,
+          "maximum": 400,
+          "default": 200
+        },
+        "initial_storage_dry_matter": {
           "type": "number",
           "description": "Initial dry matter content of baleage at time of storage (unitless).",
           "minimum": 0.0,
@@ -6174,7 +6188,7 @@
           "description": "Type of feed storage unit.",
           "pattern": "^(Bag|Bunker|Pile)$"
         },
-        "silage_initial_storage_dry_matter": {
+        "initial_storage_dry_matter": {
           "type": "number",
           "description": "Initial dry matter content of silage at time of storage (unitless).",
           "minimum": 0.0,

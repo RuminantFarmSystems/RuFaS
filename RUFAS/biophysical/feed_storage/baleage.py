@@ -3,7 +3,6 @@ from RUFAS.weather import Weather
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from .storage import Storage
-from RUFAS.input_manager import InputManager
 
 """Number of days over which baled crops dry down after storage."""
 INITIAL_LOSS_PERIOD = 30
@@ -28,9 +27,8 @@ class Baleage(Storage):
 
     def __init__(self, config: dict[str, str | float], capacity: float = float("inf")) -> None:
         super().__init__(config, capacity)
-        im = InputManager()
-        self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
-        self.bale_density: float = 0
+        self.post_wilting_moisture_percentage: float = config.get("post_wilting_moisture_percentage")
+        self.bale_density: float = config.get("bale_density")
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """

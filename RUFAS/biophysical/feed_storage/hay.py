@@ -43,8 +43,8 @@ class Hay(Storage):
 
     def __init__(self, config: dict[str, str | float], capacity: float = float("inf")) -> None:
         super().__init__(config, capacity)
-        self.bale_size: float = config.get("hay_bale_diameter")
-        self.additional_dry_matter_loss_coefficient = 0.0
+        self.bale_size: float = config.get("bale_size")
+        self.target_dry_matter = config.get("target_dry_matter")
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """

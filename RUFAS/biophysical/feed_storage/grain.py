@@ -10,6 +10,7 @@ class Grain(Storage):
 
     def __init__(self, config: dict[str, str | float], capacity: float = float("inf")):
         super().__init__(config, capacity)
+        self.dm_loss_coefficient = config.get("dm_loss_coefficient")
 
 
 class Dry(Grain):
