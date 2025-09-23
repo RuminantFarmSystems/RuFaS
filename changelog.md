@@ -232,6 +232,7 @@ v0.9.2
 - [2559](https://github.com/RuminantFarmSystems/MASM/pull/2559) - [minor change] [Manure] Implement daily spread processor.
 - [2482](https://github.com/RuminantFarmSystems/MASM/pull/2554) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
+- [2553](https://github.com/RuminantFarmSystems/MASM/pull/2553) - [minor change] [Input Manager] 3/5 Cross Validation: implement expression block.
 - [2567](https://github.com/RuminantFarmSystems/MASM/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
 - [2571](https://github.com/RuminantFarmSystems/MASM/pull/2571) - [minor change] Revert manure and animal input changes from PR2552.
 - [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
