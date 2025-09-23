@@ -1,4 +1,5 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
@@ -110,7 +111,129 @@ class SingleStreamHandler(Handler):
             MeasurementUnits.KILOGRAMS,
             time.simulation_day,
         )
-        return super().process_manure(conditions, time)
+
+        cleaning_water_volume = self.determine_handler_cleaning_water_volume(
+            self.manure_stream.pen_manure_data.num_animals,
+            self.cleaning_water_use_amount,
+            self.cleaning_water_recycle_fraction,
+        )
+
+        ammonia_emission = 0.0
+        fresh_water_volume_used_for_milking = 0.0
+
+        if self.handler_type in ["ManualScraper", "AlleyScraper", "FlushSystem"]:
+            ammonia_emission = self._calculate_ammonia_emissions(
+                self.manure_stream.ammoniacal_nitrogen,
+                self.manure_stream.pen_manure_data.manure_urine_mass,
+                ManureConstants.SLURRY_MANURE_DENSITY,
+                barn_temperature,
+                self.determine_ammonia_resistance(barn_temperature),
+                surface_area,
+                ManureConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+            )
+
+        if self.__class__.__name__ == "ParlorCleaningHandler":
+            num_animals = self.manure_stream.pen_manure_data.num_animals
+            fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
+
+        total_cleaning_water_volume = self.determine_total_cleaning_water_volume(
+            cleaning_water_volume, fresh_water_volume_used_for_milking
+        )
+
+        self._report_processor_output(
+            "total_cleaning_water_volume",
+            total_cleaning_water_volume,
+            self.process_manure.__name__,
+            MeasurementUnits.CUBIC_METERS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "barn_temperature",
+            barn_temperature,
+            self.process_manure.__name__,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
+        )
+
+        manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
+
+        manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
+        manure_total_nitrogen = max(0.0, self.manure_stream.nitrogen - ammonia_emission)
+        phosphorus = self.manure_stream.phosphorus
+        potassium = self.manure_stream.potassium
+        ash = self.manure_stream.ash
+        volume = self.manure_stream.volume + total_cleaning_water_volume
+        degradable_volatile_solids, non_degradable_volatile_solids, total_solids = self._apply_volatile_solid_loss(
+            housing_methane_emissions
+        )
+        methane_production_potential = self.manure_stream.methane_production_potential
+
+        self.manure_stream = None
+        self._report_processor_output(
+            "housing_ammonia_N_emissions",
+            ammonia_emission,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        output_stream = ManureStream(
+            water=manure_water,
+            ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+            nitrogen=manure_total_nitrogen,
+            phosphorus=phosphorus,
+            potassium=potassium,
+            ash=ash,
+            non_degradable_volatile_solids=non_degradable_volatile_solids,
+            degradable_volatile_solids=degradable_volatile_solids,
+            volume=volume,
+            total_solids=total_solids,
+            methane_production_potential=methane_production_potential,
+            pen_manure_data=None,
+        )
+        self._report_manure_stream(output_stream, "", time.simulation_day)
+
+        return {"manure": output_stream}
+
+    def _apply_volatile_solid_loss(self, housing_methane_emission: float) -> tuple[float, float, float]:
+        """
+        Calculates the loss of volatile solids to methane emissions.
+
+        Parameters
+        ----------
+        housing_methane_emission : float
+            The amount of housing emission (kg).
+
+        Returns
+        -------
+        tuple[float, float, float]
+            The updated amount of degradable volatile solids (kg).
+            The updated amount of non-degradable volatile solids (kg).
+            The updated amount of total solids (kg).
+
+        """
+        if self.manure_stream:
+            degradable_to_total_volatile_solid_ratio = 0.0
+            if self.manure_stream.total_volatile_solids != 0.0:
+                degradable_to_total_volatile_solid_ratio = (
+                    self.manure_stream.degradable_volatile_solids / self.manure_stream.total_volatile_solids
+                )
+            total_volatile_solid_loss = (
+                ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
+            )
+            degradable_volatile_solid = max(
+                0.0,
+                self.manure_stream.degradable_volatile_solids
+                - (degradable_to_total_volatile_solid_ratio * total_volatile_solid_loss),
+            )
+            non_degrading_volatile_solid = max(
+                0.0,
+                self.manure_stream.non_degradable_volatile_solids
+                - ((1 - degradable_to_total_volatile_solid_ratio) * total_volatile_solid_loss),
+            )
+            total_solids = max(0.0, self.manure_stream.total_solids - total_volatile_solid_loss)
+            return degradable_volatile_solid, non_degrading_volatile_solid, total_solids
+        else:
+            return 0.0, 0.0, 0.0
 
     @staticmethod
     def determine_housing_methane_emissions(manure_deposition_surface_area: float, barn_temperature: float) -> float:
