@@ -6,6 +6,7 @@ harvest_storage_date = date(2025, 3, 7)
 sample_crop_data: dict[str, Any] = {
     "harvest_time": harvest_storage_date,
     "storage_time": harvest_storage_date,
+    "field_name": "field_1",
     "config_name": "test_data",
     "fresh_mass": 100.0,
     "dry_matter_percentage": 50.0,
@@ -23,6 +24,7 @@ sample_crop_data: dict[str, Any] = {
 sample_crop_data_no_mass: dict[str, Any] = {
     "harvest_time": harvest_storage_date,
     "storage_time": harvest_storage_date,
+    "field_name": "field_1",
     "config_name": "test_data",
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,

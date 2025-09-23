@@ -80,8 +80,6 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[NASEMFeed | N
     """Pytest fixture to create a FeedManager instance for testing."""
     mocker.patch.object(FeedManager, "__init__", return_value=None)
     feed_manager = FeedManager.__new__(FeedManager)
-
-    # Manually set required attributes (mirroring __init__)
     feed_manager._available_feeds = mock_available_feeds
     feed_manager._cumulative_feed_requests = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_purchased_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
@@ -114,15 +112,13 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
     )
     mock_planning_cycle_allowance_init = mocker.patch.object(PlanningCycleAllowance, "__init__", return_value=None)
     mock_runtime_purchase_allowance_init = mocker.patch.object(RuntimePurchaseAllowance, "__init__", return_value=None)
-    mock_select_rufas_id_for_harvested_crop = mocker.patch(
-        "RUFAS.biophysical.feed_storage.feed_manager.FeedManager._select_rufas_id_for_harvested_crop",
-        side_effect=[1, None],
-    )
+    mock_create_all_storages = mocker.patch.object(FeedManager, "_create_all_storages", return_value=None)
 
     feed_manager = FeedManager(
         feed_config=(mock_feed_config := {"allowances": [{"runtime": 1.1}]}),
         nutrient_standard=(mock_nutrient_standard := NutrientStandard.NASEM),
-        crop_to_rufas_ids_mapping={"corn": [1, 2, 3], "alfalfa": [4, 5, 6]},
+        feed_storage_configs=[{"type": "pile", "rufas_id": 1, "field_name": "field_1", "crop_name": "corn"}],
+        feed_storage_instances={},
     )
 
     assert feed_manager.active_storages == {}
@@ -130,10 +126,7 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
     assert feed_manager.available_feeds == mock_available_feeds
     mock_planning_cycle_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
     mock_runtime_purchase_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
-    assert mock_select_rufas_id_for_harvested_crop.call_args_list == [
-        call([1, 2, 3], [1, 2]),
-        call([4, 5, 6], [1, 2]),
-    ]
+    assert mock_create_all_storages.call_count == 1
 
 
 def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[NASEMFeed | NRCFeed]) -> None:
