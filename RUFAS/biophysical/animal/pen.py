@@ -963,18 +963,11 @@ class Pen:
             if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
-            if is_ration_defined_by_user and (
-                (
-                    initial_dry_matter_requirement_fixed
-                    * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance)
-                )
-                < initial_dry_matter_requirement
-                < (
-                    initial_dry_matter_requirement_fixed
-                    * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance)
-                )
-            ):
-                if bool(
+            adjusted_dry_matter_lower = (initial_dry_matter_requirement_fixed
+                    * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance))
+            adjusted_dry_matter_upper = (initial_dry_matter_requirement_fixed
+                    * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance))
+            need_dry_matter_increase = bool(
                     set(
                         [
                             "NE_total_constraint",
@@ -987,10 +980,15 @@ class Pen:
                         ]
                     )
                     & set(constraints_failed_list)
-                ):
+                )
+            need_dry_matter_decrease = bool(set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list))
+
+            if is_ration_defined_by_user and (
+                adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper):
+                if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
-                elif bool(set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list)):
+                elif need_dry_matter_decrease:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
@@ -1005,6 +1003,11 @@ class Pen:
             self._apply_successful_solution(solution, pen_available_feeds)
         elif is_ration_defined_by_user:
             self._apply_user_defined_ration(pen_available_feeds)
+            self.om.add_log(
+                "User defined ration used for non lactating cow pen after failed formulation attempt.",
+                f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. ",
+                info_map,
+            )
         elif self.ration == {}:
             self.om.add_error(
                 "No previous ration available",
@@ -1115,6 +1118,11 @@ class Pen:
         ----------
         info_map : dict[str, Any]
             The info map to be added to the output pool.
+
+        Returns
+        -------
+        bool
+            True if ration formulation loop needs to be broken.
         """
         if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
             self.om.add_log(

@@ -868,6 +868,11 @@ class RationOptimizer:
             Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
         user_defined_ration_tolerance : float
             Allowable +/- variance in each of the defined ration inclusion percentage values.
+
+        Returns
+        -------
+        list[tuple[float, float]]
+            List of upper and lower bounds for each feed ingredient.
         """
         feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
         user_defined_boundlist = []
