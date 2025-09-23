@@ -963,28 +963,33 @@ class Pen:
             if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
 
-            adjusted_dry_matter_lower = (initial_dry_matter_requirement_fixed
-                    * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance))
-            adjusted_dry_matter_upper = (initial_dry_matter_requirement_fixed
-                    * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance))
+            adjusted_dry_matter_lower = initial_dry_matter_requirement_fixed * (
+                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance
+            )
+            adjusted_dry_matter_upper = initial_dry_matter_requirement_fixed * (
+                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance
+            )
             need_dry_matter_increase = bool(
-                    set(
-                        [
-                            "NE_total_constraint",
-                            "NE_maintenance_and_activity_constraint",
-                            "NE_lactation_constraint",
-                            "NE_growth_constraint" "calcium_constraint",
-                            "phosphorus_constraint",
-                            "protein_constraint_lower",
-                            "DMI_constraint_lower",
-                        ]
-                    )
-                    & set(constraints_failed_list)
+                set(
+                    [
+                        "NE_total_constraint",
+                        "NE_maintenance_and_activity_constraint",
+                        "NE_lactation_constraint",
+                        "NE_growth_constraint" "calcium_constraint",
+                        "phosphorus_constraint",
+                        "protein_constraint_lower",
+                        "DMI_constraint_lower",
+                    ]
                 )
-            need_dry_matter_decrease = bool(set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list))
+                & set(constraints_failed_list)
+            )
+            need_dry_matter_decrease = bool(
+                set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list)
+            )
 
             if is_ration_defined_by_user and (
-                adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper):
+                adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper
+            ):
                 if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
