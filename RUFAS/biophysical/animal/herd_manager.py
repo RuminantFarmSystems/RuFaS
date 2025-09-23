@@ -139,6 +139,7 @@ class HerdManager:
         self.is_ration_defined_by_user = is_ration_defined_by_user
         ration_feed_config = self.im.get_data("feed")
         UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
+        UserDefinedRationManager.set_user_defined_ration_tolerance(ration_feed_config)
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
@@ -1405,13 +1406,14 @@ class HerdManager:
             Day of simulation.
 
         """
-        if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
+        if pen.animal_combination == AnimalCombination.LAC_COW and pen.average_milk_production == 0.0:
+            for animal in pen.animals_in_pen:
+                pen.animals_in_pen[animal].daily_milking_update_without_history()
+        if pen.animal_combination == AnimalCombination.CALF:
             pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
-            if pen.animal_combination == AnimalCombination.LAC_COW and pen.average_milk_production == 0.0:
-                for animal in pen.animals_in_pen:
-                    pen.animals_in_pen[animal].daily_milking_update_without_history()
             pen.formulate_optimized_ration(
+                self.is_ration_defined_by_user,
                 pen_available_feeds,
                 current_temperature,
                 self._max_daily_feeds,
