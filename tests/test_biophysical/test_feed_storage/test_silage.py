@@ -1,4 +1,5 @@
 import copy
+from typing import Any
 from unittest.mock import call
 from dataclasses import replace
 from datetime import date, datetime, timedelta
@@ -16,8 +17,19 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def silage() -> Silage:
-    return Silage()
+def mock_silage_config() -> dict:
+    return {
+        "name": "silage",
+        "rufas_id": 1,
+        "field_name": "field_1",
+        "crop_name": "corn",
+        "initial_storage_dry_matter": 500.0,
+        "size": 1000.0,
+    }
+
+@pytest.fixture
+def silage(mock_silage_config: dict[str, Any]) -> Silage:
+    return Silage(config=mock_silage_config)
 
 
 @pytest.fixture
@@ -237,10 +249,9 @@ def bag() -> Bag:
     return Bag()
 
 
-@pytest.mark.parametrize("bag_size", [None, 100])
-def test_bag_init(bag_size: int | None, mocker: MockerFixture) -> None:
+def test_bag_init(mock_silage_config: dict[str, Any], mocker: MockerFixture) -> None:
     """Tests that the Bag class is initialized correctly."""
     mock_silage_init = mocker.patch("RUFAS.biophysical.feed_storage.silage.Silage.__init__")
-    bag = Bag(bag_size)
-    assert bag.bag_size == bag_size
-    mock_silage_init.assert_called_once_with()
+    bag = Bag(config=mock_silage_config)
+    assert bag.bag_size == mock_silage_config.get("size")
+    mock_silage_init.assert_called_once_with(mock_silage_config)
