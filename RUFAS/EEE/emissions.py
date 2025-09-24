@@ -111,6 +111,7 @@ class EmissionsEstimator:
         }
 
     def estimate_emissions(self) -> None:
+        """Estimates emissions associated with farmgrown feeds."""
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
@@ -218,7 +219,8 @@ class EmissionsEstimator:
         self,
         purchased_feeds: dict[int, float],
     ) -> None:
-        """Calculates the emissions from purchased feeds and land use changes."""
+        """Calculates the emissions from purchased feeds and land use changes. If there are feed IDs with missing
+        emissions factor data, they will be omitted from the calculations and not reported."""
         purchased_feed_emissions: dict[str, float] = {}
         land_use_change_emissions: dict[str, float] = {}
 
@@ -227,11 +229,11 @@ class EmissionsEstimator:
 
             factor = self.purchased_feed_emissions_by_location.get(stringified_feed_id)
             if factor is not None:
-                purchased_feed_emissions[feed_id] = feed_amount * factor
+                purchased_feed_emissions[stringified_feed_id] = feed_amount * factor
 
             luc_factor = self.land_use_change_emissions_by_location.get(stringified_feed_id)
             if luc_factor is not None:
-                land_use_change_emissions[feed_id] = feed_amount * luc_factor
+                land_use_change_emissions[stringified_feed_id] = feed_amount * luc_factor
 
         info_map = {
             "class": self.__class__.__name__,
