@@ -180,6 +180,10 @@ class ManureExcretionCalculator:
 
         total_solids = 0.178 * dry_matter_intake + 2.733
 
+        total_manure_excreted = max(
+            total_manure_excreted, (total_solids / AnimalModuleConstants.MAXMIMUM_MANURE_DRY_MATTER_CONTENT)
+        )
+
         total_volatile_solids = 0.0073 * body_weight
 
         degradable_volatile_solids = 0.9 * total_volatile_solids
@@ -560,6 +564,10 @@ class ManureExcretionCalculator:
         )
 
         total_solids = 0.178 * dry_matter_intake + 2.733
+
+        total_manure_excreted = max(
+            total_manure_excreted, (total_solids / AnimalModuleConstants.MAXMIMUM_MANURE_DRY_MATTER_CONTENT)
+        )
 
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
         organic_matter_intake = (

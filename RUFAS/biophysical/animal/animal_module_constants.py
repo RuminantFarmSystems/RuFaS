@@ -67,6 +67,9 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
+    MAXMIMUM_MANURE_DRY_MATTER_CONTENT: float = 0.20
+    """The maximum dry matter content for manure produced by all animal classe, fraction."""
+
     DAILY_MILK_VARIATION_MEAN: float = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
 
