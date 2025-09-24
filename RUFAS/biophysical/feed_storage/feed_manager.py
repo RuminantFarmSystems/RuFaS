@@ -7,6 +7,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
     FeedCategorization,
     FeedComponentType,
     RUFAS_ID,
@@ -91,7 +92,7 @@ class FeedManager:
         feed_storage_instances: dict[str, list[str]],
     ) -> None:
         self._om = OutputManager()
-        self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.active_storages: dict[str, Storage] = {}
 
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
@@ -117,7 +118,7 @@ class FeedManager:
         self._cumulative_purchased_feeds: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
 
     @property
-    def available_feeds(self) -> list[NASEMFeed | NRCFeed]:
+    def available_feeds(self) -> list[Feed]:
         """Returns the list of available feeds."""
         return self._available_feeds
 
@@ -651,7 +652,7 @@ class FeedManager:
 
     def _setup_available_feeds(
         self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
-    ) -> list[NASEMFeed | NRCFeed]:
+    ) -> list[Feed]:
         """
         Creates list of feeds available for use in the simulation.
 
@@ -671,7 +672,7 @@ class FeedManager:
         feed_library = self._process_feed_library(nutrient_standard)
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
-        available_feeds = []
+        available_feeds: list[Feed] = []
         feeds_to_parse = feed_config["purchased_feeds"]
         for feed in feeds_to_parse:
             rufas_id = feed["purchased_feed"]
