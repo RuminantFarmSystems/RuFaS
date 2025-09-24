@@ -11,7 +11,6 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NASEMFeed,
     NRCFeed,
     NutrientStandard,
-    RUFAS_ID,
     FeedCategorization,
     FeedComponentType,
     Feed,

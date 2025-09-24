@@ -6,7 +6,6 @@ from dataclasses import replace
 from datetime import datetime
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.rufas_time import RufasTime
