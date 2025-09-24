@@ -67,6 +67,9 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
+    MAXMIMUM_MANURE_DRY_MATTER_CONTENT: float = 0.20
+    """The maximum dry matter content for manure produced by all animal classe, fraction."""
+
     DAILY_MILK_VARIATION_MEAN: float = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
 
@@ -79,8 +82,12 @@ class AnimalModuleConstants:
     MILK_LACTOSE: float = 4.85
     """Milk lactose content, percentage."""
 
-    DMI_CONSTRAINT_FRACTION: float = 0.20
+    DMI_CONSTRAINT_FRACTION: float = 0.30
     """The +/- fraction of DMI estimated allowed for ration formulation."""
+
+    DMI_REQUIREMENT_BOOST: float = 1.1
+    """The fraction of the dry matter intake requirement used as the basis for
+    the inclusion rate bounds in user defined ration formulation method."""
 
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
