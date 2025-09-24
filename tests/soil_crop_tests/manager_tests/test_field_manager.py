@@ -165,7 +165,7 @@ def test_daily_update_routine(
                         lignin=0.05,
                         sugar=0.10,
                         ash=0.08,
-                        recorded_days=set()
+                        recorded_days=set(),
                     ),
                     HarvestedCrop(
                         config_name="test_crop_2",
@@ -183,7 +183,7 @@ def test_daily_update_routine(
                         lignin=0.05,
                         sugar=0.10,
                         ash=0.08,
-                        recorded_days=set()
+                        recorded_days=set(),
                     ),
                 ],
             )

@@ -177,9 +177,7 @@ def test_daily_simulation(
         "daily_update_routine",
         return_value=(mock_harvested_crops := [crop_1, crop_2]),
     )
-    expected_harvested_crops_config_names = [
-        [harvest_crop.config_name] for harvest_crop in mock_harvested_crops
-    ]
+    expected_harvested_crops_config_names = [[harvest_crop.config_name] for harvest_crop in mock_harvested_crops]
     mock_field_receive_crop = mocker.patch.object(simulation_engine.feed_manager, "receive_crop")
     mock_field_get_next_harvest_dates = mocker.patch.object(
         simulation_engine.field_manager,
@@ -241,8 +239,7 @@ def test_daily_simulation(
     mock_weather_get_current_day_conditions.assert_called_once_with(mock_time)
     mock_field_daily_update_routine.assert_called_once_with(mock_weather, mock_time, mock_manure_applications)
     assert mock_field_receive_crop.call_args_list == [
-        call(harvested_crop, simulation_engine.time.simulation_day)
-        for harvested_crop in mock_harvested_crops
+        call(harvested_crop, simulation_engine.time.simulation_day) for harvested_crop in mock_harvested_crops
     ]
 
     not_harvested_feeds_config_names = [
@@ -490,8 +487,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     assert simulation_engine.next_ration_reformulation == mock_time.current_date.date()
     assert simulation_engine.is_ration_defined_by_user == mock_is_ration_defined_by_user
     assert simulation_engine.max_daily_feed_recalculation_interval == timedelta(days=round(365 / 4))
-    assert simulation_engine.next_max_daily_feed_recalculation == \
-        mock_time.current_date + timedelta(days=round(365 / 4))
+    assert simulation_engine.next_max_daily_feed_recalculation == mock_time.current_date + timedelta(
+        days=round(365 / 4)
+    )
 
     mock_herd_manager_init.assert_called_once_with(
         mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds

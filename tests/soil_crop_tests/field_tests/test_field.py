@@ -522,7 +522,7 @@ def test_check_crop_harvest_schedule(
         lignin=0.05,
         sugar=0.10,
         ash=0.08,
-        recorded_days=set()
+        recorded_days=set(),
     )
     harvest_crop = mocker.patch.object(field, "_harvest_crop", return_value=[mock_harvested_crop])
     harvest_heat_scheduled = mocker.patch.object(field, "_harvest_heat_scheduled_crops")
