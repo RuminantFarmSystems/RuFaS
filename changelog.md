@@ -239,6 +239,7 @@ v0.9.2
 - [2563](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] Changed calculations to support multi method calculations and update inputs.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
+- [2586](https://github.com/RuminantFarmSystems/MASM/pull/2586) - [minor change] Make `max_daily_feed_recalculations_per_year` an User Input
 
 ### v0.9.2
 

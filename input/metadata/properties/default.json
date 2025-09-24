@@ -4046,6 +4046,13 @@
         "default": 0.0
       }
     },
+    "max_daily_feed_recalculations_per_year": {
+        "type": "number",
+        "description": "The maximum number of feed recalculations that can be performed per year.",
+        "minimum": 1,
+        "maximum": 365,
+        "default": 4
+    },
     "allowances": {
       "type": "array",
       "properties": {
