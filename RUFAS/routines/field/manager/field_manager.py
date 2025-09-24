@@ -1,17 +1,17 @@
-from typing import List, Tuple, Any
+from typing import Any
 from datetime import date
 
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration, CropDataFactory
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -37,7 +37,7 @@ class FieldManager:
 
     Attributes
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
     output_gatherer : FieldDataReporter
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
@@ -50,7 +50,7 @@ class FieldManager:
         info_map = {"class": self.__class__.__name__, "function": "__init__"}
         self.im = InputManager()
         self.om = OutputManager()
-        self.fields: List[Field] = []
+        self.fields: list[Field] = []
         fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
@@ -63,14 +63,9 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def get_crop_configs_to_rufas_ids(self) -> dict[str, list[RUFAS_ID]]:
-        """Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as."""
-        crop_configurations: dict[str, CropConfiguration] = CropDataFactory.get_full_crop_configurations()
-        return {crop: crop_config["rufas_ids"] for crop, crop_config in crop_configurations.items()}
-
     def daily_update_routine(
         self, weather: Weather, time: RufasTime, manure_applications: list[ManureEventNutrientRequestResults]
-    ) -> list[HarvestedCropStorageType]:
+    ) -> list[HarvestedCrop]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -87,15 +82,15 @@ class FieldManager:
 
         Returns
         -------
-        list[HarvestedCropStorageType]
-            Crops that were harvested on the current day, paired with the storage types into which they will be placed.
+        list[HarvestedCrop]
+            Crops that were harvested on the current day.
 
         Notes
         -----
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        harvested_crops: list[HarvestedCropStorageType] = []
+        harvested_crops: list[HarvestedCrop] = []
         for field in self.fields:
             current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
             info_map = {
@@ -272,7 +267,7 @@ class FieldManager:
     @staticmethod
     def _setup_fertilizer_events(
         fertilizer_schedule: str,
-    ) -> Tuple[dict[str, dict[str, float]], list[FertilizerEvent]]:
+    ) -> tuple[dict[str, dict[str, float]], list[FertilizerEvent]]:
         """
         Sets up a list of fertilizer events from fertilizer schedule and the list of available fertilizer mixes.
 
@@ -283,7 +278,7 @@ class FieldManager:
 
         Returns
         -------
-        Tuple[dict[str, dict[str, float], FertilizerSchedule]
+        tuple[dict[str, dict[str, float], FertilizerSchedule]
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
@@ -392,7 +387,7 @@ class FieldManager:
         return tillage_events
 
     @staticmethod
-    def _setup_crop_schedules(crop_rotation: str, available_crop_configurations: list[str]) -> List[CropSchedule]:
+    def _setup_crop_schedules(crop_rotation: str, available_crop_configurations: list[str]) -> list[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
 
@@ -405,7 +400,7 @@ class FieldManager:
 
         Returns
         -------
-        List[CropSchedule]
+        list[CropSchedule]
             List of all crop schedules that have been created from the input specifications.
 
         Raises

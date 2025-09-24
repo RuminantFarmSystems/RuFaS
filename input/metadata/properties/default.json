@@ -2236,19 +2236,6 @@
           "description": "Plant category of the crop configuration.",
           "pattern": "^(warm_annual_legume|cool_annual_legume|perennial_legume|warm_annual|cool_annual|perennial|tree)$"
         },
-        "crop_category": {
-          "type": "string",
-          "description": "Crop category of the crop configuration.",
-          "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
-        },
-        "rufas_ids": {
-          "type": "array",
-          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
-          "properties": {
-            "type": "number",
-            "minimum": 1
-          }
-        },
         "is_nitrogen_fixer": {
           "type": "bool",
           "description": "Whether the crop configuration is a nitrogen fixer."
@@ -2351,11 +2338,6 @@
           "type": "number",
           "description": "Empirical root distribution parameter c (unitless). See Fan, Jianling, et al. \"Root distribution by depth for temperate agricultural crops.\" Field Crops Research 189 (2016): 68-74, table 1."
         },
-        "storage_type": {
-          "type": "string",
-          "description": "Type of storage in which the harvests from this crop will be stored.",
-          "pattern": "^(Protected Indoors|Protected Wrapped|Protected Tarped|Unprotected|Baleage|Dry|High Moisture|Bunker|Pile|Bag)$"
-        },
         "optimal_harvest_index": {
           "type": "number",
           "description": "Optimal harvest index under ideal growth conditions (unitless).",
@@ -2380,45 +2362,45 @@
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "crude_protein_percent": {
+        "crude_protein_percent_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is dietary crude protein (unitless).",
+          "description": "Percentage of dry matter mass that is dietary crude protein at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "non_protein_nitrogen": {
+        "non_protein_nitrogen_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is non-protein nitrogen (unitless).",
+          "description": "Percentage of dry matter mass that is non-protein nitrogen at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "starch": {
+        "starch_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is starch (unitless).",
+          "description": "Percentage of dry matter mass that is starch at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "adf": {
+        "adf_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is acid detergent fiber (unitless).",
+          "description": "Percentage of dry matter mass that is acid detergent fiber at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "ndf": {
+        "ndf_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is neutral detergent fiber (unitless).",
+          "description": "Percentage of dry matter mass that is neutral detergent fiber at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "sugar": {
+        "sugar_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is labile carbohydrate (unitless).",
+          "description": "Percentage of dry matter mass that is labile carbohydrate at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
-        "ash": {
+        "ash_at_harvest": {
           "type": "number",
-          "description": "Percentage of dry matter mass that is ash (unitless).",
+          "description": "Percentage of dry matter mass that is ash at harvest (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
@@ -6035,21 +6017,209 @@
       }
     }
   },
-  "feed_storage_input_properties": {
+  "feed_storage_configurations": {
     "data_collection_app_compatible": false,
-    "hay_bale_diameter": {
-        "type": "number",
-        "description": "Diameter of hay bales (meters).",
-        "minimum": 0.5,
-        "maximum": 4,
-        "default": 1.8
+    "grain_storage": {
+      "type": "array",
+      "description": "A list of dry grain types that can be stored in a dry grain storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Dry grain storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(Dry|HighMoisture)$"
+        },
+        "dm_loss_coefficient": {
+          "type": "number",
+          "description": "Dry matter loss coefficient for the grain storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 0.1,
+          "default": 0.1
+        },
+        "initial_storage_dry_matter" :{
+          "type": "number",
+          "description": "Initial dry matter content of grain at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.88
+        },
+        "rufas_id": {
+          "type": "number",
+          "description": "RuFaS Feed ID which harvests from the crop stored in this unit can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "minimum": 1
+        }
+      }
     },
-    "post_wilting_moisture_percentage": {
-        "type": "number",
-        "description": "The post-wilting moisture level that baleage will dry down to.",
-        "minimum": 30,
-        "maximum": 60,
-        "default": 45
+    "hay_storage": {
+      "type": "array",
+      "description": "A list of hay types that can be stored in a hay storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Hay storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(ProtectedIndoor|ProtectedWrapped|ProtectedTarped|Unprotected)$"
+        },
+        "bale_size": {
+          "type": "number",
+          "description": "Diameter of hay bales (meters).",
+          "minimum": 0.5,
+          "maximum": 4,
+          "default": 1.8
+        },
+        "initial_storage_dry_matter" :{
+          "type": "number",
+          "description": "Initial dry matter content of hay at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.75
+        },
+        "target_dry_matter": {
+          "type": "number",
+          "description": "Target dry matter content of hay after drying down in storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.88
+        },
+        "rufas_id": {
+          "type": "number",
+          "description": "RuFaS Feed ID which harvests from the crop stored in this unit can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "minimum": 1
+        }
+      }
+    },
+    "baleage_storage": {
+      "type": "array",
+      "description": "A list of baleage types that can be stored in a baleage storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Baleage storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(Baleage)$"
+        },
+        "bale_density": {
+          "type": "number",
+          "description": "Density of baleage bales (kg dry matter / cubic meter).",
+          "minimum": 100,
+          "maximum": 400,
+          "default": 200
+        },
+        "initial_storage_dry_matter": {
+          "type": "number",
+          "description": "Initial dry matter content of baleage at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.6
+        },
+        "post_wilting_moisture_percentage": {
+          "type": "number",
+          "description": "The post-wilting moisture level that baleage will dry down to.",
+          "minimum": 30,
+          "maximum": 60,
+          "default": 45
+        },
+        "rufas_id": {
+          "type": "number",
+          "description": "RuFaS Feed ID which harvests from the crop stored in this unit can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "minimum": 1
+        }
+      }
+    },
+    "silage_storage": {
+      "type": "array",
+      "description": "A list of silage types that can be stored in a silage storage unit.",
+      "properties": {
+        "type": "object",
+        "description": "Silage storage unit.",
+        "name": {
+          "type": "string",
+          "description": "User defined name of the feed storage unit."
+        },
+        "crop_name": {
+          "type": "string",
+          "description": "Name of crop to be stored in the feed storage unit."
+        },
+        "field_name": {
+          "type": "string",
+          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of feed storage unit.",
+          "pattern": "^(Bag|Bunker|Pile)$"
+        },
+        "initial_storage_dry_matter": {
+          "type": "number",
+          "description": "Initial dry matter content of silage at time of storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.35
+        },
+        "rufas_id": {
+          "type": "number",
+          "description": "RuFaS Feed ID which harvests from the crop stored in this unit can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "minimum": 1
+        },
+        "size": {
+          "type": "number",
+          "description": "Size of the silage storage (tons).",
+          "minimum": 0.0,
+          "default": 0.0
+        }
+      }
     }
+  },
+  "feed_storage_instances": {
+    "data_collection_app_compatible": false,
+    "feed_storages": {
+      "type": "array",
+      "description": "A list of feed storage instances that are used on the farm.",
+      "properties": {
+        "type": "string",
+        "description": "The reference to the name of the storage from the `feed_storage_configurations` input."
+        }
+      }
   }
 }
+
+

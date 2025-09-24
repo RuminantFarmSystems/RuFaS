@@ -1,56 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import date
-from enum import Enum
-from typing import NamedTuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
-
-from .feed_storage_to_animal_connection import RUFAS_ID
-
-
-class CropCategory(Enum):
-    """
-    Enum for Crop Categories.
-
-    Attributes
-    ----------
-    SMALL_GRAIN : str
-        Represents small grain crops.
-    CORN : str
-        Represents corn crops.
-    SOY : str
-        Represents soy crops.
-    GRASS : str
-        Represents grass crops.
-    ALFALFA : str
-        Represents alfalfa crops.
-
-    """
-
-    SMALL_GRAIN = "Small grain"
-    CORN = "Corn"
-    SOY = "Soy"
-    GRASS = "Grass"
-    ALFALFA = "Alfalfa"
-
-
-class StorageType(Enum):
-    """
-    Maps each storage type to its respective class.
-    """
-
-    PROTECTED_INDOORS = "Protected Indoors"
-    PROTECTED_WRAPPED = "Protected Wrapped"
-    PROTECTED_TARPED = "Protected Tarped"
-    UNPROTECTED = "Unprotected"
-    BALEAGE = "Baleage"
-    DRY = "Dry"
-    HIGH_MOISTURE = "High Moisture"
-    BUNKER = "Bunker"
-    PILE = "Pile"
-    BAG = "Bag"
-
 
 """This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
 EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION = 0.3
@@ -63,12 +15,10 @@ class HarvestedCrop:
 
     Attributes
     ----------
-    category : CropCategory
-        The category of the crop (enum).
     config_name : str
         Name of the crop configuration that produced this harvested crop.
-    rufas_ids : list[RUFAS_ID]
-        List of RUFAS_IDs that this Harvested Crop may be fed as (unitless).
+    field_name : str
+        Name of the field from which this crop was harvested.
     harvest_time : date
         The time at which the crop was harvested.
     storage_time : date
@@ -125,9 +75,8 @@ class HarvestedCrop:
 
     """
 
-    category: CropCategory
     config_name: str
-    rufas_ids: list[RUFAS_ID]
+    field_name: str
     harvest_time: date
     storage_time: date
     last_time_degraded: date = field(init=False)
@@ -178,6 +127,18 @@ class HarvestedCrop:
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         return dry_matter_fraction * self.fresh_mass
+
+    @property
+    def is_alfalfa(self) -> bool:
+        """
+        Checks if the crop is alfalfa based on its configuration name.
+
+        Returns
+        -------
+        bool
+            True if the crop is alfalfa, False otherwise.
+        """
+        return "alfalfa" in self.config_name.lower()
 
     def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
         """Removes the specified amount of dry matter mass from the crop."""
@@ -262,10 +223,3 @@ class HarvestedCrop:
             104 * moisture_frac**2.18 * self.bale_density**0.5 + 5.72 * moisture_frac**1.23 * self.bale_density**0.94
         )
         return heat
-
-
-class HarvestedCropStorageType(NamedTuple):
-    """Used to couple a yield collected in the Crop and Soil module with the storage type it will be put in."""
-
-    harvested_crop: HarvestedCrop
-    storage_type: StorageType
