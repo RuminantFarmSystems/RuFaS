@@ -1425,7 +1425,7 @@ class InputManager:
         Returns
         -------
         dict[str, Any]
-            A alias name - value pair dictionary.
+            A dictionary mapping variable names to their values.
 
         """
         target_and_save_results = {}
