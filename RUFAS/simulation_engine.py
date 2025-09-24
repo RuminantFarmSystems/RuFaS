@@ -273,7 +273,7 @@ class SimulationEngine:
         self.next_ration_reformulation = self.time.current_date.date()
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
         max_daily_feed_recalculations_per_year: int = self.im.get_data(
-            "feed_management.max_daily_feed_recalculations_per_year"
+            "feed.max_daily_feed_recalculations_per_year"
         )
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval

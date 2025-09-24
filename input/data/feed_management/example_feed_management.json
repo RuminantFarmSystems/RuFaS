@@ -1,5 +1,4 @@
 {
   "hay_bale_diameter": 1.8,
-  "post_wilting_moisture_percentage": 50,
-  "max_daily_feed_recalculations_per_year": 4
+  "post_wilting_moisture_percentage": 50
 }
