@@ -40,6 +40,7 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
 
     total_manure_excreted = 4.158 * dry_matter_intake - 0.0246 * body_weight
     total_solids = 0.178 * dry_matter_intake + 2.733
+    total_manure_excreted = max(total_manure_excreted, (total_solids / 0.15))
     total_volatile_solids = 0.0073 * body_weight
     degradable_volatile_solids = 0.9 * total_volatile_solids
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
