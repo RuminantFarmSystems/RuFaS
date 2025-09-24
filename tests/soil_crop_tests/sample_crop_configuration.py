@@ -1,4 +1,3 @@
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, StorageType
 from RUFAS.routines.field.crop.crop_data import PlantCategory
 from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration
 
@@ -6,8 +5,6 @@ from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration
 SAMPLE_CROP_CONFIGURATION = CropConfiguration(
     name="alfalfa_silage",
     plant_category=PlantCategory.PERENNIAL_LEGUME,
-    crop_category=CropCategory.ALFALFA,
-    rufas_ids=[104, 109, 110],
     is_nitrogen_fixer=True,
     minimum_temperature=4.0,
     optimal_temperature=25.0,
@@ -28,18 +25,17 @@ SAMPLE_CROP_CONFIGURATION = CropConfiguration(
     max_root_depth=3000,
     root_distribution_param_da=207.0,
     root_distribution_param_c=-1.032,
-    storage_type=StorageType.BUNKER,
     optimal_harvest_index=0.90,
     minimum_harvest_index=0.40,
     dry_matter_percentage=42.883,
     lignin_dry_matter_percentage=7.419,
-    crude_protein_percent=20.471,
-    non_protein_nitrogen=10.098,
-    starch=1.973,
-    adf=33.683,
-    ndf=43.195,
-    sugar=6.274,
-    ash=10.597,
+    crude_protein_percent_at_harvest=20.471,
+    non_protein_nitrogen_at_harvest=10.098,
+    starch_at_harvest=1.973,
+    adf_at_harvest=33.683,
+    ndf_at_harvest=43.195,
+    sugar_at_harvest=6.274,
+    ash_at_harvest=10.597,
     yield_nitrogen_fraction=0.0327536,
     yield_phosphorus_fraction=0.00351,
 )

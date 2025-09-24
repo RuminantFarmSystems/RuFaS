@@ -1,4 +1,5 @@
 from dataclasses import replace
+import datetime
 from math import exp
 from typing import Dict, List
 from unittest.mock import MagicMock, PropertyMock, call, patch
@@ -7,12 +8,12 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
@@ -487,14 +488,17 @@ def test_check_crop_harvest_schedule(
     mocker: MockerFixture,
     year: int,
     day: int,
-    all_harvest_events: List[HarvestEvent],
-    current_harvest_events: List[HarvestEvent],
+    all_harvest_events: list[HarvestEvent],
+    current_harvest_events: list[HarvestEvent],
     expected_harvest_count: int,
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
     field = Field(harvestings=all_harvest_events)
 
     mocked_time = MagicMock(RufasTime)
+    mocked_time.calendar_year = year
+    mocked_time.day = day
+    mocked_time.current_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=day - 1)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     mock_conditions = MagicMock(CurrentDayConditions)
@@ -502,9 +506,25 @@ def test_check_crop_harvest_schedule(
     filter_events = mocker.patch.object(
         field, "_filter_events", return_value=(remaining_harvest_events, current_harvest_events)
     )
-    harvest_crop = mocker.patch.object(
-        field, "_harvest_crop", return_value=[HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)]
+    mock_harvested_crop = HarvestedCrop(
+        config_name="test_crop",
+        field_name="test_field",
+        harvest_time=mocked_time,
+        storage_time=mocked_time,
+        fresh_mass=10.0,
+        dry_matter_percentage=0.85,
+        dry_matter_digestibility=0.65,
+        crude_protein_percent=0.12,
+        non_protein_nitrogen=0.02,
+        starch=0.30,
+        adf=0.15,
+        ndf=0.35,
+        lignin=0.05,
+        sugar=0.10,
+        ash=0.08,
+        recorded_days=set(),
     )
+    harvest_crop = mocker.patch.object(field, "_harvest_crop", return_value=[mock_harvested_crop])
     harvest_heat_scheduled = mocker.patch.object(field, "_harvest_heat_scheduled_crops")
 
     harvest_crop_calls = []

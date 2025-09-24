@@ -1,9 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
-
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, StorageType
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 
 
 class PlantCategory(Enum):
@@ -52,12 +49,8 @@ class CropData:
     ----------
     name : Optional[str]
         The name of this specific crop instance.
-    rufas_ids : list[RUFAS_ID]
-        List of RUFAS IDs that harvests from this crop may be fed as.
     id : Optional[Any]
         The unique identifier for this crop instance.
-    rufas_ids : list[RUFAS_ID]
-        List of RuFaS Feed IDs that harvests of this crop may be fed as.
     plant_category : Optional[PlantCategory]
         Classification of the plant (Reference SWAT crop.dat file, IDC variable).
     is_perennial : Optional[bool]
@@ -68,10 +61,6 @@ class CropData:
         Proportion of the field occupied by this crop.
     is_alive : bool
         Indicates if the crop is currently alive in the field.
-    crop_category : CropCategory
-        Broad category into which this crop type falls.
-    storage_type : StorageType
-        Method of storage for this crop when harvested.
     planting_year : int
         Year of planting for this crop.
     planting_day : int
@@ -89,20 +78,20 @@ class CropData:
         Minimum harvest index under drought conditions (unitless).
     yield_phosphorus_fraction : Optional[float]
         Fraction of phosphorus in yield (unitless).
-    crude_protein_percent : float
-        Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float
-        Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float
-        Percentage of dry matter mass that is starch (unitless).
-    adf : float
-        Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float
-        Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float
-        Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float
-        Percentage of dry matter mass that is ash (unitless).
+    crude_protein_percent_at_harvest : float
+        Percentage of dry matter mass that is dietary crude protein at the point of harvest (unitless).
+    non_protein_nitrogen_at_harvest : float
+        Percentage of dry matter mass that is non-protein nitrogen at the point of harvest (unitless).
+    starch_at_harvest : float
+        Percentage of dry matter mass that is starch at the point of harvest (unitless).
+    adf_at_harvest : float
+        Percentage of dry matter mass that is acid detergent fiber at the point of harvest (unitless).
+    ndf_at_harvest : float
+        Percentage of dry matter mass that is neutral detergent fiber at the point of harvest (unitless).
+    sugar_at_harvest : float
+        Percentage of dry matter mass that is labile carbohydrate at the point of harvest (unitless).
+    ash_at_harvest : float
+        Percentage of dry matter mass that is ash at the point of harvest (unitless).
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
     optimal_temperature : float
@@ -237,17 +226,12 @@ class CropData:
 
     # ID variables (SWAT Table A-1 ish)
     name: Optional[str] = "default generic annual crop"
-    rufas_ids: list[int] = field(default_factory=list)
     id: Optional[Any] = None
-    rufas_ids: list[RUFAS_ID]
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
     is_perennial: Optional[bool] = False
     is_nitrogen_fixer: bool = False
     field_proportion: float = 1.0
     is_alive: bool = True
-
-    crop_category: CropCategory = CropCategory.SMALL_GRAIN
-    storage_type: StorageType = StorageType.DRY
 
     # Management variables
     planting_year: int = 0
@@ -258,13 +242,13 @@ class CropData:
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
     yield_phosphorus_fraction: Optional[float] = 0.0
-    crude_protein_percent: float = 12.481
-    non_protein_nitrogen: float = 2.518
-    starch: float = 72.586
-    adf: float = 3.934
-    ndf: float = 6.134
-    sugar: float = 2.235
-    ash: float = 2.496
+    crude_protein_percent_at_harvest: float = 12.481
+    non_protein_nitrogen_at_harvest: float = 2.518
+    starch_at_harvest: float = 72.586
+    adf_at_harvest: float = 3.934
+    ndf_at_harvest: float = 6.134
+    sugar_at_harvest: float = 2.235
+    ash_at_harvest: float = 2.496
 
     # SWAT Table A-3
     minimum_temperature: float = 0

@@ -3,7 +3,7 @@ from datetime import date
 from typing import Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -56,14 +56,33 @@ class Storage:
     """
     Abstract class representing a general storage structure.
 
+    Parameters
+    ----------
+    storage_config : dict[str, str | float]
+        Configuration dictionary for the storage, containing keys:
+            - name: Name of the storage (str).
+            - field_name: Name of the field associated with the storage (str).
+            - crop_name: Name of the crop associated with the storage (str).
+            - rufas_id: RuFaS Feed ID associated with the storage (int).
+            - initial_storage_dry_matter: Initial dry matter percentage of the crop when first stored (float).
+    capacity : float, optional
+
     Attributes
     ----------
-    acceptable_crops : list[CropCategory]
-        The list of crop categories that this storage can recieve.
     capacity : float
         The maximum capacity of the storage, currently set to infinity.
     stored : list[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
+    storage_name : str
+        Name of the storage.
+    field_name : str
+        Name of the field associated with the storage.
+    crop_name : str
+        Name of the crop associated with the storage.
+    rufas_feed_id : int
+        RuFaS Feed ID associated with the storage.
+    initial_storage_dry_matter : float
+        Initial dry matter percentage of the crop when first stored.
     crude_protein_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust crude protein after dry matter loss.
     starch_loss_coefficient : float, default 0.0
@@ -103,17 +122,21 @@ class Storage:
 
     """
 
-    def __init__(self, capacity: float = float("inf")):
-        self.acceptable_crops: list[CropCategory] = []
-        self.capacity = capacity
+    def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
+        self.capacity: float = capacity
         self.stored: list[HarvestedCrop] = []
-        self.crude_protein_loss_coefficient = 0.0
-        self.starch_loss_coefficient = 0.0
-        self.adf_loss_coefficient = 0.0
-        self.ndf_loss_coefficient = 0.0
-        self.lignin_loss_coefficient = 0.0
-        self.ash_loss_coefficient = 0.0
-        self.om = OutputManager()
+        self.storage_name: str = str(storage_config["name"])
+        self.field_name: str = str(storage_config["field_name"])
+        self.crop_name: str = str(storage_config["crop_name"])
+        self.rufas_feed_id: int = int(storage_config["rufas_id"])
+        self.initial_storage_dry_matter: float = float(storage_config["initial_storage_dry_matter"])
+        self.crude_protein_loss_coefficient: float = 0.0
+        self.starch_loss_coefficient: float = 0.0
+        self.adf_loss_coefficient: float = 0.0
+        self.ndf_loss_coefficient: float = 0.0
+        self.lignin_loss_coefficient: float = 0.0
+        self.ash_loss_coefficient: float = 0.0
+        self.om: OutputManager = OutputManager()
 
     @property
     def stored_mass(self) -> float:
@@ -149,15 +172,6 @@ class Storage:
             If adding the crop exceeds the storage's capacity.
 
         """
-        if not self.acceptable_crops:
-            raise NotImplementedError(
-                "Storage.acceptable_crops is not populated, consider populating it in the child class."
-            )
-        if crop.category not in self.acceptable_crops:
-            raise ValueError(
-                f"Can't receive the crop, the compatible crop categories are {self.acceptable_crops=}, "
-                f"{crop.category} is not one of them."
-            )
         if self.stored_mass + crop.fresh_mass > self.capacity:
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
@@ -525,8 +539,7 @@ class Storage:
         """
         dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
-        is_alfalfa = crop.category is CropCategory.ALFALFA
-        constants = ALFALFA_FERMENTATION_CONSTANTS if is_alfalfa else NON_ALFALFA_FERMENTATION_CONSTANTS
+        constants = ALFALFA_FERMENTATION_CONSTANTS if crop.is_alfalfa else NON_ALFALFA_FERMENTATION_CONSTANTS
         lower_temp_limit = constants["lower_temp_limit"]
         upper_temp_limit = constants["upper_temp_limit"]
         lower_dry_matter_limit = constants["lower_dry_matter_limit"]
