@@ -49,6 +49,7 @@ def hay(mock_storage_config: dict[str, float]) -> Hay:
     Hay
         An instance of the Hay class.
     """
+    mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     return Hay(config=mock_storage_config)
 
 
@@ -246,17 +247,20 @@ def test_calculate_additional_dry_matter_loss(
 
 def test_protected_wrapped_init(mock_storage_config: dict[str, float]) -> None:
     """Tests that ProtectedWrapped hay instances are initialized correctly."""
+    mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     protected_wrapped = ProtectedWrapped(config=mock_storage_config)
     assert protected_wrapped.additional_dry_matter_loss_coefficient == PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 def test_protected_tarped_init(mock_storage_config: dict[str, float]) -> None:
     """Tests that ProtectedTarped hay instances are initialized correctly."""
+    mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     protected_tarped = ProtectedTarped(config=mock_storage_config)
     assert protected_tarped.additional_dry_matter_loss_coefficient == PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 def test_outdoor_unprotected_init(mock_storage_config: dict[str, float]) -> None:
     """Tests that Unprotected hay instances are initialized correctly."""
+    mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     unprotected = Unprotected(config=mock_storage_config)
     assert unprotected.additional_dry_matter_loss_coefficient == UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT

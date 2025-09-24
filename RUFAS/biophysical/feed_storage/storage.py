@@ -125,11 +125,11 @@ class Storage:
     def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
         self.capacity: float = capacity
         self.stored: list[HarvestedCrop] = []
-        self.storage_name: str = storage_config.get("name")
-        self.field_name: str = storage_config.get("field_name")
-        self.crop_name: str = storage_config.get("crop_name")
-        self.rufas_feed_id: int = storage_config.get("rufas_id")
-        self.initial_storage_dry_matter: float = storage_config.get("initial_storage_dry_matter")
+        self.storage_name: str = str(storage_config["name"])
+        self.field_name: str = str(storage_config["field_name"])
+        self.crop_name: str = str(storage_config["crop_name"])
+        self.rufas_feed_id: int = int(storage_config["rufas_id"])
+        self.initial_storage_dry_matter: float = float(storage_config["initial_storage_dry_matter"])
         self.crude_protein_loss_coefficient: float = 0.0
         self.starch_loss_coefficient: float = 0.0
         self.adf_loss_coefficient: float = 0.0

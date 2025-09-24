@@ -6093,6 +6093,13 @@
           "maximum": 4,
           "default": 1.8
         },
+        "additional_dry_matter_loss_coefficient": {
+          "type": "number",
+          "description": "Additional dry matter loss coefficient for the hay storage (unitless).",
+          "minimum": 0.0,
+          "maximum": 0.1,
+          "default": 0.0
+        },
         "initial_storage_dry_matter" :{
           "type": "number",
           "description": "Initial dry matter content of hay at time of storage (unitless).",
