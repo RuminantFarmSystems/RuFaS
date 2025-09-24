@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 
+from RUFAS.EEE.emissions import EmissionsEstimator
 import pytest
 from unittest.mock import MagicMock, call
 
 from pytest_mock import MockerFixture
 
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
@@ -51,6 +53,7 @@ def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     simulation_engine.manure_manager = MagicMock(auto_spec=ManureManager)
     simulation_engine.field_manager = MagicMock(auto_spec=FieldManager)
     simulation_engine.feed_manager = MagicMock(auto_spec=FeedManager)
+    simulation_engine.emissions_estimator = MagicMock(auto_spec=EmissionsEstimator)
 
     return simulation_engine
 
@@ -80,6 +83,7 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
     """
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
+    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
     mock_report_end_of_simulation = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" ".report_end_of_simulation"
@@ -119,6 +123,7 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
         simulation_engine.herd_manager.cows,
     )
     mock_feed_query_available_feeds.assert_called_once()
+    mock_estimate_emissions.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -215,7 +220,9 @@ def test_daily_simulation(
         simulation_engine.feed_manager, "manage_planning_cycle_purchases"
     )
     mock_feed_manage_daily_feed_request = mocker.patch.object(
-        simulation_engine.feed_manager, "manage_daily_feed_request", return_value=is_ok_to_feed_animals
+        simulation_engine.feed_manager,
+        "manage_daily_feed_request",
+        return_value=(is_ok_to_feed_animals, {"purchased": {}}),
     )
 
     mock_herd_update_all_max_daily_feeds = mocker.patch.object(
@@ -244,6 +251,13 @@ def test_daily_simulation(
     mock_om_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     mock_record_time = mocker.patch.object(mock_time, "record_time")
     mock_record_weather = mocker.patch.object(mock_weather, "record_weather")
+    mocker.patch.object(simulation_engine.feed_manager, "report_feed_storage_levels")
+    mocker.patch.object(simulation_engine.feed_manager, "report_cumulative_purchased_feeds")
+    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions_estimator, "calculate_emissions")
+    mock_report_cumulative_purchased_feeds = mocker.patch.object(
+        simulation_engine.feed_manager, "report_cumulative_purchased_feeds"
+    )
+    mock_report_feed_storage_levels = mocker.patch.object(simulation_engine.feed_manager, "report_feed_storage_levels")
 
     # Act
     simulation_engine._daily_simulation()
@@ -299,6 +313,11 @@ def test_daily_simulation(
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
     mock_advance_time.assert_called_once_with()
+    mock_report_feed_storage_levels.assert_called_once_with(
+        simulation_engine.time.simulation_day, "daily_storage_levels"
+    )
+    mock_report_cumulative_purchased_feeds.assert_called_once_with(simulation_engine.time.simulation_day)
+    mock_calc_emissions.assert_called_once_with({})
 
 
 @pytest.mark.parametrize(
@@ -464,6 +483,11 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_manure_manager = MagicMock(auto_spec=ManureManager)
     mock_manure_manager_init = mocker.patch("RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager)
 
+    mock_emissions_estimator = MagicMock(auto_spec=EmissionsEstimator)
+    mock_emissions_estimator_init = mocker.patch(
+        "RUFAS.simulation_engine.EmissionsEstimator", return_value=mock_emissions_estimator
+    )
+
     # Act
     simulation_engine._initialize_simulation()
 
@@ -482,6 +506,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_field_manager_init.assert_called_once_with()
     assert simulation_engine.field_manager == mock_field_manager
     mock_field_get_crop_configs_to_rufas_ids.assert_called_once()
+    mock_emissions_estimator_init.assert_called_once_with()
+    assert simulation_engine.emissions_estimator == mock_emissions_estimator
     mock_nutrient_standard_init.assert_called_once_with(mock_config_nutrient_standard)
     mock_feed_manager_init.assert_called_once_with(
         mock_feed_config, mock_nutrient_standard, mock_crop_config_to_rufas_ids_map
