@@ -56,12 +56,33 @@ class Storage:
     """
     Abstract class representing a general storage structure.
 
+    Parameters
+    ----------
+    storage_config : dict[str, str | float]
+        Configuration dictionary for the storage, containing keys:
+            - name: Name of the storage (str).
+            - field_name: Name of the field associated with the storage (str).
+            - crop_name: Name of the crop associated with the storage (str).
+            - rufas_id: RuFaS Feed ID associated with the storage (int).
+            - initial_storage_dry_matter: Initial dry matter percentage of the crop when first stored (float).
+    capacity : float, optional
+
     Attributes
     ----------
     capacity : float
         The maximum capacity of the storage, currently set to infinity.
     stored : list[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
+    storage_name : str
+        Name of the storage.
+    field_name : str
+        Name of the field associated with the storage.
+    crop_name : str
+        Name of the crop associated with the storage.
+    rufas_feed_id : int
+        RuFaS Feed ID associated with the storage.
+    initial_storage_dry_matter : float
+        Initial dry matter percentage of the crop when first stored.
     crude_protein_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust crude protein after dry matter loss.
     starch_loss_coefficient : float, default 0.0
@@ -102,20 +123,20 @@ class Storage:
     """
 
     def __init__(self, storage_config: dict[str, str | float], capacity: float = float("inf")) -> None:
-        self.capacity = capacity
+        self.capacity: float = capacity
         self.stored: list[HarvestedCrop] = []
-        self.storage_name = storage_config.get("name")
-        self.field_name = storage_config.get("field_name")
-        self.crop_name = storage_config.get("crop_name")
-        self.rufas_feed_id = storage_config.get("rufas_id")
+        self.storage_name: str = storage_config.get("name")
+        self.field_name: str = storage_config.get("field_name")
+        self.crop_name: str = storage_config.get("crop_name")
+        self.rufas_feed_id: int = storage_config.get("rufas_id")
         self.initial_storage_dry_matter: float = storage_config.get("initial_storage_dry_matter")
-        self.crude_protein_loss_coefficient = 0.0
-        self.starch_loss_coefficient = 0.0
-        self.adf_loss_coefficient = 0.0
-        self.ndf_loss_coefficient = 0.0
-        self.lignin_loss_coefficient = 0.0
-        self.ash_loss_coefficient = 0.0
-        self.om = OutputManager()
+        self.crude_protein_loss_coefficient: float = 0.0
+        self.starch_loss_coefficient: float = 0.0
+        self.adf_loss_coefficient: float = 0.0
+        self.ndf_loss_coefficient: float = 0.0
+        self.lignin_loss_coefficient: float = 0.0
+        self.ash_loss_coefficient: float = 0.0
+        self.om: OutputManager = OutputManager()
 
     @property
     def stored_mass(self) -> float:

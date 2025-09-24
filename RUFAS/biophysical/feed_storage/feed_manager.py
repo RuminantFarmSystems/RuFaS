@@ -93,6 +93,7 @@ class FeedManager:
         self._om = OutputManager()
         self._available_feeds: list[NASEMFeed | NRCFeed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.active_storages: dict[str, Storage] = {}
+
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
@@ -104,7 +105,7 @@ class FeedManager:
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
         for storage in self.active_storages.values():
             if storage.rufas_feed_id in available_feed_ids:
-                self.crop_to_rufas_id[storage.crop_name] = storage.rufas_feed_id
+                self.crop_to_rufas_id[str(storage.crop_name)] = storage.rufas_feed_id
 
         self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
         self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
@@ -152,8 +153,8 @@ class FeedManager:
 
         available_rufas_ids: list[int] = [feed.rufas_id for feed in self.available_feeds]
         for instance_name in instance_names:
-            storage_config = configs_by_name.get(instance_name)
-            storage_type_str = storage_config.get("storage_type")
+            storage_config = configs_by_name[instance_name]
+            storage_type_str = storage_config["storage_type"]
             storage_class = StorageType.get_storage_class(storage_type_str)
             storage = storage_class(storage_config)
             self.active_storages[instance_name] = storage
@@ -576,11 +577,27 @@ class FeedManager:
     def _lookup_storage_rufas_id(self, crop_name: str) -> RUFAS_ID:
         """
         Looks up and returns the RuFaS Feed ID associated with a given crop name in storage.
+
+        Parameters
+        ----------
+        crop_name : str
+            The name of the crop to look up.
+
+        Returns
+        -------
+        RUFAS_ID
+            The RuFaS Feed ID associated with the crop in its appropriate storage.
+
+        Raises
+        ------
+        ValueError
+            If no storage with the given crop name is found or there is no rufas ID for the crop in this storage.
+
         """
         for storage in self.active_storages.values():
             if storage.crop_name == crop_name:
                 return storage.rufas_feed_id
-        return None
+        raise ValueError(f"No rufas id found for crop name '{crop_name}'.")
 
     def _gather_available_feeds(self) -> list[HarvestedCrop | PurchasedFeed]:
         """

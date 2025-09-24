@@ -27,8 +27,8 @@ class Baleage(Storage):
 
     def __init__(self, config: dict[str, str | float], capacity: float = float("inf")) -> None:
         super().__init__(config, capacity)
-        self.post_wilting_moisture_percentage: float = config.get("post_wilting_moisture_percentage")
-        self.bale_density: float = config.get("bale_density")
+        self.post_wilting_moisture_percentage: float = float(config["post_wilting_moisture_percentage"])
+        self.bale_density: float = float(config["bale_density"])
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
