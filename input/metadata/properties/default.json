@@ -5921,6 +5921,147 @@
       }
     }
   },
+  
+  "economics_map_properties": {
+    "data_collection_app_compatible": false,
+    "Animal": {
+      "type": "object",
+      "description": "Mappings for animal-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Economics metric definitions grouped within a category.",
+        "additionalProperties": {
+          "type": "object",
+          "description": "Mapping details for an individual economics metric.",
+          "biophysical_simulation": {
+            "type": "array",
+            "description": "InputManager addresses for the biophysical values feeding the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "economics_files": {
+            "type": "array",
+            "description": "Economics data sources referenced by the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "Supplemental notes or preprocessing guidance for the metric.",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "Crop and Soil": {
+      "type": "object",
+      "description": "Mappings for crop and soil economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Economics metric definitions grouped within a category.",
+        "additionalProperties": {
+          "type": "object",
+          "description": "Mapping details for an individual economics metric.",
+          "biophysical_simulation": {
+            "type": "array",
+            "description": "InputManager addresses for the biophysical values feeding the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "economics_files": {
+            "type": "array",
+            "description": "Economics data sources referenced by the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "Supplemental notes or preprocessing guidance for the metric.",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "Feed": {
+      "type": "object",
+      "description": "Mappings for feed-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Economics metric definitions grouped within a category.",
+        "additionalProperties": {
+          "type": "object",
+          "description": "Mapping details for an individual economics metric.",
+          "biophysical_simulation": {
+            "type": "array",
+            "description": "InputManager addresses for the biophysical values feeding the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "economics_files": {
+            "type": "array",
+            "description": "Economics data sources referenced by the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "Supplemental notes or preprocessing guidance for the metric.",
+            "nullable": true
+          }
+        }
+      },
+      "Revenue": {
+        "type": "string",
+        "description": "Reference directing revenue metrics to crop and soil mappings.",
+        "nullable": false
+      }
+    },
+    "Manure": {
+      "type": "object",
+      "description": "Mappings for manure-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Economics metric definitions grouped within a category.",
+        "additionalProperties": {
+          "type": "object",
+          "description": "Mapping details for an individual economics metric.",
+          "biophysical_simulation": {
+            "type": "array",
+            "description": "InputManager addresses for the biophysical values feeding the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "economics_files": {
+            "type": "array",
+            "description": "Economics data sources referenced by the metric.",
+            "properties": {
+              "type": "string"
+            },
+            "minimum_length": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "Supplemental notes or preprocessing guidance for the metric.",
+            "nullable": true
+          }
+        }
+      }
+    }
+  },
   "EEE_constants_properties": {
     "data_collection_app_compatible": false,
     "constants": {
@@ -6050,6 +6191,62 @@
         "minimum": 30,
         "maximum": 60,
         "default": 45
+    }
+  },
+  
+  "economic_preprocessing_properties": {
+    "data_collection_app_compatible": false,
+    "Animal": {
+      "type": "object",
+      "description": "Aggregated results for animal-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Aggregated economics metrics grouped within a category.",
+        "additionalProperties": {
+          "type": "number",
+          "description": "Aggregated value reported for the economics metric.",
+          "nullable": true
+        }
+      }
+    },
+    "Crop and Soil": {
+      "type": "object",
+      "description": "Aggregated results for crop and soil economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Aggregated economics metrics grouped within a category.",
+        "additionalProperties": {
+          "type": "number",
+          "description": "Aggregated value reported for the economics metric.",
+          "nullable": true
+        }
+      }
+    },
+    "Feed": {
+      "type": "object",
+      "description": "Aggregated results for feed-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Aggregated economics metrics grouped within a category.",
+        "additionalProperties": {
+          "type": "number",
+          "description": "Aggregated value reported for the economics metric.",
+          "nullable": true
+        }
+      }
+    },
+    "Manure": {
+      "type": "object",
+      "description": "Aggregated results for manure-related economic metrics.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Aggregated economics metrics grouped within a category.",
+        "additionalProperties": {
+          "type": "number",
+          "description": "Aggregated value reported for the economics metric.",
+          "nullable": true
+        }
+      }
     }
   }
 }
