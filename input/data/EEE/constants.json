@@ -25,16 +25,7 @@
       "Description": "",
       "Value": 0.9,
       "Unit": "unitless",
-      "Notes and remarks": "can we explain this in a few words?"
-    },
-    {
-      "ID": 588,
-      "Grouping": "Tillage",
-      "Name": "Fi",
-      "Description": "Soil Adjustment parameter i = {1 for fine, 2 for medium, 3 for coarse}",
-      "Value": 0,
-      "Unit": "unitless",
-      "Notes and remarks": "we need a value for this parameter for each  i in {1,2,3}"
+      "Notes and remarks": "The proportion of time in the field that is spent conducting the work"
     },
     {
       "ID": 589,
