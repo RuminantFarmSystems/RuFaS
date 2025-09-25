@@ -16,7 +16,6 @@ stored data is intentionally flexible and is validated using the
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 from RUFAS.input_manager import InputManager
@@ -35,7 +34,6 @@ class EconomicPreprocessor:
         self.om = OutputManager()
         self.mapping = self._load_map()
 
-    # ------------------------------------------------------------------
     def _load_map(self) -> Dict[str, Any]:
         """Load the economics mapping from the Input Manager."""
         info_map = {"class": self.__class__.__name__, "function": self._load_map.__name__}
@@ -50,7 +48,6 @@ class EconomicPreprocessor:
             raise KeyError(f"Economics mapping '{mapping_name}' not found")
         return mapping
 
-    # ------------------------------------------------------------------
     def _append_numeric(self, container: List[float], value: Any) -> None:
         """Append numeric value to container if possible."""
         try:
@@ -58,7 +55,6 @@ class EconomicPreprocessor:
         except (TypeError, ValueError):
             pass
 
-    # ------------------------------------------------------------------
     def _fetch_values(self, sim_paths: Iterable[str]) -> List[float]:
         """Collect values from the InputManager for the provided paths."""
         values: List[float] = []
@@ -79,7 +75,6 @@ class EconomicPreprocessor:
                 self._append_numeric(values, data)
         return values
 
-    # ------------------------------------------------------------------
     def _aggregate(self, values: List[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
         if not values:
@@ -102,7 +97,6 @@ class EconomicPreprocessor:
         # Default aggregation is sum
         return Aggregator.sum(values)
 
-    # ------------------------------------------------------------------
     def preprocess(self) -> Dict[str, Dict[str, Dict[str, float | None]]]:
         """Run preprocessing and store results in the InputManager."""
         results: Dict[str, Dict[str, Dict[str, float | None]]] = {}
