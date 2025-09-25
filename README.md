@@ -4,6 +4,7 @@
 [![Mypy](https://img.shields.io/badge/Mypy-1720%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 
+
 # RuFaS: Ruminant Farm Systems
 
 **RuFaS** is an open-source, next-generation, whole-farm modeling environment that simulates dairy farm production and environmental impact. It is designed to support research, innovation, and sustainable decision-making in ruminant animal agriculture.
