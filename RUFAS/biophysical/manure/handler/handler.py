@@ -156,7 +156,7 @@ class Handler(Processor):
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
-        nitrogen = self.manure_stream.nitrogen
+        manure_total_nitrogen = max(0.0, self.manure_stream.nitrogen - ammonia_emission)
         phosphorus = self.manure_stream.phosphorus
         potassium = self.manure_stream.potassium
         ash = self.manure_stream.ash
@@ -177,7 +177,7 @@ class Handler(Processor):
         output_stream = ManureStream(
             water=manure_water,
             ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-            nitrogen=nitrogen,
+            nitrogen=manure_total_nitrogen,
             phosphorus=phosphorus,
             potassium=potassium,
             ash=ash,
