@@ -276,6 +276,7 @@ def test_apply_volatile_solid_loss(
     assert total_solids == expected_total_solids
     assert non_degradable_solids == expected_non_degradable_solids
 
+
 def test_report_gas_emissions(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
     """Tests the function _report_gas_emissions()."""
     mock_report = mocker.patch.object(Processor, "_report_processor_output")
