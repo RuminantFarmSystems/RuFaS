@@ -7,8 +7,9 @@ from copy import deepcopy
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Counter, Sequence, TextIO, Union, Callable
+from typing import Any, Sequence, TextIO, Union, Callable
 
+from collections import Counter
 import collections
 import numpy as np
 import pandas as pd
@@ -1455,8 +1456,8 @@ class OutputManager(object):
                     filtered_pool[key]["values"].extend(value["values"])
                 else:
                     filtered_pool[key] = value
-            self.current_pool_size = sys.getsizeof(filtered_pool)
-            self._set_variables_pool({}, pool_size_override=self.current_pool_size)
+            self.current_pool_size = 0
+            self._set_variables_pool({}, pool_size_override=0)
 
         self._set_variables_pool(filtered_pool, pool_size_override=sys.getsizeof(filtered_pool))
 
