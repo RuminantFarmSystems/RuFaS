@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator
 
 
 def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
@@ -1995,3 +1995,247 @@ def test_extract_input_data_by_key_list_key_error(
         var_name=var_name,
         called_during_initialization=called_during_initialization,
     )
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
+        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
+        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
+        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
+        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
+        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
+    ],
+)
+def test_evaluate_expression_unknown_operation(
+    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
+) -> None:
+    """Unit tests for _evaluate_expression() in CrossValidator"""
+    cross_validator = CrossValidator()
+    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._evaluate_expression(expression_block, eager_termination)
+    else:
+        result, status = cross_validator._evaluate_expression(expression_block, eager_termination)
+        assert result is None
+        assert status is False
+    mock_get_alias_value.assert_not_called()
+    mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        ({"operation": "add", "save_as": "alias_2"}, True),
+        ({"operation": "subtract", "save_as": "alias_2"}, True),
+        ({"operation": "multiply", "ordered_variables": [], "save_as": "alias_2"}, True),
+        ({"operation": "add", "save_as": "alias_2"}, False),
+        ({"operation": "subtract", "save_as": "alias_2"}, False),
+        ({"operation": "multiply", "save_as": "alias_2"}, False),
+    ],
+)
+def test_evaluate_expression_no_ordered_variables(
+    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
+) -> None:
+    """Test the behavior of _evaluate_expression when ordered_variables is missing or empty."""
+    cross_validator = CrossValidator()
+    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._evaluate_expression(expression_block, eager_termination)
+    else:
+        result, status = cross_validator._evaluate_expression(expression_block, eager_termination)
+        assert result is None
+        assert status is False
+    mock_get_alias_value.assert_not_called()
+    mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, eager_termination",
+    [
+        ({"operation": "sum", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[], []], True),
+        ({"operation": "difference", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [{}, {}], True),
+        (
+            {"operation": "average", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [[1, 2, 3], {"a": 1, "b": 2}],
+            True,
+        ),
+        (
+            {"operation": "product", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [[4, 5, 6], ["a", "b", "c"]],
+            False,
+        ),
+        (
+            {"operation": "division", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            [{"a": [], "b": []}, [{}, {}]],
+            False,
+        ),
+        ({"operation": "no_op", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[{}], []], False),
+    ],
+)
+def test_validate_expression_block_with_complex_variable_values_multiple_complex_variable(
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool
+) -> None:
+    """
+    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator when
+    multiple complex variables are selected
+    """
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block_with_complex_variable_values(
+                expression_block, selected_variables, eager_termination
+            )
+    else:
+        result = cross_validator._validate_expression_block_with_complex_variable_values(
+            expression_block, selected_variables, eager_termination
+        )
+        assert result is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, eager_termination",
+    [
+        ({"operation": "sum", "ordered_variables": ["alias_0"]}, [[]], True),
+        ({"operation": "difference", "ordered_variables": ["alias_0"]}, [{}], True),
+        ({"operation": "average", "ordered_variables": ["alias_0"]}, [[1, 2, 3]], True),
+        ({"operation": "product", "ordered_variables": ["alias_0"]}, [{"a": 1, "b": 2, "c": 3}], False),
+        ({"operation": "division", "ordered_variables": ["alias_0"]}, [{"a": [], "b": []}], False),
+        ({"operation": "no_op", "ordered_variables": ["alias_0"]}, [[{}]], False),
+    ],
+)
+def test_validate_expression_block_with_complex_variable_values_no_apply_to(
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
+) -> None:
+    """
+    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
+    when a complex variable is selected and the `apply_to` key is missing.
+    """
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block_with_complex_variable_values(
+                expression_block, selected_variables, eager_termination
+            )
+    else:
+        result = cross_validator._validate_expression_block_with_complex_variable_values(
+            expression_block, selected_variables, eager_termination
+        )
+        assert result is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, eager_termination",
+    [
+        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], True),
+        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], False),
+    ],
+)
+def test_validate_expression_block_with_complex_variable_values_unknown_apply_to_value(
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
+) -> None:
+    """
+    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
+    when a complex variable is selected and the `apply_to` key is set to an unknown value.
+    """
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block_with_complex_variable_values(
+                expression_block, selected_variables, eager_termination
+            )
+    else:
+        result = cross_validator._validate_expression_block_with_complex_variable_values(
+            expression_block, selected_variables, eager_termination
+        )
+        assert result is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, expected_result",
+    [
+        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[1, 2, 3]], [1, 2, 3]),
+        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[]], []),
+        (
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "abc"},
+            [{"a": 1, "b": 2, "c": 3}],
+            [1, 2, 3],
+        ),
+        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [{}], []),
+        (
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "def"},
+            [{"a": [], "b": []}],
+            [[], []],
+        ),
+        (
+            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+            [[{}, {}, {}]],
+            [{}, {}, {}],
+        ),
+    ],
+)
+def test_evaluate_expression_apply_to_individual(
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    """
+    Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
+    and `apply_to` is set to `individual`
+    """
+    cross_validator = CrossValidator()
+    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    result, status = cross_validator._evaluate_expression(expression_block, False)
+    assert result == expected_result
+    assert status is True
+    mock_get_alias_value.assert_called_once()
+    if "save_as" in expression_block:
+        mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
+    else:
+        mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, expected_result",
+    [
+        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[1, 2, 3]], 6),
+        ({"operation": "difference", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[]], None),
+        (
+            {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group", "save_as": "abc"},
+            [{"a": 1, "b": 2, "c": 3}],
+            6,
+        ),
+        ({"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"}, [{}], None),
+        ({"operation": "no_op", "ordered_variables": ["a", "b", "c"], "save_as": "def"}, [2, 5, 8], [2, 5, 8]),
+        (
+            {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]},
+            [8, 7, 6, 5, 4, 3, 2, 1],
+            4.5,
+        ),
+    ],
+)
+def test_evaluate_expression_apply_to_group(
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+
+    cross_validator = CrossValidator()
+    mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    result, status = cross_validator._evaluate_expression(expression_block, False)
+    assert result == expected_result
+    assert status is True
+    if "save_as" in expression_block:
+        mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
+    else:
+        mock_save_to_alias_pool.assert_not_called()

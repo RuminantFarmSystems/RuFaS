@@ -3,7 +3,7 @@
   "tasks": [
     {
       "task_type": "HERD_INITIALIZATION",
-      "metadata_file_path": "input/metadata/default_metadata.json",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
       "output_prefix": "herd_init",
       "save_animals": true,
       "log_verbosity": "errors",

@@ -232,11 +232,15 @@ v0.9.2
 - [2559](https://github.com/RuminantFarmSystems/MASM/pull/2559) - [minor change] [Manure] Implement daily spread processor.
 - [2482](https://github.com/RuminantFarmSystems/MASM/pull/2554) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
 - [2550](https://github.com/RuminantFarmSystems/MASM/pull/2550) - [minor change] Create metadata for no animal scenario.
+- [2553](https://github.com/RuminantFarmSystems/MASM/pull/2553) - [minor change] [Input Manager] 3/5 Cross Validation: implement expression block.
 - [2567](https://github.com/RuminantFarmSystems/MASM/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
 - [2571](https://github.com/RuminantFarmSystems/MASM/pull/2571) - [minor change] Revert manure and animal input changes from PR2552.
 - [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
 - [2563](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] Changed calculations to support multi method calculations and update inputs.
 - [2573](https://github.com/RuminantFarmSystems/MASM/pull/2573) - [minor change][Manure] Additional solids calculation changes for manure handler
+- [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
+- [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
+- [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
 
 ### v0.9.2
 

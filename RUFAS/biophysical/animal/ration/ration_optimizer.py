@@ -26,6 +26,10 @@ class RationConfig:
         Nutrition requirements for pen, used in constraint methods.
     pen_average_body_weight : float
         Average body weight in pen, used in constraint methods.
+    initial_dry_matter_requirement : float
+        Dry matter intake requirement at start of ration formulation.
+    initial_protein_requirement : float
+        Metabolizable protein requirement at start of ration formulation.
     feeds_used : list[Feed]
         List of Feeds used in ration formulation.
     price_list : list[float]
@@ -56,6 +60,8 @@ class RationConfig:
         self,
         animal_requirements: NutritionRequirements,
         pen_available_feeds: Optional[list[Feed]],
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         pen_average_body_weight: float = 0,
     ) -> None:
         """
@@ -68,6 +74,10 @@ class RationConfig:
             Nutrition requirements for pen, used in constraint methods.
         pen_available_feeds : list[Feed], optional
             List of Feeds used in ration formulation.
+        initial_dry_matter_requirement : float
+            Dry matter intake requirement at start of ration formulation.
+        initial_protein_requirement : float
+            Metabolizable protein requirement at start of ration formulation.
         pen_average_body_weight : float
             Average body weight in pen, used in constraint methods.
         """
@@ -75,6 +85,8 @@ class RationConfig:
             pen_available_feeds = []
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
+        self.initial_dry_matter_requirement: float = initial_dry_matter_requirement
+        self.initial_protein_requirement: float = initial_protein_requirement
 
         self.feeds_used = pen_available_feeds
 
@@ -432,7 +444,9 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration)
+            RationOptimizer._calculate_protein_constraint_parameters(
+                decision_vector, ration_configuration, use_initial_requirement=False
+            )
         )
 
         return metabolizable_protein_supply - actual_metabolizable_protein_requirement
@@ -458,7 +472,9 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration)
+            RationOptimizer._calculate_protein_constraint_parameters(
+                decision_vector, ration_configuration, use_initial_requirement=True
+            )
         )
 
         return (
@@ -467,7 +483,7 @@ class RationOptimizer:
 
     @staticmethod
     def _calculate_protein_constraint_parameters(
-        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig, use_initial_requirement: bool
     ) -> tuple[float, float]:
         """
         Calculates the necessary parameters for protein constraints.
@@ -498,7 +514,10 @@ class RationOptimizer:
             actual_tdn_percentages=actual_tdn_percentages,
             body_weight=ration_configuration.pen_average_body_weight,
         )
-        actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
+        if use_initial_requirement:
+            actual_metabolizable_protein_requirement = ration_configuration.initial_protein_requirement
+        else:
+            actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
         return metabolizable_protein_supply, actual_metabolizable_protein_requirement
 
     @staticmethod
@@ -695,7 +714,7 @@ class RationOptimizer:
         return float(
             -(sum(decision_vector))
             + (
-                ration_configuration.animal_requirements.dry_matter
+                ration_configuration.initial_dry_matter_requirement
                 * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
             )
         )
@@ -729,9 +748,13 @@ class RationOptimizer:
         self,
         pen_average_body_weight: float,
         requirements: NutritionRequirements,
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         pen_available_feeds: list[Feed],
         animal_combination: AnimalCombination,
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float] | None = None,
+        user_defined_ration_tolerance: float = None,
     ) -> tuple[OptimizeResult, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -749,7 +772,10 @@ class RationOptimizer:
             The animal combination to optimize the ration for.
         previous_ration : dict[RUFAS_ID, str | float] | None
             Ration from previous formulation interval, if available.
-
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feed IDs and inclusion rate.
+        user_defined_ration_tolerance : float
+            Allowable tolerance of user defined ration inclusion rate.
         Returns
         -------
         OptimizeResult
@@ -763,11 +789,24 @@ class RationOptimizer:
         [AN.RAT.1]
 
         """
-        ration_config = RationConfig(requirements, pen_available_feeds, pen_average_body_weight)
+        ration_config = RationConfig(
+            requirements,
+            pen_available_feeds,
+            initial_dry_matter_requirement,
+            initial_protein_requirement,
+            pen_average_body_weight,
+        )
 
         initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
 
-        bounds = self._build_bounds(ration_config)
+        if user_defined_ration_dictionary:
+            bounds = self._build_bounds_user_defined_ration(
+                ration_config=ration_config,
+                user_defined_ration_dictionary=user_defined_ration_dictionary,
+                user_defined_ration_tolerance=user_defined_ration_tolerance,
+            )
+        else:
+            bounds = self._build_bounds(ration_config)
 
         initial_decision_vector = self._check_initial_bounds(bounds, initial_decision_vector)
         arguments = (ration_config,)
@@ -811,6 +850,54 @@ class RationOptimizer:
     def _build_bounds(ration_config: RationConfig) -> list[tuple[float, float]]:
         """Zips min/max lists into solver bounds."""
         return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+
+    @staticmethod
+    def _build_bounds_user_defined_ration(
+        ration_config: RationConfig,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float],
+        user_defined_ration_tolerance: float,
+    ) -> list[tuple[float, float]]:
+        """
+        Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
+        user_defined_ration_tolerance : float
+            Allowable +/- variance in each of the defined ration inclusion percentage values.
+
+        Returns
+        -------
+        list[tuple[float, float]]
+            List of upper and lower bounds for each feed ingredient.
+        """
+        feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+        user_defined_boundlist = []
+        udr_tolerance = user_defined_ration_tolerance
+        ration_key_list = sorted([int(key) for key in user_defined_ration_dictionary.keys()])
+        for key in ration_key_list:
+            target_lower = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 - udr_tolerance)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+            )
+            target_upper = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 + udr_tolerance)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+            )
+            targetbounds = (max(0.0, target_lower), target_upper)
+            user_defined_boundlist.append(targetbounds)
+
+        user_defined_boundlist_trimmed = [
+            (max(t1[0], t2[0]), min(t1[1], t2[1])) for t1, t2 in zip(feed_bound_list, user_defined_boundlist)
+        ]
+        return user_defined_boundlist_trimmed
 
     def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""
@@ -899,8 +986,10 @@ class RationOptimizer:
         pen_id: RUFAS_ID,
         pen_available_feeds: Any,
         average_nutrient_requirements: NutritionRequirements,
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         sim_day: int,
-    ) -> None:
+    ) -> list[str]:
         """
         Handle and log failed constraints during the ration optimization process.
 
@@ -925,16 +1014,18 @@ class RationOptimizer:
         pen_available_feeds : AvailableFeedsTypedDict
             A dictionary of available feeds for ration formulation.
         average_nutrient_requirements : NutritionRequirements
-            The pen's average (or other summary statistic) requirements used in ration formulation.
+            The pen's average requirements used in ration formulation.
+        initial_dry_matter_requirement : float
+            Dry matter intake requirement at start of ration formulation.
+        initial_protein_requirement : float
+            Metabolizable protein requirement at start of ration formulation.
         sim_day : int
             Day of simulation.
-        info_map : dict[str, Any]
-            A dictionary containing additional information to be logged with the failed
-            constraints summary.
 
         Returns:
         --------
-        None
+        list[str]
+            List of which constraints were failed.
         """
         om = OutputManager()
 
@@ -957,6 +1048,8 @@ class RationOptimizer:
             "constraints_failed_dict": constraints_failed_list,
             "ration_attempted": self.make_ration_from_solution(pen_available_feeds, solution),
             "pen requirements": average_nutrient_requirements,
+            "initial_dry_matter_requirement": initial_dry_matter_requirement,
+            "initial_protein_requirement": initial_protein_requirement,
         }
         fail_summary_units = {
             "simulation day": MeasurementUnits.SIMULATION_DAY,
@@ -964,18 +1057,19 @@ class RationOptimizer:
             "constraints_failed_dict": MeasurementUnits.UNITLESS,
             "ration_attempted": MeasurementUnits.UNITLESS,
             "pen requirements": {
-                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
-                "NEa_requirement": MeasurementUnits.MEGACALORIES,
-                "NEg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEl_requirement": MeasurementUnits.MEGACALORIES,
-                "MP_requirement": MeasurementUnits.GRAMS,
-                "Ca_requirement": MeasurementUnits.GRAMS,
-                "P_req": MeasurementUnits.GRAMS,
-                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
-                "avg_BW": MeasurementUnits.KILOGRAMS,
-                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
+                "maintenance_energy": MeasurementUnits.MEGACALORIES,
+                "growth_energy": MeasurementUnits.MEGACALORIES,
+                "pregnancy_energy": MeasurementUnits.MEGACALORIES,
+                "lactation_energy": MeasurementUnits.MEGACALORIES,
+                "metabolizable_protein": MeasurementUnits.GRAMS,
+                "calcium": MeasurementUnits.GRAMS,
+                "phosphorus": MeasurementUnits.GRAMS,
+                "process_based_phosphorus": MeasurementUnits.GRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "activity_energy": MeasurementUnits.MEGACALORIES,
             },
+            "initial_dry_matter_requirement": MeasurementUnits.KILOGRAMS,
+            "initial_protein_requirement": MeasurementUnits.GRAMS,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -987,3 +1081,5 @@ class RationOptimizer:
             fail_summary,
             dict(info_map, **{"units": fail_summary_units}),
         )
+
+        return constraints_failed_list
