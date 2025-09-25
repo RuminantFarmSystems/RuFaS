@@ -5,6 +5,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
@@ -274,3 +275,10 @@ def test_apply_volatile_solid_loss(
     assert degradable_solids == expected_degradable_solids
     assert total_solids == expected_total_solids
     assert non_degradable_solids == expected_non_degradable_solids
+
+def test_report_gas_emissions(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
+    """Tests the function _report_gas_emissions()."""
+    mock_report = mocker.patch.object(Processor, "_report_processor_output")
+    handler._report_gas_emissions(10,10,2)
+
+    assert mock_report.call_count == 2

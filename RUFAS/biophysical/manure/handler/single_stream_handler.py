@@ -97,20 +97,8 @@ class SingleStreamHandler(Handler):
 
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
-        self._report_processor_output(
-            "housing_CO2_emissions",
-            housing_CO2_emissions,
-            self.process_manure.__name__,
-            MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
-        )
-        self._report_processor_output(
-            "housing_methane_emissions",
-            housing_methane_emissions,
-            self.process_manure.__name__,
-            MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
-        )
+
+        self._report_gas_emissions(housing_CO2_emissions, housing_methane_emissions, time.simulation_day)
 
         cleaning_water_volume = self.determine_handler_cleaning_water_volume(
             self.manure_stream.pen_manure_data.num_animals,
@@ -193,6 +181,40 @@ class SingleStreamHandler(Handler):
         self._report_manure_stream(output_stream, "", time.simulation_day)
 
         return {"manure": output_stream}
+
+    def _report_gas_emissions(self, housing_CO2_emissions: float, housing_methane_emissions: float,
+                              simulation_day: int) -> None:
+        """
+        Reports the gas emissions in single stream handler.
+
+        Parameters
+        ----------
+        housing_CO2_emissions : float
+            The amount of housing CO2 emissions (kg).
+        housing_methane_emissions : float
+            The amount of housing methane emissions (kg).
+        simulation_day : int
+            The day of simulation.
+
+        Returns
+        -------
+        None
+
+        """
+        self._report_processor_output(
+            "housing_CO2_emissions",
+            housing_CO2_emissions,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            simulation_day,
+        )
+        self._report_processor_output(
+            "housing_methane_emissions",
+            housing_methane_emissions,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            simulation_day,
+        )
 
     def _apply_volatile_solid_loss(self, housing_methane_emission: float) -> tuple[float, float, float]:
         """
