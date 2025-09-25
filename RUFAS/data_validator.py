@@ -3,6 +3,20 @@ import re
 from enum import Enum
 from typing import Any, Callable, Union, Sequence
 
+from RUFAS.util import Aggregator
+
+AGGREGATION_FUNCTIONS: dict[
+    str, Callable[[list[float]], float] | Callable[[list[float]], float | None] | Callable[[list[Any]], Any | None]
+] = {
+    "average": Aggregator.average,
+    "division": Aggregator.division,
+    "product": Aggregator.product,
+    "standard_deviation": Aggregator.standard_deviation,
+    "sum": Aggregator.sum,
+    "difference": Aggregator.subtraction,
+    "no_op": Aggregator.no_op,
+}
+
 
 class ElementState(Enum):
     """
@@ -1675,22 +1689,169 @@ class CrossValidator:
         """
         pass
 
-    def _evaluate_expression(self, expression_block: dict[str, Any]) -> Any:
+    def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool) -> tuple[Any, bool]:
         """
         Evaluates an expression based on the provided expression block. This function also
-        optionally adds to the alias pool if the "save_as" key is present in the expression block.
+        optionally adds to the alias pool if the `save_as` key is present in the expression block.
 
         Parameters
         ----------
         expression_block : dict[str, Any]
             A dictionary containing the expression block to be evaluated.
+        eager_termination : bool
+            Whether to raise an error if the expression is not successfully evaluated.
 
         Returns
         -------
-        Any
-            The result of the expression.
+        tuple[Any, bool]
+            The result of the expression evaluation and a boolean indicating whether the expression was
+            successfully evaluated.
+
+        Notes
+        -----
+        Expression block:
+        >>> {
+        ...  "operation": "sum | difference | average | product | no_op", # optional, defaults to "no_op"
+        ...  "apply_to": "individual | group", # optional
+        ...  "ordered_variables": ["alias_0", "alias_1"],
+        ...  "save_as": "alias_2" # optional
+        ... }
         """
-        pass
+        operation = expression_block.get("operation", "no_op")
+        aggregator = AGGREGATION_FUNCTIONS.get(operation)
+        if operation not in AGGREGATION_FUNCTIONS or aggregator is None:
+            self._event_logs.append(
+                {
+                    "error": "Unknown Operation",
+                    "message": f"Unknown operation {operation} in cross validation rule. Expected one of "
+                    f"{list(AGGREGATION_FUNCTIONS.keys())}.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(f"Unknown operation: {operation}")
+            else:
+                return None, False
+
+        if not (ordered_variable_alias := expression_block.get("ordered_variables", [])):
+            self._event_logs.append(
+                {
+                    "error": "Missing Ordered Variables",
+                    "message": "Ordered variables list is empty or missing in cross validation rule.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Ordered variables list is empty or missing in cross validation rule.")
+            else:
+                return None, False
+        ordered_values: list[Any] = []
+        for alias_name in ordered_variable_alias:
+            value = self._get_alias_value(alias_name)
+            ordered_values.append(value)
+
+        if any(isinstance(value, (list, dict)) for value in ordered_values):
+            if not self._validate_expression_block_with_complex_variable_values(
+                expression_block, ordered_values, eager_termination
+            ):
+                return None, False
+            ordered_values = (
+                ordered_values[0] if isinstance(ordered_values[0], list) else list(ordered_values[0].values())
+            )
+            result = ordered_values if expression_block["apply_to"] == "individual" else aggregator(ordered_values)
+        else:
+            result = aggregator(ordered_values)
+
+        if "save_as" in expression_block:
+            save_as_alise_name: str = expression_block["save_as"]
+            self._save_to_alias_pool(alias_name=save_as_alise_name, value=result)
+        return result, True
+
+    def _validate_expression_block_with_complex_variable_values(
+        self, expression_block: dict[str, Any], ordered_values: list[Any], eager_termination: bool
+    ) -> bool:
+        """
+        Validates an expression block when it contains complex variables.
+
+        This method checks the validity of an expression block if it includes complex variables
+        (such as lists or dictionaries) and ensures it adheres to predefined rules. Validation
+        errors are logged, and eager termination behavior is enforced if specified.
+
+        Parameters
+        ----------
+        expression_block : dict[str, Any]
+            A dictionary representing the expression block to be validated.
+        ordered_values : list[Any]
+            A list of variables involved in the evaluation. Only one list or dictionary variable
+            is permitted for cross-validation in a single block.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
+
+        Returns
+        -------
+        bool
+            Returns True if the expression block is valid, otherwise False if eager termination
+            is disabled.
+        """
+        if len(ordered_values) > 1:
+            self._event_logs.append(
+                {
+                    "error": "Multiple Complex Variables Selected",
+                    "message": "Only one list or dict variable can be selected for cross validation in "
+                    "a single expression block.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(
+                    "Only one list or dict variable can be selected for cross validation in "
+                    "a single expression block."
+                )
+            else:
+                return False
+
+        if "apply_to" not in expression_block:
+            self._event_logs.append(
+                {
+                    "error": "Missing `apply_to` key",
+                    "message": "The 'apply_to' key is required in expression block "
+                    "when a complex data structure is selected.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Missing 'apply_to' key in expression block for selected complex data structure.")
+            else:
+                return False
+        if apply_to := expression_block["apply_to"] not in ["individual", "group"]:
+            self._event_logs.append(
+                {
+                    "error": "Unknown apply_to value",
+                    "message": f"Unknown apply_to value {apply_to} in expression block.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_expression.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(f"Unknown apply_to value: {apply_to}")
+            else:
+                return False
+        return True
 
     def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
         """

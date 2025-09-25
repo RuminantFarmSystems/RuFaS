@@ -177,6 +177,8 @@ class AnimalConfig:
         The amount of additive used for methane mitigation, (kg).
     milk_reduction_maximum : float
         Maximum possible milk production reduction from a given cause, (kg).
+    methane_model: dict[str, dict[str, bool]]
+        The methods to use for each animal type.
 
     """
 
@@ -357,7 +359,16 @@ class AnimalConfig:
         1,
     ]
 
-    methane_model: str = "IPCC"
+    methane_model: dict[str, dict[str, bool]] = {
+        "calves": {"Pattanaik": True},
+        "heiferIs": {"IPCC": True},
+        "heiferIIs": {"IPCC": True},
+        "heiferIIIs": {"IPCC": True},
+        "cow": {
+            "dry cows": {"IPCC": True, "Mills": False},
+            "lactating cows": {"IPCC": True, "Mutian": False, "Mills": False},
+        },
+    }
     methane_mitigation_method: str = "None"
     methane_mitigation_additive_amount: float = 0.0
 
@@ -504,7 +515,7 @@ class AnimalConfig:
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
-        cls.milk_reduction_maximum = im.get_data("feed.user_defined_ration_percentages.milk_reduction_maximum")
+        cls.milk_reduction_maximum = im.get_data("feed.milk_reduction_maximum")
 
         if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
             om = OutputManager()
