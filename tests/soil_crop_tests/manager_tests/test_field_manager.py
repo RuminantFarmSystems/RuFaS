@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List
 from unittest.mock import MagicMock, call, patch
 
@@ -6,13 +7,13 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
@@ -131,6 +132,7 @@ def test_daily_update_routine(
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
+    mocked_time.current_date = datetime(1998, 1, 1) + timedelta(days=5 - 1)
 
     get_conditions = mocker.patch.object(
         mock_weather, "get_current_day_conditions", return_value=MagicMock(CurrentDayConditions)
@@ -147,8 +149,42 @@ def test_daily_update_routine(
                 field,
                 "manage_field",
                 return_value=[
-                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
-                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                    HarvestedCrop(
+                        config_name="test_crop",
+                        field_name="test_field",
+                        harvest_time=mocked_time,
+                        storage_time=mocked_time,
+                        fresh_mass=10.0,
+                        dry_matter_percentage=0.85,
+                        dry_matter_digestibility=0.65,
+                        crude_protein_percent=0.12,
+                        non_protein_nitrogen=0.02,
+                        starch=0.30,
+                        adf=0.15,
+                        ndf=0.35,
+                        lignin=0.05,
+                        sugar=0.10,
+                        ash=0.08,
+                        recorded_days=set(),
+                    ),
+                    HarvestedCrop(
+                        config_name="test_crop_2",
+                        field_name="test_field",
+                        harvest_time=mocked_time,
+                        storage_time=mocked_time,
+                        fresh_mass=10.0,
+                        dry_matter_percentage=0.85,
+                        dry_matter_digestibility=0.65,
+                        crude_protein_percent=0.12,
+                        non_protein_nitrogen=0.02,
+                        starch=0.30,
+                        adf=0.15,
+                        ndf=0.35,
+                        lignin=0.05,
+                        sugar=0.10,
+                        ash=0.08,
+                        recorded_days=set(),
+                    ),
                 ],
             )
         fm.output_gatherer.send_daily_variables = MagicMock()
