@@ -114,7 +114,7 @@ def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: Mock
         ndf=15.0,
         lignin=3.0,
         sugar=20.0,
-        ash=6.0
+        ash=6.0,
     )
 
     mock_remove_dm = mocker.spy(crop, "remove_dry_matter_mass")

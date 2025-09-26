@@ -398,8 +398,13 @@ def test_check_manure_application_schedule_integration() -> None:
         (0.0, 0.0, ManureType.LIQUID, None, "Tried to apply manure with no nitrogen or phosphorus requested."),
     ],
 )
-def test_create_manure_request(nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
-                               expected_request: NutrientRequest | None, expected_log: str | None) -> None:
+def test_create_manure_request(
+    nitrogen_mass: float,
+    phosphorus_mass: float,
+    manure_type: ManureType,
+    expected_request: NutrientRequest | None,
+    expected_log: str | None,
+) -> None:
     """Tests _create_manure_request for both nutrient-requested and no-nutrient cases."""
     # Arrange
     field = Field()
@@ -1096,8 +1101,9 @@ def test_execute_fertilizer_application(
         ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}),
     ],
 )
-def test_execute_fertilizer_application_error(field_name: str, mix_name: str,
-                                              available_mixes: dict[str, dict[str, float]]) -> None:
+def test_execute_fertilizer_application_error(
+    field_name: str, mix_name: str, available_mixes: dict[str, dict[str, float]]
+) -> None:
     """
     Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
     """

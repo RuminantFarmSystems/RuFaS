@@ -234,9 +234,7 @@ def test_get_available_crop_configurations() -> None:
         yield_nitrogen_fraction=0.0327536,
         yield_phosphorus_fraction=0.00351,
     )
-    CropDataFactory._crop_configurations = {"config_1": config,
-                                            "config_2": config,
-                                            "config_3": config}
+    CropDataFactory._crop_configurations = {"config_1": config, "config_2": config, "config_3": config}
     expected = ["config_1", "config_2", "config_3"]
 
     actual = CropDataFactory.get_available_crop_configurations()

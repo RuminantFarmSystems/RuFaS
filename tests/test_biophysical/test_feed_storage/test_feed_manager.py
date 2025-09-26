@@ -490,9 +490,7 @@ def test_manage_ration_interval_purchases(
     mock_purchase_feed.assert_called_once_with({1: 6.0, 2: 15.0}, mock_time, purchase_type="ration_interval")
 
 
-def test_query_available_feed_totals(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed]
-) -> None:
+def test_query_available_feed_totals(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
     """Totals are farmgrown(projected dict) + purchased storage."""
     feed_manager.purchased_feed_storage = PurchasedFeedStorage(mock_available_feeds)
     feed_manager.purchased_feed_storage.receive_feed(
@@ -538,9 +536,7 @@ def test_query_available_feed_totals_no_stored_crops_input(
     assert result == expected_feed_totals
 
 
-def test_purchase_feed(
-    feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
-) -> None:
+def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture) -> None:
     """Test that feeds are purchased correctly."""
     feeds_to_purchase = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
     feed_manager._available_feeds = mock_available_feeds
