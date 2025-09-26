@@ -5,54 +5,60 @@
       "crop_name": "cereal_rye_grain",
       "field_name": "field_1",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.86,
-      "rufas_id": 194
+      "rufas_id": 194,
+      "capacity": 1e10
     },
     {
       "name": "corn_grain_storage_1",
       "crop_name": "corn_grain",
       "field_name": "field_1",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.86,
-      "rufas_id": 44
+      "rufas_id": 44,
+      "capacity": 1e10
     },
     {
       "name": "corn_grain_storage_2",
       "crop_name": "corn_grain",
       "field_name": "field_2",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.86,
-      "rufas_id": 44
+      "rufas_id": 44,
+      "capacity": 1e10
     },
     {
       "name": "soybean_grain_storage_1",
       "crop_name": "soybean_grain",
       "field_name": "field_1",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.81,
-      "rufas_id": 170
+      "rufas_id": 170,
+      "capacity": 1e10
     },
     {
       "name": "triticale_grain_storage_1",
       "crop_name": "triticale_grain",
       "field_name": "field_1",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.88,
-      "rufas_id": 194
+      "rufas_id": 194,
+      "capacity": 1e10
     },
     {
       "name": "winter_wheat_grain_storage_1",
       "crop_name": "winter_wheat_grain",
       "field_name": "field_1",
       "storage_type": "Dry",
-      "dry_grain_dm_loss_coefficient": 0.1,
+      "dm_loss_coefficient": 0.1,
       "initial_storage_dry_matter": 0.86,
-      "rufas_id": 194
+      "rufas_id": 194,
+      "capacity": 1e10
     }
   ],
   "silage_storage": [
@@ -62,7 +68,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.35,
-      "rufas_id": 110
+      "rufas_id": 110,
+      "capacity": 1e10,
+      "size": 0.0
     },
     {
       "name": "cereal_rye_silage_storage_1",
@@ -70,7 +78,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.35,
-      "rufas_id": 144
+      "rufas_id": 144,
+      "capacity": 1e10,
+      "size": 0.0
     },
     {
       "name": "corn_silage_storage_1",
@@ -78,7 +88,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.35,
-      "rufas_id": 51
+      "rufas_id": 51,
+      "capacity": 1e10,
+      "size": 0.0
     },
     {
       "name": "tall_fescue_silage_storage_1",
@@ -86,7 +98,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.39,
-      "rufas_id": 100
+      "rufas_id": 100,
+      "capacity": 1e10,
+      "size": 0.0
     },
     {
       "name": "triticale_silage_storage_1",
@@ -94,7 +108,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.33,
-      "rufas_id": 187
+      "rufas_id": 187,
+      "capacity": 1e10,
+      "size": 0.0
     },
     {
       "name": "winter_wheat_silage_storage_1",
@@ -102,7 +118,9 @@
       "field_name": "field_1",
       "storage_type": "Bunker",
       "initial_storage_dry_matter": 0.35,
-      "rufas_id": 198
+      "rufas_id": 198,
+      "capacity": 1e10,
+      "size": 0.0
     }
   ],
   "baleage_storage": [
@@ -111,9 +129,11 @@
       "crop_name": "alfalfa_baleage",
       "field_name": "field_1",
       "storage_type": "Baleage",
-      "baleage_initial_storage_dry_matter": 0.5,
+      "initial_storage_dry_matter": 0.5,
       "post_wilting_moisture_percentage": 45,
-      "rufas_id": 110
+      "rufas_id": 110,
+      "capacity": 1e10,
+      "bale_density": 200
     },
     {
       "name": "cereal_rye_baleage_1",
@@ -122,7 +142,9 @@
       "storage_type": "Baleage",
       "initial_storage_dry_matter": 0.35,
       "post_wilting_moisture_percentage": 45,
-      "rufas_id": 144
+      "rufas_id": 144,
+      "capacity": 1e10,
+      "bale_density": 200
     },
     {
       "name": "tall_fescue_baleage_1",
@@ -131,7 +153,9 @@
       "storage_type": "Baleage",
       "initial_storage_dry_matter": 0.39,
       "post_wilting_moisture_percentage": 45,
-      "rufas_id": 100
+      "rufas_id": 100,
+      "capacity": 1e10,
+      "bale_density": 200
     },
     {
       "name": "triticale_baleage_1",
@@ -140,7 +164,9 @@
       "storage_type": "Baleage",
       "initial_storage_dry_matter": 0.33,
       "post_wilting_moisture_percentage": 45,
-      "rufas_id": 187
+      "rufas_id": 187,
+      "capacity": 1e10,
+      "bale_density": 200
     },
     {
       "name": "winter_wheat_baleage_1",
@@ -149,7 +175,9 @@
       "storage_type": "Baleage",
       "initial_storage_dry_matter": 0.35,
       "post_wilting_moisture_percentage": 45,
-      "rufas_id": 198
+      "rufas_id": 198,
+      "capacity": 1e10,
+      "bale_density": 200
     }
   ],
   "hay_storage": [
@@ -158,60 +186,72 @@
       "crop_name": "alfalfa_hay",
       "field_name": "field_1",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.88,
-      "hay_target_dry_matter": 0.88,
-      "rufas_id": 108
+      "target_dry_matter": 0.88,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 108,
+      "bale_size": 1.8,
+      "capacity": 1e10
     },
     {
       "name": "alfalfa_hay_storage_2",
       "crop_name": "alfalfa_hay",
       "field_name": "field_2",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.88,
-      "hay_target_dry_matter": 0.88,
-      "rufas_id": 108
+      "target_dry_matter": 0.88,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 108,
+      "bale_size": 1.8,
+      "capacity": 1e10
     },
     {
       "name": "cereal_rye_hay_storage_1",
       "crop_name": "cereal_rye_hay",
       "field_name": "field_1",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.93,
-      "hay_target_dry_matter": 0.93,
-      "rufas_id": 195
+      "target_dry_matter": 0.93,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 195,
+      "bale_size": 1.8,
+      "capacity": 1e10
     },
     {
       "name": "tall_fescue_hay_storage_1",
       "crop_name": "tall_fescue_hay",
       "field_name": "field_1",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.88,
-      "hay_target_dry_matter": 0.88,
-      "rufas_id": 95
+      "target_dry_matter": 0.88,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 95,
+      "bale_size": 1.8,
+      "capacity": 1e10
     },
     {
       "name": "triticale_hay_storage_1",
       "crop_name": "triticale_hay",
       "field_name": "field_1",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.91,
-      "hay_target_dry_matter": 0.91,
-      "rufas_id": 95
+      "target_dry_matter": 0.91,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 95,
+      "bale_size": 1.8,
+      "capacity": 1e10
     },
     {
       "name": "winter_wheat_hay_storage_1",
       "crop_name": "winter_wheat_hay",
       "field_name": "field_1",
       "storage_type": "ProtectedTarped",
-      "hay_bale_diameter": 1.8,
       "initial_storage_dry_matter": 0.91,
-      "hay_target_dry_matter": 0.91,
-      "rufas_id": 195
+      "target_dry_matter": 0.91,
+      "additional_dry_matter_loss_coefficient": 0.0,
+      "rufas_id": 195,
+      "bale_size": 1.8,
+      "capacity": 1e10
     }
   ]
 }
