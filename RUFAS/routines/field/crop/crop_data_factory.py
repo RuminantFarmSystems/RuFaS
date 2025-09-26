@@ -1,6 +1,5 @@
 from typing import Any, TypedDict
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -15,7 +14,6 @@ class CropConfiguration(TypedDict):
 
     name: str
     plant_category: PlantCategory
-    rufas_ids: list[RUFAS_ID]
     is_nitrogen_fixer: bool
     minimum_temperature: float
     optimal_temperature: float
