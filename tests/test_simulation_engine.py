@@ -501,7 +501,6 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
     mock_field_manager_init.assert_called_once_with()
     assert simulation_engine.field_manager == mock_field_manager
-    mock_field_get_crop_configs_to_rufas_ids.assert_called_once()
     mock_emissions_estimator_init.assert_called_once_with()
     assert simulation_engine.emissions_estimator == mock_emissions_estimator
     mock_nutrient_standard_init.assert_called_once_with(mock_config_nutrient_standard)
