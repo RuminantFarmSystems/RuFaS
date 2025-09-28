@@ -1715,8 +1715,9 @@ class CrossValidator:
         for alias_key, value in target_and_save_result.items():
             self._save_to_alias_pool(alias_key, value)
 
-    def check_target_and_save_block(self, target_and_save_block: dict[str, dict[str, Any]],
-                                    eager_termination: bool) -> None:
+    def check_target_and_save_block(
+        self, target_and_save_block: dict[str, dict[str, Any]], eager_termination: bool
+    ) -> None:
         """Check if the target and save block is valid."""
         for section in target_and_save_block.keys():
             if section not in ["variables", "constants"]:
@@ -1732,8 +1733,10 @@ class CrossValidator:
                     }
                 )
                 if eager_termination:
-                    raise ValueError(f"Unknown block: {section}. "
-                                     "target_and_save_block should only have variables and constants blocks.")
+                    raise ValueError(
+                        f"Unknown block: {section}. "
+                        "target_and_save_block should only have variables and constants blocks."
+                    )
 
     def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool) -> tuple[Any, bool]:
         """

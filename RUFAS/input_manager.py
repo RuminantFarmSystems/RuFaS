@@ -1413,8 +1413,9 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def extract_target_and_save_block(self, target_and_save_block: dict[str, dict[str, Any]],
-                                      eager_termination: bool) -> dict[str, Any]:
+    def extract_target_and_save_block(
+        self, target_and_save_block: dict[str, dict[str, Any]], eager_termination: bool
+    ) -> dict[str, Any]:
         """
         Retrieves the alias value to pass to the CrossValidator for processing.
 

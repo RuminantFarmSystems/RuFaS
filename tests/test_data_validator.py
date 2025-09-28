@@ -2023,13 +2023,7 @@ def test_get_alias_value_returns(pool: dict[str, Any], alias: str, expected: Any
     assert v._get_alias_value(alias, True) == expected
 
 
-@pytest.mark.parametrize(
-    "eager_termination",
-    [
-        True,
-        False
-    ]
-)
+@pytest.mark.parametrize("eager_termination", [True, False])
 def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) -> None:
     """Test the function _get_alias_value() when getting unavailable keys names."""
     v = CrossValidator()
