@@ -1413,7 +1413,8 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def extract_target_and_save_block(self, target_and_save_block: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    def extract_target_and_save_block(self, target_and_save_block: dict[str, dict[str, Any]],
+                                      eager_termination: bool) -> dict[str, Any]:
         """
         Retrieves the alias value to pass to the CrossValidator for processing.
 
@@ -1421,6 +1422,9 @@ class InputManager:
         ----------
         target_and_save_block : dict[str, dict[str, Any]]
             A dictionary containing the "target and save block" of the cross-validation rule.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
 
         Returns
         -------
@@ -1429,7 +1433,7 @@ class InputManager:
 
         """
         target_and_save_results = {}
-        self.cross_validator.check_target_and_save_block(target_and_save_block)
+        self.cross_validator.check_target_and_save_block(target_and_save_block, eager_termination)
         sections = ["variables", "constants"]
         for section in sections:
             if section == "variables":

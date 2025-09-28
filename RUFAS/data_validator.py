@@ -1799,7 +1799,7 @@ class CrossValidator:
                 return None, False
         ordered_values: list[Any] = []
         for alias_name in ordered_variable_alias:
-            value = self._get_alias_value(alias_name)
+            value = self._get_alias_value(alias_name, eager_termination)
             ordered_values.append(value)
 
         if any(isinstance(value, (list, dict)) for value in ordered_values):

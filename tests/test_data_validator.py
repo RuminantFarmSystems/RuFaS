@@ -2073,7 +2073,7 @@ def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]])
 def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None:
     """Sanity check: when multiple invalid keys exist, logs each (not a single aggregated one)."""
     cv = CrossValidator()
-    block = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
 
     cv.check_target_and_save_block(block, False)
 
@@ -2084,7 +2084,7 @@ def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None
 def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_termination() -> None:
     """Sanity check: when multiple invalid keys exist with eager termination, logs each (not a single aggregated one)."""
     cv = CrossValidator()
-    block = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
 
     with pytest.raises(ValueError):
         cv.check_target_and_save_block(block, True)
