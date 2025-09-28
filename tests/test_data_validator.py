@@ -2076,7 +2076,7 @@ def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None
 
 
 def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_termination() -> None:
-    """Sanity check: when multiple invalid keys exist with eager termination, logs each (not a single aggregated one)."""
+    """Sanity check: when multiple invalid keys exist with eager termination."""
     cv = CrossValidator()
     block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
 
