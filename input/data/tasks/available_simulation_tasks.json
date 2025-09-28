@@ -4,23 +4,16 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
-      "output_prefix": "default",
+      "output_prefix": "example",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/example_open_lot_metadata.json",
-      "output_prefix": "default",
+      "output_prefix": "example",
       "log_verbosity": "errors",
       "random_seed": 42
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/testing_metadata.json",
-      "output_prefix": "testing",
-      "log_verbosity": "errors",
-      "random_seed": 0
     }
   ]
 }

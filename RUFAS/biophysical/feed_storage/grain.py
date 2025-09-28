@@ -1,4 +1,3 @@
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from .storage import Storage
 
 
@@ -7,15 +6,21 @@ class Grain(Storage):
     Represents grain storage and manages its specific attributes and behaviors.
 
     Inherits from Storage.
+
+    Parameters
+    ----------
+    config : dict[str, str | float]
+        Configuration dictionary for the grain storage.
+
+    Attributes
+    ----------
+    dm_loss_coefficient : float | None
+        Coefficient determining how much dry matter is lost in grain storage (unitless).
     """
 
-    def __init__(self, capacity: float = float("inf")):
-        super().__init__(capacity)
-        self.acceptable_crops = [
-            CropCategory.CORN,
-            CropCategory.SMALL_GRAIN,
-            CropCategory.SOY,
-        ]
+    def __init__(self, config: dict[str, str | float]):
+        super().__init__(config)
+        self.dm_loss_coefficient = config.get("dm_loss_coefficient")
 
 
 class Dry(Grain):
@@ -25,7 +30,8 @@ class Dry(Grain):
     Inherits from Grain.
     """
 
-    pass
+    def __init__(self, config: dict[str, str | float]) -> None:
+        super().__init__(config)
 
 
 class HighMoisture(Grain):
@@ -35,4 +41,5 @@ class HighMoisture(Grain):
     Inherits from Grain.
     """
 
-    pass
+    def __init__(self, config: dict[str, str | float]) -> None:
+        super().__init__(config)

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, NASEMFeed, NRCFeed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
@@ -36,8 +36,8 @@ class PurchasedFeedStorage:
     Storage class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
     """
 
-    def __init__(self, available_feeds: list[NASEMFeed | NRCFeed]) -> None:
-        self.available_feeds: list[NASEMFeed | NRCFeed] = available_feeds
+    def __init__(self, available_feeds: list[Feed]) -> None:
+        self.available_feeds: list[Feed] = available_feeds
         self.stored: list[PurchasedFeed] = []
         self._om = OutputManager()
 
