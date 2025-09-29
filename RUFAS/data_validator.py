@@ -31,11 +31,13 @@ class ElementState(Enum):
         The element is invalid and cannot be fixed.
     FIXED : int
         The element is invalid initially but has been fixed.
+    test change ss s
     """
 
     VALID = "valid"
     INVALID = "invalid"
     FIXED = "fixed"
+    CALL = "Call"
 
 
 class ElementsCounter:
