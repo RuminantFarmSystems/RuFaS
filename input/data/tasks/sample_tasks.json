@@ -49,6 +49,23 @@
           "data_type":"int"
         }
       ]
+    },
+    {
+      "task_type": "POST_PROCESSING",
+      "output_prefix": "Post Processing",
+      "log_verbosity": "errors",
+      "run_eee": true,
+      "load_saved_output_pools": true,
+      "saved_output_pools": [
+        {
+          "name": "baseline",
+          "path": "output/saved_pools/baseline.json"
+        },
+        {
+          "name": "scenario",
+          "path": "output/saved_pools/scenario.json"
+        }
+      ]
     }
   ]
 }

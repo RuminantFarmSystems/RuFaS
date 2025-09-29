@@ -1,3 +1,4 @@
+from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
@@ -356,6 +357,10 @@ class TaskManager:
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
+            saved_output_pools = []
+            for saved_pool in input_task.get("saved_output_pools", []):
+                saved_output_pools.append({"name": saved_pool["name"], "path": Path(saved_pool["path"])})
+            input_task["saved_output_pools"] = saved_output_pools
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
@@ -776,7 +781,10 @@ class TaskManager:
         Parameters
         ----------
         args : Dict[str, Any]
-            Arguments for post-processing.
+            Arguments for post-processing. When the optional ``run_eee`` key is set to ``True``,
+            the Emissions, Energy, and Economics estimators are executed before the remaining
+            post-processing steps. When ``load_saved_output_pools`` is ``True`` the saved pools
+            defined in ``saved_output_pools`` are loaded and namespaced prior to post-processing.
         input_manager : InputManager
             Manager to handle input processing.
         output_manager : OutputManager
@@ -789,6 +797,9 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
+        load_saved_output_pools : bool, optional
+            Whether to load multiple saved pools defined in ``saved_output_pools`` before
+            continuing with post-processing.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
         should_flush_im_pool: bool
@@ -801,6 +812,10 @@ class TaskManager:
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
+        if args.get("run_eee", False):
+            eee_manager_module = import_module("RUFAS.EEE.EEE_manager")
+            eee_manager_module.EEEManager.estimate_all()
+
         if export_input_data_to_csv:
             output_manager.create_directory(args["input_data_csv_export_path"])
             Utility.combine_saved_input_csv(
@@ -809,7 +824,19 @@ class TaskManager:
                 args["input_data_csv_import_path"],
             )
 
-        if load_pool_from_file:
+        if args.get("load_saved_output_pools", False):
+            saved_pools: list[dict[str, Any]] = args.get("saved_output_pools", [])
+            if saved_pools:
+                output_manager.flush_pools()
+                output_manager.load_multiple_variables_pools_from_files(saved_pools)
+                output_manager.set_metadata_prefix("reload")
+            else:
+                output_manager.add_warning(
+                    "No saved pools provided",
+                    "load_saved_output_pools was enabled, but no saved_output_pools were supplied.",
+                    info_map,
+                )
+        elif load_pool_from_file:
             output_manager.flush_pools()
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")

@@ -136,6 +136,40 @@
           "description": "If true, logs will not be written as output files.",
           "default": false
         },
+        "run_eee": {
+          "type": "bool",
+          "description": "Run the emissions, energy, and economics estimators prior to post-processing.",
+          "default": false
+        },
+        "load_saved_output_pools": {
+          "type": "bool",
+          "description": "Load previously saved output pools prior to post-processing.",
+          "default": false
+        },
+        "saved_output_pools": {
+          "type": "array",
+          "description": "Collection of saved output pools to reload before post-processing.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Identifier applied to variables loaded from this pool.",
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "path": {
+                "type": "string",
+                "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+                "description": "File path to the saved output pool JSON file."
+              }
+            },
+            "required": [
+              "name",
+              "path"
+            ]
+          },
+          "default": []
+        },
         "output_pool_path": {
           "type": "string",
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
