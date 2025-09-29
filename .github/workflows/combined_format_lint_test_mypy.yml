@@ -240,7 +240,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/dev'
+        if: ${{ github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
