@@ -235,7 +235,7 @@ jobs:
             echo "Mypy error count has increased from the dev branch to the current branch ($dev_ERRORS -> $CURRENT_ERRORS)."
             exit 1
           else
-            echo "No increase in mypy errors found."
+            echo "No large increase in mypy errors found."
           fi
         continue-on-error: true
 
