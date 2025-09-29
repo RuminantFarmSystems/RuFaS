@@ -781,10 +781,7 @@ class TaskManager:
         Parameters
         ----------
         args : dict[str, Any]
-            Arguments for post-processing. When the optional ``run_eee`` key is set to ``True``,
-            the Emissions, Energy, and Economics estimators are executed before the remaining
-            post-processing steps. When ``load_saved_output_pools`` is ``True`` the saved pools
-            defined in ``saved_output_pools`` are loaded and namespaced prior to post-processing.
+            Arguments for post-processing.
         input_manager : InputManager
             Manager to handle input processing.
         output_manager : OutputManager
@@ -798,12 +795,19 @@ class TaskManager:
         load_pool_from_file : bool
             Whether to load data pool from file.
         load_saved_output_pools : bool, optional
-            Whether to load multiple saved pools defined in ``saved_output_pools`` before
+            Whether to load multiple saved pools as defined by ``saved_output_pools`` before
             continuing with post-processing.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
         should_flush_im_pool: bool
             Whether to flush the input manager pool.
+
+        Notes
+        -----
+        - For args, when the optional ``run_eee`` key is set to ``True``, the Emissions, Energy, and Economics
+        estimators are executed before the remaining post-processing steps. When ``load_saved_output_pools`` is
+        ``True`` the saved pools defined in ``saved_output_pools`` are loaded and namespaced prior to
+        post-processing.
         """
         info_map = {
             "class": TaskManager.__name__,
