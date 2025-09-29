@@ -1998,6 +1998,95 @@ def test_extract_input_data_by_key_list_key_error(
 
 
 @pytest.mark.parametrize(
+    "alias_name,value,expected_pool",
+    [("test1", 16.4, {"test1": 16.4}), ("test2", 924.6, {"test1": 13, "test2": 924.6})],
+)
+def test_save_to_alias_pool(alias_name: str, value: Any, expected_pool: dict[str, Any]) -> None:
+    """Test the function _save_to_alias_pool()"""
+    validator = CrossValidator()
+    validator._alias_pool = {"test1": 13}
+    validator._save_to_alias_pool(alias_name, value)
+    assert validator._alias_pool == expected_pool
+
+
+@pytest.mark.parametrize(
+    "pool,alias,expected",
+    [
+        ({"a": 1}, "a", 1),
+        ({"x": "Y", "z": 3.14}, "x", "Y"),
+    ],
+)
+def test_get_alias_value_returns(pool: dict[str, Any], alias: str, expected: Any) -> None:
+    """Test the function _get_alias_value()"""
+    v = CrossValidator()
+    v._alias_pool = dict(pool)
+    assert v._get_alias_value(alias, True) == expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) -> None:
+    """Test the function _get_alias_value() when getting unavailable keys names."""
+    v = CrossValidator()
+    v._alias_pool = {"exists": 10}
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Unknown alias name: missing"):
+            v._get_alias_value("missing", eager_termination=True)
+        assert len(v._event_logs) == 1
+    else:
+        result = v._get_alias_value("missing", eager_termination=False)
+        assert result is None
+        assert len(v._event_logs) == 1
+
+
+def test_target_and_save(mocker: MockerFixture) -> None:
+    """Test the function target_and_save()"""
+    v = CrossValidator()
+    mock_save = mocker.patch.object(v, "_save_to_alias_pool")
+    v._target_and_save({"a": 1, "b": 1, "c": "value"})
+
+    assert mock_save.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        ({"variables": {}, "constants": {}}),
+        ({"variables": {"x": "A1"}, "constants": {}}),
+        ({"variables": {}, "constants": {"k": "K1"}}),
+        ({}),
+    ],
+)
+def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]]) -> None:
+    """Should not append errors when only allowed keys are present."""
+    cv = CrossValidator()
+    cv.check_target_and_save_block(block, True)
+    assert len(cv._event_logs) == 0
+
+
+def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None:
+    """Sanity check: when multiple invalid keys exist, logs each (not a single aggregated one)."""
+    cv = CrossValidator()
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+
+    cv.check_target_and_save_block(block, False)
+
+    assert len(cv._event_logs) == 3
+    assert all(any(f"Unsupported keys {k} provided." in e["message"] for e in cv._event_logs) for k in ("a", "b", "c"))
+
+
+def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_termination() -> None:
+    """Sanity check: when multiple invalid keys exist with eager termination."""
+    cv = CrossValidator()
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+
+    with pytest.raises(ValueError):
+        cv.check_target_and_save_block(block, True)
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
     "expression_block, eager_termination",
     [
         ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
