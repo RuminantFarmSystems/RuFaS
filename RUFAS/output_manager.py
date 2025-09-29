@@ -111,7 +111,7 @@ class OutputManager(object):
 
     Class Attributes
     ----------------
-    pool_element_type : dict[str, Any]
+    pool_element_type : dict[str, list[Any]]
         Type alias for the pool elements
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
         Maximum depth for recursive serialization in JSON output files (default: 4)
@@ -158,7 +158,7 @@ class OutputManager(object):
     """
 
     __instance = None
-    pool_element_type = dict[str, Any]
+    pool_element_type = dict[str, list[Any]]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __new__(cls) -> OutputManager:
@@ -1959,7 +1959,7 @@ class OutputManager(object):
 
         self.current_pool_size = sys.getsizeof(new_pool.__repr__())
 
-    def _get_flat_variables_pool(self) -> dict[str, OutputManager.pool_element_type]:
+    def _get_flat_variables_pool(self) -> dict[str, Any]:
         """Returns a flattened mapping of variable names to data when multiple pools are loaded."""
 
         if not self.variables_pool:
@@ -1971,7 +1971,7 @@ class OutputManager(object):
         ):
             return self.variables_pool
 
-        flattened: dict[str, OutputManager.pool_element_type] = {}
+        flattened: dict[str, Any] = {}
         for pool_name, pool_data in self.variables_pool.items():
             if not isinstance(pool_data, dict):
                 continue
@@ -1993,13 +1993,13 @@ class OutputManager(object):
         self,
         file_path: Path,
         info_map: dict[str, Any],
-    ) -> dict[str, OutputManager.pool_element_type]:
+    ) -> dict[str, list[Any]]:
         """Reads a variables pool JSON file and returns its contents."""
 
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
             with open(file_path) as file:
-                loaded_pool: OutputManager.pool_element_type = json.load(file)
+                loaded_pool: dict[str, list[Any]] = json.load(file)
                 loaded_pool.pop("DISCLAIMER", None)
                 self.add_log(
                     "load_data_successful",
