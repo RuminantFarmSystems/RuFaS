@@ -105,10 +105,26 @@ class EmissionsEstimator:
         )
         self._missing_purchased_ids: set[str] = set()
         self._missing_land_use_ids: set[str] = set()
-        crop_configurations: list[dict[str, Any]] = self.im.get_data("crop_configurations.crop_configurations")
-        self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {
-            config["name"]: [str(rufas_id) for rufas_id in config["rufas_ids"]] for config in crop_configurations
-        }
+
+        feed_storage_configs = self.im.get_data("feed_storage_configurations")
+        feed_storage_instances = self.im.get_data("feed_storage_instances")
+
+        all_configs: list[dict[str, Any]] = [
+            storage_config
+            for storage_config_list in feed_storage_configs.values()
+            for storage_config in storage_config_list
+        ]
+        instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+
+        self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {}
+        for config in all_configs:
+            if config["name"] not in instance_names:
+                continue
+            else:
+                if "crop_species" in config and "rufas_ids" in config:
+                    self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
+                        str(rufas_id) for rufas_id in config["rufas_ids"]
+                    ]
 
     def estimate_emissions(self) -> None:
         """Estimates emissions associated with farmgrown feeds."""

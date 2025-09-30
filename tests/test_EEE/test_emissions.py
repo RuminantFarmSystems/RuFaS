@@ -79,41 +79,67 @@ def fertilizer_applications_data() -> list[dict[str, Any]]:
 
 
 def test_emissions_estimator_init(mocker: MockerFixture) -> None:
-    """Tests the initialization of EmissionsEstimator, especially the crop_species_to_purchased_feed_id mapping."""
+    """Initialize EmissionsEstimator and verify crop_species→rufas_ids mapping is built
+    from feed_storage_configurations filtered by feed_storage_instances."""
     mocker.patch("RUFAS.EEE.emissions.OutputManager")
     im_cls = mocker.patch("RUFAS.EEE.emissions.InputManager")
     im = im_cls.return_value
+
+    mocker.patch.object(
+        EmissionsEstimator,
+        "_get_feed_emissions_data",
+        side_effect=[{"50": 1.0}, {"50": 0.1}],
+    )
+
     county_code = 11111
+
+    feed_storage_configurations = {
+        "bag": [
+            {
+                "name": "alfalfa_bag_A",
+                "crop_species": "alfalfa_hay",
+                "rufas_ids": [100, 103, 106, 107, 108],
+            },
+            {
+                "name": "wheat_bag_X",
+                "crop_species": "wheat",
+                "rufas_ids": [],
+            },
+        ],
+        "bunker": [
+            {
+                "name": "corn_silage_bunker_1",
+                "crop_species": "corn_silage",
+                "rufas_ids": [50, 51, 52],
+            }
+        ],
+    }
+
+    feed_storage_instances = {
+        "freestall": ["alfalfa_bag_A", "corn_silage_bunker_1"],
+    }
 
     purchased_feed_emissions_data = {
         "county_code": [county_code],
-        "emissions": [
-            {"50": 1.0, "51": 2.0, "52": 3.0}
-        ],
+        "emissions": [{"50": 1.0, "51": 2.0, "52": 3.0}],
     }
 
     land_use_change_emissions_data = {
         "county_code": [county_code],
-        "emissions": [
-            {"50": 0.1, "51": 0.2, "52": 0.3}
-        ],
+        "emissions": [{"50": 0.1, "51": 0.2, "52": 0.3}],
     }
 
-    crop_configs = [
-        {"name": "corn_silage", "rufas_ids": ["50", "51", "52"]},
-        {"name": "alfalfa_hay", "rufas_ids": ["100", "103", "106", "107", "108"]},
-        {"name": "wheat", "rufas_ids": []},
-    ]
-
-    def get_data_side_effect(key: str) -> Any:
+    def get_data_side_effect(key: str):
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
             return purchased_feed_emissions_data
         if key == "purchased_feed_land_use_change_emissions":
             return land_use_change_emissions_data
-        if key == "crop_configurations.crop_configurations":
-            return crop_configs
+        if key == "feed_storage_configurations":
+            return feed_storage_configurations
+        if key == "feed_storage_instances":
+            return feed_storage_instances
         raise KeyError(key)
 
     im.get_data.side_effect = get_data_side_effect
@@ -123,7 +149,6 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
     expected = {
         "corn_silage": ["50", "51", "52"],
         "alfalfa_hay": ["100", "103", "106", "107", "108"],
-        "wheat": [],
     }
     assert estimator.crop_species_to_purchased_feed_id == expected
 
