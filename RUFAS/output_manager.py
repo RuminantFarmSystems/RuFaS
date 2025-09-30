@@ -7,8 +7,9 @@ from copy import deepcopy
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Counter, TextIO, Union, Callable
+from typing import Any, Sequence, TextIO, Union, Callable
 
+from collections import Counter
 import collections
 import numpy as np
 import pandas as pd
@@ -358,7 +359,7 @@ class OutputManager(object):
         units = info_map.get("units")
         if units is None:
             raise KeyError(f"'units' was not found in info_map for call to 'add_variable()' for {name}.")
-        if isinstance(units, dict) and len(info_map.get("units")) != len(value) and value != {}:
+        if isinstance(units, dict) and len(info_map["units"]) != len(value) and value != {}:
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
@@ -416,8 +417,7 @@ class OutputManager(object):
             f"Saved the current variable pool to {saved_pool_file_path}",
             info_map,
         )
-        self.variables_pool = {}
-        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self._set_variables_pool({})
         self.saved_pool_chunks_num += 1
 
     def _stringify_units(self, units: dict[str, Any] | MeasurementUnits) -> dict[str, Any] | str:
@@ -1308,7 +1308,7 @@ class OutputManager(object):
         self.add_log("filtering_log", filter_excl_msg, info_map)
 
         filtered_pool: dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
-            dict_to_filter=self.variables_pool,
+            dict_to_filter=self._get_flat_variables_pool(),
             filter_patterns=filter_content.get("filters", []),
             filter_by_exclusion=filter_by_exclusion,
         )
@@ -1435,31 +1435,23 @@ class OutputManager(object):
 
     def load_saved_pools(self) -> None:
         """
-        Filters saved pools of data by applying specific filter criteria.
-
-        This method iterates over JSON files in the saved pool directory. It then loads each file as the OutputManager
-        variable pool and applies the filter by calling the `filter_variables_pool()` method. The results are
-        aggregated into a single dictionary,
-        combining entries under the same key by extending lists of info_maps and values.
-
-        Notes
-        -----
-        This function has a side effect that modifies the variable_pool of the OutputManager
+        Loads saved pools of data from JSON files in the saved_pool_chunks_path directory and merges them into
+        a single variables pool.
         """
-        filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+        merged_pool: dict[str, OutputManager.pool_element_type] = {}
         list_of_dumped_files = self._sort_saved_chunk_files()
         for file in list_of_dumped_files:
             self.load_variables_pool_from_file(file)
             for key, value in self.variables_pool.items():
-                if key in filtered_pool.keys():
-                    filtered_pool[key]["info_maps"].extend(value["info_maps"])
-                    filtered_pool[key]["values"].extend(value["values"])
+                if key not in merged_pool:
+                    merged_pool[key] = value
                 else:
-                    filtered_pool[key] = value
-            self.current_pool_size = sys.getsizeof(filtered_pool)
-            self.variables_pool = {}
+                    merged_pool[key]["info_maps"].extend(value["info_maps"])
+                    merged_pool[key]["values"].extend(value["values"])
+            self.current_pool_size = 0
+            self._set_variables_pool({}, pool_size_override=0)
 
-        self.variables_pool = filtered_pool
+        self._set_variables_pool(merged_pool, pool_size_override=sys.getsizeof(merged_pool))
 
     def save_results(  # noqa: C901
         self,
@@ -1496,7 +1488,7 @@ class OutputManager(object):
             The directory for saving JSONs containing filtered simulation output.
 
         """
-        info_map = {
+        info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
             "function": self.save_results.__name__,
         }
@@ -1864,7 +1856,7 @@ class OutputManager(object):
         """
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
-        for name, variable_data in self.variables_pool.items():
+        for name, variable_data in self._get_flat_variables_pool().items():
             if "values" not in variable_data:
                 var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
                 continue
@@ -1944,14 +1936,87 @@ class OutputManager(object):
         self.dump_errors(path)
         self.report_variables_usage_counts(path)
 
+    def _set_variables_pool(
+        self,
+        new_pool: dict[str, OutputManager.pool_element_type],
+        *,
+        pool_size_override: int | None = None,
+    ) -> None:
+        """Assigns the variables pool and updates the cached size.
+
+        Parameters
+        ----------
+        new_pool : dict[str, OutputManager.pool_element_type]
+            The new variables pool to be assigned.
+        pool_size_override : int | None, optional
+            If provided, this value will be used to set the current pool size instead of calculating it.
+        """
+
+        self.variables_pool = new_pool
+        if pool_size_override is not None:
+            self.current_pool_size = pool_size_override
+            return
+
+        self.current_pool_size = sys.getsizeof(new_pool.__repr__())
+
+    def _get_flat_variables_pool(self) -> dict[str, Any]:
+        """Returns a flattened mapping of variable names to data when multiple pools are loaded."""
+
+        if not self.variables_pool:
+            return {}
+
+        if all(
+            isinstance(variable_data, dict) and "values" in variable_data
+            for variable_data in self.variables_pool.values()
+        ):
+            return self.variables_pool
+
+        flattened: dict[str, Any] = {}
+        for pool_name, pool_data in self.variables_pool.items():
+            if not isinstance(pool_data, dict):
+                continue
+            for variable_name, variable_data in pool_data.items():
+                flattened[f"{pool_name}.{variable_name}"] = variable_data
+
+        return flattened
+
     def flush_pools(self) -> None:
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool = {}
+        self._set_variables_pool({})
         self.warnings_pool = {}
         self.errors_pool = {}
         self.logs_pool = {}
+
+    def _read_variables_pool_file(
+        self,
+        file_path: Path,
+        info_map: dict[str, Any],
+    ) -> dict[str, list[Any]]:
+        """Reads a variables pool JSON file and returns its contents."""
+
+        self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
+        try:
+            with open(file_path) as file:
+                loaded_pool: dict[str, list[Any]] = json.load(file)
+                loaded_pool.pop("DISCLAIMER", None)
+                self.add_log(
+                    "load_data_successful",
+                    f"Successfully loaded data from {str(file_path)}.",
+                    info_map,
+                )
+                return loaded_pool
+        except FileNotFoundError:
+            self.add_error(
+                "File not found",
+                f"The file '{str(file_path)}' does not exist.",
+                info_map,
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
@@ -1973,27 +2038,44 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.load_variables_pool_from_file.__name__,
         }
-        self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
-        try:
-            with open(file_path) as file:
-                loaded_pool: OutputManager.pool_element_type = json.load(file)
-                loaded_pool.pop("DISCLAIMER", None)
-                self.variables_pool = loaded_pool
-                self.add_log(
-                    "load_data_successful",
-                    f"Successfully loaded data from {str(file_path)}.",
-                    info_map,
-                )
-        except FileNotFoundError:
-            self.add_error(
-                "File not found",
-                f"The file '{str(file_path)}' does not exist.",
-                info_map,
-            )
-            raise
-        except json.JSONDecodeError as e:
-            self.add_error("JSON parsing error", str(e), info_map)
-            raise
+        loaded_pool = self._read_variables_pool_file(file_path, info_map)
+        self._set_variables_pool(loaded_pool)
+
+    def load_multiple_variables_pools_from_files(self, pools: Sequence[tuple[str, Path] | dict[str, Any]]) -> None:
+        """Loads multiple Output Manager variable pools, namespacing each pool's entries.
+
+        Parameters
+        ----------
+        pools : Sequence[tuple[str, Path] | dict[str, Any]]
+            An iterable of pool descriptors. Each descriptor must provide a pool name and the
+            path to the JSON file containing the pool to load. When dicts are provided they
+            must include ``"name"`` and ``"path"`` keys.
+
+        """
+
+        info_map_base = {
+            "class": self.__class__.__name__,
+            "function": self.load_multiple_variables_pools_from_files.__name__,
+        }
+
+        separated_pools: dict[str, OutputManager.pool_element_type] = {}
+        normalized_pools: list[tuple[str, Path]] = []
+        for pool in pools:
+            if isinstance(pool, tuple):
+                pool_name, pool_path = pool
+            else:
+                pool_name = pool["name"]
+                pool_path = pool["path"]
+            if not isinstance(pool_path, Path):
+                pool_path = Path(pool_path)
+            normalized_pools.append((pool_name, pool_path))
+
+        for pool_name, pool_path in normalized_pools:
+            pool_info_map = {**info_map_base, "pool_name": pool_name}
+            loaded_pool = self._read_variables_pool_file(pool_path, pool_info_map)
+            separated_pools[pool_name] = loaded_pool
+
+        self._set_variables_pool(separated_pools)
 
     def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
         """Clears the output directory if vars_file_path not in output directory.
