@@ -4,7 +4,7 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Sequence, Type, Union, cast
 
 import pandas as pd
 import psutil
@@ -1811,7 +1811,7 @@ def test_get_flat_variables_pool_nested_is_flattened_and_non_dict_skipped(
     mock_output_manager: OutputManager,
 ) -> None:
     """Flattens nested pools and skips non-dict entries at the pool level."""
-    mock_output_manager.variables_pool = {
+    mock_output_manager.variables_pool = cast(Any, {
         "poolA": {
             "var1": {"values": [1], "info_maps": [{"units": "kg"}]},
             "var2": {"values": [2], "info_maps": [{"units": "kg"}]},
@@ -1820,7 +1820,7 @@ def test_get_flat_variables_pool_nested_is_flattened_and_non_dict_skipped(
             "v3": {"values": [3], "info_maps": [{"units": "m"}]},
         },
         "not_a_pool": 42,
-    }
+    })
 
     result = mock_output_manager._get_flat_variables_pool()
 
@@ -1834,7 +1834,7 @@ def test_load_multiple_variables_pools_from_files_mixed_descriptors(
     mocker: MockerFixture,
 ) -> None:
     """Loads pools from a tuple(Path) and a dict(str path), passes correct info_map, and namespaces results."""
-    pools_input = [
+    pools_input: Sequence[tuple[str, Path] | dict[str, Any]] = [
         ("poolA", Path("a.json")),
         {"name": "poolB", "path": "b.json"},
     ]
