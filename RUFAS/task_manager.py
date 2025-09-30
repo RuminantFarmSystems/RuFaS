@@ -817,7 +817,8 @@ class TaskManager:
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
         if args.get("run_eee", False):
-            eee_manager_module = import_module("RUFAS.EEE.EEE_manager")
+            # TODO update path to `RUFAS.EEE.EEE_manager` when EEE is finalized and moved in either PR #2524 or #1299
+            eee_manager_module = import_module("RUFAS.routines.EEE.EEE_manager")
             eee_manager_module.EEEManager.estimate_all()
 
         if export_input_data_to_csv:
