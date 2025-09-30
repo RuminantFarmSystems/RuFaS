@@ -28,6 +28,5 @@ class DailyRoutinesOutput:
     """
 
     herd_reproduction_statistics: HerdReproductionStatistics
-    daily_digestion_output: dict[AnimalType, dict[str, float]] = field(default_factory=dict)
     animal_status: AnimalStatus = AnimalStatus.REMAIN
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
