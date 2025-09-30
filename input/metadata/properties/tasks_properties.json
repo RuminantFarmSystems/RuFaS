@@ -149,10 +149,9 @@
         "saved_output_pools": {
           "type": "array",
           "description": "Collection of saved output pools to reload before post-processing.",
-          "items": {
+          "properties": {
             "type": "object",
-            "properties": {
-              "name": {
+            "name": {
                 "type": "string",
                 "description": "Identifier applied to variables loaded from this pool.",
                 "pattern": "^[A-Za-z0-9_.-]+$"
@@ -163,12 +162,7 @@
                 "description": "File path to the saved output pool JSON file."
               }
             },
-            "required": [
-              "name",
-              "path"
-            ]
-          },
-          "default": []
+          "nullable": true
         },
         "output_pool_path": {
           "type": "string",
