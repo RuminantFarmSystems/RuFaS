@@ -1309,14 +1309,6 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_reports.__name__,
         }
-        if herd_statistics.total_enteric_methane:
-            for animal_type, methane_amount in herd_statistics.total_enteric_methane.items():
-                for method, emissions in herd_statistics.total_enteric_methane[animal_type].items():
-                    om.add_variable(
-                        f"{animal_type.value}_total_enteric_methane_{method}",
-                        emissions,
-                        dict(info_map, **{"units": MeasurementUnits.GRAMS}),
-                    )
 
     @classmethod
     def report_end_of_simulation(

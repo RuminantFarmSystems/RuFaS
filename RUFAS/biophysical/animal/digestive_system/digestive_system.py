@@ -116,7 +116,7 @@ class DigestiveSystem:
                 digestive_system_inputs.nutrients,
                 AnimalConfig.methane_mitigation_method,
                 AnimalConfig.methane_mitigation_additive_amount,
-                AnimalConfig.methane_model["cow"],
+                AnimalConfig.methane_model,
             )
 
             phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
