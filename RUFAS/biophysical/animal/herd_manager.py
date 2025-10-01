@@ -389,13 +389,9 @@ class HerdManager:
         self._update_sold_heiferII_statistics(sold_heiferIIs)
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
-    def _perform_daily_routines_for_animals(self, time: RufasTime, animals: list[Animal]) -> tuple[
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal]
-    ]:
+    def _perform_daily_routines_for_animals(
+        self, time: RufasTime, animals: list[Animal]
+    ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]:
         """Perform daily routines for a given list of animals."""
         graduated_animals: list[Animal] = []
         sold_animals: list[Animal] = []
@@ -422,13 +418,7 @@ class HerdManager:
                         newborn_calves.append(newborn_calf)
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
-        return (
-            graduated_animals,
-            sold_animals,
-            stillborn_newborn_calves,
-            newborn_calves,
-            sold_newborn_calves
-        )
+        return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
     def _update_herd_structure(
         self,
@@ -492,21 +482,15 @@ class HerdManager:
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
-        graduated_calves, sold_calves, _, _, _= self._perform_daily_routines_for_animals(
-            time, self.calves
-        )
+        graduated_calves, sold_calves, _, _, _ = self._perform_daily_routines_for_animals(time, self.calves)
         graduated_animals += graduated_calves
         removed_animals += sold_calves
 
-        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(
-            time, self.heiferIs
-        )
+        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIs)
         graduated_animals += graduated_heiferIs
         removed_animals += sold_heiferIs
 
-        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(
-            time, self.heiferIIs
-        )
+        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIIs)
         graduated_animals += graduated_heiferIIs
         removed_animals += sold_heiferIIs
 
@@ -516,7 +500,7 @@ class HerdManager:
             sold_heiferIIIs,
             stillborn_newborn_calves_from_heiferIIIs,
             newborn_calves_from_heiferIIIs,
-            sold_newborn_calves_from_heiferIIIs
+            sold_newborn_calves_from_heiferIIIs,
         ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
         graduated_animals += graduated_heiferIIIs
         removed_animals += sold_heiferIIIs
@@ -529,7 +513,7 @@ class HerdManager:
             sold_and_died_cows,
             stillborn_newborn_calves_from_cows,
             newborn_calves_from_cows,
-            sold_newborn_calves_from_cows
+            sold_newborn_calves_from_cows,
         ) = self._perform_daily_routines_for_animals(time, self.cows)
         graduated_animals += graduated_cows
         removed_animals += sold_and_died_cows
