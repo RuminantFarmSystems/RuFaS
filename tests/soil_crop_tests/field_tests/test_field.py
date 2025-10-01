@@ -1,18 +1,19 @@
 from dataclasses import replace
+import datetime
 from math import exp
-from typing import Dict, List
+from typing import Any, Dict, List
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
@@ -60,7 +61,7 @@ def mock_field_data() -> FieldData:
     )
 
 
-def test_field_init_defaults():
+def test_field_init_defaults() -> None:
     """Tests that Field initializes correctly with default values when no parameters are provided."""
     # Act
     field = Field()
@@ -397,7 +398,13 @@ def test_check_manure_application_schedule_integration() -> None:
         (0.0, 0.0, ManureType.LIQUID, None, "Tried to apply manure with no nitrogen or phosphorus requested."),
     ],
 )
-def test_create_manure_request(nitrogen_mass, phosphorus_mass, manure_type, expected_request, expected_log):
+def test_create_manure_request(
+    nitrogen_mass: float,
+    phosphorus_mass: float,
+    manure_type: ManureType,
+    expected_request: NutrientRequest | None,
+    expected_log: str | None,
+) -> None:
     """Tests _create_manure_request for both nutrient-requested and no-nutrient cases."""
     # Arrange
     field = Field()
@@ -487,14 +494,17 @@ def test_check_crop_harvest_schedule(
     mocker: MockerFixture,
     year: int,
     day: int,
-    all_harvest_events: List[HarvestEvent],
-    current_harvest_events: List[HarvestEvent],
+    all_harvest_events: list[HarvestEvent],
+    current_harvest_events: list[HarvestEvent],
     expected_harvest_count: int,
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
     field = Field(harvestings=all_harvest_events)
 
     mocked_time = MagicMock(RufasTime)
+    mocked_time.calendar_year = year
+    mocked_time.day = day
+    mocked_time.current_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=day - 1)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     mock_conditions = MagicMock(CurrentDayConditions)
@@ -502,9 +512,25 @@ def test_check_crop_harvest_schedule(
     filter_events = mocker.patch.object(
         field, "_filter_events", return_value=(remaining_harvest_events, current_harvest_events)
     )
-    harvest_crop = mocker.patch.object(
-        field, "_harvest_crop", return_value=[HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)]
+    mock_harvested_crop = HarvestedCrop(
+        config_name="test_crop",
+        field_name="test_field",
+        harvest_time=mocked_time,
+        storage_time=mocked_time,
+        fresh_mass=10.0,
+        dry_matter_percentage=0.85,
+        dry_matter_digestibility=0.65,
+        crude_protein_percent=0.12,
+        non_protein_nitrogen=0.02,
+        starch=0.30,
+        adf=0.15,
+        ndf=0.35,
+        lignin=0.05,
+        sugar=0.10,
+        ash=0.08,
+        recorded_days=set(),
     )
+    harvest_crop = mocker.patch.object(field, "_harvest_crop", return_value=[mock_harvested_crop])
     harvest_heat_scheduled = mocker.patch.object(field, "_harvest_heat_scheduled_crops")
 
     harvest_crop_calls = []
@@ -776,8 +802,8 @@ def test_record_planting(
     day: int,
     field_name: str,
     field_size: float,
-    expected_info_map: Dict,
-    expected_value: Dict,
+    expected_info_map: dict[str, Any],
+    expected_value: dict[str, Any],
 ) -> None:
     """Tests that crop plantings are correctly recorded to the OutputManager."""
     field = Field(field_data=FieldData(name=field_name, field_size=field_size))
@@ -1075,7 +1101,9 @@ def test_execute_fertilizer_application(
         ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}),
     ],
 )
-def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict) -> None:
+def test_execute_fertilizer_application_error(
+    field_name: str, mix_name: str, available_mixes: dict[str, dict[str, float]]
+) -> None:
     """
     Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
     """
@@ -2254,8 +2282,8 @@ def test_record_manure_application(
     remainder: float,
     year: int,
     day: int,
-    expected_info: Dict,
-    expected_values: Dict,
+    expected_info: dict[str, Any],
+    expected_values: dict[str, Any],
     potassium: float,
 ) -> None:
     """Tests that manure applications are recorded correctly."""
@@ -2361,7 +2389,7 @@ def test_record_nutrient_application_error(
     name: str,
     year: int,
     day: int,
-    expected_info_map: dict,
+    expected_info_map: dict[str, Any],
     expected_error_message: str,
 ) -> None:
     """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
@@ -2829,7 +2857,7 @@ def test_potential_evapotranspiration(
     min_temp: float,
     avg_temp: float,
     expected_avg: float,
-    expected_result,
+    expected_result: float,
 ) -> None:
     with patch(
         "RUFAS.routines.field.field.field.Field._determine_latent_heat_vaporization",
@@ -2851,7 +2879,7 @@ def test_potential_evapotranspiration(
         20.4486,
     ],
 )
-def test_determine_latent_heat_vaporization(avg_temp):
+def test_determine_latent_heat_vaporization(avg_temp: float) -> None:
     observe = Field._determine_latent_heat_vaporization(avg_temp)
     expect = 2.501 - (0.002361 * avg_temp)
     assert expect == observe
@@ -2908,7 +2936,7 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(
     "soil_evaporation_adj,snow_water_content",
     [(1.3, 3.2), (0, 0), (1.3, 0.4), (1.8954, 0)],
 )
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
+def test_determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> None:
     observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
     if snow_water_content > soil_evaporation_adj:
         assert 0 == observe
@@ -3231,8 +3259,8 @@ def test_record_field_watering(
     day: int,
     year: int,
     watering_amount: float,
-    expected_info_map: Dict,
-    expected_value: Dict,
+    expected_info_map: dict[str, Any],
+    expected_value: dict[str, Any],
 ) -> None:
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
