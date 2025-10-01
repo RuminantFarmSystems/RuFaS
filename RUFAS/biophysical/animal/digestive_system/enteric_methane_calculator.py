@@ -268,9 +268,7 @@ class EntericMethaneCalculator:
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
             )
-            methane_emission = (
-                0.065 * gross_energy_concentration * dry_matter_intake / GeneralConstants.MJ_CH4_TO_G_CH4
-            )
+            methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / GeneralConstants.MJ_CH4_TO_G_CH4
             return methane_emission
 
     @staticmethod

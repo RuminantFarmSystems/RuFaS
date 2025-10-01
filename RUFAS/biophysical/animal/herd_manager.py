@@ -139,6 +139,7 @@ class HerdManager:
         self.is_ration_defined_by_user = is_ration_defined_by_user
         ration_feed_config = self.im.get_data("feed")
         UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
+        UserDefinedRationManager.set_user_defined_ration_tolerance(ration_feed_config)
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
@@ -388,13 +389,9 @@ class HerdManager:
         self._update_sold_heiferII_statistics(sold_heiferIIs)
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
-    def _perform_daily_routines_for_animals(self, time: RufasTime, animals: list[Animal]) -> tuple[
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal]
-    ]:
+    def _perform_daily_routines_for_animals(
+        self, time: RufasTime, animals: list[Animal]
+    ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]:
         """Perform daily routines for a given list of animals."""
         graduated_animals: list[Animal] = []
         sold_animals: list[Animal] = []
@@ -421,13 +418,7 @@ class HerdManager:
                         newborn_calves.append(newborn_calf)
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
-        return (
-            graduated_animals,
-            sold_animals,
-            stillborn_newborn_calves,
-            newborn_calves,
-            sold_newborn_calves
-        )
+        return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
     def _update_herd_structure(
         self,
@@ -491,21 +482,15 @@ class HerdManager:
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
-        graduated_calves, sold_calves, _, _, _= self._perform_daily_routines_for_animals(
-            time, self.calves
-        )
+        graduated_calves, sold_calves, _, _, _ = self._perform_daily_routines_for_animals(time, self.calves)
         graduated_animals += graduated_calves
         removed_animals += sold_calves
 
-        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(
-            time, self.heiferIs
-        )
+        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIs)
         graduated_animals += graduated_heiferIs
         removed_animals += sold_heiferIs
 
-        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(
-            time, self.heiferIIs
-        )
+        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIIs)
         graduated_animals += graduated_heiferIIs
         removed_animals += sold_heiferIIs
 
@@ -515,7 +500,7 @@ class HerdManager:
             sold_heiferIIIs,
             stillborn_newborn_calves_from_heiferIIIs,
             newborn_calves_from_heiferIIIs,
-            sold_newborn_calves_from_heiferIIIs
+            sold_newborn_calves_from_heiferIIIs,
         ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
         graduated_animals += graduated_heiferIIIs
         removed_animals += sold_heiferIIIs
@@ -528,7 +513,7 @@ class HerdManager:
             sold_and_died_cows,
             stillborn_newborn_calves_from_cows,
             newborn_calves_from_cows,
-            sold_newborn_calves_from_cows
+            sold_newborn_calves_from_cows,
         ) = self._perform_daily_routines_for_animals(time, self.cows)
         graduated_animals += graduated_cows
         removed_animals += sold_and_died_cows
@@ -1395,13 +1380,14 @@ class HerdManager:
             Day of simulation.
 
         """
-        if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
+        if pen.animal_combination == AnimalCombination.LAC_COW and pen.average_milk_production == 0.0:
+            for animal in pen.animals_in_pen:
+                pen.animals_in_pen[animal].daily_milking_update_without_history()
+        if pen.animal_combination == AnimalCombination.CALF:
             pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
-            if pen.animal_combination == AnimalCombination.LAC_COW and pen.average_milk_production == 0.0:
-                for animal in pen.animals_in_pen:
-                    pen.animals_in_pen[animal].daily_milking_update_without_history()
             pen.formulate_optimized_ration(
+                self.is_ration_defined_by_user,
                 pen_available_feeds,
                 current_temperature,
                 self._max_daily_feeds,

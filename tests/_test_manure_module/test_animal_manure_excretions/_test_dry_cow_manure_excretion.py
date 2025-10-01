@@ -53,7 +53,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         0.00711 * body_weight + 0.324 * CP_concentration + 0.259 * NDF_concentration + 8.05
     )
     total_solids = 0.178 * dry_matter_intake + 2.733
-
+    total_manure_excreted = max(total_manure_excreted, (total_solids / 0.12))
     dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
     organic_matter_intake = (
         dry_matter_intake
