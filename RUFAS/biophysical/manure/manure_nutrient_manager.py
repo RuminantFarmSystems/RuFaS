@@ -59,20 +59,22 @@ class ManureNutrientManager:
         """
         current_pool_by_category = self.nutrients_by_manure_category[removal_details.get("manure_type")]
 
+        nitrogen_amount_after_renewal = current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0.0)
+        phosphorus_amount_after_renewal = current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0.0)
+        potassium_amount_after_renewal = current_pool_by_category.potassium - removal_details.get("potassium", 0.0)
+        total_manure_mass_after_renewal = (
+            current_pool_by_category.total_manure_mass
+            - removal_details.get("water", 0.0)
+            - removal_details.get("total_solids", 0.0)
+        )
+        dry_matter_after_renewal = current_pool_by_category.dry_matter - removal_details.get("total_solids", 0.0)
         category_amount_after_renewal = ManureNutrients(
             manure_type=current_pool_by_category.manure_type,
-            nitrogen=max(0.0, current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0.0)),
-            phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0.0)),
-            potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0.0)),
-            total_manure_mass=max(
-                0.0,
-                (
-                    current_pool_by_category.total_manure_mass
-                    - removal_details.get("water", 0.0)
-                    - removal_details.get("total_solids", 0.0)
-                ),
-            ),
-            dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0.0)),
+            nitrogen=nitrogen_amount_after_renewal if nitrogen_amount_after_renewal > 1e-3 else 0.0,
+            phosphorus=phosphorus_amount_after_renewal if phosphorus_amount_after_renewal > 1e-3 else 0.0,
+            potassium=potassium_amount_after_renewal if potassium_amount_after_renewal > 1e-3 else 0.0,
+            total_manure_mass=total_manure_mass_after_renewal if total_manure_mass_after_renewal > 1e-3 else 0.0,
+            dry_matter=dry_matter_after_renewal if dry_matter_after_renewal > 1e-3 else 0.0,
         )
 
         self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
