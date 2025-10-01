@@ -3,7 +3,6 @@ from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import numpy as np
 import pytest
-import RUFAS.biophysical.animal.pen as pen_module
 from pytest_mock import MockerFixture
 from scipy.optimize import OptimizeResult
 
@@ -1180,7 +1179,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
-        None,
+        True,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
@@ -1194,7 +1193,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
 
 def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW: first attempt fails, second succeeds."""
-    mocker.patch.object(pen_module.UserDefinedRationManager, "tolerance", 0.0, create=True)
+    mocker.patch("RUFAS.biophysical.animal.pen.UserDefinedRationManager.tolerance", 0.0, create=True)
 
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
