@@ -738,6 +738,7 @@ class Pen:
             bedding_mass=total_bedding_mass, bedding_volume=total_bedding_volume
         )
 
+
         return ManureStream(
             water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
             ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
@@ -759,6 +760,7 @@ class Pen:
             volume=manure_stream.volume + total_bedding_volume,
             methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
+            bedding_volatile_solids=total_bedding_dry_solids
         )
 
     def _calculate_manure_surface_area(self) -> float:

@@ -159,6 +159,8 @@ class ManureStream:
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
+    bedding_volatile_solids : float
+        Amount of bedding volatile solids (kg).
 
     Class Attributes
     ----------------
@@ -178,6 +180,7 @@ class ManureStream:
     volume: float
     methane_production_potential: float
     pen_manure_data: PenManureData | None
+    bedding_volatile_solids: float
 
     MANURE_STREAM_UNITS = {
         "water": MeasurementUnits.KILOGRAMS,
@@ -235,6 +238,7 @@ class ManureStream:
             pen_manure_data=(
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
             ),
+            bedding_volatile_solids=self.bedding_volatile_solids + other.bedding_volatile_solids
         )
 
     @property
@@ -256,6 +260,7 @@ class ManureStream:
                 self.degradable_volatile_solids,
                 self.total_solids,
                 self.volume,
+                self.bedding_volatile_solids
             ]
         )
 
@@ -289,6 +294,7 @@ class ManureStream:
             volume=0.0,
             methane_production_potential=0.0,
             pen_manure_data=None,
+            bedding_volatile_solids=0.0
         )
 
     def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
@@ -348,4 +354,5 @@ class ManureStream:
             volume=self.volume * split_ratio,
             methane_production_potential=self.methane_production_potential,
             pen_manure_data=split_pen_manure_data,
+            bedding_volatile_solids=self.bedding_volatile_solids * split_ratio
         )
