@@ -434,6 +434,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
             mock_feed_storage_instances,
             mock_ration_interval_length,
             mock_is_ration_defined_by_user,
+            4,
         ],
     )
 
@@ -469,6 +470,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         call("feed_storage_instances"),
         call("animal.ration.formulation_interval"),
         call("animal.ration.user_input"),
+        call("feed.max_daily_feed_recalculations_per_year"),
     ]
 
     assert simulation_engine.om.time == mock_time
