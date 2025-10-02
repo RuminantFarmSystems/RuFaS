@@ -2200,8 +2200,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             initial_phosphorus=18.4,
             net_merit=75.1,
         ),
-        herd_reproduction_statistics=HerdReproductionStatistics(),
-        daily_digestion_output={AnimalType.CALF: {"Pattanaik": 0}},
+        herd_reproduction_statistics=HerdReproductionStatistics()
     )
 
 
@@ -2245,8 +2244,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     assert result == DailyRoutinesOutput(
         animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
         newborn_calf_config=mock_new_born_calf_config,
-        herd_reproduction_statistics=HerdReproductionStatistics(),
-        daily_digestion_output={AnimalType.CALF: {"Pattanaik": 0}},
+        herd_reproduction_statistics=HerdReproductionStatistics()
     )
 
 

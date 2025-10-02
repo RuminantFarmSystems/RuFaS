@@ -150,8 +150,7 @@ def test_perform_daily_routines_for_animals(
                         initial_phosphorus=10.0,
                         net_merit=18.8,
                     ),
-                    herd_reproduction_statistics=HerdReproductionStatistics(),
-                    daily_digestion_output={animal_type: {"IPCC": 0}},
+                    herd_reproduction_statistics=HerdReproductionStatistics()
                 ),
             )
         else:
@@ -160,8 +159,7 @@ def test_perform_daily_routines_for_animals(
                 "daily_routines",
                 return_value=DailyRoutinesOutput(
                     animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
-                    herd_reproduction_statistics=HerdReproductionStatistics(),
-                    daily_digestion_output={animal_type: {"IPCC": 0}},
+                    herd_reproduction_statistics=HerdReproductionStatistics()
                 ),
             )
         expected_graduated_animals.append(animal)
@@ -172,8 +170,7 @@ def test_perform_daily_routines_for_animals(
             "daily_routines",
             return_value=DailyRoutinesOutput(
                 animal_status=AnimalStatus.SOLD,
-                herd_reproduction_statistics=HerdReproductionStatistics(),
-                daily_digestion_output={animal_type: {"IPCC": 0}},
+                herd_reproduction_statistics=HerdReproductionStatistics()
             ),
         )
         expected_sold_animals.append(animal)
@@ -183,8 +180,7 @@ def test_perform_daily_routines_for_animals(
             "daily_routines",
             return_value=DailyRoutinesOutput(
                 animal_status=AnimalStatus.REMAIN,
-                herd_reproduction_statistics=HerdReproductionStatistics(),
-                daily_digestion_output={animal_type: {"IPCC": 0}},
+                herd_reproduction_statistics=HerdReproductionStatistics()
             ),
         )
 
@@ -211,8 +207,7 @@ def test_perform_daily_routines_for_animals(
         actual_sold_animal,
         actual_stillborn_newborn_calves,
         actual_newborn_calves,
-        actual_sold_newborn_calves,
-        digestion_outputs,
+        actual_sold_newborn_calves
     ) = herd_manager._perform_daily_routines_for_animals(mock_time, animals)
 
     assert set(actual_graduated_animals) == set(expected_graduated_animals)
@@ -320,27 +315,22 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     )
 
     mock_perform_daily_routines_for_animals_side_effect = [
-        (graduated_calves, sold_calves, [], [], [], [{"Pattanaik": 10}]),
-        (graduated_heiferIs, sold_heiferIs, [], [], [], [{"IPCC": 10}]),
-        (graduated_heiferIIs, sold_heiferIIs, [], [], [], [{"IPCC": 10}]),
+        (graduated_calves, sold_calves, [], [], []),
+        (graduated_heiferIs, sold_heiferIs, [], [], []),
+        (graduated_heiferIIs, sold_heiferIIs, [], [], []),
         (
             graduated_heiferIIIs,
             sold_heiferIIIs,
             heiferIII_sold_newborn_calves,
             heiferIII_newborn_calves,
-            [],
-            [
-                {"IPCC": 10},
-                {"Mills": 0},
-            ],
+            []
         ),
         (
             graduated_cows,
             sold_and_died_cows,
             cow_sold_newborn_calves,
             cow_newborn_calves,
-            [],
-            [{"IPCC": 10}, {"Mills": 0}, {"Mutian": 0}],
+            []
         ),
     ]
 
