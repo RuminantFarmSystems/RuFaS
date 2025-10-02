@@ -99,12 +99,7 @@ def test_calculate_cow_methane(
         nutrient_amounts=mock_nutrition,
         methane_mitigation_method=methane_mitigation_method,
         methane_mitigation_additive_amount=methane_mitigation_additive_amount,
-        methane_models={
-            "cows": {
-                "lactating cows": "IPCC",
-                "dry cows": "IPCC"
-            }
-        }
+        methane_models={"cows": {"lactating cows": "IPCC", "dry cows": "IPCC"}},
     )
 
     if is_lactating:
@@ -123,9 +118,15 @@ def test_calculate_cow_methane(
 @pytest.mark.parametrize(
     "methane_model, expected_methane",
     [
-        ("Mutian", 393.2,),
-        ("Mills",413.11769991015274,),
-        ("IPCC", 525.2840970350404)
+        (
+            "Mutian",
+            393.2,
+        ),
+        (
+            "Mills",
+            413.11769991015274,
+        ),
+        ("IPCC", 525.2840970350404),
     ],
 )
 def test_calculate_lactating_cow_enteric_methane(
@@ -167,14 +168,9 @@ def test_calculate_lactating_cow_enteric_methane(
 
 @pytest.mark.parametrize(
     "methane_model, expected_methane",
-    [
-        ("Mills", 413.11769991015274),
-        ("IPCC", 525.2840970350404)
-    ],
+    [("Mills", 413.11769991015274), ("IPCC", 525.2840970350404)],
 )
-def test_calculate_dry_cow_enteric_methane(
-    mocker: MockerFixture, methane_model: str, expected_methane: float
-) -> None:
+def test_calculate_dry_cow_enteric_methane(mocker: MockerFixture, methane_model: str, expected_methane: float) -> None:
     """
     Parametrized test for _calculate_dry_cow_enteric_methane with different methane models.
     """
