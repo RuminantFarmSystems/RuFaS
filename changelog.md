@@ -246,6 +246,7 @@ v0.9.2
 - [2579](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] [Animal] Changed location of milking cow fraction to main animal input file.
 - [2586](https://github.com/RuminantFarmSystems/MASM/pull/2586) - [minor change] Make `max_daily_feed_recalculations_per_year` an User Input
 - [2584](https://github.com/RuminantFarmSystems/MASM/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
+- [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
 
 ### v0.9.2
 

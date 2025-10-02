@@ -483,10 +483,6 @@ def mock_herd_manager(
             replacement=replacement,
         )
     )
-    mock_purchased_feed_emissions_estimator_init: MagicMock = mocker.patch(
-        "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
-        return_value=None,
-    )
 
     herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
 
@@ -495,7 +491,6 @@ def mock_herd_manager(
         "mock_initialize_animal_config": mock_initialize_animal_config,
         "mock_set_lactation_parameters": mock_set_lactation_parameters,
         "mock_set_milk_quality": mock_set_milk_quality,
-        "mock_purchased_feed_emissions_estimator_init": mock_purchased_feed_emissions_estimator_init,
     }
 
 

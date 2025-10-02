@@ -5,7 +5,6 @@ from unittest.mock import MagicMock, call
 
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -109,8 +108,8 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
         simulation_engine.herd_manager.herd_statistics,
         simulation_engine.herd_manager.herd_reproduction_statistics,
         simulation_engine.time,
-        simulation_engine.herd_manager.heiferIIs,
-        simulation_engine.herd_manager.cows,
+        simulation_engine.herd_manager.heiferII_events_by_id,
+        simulation_engine.herd_manager.cow_events_by_id,
     )
 
 
@@ -332,7 +331,9 @@ def test_formulate_ration(
     mock_feed_manage_ration_interval_purchases = mocker.patch.object(
         simulation_engine.feed_manager, "manage_ration_interval_purchases"
     )
-    mock_report_ration_interval_data = mocker.patch.object(AnimalModuleReporter, "report_ration_interval_data")
+    mock_report_ration_interval_data = mocker.patch.object(
+        simulation_engine.herd_manager, "report_ration_interval_data"
+    )
 
     simulation_engine._formulate_ration()
 
@@ -350,7 +351,7 @@ def test_formulate_ration(
         simulation_engine.time.simulation_day,
     )
     mock_feed_manage_ration_interval_purchases.assert_called_once_with(mock_requested_feed, mock_time)
-    assert mock_report_ration_interval_data.call_count == number_of_pens
+    mock_report_ration_interval_data.assert_called_once()
 
 
 def test_generate_daily_manure_applications(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
