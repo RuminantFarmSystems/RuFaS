@@ -27,7 +27,9 @@
             "propane_liters_per_day": 1,
             "megajoules_per_day": 1,
             "kwh_per_day": 1,
-            "cubic_meters_water_per_day": 1
+            "cubic_meters_water_per_day": 1,
+            "kwh_per_day_produced": 1,
+            "digester_rng_produced": 1
         },
         "manure_disposal_kg": 1,
         "manure_disposal_price_per_kg": 1,
