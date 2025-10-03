@@ -155,6 +155,7 @@ jobs:
           echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
         
       - name: Capture the commit hash
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
         id: capture_commit_sha
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
