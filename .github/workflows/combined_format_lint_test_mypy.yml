@@ -138,7 +138,7 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
