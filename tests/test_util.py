@@ -11,7 +11,7 @@ from matplotlib.dates import DateFormatter, date2num
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.util import Utility
+from RUFAS.util import Utility, Aggregator
 
 
 def test_calc_average() -> None:
@@ -1073,3 +1073,42 @@ def test_compare_randomized_rate_less_than(
     mocker.patch("RUFAS.util.random", return_value=random_value)
     result = Utility.compare_randomized_rate_less_than(reference_rate)
     assert result == expected_result
+
+
+def test_average_aggregator() -> None:
+    assert Aggregator.average([1, 2, 3, 4, 5]) == 3
+    assert Aggregator.average([-1, -2, -3, -4, -5]) == -3
+    assert Aggregator.average([]) == 0
+
+
+def test_division_aggregator() -> None:
+    assert Aggregator.division([100, 2, 5]) == 10
+    assert Aggregator.division([100, -2, 5]) == -10
+    assert Aggregator.division([]) is None
+    assert Aggregator.division([10]) is None
+    assert Aggregator.division([10, 0]) is None
+
+
+def test_product_aggregator() -> None:
+    assert Aggregator.product([1, 2, 3, 4, 5]) == 120
+    assert Aggregator.product([-1, 2, -3, 4, -5]) == -120
+    assert Aggregator.product([]) == 1
+
+
+def test_sd_aggregator() -> None:
+    assert Aggregator.standard_deviation([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
+    assert Aggregator.standard_deviation([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
+    assert Aggregator.standard_deviation([]) == 0
+
+
+def test_sum_aggregator() -> None:
+    assert Aggregator.sum([1, 2, 3, 4, 5]) == 15
+    assert Aggregator.sum([-1, -2, -3, -4, -5]) == -15
+    assert Aggregator.sum([]) == 0
+
+
+def test_subtraction_aggregator() -> None:
+    assert Aggregator.subtraction([10, 2, 3]) == 5
+    assert Aggregator.subtraction([10, -2, -3]) == 15
+    assert Aggregator.subtraction([]) is None
+    assert Aggregator.subtraction([10]) is None
