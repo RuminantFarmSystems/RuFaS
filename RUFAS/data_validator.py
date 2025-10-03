@@ -1902,22 +1902,65 @@ class CrossValidator:
                 return False
         return True
 
-    def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
+    def _evaluate_condition(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
         """
-
         Evaluates if a single condition is satisfied based on the provided condition clause.
 
         Parameters
         ----------
         condition_clause : dict[str, Any]
             The condition clause to be evaluated.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
 
         Returns
         -------
         bool
             A boolean indicating whether the condition is satisfied.
         """
-        pass
+        left_expression = condition_clause.get("left_hand", False)
+        right_expression = condition_clause.get("left_hand", False)
+        relationship = condition_clause.get("relationship", False)
+        if (not left_expression) or (not right_expression) or (not relationship):
+            if not left_expression:
+                self._event_logs.append(
+                    {
+                        "error": "Missing required condition clause field",
+                        "message": "Missing the left expression field in condition clause.",
+                        "info_map": {
+                            "class": CrossValidator.__name__,
+                            "function": CrossValidator._evaluate_condition.__name__,
+                        },
+                    }
+                )
+            if not right_expression:
+                self._event_logs.append(
+                    {
+                        "error": "Missing required condition clause field",
+                        "message": "Missing the right expression field in condition clause.",
+                        "info_map": {
+                            "class": CrossValidator.__name__,
+                            "function": CrossValidator._evaluate_condition.__name__,
+                        },
+                    }
+                )
+            if not relationship:
+                self._event_logs.append(
+                    {
+                        "error": "Missing required condition clause field",
+                        "message": "Missing the relationship field in condition clause.",
+                        "info_map": {
+                            "class": CrossValidator.__name__,
+                            "function": CrossValidator._evaluate_condition.__name__,
+                        },
+                    }
+                )
+            if eager_termination:
+                raise KeyError("Missing required field in conditional clause.")
+
+        left_hand = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
+        right_hand = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
 
     def _evaluate_condition_clause_array(self, condition_clause_array: list[dict[str, Any]]) -> bool:
         """
@@ -1933,4 +1976,8 @@ class CrossValidator:
         bool
             A boolean indicating whether all conditions in the array are satisfied.
         """
-        pass
+        for clause in condition_clause_array:
+            satisfied = self._evaluate_condition(clause)
+            if not satisfied:
+                return False
+        return True
