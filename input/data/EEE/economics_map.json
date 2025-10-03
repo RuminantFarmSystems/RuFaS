@@ -25,7 +25,7 @@
       "Bedding requirements": {
         "biophysical_simulation": [
           "AnimalModuleReporter.report_daily_animal_population.num_(calves|heiferIs|heiferIIs|heiferIIIs|dry_cows|lactating_cows)",
-          "inputs.manure_management.bedding_type"
+          "manure_management.bedding_type"
         ],
         "economics_files": [
           "commodity_prices.bedding_sand.dollar_per_head.csv",
@@ -370,7 +370,7 @@
       },
       "Renewable natural gas (RNG) production": {
         "biophysical_simulation": [
-          "Economic_preprocessing.Manure.digester_rng"
+          "Economic_inputs.Manure.digester.digester_rng_produced"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
@@ -379,7 +379,7 @@
       },
       "Electricity production from anaerobic digester": {
         "biophysical_simulation": [
-          "Economic_preprocessing.Manure.digester_elec"
+          "Economic_inputs.Manure.digester.kwh_per_day_produced"
         ],
         "economics_files": [
           "commodity_prices.elec_industrial.dollar_per_kwh.csv"
