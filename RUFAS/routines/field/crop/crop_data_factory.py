@@ -1,10 +1,5 @@
 from typing import Any, TypedDict
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
-    CropCategory,
-    StorageType,
-)
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -19,8 +14,6 @@ class CropConfiguration(TypedDict):
 
     name: str
     plant_category: PlantCategory
-    crop_category: CropCategory
-    rufas_ids: list[RUFAS_ID]
     is_nitrogen_fixer: bool
     minimum_temperature: float
     optimal_temperature: float
@@ -41,18 +34,17 @@ class CropConfiguration(TypedDict):
     max_root_depth: float
     root_distribution_param_da: float
     root_distribution_param_c: float
-    storage_type: StorageType
     optimal_harvest_index: float
     minimum_harvest_index: float
     dry_matter_percentage: float
     lignin_dry_matter_percentage: float
-    crude_protein_percent: float
-    non_protein_nitrogen: float
-    starch: float
-    adf: float
-    ndf: float
-    sugar: float
-    ash: float
+    crude_protein_percent_at_harvest: float
+    non_protein_nitrogen_at_harvest: float
+    starch_at_harvest: float
+    adf_at_harvest: float
+    ndf_at_harvest: float
+    sugar_at_harvest: float
+    ash_at_harvest: float
     yield_nitrogen_fraction: float
     yield_phosphorus_fraction: float
 
@@ -123,13 +115,9 @@ class CropDataFactory:
             If the crop type is not valid for the crop category.
 
         """
-        crop_category = CropCategory(config["crop_category"])
         plant_category = PlantCategory(config["plant_category"])
-        storage_type = StorageType(config["storage_type"])
 
         config["plant_category"] = plant_category
-        config["crop_category"] = crop_category
-        config["storage_type"] = storage_type
 
         new_config: CropConfiguration = CropConfiguration(**config)
         return new_config

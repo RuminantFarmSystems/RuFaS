@@ -7,8 +7,6 @@ from pytest_mock import MockerFixture
 from RUFAS.output_manager import OutputManager
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
-    StorageType,
-    HarvestedCropStorageType,
 )
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.crop_management import CropManagement
@@ -184,7 +182,25 @@ def test_manage_harvest(
     get_crop = mocker.patch.object(
         crop_manager,
         "_get_harvested_crop",
-        return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)),
+        return_value=(
+            expected_val := HarvestedCrop(
+                config_name="mock_crop",
+                field_name="mock_field",
+                harvest_time=mock_time.current_date.date(),
+                storage_time=mock_time.current_date.date(),
+                fresh_mass=1234.5,
+                dry_matter_percentage=42.0,
+                dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
+                crude_protein_percent=20.0,
+                non_protein_nitrogen=10.0,
+                starch=2.0,
+                adf=33.0,
+                ndf=43.0,
+                sugar=6.0,
+                lignin=7.0,
+                ash=10.0,
+            )
+        ),
     )
     record_yield = mocker.patch.object(crop_manager, "_record_yield")
     transfer_residue = mocker.patch.object(crop_manager, "_transfer_residue")
@@ -330,30 +346,38 @@ def test_store_harvested_crop(
 ) -> None:
     crop_management = CropManagement(crop_data=mock_crop_data, wet_yield_collected=wet_yield_collected)
     expected_harvest_crop = HarvestedCrop(
-        category=mock_crop_data.crop_category,
+        config_name=mock_crop_data.name,
+        field_name="mock_field",
         harvest_time=mock_time.current_date.date(),
         storage_time=mock_time.current_date.date(),
         fresh_mass=expected_fresh_mass,
         dry_matter_percentage=mock_crop_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-        crude_protein_percent=mock_crop_data.crude_protein_percent,
-        non_protein_nitrogen=mock_crop_data.non_protein_nitrogen,
-        starch=mock_crop_data.starch,
-        adf=mock_crop_data.adf,
-        ndf=mock_crop_data.ndf,
-        sugar=mock_crop_data.sugar,
+        crude_protein_percent=mock_crop_data.crude_protein_percent_at_harvest,
+        non_protein_nitrogen=mock_crop_data.non_protein_nitrogen_at_harvest,
+        starch=mock_crop_data.starch_at_harvest,
+        adf=mock_crop_data.adf_at_harvest,
+        ndf=mock_crop_data.ndf_at_harvest,
+        sugar=mock_crop_data.sugar_at_harvest,
         lignin=mock_crop_data.lignin_dry_matter_percentage,
-        ash=mock_crop_data.ash,
-        rufas_ids=mock_crop_data.rufas_ids,
-        config_name=mock_crop_data.name,
+        ash=mock_crop_data.ash_at_harvest,
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
-    actual = crop_management._get_harvested_crop(mock_time, field_size)
+    actual = crop_management._get_harvested_crop(mock_time, field_size, "mock_field")
 
-    assert actual.harvested_crop.category == mock_crop_data.crop_category
-    assert actual.harvested_crop.fresh_mass == expected_fresh_mass
-    assert actual.storage_type == mock_crop_data.storage_type
+    assert actual.fresh_mass == expected_fresh_mass
+    assert actual.dry_matter_percentage == expected_harvest_crop.dry_matter_percentage
+    assert actual.dry_matter_digestibility == expected_harvest_crop.dry_matter_digestibility
+    assert actual.crude_protein_percent == expected_harvest_crop.crude_protein_percent
+    assert actual.non_protein_nitrogen == expected_harvest_crop.non_protein_nitrogen
+    assert actual.starch == expected_harvest_crop.starch
+    assert actual.adf == expected_harvest_crop.adf
+    assert actual.ndf == expected_harvest_crop.ndf
+    assert actual.sugar == expected_harvest_crop.sugar
+    assert actual.lignin == expected_harvest_crop.lignin
+    assert actual.ash == expected_harvest_crop.ash
+    assert actual.last_time_degraded == expected_harvest_crop.last_time_degraded
 
 
 @pytest.mark.parametrize(
