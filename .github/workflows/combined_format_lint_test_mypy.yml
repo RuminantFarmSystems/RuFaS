@@ -160,7 +160,10 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
-
+- name: Format code with Black for forked branches
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url != 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        run: |
+          echo $(black ${{ env.FILES }})
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
