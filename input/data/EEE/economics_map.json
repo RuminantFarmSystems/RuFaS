@@ -15,11 +15,12 @@
           "AnimalModuleReporter._record_heiferIIs_conception_rate.heiferII_total_num_ai_performed",
           "AnimalModuleReporter._record_cows_conception_rate.cow_total_num_ai_performed"
         ],
-        "economics_files": [
-          "commodity_prices.semen_conventional.dollar_per_straw.csv",
-          "commodity_prices.semen_sexed.dollar_per_straw.csv",
-          "commodity_prices.semen_beef.dollar_per_straw.csv"
-        ],
+        "economics_files": {
+          "input_manager_location": "im.pool"["animal"]["animal_config"]["management_decisions"]["semen_type"],
+          "conventional": "commodity_prices.semen_conventional.dollar_per_straw.csv",
+          "sexed": "commodity_prices.semen_sexed.dollar_per_straw.csv",
+          "beef": "commodity_prices.semen_beef.dollar_per_straw.csv"
+        },
         "preprocessing": "sum of mean of both biophysical outputs, select econ file from user input",
         "processing": ""
       },
