@@ -2098,9 +2098,9 @@ class CrossValidator:
         """
         return re.fullmatch(left_hand_value, right_hand_value) is not None
 
-    def _evaluate_condition_clause_array(self,
-                                         condition_clause_array: list[dict[str, Any]],
-                                         eager_termination: bool) -> bool:
+    def _evaluate_condition_clause_array(
+        self, condition_clause_array: list[dict[str, Any]], eager_termination: bool
+    ) -> bool:
         """
         Evaluates if all conditions in the provided condition clause array are satisfied.
 
