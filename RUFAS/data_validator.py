@@ -1918,47 +1918,45 @@ class CrossValidator:
         -------
         bool
             A boolean indicating whether the condition is satisfied.
+
         """
-        is_condition_clause_valid = self._validate_condition_clause(condition_clause, eager_termination)
-        if is_condition_clause_valid:
-            left_hand = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
-            right_hand = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
+        if not self._validate_condition_clause(condition_clause, eager_termination):
+            return False
+
+        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
+        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
+
+        if left_evaluated and right_evaluated:
             if condition_clause["relationship"] == "equal":
                 return self._evaluate_equal_condition(left_hand, right_hand)
+
             elif condition_clause["relationship"] == "greater":
                 return self._evaluate_greater_condition(left_hand, right_hand)
+
             elif condition_clause["relationship"] == "greater_or_equals_to":
-                return self._evaluate_equal_or_greater_to_condition(left_hand, right_hand)
+                return self._evaluate_greater_condition(
+                    left_hand, right_hand) or self._evaluate_equal_condition(left_hand, right_hand)
+
             elif condition_clause["relationship"] == "not_equal":
                 return not self._evaluate_equal_condition(left_hand, right_hand)
+
             elif condition_clause["relationship"] == "is_of_type":
-                if not isinstance(right_hand, str):
-                    self._event_logs.append(
-                        {
-                            "error": "Invalid type validation",
-                            "message": f"Must indicate the type to compare in string data type, got: {type(right_hand)}",
-                            "info_map": {
-                                "class": CrossValidator.__name__,
-                                "function": CrossValidator._evaluate_condition.__name__,
-                            },
-                        }
-                    )
-                    if eager_termination:
-                        raise ValueError("Invalid type comparison in cross validation.")
-                    return False
                 return self._evaluate_is_type(left_hand, right_hand, eager_termination)
+
             elif condition_clause["relationship"] == "is_null":
                 return self._evaluate_is_null(left_hand)
+
             else:
                 return self._evaluate_regex(left_hand, right_hand)
         else:
             return False
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
+        """Validate the whole condition block."""
         left_expression = condition_clause.get("left_hand", False)
         right_expression = condition_clause.get("left_hand", False)
         relationship = condition_clause.get("relationship", False)
-        if self._validate_relationship_block(relationship, eager_termination):
+        if self._validate_relationship(relationship, eager_termination):
             valid: bool = True
             if (not left_expression) or (not right_expression) or (not relationship):
                 if not left_expression:
@@ -2004,7 +2002,8 @@ class CrossValidator:
 
         return valid
 
-    def _validate_relationship_block(self, relationship: Any, eager_termination: bool) -> bool:
+    def _validate_relationship(self, relationship: Any, eager_termination: bool) -> bool:
+        """Validate if a valid relationship check is given."""
         available_relationship = ["equal", "greater", "greater_or_equals_to", "not_equal", "is_of_type", "regex"]
         if not isinstance(relationship, str):
             self._event_logs.append(
@@ -2013,7 +2012,7 @@ class CrossValidator:
                     "message": f"Relationship block must be a string, got: {type(relationship)}.",
                     "info_map": {
                         "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship_block.__name__,
+                        "function": CrossValidator._validate_relationship.__name__,
                     },
                 }
             )
@@ -2027,7 +2026,7 @@ class CrossValidator:
                     "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
                     "info_map": {
                         "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship_block.__name__,
+                        "function": CrossValidator._validate_relationship.__name__,
                     },
                 }
             )
@@ -2038,21 +2037,32 @@ class CrossValidator:
             return True
 
     def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        """Evaluates equal condition."""
         return left_hand_value == right_hand_value
 
     def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        """Evaluates greater than condition"""
         return left_hand_value > right_hand_value
 
-    def _evaluate_equal_or_greater_to_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
-        return left_hand_value >= right_hand_value
-
-    def _evaluate_not_equal(self, left_hand_value: Any, right_hand_value: Any) -> bool:
-        return left_hand_value != right_hand_value
-
     def _evaluate_is_null(self, left_hand_value: Any) -> bool:
+        """Evaluates is null condition."""
         return left_hand_value is None
 
-    def _evaluate_is_type(self, left_hand_value: Any, data_type: str, eager_termination: bool) -> bool:
+    def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
+        if not isinstance(data_type, str):
+            self._event_logs.append(
+                {
+                    "error": "Invalid type validation",
+                    "message": f"Must indicate the type to compare in string data type, got: {type(data_type)}",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_condition.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Invalid type comparison in cross validation.")
+            return False
         data_type = data_type.strip().lower()
         checkers = {
             "string": lambda v: isinstance(v, str),
@@ -2096,7 +2106,7 @@ class CrossValidator:
         bool
             True if the value fully matches the regex pattern, otherwise False.
         """
-        return re.fullmatch(left_hand_value, right_hand_value) is not None
+        return re.fullmatch(right_hand_value, left_hand_value) is not None
 
     def _evaluate_condition_clause_array(
         self, condition_clause_array: list[dict[str, Any]], eager_termination: bool
