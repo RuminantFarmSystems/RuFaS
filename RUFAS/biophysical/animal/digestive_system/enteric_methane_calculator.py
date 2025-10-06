@@ -219,8 +219,7 @@ class EntericMethaneCalculator:
             )
             return methane_emission
         elif methane_model == "Mills":
-            return EntericMethaneCalculator._calculate_cow_mills_methane(nutrient_amounts,
-                                                                         metabolizable_energy_intake)
+            return EntericMethaneCalculator._calculate_cow_mills_methane(nutrient_amounts, metabolizable_energy_intake)
         else:
             return EntericMethaneCalculator._calculate_IPCC_methane(nutrient_amounts)
 
@@ -265,8 +264,7 @@ class EntericMethaneCalculator:
             return EntericMethaneCalculator._calculate_IPCC_methane(nutrient_amounts)
 
     @staticmethod
-    def _calculate_cow_mills_methane(nutrient_amounts: NutritionSupply,
-                                     metabolizable_energy_intake: float) -> float:
+    def _calculate_cow_mills_methane(nutrient_amounts: NutritionSupply, metabolizable_energy_intake: float) -> float:
         """
         Return the amount of cow methane predicted my Mills method.
 
@@ -292,14 +290,16 @@ class EntericMethaneCalculator:
         mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
         mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
         mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
-        methane_emission_MJ = mitscherlich_parameter_a - (
-                mitscherlich_parameter_a + mitscherlich_parameter_b
-        ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
+        methane_emission_MJ = mitscherlich_parameter_a - (mitscherlich_parameter_a + mitscherlich_parameter_b) * exp(
+            -mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ
+        )
         methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
         return methane_emission
 
     @staticmethod
-    def _calculate_IPCC_methane(nutrient_amounts: NutritionSupply,) -> float:
+    def _calculate_IPCC_methane(
+        nutrient_amounts: NutritionSupply,
+    ) -> float:
         """
         Return the amount of methane predicted my IPCC method.
 
@@ -330,10 +330,10 @@ class EntericMethaneCalculator:
             - ethyl_ester_concentration
         )
         gross_energy_concentration = (
-                0.263 * crude_protein_concentration
-                + 0.522 * ethyl_ester_concentration
-                + 0.198 * neutral_detergent_fiber_concentration
-                + 0.160 * soluble_residue
+            0.263 * crude_protein_concentration
+            + 0.522 * ethyl_ester_concentration
+            + 0.198 * neutral_detergent_fiber_concentration
+            + 0.160 * soluble_residue
         )
         methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.MJ_CH4_TO_G_CH4
         return methane_emission
