@@ -785,67 +785,43 @@
       "type": "object",
       "description": "Methane emission models to use",
       "calves": {
-        "type": "object",
-        "description": "Methane emission models to use fro calves.",
-        "Pattanaik": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for calves.",
+        "pattern": "^(Pattanaik)$",
+        "default": "Pattanaik"
       },
       "heiferIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "heiferIIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "heiferIIIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIIIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIIIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "cows": {
         "type": "object",
-        "description": "Methane emission models to cows.",
+        "description": "Methane emission models for cows.",
         "dry cows": {
-          "type": "object",
-          "description": "Methane emission models to dry cows.",
-          "IPCC": {
-            "type": "bool",
-            "default": true
-          },
-          "Mills": {
-            "type": "bool",
-            "default": false
-          }
+          "type": "string",
+          "description": "Methane emission models for dry cows.",
+          "default": "IPCC",
+          "pattern": "^(IPCC|Mills)$"
         },
         "lactating cows": {
-          "type": "object",
-          "description": "Methane emission models to lactating cows.",
-          "IPCC": {
-            "type": "bool",
-            "default": true
-          },
-          "Mills": {
-            "type": "bool",
-            "default": false
-          },
-          "Mutian": {
-            "type": "bool",
-            "default": false
-          }
+          "type": "string",
+          "description": "Methane emission models for lactating cows.",
+          "default": "IPCC",
+          "pattern": "^(IPCC|Mills|Mutian)$"
         }
       }
     },
