@@ -1936,8 +1936,7 @@ class CrossValidator:
                     self._event_logs.append(
                         {
                             "error": "Invalid type validation",
-                            "message":
-                                f"Must indicate the type to compare in string data type, got: {type(right_hand)}",
+                            "message": f"Must indicate the type to compare in string data type, got: {type(right_hand)}",
                             "info_map": {
                                 "class": CrossValidator.__name__,
                                 "function": CrossValidator._evaluate_condition.__name__,
@@ -2025,8 +2024,7 @@ class CrossValidator:
             self._event_logs.append(
                 {
                     "error": "Invalid relationship.",
-                    "message": f"Relationship block must be one of {available_relationship},"
-                               f" got: {relationship}.",
+                    "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
                     "info_map": {
                         "class": CrossValidator.__name__,
                         "function": CrossValidator._validate_relationship_block.__name__,
