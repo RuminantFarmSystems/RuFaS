@@ -26,17 +26,17 @@
       },
       "Bedding requirements": {
         "biophysical_simulation": [
-          "AnimalModuleReporter.report_daily_animal_population.num_(calves|heiferIs|heiferIIs|heiferIIIs|dry_cows|lactating_cows)",
-          "manure_management.bedding_type"
+          "om.variables_pool["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]",
         ],
-        "economics_files": [
-          "commodity_prices.bedding_sand.dollar_per_head.csv",
-          "commodity_prices.bedding_straw.dollar_per_head.csv",
-          "commodity_prices.bedding_sawdust.dollar_per_head.csv",
-          "commodity_prices.bedding_manure_solids.dollar_per_head.csv",
-          "commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv"
-        ],
-        "preprocessing": "dollar per head is reported on a per year basis, average num of animals? Map bedding price to number of animals for each bedding type, depending on their pen"
+        "economics_files": {
+          "input_manager_location": "im.pool"["animal"]["pen_information"][".*"]["manure_streams"][0]["bedding_name"],
+          "sand": "commodity_prices.bedding_sand.dollar_per_head.csv",
+          "staw": "commodity_prices.bedding_straw.dollar_per_head.csv",
+          "sawdust": "commodity_prices.bedding_sawdust.dollar_per_head.csv",
+          "manure_solids": "commodity_prices.bedding_manure_solids.dollar_per_head.csv",
+          "CBPB": "commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv"
+        },
+        "preprocessing": "dollar per head is reported on an annual basis, Map bedding price to number of animals for each bedding type, depending on their pen. Final step will be to get mean, not sum, of daily value over time slice."
       },
       "Animal - Labor hours": {
         "biophysical_simulation": [
@@ -48,13 +48,21 @@
         "notes": "",
         "future_expansion": "more subcategories, e.g. vet, milker"
       },
-      "Animal investment - Liquid fuel consumption": {
+      "Animal investment - Gasoline consumption": {
         "biophysical_simulation": [
-          "Economic_inputs.Animal.liquid_fuel_liters_per_day"
+          "Economic_inputs.Animal.gasoline_liters_per_day"
         ],
         "economics_files": [
-          "commodity_prices.diesel.dollar_per_liter.csv",
           "commodity_prices.gasoline.dollar_per_liter.csv"
+        ],
+        "notes": ""
+      },
+      "Animal investment - Diesel consumption": {
+        "biophysical_simulation": [
+          "Economic_inputs.Animal.diesel_liters_per_day"
+        ],
+        "economics_files": [
+          "commodity_prices.diesel.dollar_per_liter.csv"
         ],
         "notes": ""
       },
@@ -430,7 +438,7 @@
           "commodity_prices.calf_starter_18cp",
           "commodity_prices.limestone"
         ],
-        "processing": "no commodity price needed, just loop over each feed, report separately",
+        "processing": "no commodity price needed, just loop over each feed .*, report separately",
         "future_expansion": "cases where historical references are desired: Instead of cost, select from economics_input options, all end in '.dollar_per_kilogram.csv', compare price in input to this price, scale accordingly (e.g. price was 1, in file is 2, double the final cost)"
       },
       "Feed storage - Labor hours": {
@@ -446,7 +454,7 @@
     "Revenue": {
       "Feed_sales": {
         "biophysical_simulation": [
-          "CropManagement._record_yield.harvest_yield.field='field_1'"
+          "CropManagement._record_yield.harvest_yield.field='field_.*'"
         ],
         "economics_files": [
           "commodity_prices.alfalfa_hay",
@@ -473,7 +481,7 @@
           "commodity_prices.calf_starter_18cp",
           "commodity_prices.limestone"
         ],
-        "processing?": "Needs to loop over each field, each harvest, get total yield and map against the commodity prices here, but SUBTRACT from what's fed out...or NEW LOGIC to sell surplus"
+        "processing?": "Needs to loop over each field, each harvest, get total yield and map against the commodity prices here, but SUBTRACT from what's fed out...or NEW LOGIC to sell surplus?"
       }
     }
   },
