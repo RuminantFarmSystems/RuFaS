@@ -1,7 +1,7 @@
 {
   "Animal": {
     "Costs": {
-      "Number of purchased heifers": {
+      "Purchased heifers": {
         "biophysical_simulation": [
           "AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"
         ],
@@ -12,14 +12,15 @@
       },
       "Semen purchased": {
         "biophysical_simulation": [
-          "reproduction_data_stream.herd_reproduction_statistics.total_num_ai_performed"
+          "AnimalModuleReporter._record_heiferIIs_conception_rate.heiferII_total_num_ai_performed",
+          "AnimalModuleReporter._record_cows_conception_rate.cow_total_num_ai_performed"
         ],
         "economics_files": [
           "commodity_prices.semen_conventional.dollar_per_straw.csv",
           "commodity_prices.semen_sexed.dollar_per_straw.csv",
           "commodity_prices.semen_beef.dollar_per_straw.csv"
         ],
-        "preprocessing": "mean of biophysical output, select econ file from user input",
+        "preprocessing": "sum of mean of both biophysical outputs, select econ file from user input",
         "processing": ""
       },
       "Bedding requirements": {
