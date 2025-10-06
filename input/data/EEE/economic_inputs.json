@@ -1,4 +1,4 @@
-{TURN per_day into daily values here
+{
     "Animal": {
         "liquid_fuel_liters_per_day": 1,
         "liquid_fuel_type": "diesel",
