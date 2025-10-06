@@ -1,7 +1,7 @@
 {
     "Animal": {
-        "liquid_fuel_liters_per_day": 1,
-        "liquid_fuel_type": "diesel",
+        "diesel_liters_per_day": 1,
+        "gasoline_liters_per_day": 1,
         "propane_liters_per_day": 1,
         "natural_gas_megajoule_per_day": 1,
         "electricity_kwh_per_day": 1,
