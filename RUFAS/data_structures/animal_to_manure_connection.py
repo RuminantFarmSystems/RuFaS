@@ -291,7 +291,12 @@ class ManureStream:
             pen_manure_data=None,
         )
 
-    def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
+    def split_stream(
+        self,
+        split_ratio: float,
+        stream_type: StreamType | None = None,
+        manure_stream_deposition_split: float | None = None,
+    ) -> "ManureStream":
         """
         Splits this manure stream using the specified ratio.
 
@@ -301,6 +306,9 @@ class ManureStream:
             Proportion of this stream to split into the new stream.
         stream_type : StreamType | None, default None
             Type to assign to the new manure stream's PenManureData, if applicable.
+        manure_stream_deposition_split : float | None, default None
+            Proportion of the manure deposition surface area to assign to the new stream's PenManureData,
+            if applicable. If None, the split_ratio will be used.
 
         Returns
         -------
@@ -327,7 +335,11 @@ class ManureStream:
         if self.pen_manure_data is not None and stream_type is not None:
             split_pen_manure_data = PenManureData(
                 num_animals=self.pen_manure_data.num_animals,
-                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
+                manure_deposition_surface_area=(
+                    self.pen_manure_data.manure_deposition_surface_area * manure_stream_deposition_split
+                    if manure_stream_deposition_split is not None
+                    else self.pen_manure_data.manure_deposition_surface_area * split_ratio
+                ),
                 animal_combination=self.pen_manure_data.animal_combination,
                 pen_type=self.pen_manure_data.pen_type,
                 manure_urine_mass=self.pen_manure_data.manure_urine_mass * split_ratio,
