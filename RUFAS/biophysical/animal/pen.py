@@ -382,11 +382,6 @@ class Pen:
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     @property
-    def total_enteric_methane(self) -> float:
-        """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
-        return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
-
-    @property
     def total_pen_ration(self) -> dict[str, float]:
         """Returns the total ration of the pen."""
         if (number_of_animals_in_pen := len(self.animals_in_pen)) == 0:
