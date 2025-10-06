@@ -2316,7 +2316,6 @@ def test_evaluate_expression_apply_to_individual(
 def test_evaluate_expression_apply_to_group(
     expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
-
     cross_validator = CrossValidator()
     mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
@@ -2328,3 +2327,7 @@ def test_evaluate_expression_apply_to_group(
         mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
     else:
         mock_save_to_alias_pool.assert_not_called()
+
+
+def test_evaluate_condition(mocker: MockerFixture, condition_block: dict[str, Any]) -> None:
+    pass

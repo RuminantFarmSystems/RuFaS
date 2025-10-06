@@ -2100,7 +2100,9 @@ class CrossValidator:
         """
         return re.fullmatch(left_hand_value, right_hand_value) is not None
 
-    def _evaluate_condition_clause_array(self, condition_clause_array: list[dict[str, Any]]) -> bool:
+    def _evaluate_condition_clause_array(self,
+                                         condition_clause_array: list[dict[str, Any]],
+                                         eager_termination: bool) -> bool:
         """
         Evaluates if all conditions in the provided condition clause array are satisfied.
 
@@ -2108,6 +2110,9 @@ class CrossValidator:
         ----------
         condition_clause_array : list[dict[str, Any]]
             An array of condition clauses to be evaluated.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
 
         Returns
         -------
@@ -2115,7 +2120,7 @@ class CrossValidator:
             A boolean indicating whether all conditions in the array are satisfied.
         """
         for clause in condition_clause_array:
-            satisfied = self._evaluate_condition(clause)
+            satisfied = self._evaluate_condition(clause, eager_termination)
             if not satisfied:
                 return False
         return True
