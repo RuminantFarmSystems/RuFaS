@@ -1305,17 +1305,6 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_pen_manure_properties(pen, simulation_day)
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, simulation_day)
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_reports.__name__,
-        }
-        if herd_statistics.total_enteric_methane:
-            for animal_type, methane_amount in herd_statistics.total_enteric_methane.items():
-                om.add_variable(
-                    f"{animal_type}_total_enteric_methane",
-                    herd_statistics.total_enteric_methane[animal_type],
-                    dict(info_map, **{"units": MeasurementUnits.GRAMS}),
-                )
 
     @classmethod
     def report_end_of_simulation(

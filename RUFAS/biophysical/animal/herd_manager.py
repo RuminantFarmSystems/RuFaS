@@ -389,25 +389,18 @@ class HerdManager:
         self._update_sold_heiferII_statistics(sold_heiferIIs)
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
-    def _perform_daily_routines_for_animals(self, time: RufasTime, animals: list[Animal]) -> tuple[
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[Animal],
-        list[dict[AnimalType, dict[str, float]]],
-    ]:
+    def _perform_daily_routines_for_animals(
+        self, time: RufasTime, animals: list[Animal]
+    ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]:
         """Perform daily routines for a given list of animals."""
         graduated_animals: list[Animal] = []
         sold_animals: list[Animal] = []
         stillborn_newborn_calves: list[Animal] = []
         sold_newborn_calves: list[Animal] = []
         newborn_calves: list[Animal] = []
-        digestion_outputs: list[dict[AnimalType, dict[str, float]]] = []
 
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
-            digestion_outputs.append(animal_daily_routines_output.daily_digestion_output)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
                 self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
@@ -425,14 +418,7 @@ class HerdManager:
                         newborn_calves.append(newborn_calf)
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
-        return (
-            graduated_animals,
-            sold_animals,
-            stillborn_newborn_calves,
-            newborn_calves,
-            sold_newborn_calves,
-            digestion_outputs,
-        )
+        return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
     def _update_herd_structure(
         self,
@@ -496,26 +482,17 @@ class HerdManager:
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
-        graduated_calves, sold_calves, _, _, _, calves_digestions = self._perform_daily_routines_for_animals(
-            time, self.calves
-        )
+        graduated_calves, sold_calves, _, _, _ = self._perform_daily_routines_for_animals(time, self.calves)
         graduated_animals += graduated_calves
         removed_animals += sold_calves
-        self._update_total_enteric_methane(calves_digestions)
 
-        graduated_heiferIs, sold_heiferIs, _, _, _, heiferI_digestions = self._perform_daily_routines_for_animals(
-            time, self.heiferIs
-        )
+        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIs)
         graduated_animals += graduated_heiferIs
         removed_animals += sold_heiferIs
-        self._update_total_enteric_methane(heiferI_digestions)
 
-        graduated_heiferIIs, sold_heiferIIs, _, _, _, heiferII_digestions = self._perform_daily_routines_for_animals(
-            time, self.heiferIIs
-        )
+        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIIs)
         graduated_animals += graduated_heiferIIs
         removed_animals += sold_heiferIIs
-        self._update_total_enteric_methane(heiferII_digestions)
 
         # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
         (
@@ -524,9 +501,7 @@ class HerdManager:
             stillborn_newborn_calves_from_heiferIIIs,
             newborn_calves_from_heiferIIIs,
             sold_newborn_calves_from_heiferIIIs,
-            heiferIII_digestions,
         ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
-        self._update_total_enteric_methane(heiferIII_digestions)
         graduated_animals += graduated_heiferIIIs
         removed_animals += sold_heiferIIIs
         stillborn_newborn_calves += stillborn_newborn_calves_from_heiferIIIs
@@ -539,9 +514,7 @@ class HerdManager:
             stillborn_newborn_calves_from_cows,
             newborn_calves_from_cows,
             sold_newborn_calves_from_cows,
-            cow_digestions,
         ) = self._perform_daily_routines_for_animals(time, self.cows)
-        self._update_total_enteric_methane(cow_digestions)
         graduated_animals += graduated_cows
         removed_animals += sold_and_died_cows
         stillborn_newborn_calves += stillborn_newborn_calves_from_cows
@@ -580,6 +553,7 @@ class HerdManager:
         for pen in self.all_pens:
             animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
             herd_manager_output.update(pen.get_manure_streams())
+            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
 
@@ -1918,16 +1892,3 @@ class HerdManager:
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
-
-    def _update_total_enteric_methane(self, digestive_outputs: list[dict[AnimalType, dict[str, float]]]) -> None:
-        """Update the amount of total enteric methane in the herd statistics."""
-        for methane_emission in digestive_outputs:
-            for animal_type in methane_emission:
-                if animal_type in self.herd_statistics.total_enteric_methane:
-                    current_totals = self.herd_statistics.total_enteric_methane[animal_type]
-                    new_emissions = methane_emission[animal_type]
-
-                    all_keys = set(current_totals.keys()) | set(new_emissions.keys())
-                    self.herd_statistics.total_enteric_methane[animal_type] = {
-                        k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
-                    }
