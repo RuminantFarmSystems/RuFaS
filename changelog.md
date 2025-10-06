@@ -242,6 +242,7 @@ v0.9.2
 - [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
+- [2598](https://github.com/RuminantFarmSystems/MASM/pull/2598) - [minor change] [FeedManager][Feed Storage] Adjust feed deduction logic to gather and remove available feeds by storage rather than crop.
 
 ### v0.9.2
 
