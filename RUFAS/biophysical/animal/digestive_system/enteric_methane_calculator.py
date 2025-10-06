@@ -14,10 +14,6 @@ class EntericMethaneCalculator:
         """
         Calculates the amount of methane emission for calf.
 
-        Notes
-        -----
-        [AN.MET.4]
-
         Parameters
         ----------
         methane_model: str
@@ -33,6 +29,7 @@ class EntericMethaneCalculator:
         References
         ----------
         (Pattanaik et al., 2003)
+        [AN.MET.4]
 
         """
         if methane_model == "Pattanaik":
@@ -61,7 +58,7 @@ class EntericMethaneCalculator:
         Parameters
         ----------
         methane_model: str
-            Methane model used for methane emission calculations, including IPCC.
+            Model for methane prediction.
         nutrition_supply: NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
 
@@ -123,7 +120,7 @@ class EntericMethaneCalculator:
         body_weight: float
             Body weight of the current cow (kg).
         methane_models: dict[str, Any]
-            Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+            Methane model used for methane emission calculations.
         is_lactating: bool
             Indicator of cow's lactating status.
         milk_fat: float
@@ -196,18 +193,6 @@ class EntericMethaneCalculator:
         """
         Calculates the daily enteric emissions for lactating cows.
 
-        Notes
-        -----
-        Soluble residue: [AN.MET.1]
-        Gross energy concentration: [AN.MET.2]
-        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
-        Enteric methane emission, Mutian Model:  [AN.MET.6]
-        Enteric methane emission, Mills Model:  [AN.MET.7]
-        Enteric methane emission, IPCC Model:  [AN.MET.5]
-
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
         Parameters
         ----------
         body_weight: float
@@ -223,6 +208,18 @@ class EntericMethaneCalculator:
         -------
         float
             The daily enteric emissions for lactating cows (g/day).
+
+        Notes
+        -----
+        Soluble residue: [AN.MET.1]
+        Gross energy concentration: [AN.MET.2]
+        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
+        Enteric methane emission, Mutian Model:  [AN.MET.6]
+        Enteric methane emission, Mills Model:  [AN.MET.7]
+        Enteric methane emission, IPCC Model:  [AN.MET.5]
+
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         References
         ----------
@@ -280,21 +277,10 @@ class EntericMethaneCalculator:
         """
         Calculates the daily enteric methane emissions for dry cows.
 
-        Notes
-        -----
-        Soluble residue: [AN.MET.1]
-        Gross energy concentration: [AN.MET.2]
-        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
-        Enteric methane emission, Mills Model:  [AN.MET.7]
-        Enteric methane emission, IPCC Model:  [AN.MET.5]
-
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
         Parameters
         ----------
-        methane_models: str
-            Methane model used for methane emission calculations, including Mills, IPCC.
+        methane_model: str
+            Methane model used for methane emission calculations.
         metabolizable_energy_intake: float
             Metabolizable energy intake, Mcal/kg dry matter.
         nutrient_amounts: Dict[str, float]
@@ -305,6 +291,17 @@ class EntericMethaneCalculator:
         float
             The daily enteric emissions for dry cows (g/day).
 
+
+        Notes
+        -----
+        Soluble residue: [AN.MET.1]
+        Gross energy concentration: [AN.MET.2]
+        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
+        Enteric methane emission, Mills Model:  [AN.MET.7]
+        Enteric methane emission, IPCC Model:  [AN.MET.5]
+
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         References
         ----------
