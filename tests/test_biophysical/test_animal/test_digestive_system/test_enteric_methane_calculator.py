@@ -275,8 +275,6 @@ def test_calculate_IPCC_methane(mocker: MockerFixture) -> None:
     mock_nutrition.fat_percentage = 6.0
     mock_nutrition.starch_percentage = 21.0
 
-    result = EntericMethaneCalculator._calculate_IPCC_methane(
-        nutrient_amounts=mock_nutrition
-    )
+    result = EntericMethaneCalculator._calculate_IPCC_methane(nutrient_amounts=mock_nutrition)
 
     assert pytest.approx(result) == 525.284
