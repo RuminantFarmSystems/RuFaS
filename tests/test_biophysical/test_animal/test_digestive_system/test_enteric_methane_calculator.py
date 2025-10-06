@@ -14,6 +14,12 @@ def test_calf_methane_with_model(body_weight: float, expected: dict[str, float])
     assert pytest.approx(actual) == expected
 
 
+def test_calf_methane_no_model() -> None:
+    """Test the calf methane result without model provided."""
+    actual = EntericMethaneCalculator.calculate_calf_methane("None", 50.0)
+    assert pytest.approx(actual) == 0.0
+
+
 @pytest.mark.parametrize(
     "nutrient_concentrations,expected",
     [
@@ -48,6 +54,44 @@ def test_calf_methane_with_model(body_weight: float, expected: dict[str, float])
 def test_heifer_methane_with_model(nutrient_concentrations: NutritionSupply, expected: float) -> None:
     """Test the calf methane result without model provided."""
     actual = EntericMethaneCalculator.calculate_heifer_methane("IPCC", nutrient_concentrations)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "nutrient_concentrations,expected",
+    [
+        (
+            NutritionSupply(
+                metabolizable_energy=50.0,
+                maintenance_energy=10.0,
+                lactation_energy=15.0,
+                growth_energy=20.0,
+                metabolizable_protein=5.0,
+                calcium=0.5,
+                phosphorus=0.3,
+                dry_matter=50.0,
+                wet_matter=50.0,
+                ndf_supply=40.0,
+                forage_ndf_supply=30.0,
+                fat_supply=5.0,
+                crude_protein=10.0,
+                adf_supply=20.0,
+                digestible_energy_supply=45.0,
+                tdn_supply=60.0,
+                lignin_supply=5.0,
+                ash_supply=5.0,
+                potassium_supply=0.5,
+                starch_supply=5.0,
+                byproduct_supply=5.0,
+            ),
+            0.0,
+        )
+    ],
+)
+def test_heifer_methane_no_model(nutrient_concentrations: NutritionSupply, expected: float) -> None:
+    """Test the calf methane result without model provided."""
+    actual = EntericMethaneCalculator.calculate_heifer_methane("None", nutrient_concentrations)
 
     assert pytest.approx(actual) == expected
 
@@ -199,3 +243,40 @@ def test_calculate_dry_cow_enteric_methane(mocker: MockerFixture, methane_model:
 
     if methane_model == "Mills":
         mock_exp.assert_called_once()
+
+
+def test_calculate_cow_mills_methane(mocker: MockerFixture) -> None:
+    """Test for _calculate_cow_mills_methane."""
+    mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
+    mock_nutrition.dry_matter = 22.0
+    mock_nutrition.ash_percentage = 5.0
+    mock_nutrition.adf_percentage = 25.0
+    mock_nutrition.crude_protein_percentage = 18.0
+    mock_nutrition.ndf_percentage = 32.0
+    mock_nutrition.fat_percentage = 6.0
+    mock_nutrition.starch_percentage = 21.0
+
+    result = EntericMethaneCalculator._calculate_cow_mills_methane(
+        nutrient_amounts=mock_nutrition,
+        metabolizable_energy_intake=28.0,
+    )
+
+    assert pytest.approx(result) == 282.7818
+
+
+def test_calculate_IPCC_methane(mocker: MockerFixture) -> None:
+    """Test for _calculate_IPCC_methane."""
+    mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
+    mock_nutrition.dry_matter = 22.0
+    mock_nutrition.ash_percentage = 5.0
+    mock_nutrition.adf_percentage = 25.0
+    mock_nutrition.crude_protein_percentage = 18.0
+    mock_nutrition.ndf_percentage = 32.0
+    mock_nutrition.fat_percentage = 6.0
+    mock_nutrition.starch_percentage = 21.0
+
+    result = EntericMethaneCalculator._calculate_IPCC_methane(
+        nutrient_amounts=mock_nutrition
+    )
+
+    assert pytest.approx(result) == 525.284
