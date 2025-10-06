@@ -73,26 +73,7 @@ class EntericMethaneCalculator:
 
         """
         if methane_model == "IPCC":
-            crude_protein_concentration = nutrition_supply.crude_protein_percentage
-            ethyl_ester_concentration = nutrition_supply.fat_percentage
-            neutral_detergent_fiber_concentration = nutrition_supply.ndf_percentage
-            ash_concentration = nutrition_supply.ash_percentage
-            soluble_residue = (
-                (100 - ash_concentration)
-                - neutral_detergent_fiber_concentration
-                - crude_protein_concentration
-                - ethyl_ester_concentration
-            )
-            gross_energy_concentration = (
-                0.263 * crude_protein_concentration
-                + 0.522 * ethyl_ester_concentration
-                + 0.198 * neutral_detergent_fiber_concentration
-                + 0.160 * soluble_residue
-            )
-            methane_emission = (
-                0.065 * gross_energy_concentration * nutrition_supply.dry_matter
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4
-            return methane_emission
+            return EntericMethaneCalculator._calculate_IPCC_methane(nutrition_supply)
         else:
             return 0.0
 
@@ -227,12 +208,7 @@ class EntericMethaneCalculator:
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
-        ash_concentration = nutrient_amounts.ash_percentage
-        acid_detergent_fiber_concentration = nutrient_amounts.adf_percentage
-        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
-        ethyl_ester_concentration = nutrient_amounts.fat_percentage
-        starch_concentration = nutrient_amounts.starch_percentage
         if methane_model == "Mutian":
             methane_emission = (
                 -126
@@ -243,30 +219,10 @@ class EntericMethaneCalculator:
             )
             return methane_emission
         elif methane_model == "Mills":
-            mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
-            mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
-            mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
-            methane_emission_MJ = mitscherlich_parameter_a - (
-                mitscherlich_parameter_a + mitscherlich_parameter_b
-            ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
-            methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
-            return methane_emission
+            return EntericMethaneCalculator._calculate_cow_mills_methane(nutrient_amounts,
+                                                                         metabolizable_energy_intake)
         else:
-            soluble_residue = (
-                GeneralConstants.FRACTION_TO_PERCENTAGE
-                - ash_concentration
-                - neutral_detergent_fiber_concentration
-                - crude_protein_concentration
-                - ethyl_ester_concentration
-            )
-            gross_energy_concentration = (
-                0.263 * crude_protein_concentration
-                + 0.522 * ethyl_ester_concentration
-                + 0.198 * neutral_detergent_fiber_concentration
-                + 0.160 * soluble_residue
-            )
-            methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / GeneralConstants.MJ_CH4_TO_G_CH4
-            return methane_emission
+            return EntericMethaneCalculator._calculate_IPCC_methane(nutrient_amounts)
 
     @staticmethod
     def _calculate_dry_cow_enteric_methane(
@@ -291,7 +247,6 @@ class EntericMethaneCalculator:
         float
             The daily enteric emissions for dry cows (g/day).
 
-
         Notes
         -----
         Soluble residue: [AN.MET.1]
@@ -303,41 +258,82 @@ class EntericMethaneCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        """
+        if methane_model == "Mills":
+            return EntericMethaneCalculator._calculate_cow_mills_methane(nutrient_amounts, metabolizable_energy_intake)
+        else:
+            return EntericMethaneCalculator._calculate_IPCC_methane(nutrient_amounts)
+
+    @staticmethod
+    def _calculate_cow_mills_methane(nutrient_amounts: NutritionSupply,
+                                     metabolizable_energy_intake: float) -> float:
+        """
+        Return the amount of cow methane predicted my Mills method.
+
+        Parameters
+        ----------
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        metabolizable_energy_intake : float
+            Metabolizable energy intake, Mcal/kg dry matter.
+
+        Returns
+        -------
+        float
+            The daily enteric emissions for cows (g/day).
+
         References
         ----------
-        (Mills et al., 2003; IPCC, 2006)
+        Mills et al., 2003
+
+        """
+        starch_concentration = nutrient_amounts.starch_percentage
+        acid_detergent_fiber_concentration = nutrient_amounts.adf_percentage
+        mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
+        mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
+        mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
+        methane_emission_MJ = mitscherlich_parameter_a - (
+                mitscherlich_parameter_a + mitscherlich_parameter_b
+        ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
+        methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
+        return methane_emission
+
+    @staticmethod
+    def _calculate_IPCC_methane(nutrient_amounts: NutritionSupply,) -> float:
+        """
+        Return the amount of methane predicted my IPCC method.
+
+        Parameters
+        ----------
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+
+        Returns
+        -------
+        float
+            The daily enteric emissions (g/day).
+
+        References
+        ----------
+        IPCC, 2006
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
         ash_concentration = nutrient_amounts.ash_percentage
-        acid_detergent_fiber_concentration = nutrient_amounts.adf_percentage
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
         ethyl_ester_concentration = nutrient_amounts.fat_percentage
-        starch_concentration = nutrient_amounts.starch_percentage
         soluble_residue = (
             (100 - ash_concentration)
             - neutral_detergent_fiber_concentration
             - crude_protein_concentration
             - ethyl_ester_concentration
         )
-        if methane_model == "Mills":
-            mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
-            mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
-            mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
-            methane_emission_MJ = mitscherlich_parameter_a - (
-                mitscherlich_parameter_a + mitscherlich_parameter_b
-            ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ)
-            methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
-            return methane_emission
-        else:
-            gross_energy_concentration = (
+        gross_energy_concentration = (
                 0.263 * crude_protein_concentration
                 + 0.522 * ethyl_ester_concentration
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
-            )
-            methane_emission = (
-                0.065 * gross_energy_concentration * dry_matter_intake
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4
-            return methane_emission
+        )
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.MJ_CH4_TO_G_CH4
+        return methane_emission
