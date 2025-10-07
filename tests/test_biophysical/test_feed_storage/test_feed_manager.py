@@ -881,11 +881,11 @@ def test_deduct_from_storage_farmgrown_basic_fifo_updates_cumulative(
     """Farmgrown: removes in FIFO order, updates cumulative dict, returns (remaining, deducted)."""
     feed_id = next(iter(feed_manager._cumulative_farmgrown_feeds_fed.keys()))
 
-    fg1 = MagicMock()
+    fg1 = MagicMock(spec=HarvestedCrop)
     fg1.dry_matter_mass = 300.0
     fg1.remove_feed_mass = MagicMock()
 
-    fg2 = MagicMock()
+    fg2 = MagicMock(spec=HarvestedCrop)
     fg2.dry_matter_mass = 200.0
     fg2.remove_feed_mass = MagicMock()
 
@@ -893,7 +893,6 @@ def test_deduct_from_storage_farmgrown_basic_fifo_updates_cumulative(
         feed_id=feed_id,
         remaining=450.0,
         feed_storages=[fg1, fg2],
-        storage_type="farmgrown",
     )
 
     fg1.remove_feed_mass.assert_called_once_with(300.0)
@@ -922,7 +921,6 @@ def test_deduct_from_storage_purchased_skips_tiny_and_updates_cumulative(
         feed_id=feed_id,
         remaining=50.0,
         feed_storages=[p1, p2],
-        storage_type="purchased",
     )
 
     p1.remove_dry_matter_mass.assert_not_called()
@@ -933,29 +931,15 @@ def test_deduct_from_storage_purchased_skips_tiny_and_updates_cumulative(
     assert feed_manager._cumulative_purchased_feeds_fed[feed_id] == pytest.approx(50.0)
 
 
-def test_deduct_from_storage_invalid_type_raises(feed_manager: "FeedManager") -> None:
-    """Invalid storage_type should raise ValueError with a helpful message."""
-    bogus_storage = MagicMock()
-    bogus_storage.dry_matter_mass = 100.0
-
-    with pytest.raises(ValueError, match="Invalid storage_type 'invalid'.*'farmgrown' or 'purchased'"):
-        feed_manager._deduct_from_storage(
-            feed_id=1,
-            remaining=10.0,
-            feed_storages=[bogus_storage],
-            storage_type="invalid",
-        )
-
-
 def test_deduct_from_storage_breaks_early_when_remaining_met(feed_manager: "FeedManager") -> None:
     """Covers the early break when remaining <= 1e-3 before processing all storages."""
     feed_id = next(iter(feed_manager._cumulative_farmgrown_feeds_fed.keys()))
 
-    s1 = MagicMock()
+    s1 = MagicMock(spec=HarvestedCrop)
     s1.dry_matter_mass = 100.0
     s1.remove_feed_mass = MagicMock()
 
-    s2 = MagicMock()
+    s2 = MagicMock(spec=HarvestedCrop)
     s2.dry_matter_mass = 200.0
     s2.remove_feed_mass = MagicMock()
 
@@ -963,7 +947,6 @@ def test_deduct_from_storage_breaks_early_when_remaining_met(feed_manager: "Feed
         feed_id=feed_id,
         remaining=50.0,
         feed_storages=[s1, s2],
-        storage_type="farmgrown",
     )
 
     s1.remove_feed_mass.assert_called_once_with(50.0)

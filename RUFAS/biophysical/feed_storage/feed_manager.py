@@ -538,14 +538,13 @@ class FeedManager:
             remaining, farmgrown_deducted = self._deduct_from_storage(feed_id,
                                                                       remaining,
                                                                       farmgrown_by_id.get(feed_id, ()),
-                                                                      "farmgrown")
+                                                                      )
             if farmgrown_deducted:
                 total_farmgrown_deducted[feed_id] = total_farmgrown_deducted.get(feed_id, 0.0) + farmgrown_deducted
 
             if remaining > 1e-3:
                 remaining, purchased_deducted = \
-                    self._deduct_from_storage(feed_id, remaining, purchased_by_id.get(feed_id, ()),
-                                              "purchased")
+                    self._deduct_from_storage(feed_id, remaining, purchased_by_id.get(feed_id, ()))
                 if purchased_deducted:
                     total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
 
@@ -596,7 +595,6 @@ class FeedManager:
         feed_id: RUFAS_ID,
         remaining: float,
         feed_storages: Sequence[HarvestedCrop | PurchasedFeed],
-        storage_type: str
     ) -> tuple[float, float]:
         """Removes feeds from specified storages.
 
@@ -608,16 +606,12 @@ class FeedManager:
             Amount of feed to deduct (kg dry matter).
         feed_storages : Sequence[HarvestedCrop | PurchasedFeed]
             List of storages from which to deduct feed.
-        storage_type : str
-            Type of storage being deducted from, either 'farmgrown' or 'purchased'.
 
         Returns
         -------
         tuple[float, float]
             The remaining amount of feed to deduct and the total amount deducted from storage.
         """
-        if storage_type not in ("farmgrown", "purchased"):
-            raise ValueError(f"Invalid storage_type '{storage_type}'. Must be 'farmgrown' or 'purchased'.")
         deducted = 0.0
         for storage in feed_storages:
             if remaining <= 1e-3:
@@ -626,7 +620,7 @@ class FeedManager:
             if available <= 1e-3:
                 continue
             amount_to_remove = min(remaining, available)
-            if storage_type == 'farmgrown':
+            if isinstance(storage, HarvestedCrop):
                 storage.remove_feed_mass(amount_to_remove)
                 self._cumulative_farmgrown_feeds_fed[feed_id] = \
                     self._cumulative_farmgrown_feeds_fed.get(feed_id, 0.0) + amount_to_remove
