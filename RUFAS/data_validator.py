@@ -2049,6 +2049,7 @@ class CrossValidator:
         return left_hand_value is None
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
+        """Evaluates the if_type condition"""
         if not isinstance(data_type, str):
             self._event_logs.append(
                 {
