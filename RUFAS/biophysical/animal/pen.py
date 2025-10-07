@@ -619,7 +619,7 @@ class Pen:
         - The function first constructs a `total_stream` representing the full manure excretion from a pen.
         - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
         based on the `minutes_away_for_milking` ratio using the `split_stream` method. Parlor deposition
-        is set to 0.0.
+        is set to 0.0, as manure deposition in the parlor is accounted for in source methodology (IFSM, 2023).
         - The remaining manure is split into one or more general streams according to the proportions
         specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
         it reaches the manure module.
