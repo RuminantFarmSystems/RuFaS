@@ -9,7 +9,7 @@ from RUFAS.biophysical.feed_storage.feed_storage_enum import StorageType
 
 
 @pytest.mark.parametrize("member", list(StorageType))
-def test_get_storage_class_returns_enum_value(member) -> None:
+def test_get_storage_class_returns_enum_value(member: StorageType) -> None:
     """Each enum name maps to its underlying storage class."""
     cls = StorageType.get_storage_class(member.name)
     assert cls is member.value
