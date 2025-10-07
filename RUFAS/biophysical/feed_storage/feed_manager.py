@@ -514,6 +514,11 @@ class FeedManager:
             Mapping of RuFaS Feed IDs to the amounts of that feed to be deducted (kg dry matter).
         simulation_day : int
             Current simulation day.
+
+        Raises
+        ------
+        ValueError
+            If there is not enough feed in storage to cover the deduction request.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -530,15 +535,17 @@ class FeedManager:
         for feed_id, amount_needed in feeds_to_deduct.items():
             remaining = float(amount_needed)
 
-            remaining, farmgrown_deducted = self._deduct_from_farmgrown(feed_id,
-                                                                        remaining,
-                                                                        farmgrown_by_id.get(feed_id, ()))
+            remaining, farmgrown_deducted = self._deduct_from_storage(feed_id,
+                                                                      remaining,
+                                                                      farmgrown_by_id.get(feed_id, ()),
+                                                                      "farmgrown")
             if farmgrown_deducted:
                 total_farmgrown_deducted[feed_id] = total_farmgrown_deducted.get(feed_id, 0.0) + farmgrown_deducted
 
             if remaining > 1e-3:
                 remaining, purchased_deducted = \
-                    self._deduct_from_purchased(feed_id, remaining, purchased_by_id.get(feed_id, ()))
+                    self._deduct_from_storage(feed_id, remaining, purchased_by_id.get(feed_id, ()),
+                                              "purchased")
                 if purchased_deducted:
                     total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
 
@@ -584,13 +591,14 @@ class FeedManager:
         for feed_id, amount in total_farmgrown.items():
             self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", amount, info_map)
 
-    def _deduct_from_farmgrown(
+    def _deduct_from_storage(
         self,
         feed_id: RUFAS_ID,
         remaining: float,
-        farmgrown_feeds: Sequence[HarvestedCrop],
+        feed_storages: Sequence[HarvestedCrop | PurchasedFeed],
+        storage_type: str
     ) -> tuple[float, float]:
-        """Removes farmgrown feeds from storage, FIFO.
+        """Removes feeds from specified storages.
 
         Parameters
         ----------
@@ -598,64 +606,36 @@ class FeedManager:
             ID of the feed to deduct from.
         remaining : float
             Amount of feed to deduct (kg dry matter).
-        farmgrown_feeds : Sequence[HarvestedCrop]
-            FIFO-ordered list of stored farmgrown crops from which to deduct feed.
+        feed_storages : Sequence[HarvestedCrop | PurchasedFeed]
+            List of storages from which to deduct feed.
+        storage_type : str
+            Type of storage being deducted from, either 'farmgrown' or 'purchased'.
 
         Returns
         -------
         tuple[float, float]
-            The remaining amount of feed to deduct and the total amount deducted from farmgrown feed storages.
+            The remaining amount of feed to deduct and the total amount deducted from storage.
         """
+        if storage_type not in ("farmgrown", "purchased"):
+            raise ValueError(f"Invalid storage_type '{storage_type}'. Must be 'farmgrown' or 'purchased'.")
         deducted = 0.0
-        for feed in farmgrown_feeds:
+        for storage in feed_storages:
             if remaining <= 1e-3:
                 break
-            available = float(feed.dry_matter_mass)
+            available = float(storage.dry_matter_mass)
             if available <= 1e-3:
                 continue
             amount_to_remove = min(remaining, available)
-            feed.remove_feed_mass(amount_to_remove)
+            if storage_type == 'farmgrown':
+                storage.remove_feed_mass(amount_to_remove)
+                self._cumulative_farmgrown_feeds_fed[feed_id] = \
+                    self._cumulative_farmgrown_feeds_fed.get(feed_id, 0.0) + amount_to_remove
+            else:
+                storage.remove_dry_matter_mass(amount_to_remove)
+                self._cumulative_purchased_feeds_fed[feed_id] = \
+                    self._cumulative_purchased_feeds_fed.get(feed_id, 0.0) + amount_to_remove
             remaining -= amount_to_remove
             deducted += amount_to_remove
-            self._cumulative_farmgrown_feeds_fed[feed_id] = \
-                self._cumulative_farmgrown_feeds_fed.get(feed_id, 0.0) + amount_to_remove
-        return remaining, deducted
-
-    def _deduct_from_purchased(
-        self,
-        feed_id: RUFAS_ID,
-        remaining: float,
-        purchased_feeds: Sequence[PurchasedFeed],
-    ) -> tuple[float, float]:
-        """Removes purchased feeds from storage.
-
-        Parameters
-        ----------
-        feed_id : RUFAS_ID
-            ID of the feed to deduct from.
-        remaining : float
-            Amount of feed to deduct (kg dry matter).
-        purchased_feeds : Sequence[PurchasedFeed]
-            List of stored purchased feeds from which to deduct feed.
-
-        Returns
-        -------
-        tuple[float, float]
-            The remaining amount of feed to deduct and the total amount deducted from purchased feed storages.
-        """
-        deducted = 0.0
-        for feed in purchased_feeds:
-            if remaining <= 1e-3:
-                break
-            available = float(feed.dry_matter_mass)
-            if available <= 1e-3:
-                continue
-            amount_to_remove = min(remaining, available)
-            feed.remove_dry_matter_mass(amount_to_remove)
-            remaining -= amount_to_remove
-            deducted += amount_to_remove
-            self._cumulative_purchased_feeds_fed[feed_id] = \
-                self._cumulative_purchased_feeds_fed.get(feed_id, 0.0) + amount_to_remove
         return remaining, deducted
 
     def _lookup_storage_rufas_id(self, crop_name: str) -> RUFAS_ID:
