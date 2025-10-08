@@ -25,8 +25,8 @@ def stored_manure() -> ManureStream:
         phosphorus=40.44,
         potassium=50.55,
         ash=60.66,
-        non_degradable_volatile_solids=70.77,
-        degradable_volatile_solids=80.88,
+        manure_non_degradable_volatile_solids=70.77,
+        manure_degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
         methane_production_potential=0.24,
@@ -44,8 +44,8 @@ def received_manure() -> ManureStream:
         phosphorus=4.56,
         potassium=5.67,
         ash=6.78,
-        non_degradable_volatile_solids=7.89,
-        degradable_volatile_solids=8.90,
+        manure_non_degradable_volatile_solids=7.89,
+        manure_degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
         methane_production_potential=0.24,
@@ -215,8 +215,8 @@ def test_apply_methane_emissions_no_flare(
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=10.0,
-        degradable_volatile_solids=20.0,
+        manure_non_degradable_volatile_solids=10.0,
+        manure_degradable_volatile_solids=20.0,
         total_solids=35.0,
         volume=0.0,
         methane_production_potential=0.24,
@@ -235,10 +235,10 @@ def test_apply_methane_emissions_no_flare(
     assert total == expected_total
     assert burned == expected_burned
     assert stored_manure.total_solids == pytest.approx(35.0 - mass_loss, rel=1e-6)
-    assert stored_manure.degradable_volatile_solids == pytest.approx(
+    assert stored_manure.manure_degradable_volatile_solids == pytest.approx(
         20.0 - 2.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
-    assert stored_manure.non_degradable_volatile_solids == pytest.approx(
+    assert stored_manure.manure_non_degradable_volatile_solids == pytest.approx(
         10.0 - 1.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
 
@@ -256,8 +256,8 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=5.0,
         methane_production_potential=0.24,

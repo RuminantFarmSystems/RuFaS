@@ -47,8 +47,8 @@ def manure_stream() -> ManureStream:
         phosphorus=3.0,
         potassium=2.0,
         ash=15.0,
-        non_degradable_volatile_solids=20.0,
-        degradable_volatile_solids=12.0,
+        manure_non_degradable_volatile_solids=20.0,
+        manure_degradable_volatile_solids=12.0,
         total_solids=50.0,
         volume=500.0,
         methane_production_potential=0.24,
@@ -104,7 +104,7 @@ def test_process_manure(
     """Test that manure is digested correctly."""
     digester._manure_in_digester = replace(manure_stream)
 
-    manure_stream.degradable_volatile_solids, manure_stream.non_degradable_volatile_solids = 12.0, 11.0
+    manure_stream.manure_degradable_volatile_solids, manure_stream.manure_non_degradable_volatile_solids = 12.0, 11.0
     mock_calculate_generated_methane = mocker.patch.object(
         digester, "_calculate_generated_methane", return_value=(10.0, 18.8)
     )
@@ -188,14 +188,14 @@ def test_destroy_volatile_solids(
     expected_error_count: int,
 ) -> None:
     """Test that volatile solids are destroyed correctly."""
-    digester._manure_in_digester.degradable_volatile_solids = degradable
-    digester._manure_in_digester.non_degradable_volatile_solids = non_degradable
+    digester._manure_in_digester.manure_degradable_volatile_solids = degradable
+    digester._manure_in_digester.manure_non_degradable_volatile_solids = non_degradable
     add_error = mocker.patch.object(digester._om, "add_error")
 
     actual = digester._destroy_volatile_solids(destroyed, time)
 
-    assert actual.degradable_volatile_solids == expected_degradable
-    assert actual.non_degradable_volatile_solids == expected_non_degradable
+    assert actual.manure_degradable_volatile_solids == expected_degradable
+    assert actual.manure_non_degradable_volatile_solids == expected_non_degradable
     assert add_error.call_count == expected_error_count
 
 

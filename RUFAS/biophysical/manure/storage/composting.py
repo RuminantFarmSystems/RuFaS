@@ -127,8 +127,8 @@ class Composting(Storage):
 
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
-            self._manure_to_process.non_degradable_volatile_solids,
-            self._manure_to_process.degradable_volatile_solids,
+            self._manure_to_process.manure_non_degradable_volatile_solids,
+            self._manure_to_process.manure_degradable_volatile_solids,
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
@@ -206,14 +206,14 @@ class Composting(Storage):
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
-            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
+            self._manure_to_process.manure_degradable_volatile_solids, self._manure_to_process.total_volatile_solids
         )
         non_degradable_volatile_solids_after_losses = (
-            self._manure_to_process.non_degradable_volatile_solids
+            self._manure_to_process.manure_non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         )
         degradable_volatile_solids_after_losses = (
-            self._manure_to_process.degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
+                self._manure_to_process.manure_degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
         )
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
@@ -239,8 +239,8 @@ class Composting(Storage):
             )
             raise ValueError(error_message)
 
-        self._manure_to_process.non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
-        self._manure_to_process.degradable_volatile_solids = degradable_volatile_solids_after_losses
+        self._manure_to_process.manure_non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
+        self._manure_to_process.manure_degradable_volatile_solids = degradable_volatile_solids_after_losses
         self._manure_to_process.total_solids = total_solids_after_losses
 
     def _apply_nitrogen_losses(

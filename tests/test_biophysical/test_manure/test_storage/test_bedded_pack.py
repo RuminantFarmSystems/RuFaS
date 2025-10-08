@@ -43,8 +43,8 @@ def stored_manure() -> ManureStream:
         phosphorus=40.44,
         potassium=50.55,
         ash=60.66,
-        non_degradable_volatile_solids=70.77,
-        degradable_volatile_solids=80.88,
+        manure_non_degradable_volatile_solids=70.77,
+        manure_degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
         pen_manure_data=None,
@@ -62,8 +62,8 @@ def received_manure() -> ManureStream:
         phosphorus=4.56,
         potassium=5.67,
         ash=6.78,
-        non_degradable_volatile_solids=7.89,
-        degradable_volatile_solids=8.90,
+        manure_non_degradable_volatile_solids=7.89,
+        manure_degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
         pen_manure_data=None,
@@ -219,8 +219,8 @@ def test_apply_dry_matter_loss_valid(
     bedded_pack._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
 
     manure = bedded_pack._manure_to_process
-    assert manure.non_degradable_volatile_solids == pytest.approx(7.89 - 4.0 * 0.5)
-    assert manure.degradable_volatile_solids == pytest.approx(8.90 - 4.0 * 0.5)
+    assert manure.manure_non_degradable_volatile_solids == pytest.approx(7.89 - 4.0 * 0.5)
+    assert manure.manure_degradable_volatile_solids == pytest.approx(8.90 - 4.0 * 0.5)
     assert manure.total_solids == pytest.approx(29.01 - 4.0)
 
 

@@ -35,8 +35,8 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
         methane_production_potential=0.24,
@@ -79,8 +79,8 @@ def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     assert manure_result.phosphorus == original_stream.phosphorus
     assert manure_result.potassium == original_stream.potassium
     assert manure_result.ash == original_stream.ash
-    assert manure_result.non_degradable_volatile_solids == original_stream.non_degradable_volatile_solids
-    assert manure_result.degradable_volatile_solids == original_stream.degradable_volatile_solids
+    assert manure_result.manure_non_degradable_volatile_solids == original_stream.manure_non_degradable_volatile_solids
+    assert manure_result.manure_degradable_volatile_solids == original_stream.manure_degradable_volatile_solids
     assert manure_result.volume == original_stream.volume + expected_total_cleaning_water_volume
     assert manure_result.total_solids == original_stream.total_solids
     assert manure_result.pen_manure_data is None
@@ -97,8 +97,8 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
         methane_production_potential=0.24,
@@ -140,8 +140,8 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert manure_result.phosphorus == original_stream.phosphorus
     assert manure_result.potassium == original_stream.potassium
     assert manure_result.ash == original_stream.ash
-    assert manure_result.non_degradable_volatile_solids == original_stream.non_degradable_volatile_solids
-    assert manure_result.degradable_volatile_solids == original_stream.degradable_volatile_solids
+    assert manure_result.manure_non_degradable_volatile_solids == original_stream.manure_non_degradable_volatile_solids
+    assert manure_result.manure_degradable_volatile_solids == original_stream.manure_degradable_volatile_solids
     assert manure_result.volume == original_stream.volume + expected_total_cleaning_water_volume
     assert manure_result.total_solids == original_stream.total_solids
     assert manure_result.pen_manure_data is None
@@ -157,8 +157,8 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
         methane_production_potential=0.24,
@@ -188,8 +188,8 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
         methane_production_potential=0.24,
@@ -294,8 +294,8 @@ def test_check_manure_stream_compatibility(
         phosphorus=0.0,
         potassium=0.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        manure_non_degradable_volatile_solids=0.0,
+        manure_degradable_volatile_solids=0.0,
         total_solids=0.0,
         volume=0.0,
         methane_production_potential=0.24,

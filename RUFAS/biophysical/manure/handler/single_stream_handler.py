@@ -171,8 +171,8 @@ class SingleStreamHandler(Handler):
             phosphorus=phosphorus,
             potassium=potassium,
             ash=ash,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
+            manure_non_degradable_volatile_solids=non_degradable_volatile_solids,
+            manure_degradable_volatile_solids=degradable_volatile_solids,
             volume=volume,
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
@@ -238,19 +238,19 @@ class SingleStreamHandler(Handler):
             degradable_to_total_volatile_solid_ratio = 0.0
             if self.manure_stream.total_volatile_solids != 0.0:
                 degradable_to_total_volatile_solid_ratio = (
-                    self.manure_stream.degradable_volatile_solids / self.manure_stream.total_volatile_solids
+                        self.manure_stream.manure_degradable_volatile_solids / self.manure_stream.total_volatile_solids
                 )
             total_volatile_solid_loss = (
                 ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
             )
             degradable_volatile_solid = max(
                 0.0,
-                self.manure_stream.degradable_volatile_solids
+                self.manure_stream.manure_degradable_volatile_solids
                 - (degradable_to_total_volatile_solid_ratio * total_volatile_solid_loss),
             )
             non_degrading_volatile_solid = max(
                 0.0,
-                self.manure_stream.non_degradable_volatile_solids
+                self.manure_stream.manure_non_degradable_volatile_solids
                 - ((1 - degradable_to_total_volatile_solid_ratio) * total_volatile_solid_loss),
             )
             total_solids = max(0.0, self.manure_stream.total_solids - total_volatile_solid_loss)

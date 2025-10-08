@@ -160,8 +160,8 @@ class Handler(Processor):
         phosphorus = self.manure_stream.phosphorus
         potassium = self.manure_stream.potassium
         ash = self.manure_stream.ash
-        non_degradable_volatile_solids = self.manure_stream.non_degradable_volatile_solids
-        degradable_volatile_solids = self.manure_stream.degradable_volatile_solids
+        non_degradable_volatile_solids = self.manure_stream.manure_non_degradable_volatile_solids
+        degradable_volatile_solids = self.manure_stream.manure_degradable_volatile_solids
         volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
         methane_production_potential = self.manure_stream.methane_production_potential
@@ -181,8 +181,8 @@ class Handler(Processor):
             phosphorus=phosphorus,
             potassium=potassium,
             ash=ash,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
+            manure_non_degradable_volatile_solids=non_degradable_volatile_solids,
+            manure_degradable_volatile_solids=degradable_volatile_solids,
             volume=volume,
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
