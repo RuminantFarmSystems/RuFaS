@@ -319,7 +319,7 @@ class HerdFactory:
             days_born=0,
             initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
             birth_weight=cow.reproduction.calf_birth_weight,
-            net_merit=0.0,
+            # net_merit=0.0,
             animal_type=AnimalType.CALF.value,
         )
         cow.nutrients.total_phosphorus_in_animal = (
@@ -334,7 +334,7 @@ class HerdFactory:
         calf = Animal(args)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
-            calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(self.time, calf.breed, cow.net_merit)
+            calf.genetics = AnimalGenetics()
 
     def _heiferIIIs_update(self, day: int) -> None:
         """HeiferIIIs update for generating herd simulation"""
@@ -383,16 +383,14 @@ class HerdFactory:
                 days_born=0,
                 initial_phosphorus=0,
                 birth_weight=birth_weight,
-                net_merit=0.0,
+                # net_merit=0.0,
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
                 birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
-                calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                    birth_date_str, self.breed
-                )
+                calf.genetics = AnimalGenetics()
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_update()
@@ -417,9 +415,7 @@ class HerdFactory:
             animal_data.update(initial_phosphorus=0)
         animal = Animal(animal_data)
         animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
-        animal.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-            birth_date=animal_birth_date, breed=animal.breed
-        )
+        animal.genetics = AnimalGenetics()
         return animal
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
