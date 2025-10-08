@@ -10,7 +10,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, NutrientStandard
 
 from RUFAS.output_manager import OutputManager
 
@@ -58,11 +58,14 @@ class RationConfig:
 
     def __init__(
         self,
+        nutrient_standard: NutrientStandard,
         animal_requirements: NutritionRequirements,
         pen_available_feeds: Optional[list[Feed]],
         initial_dry_matter_requirement: float,
         initial_protein_requirement: float,
         pen_average_body_weight: float = 0,
+        pen_average_enteric_methane : float  | None = None,
+        pen_average_urine_nitrogen : float  | None = None
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
@@ -80,11 +83,18 @@ class RationConfig:
             Metabolizable protein requirement at start of ration formulation.
         pen_average_body_weight : float
             Average body weight in pen, used in constraint methods.
+        pen_average_enteric_methane : float
+            Average enteric methane produced in pen, used in constraint methods.
+        pen_average_urine_nitrogen : float
+            Average urine nitrogen generated in pen, used in constraint methods.
         """
+        self.nutrient_standard = nutrient_standard
         if pen_available_feeds is None:
             pen_available_feeds = []
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
+        self.pen_average_enteric_methane = pen_average_enteric_methane
+        self.pen_average_urine_nitrogen = pen_average_urine_nitrogen
         self.initial_dry_matter_requirement: float = initial_dry_matter_requirement
         self.initial_protein_requirement: float = initial_protein_requirement
 
@@ -149,15 +159,21 @@ class RationOptimizer:
             self.fat_constraint,
             self.DMI_constraint_upper,
             self.DMI_constraint_lower,
+            self.NASEM_net_energy_constraint
         ]
 
-        self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
+        if RationConfig.nutrient_standard is NutrientStandard.NRC:            
+            self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
 
-        self.heifer_constraints = [
-            cons
-            for cons in self.cow_constraints
-            if cons["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint]
-        ]
+            self.heifer_constraints = [
+                cons
+                for cons in self.cow_constraints
+                if cons["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint]
+            ]
+        elif RationConfig.nutrient_standard is NutrientStandard.NASEM:
+            self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions if func not in [self.NE_total_constraint, self.NE_lactation_constraint, self.NE_growth_constraint, self.NE_maintenance_and_activity_constraint]]
+
+            self.heifer_constraints = self.cow_constraints
 
     @staticmethod
     def convert_decision_vec_to_feeds(
@@ -334,6 +350,45 @@ class RationOptimizer:
         return actual_lactation_net_energy_supply - (
             actual_lactation_net_energy_requirement + actual_pregnancy_net_energy_requirement
         )
+
+    @staticmethod
+    def NASEM_net_energy_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
+        """
+        Constraint method for net energy for lactation. Only applicable to lactating cows.
+        This constraint is a simple check that the supply exceeds the requirement.
+
+        Parameters
+        ----------
+        decision_vector : numpy.ndarray
+            The decision vector used in the scipy minimize method.
+        ration_configuration: RationConfig object
+            Collection of animal requirements and feed supply information for the ration formulation process.
+
+        Returns
+        -------
+        float
+            Non-negative value indicates that supply is greater than the requirements for lactation.
+
+        """
+        feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
+        dry_matter_intake = sum(decision_vector)
+        total_starch = sum(
+            [feed.amount * feed.info.starch * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds]
+        )
+
+        total_metabolizable_energy = NutritionSupplyCalculator.calculate_NASEM_metabolizable_energy(
+            feeds=feeds,
+            dry_matter_intake=dry_matter_intake,
+            body_weight=ration_configuration.pen_average_body_weight,
+            total_starch=total_starch,
+            enteric_methane=enteric_methane,
+            urinary_nitrogen=urinary_nitrogen
+        )
+        actual_lactation_net_energy_supply = NutritionSupplyCalculator.calculate_NASEM_net_energy(total_metabolizable_energy=total_metabolizable_energy
+        )
+        actual_lactation_net_energy_requirement = ration_configuration.animal_requirements.lactation_energy
+
+        return actual_lactation_net_energy_supply - actual_lactation_net_energy_requirement
 
     @staticmethod
     def NE_growth_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
@@ -746,7 +801,10 @@ class RationOptimizer:
 
     def attempt_optimization(
         self,
+        nutrient_standard: NutrientStandard,
         pen_average_body_weight: float,
+        pen_average_enteric_methane: float | None,
+        pen_average_urine_nitrogen: float | None,
         requirements: NutritionRequirements,
         initial_dry_matter_requirement: float,
         initial_protein_requirement: float,
@@ -790,11 +848,14 @@ class RationOptimizer:
 
         """
         ration_config = RationConfig(
+            nutrient_standard,
             requirements,
             pen_available_feeds,
             initial_dry_matter_requirement,
             initial_protein_requirement,
             pen_average_body_weight,
+            pen_average_enteric_methane,
+            pen_average_urine_nitrogen
         )
 
         initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)

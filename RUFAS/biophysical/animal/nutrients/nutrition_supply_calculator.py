@@ -31,7 +31,9 @@ class NutritionSupplyCalculator:
 
     @classmethod
     def calculate_nutrient_supply(
-        cls, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float], body_weight: float
+        cls, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float], body_weight: float,
+        enteric_methane: float,
+        urinary_nitrogen: float
     ) -> NutritionSupply:
         """
         Calculates the energy and nutrients supplied in a ration.
@@ -42,6 +44,12 @@ class NutritionSupplyCalculator:
             List of feeds that were used to construct the ration formulation.
         ration_formulation : dict[RUFAS_ID, float]
             Maps the RuFaS ID of a feed to the amount fed in a ration (kg dry matter).
+        body_weight : float
+            Body weight (kg).
+        enteric_methane : float
+            Enteric methane emission (g/day).
+        urinary_nitrogen : float
+            Amount of nitrogen in urine (kg).
 
         Returns
         -------
@@ -56,16 +64,7 @@ class NutritionSupplyCalculator:
 
         intake_nutrient_discount = cls.calculate_nutrient_intake_discount(feeds, body_weight)
         actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * intake_nutrient_discount for feed in feeds}
-        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
-
-        metabolizable_energy = cls.calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
-        total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
-
-        maintenance_energy = cls.calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
-        lactation_energy = cls.calculate_actual_lactation_net_energy(
-            feeds, metabolizable_energy, actual_digestible_energy
-        )
-        growth_energy = cls.calculate_actual_growth_net_energy(feeds, metabolizable_energy)
+        
         calcium = cls.calculate_calcium_supply(feeds)
         phosphorus = cls.calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
@@ -79,6 +78,29 @@ class NutritionSupplyCalculator:
         digestible_energy = cls._calculate_digestible_energy(feeds)
         total_byproducts = cls._calculate_byproducts_supply(feeds)
         forage_ndf_content = cls.calculate_forage_neutral_detergent_fiber_content(feeds)
+        if cls.nutrient_standard is NutrientStandard.NRC:
+            actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
+            metabolizable_energy = cls.calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
+            total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
+
+            maintenance_energy = cls.calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
+            lactation_energy = cls.calculate_actual_lactation_net_energy(
+                feeds, metabolizable_energy, actual_digestible_energy
+            )
+            growth_energy = cls.calculate_actual_growth_net_energy(feeds, metabolizable_energy)
+        elif cls.nutrient_standard is NutrientStandard.NASEM:
+            total_metabolizable_energy = cls.calculate_NASEM_metabolizable_energy(
+                feeds=feeds,
+                dry_matter_intake=dry_matter_intake,
+                body_weight=body_weight,
+                total_starch=nutrient_contents["starch"],
+                enteric_methane=enteric_methane,
+                urinary_nitrogen=urinary_nitrogen
+            )
+            lactation_energy = cls.calculate_NASEM_net_energy(
+                total_metabolizable_energy=total_metabolizable_energy
+            )
+            
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -240,6 +262,81 @@ class NutritionSupplyCalculator:
         total = sum([feed.amount * actual_maintenance_net_energy[feed.info.rufas_id] for feed in feeds])
 
         return total
+
+    @classmethod
+    def calculate_NASEM_dNDF(
+        cls,
+        feed: FeedInRation,
+        dry_matter_intake: float,
+        body_weight: float,
+        total_starch: float
+        ) -> float:
+        dNDFbase: float = (0.75 * (feed.info.NDF - feed.info.lignin) * (1 - feed.info.lignin / feed.info.NDF) ** 0.667) / feed.info.lignin
+
+        dNDF: float = dNDFbase - 0.0059 * (total_starch - 0.26) - 1.1 * ((dry_matter_intake / body_weight) - 0.035)
+
+        return dNDF
+
+    @classmethod
+    def calculate_NASEM_dstarch(
+        cls,
+        feed: FeedInRation,
+        dry_matter_intake: float,
+        body_weight: float
+    ) -> float:
+        dstarch: float = feed.info.starch_digested - 1.0 * ((dry_matter_intake / body_weight) - 0.035)
+
+        return dstarch
+
+    @classmethod
+    def calculate_NASEM_digestible_energy(
+        cls,
+        feeds: list[FeedInRation],
+        dry_matter_intake: float,
+        body_weight: float,
+        total_starch: float
+    ) -> float:
+        digestible_energy_NASEM_list: dict[RUFAS_ID, float] = {}
+        dFA = 0.73
+        for feed in feeds:
+            # TODO check NPN supp calc
+            NPNsupp: float = feed.info.NPN_source / feed.info.CP
+            RDP: float = (1 - feed.info.RUP) / feed.info.CP
+            ROM: float = 1 - feed.info.FA / 1.06 - feed.info.ash - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp)
+            dROM: float = 0.96
+
+            digestible_energy_NASEM: float = 0.042 * feed.info.NDF * cls.calculate_NASEM_dNDF(feed, dry_matter_intake, body_weight, total_starch) + 0.0423 * feed.info.starch * cls.calculate_NASEM_dstarch(feed, dry_matter_intake, body_weight) + 0.0940 * feed.info.FA * dFA + 0.0565 * (RDP + feed.info.RUP * feed.info.dRUP - feed.info.NPN_source) + 0.0089 * feed.info.NPN_source + 0.040 * ROM * dROM - 0.318
+            digestible_energy_NASEM_list[feed.info.rufas_id] = digestible_energy_NASEM
+        total: float = sum(digestible_energy_NASEM_list)
+
+        return total
+
+    @classmethod
+    def calculate_NASEM_metabolizable_energy(
+        cls,
+        feeds: list[FeedInRation],
+        dry_matter_intake: float,
+        body_weight: float,
+        total_starch: float,
+        enteric_methane: float,
+        urinary_nitrogen: float
+        ) -> float:
+
+        NASEM_digestible_energy: float = cls.calculate_NASEM_digestible_energy(feeds, dry_matter_intake, body_weight, total_starch)
+        # TODO check the conversions below, seem to be in opposite kg-g formats required by calculations, ensure  this isn't a mistake
+        gas_energy: float = 13.28 * enteric_methane * GeneralConstants.GRAMS_TO_KG
+        urine_energy: float = 0.0146 * urinary_nitrogen * GeneralConstants.KG_TO_GRAMS
+
+        total: float = NASEM_digestible_energy -  gas_energy - urine_energy
+        return total
+
+    @classmethod
+    def calculate_NASEM_net_energy(
+        cls,
+        total_metabolizable_energy: float
+        ) -> float:
+        net_energy: float = 0.66 * total_metabolizable_energy
+        return net_energy
 
     @classmethod
     def calculate_actual_lactation_net_energy(
