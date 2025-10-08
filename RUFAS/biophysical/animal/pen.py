@@ -626,14 +626,14 @@ class Pen:
         Returns
         -------
         dict[str, ManureStream]:
-            A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
-            list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
+            A dictionary mapping stream names to their corresponding ManureStream objects.
 
         Notes
         -----
         - The function first constructs a `total_stream` representing the full manure excretion from a pen.
         - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
-        based on the `minutes_away_for_milking` ratio using the `split_stream` method.
+        based on the `minutes_away_for_milking` ratio using the `split_stream` method. Parlor deposition
+        is set to 0.0, as manure deposition in the parlor is accounted for in source methodology (IFSM, 2023).
         - The remaining manure is split into one or more general streams according to the proportions
         specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
         it reaches the manure module.
@@ -698,12 +698,14 @@ class Pen:
             pen_manure_data=total_pen_manure_data,
         )
 
+        parlor_stream_proportion = None
         if self.animal_combination == AnimalCombination.LAC_COW:
             parlor_stream_proportion = self.minutes_away_for_milking / 1440
             general_stream_proportion = 1 - parlor_stream_proportion
             parlor_stream = total_stream.split_stream(
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
+                manure_stream_deposition_split=0.0,
             )
             if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
@@ -716,9 +718,14 @@ class Pen:
         self._validate_general_manure_stream_proportions()
         for stream in self.manure_streams:
             general_substream_proportion = float(stream.get("stream_proportion", 1.0))
+            split_ratio = general_substream_proportion * general_stream_proportion
+            manure_stream_deposit_split = (
+                general_substream_proportion if parlor_stream_proportion is not None else split_ratio
+            )
             manure_stream = total_stream.split_stream(
-                split_ratio=general_substream_proportion * general_stream_proportion,
+                split_ratio=split_ratio,
                 stream_type=StreamType.GENERAL,
+                manure_stream_deposition_split=manure_stream_deposit_split,
             )
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
