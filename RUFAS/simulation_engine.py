@@ -3,6 +3,8 @@
 import time as timer
 from datetime import date, timedelta
 
+from RUFAS.EEE.EEE_manager import EEEManager
+from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -73,7 +75,7 @@ class SimulationEngine:
             self.herd_manager.heiferII_events_by_id,
             self.herd_manager.cow_events_by_id,
         )
-        # EEEManager.estimate_all()
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -106,7 +108,8 @@ class SimulationEngine:
                 crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in next_harvest_dates.keys()
             ]
             next_harvest_dates = self.field_manager.get_next_harvest_dates(crops_to_get_next_harvest_dates)
-            self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
+            self.next_max_daily_feed_recalculation: date = self.time.current_date
+            + self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
             total_projected_inventory = self.feed_manager.get_total_projected_inventory(
@@ -127,9 +130,14 @@ class SimulationEngine:
 
         requested_feed = self.herd_manager.collect_daily_feed_request()
         self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")
-        is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
-        info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
+        self.feed_manager.report_cumulative_purchased_feeds(self.time.simulation_day)
+        is_ok_to_feed_animals, daily_feeds_fed = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
+
+        daily_purchased_feeds_fed = daily_feeds_fed.get("purchased", {})
+        self.emissions_estimator.calculate_emissions(daily_purchased_feeds_fed)
+
         if not is_ok_to_feed_animals:
+            info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
@@ -267,3 +275,7 @@ class SimulationEngine:
         )
 
         self.manure_manager: ManureManager = ManureManager()
+
+        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
+        feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]
+        self.emissions_estimator.check_available_purchased_feed_data(feed_manager_available_feed_ids)
