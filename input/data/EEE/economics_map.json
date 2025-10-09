@@ -8,7 +8,7 @@
         "economics_files": [
           "commodity_prices.cow_dairy_heifer_bred_t3.dollar_per_animal.csv"
         ],
-        "preprocessing": "sum biophysical output for time slice"
+        "postprocessing": "sum biophysical output for time slice"
       },
       "Semen purchased": {
         "biophysical_simulation": [
