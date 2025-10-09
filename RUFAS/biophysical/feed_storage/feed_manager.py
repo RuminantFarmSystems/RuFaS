@@ -567,32 +567,37 @@ class FeedManager:
         total_farmgrown_deducted: dict[RUFAS_ID, float] = {}
 
         for feed_id, amount_needed in feeds_to_deduct.items():
-            remaining = float(amount_needed)
+            remaining_amount_needed = float(amount_needed)
 
-            remaining, farmgrown_deducted = self._deduct_from_storage(feed_id,
-                                                                      remaining,
-                                                                      farmgrown_by_id.get(feed_id, ()),
-                                                                      )
+            farmgrown_deducted = self._deduct_from_storage(
+                feed_id,
+                remaining_amount_needed,
+                farmgrown_by_id.get(feed_id, ()),
+            )
             if farmgrown_deducted:
                 total_farmgrown_deducted[feed_id] = total_farmgrown_deducted.get(feed_id, 0.0) + farmgrown_deducted
+                remaining_amount_needed -= farmgrown_deducted
 
-            if remaining > 1e-3:
-                remaining, purchased_deducted = \
-                    self._deduct_from_storage(feed_id, remaining, purchased_by_id.get(feed_id, ()))
+            if remaining_amount_needed > 1e-3:
+                purchased_deducted = \
+                    self._deduct_from_storage(feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ()))
                 if purchased_deducted:
                     total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
+                    remaining_amount_needed -= purchased_deducted
 
-            if remaining > 1e-3:
+            if remaining_amount_needed > 1e-3:
                 self._om.add_error(
                     "Feed Deduction Error",
-                    f"Not adequate feed to deduct remaining {remaining:.3f} kg DM of feed {feed_id}.",
+                    f"Not adequate feed to deduct remaining {remaining_amount_needed:.3f} kg DM of feed {feed_id}.",
                     info_map,
                 )
                 raise ValueError(
-                    f"Not adequate feed to deduct remaining {remaining:.3f} kg DM of feed {feed_id}."
+                    f"Not adequate feed to deduct remaining {remaining_amount_needed:.3f} kg DM of feed {feed_id}."
                 )
 
         self._log_feed_deductions(total_purchased_deducted, total_farmgrown_deducted, simulation_day)
+
+        return {"purchased": total_purchased_deducted, "farmgrown": total_farmgrown_deducted}
 
     def _log_feed_deductions(
         self,
@@ -600,7 +605,8 @@ class FeedManager:
         total_farmgrown: dict[RUFAS_ID, float],
         simulation_day: int,
     ) -> None:
-        """Logs the total amounts of purchased and farmgrown feeds that were deducted.
+        """
+        Logs the total amounts of purchased and farmgrown feeds that were deducted.
 
         Parameters
         ----------
@@ -629,7 +635,7 @@ class FeedManager:
         feed_id: RUFAS_ID,
         remaining: float,
         feed_storages: Sequence[HarvestedCrop | PurchasedFeed],
-    ) -> tuple[float, float]:
+    ) -> float:
         """Removes feeds from specified storages.
 
         Parameters
@@ -643,8 +649,8 @@ class FeedManager:
 
         Returns
         -------
-        tuple[float, float]
-            The remaining amount of feed to deduct and the total amount deducted from storage.
+        float
+            The total amount deducted from storage.
         """
         deducted = 0.0
         for storage in feed_storages:
@@ -652,6 +658,7 @@ class FeedManager:
                 break
             available = float(storage.dry_matter_mass)
             if available <= 1e-3:
+                available = 0.0
                 continue
             amount_to_remove = min(remaining, available)
             if isinstance(storage, HarvestedCrop):
@@ -665,7 +672,7 @@ class FeedManager:
             remaining -= amount_to_remove
             deducted += amount_to_remove
 
-        return remaining, deducted
+        return deducted
 
     def _lookup_storage_rufas_id(self, crop_name: str) -> RUFAS_ID:
         """
