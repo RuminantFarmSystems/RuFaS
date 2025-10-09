@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta
 import math
-from typing import Any, Optional
+from typing import Any
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
@@ -20,6 +20,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
@@ -44,7 +45,6 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 from RUFAS.weather import Weather
@@ -75,12 +75,7 @@ class HerdManager:
         cls.ANIMAL_GROUPING_SCENARIO = scenario
 
     def __init__(
-        self,
-        weather: Weather,
-        time: RufasTime,
-        is_ration_defined_by_user: bool,
-        available_feeds: list[Feed],
-        feed_emissions_estimator: PurchasedFeedEmissionsEstimator | None = None,
+        self, weather: Weather, time: RufasTime, is_ration_defined_by_user: bool, available_feeds: list[Feed]
     ) -> None:
         """
         Initializes the pens and the animal herd in the simulation with data from
@@ -168,10 +163,6 @@ class HerdManager:
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
-
-        self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
-            feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
-        )
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
@@ -284,6 +275,73 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
+    @property
+    def heiferII_events_by_id(self) -> dict[str, str]:
+        """
+        Returns a dictionary that maps unique identifiers for HeiferII objects to their corresponding events.
+
+        The unique identifier for each HeiferII object is a combination of its `animal_type.name` and `id`.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary where each key is the unique identifier of a HeiferII,
+            and the value is the string representation of the events associated with that HeiferII.
+
+        """
+        return {f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events for heiferII in self.heiferIIs}
+
+    @property
+    def cow_events_by_id(self) -> dict[str, str]:
+        """
+        Returns a dictionary that maps unique identifiers for Cow objects to their corresponding events.
+
+        The unique identifier for each Cow object is a combination of its `animal_type.name` and `id`.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary where each key is the unique identifier of a Cow,
+            and the value is the string representation of the events associated with that Cow.
+
+        """
+        return {f"{cow.animal_type.name}_{cow.id}": cow.events for cow in self.cows}
+
+    @property
+    def daily_milk_report(self) -> list[MilkProductionStatistics]:
+        """
+        Returns a list of MilkProductionStatistics for all cows in the herd.
+
+        Returns
+        -------
+        list[MilkProductionStatistics]
+            A list of MilkProductionStatistics for all cows.
+
+        """
+        return [cow.milk_statistics for cow in self.cows]
+
+    @property
+    def average_herd_305_days_milk_production(self) -> float:
+        """
+        Calculates the herd average total past 305-day milk production.
+
+        Returns
+        -------
+        float
+            The herd mean of latest_milk_production_305days.
+        """
+        lactating_cow_305_days_milk_production = list(
+            filter(
+                lambda x: x > 0,
+                [cow.milk_production.current_lactation_305_day_milk_produced for cow in self.cows if cow.is_milking],
+            )
+        )
+        return (
+            sum(lactating_cow_305_days_milk_production) / len(lactating_cow_305_days_milk_production)
+            if len(lactating_cow_305_days_milk_production) > 0
+            else 0.0
+        )
+
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
         Collects total amount of feeds needed for all animals on the current day.
@@ -296,7 +354,7 @@ class HerdManager:
         """
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
-            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen.values())
+            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen)
 
         return total_requested_feed
 
@@ -533,7 +591,6 @@ class HerdManager:
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-
         self._update_herd_structure(
             graduated_animals=graduated_animals,
             newborn_calves=newborn_calves,
@@ -549,20 +606,39 @@ class HerdManager:
 
         animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
         herd_manager_output: dict[str, ManureStream] = {}
-        enteric_methane_emission_by_pen: dict[str, float] = {}
         for pen in self.all_pens:
             animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
             herd_manager_output.update(pen.get_manure_streams())
-            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
 
+        AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
+        AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, time.simulation_day)
         AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
         AnimalModuleReporter.report_manure_streams(herd_manager_output, time.simulation_day)
-        AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
-        AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
+        AnimalModuleReporter.report_milk(self.daily_milk_report, time.simulation_day)
+        AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
+        self._report_ration(time.simulation_day)
 
         return herd_manager_output
+
+    def _report_ration(self, simulation_day: int) -> None:
+        """Report the ration for all pens."""
+        herd_total_ration: dict[str, float] = {}
+        for pen in self.all_pens:
+            AnimalModuleReporter.report_daily_pen_total(
+                str(pen.id),
+                pen.animal_combination.name,
+                len(pen.animals_in_pen),
+                simulation_day,
+            )
+
+            current_pen_ration = pen.total_pen_ration
+            AnimalModuleReporter.report_daily_ration_per_pen(
+                str(pen.id), pen.animal_combination.name, current_pen_ration, simulation_day
+            )
+
+        AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
 
     def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
         """
@@ -1473,14 +1549,14 @@ class HerdManager:
         parity_3_cows = [cow for cow in self.cows if cow.reproduction.calves == 3]
         parity_4_cows = [cow for cow in self.cows if cow.reproduction.calves == 4]
         parity_5_cows = [cow for cow in self.cows if cow.reproduction.calves == 5]
-        parity_greater_than_3_cows = [cow for cow in self.cows if cow.reproduction.calves > 3]
+        parity_greater_than_5_cows = [cow for cow in self.cows if cow.reproduction.calves > 5]
         self.herd_statistics.num_cow_for_parity = {
             "1": len(parity_1_cows),
             "2": len(parity_2_cows),
             "3": len(parity_3_cows),
             "4": len(parity_4_cows),
             "5": len(parity_5_cows),
-            "greater_than_3": len(parity_greater_than_3_cows),
+            "greater_than_5": len(parity_greater_than_5_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
             "1": sum([cow.days_born for cow in parity_1_cows]) / len(parity_1_cows) if len(parity_1_cows) > 0 else 0,
@@ -1488,9 +1564,9 @@ class HerdManager:
             "3": sum([cow.days_born for cow in parity_3_cows]) / len(parity_3_cows) if len(parity_3_cows) > 0 else 0,
             "4": sum([cow.days_born for cow in parity_4_cows]) / len(parity_4_cows) if len(parity_4_cows) > 0 else 0,
             "5": sum([cow.days_born for cow in parity_5_cows]) / len(parity_5_cows) if len(parity_5_cows) > 0 else 0,
-            "greater_than_3": (
-                sum([cow.days_born for cow in parity_greater_than_3_cows]) / len(parity_greater_than_3_cows)
-                if len(parity_greater_than_3_cows) > 0
+            "greater_than_5": (
+                sum([cow.days_born for cow in parity_greater_than_5_cows]) / len(parity_greater_than_5_cows)
+                if len(parity_greater_than_5_cows) > 0
                 else 0
             ),
         }
@@ -1500,8 +1576,8 @@ class HerdManager:
         parity_3_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_3_cows]
         parity_4_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_4_cows]
         parity_5_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_5_cows]
-        parity_greater_than_3_calving_age = [
-            cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_greater_than_3_cows
+        parity_greater_than_5_calving_age = [
+            cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_greater_than_5_cows
         ]
 
         parity_1_calving_age = [calving_age for calving_age in parity_1_calving_age if calving_age > 0]
@@ -1509,8 +1585,8 @@ class HerdManager:
         parity_3_calving_age = [calving_age for calving_age in parity_3_calving_age if calving_age > 0]
         parity_4_calving_age = [calving_age for calving_age in parity_4_calving_age if calving_age > 0]
         parity_5_calving_age = [calving_age for calving_age in parity_5_calving_age if calving_age > 0]
-        parity_greater_than_3_calving_age = [
-            calving_age for calving_age in parity_greater_than_3_calving_age if calving_age > 0
+        parity_greater_than_5_calving_age = [
+            calving_age for calving_age in parity_greater_than_5_calving_age if calving_age > 0
         ]
         self.herd_statistics.avg_age_for_calving = {
             "1": (sum(parity_1_calving_age) / len(parity_1_calving_age)) if len(parity_1_calving_age) > 0 else 0,
@@ -1518,9 +1594,9 @@ class HerdManager:
             "3": (sum(parity_3_calving_age) / len(parity_3_calving_age)) if len(parity_3_calving_age) > 0 else 0,
             "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_4_calving_age) > 0 else 0,
             "5": (sum(parity_5_calving_age) / len(parity_5_calving_age)) if len(parity_5_calving_age) > 0 else 0,
-            "greater_than_3": (
-                (sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age))
-                if len(parity_greater_than_3_calving_age) > 0
+            "greater_than_5": (
+                (sum(parity_greater_than_5_calving_age) / len(parity_greater_than_5_calving_age))
+                if len(parity_greater_than_5_calving_age) > 0
                 else 0
             ),
         }
@@ -1540,8 +1616,8 @@ class HerdManager:
         parity_5_calving_to_pregnancy_time = [
             cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_5_cows
         ]
-        parity_greater_than_3_calving_to_pregnancy_time = [
-            cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_greater_than_3_cows
+        parity_greater_than_5_calving_to_pregnancy_time = [
+            cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_greater_than_5_cows
         ]
 
         parity_1_calving_to_pregnancy_time = [
@@ -1569,9 +1645,9 @@ class HerdManager:
             for calving_to_pregnancy_time in parity_5_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
-        parity_greater_than_3_calving_to_pregnancy_time = [
+        parity_greater_than_5_calving_to_pregnancy_time = [
             calving_to_pregnancy_time
-            for calving_to_pregnancy_time in parity_greater_than_3_calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_greater_than_5_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         self.herd_statistics.avg_calving_to_preg_time = {
@@ -1600,12 +1676,12 @@ class HerdManager:
                 if len(parity_5_calving_to_pregnancy_time) > 0
                 else 0
             ),
-            "greater_than_3": (
+            "greater_than_5": (
                 (
-                    sum(parity_greater_than_3_calving_to_pregnancy_time)
-                    / len(parity_greater_than_3_calving_to_pregnancy_time)
+                    sum(parity_greater_than_5_calving_to_pregnancy_time)
+                    / len(parity_greater_than_5_calving_to_pregnancy_time)
                 )
-                if len(parity_greater_than_3_calving_to_pregnancy_time) > 0
+                if len(parity_greater_than_5_calving_to_pregnancy_time) > 0
                 else 0
             ),
         }
@@ -1745,8 +1821,8 @@ class HerdManager:
         self.herd_statistics.sold_cow_num += len(sold_cows)
 
         for parity in self.herd_statistics.parity_culling_stats_range.keys():
-            if parity == "greater_than_3":
-                culled_cows_with_current_parity = [cow for cow in sold_and_died_cows if cow.reproduction.calves > 3]
+            if parity == "greater_than_5":
+                culled_cows_with_current_parity = [cow for cow in sold_and_died_cows if cow.reproduction.calves > 5]
             else:
                 current_parity = int(parity)
                 culled_cows_with_current_parity = [
@@ -1892,3 +1968,50 @@ class HerdManager:
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
+
+    def report_ration_interval_data(self, simulation_day: int) -> None:
+        """Reports the ration interval data for the herd."""
+        for pen in self.all_pens:
+            if not pen.is_populated:
+                continue
+
+            pen_base_name = f"{pen.animal_combination.name}_PEN_{pen.id}"
+            average_nutrition_supply = pen.average_nutrition_supply
+            total_dry_matter = average_nutrition_supply.dry_matter
+            num_animals = len(pen.animals_in_pen)
+
+            AnimalModuleReporter.report_ration_per_animal(
+                pen_base_name, pen.ration, total_dry_matter, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_nutrient_amounts(
+                pen_base_name, average_nutrition_supply, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_me_diet(
+                pen_base_name, average_nutrition_supply.metabolizable_energy, num_animals, simulation_day
+            )
+
+            if pen.animal_combination != AnimalCombination.CALF:
+                AnimalModuleReporter.report_average_nutrient_requirements(
+                    pen_base_name,
+                    pen.average_nutrition_requirements,
+                    pen.average_body_weight,
+                    pen.average_milk_production_reduction,
+                    num_animals,
+                    simulation_day,
+                )
+                AnimalModuleReporter.report_average_nutrient_evaluation_results(
+                    pen_base_name, pen.average_nutrition_evaluation, simulation_day
+                )
+
+    def _update_total_enteric_methane(self, digestive_outputs: list[dict[AnimalType, dict[str, float]]]) -> None:
+        """Update the amount of total enteric methane in the herd statistics."""
+        for methane_emission in digestive_outputs:
+            for animal_type in methane_emission:
+                if animal_type in self.herd_statistics.total_enteric_methane:
+                    current_totals = self.herd_statistics.total_enteric_methane[animal_type]
+                    new_emissions = methane_emission[animal_type]
+
+                    all_keys = set(current_totals.keys()) | set(new_emissions.keys())
+                    self.herd_statistics.total_enteric_methane[animal_type] = {
+                        k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
+                    }

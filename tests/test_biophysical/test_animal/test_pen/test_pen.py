@@ -787,16 +787,16 @@ def test_get_manure_streams(
     pen: Pen,
     animals_in_pen: dict[int, Animal],
 ) -> None:
-    """Tests get_manure_streams() with both custom and fallback logic."""
+    """Verify get_manure_streams produces correct keys and calls split_stream with expected args."""
+
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
     pen.manure_streams = manure_streams
     pen.first_parlor_processor = "stream_a"
     pen.parlor_stream_name = "test_stream"
     pen.minutes_away_for_milking = 360
-    apply_bedding_side_effects = [MagicMock(auto_spec=ManureStream)] * len(manure_streams)
-    for i in range(len(manure_streams)):
-        apply_bedding_side_effects[i].name = manure_streams[i]["stream_name"]
+
+    apply_bedding_side_effects = [MagicMock(spec=ManureStream) for _ in manure_streams]
     mock_apply_bedding = mocker.patch.object(pen, "_apply_bedding", side_effect=apply_bedding_side_effects)
 
     mock_excretion = AnimalManureExcretions(
@@ -817,23 +817,50 @@ def test_get_manure_streams(
         phosphorus_fraction=0.0,
         potassium=0.5,
     )
-
     for animal in animals_in_pen.values():
         mocker.patch.object(animal.digestive_system, "manure_excretion", new=mock_excretion)
 
+    child_stream = MagicMock(spec=ManureStream)
+    child_stream.pen_manure_data = MagicMock(set_first_processor=MagicMock())
     mock_split = mocker.patch.object(
         ManureStream,
         "split_stream",
-        side_effect=lambda split_ratio, stream_type: MagicMock(
-            spec=ManureStream, pen_manure_data=MagicMock(set_first_processor=MagicMock())
-        ),
+        autospec=True,
+        return_value=child_stream,
     )
 
     result = pen.get_manure_streams()
 
-    assert mock_apply_bedding.call_count == len(manure_streams)
     assert list(result.keys()) == expected_result_keys
-    assert mock_split.call_count == len(expected_result_keys)
+    assert mock_apply_bedding.call_count == len(manure_streams)
+
+    expected_calls = (
+        (1 + len(manure_streams)) if animal_combination == AnimalCombination.LAC_COW else len(manure_streams)
+    )
+    assert mock_split.call_count == expected_calls
+
+    if animal_combination == AnimalCombination.LAC_COW:
+        parlor_call = mock_split.call_args_list[0]
+        assert pytest.approx(parlor_call.kwargs["split_ratio"]) == 0.25
+        assert parlor_call.kwargs["stream_type"] == StreamType.PARLOR
+        assert parlor_call.kwargs["manure_stream_deposition_split"] == 0.0
+
+        non_parlor = 1.0 - 0.25
+        for i, call in enumerate(mock_split.call_args_list[1:]):
+            prop = float(manure_streams[i]["stream_proportion"])
+            expected_split_ratio = prop * non_parlor
+            expected_deposition = prop
+
+            assert call.kwargs["stream_type"] == StreamType.GENERAL
+            assert pytest.approx(call.kwargs["split_ratio"]) == pytest.approx(expected_split_ratio)
+            assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(expected_deposition)
+
+    else:
+        for i, call in enumerate(mock_split.call_args_list):
+            proportion = float(manure_streams[i]["stream_proportion"])
+            assert call.kwargs["stream_type"] == StreamType.GENERAL
+            assert pytest.approx(call.kwargs["split_ratio"]) == pytest.approx(proportion)
+            assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(proportion)
 
 
 @pytest.mark.parametrize(
@@ -1152,7 +1179,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
-        None,
+        True,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
@@ -1166,6 +1193,8 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
 
 def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW: first attempt fails, second succeeds."""
+    mocker.patch("RUFAS.biophysical.animal.pen.UserDefinedRationManager.tolerance", 0.0, create=True)
+
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
     pen.id = 3
