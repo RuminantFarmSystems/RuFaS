@@ -212,6 +212,7 @@ v0.9.2
 - [2293](https://github.com/RuminantFarmSystems/MASM/pull/2293) - [minor change] [Animal] Adds behavior in an animal reporter method to create an empty output variable in case where there are no sold animals for a given AnimalCombination.
 - [2497](https://github.com/RuminantFarmSystems/MASM/pull/2497) - [minor change] Establishes a FeedManager balance reporting system.
 - [2479](https://github.com/RuminantFarmSystems/MASM/pull/2479) - [minor change] Removes `errors.py`.
+- [2496](https://github.com/RuminantFarmSystems/MASM/pull/2496) - [minor change] [EEE] Adds economic map file to generate partial budget analysis.
 - [2492](https://github.com/RuminantFarmSystems/MASM/pull/2492) - [minor change] [Manure] Use annual mean temperature and redo MCF factor calculation in bedded pack.
 - [2504](https://github.com/RuminantFarmSystems/MASM/pull/2504) - [minor change] [Data Validator] Raise helpful error messages when object level data validations failed.
 - [2499](https://github.com/RuminantFarmSystems/MASM/pull/2499) - [minor change] Updates `pyproject.toml` and added check for user meeting dependency requirements.
@@ -240,7 +241,6 @@ v0.9.2
 - [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
-- [2496](https://github.com/RuminantFarmSystems/MASM/pull/2496) - [minor change] [EEE] Adds economic map file to generate partial budget analysis.
 
 ### v0.9.2
 

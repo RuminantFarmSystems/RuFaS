@@ -20,19 +20,6 @@
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
-    },  "animal_net_merit": {
-      "title": "Animal Net Merit data",
-      "description": "The net merit value for cows.",
-      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
-      "type": "csv",
-      "properties": "animal_net_merit_properties"
-    },
-    "animal_top_listing_semen": {
-      "title": "Animal Top Listing Semen data",
-      "description": "The top listing semen value for new born calves.",
-      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
-      "type": "csv",
-      "properties": "animal_top_listing_semen_properties"
     },
     "animal_net_merit": {
       "title": "Animal Net Merit data",
