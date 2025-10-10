@@ -27,6 +27,7 @@ class FeedCategorization(Enum):
     PASTURE = "Pasture"
     PLANT_PROTEIN = "Plant Protein"
     VITAMIN_MINERAL = "Vitamin/Mineral"
+    NPN_SUPPLEMENT = "NPN Supplement"
 
 
 class FeedComponentType(Enum):
