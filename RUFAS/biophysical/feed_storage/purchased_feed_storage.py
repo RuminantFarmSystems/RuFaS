@@ -39,6 +39,7 @@ class PurchasedFeedStorage:
     def __init__(self, available_feeds: list[Feed]) -> None:
         self.available_feeds: list[Feed] = available_feeds
         self.stored: list[PurchasedFeed] = []
+        self._prefix = "Feed.PurchasedFeedStorage"
         self._om = OutputManager()
 
     def receive_feed(self, purchased_feed: PurchasedFeed) -> None:
