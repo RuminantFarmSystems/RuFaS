@@ -22,6 +22,8 @@ class RationConfig:
 
     Attributes
     ----------
+    nutrient_standard : NutrientStandard
+        Nutrient standard used in supply and requirement calculations.
     animal_requirements : NutritionRequirements
         Nutrition requirements for pen, used in constraint methods.
     pen_average_body_weight : float
@@ -162,7 +164,7 @@ class RationOptimizer:
             self.NASEM_net_energy_constraint
         ]
 
-        if RationConfig.nutrient_standard is NutrientStandard.NRC:            
+        if arguments[0].nutrient_standard is NutrientStandard.NRC:            
             self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions if func not in [self.NASEM_net_energy_constraint]]
 
             self.heifer_constraints = [
@@ -170,7 +172,7 @@ class RationOptimizer:
                 for cons in self.cow_constraints
                 if cons["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint, self.NASEM_net_energy_constraint]
             ]
-        elif RationConfig.nutrient_standard is NutrientStandard.NASEM:
+        elif arguments[0].nutrient_standard is NutrientStandard.NASEM:
             self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions if func not in [self.NE_total_constraint, self.NE_lactation_constraint, self.NE_growth_constraint, self.NE_maintenance_and_activity_constraint]]
 
             self.heifer_constraints = self.cow_constraints
