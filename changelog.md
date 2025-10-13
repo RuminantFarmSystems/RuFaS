@@ -253,6 +253,7 @@ v0.9.2
 - [2584](https://github.com/RuminantFarmSystems/MASM/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
 - [2597](https://github.com/RuminantFarmSystems/MASM/pull/2597) - [minor change] [Cross Validation] Implement conditional clause functions.
 - [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
+- [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
 
 ### v0.9.2
 
