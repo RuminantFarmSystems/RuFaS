@@ -2662,3 +2662,82 @@ def test_evaluate_condition_clause_array_short_circuit_on_false(mocker: MockerFi
         valid = cv._evaluate_condition_clause_array([{}, {}, {}], eager_termination)
         assert not valid
         assert mock.call_count == 2
+
+
+def test_validate_condition_clause_ok(mocker: MockerFixture) -> None:
+    """True when relationship valid and both sides present."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "right_hand": 2, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is True
+    log.assert_not_called()
+
+
+def test_validate_condition_clause_missing_both_no_eager(mocker: MockerFixture) -> None:
+    """False and logs both fields when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_missing_left_no_eager(mocker: MockerFixture) -> None:
+    """False and logs left when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"right_hand": 2, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand")]
+
+
+def test_validate_condition_clause_missing_right_no_eager(mocker: MockerFixture) -> None:
+    """False and logs right when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("right hand")]
+
+
+def test_validate_condition_clause_missing_both_eager_raises(mocker: MockerFixture) -> None:
+    """Raises KeyError and logs both when eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    with pytest.raises(KeyError):
+        v._validate_condition_clause(clause, eager_termination=True)
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_invalid_relationship(mocker: MockerFixture) -> None:
+    """False when relationship validation fails."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=False)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "right_hand": 2, "relationship": "bogus"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    log.assert_not_called()
+
+
+def test_log_missing_condition_clause_field_only() -> None:
+    """Appends one correctly shaped entry."""
+    v = CrossValidator()
+    v._event_logs = []
+    v._log_missing_condition_clause_field("left hand")
+    assert len(v._event_logs) == 1
+    e = v._event_logs[0]
+    assert e["error"] == "Missing required condition clause field"
+    assert e["message"] == "Missing the left hand field in condition clause."
+    assert e["info_map"]["class"] == CrossValidator.__name__
+    assert e["info_map"]["function"] == CrossValidator._log_missing_condition_clause_field.__name__

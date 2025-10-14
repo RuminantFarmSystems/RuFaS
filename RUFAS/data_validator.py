@@ -1947,7 +1947,7 @@ class CrossValidator:
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
         """Validate the whole condition block."""
         left_expression = condition_clause.get("left_hand", False)
-        right_expression = condition_clause.get("left_hand", False)
+        right_expression = condition_clause.get("right_hand", False)
         relationship = condition_clause.get("relationship", False)
         fields = {
             "left hand": left_expression,
@@ -1977,11 +1977,10 @@ class CrossValidator:
                 "message": f"Missing the {missing_field} field in condition clause.",
                 "info_map": {
                     "class": CrossValidator.__name__,
-                    "function": CrossValidator._evaluate_condition.__name__,
+                    "function": CrossValidator._log_missing_condition_clause_field.__name__,
                 },
             }
         )
-
 
     def _validate_relationship(self, relationship: Any, eager_termination: bool) -> bool:
         """Validate if a valid relationship check is given."""
