@@ -785,67 +785,43 @@
       "type": "object",
       "description": "Methane emission models to use",
       "calves": {
-        "type": "object",
-        "description": "Methane emission models to use fro calves.",
-        "Pattanaik": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for calves.",
+        "pattern": "^(Pattanaik)$",
+        "default": "Pattanaik"
       },
       "heiferIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "heiferIIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "heiferIIIs": {
-        "type": "object",
-        "description": "Methane emission models to heiferIIIs.",
-        "IPCC": {
-          "type": "bool",
-          "default": true
-        }
+        "type": "string",
+        "description": "Methane emission models to use for heiferIIIs.",
+        "default": "IPCC",
+        "pattern": "^(IPCC)$"
       },
       "cows": {
         "type": "object",
-        "description": "Methane emission models to cows.",
+        "description": "Methane emission models for cows.",
         "dry cows": {
-          "type": "object",
-          "description": "Methane emission models to dry cows.",
-          "IPCC": {
-            "type": "bool",
-            "default": true
-          },
-          "Mills": {
-            "type": "bool",
-            "default": false
-          }
+          "type": "string",
+          "description": "Methane emission models for dry cows.",
+          "default": "IPCC",
+          "pattern": "^(IPCC|Mills)$"
         },
         "lactating cows": {
-          "type": "object",
-          "description": "Methane emission models to lactating cows.",
-          "IPCC": {
-            "type": "bool",
-            "default": true
-          },
-          "Mills": {
-            "type": "bool",
-            "default": false
-          },
-          "Mutian": {
-            "type": "bool",
-            "default": false
-          }
+          "type": "string",
+          "description": "Methane emission models for lactating cows.",
+          "default": "IPCC",
+          "pattern": "^(IPCC|Mills|Mutian)$"
         }
       }
     },
@@ -914,8 +890,8 @@
         },
         "pen_type": {
           "type": "string",
-          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
-          "pattern": "^(freestall|tiestall|open lot|compost bedded pack barn)$",
+          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, bedded pack)",
+          "pattern": "^(freestall|tiestall|open lot|bedded pack)$",
           "default": "freestall"
         },
         "max_stocking_density": {
@@ -4020,6 +3996,13 @@
         "maximum": 1,
         "default": 0.0
       }
+    },
+    "max_daily_feed_recalculations_per_year": {
+        "type": "number",
+        "description": "The maximum number of feed recalculations that can be performed per year.",
+        "minimum": 1,
+        "maximum": 365,
+        "default": 4
     },
     "allowances": {
       "type": "array",
