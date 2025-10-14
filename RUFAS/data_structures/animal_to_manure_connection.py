@@ -269,7 +269,8 @@ class ManureStream:
     @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
-        return self.manure_non_degradable_volatile_solids + self.manure_degradable_volatile_solids
+        return (self.manure_non_degradable_volatile_solids + self.manure_degradable_volatile_solids +
+                self.bedding_non_degradable_volatile_solids)
 
     @property
     def mass(self) -> float:
