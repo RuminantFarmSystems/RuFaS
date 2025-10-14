@@ -144,7 +144,8 @@ class AnaerobicLagoon(Storage):
             is_degradable=True,
         )
         storage_methane_from_non_degradable_volatile_solids = self._calculate_methane_emissions(
-            volatile_solids=self._manure_to_process.manure_non_degradable_volatile_solids,
+            volatile_solids=self._manure_to_process.manure_non_degradable_volatile_solids +
+            self._manure_to_process.bedding_non_degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
