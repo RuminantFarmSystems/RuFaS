@@ -148,16 +148,12 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_calf_methane">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_calf_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_calf_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_calf_methane'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_calf_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_calf_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_calf_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the amount of methane emission for calf.</p>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>[AN.MET.4]</p>
-</section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>methane_model: str | None</dt><dd><p>Methane model used for methane emission calculations, including Mutian, Mills, IPCC.</p>
+<dt>methane_model: str</dt><dd><p>Methane model used for methane emission calculations.</p>
 </dd>
 <dt>body_weight: float</dt><dd><p>Body weight of the current animal, kg.</p>
 </dd>
@@ -172,56 +168,57 @@
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
-<p>(Pattanaik et al., 2003)</p>
+<p>(Pattanaik et al., 2003)
+[AN.MET.4]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_heifer_methane">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_heifer_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrition_supply</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_heifer_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_heifer_methane'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_heifer_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrition_supply</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_heifer_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_heifer_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the amount of methane emission for heifer.</p>
-<section id="id1">
-<h2>Notes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
 <p>Soluble residue: [AN.MET.1]
 Gross energy concentration: [AN.MET.2]
 Starch to acid detergent fiber concentration ratio: [AN.MET.3]
 Enteric methane emission:  [AN.MET.5]</p>
 </section>
-<section id="id2">
-<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>methane_model: str</dt><dd><p>Methane model used for methane emission calculations, including IPCC.</p>
+<dt>methane_model: str</dt><dd><p>Model for methane prediction.</p>
 </dd>
 <dt>nutrition_supply: NutritionSupply</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>float</dt><dd><p>Amount of methane emission for heifer (g/day).</p>
+<dt>dict[str, float]</dt><dd><p>Amount of methane emission for heifer (g/day).</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h2>References<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id3">
+<h2>References<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
 <p>(IPCC tier 2, 2006)</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_cow_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_cow_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the daily enteric emissions for cows.</p>
-<section id="id5">
-<h2>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id4">
+<h2>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
 and nitrogen (“N”) are all percentages of dry matter.</p>
 </section>
-<section id="id6">
-<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>body_weight: float</dt><dd><p>Body weight of the current cow (kg).</p>
 </dd>
-<dt>methane_model: str</dt><dd><p>Methane model used for methane emission calculations, including “Mutian”, “Mills”, “IPCC”.</p>
+<dt>methane_models: dict[str, Any]</dt><dd><p>Methane model used for methane emission calculations.</p>
 </dd>
 <dt>is_lactating: bool</dt><dd><p>Indicator of cow’s lactating status.</p>
 </dd>
@@ -240,8 +237,8 @@ and nitrogen (“N”) are all percentages of dry matter.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily enteric emissions for cows (g/day).</p>
 </dd>
@@ -252,19 +249,8 @@ and nitrogen (“N”) are all percentages of dry matter.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_lactating_cow_enteric_methane">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_lactating_cow_enteric_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_lactating_cow_enteric_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_lactating_cow_enteric_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the daily enteric emissions for lactating cows.</p>
-<section id="id8">
-<h2>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
-<p>Soluble residue: [AN.MET.1]
-Gross energy concentration: [AN.MET.2]
-Starch to acid detergent fiber concentration ratio: [AN.MET.3]
-Enteric methane emission, Mutian Model:  [AN.MET.6]
-Enteric methane emission, Mills Model:  [AN.MET.7]
-Enteric methane emission, IPCC Model:  [AN.MET.5]</p>
-<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
-and nitrogen (“N”) are all percentages of dry matter.</p>
-</section>
-<section id="id9">
-<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>body_weight: float</dt><dd><p>Body weight of the current cow (kg).</p>
 </dd>
@@ -276,15 +262,26 @@ and nitrogen (“N”) are all percentages of dry matter.</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The daily enteric emissions for lactating cows (g/day).</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h2>References<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<section id="id9">
+<h2>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<p>Soluble residue: [AN.MET.1]
+Gross energy concentration: [AN.MET.2]
+Starch to acid detergent fiber concentration ratio: [AN.MET.3]
+Enteric methane emission, Mutian Model:  [AN.MET.6]
+Enteric methane emission, Mills Model:  [AN.MET.7]
+Enteric methane emission, IPCC Model:  [AN.MET.5]</p>
+<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
+and nitrogen (“N”) are all percentages of dry matter.</p>
+</section>
+<section id="id10">
+<h2>References<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
 <p>(Niu et al., 2018; Mills et al., 2003; IPCC, 2006)</p>
 </section>
 </dd></dl>
@@ -292,8 +289,26 @@ and nitrogen (“N”) are all percentages of dry matter.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_dry_cow_enteric_methane">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_dry_cow_enteric_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_dry_cow_enteric_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_dry_cow_enteric_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the daily enteric methane emissions for dry cows.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>methane_model: str</dt><dd><p>Methane model used for methane emission calculations.</p>
+</dd>
+<dt>metabolizable_energy_intake: float</dt><dd><p>Metabolizable energy intake, Mcal/kg dry matter.</p>
+</dd>
+<dt>nutrient_amounts: Dict[str, float]</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+</dl>
+</section>
 <section id="id12">
-<h2>Notes<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The daily enteric emissions for dry cows (g/day).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Notes<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
 <p>Soluble residue: [AN.MET.1]
 Gross energy concentration: [AN.MET.2]
 Starch to acid detergent fiber concentration ratio: [AN.MET.3]
@@ -302,27 +317,53 @@ Enteric methane emission, IPCC Model:  [AN.MET.5]</p>
 <p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
 and nitrogen (“N”) are all percentages of dry matter.</p>
 </section>
-<section id="id13">
-<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_cow_mills_methane">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_cow_mills_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_cow_mills_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_cow_mills_methane'"><span>#</span></a></dt>
+<dd><p>Return the amount of cow methane predicted my Mills method.</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>methane_model: str</dt><dd><p>Methane model used for methane emission calculations, including Mills, IPCC.</p>
-</dd>
-<dt>metabolizable_energy_intake: float</dt><dd><p>Metabolizable energy intake, Mcal/kg dry matter.</p>
-</dd>
 <dt>nutrient_amounts: Dict[str, float]</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
 </dd>
-</dl>
-</section>
-<section id="id14">
-<h2>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>The daily enteric emissions for dry cows (g/day).</p>
+<dt>metabolizable_energy_intake<span class="classifier">float</span></dt><dd><p>Metabolizable energy intake, Mcal/kg dry matter.</p>
 </dd>
 </dl>
 </section>
 <section id="id15">
-<h2>References<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
-<p>(Mills et al., 2003; IPCC, 2006)</p>
+<h2>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The daily enteric emissions for cows (g/day).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>References<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<p>Mills et al., 2003</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_IPCC_methane">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_IPCC_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_IPCC_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_IPCC_methane'"><span>#</span></a></dt>
+<dd><p>Return the amount of methane predicted my IPCC method.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>nutrient_amounts: Dict[str, float]</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The daily enteric emissions (g/day).</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h2>References<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
+<p>IPCC, 2006</p>
 </section>
 </dd></dl>
 </dd></dl>
@@ -336,6 +377,8 @@ and nitrogen (“N”) are all percentages of dry matter.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator.calculate_cow_methane"><code class="docutils literal notranslate"><span class="pre">EntericMethaneCalculator.calculate_cow_methane()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_lactating_cow_enteric_methane'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_lactating_cow_enteric_methane"><code class="docutils literal notranslate"><span class="pre">EntericMethaneCalculator._calculate_lactating_cow_enteric_methane()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_dry_cow_enteric_methane'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_dry_cow_enteric_methane"><code class="docutils literal notranslate"><span class="pre">EntericMethaneCalculator._calculate_dry_cow_enteric_methane()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_cow_mills_methane'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_cow_mills_methane"><code class="docutils literal notranslate"><span class="pre">EntericMethaneCalculator._calculate_cow_mills_methane()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_IPCC_methane'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator._calculate_IPCC_methane"><code class="docutils literal notranslate"><span class="pre">EntericMethaneCalculator._calculate_IPCC_methane()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -632,11 +632,23 @@ It checks whether the animal type is a cow, and raises a TypeError otherwise.</p
 </section>
 </dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.stillborn">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stillborn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.stillborn" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.stillborn'"><span>#</span></a></dt>
+<dd><p>Checks if the object is stillborn based on the presence and value of <cite>stillborn_day</cite>.</p>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if <cite>stillborn_day</cite> is not None and greater than or equal to 0, otherwise False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.sold">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.sold" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.sold'"><span>#</span></a></dt>
 <dd><p>Checks if the object is sold based on the presence and value of <cite>sold_at_day</cite>.</p>
-<section id="id32">
-<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if <cite>sold_at_day</cite> is not None and greater than or equal to 0, otherwise False.</p>
 </dd>
@@ -647,14 +659,19 @@ It checks whether the animal type is a cow, and raises a TypeError otherwise.</p
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.dead">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dead</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.dead" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.dead'"><span>#</span></a></dt>
 <dd><p>Check if the object is considered dead based on its <cite>dead_at_day</cite> attribute.</p>
-<section id="id33">
-<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if <cite>dead_at_day</cite> is not None and greater than or equal to 0, indicating
 the object is no longer alive. False otherwise.</p>
 </dd>
 </dl>
 </section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.milk_statistics">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">milk_statistics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MilkProductionStatistics</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.milk_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.milk_statistics'"><span>#</span></a></dt>
+<dd><p>Returns the milk statistics for the animal.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._assign_sex_to_newborn_calf">
@@ -663,8 +680,8 @@ the object is no longer alive. False otherwise.</p>
 <p>Determines the sex of the calf by evaluating the type of semen used (conventional
 or sexed) and the corresponding male calf rate. Raises a ValueError if an
 unexpected semen type is encountered.</p>
-<section id="id34">
-<h3>Raises<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<section id="id35">
+<h3>Raises<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If <cite>AnimalConfig.semen_type</cite> is not “conventional” or “sexed”.</p>
 </dd>
@@ -675,8 +692,8 @@ unexpected semen type is encountered.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf">
 <span class="sig-name descname"><span class="pre">_initialize_newborn_calf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NewBornCalfValuesTypedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf'"><span>#</span></a></dt>
 <dd><p>Initialize a newborn calf with specific attributes and simulation variables.</p>
-<section id="id35">
-<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>args<span class="classifier">NewBornCalfValuesTypedDict</span></dt><dd><p>A dictionary containing values related to the newborn calf.
 Expected keys include ‘birth_weight’ and ‘initial_phosphorus’.</p>
@@ -690,8 +707,8 @@ Expected keys include ‘birth_weight’ and ‘initial_phosphorus’.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI">
 <span class="sig-name descname"><span class="pre">_initialize_calf_or_heiferI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CalfValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIValuesTypedDict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI'"><span>#</span></a></dt>
 <dd><p>Initializes the attributes of a calf or heifer.</p>
-<section id="id36">
-<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>args<span class="classifier">CalfValuesTypedDict or HeiferIValuesTypedDict</span></dt><dd><p>A dictionary containing initial values for the calf or heifer instance.</p>
 </dd>
@@ -700,17 +717,17 @@ Expected keys include ‘birth_weight’ and ‘initial_phosphorus’.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._determine_heifer_reproduction_programs">
-<span class="sig-name descname"><span class="pre">_determine_heifer_reproduction_programs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HeiferIIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIIIValuesTypedDict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">HeiferReproductionProtocol</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">HeiferTAISubProtocol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferSynchEDSubProtocol</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._determine_heifer_reproduction_programs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._determine_heifer_reproduction_programs'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_determine_heifer_reproduction_programs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HeiferIIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIIIValuesTypedDict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">HeiferReproductionProtocol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">HeiferTAISubProtocol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferSynchEDSubProtocol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._determine_heifer_reproduction_programs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._determine_heifer_reproduction_programs'"><span>#</span></a></dt>
 <dd><p>Determines the reproduction program and sub-program for a heifer.</p>
-<section id="id37">
-<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>args<span class="classifier">HeiferIIValuesTypedDict or HeiferIIIValuesTypedDict</span></dt><dd><p>A dictionary containing information about the heifer reproduction program and sub-program.</p>
 </dd>
 </dl>
 </section>
-<section id="id38">
-<h3>Returns<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple (HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol)</dt><dd><p>A tuple where the first element is the determined heifer reproduction program and
 the second element is the corresponding sub-program for the specified reproduction program.</p>
@@ -722,8 +739,8 @@ the second element is the corresponding sub-program for the specified reproducti
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._initialize_heiferII_or_heiferIII">
 <span class="sig-name descname"><span class="pre">_initialize_heiferII_or_heiferIII</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HeiferIIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIIIValuesTypedDict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._initialize_heiferII_or_heiferIII" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._initialize_heiferII_or_heiferIII'"><span>#</span></a></dt>
 <dd><p>Initializes the attributes specific to a heifer in the HeiferII or HeiferIII stage.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<section id="id40">
+<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>args<span class="classifier">HeiferIIValuesTypedDict or HeiferIIIValuesTypedDict</span></dt><dd><p>A dictionary-like object containing the attributes and values required
 for setting up the HeiferII or HeiferIII stage, including reproduction
@@ -731,8 +748,8 @@ details and nutrient requirements.</p>
 </dd>
 </dl>
 </section>
-<section id="id40">
-<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<section id="id41">
+<h3>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -740,15 +757,15 @@ details and nutrient requirements.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._initialize_cow">
 <span class="sig-name descname"><span class="pre">_initialize_cow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CowValuesTypedDict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._initialize_cow" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._initialize_cow'"><span>#</span></a></dt>
 <dd><p>Initializes the attributes of a cow object using the provided arguments.</p>
-<section id="id41">
-<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>args<span class="classifier">CowValuesTypedDict</span></dt><dd><p>A dictionary containing values used for initializing the cow’s attributes.</p>
 </dd>
 </dl>
 </section>
-<section id="id42">
-<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -756,8 +773,8 @@ details and nutrient requirements.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.reduce_milk_production">
 <span class="sig-name descname"><span class="pre">reduce_milk_production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.reduce_milk_production" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.reduce_milk_production'"><span>#</span></a></dt>
 <dd><p>Attempts reduction of milk production.</p>
-<section id="id43">
-<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the reduction was successful, False otherwise.</p>
 </dd>
@@ -790,8 +807,8 @@ object, which simulates and calculates digestion-related processes for the day.<
 <p>If the animal type is not a cow, the method exits without performing any operation.
 For cows, the method calculates the milking updates using the animal’s daily metrics
 and adjusts the milking-related data accordingly.</p>
-<section id="id44">
-<h3>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The current time context for the daily milking update.</p>
 </dd>
@@ -814,8 +831,8 @@ and adjusts the milking-related data accordingly.</p>
 <dd><p>Updates the daily growth parameters of the animal based on the provided time input.</p>
 <p>This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
 attributes such as body weight, conceptual weight, and events of the animal accordingly.</p>
-<section id="id45">
-<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance used for updating growth and body weight changes.</p>
 </dd>
@@ -827,29 +844,29 @@ attributes such as body weight, conceptual weight, and events of the animal acco
 <span class="sig-name descname"><span class="pre">_determine_days_in_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_output_days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._determine_days_in_milk" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._determine_days_in_milk'"><span>#</span></a></dt>
 <dd><p>Determines the days in milk based on the values of the initial <cite>days_in_milk</cite>,
 milk production output <cite>days_in_milk</cite> and the reproduction output <cite>days_in_milk</cite>.</p>
-<section id="id46">
-<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<section id="id47">
+<h3>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>reproduction_output_days_in_milk<span class="classifier">int</span></dt><dd><p>The <cite>days_in_milk</cite> value from the reproduction update result.</p>
 </dd>
 </dl>
 </section>
-<section id="id47">
-<h3>Returns<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<section id="id48">
+<h3>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>The determined <cite>days_in_milk</cite>.</p>
 </dd>
 </dl>
 </section>
-<section id="id48">
-<h3>Raises<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
+<section id="id49">
+<h3>Raises<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the <cite>days_in_milk</cite> attribute has an negative or invalid value.</p>
 </dd>
 </dl>
 </section>
-<section id="id49">
-<h3>Notes<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
+<section id="id50">
+<h3>Notes<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <p>This method determines the <cite>days_in_milk</cite> value based on the following conditions:</p>
 <blockquote>
 <div><ol class="arabic">
@@ -886,15 +903,15 @@ milk production output <cite>days_in_milk</cite> and the reproduction output <ci
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.daily_reproduction_update">
 <span class="sig-name descname"><span class="pre">daily_reproduction_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">NewBornCalfValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">HerdReproductionStatistics</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.daily_reproduction_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.daily_reproduction_update'"><span>#</span></a></dt>
 <dd><p>Handles the daily reproduction state update for an animal.</p>
-<section id="id50">
-<h3>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance for updating reproduction-related dynamics.</p>
 </dd>
 </dl>
 </section>
-<section id="id51">
-<h3>Returns<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NewBornCalfValuesTypedDict or None</dt><dd><p>A dictionary containing details related to a newly born calf if a calf is born during this update;
 otherwise, None.</p>
@@ -908,15 +925,15 @@ otherwise, None.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.daily_routines">
 <span class="sig-name descname"><span class="pre">daily_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">DailyRoutinesOutput</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.daily_routines" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.daily_routines'"><span>#</span></a></dt>
 <dd><p>Perform daily routines for the animal, updating its status and outputs.</p>
-<section id="id52">
-<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
+<section id="id53">
+<h3>Parameters<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance.</p>
 </dd>
 </dl>
 </section>
-<section id="id53">
-<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>DailyRoutinesOutput</dt><dd><p>An object containing the updated animal status and any newborn calf configuration.</p>
 </dd>
@@ -928,15 +945,15 @@ otherwise, None.</p>
 <span class="sig-name descname"><span class="pre">_calf_life_stage_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalStatus</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._calf_life_stage_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._calf_life_stage_update'"><span>#</span></a></dt>
 <dd><p>Determines and updates the life stage of a calf based on specific evaluation criteria.
 Transitions the calf to the ‘HeiferI’ stage if the criteria are met, otherwise retains the current life stage.</p>
-<section id="id54">
-<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>_<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance.</p>
 </dd>
 </dl>
 </section>
-<section id="id55">
-<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<section id="id56">
+<h3>Returns<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[AnimalStatus, None]</dt><dd><p>A tuple where the first value indicates whether the life stage was changed
 (AnimalStatus.LIFE_STAGE_CHANGED) or remains the same (AnimalStatus.REMAIN).
@@ -951,15 +968,15 @@ The second value is always None.</p>
 <dd><p>Updates the life stage of a heiferI animal based on specific evaluation criteria.
 If the evaluation determines that the heiferI should transition to heiferII,
 the necessary transition is performed. Otherwise, the animal remains in its current life stage.</p>
-<section id="id56">
-<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance used for evaluation and transition.</p>
 </dd>
 </dl>
 </section>
-<section id="id57">
-<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[AnimalStatus, None]</dt><dd><p>AnimalStatus.LIFE_STAGE_CHANGED, None: If the heiferI transitions to the heifer II life stage.
 AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.</p>
@@ -973,15 +990,15 @@ AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.</p>
 <dd><p>Updates the life stage of a heiferII based on evaluation criteria such as culling or transitioning to heiferIII.
 If the evaluation determines that the heiferII should transition to heiferIII,
 the necessary transition is performed. Otherwise, the animal remains in its current life stage.</p>
-<section id="id58">
-<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object, used to determine the current simulation day.</p>
 </dd>
 </dl>
 </section>
-<section id="id59">
-<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[AnimalStatus, None]</dt><dd><p>A tuple containing the status of the animal (whether it is sold, its life stage
 has changed, or it remains in the current state) and None.</p>
@@ -997,15 +1014,15 @@ has changed, or it remains in the current state) and None.</p>
 the Cow life stage. If the animal transitions, configuration data for a
 newborn calf is returned. If the transition does not occur, the animal
 remains in the HeiferIII life stage, and no newborn calf data is provided.</p>
-<section id="id60">
-<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
+<section id="id61">
+<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance used to evaluate the life stage transition.</p>
 </dd>
 </dl>
 </section>
-<section id="id61">
-<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
+<section id="id62">
+<h3>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <dl>
 <dt>tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]</dt><dd><p>A tuple containing the animal’s status:
 - AnimalStatus.LIFE_STAGE_CHANGED along with the newborn calf</p>
@@ -1023,15 +1040,15 @@ remains in the HeiferIII life stage, and no newborn calf data is provided.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._cow_life_stage_update">
 <span class="sig-name descname"><span class="pre">_cow_life_stage_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalStatus</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._cow_life_stage_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._cow_life_stage_update'"><span>#</span></a></dt>
 <dd><p>Updates the life stage of a cow based on its milking status and current animal type.</p>
-<section id="id62">
-<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>_<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance.</p>
 </dd>
 </dl>
 </section>
-<section id="id63">
-<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
+<section id="id64">
+<h3>Returns<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[AnimalStatus, None]</dt><dd><p>A tuple where the first element indicates whether the life stage has changed or remains the same,
 and the second element is always None.</p>
@@ -1043,15 +1060,15 @@ and the second element is always None.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.animal_life_stage_update">
 <span class="sig-name descname"><span class="pre">animal_life_stage_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalStatus</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">NewBornCalfValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.animal_life_stage_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.animal_life_stage_update'"><span>#</span></a></dt>
 <dd><p>Updates the life stage of an animal based on its type and current simulation time.</p>
-<section id="id64">
-<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
+<section id="id65">
+<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance used to determine life stage updates for the animal.</p>
 </dd>
 </dl>
 </section>
-<section id="id65">
-<h3>Returns<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
+<section id="id66">
+<h3>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]</dt><dd><p>A tuple containing the updated animal status and, if applicable, configuration for a newborn calf.</p>
 </dd>
@@ -1062,8 +1079,8 @@ and the second element is always None.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._evaluate_calf_for_heiferI">
 <span class="sig-name descname"><span class="pre">_evaluate_calf_for_heiferI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._evaluate_calf_for_heiferI" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._evaluate_calf_for_heiferI'"><span>#</span></a></dt>
 <dd><p>Evaluates if the calf qualifies as a heiferI based on its weaning day.</p>
-<section id="id66">
-<h3>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the calf has reached the weaning day as defined in AnimalConfig,
 False otherwise.</p>
@@ -1075,8 +1092,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._evaluate_heiferI_for_heiferII">
 <span class="sig-name descname"><span class="pre">_evaluate_heiferI_for_heiferII</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferI_for_heiferII" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferI_for_heiferII'"><span>#</span></a></dt>
 <dd><p>Checks if heiferI is ready for heiferII stage based on the breeding start day.</p>
-<section id="id67">
-<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
+<section id="id68">
+<h3>Returns<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the heiferI’s days born is equal to the configured heifer breed start day,
 False otherwise.</p>
@@ -1088,8 +1105,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_heiferIII">
 <span class="sig-name descname"><span class="pre">_evaluate_heiferII_for_heiferIII</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_heiferIII" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_heiferIII'"><span>#</span></a></dt>
 <dd><p>Evaluate if a heiferII can transition to heiferIII stage.</p>
-<section id="id68">
-<h3>Returns<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
+<section id="id69">
+<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the heifer meets all the conditions to transition to heifer III,
 False otherwise.</p>
@@ -1101,8 +1118,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_culling">
 <span class="sig-name descname"><span class="pre">_evaluate_heiferII_for_culling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_culling" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._evaluate_heiferII_for_culling'"><span>#</span></a></dt>
 <dd><p>Determines whether a heiferII should be culled based on pregnancy status and age.</p>
-<section id="id69">
-<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
+<section id="id70">
+<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the heiferII is not pregnant and its age in days exceeds the culling threshold,
 False otherwise.</p>
@@ -1114,8 +1131,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.evaluate_heiferIII_for_cow">
 <span class="sig-name descname"><span class="pre">evaluate_heiferIII_for_cow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.evaluate_heiferIII_for_cow" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.evaluate_heiferIII_for_cow'"><span>#</span></a></dt>
 <dd><p>Checks if a heiferIII has reached the expected gestation period, indicating it ready to become a cow.</p>
-<section id="id70">
-<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
+<section id="id71">
+<h3>Returns<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the heiferIII is ready to become a cow;
 False otherwise.</p>
@@ -1132,8 +1149,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._transition_heiferI_to_heiferII">
 <span class="sig-name descname"><span class="pre">_transition_heiferI_to_heiferII</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._transition_heiferI_to_heiferII" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._transition_heiferI_to_heiferII'"><span>#</span></a></dt>
 <dd><p>Handles the transition of an animal from HEIFER_I to HEIFER_II stage.</p>
-<section id="id71">
-<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
+<section id="id72">
+<h3>Parameters<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object used to update reproduction information.</p>
 </dd>
@@ -1149,22 +1166,22 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.transition_heiferIII_to_cow">
 <span class="sig-name descname"><span class="pre">transition_heiferIII_to_cow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">NewBornCalfValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.transition_heiferIII_to_cow" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.transition_heiferIII_to_cow'"><span>#</span></a></dt>
 <dd><p>Handles the transition of a HeiferIII to a Cow and initializes the necessary parameters for the cow.</p>
-<section id="id72">
-<h3>Parameters<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
+<section id="id73">
+<h3>Parameters<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object at which the transition occurs.</p>
 </dd>
 </dl>
 </section>
-<section id="id73">
-<h3>Returns<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
+<section id="id74">
+<h3>Returns<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NewBornCalfValuesTypedDict</dt><dd><p>A dictionary containing the configuration for the newly born calf.</p>
 </dd>
 </dl>
 </section>
-<section id="id74">
-<h3>Raises<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
+<section id="id75">
+<h3>Raises<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>Raised if the HeiferIII does not give birth to a calf during the transition to a cow.</p>
 </dd>
@@ -1175,8 +1192,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.get_animal_values">
 <span class="sig-name descname"><span class="pre">get_animal_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">CalfValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIIIValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CowValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.get_animal_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.get_animal_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values of the animal.</p>
-<section id="id75">
-<h3>Returns<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
+<section id="id76">
+<h3>Returns<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>(CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict |</dt><dd><dl class="simple">
 <dt>CowValuesTypedDict)</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
@@ -1185,8 +1202,8 @@ False otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="id76">
-<h3>Raises<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
+<section id="id77">
+<h3>Raises<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>KeyError</dt><dd><p>If the animal_type is not present in the mapping dictionary.</p>
 </dd>
@@ -1197,8 +1214,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._get_calf_values">
 <span class="sig-name descname"><span class="pre">_get_calf_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">CalfValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._get_calf_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._get_calf_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values for calf.</p>
-<section id="id77">
-<h3>Returns<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
+<section id="id78">
+<h3>Returns<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>CalfValuesTypedDict</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
 </dd>
@@ -1209,8 +1226,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._get_heiferI_values">
 <span class="sig-name descname"><span class="pre">_get_heiferI_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">HeiferIValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._get_heiferI_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._get_heiferI_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values for heiferI.</p>
-<section id="id78">
-<h3>Returns<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
+<section id="id79">
+<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>HeiferIValuesTypedDict</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
 </dd>
@@ -1221,8 +1238,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._get_heiferII_values">
 <span class="sig-name descname"><span class="pre">_get_heiferII_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">HeiferIIValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._get_heiferII_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._get_heiferII_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values for heiferII.</p>
-<section id="id79">
-<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
+<section id="id80">
+<h3>Returns<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>HeiferIIValuesTypedDict</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
 </dd>
@@ -1233,8 +1250,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._get_heiferIII_values">
 <span class="sig-name descname"><span class="pre">_get_heiferIII_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">HeiferIIIValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._get_heiferIII_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._get_heiferIII_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values for heiferIII.</p>
-<section id="id80">
-<h3>Returns<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h3>
+<section id="id81">
+<h3>Returns<a class="headerlink" href="#id81" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id81'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>HeiferIIIValuesTypedDict</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
 </dd>
@@ -1245,8 +1262,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._get_cow_values">
 <span class="sig-name descname"><span class="pre">_get_cow_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">CowValuesTypedDict</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._get_cow_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._get_cow_values'"><span>#</span></a></dt>
 <dd><p>Get the attribute values for cow.</p>
-<section id="id81">
-<h3>Returns<a class="headerlink" href="#id81" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id81'"><span>#</span></a></h3>
+<section id="id82">
+<h3>Returns<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>CowValuesTypedDict</dt><dd><p>A dictionary containing key-value pairs specific to the current animal.</p>
 </dd>
@@ -1257,15 +1274,15 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.determine_future_death_date">
 <span class="sig-name descname"><span class="pre">determine_future_death_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.determine_future_death_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.determine_future_death_date'"><span>#</span></a></dt>
 <dd><p>Determine the future death date of the animal based on its parity.</p>
-<section id="id82">
-<h3>Returns<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h3>
+<section id="id83">
+<h3>Returns<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>Calculated future death date in simulation days.</p>
 </dd>
 </dl>
 </section>
-<section id="id83">
-<h3>Notes<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
+<section id="id84">
+<h3>Notes<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
 <p>[AN.ANM.1]</p>
 </section>
 </dd></dl>
@@ -1273,15 +1290,15 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date">
 <span class="sig-name descname"><span class="pre">determine_future_cull_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.determine_future_cull_date'"><span>#</span></a></dt>
 <dd><p>Determine the future cull date and reason for the animal based on parity-specific probabilities.</p>
-<section id="id84">
-<h3>Returns<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
+<section id="id85">
+<h3>Returns<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[int, str]</dt><dd><p>Future cull date in simulation days and reason for culling.</p>
 </dd>
 </dl>
 </section>
-<section id="id85">
-<h3>Notes<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
+<section id="id86">
+<h3>Notes<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
 <p>[AN.ANM.2]</p>
 </section>
 </dd></dl>
@@ -1292,8 +1309,8 @@ False otherwise.</p>
 history if the animal is in a different pen than it was the last time
 this method is called or modifying the last element in the pen_history
 list to reflect the current simulation day.</p>
-<section id="id86">
-<h3>Parameters<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
+<section id="id87">
+<h3>Parameters<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_pen: int</dt><dd><p>The id of the new pen that the animal is assigned to.</p>
 </dd>
@@ -1309,8 +1326,8 @@ list to reflect the current simulation day.</p>
 <span class="sig-name descname"><span class="pre">set_daily_walking_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertical_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.set_daily_walking_distance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.set_daily_walking_distance'"><span>#</span></a></dt>
 <dd><p>Calculates and sets the animal’s daily vertical and horizontal
 walking distance (DVD and DHD).</p>
-<section id="id87">
-<h3>Parameters<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
+<section id="id88">
+<h3>Parameters<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>vertical_dist_to_parlor<span class="classifier">float</span></dt><dd><p>Vertical distance to milking parlor (km).</p>
 </dd>
@@ -1328,8 +1345,8 @@ walking distance (DVD and DHD).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements">
 <span class="sig-name descname"><span class="pre">calculate_nutrition_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walking_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">NutritionRequirements</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements'"><span>#</span></a></dt>
 <dd><p>Gets the nutrition requirements for an animal.</p>
-<section id="id88">
-<h3>Parameters<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h3>
+<section id="id89">
+<h3>Parameters<a class="headerlink" href="#id89" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id89'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>housing<span class="classifier">str</span></dt><dd><p>The housing type of the animal, either “barn” or “grazing”.</p>
 </dd>
@@ -1341,8 +1358,8 @@ walking distance (DVD and DHD).</p>
 </dd>
 </dl>
 </section>
-<section id="id89">
-<h3>Returns<a class="headerlink" href="#id89" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id89'"><span>#</span></a></h3>
+<section id="id90">
+<h3>Returns<a class="headerlink" href="#id90" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id90'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NutritionRequirements</dt><dd><p>The nutrition requirements for the animal.</p>
 </dd>
@@ -1383,8 +1400,10 @@ walking distance (DVD and DHD).</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.cow_presynch_program'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.cow_presynch_program"><code class="docutils literal notranslate"><span class="pre">Animal.cow_presynch_program</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.cow_ovsynch_program'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.cow_ovsynch_program"><code class="docutils literal notranslate"><span class="pre">Animal.cow_ovsynch_program</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.cow_resynch_program'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.cow_resynch_program"><code class="docutils literal notranslate"><span class="pre">Animal.cow_resynch_program</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.stillborn'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.stillborn"><code class="docutils literal notranslate"><span class="pre">Animal.stillborn</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.sold'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.sold"><code class="docutils literal notranslate"><span class="pre">Animal.sold</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.dead'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.dead"><code class="docutils literal notranslate"><span class="pre">Animal.dead</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal.milk_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal.milk_statistics"><code class="docutils literal notranslate"><span class="pre">Animal.milk_statistics</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal._assign_sex_to_newborn_calf'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal._assign_sex_to_newborn_calf"><code class="docutils literal notranslate"><span class="pre">Animal._assign_sex_to_newborn_calf()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf"><code class="docutils literal notranslate"><span class="pre">Animal._initialize_newborn_calf()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI'" class="reference internal" href="#RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI"><code class="docutils literal notranslate"><span class="pre">Animal._initialize_calf_or_heiferI()</span></code></a></li>

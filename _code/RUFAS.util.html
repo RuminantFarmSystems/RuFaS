@@ -742,6 +742,131 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 </section>
 </dd></dl>
 </dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.util.</span></span><span class="sig-name descname"><span class="pre">Aggregator</span></span><a class="headerlink" href="#RUFAS.util.Aggregator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.average">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.average'"><span>#</span></a></dt>
+<dd><p>Calculates the average of a list of numbers.</p>
+<section id="id51">
+<h2>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose average is to be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h2>Returns<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The average of the input numbers.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.division">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">division</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.division" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.division'"><span>#</span></a></dt>
+<dd><p>Divides the first number in the list by each of the subsequent numbers.</p>
+<section id="id53">
+<h2>Parameters<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the division operation.</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h2>Returns<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The result of dividing the first number by each subsequent number.
+Returns None if the list is empty or has only one element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.product">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.product" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.product'"><span>#</span></a></dt>
+<dd><p>Returns the product of a list of numbers.</p>
+<section id="id55">
+<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose product is to be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h2>Returns<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The product of the input numbers. Returns 1 for an empty list.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.standard_deviation">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.standard_deviation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.standard_deviation'"><span>#</span></a></dt>
+<dd><p>Calculates the standard deviation of a list of numbers.</p>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose standard deviation is to be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The standard deviation of the input numbers.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.sum">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.sum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.sum'"><span>#</span></a></dt>
+<dd><p>Returns the sum of a list of numbers.</p>
+<section id="id59">
+<h2>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose sum is to be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The sum of the input numbers.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.subtraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subtraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.subtraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.subtraction'"><span>#</span></a></dt>
+<dd><p>Subtracts each subsequent number in the list from the first number.</p>
+<section id="id61">
+<h2>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the subtraction operation.</p>
+</dd>
+</dl>
+</section>
+<section id="id62">
+<h2>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The result of subtracting each subsequent number from the first number.
+Returns None if the list is empty or has only one element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Aggregator.no_op">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">no_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.no_op" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.no_op'"><span>#</span></a></dt>
+<dd></dd></dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -777,6 +902,16 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.compare_randomized_rate_less_than'" class="reference internal" href="#RUFAS.util.Utility.compare_randomized_rate_less_than"><code class="docutils literal notranslate"><span class="pre">Utility.compare_randomized_rate_less_than()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.validate_date_format'" class="reference internal" href="#RUFAS.util.Utility.validate_date_format"><code class="docutils literal notranslate"><span class="pre">Utility.validate_date_format()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.get_date_formatter'" class="reference internal" href="#RUFAS.util.Utility.get_date_formatter"><code class="docutils literal notranslate"><span class="pre">Utility.get_date_formatter()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator'" class="reference internal" href="#RUFAS.util.Aggregator"><code class="docutils literal notranslate"><span class="pre">Aggregator</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.average'" class="reference internal" href="#RUFAS.util.Aggregator.average"><code class="docutils literal notranslate"><span class="pre">Aggregator.average()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.division'" class="reference internal" href="#RUFAS.util.Aggregator.division"><code class="docutils literal notranslate"><span class="pre">Aggregator.division()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.product'" class="reference internal" href="#RUFAS.util.Aggregator.product"><code class="docutils literal notranslate"><span class="pre">Aggregator.product()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.standard_deviation'" class="reference internal" href="#RUFAS.util.Aggregator.standard_deviation"><code class="docutils literal notranslate"><span class="pre">Aggregator.standard_deviation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.sum'" class="reference internal" href="#RUFAS.util.Aggregator.sum"><code class="docutils literal notranslate"><span class="pre">Aggregator.sum()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.subtraction'" class="reference internal" href="#RUFAS.util.Aggregator.subtraction"><code class="docutils literal notranslate"><span class="pre">Aggregator.subtraction()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Aggregator.no_op'" class="reference internal" href="#RUFAS.util.Aggregator.no_op"><code class="docutils literal notranslate"><span class="pre">Aggregator.no_op()</span></code></a></li>
 </ul>
 </li>
 </ul>

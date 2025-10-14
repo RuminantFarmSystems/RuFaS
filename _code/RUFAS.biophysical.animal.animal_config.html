@@ -309,6 +309,8 @@
 </dd>
 <dt>milk_reduction_maximum<span class="classifier">float</span></dt><dd><p>Maximum possible milk production reduction from a given cause, (kg).</p>
 </dd>
+<dt>methane_model: dict[str, dict[str, bool]]</dt><dd><p>The methods to use for each animal type.</p>
+</dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.wean_day">
@@ -616,7 +618,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model">
-<span class="sig-name descname"><span class="pre">methane_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'IPCC'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">methane_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'calves':</span> <span class="pre">'Pattanaik',</span> <span class="pre">'cow':</span> <span class="pre">{'dry</span> <span class="pre">cows':</span> <span class="pre">'IPCC',</span> <span class="pre">'lactating</span> <span class="pre">cows':</span> <span class="pre">'IPCC'},</span> <span class="pre">'heiferIIIs':</span> <span class="pre">'IPCC',</span> <span class="pre">'heiferIIs':</span> <span class="pre">'IPCC',</span> <span class="pre">'heiferIs':</span> <span class="pre">'IPCC'}</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_method">

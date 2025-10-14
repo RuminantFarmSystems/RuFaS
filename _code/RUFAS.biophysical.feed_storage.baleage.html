@@ -143,9 +143,16 @@
 <span id="rufas-biophysical-feed-storage-baleage-module"></span><h1>RUFAS.biophysical.feed_storage.baleage module<a class="headerlink" href="#module-RUFAS.biophysical.feed_storage.baleage" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.baleage.Baleage">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.baleage.</span></span><span class="sig-name descname"><span class="pre">Baleage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage'"><span>#</span></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.baleage.</span></span><span class="sig-name descname"><span class="pre">Baleage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage" title="RUFAS.biophysical.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
 <p>Class representing Baleage storage, a subclass of Storage.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>config<span class="classifier">dict[str, str | float]</span></dt><dd><p>Configuration dictionary for the baleage storage.</p>
+</dd>
+</dl>
+</section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
@@ -163,15 +170,15 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.baleage.Baleage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.baleage.Baleage.process_degradations">
 <span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage.process_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage.process_degradations'"><span>#</span></a></dt>
 <dd><p>Processes the loss of moisture in baled crops, and calls the base class’s implementation of
 <cite>process_degradations</cite> to process the loss of dry matter.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather information for the simulation.</p>
 </dd>
@@ -184,8 +191,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.baleage.Baleage.project_degradations">
 <span class="sig-name descname"><span class="pre">project_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage.project_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage.project_degradations'"><span>#</span></a></dt>
 <dd><p>Projects the state of crops currently stored at a given future date.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crops<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>List of HarvestedCrops to project degradations for.</p>
 </dd>
@@ -207,8 +214,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.baleage.Baleage.calculate_protein_loss">
 <span class="sig-name descname"><span class="pre">calculate_protein_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.baleage.Baleage.calculate_protein_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.baleage.Baleage.calculate_protein_loss'"><span>#</span></a></dt>
 <dd><p>Calculate the protein loss specific to Baleage storage.</p>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>

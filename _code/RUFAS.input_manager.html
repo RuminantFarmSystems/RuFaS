@@ -607,9 +607,10 @@ properties.</p>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.delete_input_and_metadata">
-<span class="sig-name descname"><span class="pre">delete_input_and_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.delete_input_and_metadata" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.delete_input_and_metadata'"><span>#</span></a></dt>
-<dd><p>When given a valid address, this function removes the input data and its associated metadata.</p>
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.__delete_input_and_metadata">
+<span class="sig-name descname"><span class="pre">__delete_input_and_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.__delete_input_and_metadata" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.__delete_input_and_metadata'"><span>#</span></a></dt>
+<dd><p>NOTE: <strong>Please use extreme caution using this function as it will delete data and metadata from the pool.</strong></p>
+<p>When given a valid address, this function removes the input data and its associated metadata.</p>
 <section id="id34">
 <h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
 <dl class="simple">
@@ -957,6 +958,28 @@ to flatten it by creating a record for each entry.</p>
 </dl>
 </section>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.extract_target_and_save_block">
+<span class="sig-name descname"><span class="pre">extract_target_and_save_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_and_save_block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.extract_target_and_save_block" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.extract_target_and_save_block'"><span>#</span></a></dt>
+<dd><p>Retrieves the alias value to pass to the CrossValidator for processing.</p>
+<section id="id65">
+<h2>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>target_and_save_block<span class="classifier">dict[str, dict[str, Any]]</span></dt><dd><p>A dictionary containing the “target and save block” of the cross-validation rule.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Specifies whether to immediately terminate the process when a validation error is
+encountered.</p>
+</dd>
+</dl>
+</section>
+<section id="id66">
+<h2>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>dict[str, Any]</dt><dd><p>A dictionary mapping variable names to their values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -982,7 +1005,7 @@ to flatten it by creating a record for each entry.</p>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.check_property_exists_in_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.check_property_exists_in_pool"><code class="docutils literal notranslate"><span class="pre">InputManager.check_property_exists_in_pool()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.get_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager.get_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager.get_metadata()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.get_data_keys_by_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager.get_data_keys_by_properties"><code class="docutils literal notranslate"><span class="pre">InputManager.get_data_keys_by_properties()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.delete_input_and_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager.delete_input_and_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager.delete_input_and_metadata()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.__delete_input_and_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager.__delete_input_and_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager.__delete_input_and_metadata()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.flush_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.flush_pool"><code class="docutils literal notranslate"><span class="pre">InputManager.flush_pool()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._metadata_properties_exist'" class="reference internal" href="#RUFAS.input_manager.InputManager._metadata_properties_exist"><code class="docutils literal notranslate"><span class="pre">InputManager._metadata_properties_exist()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._add_variable_to_pool'" class="reference internal" href="#RUFAS.input_manager.InputManager._add_variable_to_pool"><code class="docutils literal notranslate"><span class="pre">InputManager._add_variable_to_pool()</span></code></a></li>
@@ -999,6 +1022,7 @@ to flatten it by creating a record for each entry.</p>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._create_record'" class="reference internal" href="#RUFAS.input_manager.InputManager._create_record"><code class="docutils literal notranslate"><span class="pre">InputManager._create_record()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.compare_metadata_properties'" class="reference internal" href="#RUFAS.input_manager.InputManager.compare_metadata_properties"><code class="docutils literal notranslate"><span class="pre">InputManager.compare_metadata_properties()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.export_pool_to_csv'" class="reference internal" href="#RUFAS.input_manager.InputManager.export_pool_to_csv"><code class="docutils literal notranslate"><span class="pre">InputManager.export_pool_to_csv()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.extract_target_and_save_block'" class="reference internal" href="#RUFAS.input_manager.InputManager.extract_target_and_save_block"><code class="docutils literal notranslate"><span class="pre">InputManager.extract_target_and_save_block()</span></code></a></li>
 </ul>
 </li>
 </ul>

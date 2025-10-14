@@ -7,16 +7,14 @@
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>RUFAS.routines.animal.purchased_feed_emissions_estimator module | Ruminant Farm Simulation (RuFaS)  documentation</title>
-<meta content="RUFAS.routines.animal.purchased_feed_emissions_estimator module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
-<meta content="RUFAS.routines.animal.purchased_feed_emissions_estimator module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<title>RUFAS.EEE.EEE_manager module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.EEE.EEE_manager module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.EEE.EEE_manager module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.routines.feed.html" rel="next" title="RUFAS.routines.feed package"/>
-<link href="RUFAS.routines.animal.pen.html" rel="prev" title="RUFAS.routines.animal.pen module"/>
 <script>
     <!-- Prevent Flash of wrong theme -->
       const userPreference = localStorage.getItem('darkMode');
@@ -72,8 +70,8 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
@@ -132,98 +130,32 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.html">RUFAS.routines package</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.routines.animal.purchased_feed_emissions_estimator module</span>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.EEE.EEE_manager module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.routines.animal.purchased_feed_emissions_estimator">
-<span id="rufas-routines-animal-purchased-feed-emissions-estimator-module"></span><h1>RUFAS.routines.animal.purchased_feed_emissions_estimator module<a class="headerlink" href="#module-RUFAS.routines.animal.purchased_feed_emissions_estimator" title="Link to this heading"><span>#</span></a></h1>
+<section id="module-RUFAS.EEE.EEE_manager">
+<span id="rufas-eee-eee-manager-module"></span><h1>RUFAS.EEE.EEE_manager module<a class="headerlink" href="#module-RUFAS.EEE.EEE_manager" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.purchased_feed_emissions_estimator.</span></span><span class="sig-name descname"><span class="pre">PurchasedFeedEmissionsEstimator</span></span><a class="headerlink" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.EEE.EEE_manager.</span></span><span class="sig-name descname"><span class="pre">EEEManager</span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report">
-<span class="sig-name descname"><span class="pre">create_daily_purchased_feed_emissions_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_feed_totals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report'"><span>#</span></a></dt>
-<dd><p>Reports the total emissions from the feeds given to a pen.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>daily_feed_totals<span class="classifier">dict[str, float]</span></dt><dd><p>Maps the feed type to the amount of feed given to the pen (feed ID: kg dry matter).</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>dict[str, float]</dt><dd><p>Maps the feed type to the amount of emissions generated in producing and delivering it (feed ID: kg CO2).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report">
-<span class="sig-name descname"><span class="pre">create_daily_land_use_change_feed_emissions_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_feed_totals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report'"><span>#</span></a></dt>
-<dd><p>Reports the emissions from land use changes associated with the purchased feed totals.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>daily_feed_totals<span class="classifier">dict[str, float]</span></dt><dd><p>Maps the feed type to the amount of feed given to the pen (feed ID: kg dry matter).</p>
-</dd>
-</dl>
-</section>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>dict[str, float]</dt><dd><p>Maps the feed type to the amount of emissions assciated with land use changes for that feed type (feed ID:
-kg CO2).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator._setup_feed_emissions">
-<span class="sig-name descname"><span class="pre">_setup_feed_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_emissions_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator._setup_feed_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator._setup_feed_emissions'"><span>#</span></a></dt>
-<dd><p>Setup a dictionary mapping emissions factors to purchased feeds types.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>feed_emissions_data<span class="classifier">dict[str, list[float]]</span></dt><dd><p>Dictionary mapping FIPS county codes to emissions factors associated with RuFaS feed IDs.</p>
-</dd>
-</dl>
-</section>
-<section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>dict[str, float]</dt><dd><p>Dictionary mapping the RuFaS feed ID to the amount of CO2 emissions in kg per kg’s of dry matter feed.</p>
-</dd>
-</dl>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>This method works by:
-- Grabbing the table that maps all available FIPS county codes to purchased feeds emissions information.
-- Finding the row (index) which contains the desired FIPS county information.
-- Grabbing the information for each available feed ID from the row found in the previous step.</p>
-</section>
+<dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager.estimate_all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager.estimate_all" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager.estimate_all'"><span>#</span></a></dt>
+<dd><p>Runs all estimation functions and records all results from them.</p>
 </dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator'" class="reference internal" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedEmissionsEstimator</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__'" class="reference internal" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedEmissionsEstimator.__init__()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report'" class="reference internal" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedEmissionsEstimator.create_daily_purchased_feed_emissions_report()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report'" class="reference internal" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedEmissionsEstimator.create_daily_land_use_change_feed_emissions_report()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator._setup_feed_emissions'" class="reference internal" href="#RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator._setup_feed_emissions"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedEmissionsEstimator._setup_feed_emissions()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager"><code class="docutils literal notranslate"><span class="pre">EEEManager</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager.__init__'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager.__init__"><code class="docutils literal notranslate"><span class="pre">EEEManager.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager.estimate_all'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager.estimate_all"><code class="docutils literal notranslate"><span class="pre">EEEManager.estimate_all()</span></code></a></li>
 </ul>
 </li>
 </ul>

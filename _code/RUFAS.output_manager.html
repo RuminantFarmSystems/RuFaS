@@ -1022,26 +1022,19 @@ the saved_pool_chunks_path. Then sort the files according to their file name to 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.load_saved_pools">
 <span class="sig-name descname"><span class="pre">load_saved_pools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.load_saved_pools" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.load_saved_pools'"><span>#</span></a></dt>
-<dd><p>Filters saved pools of data by applying specific filter criteria.</p>
-<p>This method iterates over JSON files in the saved pool directory. It then loads each file as the OutputManager
-variable pool and applies the filter by calling the <cite>filter_variables_pool()</cite> method. The results are
-aggregated into a single dictionary,
-combining entries under the same key by extending lists of info_maps and values.</p>
-<section id="id44">
-<h3>Notes<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
-<p>This function has a side effect that modifies the variable_pool of the OutputManager</p>
-</section>
+<dd><p>Loads saved pools of data from JSON files in the saved_pool_chunks_path directory and merges them into
+a single variables pool.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_results">
 <span class="sig-name descname"><span class="pre">save_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters_dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.save_results'"><span>#</span></a></dt>
 <dd><p>Parses the filter files in the given directory and saves the results to the given path.</p>
-<section id="id45">
-<h3>Notes<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<section id="id44">
+<h3>Notes<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <p>The filter files can be used to generate different output formats such as JSON, CSV, and graphical output.</p>
 </section>
-<section id="id46">
-<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filters_dir_path<span class="classifier">Path</span></dt><dd><p>Path of the directory containing the files containing the keys for filtering.</p>
 </dd>
@@ -1070,8 +1063,8 @@ saving process to the corresponding function to handle specific formats such as 
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._save_to_json">
 <span class="sig-name descname"><span class="pre">_save_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pool_element_type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._save_to_json" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._save_to_json'"><span>#</span></a></dt>
 <dd><p>Saves the filtered pool to a JSON file.</p>
-<section id="id47">
-<h3>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filter_file<span class="classifier">str</span></dt><dd><p>The name of the filter file being processed.</p>
 </dd>
@@ -1089,8 +1082,8 @@ saving process to the corresponding function to handle specific formats such as 
 <span class="sig-name descname"><span class="pre">route_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.route_logs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.route_logs'"><span>#</span></a></dt>
 <dd><p>Takes logs from other classes and routes them to the appropriate pools in
 Output Manager.</p>
-<section id="id48">
-<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
+<section id="id47">
+<h3>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>log_pool<span class="classifier">list[dict[str, str | dict[str, str]]]</span></dt><dd><p>A list of log, warning, and error dictionaries containing all the components needed
 to log the information to the appropriate pool.</p>
@@ -1117,8 +1110,8 @@ to log the information to the appropriate pool.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.report_variables_usage_counts">
 <span class="sig-name descname"><span class="pre">report_variables_usage_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.report_variables_usage_counts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.report_variables_usage_counts'"><span>#</span></a></dt>
 <dd><p>Reports the usage counts of variables in the variables pool to a CSV file in the given path to a directory.</p>
-<section id="id49">
-<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>path<span class="classifier">Path</span></dt><dd><p>The path to the directory where the file will be saved.</p>
 </dd>
@@ -1130,8 +1123,8 @@ to log the information to the appropriate pool.</p>
 <span class="sig-name descname"><span class="pre">dump_variable_names_and_contexts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts'"><span>#</span></a></dt>
 <dd><p>Dumps names of all variables added to variables_pool along with the caller class
 and function contextual information into a txt file in the given path to a directory.</p>
-<section id="id50">
-<h3>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<section id="id49">
+<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>path<span class="classifier">str</span></dt><dd><p>The path to the file to be dumped to.</p>
 </dd>
@@ -1141,8 +1134,8 @@ and function contextual information into a txt file in the given path to a direc
 </dd>
 </dl>
 </section>
-<section id="id51">
-<h3>Examples<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<section id="id50">
+<h3>Examples<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <p>For the different format options available:</p>
 <dl class="simple">
 <dt>format_option: str = “basic” - Excludes information about whether data is from info_maps but has the same</dt><dd><p>format as output CSV column headers.</p>
@@ -1176,9 +1169,33 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dd><p>Dumps all non-data pools into the given path to a directory.</p>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._set_variables_pool">
+<span class="sig-name descname"><span class="pre">_set_variables_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size_override</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._set_variables_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._set_variables_pool'"><span>#</span></a></dt>
+<dd><p>Assigns the variables pool and updates the cached size.</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>new_pool<span class="classifier">dict[str, OutputManager.pool_element_type]</span></dt><dd><p>The new variables pool to be assigned.</p>
+</dd>
+<dt>pool_size_override<span class="classifier">int | None, optional</span></dt><dd><p>If provided, this value will be used to set the current pool size instead of calculating it.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._get_flat_variables_pool">
+<span class="sig-name descname"><span class="pre">_get_flat_variables_pool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._get_flat_variables_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._get_flat_variables_pool'"><span>#</span></a></dt>
+<dd><p>Returns a flattened mapping of variable names to data when multiple pools are loaded.</p>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.flush_pools">
 <span class="sig-name descname"><span class="pre">flush_pools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.flush_pools" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.flush_pools'"><span>#</span></a></dt>
 <dd><p>Sets each pool to an empty dictionary.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._read_variables_pool_file">
+<span class="sig-name descname"><span class="pre">_read_variables_pool_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._read_variables_pool_file" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._read_variables_pool_file'"><span>#</span></a></dt>
+<dd><p>Reads a variables pool JSON file and returns its contents.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.load_variables_pool_from_file">
@@ -1202,11 +1219,25 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 </section>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files">
+<span class="sig-name descname"><span class="pre">load_multiple_variables_pools_from_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files'"><span>#</span></a></dt>
+<dd><p>Loads multiple Output Manager variable pools, namespacing each pool’s entries.</p>
+<section id="id54">
+<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>pools<span class="classifier">Sequence[tuple[str, Path] | dict[str, Any]]</span></dt><dd><p>An iterable of pool descriptors. Each descriptor must provide a pool name and the
+path to the JSON file containing the pool to load. When dicts are provided they
+must include <code class="docutils literal notranslate"><span class="pre">"name"</span></code> and <code class="docutils literal notranslate"><span class="pre">"path"</span></code> keys.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.clear_output_dir">
 <span class="sig-name descname"><span class="pre">clear_output_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.clear_output_dir" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.clear_output_dir'"><span>#</span></a></dt>
 <dd><p>Clears the output directory if vars_file_path not in output directory.</p>
-<section id="id54">
-<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>vars_file_path<span class="classifier">Path</span></dt><dd><p>Path to file used to load Output Manager vars pool.</p>
 </dd>
@@ -1219,8 +1250,8 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.is_file_in_dir">
 <span class="sig-name descname"><span class="pre">is_file_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.is_file_in_dir" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.is_file_in_dir'"><span>#</span></a></dt>
 <dd><p>Checks if a file path is in the provided directory.</p>
-<section id="id55">
-<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dir_path<span class="classifier">Path</span></dt><dd><p>Path to the directory to be checked.</p>
 </dd>
@@ -1233,8 +1264,8 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.create_directory">
 <span class="sig-name descname"><span class="pre">create_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.create_directory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.create_directory'"><span>#</span></a></dt>
 <dd><p>Creates a dir from the provided path if it does not already exist.</p>
-<section id="id56">
-<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>path<span class="classifier">Path</span></dt><dd><p>The path where the directory will be created if it does not already exist.</p>
 </dd>
@@ -1245,8 +1276,8 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._get_errors_warnings_logs_counts">
 <span class="sig-name descname"><span class="pre">_get_errors_warnings_logs_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._get_errors_warnings_logs_counts" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._get_errors_warnings_logs_counts'"><span>#</span></a></dt>
 <dd><p>Get the total number of errors, warnings, and logs in the output manager’s errors, warnings, and logs pools.</p>
-<section id="id57">
-<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[int, int, int]</dt><dd><p>The total number of errors, warnings, and logs in the output manager’s errors, warnings, and logs pools.</p>
 </dd>
@@ -1269,6 +1300,32 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dd><p>Prints out the RuFaS credits when LogVerbosity is set to any level except None.</p>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.summarize_e2e_test_results">
+<span class="sig-name descname"><span class="pre">summarize_e2e_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.summarize_e2e_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.summarize_e2e_test_results'"><span>#</span></a></dt>
+<dd><p>Summarizes the end-to-end test results by gathering the results from all the e2e tests and readies them to be
+printed out to the console.
+This method is intended to be called at the end of an end-to-end testing run.</p>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>json_output_directory<span class="classifier">Path</span></dt><dd><p>The directory where the JSON output files are located.</p>
+</dd>
+<dt>output_prefixes<span class="classifier">list[str]</span></dt><dd><p>A list of output prefixes to look for in the filenames.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._print_e2e_results_summary">
+<span class="sig-name descname"><span class="pre">_print_e2e_results_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e2e_results_summary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._print_e2e_results_summary" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._print_e2e_results_summary'"><span>#</span></a></dt>
+<dd><p>Prints the end-to-end results summary to the console.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._normalize_module_header">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_normalize_module_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._normalize_module_header" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._normalize_module_header'"><span>#</span></a></dt>
+<dd><p>Normalizes the module header from a JSON key.</p>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.set_exclude_info_maps_flag">
 <span class="sig-name descname"><span class="pre">set_exclude_info_maps_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.set_exclude_info_maps_flag" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.set_exclude_info_maps_flag'"><span>#</span></a></dt>
 <dd><p>Sets the exclude_info_maps flag to the given value.
@@ -1283,23 +1340,23 @@ exclude_info_maps : bool</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager._get_origin_label">
 <span class="sig-name descname"><span class="pre">_get_origin_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.output_manager.OriginLabel" title="RUFAS.output_manager.OriginLabel"><span class="pre">OriginLabel</span></a></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager._get_origin_label" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager._get_origin_label'"><span>#</span></a></dt>
 <dd><p>Retrieves the origin label from the provided filter content.</p>
-<section id="id58">
-<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
+<section id="id60">
+<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filter_content<span class="classifier">dict[str, str | int]</span></dt><dd><p>A dictionary containing filter information, which may include the “origin_label” key.</p>
 </dd>
 </dl>
 </section>
-<section id="id59">
-<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<section id="id61">
+<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>OriginLabel</dt><dd><p>The origin label corresponding to the value in the filter content.
 If the “origin_label” key is not present or has an invalid value, OriginLabel.NONE is returned.</p>
 </dd>
 </dl>
 </section>
-<section id="id60">
-<h3>Notes<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
+<section id="id62">
+<h3>Notes<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <p>This method checks the value of the <cite>origin_label</cite> key in the provided <cite>filter_content</cite> dictionary.
 If the value is a valid string matching one of the supported options defined in the <cite>OriginLabel</cite> enum,
 the corresponding <cite>OriginLabel</cite> member is returned. If the value is invalid or the key is not present,
@@ -1315,8 +1372,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_filter_content">
 <span class="sig-name descname"><span class="pre">validate_filter_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters_dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_filter_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_filter_content'"><span>#</span></a></dt>
 <dd><p>Validates the content of the filters, including keys and values.</p>
-<section id="id61">
-<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filters_dir_path<span class="classifier">Path</span></dt><dd><p>Path of the directory containing the files containing the keys for filtering.</p>
 </dd>
@@ -1327,24 +1384,6 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_json_filters">
 <span class="sig-name descname"><span class="pre">validate_json_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_json_filters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_json_filters'"><span>#</span></a></dt>
 <dd><p>Validate the json filter.</p>
-<section id="id62">
-<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>filter_content<span class="classifier">dict[Any, Any]</span></dt><dd><p>The report filter to validate.</p>
-</dd>
-<dt>filter_name<span class="classifier">str</span></dt><dd><p>The name of the filter to validate.</p>
-</dd>
-</dl>
-</section>
-<section id="id63">
-<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
-<p>None</p>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_csv_filters">
-<span class="sig-name descname"><span class="pre">validate_csv_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_csv_filters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_csv_filters'"><span>#</span></a></dt>
-<dd><p>Validate the csv filter.</p>
 <section id="id64">
 <h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
 <dl class="simple">
@@ -1360,9 +1399,9 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_report_filters">
-<span class="sig-name descname"><span class="pre">validate_report_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_report_filters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_report_filters'"><span>#</span></a></dt>
-<dd><p>Validate the report filter.</p>
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_csv_filters">
+<span class="sig-name descname"><span class="pre">validate_csv_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_csv_filters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_csv_filters'"><span>#</span></a></dt>
+<dd><p>Validate the csv filter.</p>
 <section id="id66">
 <h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
 <dl class="simple">
@@ -1378,11 +1417,29 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </section>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_report_filters">
+<span class="sig-name descname"><span class="pre">validate_report_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_report_filters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_report_filters'"><span>#</span></a></dt>
+<dd><p>Validate the report filter.</p>
+<section id="id68">
+<h3>Parameters<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>filter_content<span class="classifier">dict[Any, Any]</span></dt><dd><p>The report filter to validate.</p>
+</dd>
+<dt>filter_name<span class="classifier">str</span></dt><dd><p>The name of the filter to validate.</p>
+</dd>
+</dl>
+</section>
+<section id="id69">
+<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_filter_constant_content">
 <span class="sig-name descname"><span class="pre">validate_filter_constant_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters_dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_filter_constant_content" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_filter_constant_content'"><span>#</span></a></dt>
 <dd><p>Validates the content of the filters, including keys and values.</p>
-<section id="id68">
-<h3>Parameters<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
+<section id="id70">
+<h3>Parameters<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filters_dir_path<span class="classifier">Path</span></dt><dd><p>Path of the directory containing the files containing the keys for filtering.</p>
 </dd>
@@ -1393,8 +1450,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_direction">
 <span class="sig-name descname"><span class="pre">validate_direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_direction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_direction'"><span>#</span></a></dt>
 <dd><p>Validates the direction of CSV outputs.</p>
-<section id="id69">
-<h3>Parameters<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
+<section id="id71">
+<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>value<span class="classifier">Any</span></dt><dd><p>The aggregator option to validate.</p>
 </dd>
@@ -1404,16 +1461,16 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </dd>
 </dl>
 </section>
-<section id="id70">
-<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
+<section id="id72">
+<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_graph_details">
 <span class="sig-name descname"><span class="pre">validate_graph_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_graph_details" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_graph_details'"><span>#</span></a></dt>
 <dd><p>Validate the graph details provided.</p>
-<section id="id71">
-<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
+<section id="id73">
+<h3>Parameters<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>value<span class="classifier">Any</span></dt><dd><p>The graph details to validate.</p>
 </dd>
@@ -1423,8 +1480,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </dd>
 </dl>
 </section>
-<section id="id72">
-<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
+<section id="id74">
+<h3>Returns<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1432,8 +1489,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_type">
 <span class="sig-name descname"><span class="pre">validate_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_type'"><span>#</span></a></dt>
 <dd><p>Generic type checker.</p>
-<section id="id73">
-<h3>Parameters<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
+<section id="id75">
+<h3>Parameters<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>value<span class="classifier">Any</span></dt><dd><p>The value to check.</p>
 </dd>
@@ -1452,8 +1509,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_aggregator">
 <span class="sig-name descname"><span class="pre">validate_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_aggregator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_aggregator'"><span>#</span></a></dt>
 <dd><p>Validate the aggregator option provided.</p>
-<section id="id74">
-<h3>Parameters<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
+<section id="id76">
+<h3>Parameters<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>value<span class="classifier">Any</span></dt><dd><p>The aggregator option to validate.</p>
 </dd>
@@ -1463,8 +1520,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </dd>
 </dl>
 </section>
-<section id="id75">
-<h3>Returns<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
+<section id="id77">
+<h3>Returns<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1472,8 +1529,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_list_of_strings">
 <span class="sig-name descname"><span class="pre">validate_list_of_strings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_list_of_strings" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_list_of_strings'"><span>#</span></a></dt>
 <dd><p>Validate filter content that should be list of strings.</p>
-<section id="id76">
-<h3>Parameters<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
+<section id="id78">
+<h3>Parameters<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>value<span class="classifier">Any</span></dt><dd><p>The filter content to validate.</p>
 </dd>
@@ -1483,8 +1540,8 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </dd>
 </dl>
 </section>
-<section id="id77">
-<h3>Returns<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
+<section id="id79">
+<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1492,26 +1549,6 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_dict_of_numbers">
 <span class="sig-name descname"><span class="pre">validate_dict_of_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_dict_of_numbers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_dict_of_numbers'"><span>#</span></a></dt>
 <dd><p>Validate filter content that should be a dictionary with string type as keys and int or float as values.</p>
-<section id="id78">
-<h3>Parameters<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>value<span class="classifier">Any</span></dt><dd><p>The filter content to validate.</p>
-</dd>
-<dt>content_name<span class="classifier">str</span></dt><dd><p>The corresponding filter option to provide in error reporting.</p>
-</dd>
-<dt>filter_name<span class="classifier">str</span></dt><dd><p>Name of the filter to validate.</p>
-</dd>
-</dl>
-</section>
-<section id="id79">
-<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
-<p>None</p>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_graph_type">
-<span class="sig-name descname"><span class="pre">validate_graph_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_graph_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_graph_type'"><span>#</span></a></dt>
-<dd><p>Validate the provided graph type in the filter contents.</p>
 <section id="id80">
 <h3>Parameters<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h3>
 <dl class="simple">
@@ -1529,9 +1566,9 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_customization_details">
-<span class="sig-name descname"><span class="pre">validate_customization_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_customization_details" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_customization_details'"><span>#</span></a></dt>
-<dd><p>Validate the graph customization details in the filter contents.</p>
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_graph_type">
+<span class="sig-name descname"><span class="pre">validate_graph_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_graph_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_graph_type'"><span>#</span></a></dt>
+<dd><p>Validate the provided graph type in the filter contents.</p>
 <section id="id82">
 <h3>Parameters<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h3>
 <dl class="simple">
@@ -1545,6 +1582,26 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 </section>
 <section id="id83">
 <h3>Returns<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.validate_customization_details">
+<span class="sig-name descname"><span class="pre">validate_customization_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.validate_customization_details" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.output_manager.OutputManager.validate_customization_details'"><span>#</span></a></dt>
+<dd><p>Validate the graph customization details in the filter contents.</p>
+<section id="id84">
+<h3>Parameters<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>value<span class="classifier">Any</span></dt><dd><p>The filter content to validate.</p>
+</dd>
+<dt>content_name<span class="classifier">str</span></dt><dd><p>The corresponding filter option to provide in error reporting.</p>
+</dd>
+<dt>filter_name<span class="classifier">str</span></dt><dd><p>Name of the filter to validate.</p>
+</dd>
+</dl>
+</section>
+<section id="id85">
+<h3>Returns<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1621,8 +1678,12 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.report_variables_usage_counts'" class="reference internal" href="#RUFAS.output_manager.OutputManager.report_variables_usage_counts"><code class="docutils literal notranslate"><span class="pre">OutputManager.report_variables_usage_counts()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts'" class="reference internal" href="#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_variable_names_and_contexts()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.dump_all_nondata_pools'" class="reference internal" href="#RUFAS.output_manager.OutputManager.dump_all_nondata_pools"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_all_nondata_pools()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._set_variables_pool'" class="reference internal" href="#RUFAS.output_manager.OutputManager._set_variables_pool"><code class="docutils literal notranslate"><span class="pre">OutputManager._set_variables_pool()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._get_flat_variables_pool'" class="reference internal" href="#RUFAS.output_manager.OutputManager._get_flat_variables_pool"><code class="docutils literal notranslate"><span class="pre">OutputManager._get_flat_variables_pool()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.flush_pools'" class="reference internal" href="#RUFAS.output_manager.OutputManager.flush_pools"><code class="docutils literal notranslate"><span class="pre">OutputManager.flush_pools()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._read_variables_pool_file'" class="reference internal" href="#RUFAS.output_manager.OutputManager._read_variables_pool_file"><code class="docutils literal notranslate"><span class="pre">OutputManager._read_variables_pool_file()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.load_variables_pool_from_file'" class="reference internal" href="#RUFAS.output_manager.OutputManager.load_variables_pool_from_file"><code class="docutils literal notranslate"><span class="pre">OutputManager.load_variables_pool_from_file()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files'" class="reference internal" href="#RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files"><code class="docutils literal notranslate"><span class="pre">OutputManager.load_multiple_variables_pools_from_files()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.clear_output_dir'" class="reference internal" href="#RUFAS.output_manager.OutputManager.clear_output_dir"><code class="docutils literal notranslate"><span class="pre">OutputManager.clear_output_dir()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.is_file_in_dir'" class="reference internal" href="#RUFAS.output_manager.OutputManager.is_file_in_dir"><code class="docutils literal notranslate"><span class="pre">OutputManager.is_file_in_dir()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.create_directory'" class="reference internal" href="#RUFAS.output_manager.OutputManager.create_directory"><code class="docutils literal notranslate"><span class="pre">OutputManager.create_directory()</span></code></a></li>
@@ -1630,6 +1691,9 @@ the corresponding <cite>OriginLabel</cite> member is returned. If the value is i
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.print_credits'" class="reference internal" href="#RUFAS.output_manager.OutputManager.print_credits"><code class="docutils literal notranslate"><span class="pre">OutputManager.print_credits()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.print_task_id'" class="reference internal" href="#RUFAS.output_manager.OutputManager.print_task_id"><code class="docutils literal notranslate"><span class="pre">OutputManager.print_task_id()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.print_errors_warnings_logs_counts'" class="reference internal" href="#RUFAS.output_manager.OutputManager.print_errors_warnings_logs_counts"><code class="docutils literal notranslate"><span class="pre">OutputManager.print_errors_warnings_logs_counts()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.summarize_e2e_test_results'" class="reference internal" href="#RUFAS.output_manager.OutputManager.summarize_e2e_test_results"><code class="docutils literal notranslate"><span class="pre">OutputManager.summarize_e2e_test_results()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._print_e2e_results_summary'" class="reference internal" href="#RUFAS.output_manager.OutputManager._print_e2e_results_summary"><code class="docutils literal notranslate"><span class="pre">OutputManager._print_e2e_results_summary()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._normalize_module_header'" class="reference internal" href="#RUFAS.output_manager.OutputManager._normalize_module_header"><code class="docutils literal notranslate"><span class="pre">OutputManager._normalize_module_header()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.set_exclude_info_maps_flag'" class="reference internal" href="#RUFAS.output_manager.OutputManager.set_exclude_info_maps_flag"><code class="docutils literal notranslate"><span class="pre">OutputManager.set_exclude_info_maps_flag()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager._get_origin_label'" class="reference internal" href="#RUFAS.output_manager.OutputManager._get_origin_label"><code class="docutils literal notranslate"><span class="pre">OutputManager._get_origin_label()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.output_manager.OutputManager.run_startup_sequence'" class="reference internal" href="#RUFAS.output_manager.OutputManager.run_startup_sequence"><code class="docutils literal notranslate"><span class="pre">OutputManager.run_startup_sequence()</span></code></a></li>

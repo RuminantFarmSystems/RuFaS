@@ -210,11 +210,52 @@ the only classification is “manure”.</p>
 </section>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions">
+<span class="sig-name descname"><span class="pre">_report_gas_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">housing_CO2_emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_methane_emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions'"><span>#</span></a></dt>
+<dd><p>Reports the gas emissions in single stream handler.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>housing_CO2_emissions<span class="classifier">float</span></dt><dd><p>The amount of housing CO2 emissions (kg).</p>
+</dd>
+<dt>housing_methane_emissions<span class="classifier">float</span></dt><dd><p>The amount of housing methane emissions (kg).</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The day of simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._apply_volatile_solid_loss">
+<span class="sig-name descname"><span class="pre">_apply_volatile_solid_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">housing_methane_emission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._apply_volatile_solid_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._apply_volatile_solid_loss'"><span>#</span></a></dt>
+<dd><p>Calculates the loss of volatile solids to methane emissions.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>housing_methane_emission<span class="classifier">float</span></dt><dd><p>The amount of housing emission (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>tuple[float, float, float]</dt><dd><p>The updated amount of degradable volatile solids (kg).
+The updated amount of non-degradable volatile solids (kg).
+The updated amount of total solids (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_methane_emissions">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_housing_methane_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_deposition_surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_methane_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_methane_emissions'"><span>#</span></a></dt>
 <dd><p>Calculates the methane housing emission.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_deposition_surface_area<span class="classifier">float</span></dt><dd><p>The surface area of the manure deposition area in the pen (m^2).</p>
 </dd>
@@ -222,8 +263,8 @@ the only classification is “manure”.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Methane emission from manure (kg).</p>
 </dd>
@@ -234,8 +275,8 @@ the only classification is “manure”.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_carbon_dioxide_emissions">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_housing_carbon_dioxide_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_deposition_surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_carbon_dioxide_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_carbon_dioxide_emissions'"><span>#</span></a></dt>
 <dd><p>Calculates the housing carbon dioxide housing emission.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_deposition_surface_area<span class="classifier">float</span></dt><dd><p>The surface area of the manure deposition area in the pen (m^2).</p>
 </dd>
@@ -243,8 +284,8 @@ the only classification is “manure”.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Carbon dioxide emission from manure (kg).</p>
 </dd>
@@ -265,6 +306,8 @@ the only classification is “manure”.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.__init__'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.__init__"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.receive_manure'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.receive_manure"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler.receive_manure()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.process_manure'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.process_manure"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler.process_manure()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler._report_gas_emissions()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._apply_volatile_solid_loss'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._apply_volatile_solid_loss"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler._apply_volatile_solid_loss()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_methane_emissions'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_methane_emissions"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler.determine_housing_methane_emissions()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_carbon_dioxide_emissions'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler.determine_housing_carbon_dioxide_emissions"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler.determine_housing_carbon_dioxide_emissions()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._abc_impl'" class="reference internal" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._abc_impl"><code class="docutils literal notranslate"><span class="pre">SingleStreamHandler._abc_impl</span></code></a></li>
