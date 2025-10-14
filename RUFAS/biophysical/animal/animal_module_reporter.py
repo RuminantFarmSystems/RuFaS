@@ -441,6 +441,21 @@ class AnimalModuleReporter:
         om.add_variable(f"ration_daily_feed_totals_for_pen_{pen_id}_{pen_animal_name}", pen_ration, info_map)
 
     @classmethod
+    def report_enteric_methane_emission(cls, enteric_methane_emission_by_pen: dict[str, float]) -> None:
+        """Reports the amount of daily emission by pen."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
+            "data_origin": [("HerdManager", "daily_routines")],
+        }
+        for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
+            om.add_variable(
+                f"enteric_methane_emission_for_{pen_id_combination}",
+                enteric_methane_emission,
+                dict(info_map, **{"units": MeasurementUnits.GRAMS}),
+            )
+
+    @classmethod
     def report_manure_streams(cls, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
         """
         Report Animal Module manure stream data to Output Manager.
