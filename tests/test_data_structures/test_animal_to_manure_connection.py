@@ -51,6 +51,7 @@ def manure_stream_1() -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -80,6 +81,7 @@ def manure_stream_1() -> ManureStream:
                     manure_urine_nitrogen=3.0,
                     stream_type=StreamType.PARLOR,
                 ),
+                bedding_non_degradable_volatile_solids=2
             ),
             None,
             {
@@ -91,7 +93,7 @@ def manure_stream_1() -> ManureStream:
                 "ash": 27.0,
                 "total_solids": 108.0,
                 "volume": 1.8,
-                "methane_production_potential": 0.2088888888888889,
+                "methane_production_potential": 0.21083333,
                 "pen_data_num_animals": 15,
             },
         ),
@@ -110,6 +112,7 @@ def manure_stream_1() -> ManureStream:
                 volume=0.5,
                 methane_production_potential=0.17,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=2
             ),
             None,
             {
@@ -121,7 +124,7 @@ def manure_stream_1() -> ManureStream:
                 "ash": 23.0,
                 "total_solids": 85.0,
                 "volume": 1.5,
-                "methane_production_potential": 0.21941176470588236,
+                "methane_production_potential": 0.2205154,
                 "pen_data_num_animals": None,
             },
         ),
