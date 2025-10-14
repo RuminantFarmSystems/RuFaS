@@ -253,6 +253,7 @@ v0.9.2
 - [2584](https://github.com/RuminantFarmSystems/MASM/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
 - [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
 - [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
+- [2605](https://github.com/RuminantFarmSystems/MASM/pull/2605) - [minor change] Adds E2E testing for Feed and Feed Storage modules.
 
 ### v0.9.2
 
