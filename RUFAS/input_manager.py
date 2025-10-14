@@ -728,8 +728,10 @@ class InputManager:
 
         return data_keys
 
-    def delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
+    def __delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
         """
+        NOTE: **Please use extreme caution using this function as it will delete data and metadata from the pool.**
+
         When given a valid address, this function removes the input data and its associated metadata.
 
         Parameters
@@ -745,7 +747,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.delete_input_and_metadata.__name__,
+            "function": self.__delete_input_and_metadata.__name__,
         }
         keys = data_address.split(".")
         timestamp = Utility.get_timestamp(include_millis=True)
@@ -754,7 +756,7 @@ class InputManager:
             self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1]).pop(keys[-1])
             removed_data = True
             self.__delete_data_logs_pool[timestamp] = (
-                f"InputManager.delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
+                f"InputManager.__delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
             )
         except KeyError as keyerror:
             self.om.add_error("Validation: data not found", str(keyerror), info_map)

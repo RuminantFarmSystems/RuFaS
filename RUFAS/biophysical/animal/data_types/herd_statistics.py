@@ -240,7 +240,6 @@ class HerdStatistics:
     percent_cow_for_parity: dict[str, float]
 
     animals_deaths_by_stage: dict[AnimalType, int]
-    total_enteric_methane: dict[AnimalType, dict[str, float]]
 
     def __init__(self) -> None:
         """
@@ -250,7 +249,9 @@ class HerdStatistics:
             "1": 0.0,
             "2": 0.0,
             "3": 0.0,
-            "greater_than_3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "greater_than_5": 0.0,
         }
         self.cull_reason_stats = {
             animal_constants.DEATH_CULL: 0,
@@ -262,10 +263,10 @@ class HerdStatistics:
             animal_constants.UDDER_CULL: 0,
             animal_constants.UNKNOWN_CULL: 0,
         }
-        self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
-        self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
-        self.avg_age_for_calving = {"1": 0.0, "2": 0.0, "3": 0.0, "greater_than_3": 0.0}
-        self.avg_age_for_parity = {"1": 0.0, "2": 0.0, "3": 0.0, "greater_than_3": 0.0}
+        self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.avg_age_for_calving = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.avg_age_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
         self.cull_reason_stats_percent = {
             animal_constants.DEATH_CULL: 0.0,
             animal_constants.LOW_PROD_CULL: 0.0,
@@ -280,7 +281,9 @@ class HerdStatistics:
             "1": 0.0,
             "2": 0.0,
             "3": 0.0,
-            "greater_than_3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "greater_than_5": 0.0,
         }
 
         self.stillborn_calf_info = []
@@ -297,15 +300,6 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
-        }
-
-        self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
-            AnimalType.CALF: {},
-            AnimalType.HEIFER_I: {},
-            AnimalType.HEIFER_II: {},
-            AnimalType.HEIFER_III: {},
-            AnimalType.LAC_COW: {},
-            AnimalType.DRY_COW: {},
         }
 
     def reset_daily_stats(self) -> None:
@@ -380,15 +374,6 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
-        }
-
-        self.total_enteric_methane: dict[AnimalType, dict[str, float]] = {
-            AnimalType.CALF: {},
-            AnimalType.HEIFER_I: {},
-            AnimalType.HEIFER_II: {},
-            AnimalType.HEIFER_III: {},
-            AnimalType.LAC_COW: {},
-            AnimalType.DRY_COW: {},
         }
 
     def reset_parity(self) -> None:
