@@ -85,11 +85,9 @@ class TractorImplement:
         if self.operation_type == OperationType.COLLECTION:  # 418b
             return (self.throughput / crop_yield_ton_per_ha) * self.field_efficiency
         elif self.operation_type in [
-            OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
-            OperationType.FERTILIZER_APPLICATION_SURFACE,
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
-        ]:
+        ]: #418c
             return (self.throughput / application_mass) * self.field_efficiency
         return (
             self.field_speed_km_per_hr
@@ -152,10 +150,7 @@ class TractorImplement:
         coefficient_to_use = (
             application_mass
             if self.operation_type
-            in [
-                OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
-                OperationType.FERTILIZER_APPLICATION_SURFACE,
-                OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
+            in [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
                 OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
             ]
             else crop_yield_ton_per_ha

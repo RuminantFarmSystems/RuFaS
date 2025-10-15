@@ -39,13 +39,14 @@ class EnergyEstimator:
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
             )
-
+            
             diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
                 diesel_consumption_data_item.get("crop_yield", 0),
                 diesel_consumption_data_item["field_production_size"],
                 tractor,
                 diesel_consumption_data_item.get("clay_percent", 0),
                 diesel_consumption_data_item.get("mass"),
+                diesel_consumption_data_item.get("dry_matter_fraction"),
             )
             estimator.report_diesel_consumption(
                 diesel_consumption_data_item,
@@ -113,6 +114,15 @@ class EnergyEstimator:
                 f"application_depth_for_{suffix}",
                 diesel_consumption_data.get("application_depth"),
                 {**base_info_map, **{"units": MeasurementUnits.CENTIMETERS}},
+            )
+        if operation_event in [
+            FieldOperationEvent.MANURE_APPLICATION,
+            FieldOperationEvent.FERTILIZER_APPLICATION
+        ]:
+            om.add_variable(
+                f"application_mass_{suffix}",
+                diesel_consumption_data.get("mass"),
+                {**base_info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}},
             )
         if operation_event == FieldOperationEvent.TILLING:
             om.add_variable(
@@ -208,6 +218,7 @@ class EnergyEstimator:
             },
             FieldOperationEvent.MANURE_APPLICATION: {
                 "mass": "dry_matter_mass",
+                "dry_matter_fraction":"dry_matter_fraction",
                 "application_depth": "application_depth",
                 "field_production_size": "field_size",
                 "clay_percent": "average_clay_percent",
@@ -262,6 +273,7 @@ class EnergyEstimator:
         tractor: Tractor,
         clay_percent: float,
         application_mass: float | None = None,
+        application_dm_content:float |None = None
     ) -> float:
         """
         General estimate of diesel fuel consumption for a given attachment type and tractor size.
@@ -290,14 +302,18 @@ class EnergyEstimator:
 
         for implement in tractor.implements:
             crop_yield_ton_ha = crop_yield * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
+            if application_mass and application_dm_content:
+                application_mass_per_ha = (application_mass * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS/application_dm_content)/field_production_size
+            else: application_mass_per_ha = None
+
             total_power_needed_kW = self._calculate_total_power_needed(
-                tractor, implement, crop_yield_ton_ha, field_production_size, clay_percent, application_mass
+                tractor, implement, crop_yield_ton_ha, field_production_size, clay_percent, application_mass_per_ha
             )
 
             specific_fuel_consumption_liter_per_kWh = UserConstants.SPECIFIC_FUEL_CONSUMPTION
 
             tractor_implement_operation_time_hr = implement.calculate_operation_time_hr(
-                field_production_size, crop_yield_ton_ha, application_mass
+                field_production_size, crop_yield_ton_ha, application_mass_per_ha
             )
             diesel_consumption_tractor_implement_liter_ha = (
                 specific_fuel_consumption_liter_per_kWh
