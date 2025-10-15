@@ -9,7 +9,6 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
@@ -333,7 +332,6 @@ class HerdFactory:
         calf = Animal(args)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
-            calf.genetics = AnimalGenetics()
 
     def _heiferIIIs_update(self, day: int) -> None:
         """HeiferIIIs update for generating herd simulation"""
@@ -410,7 +408,6 @@ class HerdFactory:
         if animal_type == "calf":
             animal_data.update(initial_phosphorus=0)
         animal = Animal(animal_data)
-        animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
         return animal
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
