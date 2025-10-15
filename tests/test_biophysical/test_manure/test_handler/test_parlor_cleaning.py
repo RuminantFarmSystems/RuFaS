@@ -33,6 +33,7 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=pen,
+        bedding_non_degradable_volatile_solids=0.0
     )
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
@@ -60,6 +61,7 @@ def test_process_manure_error(handler: ParlorCleaningHandler, mocker: MockerFixt
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
     try:
@@ -88,6 +90,7 @@ def test_receive_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.receive_manure(manure_stream)
@@ -110,6 +113,7 @@ def test_receive_manure_multiple_streams(handler: ParlorCleaningHandler, mocker:
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.manure_stream = manure_stream
@@ -127,6 +131,7 @@ def test_receive_manure_multiple_streams(handler: ParlorCleaningHandler, mocker:
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
     mock_receive.assert_called_once()
 

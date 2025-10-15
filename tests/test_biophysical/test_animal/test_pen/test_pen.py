@@ -888,6 +888,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.SAND,
             ManureStream(
@@ -911,6 +912,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -935,6 +937,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.NONE,
             ManureStream(
@@ -958,6 +961,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -982,6 +986,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.CBPB_SAWDUST,
             ManureStream(
@@ -1005,6 +1010,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
     ],
@@ -1070,6 +1076,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         volume=12.80,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
     with pytest.raises(ValueError):

@@ -32,6 +32,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -51,6 +52,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -233,6 +235,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -250,6 +253,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -267,6 +271,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -284,6 +289,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
     ],
@@ -336,7 +342,8 @@ def test_apply_methane_emissions(
             is_degradable=True,
         ),
         call(
-            volatile_solids=stored_manure.manure_non_degradable_volatile_solids,
+            volatile_solids=stored_manure.manure_non_degradable_volatile_solids
+                            +stored_manure.bedding_non_degradable_volatile_solids,
             manure_temperature=dummy_manure_temperature,
             is_degradable=False,
         ),
@@ -363,6 +370,7 @@ def test_apply_methane_emissions(
             volume=100.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=10
         )
     ],
 )
@@ -410,6 +418,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -427,6 +436,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -444,6 +454,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -461,6 +472,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
     ],

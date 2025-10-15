@@ -190,14 +190,15 @@ class ManureStream:
         "phosphorus": MeasurementUnits.KILOGRAMS,
         "potassium": MeasurementUnits.KILOGRAMS,
         "ash": MeasurementUnits.KILOGRAMS,
-        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "manure_non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "manure_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
         "total_solids": MeasurementUnits.KILOGRAMS,
         "volume": MeasurementUnits.CUBIC_METERS,
         "mass": MeasurementUnits.KILOGRAMS,
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
         "methane_production_potential": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
         "pen_manure_data": None,
+        "bedding_non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS
     }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":

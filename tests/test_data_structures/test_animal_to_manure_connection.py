@@ -8,12 +8,13 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, Stre
 
 @pytest.fixture
 def manure_stream(mocker: MockerFixture) -> ManureStream:
-    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10, 0.24, mocker.MagicMock(autospec=PenManureData))
+    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10, 0.24, mocker.MagicMock(autospec=PenManureData),
+                        10)
 
 
 def test_total_volatile_solids(manure_stream: ManureStream) -> None:
     """Checks that the property method correctly calculated total_volatile_solids."""
-    assert manure_stream.total_volatile_solids == 16.5
+    assert manure_stream.total_volatile_solids == 26.5
 
 
 def test_mass(manure_stream: ManureStream) -> None:
@@ -316,7 +317,7 @@ def test_manure_stream_is_empty() -> None:
     """Test that ManureStream.is_empty() returns True for an empty stream."""
     empty_stream = ManureStream.make_empty_manure_stream()
     assert empty_stream.is_empty
-    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0.24, None)
+    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0.24, None, 10)
     assert not non_empty_stream.is_empty
 
 
@@ -335,6 +336,7 @@ def sample_manure_stream(pen_data_2: PenManureData) -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data_2,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -378,6 +380,7 @@ def test_split_stream_without_pen_manure_data() -> None:
         volume=0.5,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
     split = stream.split_stream(0.5, stream_type=StreamType.GENERAL)

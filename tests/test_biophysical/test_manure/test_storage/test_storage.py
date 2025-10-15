@@ -104,6 +104,7 @@ def test_storage_init() -> None:
                     volume=1500.0,
                     methane_production_potential=0.24,
                     pen_manure_data=None,
+                    bedding_non_degradable_volatile_solids=10
                 ),
                 ManureStream(
                     water=100.0,
@@ -118,6 +119,7 @@ def test_storage_init() -> None:
                     volume=1500.0,
                     methane_production_potential=0.24,
                     pen_manure_data=None,
+                    bedding_non_degradable_volatile_solids=10
                 ),
             ],
             ManureStream(
@@ -133,6 +135,7 @@ def test_storage_init() -> None:
                 volume=3000.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=20
             ),
         ),
     ],
@@ -212,6 +215,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             volume=10.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=10
         )
     )
     storage.stored_manure = (
@@ -228,6 +232,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             volume=100.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=10
         )
     )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure

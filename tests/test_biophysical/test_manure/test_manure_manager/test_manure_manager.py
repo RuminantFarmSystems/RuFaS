@@ -1028,6 +1028,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
 
     non_lim_fields: list[str] = []
@@ -1050,10 +1051,11 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         "ammoniacal_nitrogen",
         "potassium",
         "ash",
-        "non_degradable_volatile_solids",
-        "degradable_volatile_solids",
+        "manure_degradable_volatile_solids",
+        "manure_non_degradable_volatile_solids",
         "total_solids",
         "volume",
+        "bedding_non_degradable_volatile_solids"
     ]:
         assert getattr(new_stream, field_name) == 0.0
 
