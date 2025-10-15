@@ -135,7 +135,7 @@ class EnergyEstimator:
                 {**base_info_map, **{"units": MeasurementUnits.UNITLESS}},
             )
         om.add_variable(
-            f"diesel_consumption_tractor_implement_for_{suffix}",
+            f"diesel_consumption_for_{suffix}",
             diesel_consumption_tractor_implement_liter_per_ton,
             {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_TON}},
         )
