@@ -483,8 +483,8 @@ def test_report_manure_streams_key_error(mocker: MockerFixture) -> None:
         phosphorus=4.4,
         potassium=5.5,
         ash=6.6,
-        non_degradable_volatile_solids=7.7,
-        degradable_volatile_solids=8.8,
+        manure_non_degradable_volatile_solids=7.7,
+        manure_degradable_volatile_solids=8.8,
         total_solids=66.6,
         volume=9.9,
         methane_production_potential=10.1,
@@ -499,6 +499,7 @@ def test_report_manure_streams_key_error(mocker: MockerFixture) -> None:
             total_bedding_mass=3.3,
             total_bedding_volume=4.4,
         ),
+        bedding_non_degradable_volatile_solids=10
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -570,12 +571,13 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
         phosphorus=4.4,
         potassium=5.5,
         ash=6.6,
-        non_degradable_volatile_solids=7.7,
-        degradable_volatile_solids=8.8,
+        manure_non_degradable_volatile_solids=7.7,
+        manure_degradable_volatile_solids=8.8,
         total_solids=66.6,
         volume=9.9,
         methane_production_potential=10.1,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -598,8 +600,8 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
             phosphorus=4.4,
             potassium=5.5,
             ash=6.6,
-            non_degradable_volatile_solids=7.7,
-            degradable_volatile_solids=8.8,
+            manure_non_degradable_volatile_solids=7.7,
+            manure_degradable_volatile_solids=8.8,
             total_solids=66.6,
             volume=9.9,
             methane_production_potential=10.1,
@@ -614,6 +616,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10.0
         ),
         "stream_2": ManureStream(
             water=1.1,
@@ -622,8 +625,8 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
             phosphorus=4.4,
             potassium=5.5,
             ash=6.6,
-            non_degradable_volatile_solids=7.7,
-            degradable_volatile_solids=8.8,
+            manure_non_degradable_volatile_solids=7.7,
+            manure_degradable_volatile_solids=8.8,
             total_solids=66.6,
             volume=9.9,
             methane_production_potential=10.1,
@@ -636,8 +639,9 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 manure_urine_nitrogen=2.2,
                 stream_type=StreamType.GENERAL,
                 total_bedding_mass=3.3,
-                total_bedding_volume=4.4,
+                total_bedding_volume=4.4
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
         "stream_3": ManureStream(
             water=2.1,
@@ -646,8 +650,8 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
             phosphorus=5.4,
             potassium=6.5,
             ash=7.6,
-            non_degradable_volatile_solids=8.7,
-            degradable_volatile_solids=9.8,
+            manure_non_degradable_volatile_solids=8.7,
+            manure_degradable_volatile_solids=9.8,
             total_solids=77.7,
             volume=10.9,
             methane_production_potential=11.1,
@@ -662,6 +666,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
         "stream_4": ManureStream(
             water=3.1,
@@ -670,8 +675,8 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
             phosphorus=6.4,
             potassium=7.5,
             ash=8.6,
-            non_degradable_volatile_solids=9.7,
-            degradable_volatile_solids=10.8,
+            manure_non_degradable_volatile_solids=9.7,
+            manure_degradable_volatile_solids=10.8,
             total_solids=88.8,
             volume=11.9,
             methane_production_potential=12.1,
@@ -686,12 +691,13 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
     }
 
     AnimalModuleReporter.report_manure_streams(manure_streams, 10)
 
-    assert mock_om_add_variable.call_count == 15 * len(manure_streams)
+    assert mock_om_add_variable.call_count == 16 * len(manure_streams)
 
 
 def test_report_manure_excretions(mocker: MockerFixture) -> None:

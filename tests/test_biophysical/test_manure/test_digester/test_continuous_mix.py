@@ -53,6 +53,7 @@ def manure_stream() -> ManureStream:
         volume=500.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
