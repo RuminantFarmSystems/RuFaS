@@ -576,7 +576,7 @@ class HerdFactory:
             }
 
             parity_input_name = "animal.herd_information.parity_fractions." + str(PARITY_KEY[animal_type][0])
-            milking_cow_fraction = self.im.get_data("lactation.milking_cow_fraction")
+            milking_cow_fraction = self.im.get_data("animal.herd_information.milking_cow_fraction")
             if not PARITY_KEY[animal_type][1]:
                 milking_cow_fraction = 1 - milking_cow_fraction
 

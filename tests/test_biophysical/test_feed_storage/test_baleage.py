@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -5,9 +6,8 @@ from dataclasses import replace
 from datetime import datetime
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
 from RUFAS.biophysical.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
@@ -15,7 +15,22 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def baleage(mocker: MockerFixture) -> Baleage:
+def mock_baleage_config() -> dict[str, Any]:
+    """Pytest fixture to create a mock baleage configuration dictionary."""
+    return {
+        "name": "baleage",
+        "rufas_id": 1,
+        "field_name": "field_1",
+        "crop_name": "corn",
+        "initial_storage_dry_matter": 45.0,
+        "post_wilting_moisture_percentage": 40.0,
+        "bale_density": 200.0,
+        "capacity": 1_000_000.0,
+    }
+
+
+@pytest.fixture
+def baleage(mock_baleage_config: dict[str, Any]) -> Baleage:
     """
     Pytest fixture to create a Baleage instance for testing.
 
@@ -25,9 +40,7 @@ def baleage(mocker: MockerFixture) -> Baleage:
         An instance of the Baleage class.
 
     """
-    im = InputManager()
-    mocker.patch.object(im, "get_data", return_value=45)
-    return Baleage()
+    return Baleage(config=mock_baleage_config)
 
 
 @pytest.fixture
@@ -69,17 +82,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
-
-
-def test_acceptable_crops(baleage: Baleage) -> None:
-    """Tests that Baleage has acceptable_crops set correctly."""
-    assert baleage.acceptable_crops == [
-        CropCategory.ALFALFA,
-        CropCategory.GRASS,
-        CropCategory.SMALL_GRAIN,
-    ]
+    return HarvestedCrop(**sample_crop_data)
 
 
 def test_process_degradations(

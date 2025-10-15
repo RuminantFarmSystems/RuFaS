@@ -13,7 +13,7 @@ from datetime import date
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.data_structures.tillage_implements import TillageImplement
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.rufas_time import RufasTime
 
 

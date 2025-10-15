@@ -238,12 +238,19 @@
       "type": "json",
       "properties": "NA"
     },
-    "feed_management": {
-      "title": "Feed Management Dataset",
-      "description": "Feed management data.",
-      "path": "input/data/feed_management/example_feed_management.json",
+    "feed_storage_configurations": {
+      "title": "Feed Management",
+      "description": "Configurations for feed storage units.",
+      "path": "input/data/feed_management/example_feed_storage_configs.json",
       "type": "json",
-      "properties": "feed_storage_input_properties"
+      "properties": "feed_storage_configurations"
+    },
+    "feed_storage_instances": {
+      "title": "Feed Storages",
+      "description": "Names of feed storage configs used in the simulation.",
+      "path": "input/data/feed_management/example_freestall_feed_storages.json",
+      "type": "json",
+      "properties": "feed_storage_instances"
     }
   },
   "cross-validation": {}
