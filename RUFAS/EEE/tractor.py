@@ -3,6 +3,7 @@ from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TillageImplement, TractorSize, OperationType
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 
 input_manager = InputManager()
 
@@ -33,6 +34,7 @@ class Tractor:
         herd_size: int | None = None,
         application_depth: float | None = None,
         tillage_implement: TillageImplement | None = None,
+        harvest_type: HarvestOperation | None = None
     ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
@@ -58,7 +60,13 @@ class Tractor:
         self.operation_types = self.determine_operation_type(application_depth)
         self.implements = [
             TractorImplement(
-                operation_event, operation_type, crop_type, self.tractor_size, tillage_implement, application_depth
+                operation_event,
+                operation_type,
+                crop_type,
+                self.tractor_size,
+                tillage_implement,
+                application_depth,
+                harvest_type
             )
             for operation_type in self.operation_types
         ]

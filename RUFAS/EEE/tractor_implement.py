@@ -1,3 +1,4 @@
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.util import Utility
@@ -18,12 +19,14 @@ class TractorImplement:
         tractor_size: TractorSize,
         tillage_implement: TillageImplement | None,
         application_depth: float | None,
+        harvest_type: HarvestOperation | None = None
     ) -> None:
         self.operation_event = operation_event
         self.operation_type = operation_type
         self.crop_type = crop_type
         self.tractor_size = tractor_size
         self.tillage_implement = tillage_implement
+        self.harvest_type = harvest_type if self.operation_event == FieldOperationEvent.HARVEST else None
         constants = input_manager.get_data("EEE_constants.constants")
         constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
         self.field_speed_km_per_hr = constants_by_ID[FIELD_SPEED_CONSTANT_ID][
@@ -82,13 +85,17 @@ class TractorImplement:
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
         Implements Helper Functions 418a and 418b in EEE Functions file.
         """
-        if self.operation_type == OperationType.COLLECTION:  # 418b
+        if self.operation_type == OperationType.COLLECTION and self.harvest_type != HarvestOperation.KILL_ONLY:  # 418b
             return (self.throughput / crop_yield_ton_per_ha) * self.field_efficiency
         elif self.operation_type in [
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
         ]:      # 418c
             return (self.throughput / application_mass) * self.field_efficiency
+
+        if self.operation_type == OperationType.COLLECTION and self.harvest_type == HarvestOperation.KILL_ONLY:
+            print("CORRECT", self.operation_event, self.operation_type, self.harvest_type)
+            print(f"{self.field_speed_km_per_hr=}, {self.width_m=}, {self.field_efficiency=}")
         return (
             self.field_speed_km_per_hr
             * GeneralConstants.KM_TO_M

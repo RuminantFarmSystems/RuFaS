@@ -1,5 +1,6 @@
 from typing import Any
 
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize
 from RUFAS.input_manager import InputManager
 from RUFAS.units import MeasurementUnits
@@ -31,12 +32,16 @@ class EnergyEstimator:
         total_diesel_consumption_tractor_implement_liter_per_ha = 0
         herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_consumption_data_list:
+            harvest_type: HarvestOperation | None = None
+            if harvest_type_str := diesel_consumption_data_item.get("harvest_type"):
+                harvest_type = HarvestOperation(harvest_type_str)
             tractor = Tractor(
                 operation_event=diesel_consumption_data_item["operation_event"],
                 crop_type=diesel_consumption_data_item.get("crop_type"),
                 herd_size=herd_size,
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
+                harvest_type=harvest_type
             )
 
             diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
@@ -188,7 +193,9 @@ class EnergyEstimator:
                 "name": FieldOperationEvent.HARVEST,
                 "use_name": True,
                 "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-                "variables": ["dry_yield", "crop", "field_size", "harvest_year", "harvest_day", "field_name"],
+                "variables": [
+                    "dry_yield", "crop", "field_size", "harvest_year", "harvest_day", "field_name", "harvest_type"
+                ],
             },
             {
                 "name": FieldOperationEvent.PLANTING,
@@ -214,6 +221,7 @@ class EnergyEstimator:
                 "operation_year": "harvest_year",
                 "operation_day": "harvest_day",
                 "field_name": "field_name",
+                "harvest_type": "harvest_type"
             },
             FieldOperationEvent.MANURE_APPLICATION: {
                 "mass": "dry_matter_mass",

@@ -171,7 +171,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
+        self._record_yield(harvest_op, field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
         return harvested_crop
@@ -373,12 +373,16 @@ class CropManagement:
         )
         return harvested_crop
 
-    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
+    def _record_yield(
+            self, harvest_op : HarvestOperation, field_name: str, field_size: float, year: int, day: int
+    ) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
         Parameters
         ----------
+        harvest_op : HarvestOperation
+            The operation to be executed on this crop.
         field_name : str
             Name of the field that contains this crop.
         field_size : float
@@ -391,6 +395,7 @@ class CropManagement:
         """
         units = {
             "crop": MeasurementUnits.UNITLESS,
+            "harvest_type": MeasurementUnits.UNITLESS,
             "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
             "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
             "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
@@ -418,6 +423,7 @@ class CropManagement:
         }
         value = {
             "crop": self.data.name,
+            "harvest_type": harvest_op.value,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
             "nitrogen": nitrogen_harvested,
