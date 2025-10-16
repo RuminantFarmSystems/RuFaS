@@ -10,15 +10,6 @@
       "Notes and remarks": "Where S can be taken as 10km/h, refer to the external link or IFSM handbook for W, and field efficiency is taken as 0.90."
     },
     {
-      "ID": 586,
-      "Grouping": "",
-      "Name": "Machine width",
-      "Description": "formerly W for width or number of rows or tools",
-      "Value": 0,
-      "Unit": "m",
-      "Notes and remarks": "What should be the value for W?"
-    },
-    {
       "ID": 587,
       "Grouping": "",
       "Name": "Field Efficiency",
