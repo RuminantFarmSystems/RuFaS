@@ -254,7 +254,7 @@ v0.9.2
 - [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
 - [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
 - [2606](https://github.com/RuminantFarmSystems/MASM/pull/2606) - [minor change] Moves Field/Crop/Soil module to `biophysical` and removes `routines` directory.
-- [2609](https://github.com/RuminantFarmSystems/MASM/pull/2609) - [minor change] Remove the generation of `dummy_path` when running unit tests.
+- [2612](https://github.com/RuminantFarmSystems/MASM/pull/2612) - [minor change] Remove the generation of `dummy_path` when running unit tests.
 
 ### v0.9.2
 
