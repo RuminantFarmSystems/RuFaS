@@ -214,7 +214,7 @@
     "tractor_dataset": {
       "title": "Tractor Dataset",
       "description": "Details agricultural machinery operations for various crops, including tractor size, operations (planting, mowing, collection, etc.), implement details, operational parameters (depth, width, mass), and throughput metrics, spanning different crop types and soil management practices.",
-      "path": "input/data/EEE/tractor_dataset.csv",
+      "path": "input/data/EEE/tractor_dataset_Oct162025.csv",
       "type": "csv",
       "properties": "tractor_dataset_properties"
     },

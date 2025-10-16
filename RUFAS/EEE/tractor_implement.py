@@ -29,10 +29,10 @@ class TractorImplement:
         self.harvest_type = harvest_type if self.operation_event == FieldOperationEvent.HARVEST else None
         constants = input_manager.get_data("EEE_constants.constants")
         constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
-        self.field_speed_km_per_hr = constants_by_ID[FIELD_SPEED_CONSTANT_ID][
+        self.field_speed_km_per_hr: float = constants_by_ID[FIELD_SPEED_CONSTANT_ID][
             "Value"
         ]  # Constant 585 in EEE Functions file
-        self.field_efficiency = constants_by_ID[FIELD_EFFICIENCY_CONSTANT_ID][
+        self.field_efficiency: float = constants_by_ID[FIELD_EFFICIENCY_CONSTANT_ID][
             "Value"
         ]  # Constant 587 in EEE Functions file
         self.determine_implement_parameters(application_depth)
@@ -49,22 +49,24 @@ class TractorImplement:
             crop_type_or_tillage_implement = self.tillage_implement.value.lower()
         else:
             crop_type_or_tillage_implement = self.crop_type.lower() if self.crop_type is not None else "none"
+        if self.operation_event == FieldOperationEvent.HARVEST and self.harvest_type == HarvestOperation.KILL_ONLY:
+            self.operation_type = OperationType.MOWING
         for data_entry in dataset:
             if (
                 data_entry.get("Crop Type or Tillage Implement").lower() in [crop_type_or_tillage_implement, "none"]
                 and data_entry.get("Tractor Size").lower() == self.tractor_size.value.lower()
                 and data_entry.get("Operation").lower() == self.operation_type.value.lower()
             ):
-                self.implement_name = data_entry["Tractor Implement"]
-                self.A = data_entry["Tractor A (unitless)"]
-                self.B = data_entry["Tractor B (unitless)"]
-                self.C = data_entry["Tractor C (unitless)"]
-                self.E = data_entry["Tractor E (unitless)"]
-                self.F = data_entry["Tractor F (unitless)"]
-                self.G = data_entry["Tractor G (unitless)"]
-                self.width_m = data_entry["Tractor Implement Width (m)"]
-                self.mass_kg = data_entry["Tractor Implement Mass (kg)"]
-                self.throughput = data_entry["Max Throughput (tons dm/hour)"]
+                self.implement_name: str = data_entry["Tractor Implement"]
+                self.A: float = data_entry["Tractor A (unitless)"]
+                self.B: float = data_entry["Tractor B (unitless)"]
+                self.C: float = data_entry["Tractor C (unitless)"]
+                self.E: float = data_entry["Tractor E (unitless)"]
+                self.F: float = data_entry["Tractor F (unitless)"]
+                self.G: float = data_entry["Tractor G (unitless)"]
+                self.width_m: float = data_entry["Tractor Implement Width (m)"]
+                self.mass_kg: float = data_entry["Tractor Implement Mass (kg)"]
+                self.throughput: float = data_entry["Max Throughput (tons dm/hour)"]
                 if self.operation_type in [
                     OperationType.TILLING,
                     OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
@@ -72,10 +74,10 @@ class TractorImplement:
                     OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
                     OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
                 ]:
-                    self.depth_cm = application_depth * GeneralConstants.MM_TO_CM
+                    self.depth_cm: float = application_depth * GeneralConstants.MM_TO_CM
                 else:
                     self.depth_cm = data_entry["Depth"]
-                self.is_depth_relevant = data_entry["is depth relevant"]
+                self.is_depth_relevant: bool = data_entry["is depth relevant"]
                 break
 
     def field_capacity_ha_per_hr(
@@ -93,9 +95,6 @@ class TractorImplement:
         ]:      # 418c
             return (self.throughput / application_mass) * self.field_efficiency
 
-        if self.operation_type == OperationType.COLLECTION and self.harvest_type == HarvestOperation.KILL_ONLY:
-            print("CORRECT", self.operation_event, self.operation_type, self.harvest_type)
-            print(f"{self.field_speed_km_per_hr=}, {self.width_m=}, {self.field_efficiency=}")
         return (
             self.field_speed_km_per_hr
             * GeneralConstants.KM_TO_M
