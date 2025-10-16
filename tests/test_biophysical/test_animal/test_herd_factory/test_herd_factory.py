@@ -1224,6 +1224,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     """Unit test for initialize_herd() with init_herd=True and save_animals=True"""
 
     mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+    mock_om_create_directory = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
     mock_initialize_animal_config = mocker.patch(
         "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
@@ -1265,6 +1266,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_random_sample_with_replacement.assert_called_once()
     assert mock_report_animal_population_statistics.call_count == 2
 
+    mock_om_create_directory.assert_called_once_with(Path("dummy_path"))
     mock_om_dict_to_file_json.assert_called_once_with(
         mock_herd_factory.pre_animal_population.__repr__(),
         expected_save_path,
