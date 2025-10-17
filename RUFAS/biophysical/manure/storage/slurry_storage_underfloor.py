@@ -114,7 +114,7 @@ class SlurryStorageUnderfloor(Storage):
             storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
         )
         bedding_to_manure_non_degradable_volatile_solids_ratio = (
-            self._manure_to_process.bedding_non_degradable_volatile_solids/ (
+            self._manure_to_process.bedding_non_degradable_volatile_solids / (
                 self._manure_to_process.non_degradable_volatile_solids
                 + self._manure_to_process.bedding_non_degradable_volatile_solids)
         )

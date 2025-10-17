@@ -230,9 +230,9 @@ class ManureStream:
             potassium=self.potassium + other.potassium,
             ash=self.ash + other.ash,
             non_degradable_volatile_solids=self.non_degradable_volatile_solids
-                                           + other.non_degradable_volatile_solids,
+            + other.non_degradable_volatile_solids,
             degradable_volatile_solids=self.degradable_volatile_solids
-                                       + other.degradable_volatile_solids,
+            + other.degradable_volatile_solids,
             total_solids=self.total_solids + other.total_solids,
             volume=self.volume + other.volume,
             methane_production_potential=(
