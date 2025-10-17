@@ -2041,6 +2041,7 @@ class CrossValidator:
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
+        # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
         if not isinstance(data_type, str):
             self._event_logs.append(
                 {
