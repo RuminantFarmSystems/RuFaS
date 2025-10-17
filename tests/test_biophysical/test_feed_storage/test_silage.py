@@ -99,6 +99,7 @@ def test_process_degradations(
     expected_info_map = {
         "class": silage.__class__.__name__,
         "function": silage.process_degradations.__name__,
+        "prefix": "Feed.Storage.Silage.silage",
         "units": MeasurementUnits.KILOGRAMS,
         "simulation_day": mock_time.simulation_day,
     }
