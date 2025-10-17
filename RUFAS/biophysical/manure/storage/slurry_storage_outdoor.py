@@ -133,8 +133,7 @@ class SlurryStorageOutdoor(Storage):
                 total_storage_methane
             )
         bedding_to_manure_non_degradable_volatile_solids_ratio = (
-            self._manure_to_process.bedding_non_degradable_volatile_solids
-            + self._manure_to_process.degradable_volatile_solids/ (
+            self._manure_to_process.bedding_non_degradable_volatile_solids/ (
                 self._manure_to_process.non_degradable_volatile_solids
                 + self._manure_to_process.bedding_non_degradable_volatile_solids)
         )
