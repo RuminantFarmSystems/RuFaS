@@ -135,7 +135,7 @@ class TractorImplement:
         soil_texture_adjustment = (
             3 if clay_percent < 20 else 2 if clay_percent < 50 else 1 if clay_percent <= 100 else "Invalid"
         )
-        effective_depth = self.depth_cm if self.is_depth_relevant else 1
+        effective_depth = self.depth_cm if self.is_depth_relevant and self.depth_cm > 0 else 1
         return (
             self.width_m
             * effective_depth
