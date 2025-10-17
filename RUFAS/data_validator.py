@@ -1623,6 +1623,19 @@ class DataValidator:
 
 
 class CrossValidator:
+    """
+    This class is will be utilized for cross-validation.
+
+    Attributes
+    ----------
+    _alias_pool : dict[str, Any]
+        Alias pool storing data for cross validation.
+    _event_logs : list[dict[str, str | dict[str, str]]]
+        Logs for the events that will be handled by output manager.
+    relation_mapping : dict[str, Any]
+        A mapping for all the supported relationship evaluation functions.
+
+    """
     def __init__(self) -> None:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -1938,9 +1951,9 @@ class CrossValidator:
 
         if not (left_evaluated and right_evaluated):
             return False
-        else:
-            evaluation_function = self.relation_mapping.get(condition_clause["relationship"])
-            return evaluation_function(left_hand, right_hand, eager_termination)
+
+        evaluation_function = self.relation_mapping.get(condition_clause["relationship"])
+        return evaluation_function(left_hand, right_hand, eager_termination)
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
         """Validate the whole condition block."""
