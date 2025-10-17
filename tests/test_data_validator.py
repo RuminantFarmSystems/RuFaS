@@ -260,8 +260,7 @@ def test_fix_array_type_fixable_data(
     dummy_variable_properties: Dict[str, Any],
     dummy_element_hierarchy: List[str],
     expected_value: List[Any],
-    expected_result: bool,
-    mocker: MockerFixture,
+    expected_result: bool
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
@@ -301,15 +300,15 @@ def test_fix_array_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                       f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                       f" {original_invalid_value} to "
+                       f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                       f"'{dummy_properties_key}'.",
             "info_map": info_map,
         },
     ]
@@ -360,7 +359,6 @@ def test_fix_array_type_critical_data(
     dummy_variable_properties: Dict[str, Any],
     dummy_element_hierarchy: List[str],
     expected_result: bool,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
     dummy_input_data = mock_input_array_data_for_fix_data()
@@ -469,8 +467,7 @@ def test_fix_string_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str],
     expected_value: str,
-    expected_result: bool,
-    mocker: MockerFixture,
+    expected_result: bool
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
     dummy_input_data = mock_input_array_data_for_fix_data()
@@ -509,15 +506,15 @@ def test_fix_string_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                       f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                       f" {original_invalid_value} to "
+                       f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                       f"'{dummy_properties_key}'.",
             "info_map": info_map,
         },
     ]
@@ -564,15 +561,15 @@ def test_fix_string_type_csv_data() -> None:
         {
             "warning": "Validation: invalid data found",
             "message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                       f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                       f" {original_invalid_value} to "
+                       f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                       f"'{dummy_properties_key}'.",
             "info_map": info_map,
         },
     ]
@@ -737,8 +734,7 @@ def test_fix_number_type_fixable_data(
     dummy_element_hierarchy: list[str],
     expected_value: str,
     expected_result: bool,
-    expected_warning_call_count: int,
-    mocker: MockerFixture,
+    expected_warning_call_count: int
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
     dummy_input_data = mock_input_array_data_for_fix_data()
@@ -777,15 +773,15 @@ def test_fix_number_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                       f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                       f" {original_invalid_value} to "
+                       f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                       f"'{dummy_properties_key}'.",
             "info_map": info_map,
         },
     ]
@@ -840,8 +836,7 @@ def test_fix_number_type_critical_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str],
     expected_result: bool,
-    expected_warning_call_count: int,
-    mocker: MockerFixture,
+    expected_warning_call_count: int
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
     dummy_input_data = mock_input_array_data_for_fix_data()
@@ -1425,12 +1420,14 @@ def test_validate_input_by_type_key_error() -> None:
     [
         (
             True,
-            {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
+            {"files": {
+                "file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
             False,
         ),
         (
             False,
-            {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
+            {"files": {
+                "file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
             True,
         ),
         (
@@ -2281,7 +2278,8 @@ def test_evaluate_expression_apply_to_individual(
     and `apply_to` is set to `individual`
     """
     cross_validator = CrossValidator()
-    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
+    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value",
+                                               side_effect=selected_variables)
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
     result, status = cross_validator._evaluate_expression(expression_block, False)
@@ -2316,7 +2314,6 @@ def test_evaluate_expression_apply_to_individual(
 def test_evaluate_expression_apply_to_group(
     expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
-
     cross_validator = CrossValidator()
     mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
@@ -2328,3 +2325,417 @@ def test_evaluate_expression_apply_to_group(
         mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
     else:
         mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "relationship",
+    ["equal", "greater", "greater_or_equals_to", "not_equal", "is_of_type", "regex"],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_valid_values(relationship: str, eager_termination: bool) -> None:
+    """Valid relationship strings should pass with no event logs."""
+    cv = CrossValidator()
+
+    # Act
+    result = cv._validate_relationship(relationship, eager_termination)
+
+    # Assert
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_non_string(eager_termination: bool) -> None:
+    """Non-string relationship should log error; optionally raise in eager mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Relationship must be a string\."):
+            cv._validate_relationship(123, eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        # Act
+        ok = cv._validate_relationship(123, eager_termination=False)
+        # Assert
+        assert ok is False
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_invalid_value(eager_termination: bool) -> None:
+    """Unknown relationship should log error; optionally raise in eager mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Invalid relationship provided\."):
+            cv._validate_relationship("something_else", eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        ok = cv._validate_relationship("something_else", eager_termination=False)
+        assert ok is False
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (1, 1, True),
+        (1, 2, False),
+        ("x", "x", True),
+        ("x", "y", False),
+        (True, True, True),
+        (True, False, False),
+    ],
+)
+def test_evaluate_equal_condition(a: Any, b: Any, expected: bool) -> None:
+    """_evaluate_equal_condition returns Python == semantics."""
+    cv = CrossValidator()
+    assert cv._evaluate_equal_condition(a, b) is expected
+
+
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (2, 1, True),
+        (1, 2, False),
+        ("b", "a", True),
+        ("a", "b", False),
+    ],
+)
+def test_evaluate_greater_condition(a: Any, b: Any, expected: bool) -> None:
+    """_evaluate_greater_condition returns Python > semantics."""
+    cv = CrossValidator()
+    assert cv._evaluate_greater_condition(a, b) is expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (None, True),
+        (0, False),
+        ("", False),
+        ([], False),
+    ],
+)
+def test_evaluate_is_null(value: Any, expected: bool) -> None:
+    """_evaluate_is_null checks identity to None."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_null(value) is expected
+
+
+@pytest.mark.parametrize(
+    "data_type,left_value,expected",
+    [
+        ("string", "abc", True),
+        ("string", 123, False),
+        ("integer", 7, True),
+        ("integer", True, False),
+        ("float", 1.2, True),
+        ("float", 7, False),
+        ("boolean", True, True),
+        ("boolean", 0, False),
+        ("number", 7, True),
+        ("number", 1.2, True),
+        ("number", False, False),
+        ("  StRiNg  ", "ok", True),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_supported_types(
+    data_type: str, left_value: Any, expected: bool, eager_termination: bool
+) -> None:
+    """Supported types honor bool/int nuances and case-insensitive type strings."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_type(left_value, data_type, eager_termination) is expected
+    # No error logs on supported types
+    assert all(e["error"] != "Invalid data type expectation." for e in cv._event_logs)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_data_type_not_str(eager_termination: bool) -> None:
+    """Non-string data_type logs and optionally raises."""
+    cv = CrossValidator()
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Invalid type comparison in cross validation\."):
+            cv._evaluate_is_type("x", 123, eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        valid = cv._evaluate_is_type("x", 123, eager_termination=False)
+        assert not valid
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_unsupported_type_string(eager_termination: bool) -> None:
+    """Unsupported type string logs and optionally raises."""
+    cv = CrossValidator()
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Unsupported data type weird\. Supported types:"):
+            cv._evaluate_is_type("x", "weird", eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        valid = cv._evaluate_is_type("x", "weird", eager_termination=False)
+        assert not valid
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "text,pattern,expected",
+    [
+        ("abc", r"a.c", True),
+        ("abc", r"^a.*c$", True),
+        ("abc", r"^ab$", False),
+        ("", r"^$", True),
+    ],
+)
+def test_evaluate_regex_fullmatch(text: str, pattern: str, expected: bool) -> None:
+    """
+    Per docstring: left_hand_value is the string, right_hand_value is the regex pattern.
+    NOTE: If this test fails, check that _evaluate_regex calls re.fullmatch(pattern, text).
+    """
+    cv = CrossValidator()
+    assert cv._evaluate_regex(text, pattern) is expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_short_circuits_when_validation_fails(mocker: MockerFixture,
+                                                                 eager_termination: bool) -> None:
+    """If _validate_condition_clause returns False, no expressions are evaluated and result is False."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=False)
+    mock_eval = mocker.patch.object(cv, "_evaluate_expression")
+
+    valid = cv._evaluate_condition({"relationship": "equal"}, eager_termination)
+
+    assert not valid
+    mock_eval.assert_not_called()
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_returns_false_when_side_not_evaluated(mocker: MockerFixture,
+                                                                  eager_termination: bool) -> None:
+    """If either side doesn't evaluate, the condition returns False."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    # Left evaluated False; right True
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("L", False), ("R", True)])
+
+    valid = cv._evaluate_condition({"relationship": "equal", "left_expression": {},
+                                    "right_expression": {}}, eager_termination)
+
+    assert not valid
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Dispatch to _evaluate_equal_condition for 'equal'."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("A", True), ("B", True)])
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "equal", "left_expression": {},
+                                    "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_eq.assert_called_once_with("A", "B")
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_greater_or_equals_short_circuit(mocker: MockerFixture, eager_termination: bool) -> None:
+    """When 'greater_or_equals_to', greater=True should short-circuit (no equality call)."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(5, True), (2, True)])
+    mock_gt = mocker.patch.object(cv, "_evaluate_greater_condition", return_value=True)
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=False)
+
+    valid = cv._evaluate_condition(
+        {"relationship": "greater_or_equals_to", "left_expression": {}, "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_gt.assert_called_once_with(5, 2)
+    mock_eq.assert_not_called()
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_greater_or_equals_falls_back_to_equal(mocker: MockerFixture,
+                                                                  eager_termination: bool) -> None:
+    """When 'greater_or_equals_to', if greater=False, equality result is used."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(2, True), (2, True)])
+    mock_gt = mocker.patch.object(cv, "_evaluate_greater_condition", return_value=False)
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=True)
+
+    valid = cv._evaluate_condition(
+        {"relationship": "greater_or_equals_to", "left_expression": {}, "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_gt.assert_called_once_with(2, 2)
+    mock_eq.assert_called_once_with(2, 2)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_not_equal_inverts_equality(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'not_equal' returns logical inversion of equality."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("foo", True), ("bar", True)])
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=False)
+
+    valid = cv._evaluate_condition({"relationship": "not_equal", "left_expression": {},
+                                    "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_eq.assert_called_once_with("foo", "bar")
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_of_type_passes_eager(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_of_type' should pass eager flag to _evaluate_is_type."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("text", True), ("string", True)])
+    mock_is_type = mocker.patch.object(cv, "_evaluate_is_type", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_of_type", "left_expression": {},
+                                    "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_is_type.assert_called_once_with("text", "string", eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_null_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_null' should evaluate only semantics of left-hand (we still provide right to enter branch)."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    # Both evaluated True so the code enters the relationship switch
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(None, True), ("ignored", True)])
+    mock_is_null = mocker.patch.object(cv, "_evaluate_is_null", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_null", "left_expression": {},
+                                    "right_expression": {}}, eager_termination)
+
+    assert valid
+    mock_is_null.assert_called_once_with(None)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_regex_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Fallback (else) is regex."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("abc", True), (r"a.c", True)])
+    mock_regex = mocker.patch.object(cv, "_evaluate_regex", return_value=True)
+
+    ok = cv._evaluate_condition({"relationship": "regex", "left_expression": {},
+                                 "right_expression": {}}, eager_termination)
+
+    assert ok is True
+    mock_regex.assert_called_once_with("abc", r"a.c")
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_clause_array_all_true(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Array evaluation returns True when all clauses pass."""
+    cv = CrossValidator()
+    mock = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, True, True])
+
+    valid = cv._evaluate_condition_clause_array([{}, {}, {}], eager_termination)
+
+    assert valid
+    assert mock.call_count == 3
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_clause_array_short_circuit_on_false(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Stops on first False and returns False."""
+    cv = CrossValidator()
+    mock = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cv._evaluate_condition_clause_array([{}, {}, {}], eager_termination)
+    else:
+        valid = cv._evaluate_condition_clause_array([{}, {}, {}], eager_termination)
+        assert not valid
+        assert mock.call_count == 2
+
+
+def test_validate_condition_clause_ok(mocker: MockerFixture) -> None:
+    """True when relationship valid and both sides present."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "right_hand": 2, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is True
+    log.assert_not_called()
+
+
+def test_validate_condition_clause_missing_both_no_eager(mocker: MockerFixture) -> None:
+    """False and logs both fields when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_missing_left_no_eager(mocker: MockerFixture) -> None:
+    """False and logs left when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"right_hand": 2, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand")]
+
+
+def test_validate_condition_clause_missing_right_no_eager(mocker: MockerFixture) -> None:
+    """False and logs right when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("right hand")]
+
+
+def test_validate_condition_clause_missing_both_eager_raises(mocker: MockerFixture) -> None:
+    """Raises KeyError and logs both when eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    with pytest.raises(KeyError):
+        v._validate_condition_clause(clause, eager_termination=True)
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_invalid_relationship(mocker: MockerFixture) -> None:
+    """False when relationship validation fails."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=False)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "right_hand": 2, "relationship": "bogus"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    log.assert_not_called()
+
+
+def test_log_missing_condition_clause_field_only() -> None:
+    """Appends one correctly shaped entry."""
+    v = CrossValidator()
+    v._event_logs = []
+    v._log_missing_condition_clause_field("left hand")
+    assert len(v._event_logs) == 1
+    e = v._event_logs[0]
+    assert e["error"] == "Missing required condition clause field"
+    assert e["message"] == "Missing the left hand field in condition clause."
