@@ -253,6 +253,7 @@ v0.9.2
 - [2584](https://github.com/RuminantFarmSystems/MASM/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
 - [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
 - [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
+- [2605](https://github.com/RuminantFarmSystems/MASM/pull/2605) - [minor change] Adds E2E testing for Feed and Feed Storage modules.
 - [2606](https://github.com/RuminantFarmSystems/MASM/pull/2606) - [minor change] Moves Field/Crop/Soil module to `biophysical` and removes `routines` directory.
 - [2613](https://github.com/RuminantFarmSystems/MASM/pull/2613) - [minor change] Added new image and adjust phrasing on a step in rufas onboarding documentation.
 ### v0.9.2

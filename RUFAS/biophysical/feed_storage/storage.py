@@ -136,6 +136,8 @@ class Storage:
         self.ndf_loss_coefficient: float = 0.0
         self.lignin_loss_coefficient: float = 0.0
         self.ash_loss_coefficient: float = 0.0
+        base_class_name = self.__class__.__bases__[0].__name__
+        self._prefix = f"Feed.{base_class_name}.{self.__class__.__name__}.{self.storage_name}"
         self.om: OutputManager = OutputManager()
 
     @property
@@ -211,6 +213,7 @@ class Storage:
             "class": self.__class__.__name__,
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
+            "prefix": self._prefix,
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
@@ -392,6 +395,7 @@ class Storage:
             "function": self._record_storage_totals.__name__,
             "units": MeasurementUnits.KILOGRAMS,
             "simulation_day": simulation_day,
+            "prefix": self._prefix,
         }
         self.om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
@@ -465,6 +469,7 @@ class Storage:
                 "suffix": f"crop='{crop.config_name}'," f"stored_date={crop.storage_time}",
                 "units": MeasurementUnits.KILOGRAMS,
                 "simulation_day": simulation_day,
+                "prefix": self._prefix,
             }
             if simulation_day in crop.recorded_days:
                 self.om.add_log(
@@ -611,6 +616,7 @@ class Storage:
             "class": self.__class__.__name__,
             "function": self._process_moisture_loss.__name__,
             "units": MeasurementUnits.KILOGRAMS,
+            "prefix": self._prefix,
         }
         total_moisture_loss = 0.0
         for crop in self.stored:
@@ -787,7 +793,8 @@ class Storage:
 
         fraction_of_nutrient_in_lost_dry_matter = loss_coefficient * dry_matter_loss_fraction
         if initial_nutrient_fraction < fraction_of_nutrient_in_lost_dry_matter:
-            info_map = {"class": self.__class__.__name__, "function": self.recalculate_nutrient_percentage.__name__}
+            info_map = {"class": self.__class__.__name__, "function": self.recalculate_nutrient_percentage.__name__,
+                        "prefix": self._prefix}
             warning_title = (
                 f"Nutrient fraction {initial_nutrient_fraction} is less than nutrient fraction in dry matter loss "
                 + f"{fraction_of_nutrient_in_lost_dry_matter}"

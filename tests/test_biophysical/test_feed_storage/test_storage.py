@@ -146,6 +146,7 @@ def test_process_degradations(
         "class": storage.__class__.__name__,
         "function": storage.process_degradations.__name__,
         "units": MeasurementUnits.KILOGRAMS,
+        "prefix": "Feed.object.Storage.Test Storage"
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
@@ -477,6 +478,7 @@ def test_process_moisture_loss(
         "class": storage.__class__.__name__,
         "function": storage._process_moisture_loss.__name__,
         "units": MeasurementUnits.KILOGRAMS,
+        "prefix": "Feed.object.Storage.Test Storage"
     }
     harvested_crop.initial_dry_matter_percentage = 100.0 - moisture
     harvested_crop.initial_dry_matter_mass = (
