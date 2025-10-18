@@ -241,9 +241,7 @@ def test_apply_methane_emissions_no_flare(
     assert stored_manure.degradable_volatile_solids == pytest.approx(
         20.0 - 2.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
-    assert stored_manure.non_degradable_volatile_solids == pytest.approx(
-        10.0 - 1.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
-    )
+    assert stored_manure.non_degradable_volatile_solids == 5.375
 
 
 def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:

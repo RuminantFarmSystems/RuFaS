@@ -893,8 +893,8 @@ class ManureManager:
             "ammoniacal_nitrogen",
             "potassium",
             "ash",
-            "manure_non_degradable_volatile_solids",
-            "manure_degradable_volatile_solids",
+            "non_degradable_volatile_solids",
+            "degradable_volatile_solids",
             "total_solids",
             "bedding_non_degradable_volatile_solids"
         ]
