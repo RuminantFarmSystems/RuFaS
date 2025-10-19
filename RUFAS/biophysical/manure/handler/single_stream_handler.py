@@ -238,11 +238,11 @@ class SingleStreamHandler(Handler):
         """
         if self.manure_stream:
             degradable_to_total_manure_volatile_solid_ratio = 0.0
-            if self.manure_stream.total_volatile_solids != 0.0:
+            if self.manure_stream.degradable_volatile_solids + self.manure_stream.non_degradable_volatile_solids != 0.0:
                 degradable_to_total_manure_volatile_solid_ratio = (
-                    self.manure_stream.degradable_volatile_solids /
-                    (self.manure_stream.degradable_volatile_solids +
-                     self.manure_stream.non_degradable_volatile_solids)
+                    self.manure_stream.degradable_volatile_solids / (
+                        self.manure_stream.degradable_volatile_solids
+                        + self.manure_stream.non_degradable_volatile_solids)
                 )
             total_volatile_solid_loss = (
                 ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
