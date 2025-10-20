@@ -173,7 +173,7 @@ def test_receive_manure_error(
     pen_manure_data: PenManureData | None,
     is_housing_emissions_calculator: bool,
     expected_msg: str,
-    mocker,
+    mocker: MockerFixture,
 ) -> None:
     """Test that Storage.receive_manure raises appropriate errors for invalid streams."""
     storage.is_housing_emissions_calculator = is_housing_emissions_calculator
