@@ -406,10 +406,8 @@ To ensure your dependencies are up to date, you'll just need to run:
 
                   pip install .
 
-  .. figure:: /_static/config.png
+  .. image:: /_static/config.png
      :alt: RuFaS Configuration
-     :align: center
-     :name: rufas Configuration
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.
