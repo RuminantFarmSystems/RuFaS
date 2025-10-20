@@ -753,6 +753,17 @@ message includes the invalid modifiability value and suggests valid values.</p>
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.data_validator.</span></span><span class="sig-name descname"><span class="pre">CrossValidator</span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is will be utilized for cross-validation.</p>
+<section id="id34">
+<h2>Attributes<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>_alias_pool<span class="classifier">dict[str, Any]</span></dt><dd><p>Alias pool storing data for cross validation.</p>
+</dd>
+<dt>_event_logs<span class="classifier">list[dict[str, str | dict[str, str]]]</span></dt><dd><p>Logs for the events that will be handled by output manager.</p>
+</dd>
+<dt>relation_mapping<span class="classifier">dict[str, Any]</span></dt><dd><p>A mapping for all the supported relationship evaluation functions.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator.__init__'"><span>#</span></a></dt>
@@ -761,8 +772,8 @@ message includes the invalid modifiability value and suggests valid values.</p>
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator.cross_validate_data">
 <span class="sig-name descname"><span class="pre">cross_validate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im_variable_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_validation_rules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator.cross_validate_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator.cross_validate_data'"><span>#</span></a></dt>
 <dd><p>Performs cross-validation on the provided data using the provided cross validation rules.</p>
-<section id="id34">
-<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>im_variable_pool<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary containing the InputManager variable pool to be validated.</p>
 </dd>
@@ -770,8 +781,8 @@ message includes the invalid modifiability value and suggests valid values.</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h2>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>A boolean indicating whether the data passed cross-validation.</p>
 </dd>
@@ -782,8 +793,8 @@ message includes the invalid modifiability value and suggests valid values.</p>
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._save_to_alias_pool">
 <span class="sig-name descname"><span class="pre">_save_to_alias_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alias_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._save_to_alias_pool" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._save_to_alias_pool'"><span>#</span></a></dt>
 <dd><p>Saves a value to the alias pool with the specified alias name.</p>
-<section id="id36">
-<h2>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>alias_name<span class="classifier">str</span></dt><dd><p>The name of the alias to be saved.</p>
 </dd>
@@ -796,8 +807,8 @@ message includes the invalid modifiability value and suggests valid values.</p>
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._get_alias_value">
 <span class="sig-name descname"><span class="pre">_get_alias_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alias_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._get_alias_value" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._get_alias_value'"><span>#</span></a></dt>
 <dd><p>Retrieves the value associated with the specified alias name from the alias pool.</p>
-<section id="id37">
-<h2>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>alias_name<span class="classifier">str</span></dt><dd><p>The alias of the value to retrieve.</p>
 </dd>
@@ -805,15 +816,15 @@ message includes the invalid modifiability value and suggests valid values.</p>
 </dd>
 </dl>
 </section>
-<section id="id38">
-<h2>Returns<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h2>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Any</dt><dd><p>The value associated with the specified alias name from the alias pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id39">
-<h2>Raises<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
+<section id="id40">
+<h3>Raises<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>KeyError</dt><dd><p>Raises the error when the alias name provided does not have value in the alias pool.</p>
 </dd>
@@ -827,8 +838,8 @@ message includes the invalid modifiability value and suggests valid values.</p>
 It retrieves the value of the target variable from the InputManager variable pool
 and saves it to the alias pool with the specified alias name. It also saves the
 constants defined in the “constants” block to the alias pool with the specified alias.</p>
-<section id="id40">
-<h2>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>target_and_save_result<span class="classifier">dict[str, dict[str, Any]]</span></dt><dd><p>A dictionary containing the “target and save block” of the cross-validation rule.</p>
 </dd>
@@ -845,8 +856,8 @@ constants defined in the “constants” block to the alias pool with the specif
 <span class="sig-name descname"><span class="pre">_evaluate_expression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expression_block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_expression" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_expression'"><span>#</span></a></dt>
 <dd><p>Evaluates an expression based on the provided expression block. This function also
 optionally adds to the alias pool if the <cite>save_as</cite> key is present in the expression block.</p>
-<section id="id41">
-<h2>Parameters<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>expression_block<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary containing the expression block to be evaluated.</p>
 </dd>
@@ -854,16 +865,16 @@ optionally adds to the alias pool if the <cite>save_as</cite> key is present in 
 </dd>
 </dl>
 </section>
-<section id="id42">
-<h2>Returns<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[Any, bool]</dt><dd><p>The result of the expression evaluation and a boolean indicating whether the expression was
 successfully evaluated.</p>
 </dd>
 </dl>
 </section>
-<section id="id43">
-<h2>Notes<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<section id="id44">
+<h3>Notes<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <p>Expression block:
 &gt;&gt;&gt; {
 …  “operation”: “sum | difference | average | product | no_op”, # optional, defaults to “no_op”
@@ -880,8 +891,8 @@ successfully evaluated.</p>
 <p>This method checks the validity of an expression block if it includes complex variables
 (such as lists or dictionaries) and ensures it adheres to predefined rules. Validation
 errors are logged, and eager termination behavior is enforced if specified.</p>
-<section id="id44">
-<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>expression_block<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary representing the expression block to be validated.</p>
 </dd>
@@ -893,8 +904,8 @@ encountered.</p>
 </dd>
 </dl>
 </section>
-<section id="id45">
-<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>Returns True if the expression block is valid, otherwise False if eager termination
 is disabled.</p>
@@ -904,17 +915,20 @@ is disabled.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_condition">
-<span class="sig-name descname"><span class="pre">_evaluate_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_clause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_condition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_condition'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_evaluate_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_clause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_condition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_condition'"><span>#</span></a></dt>
 <dd><p>Evaluates if a single condition is satisfied based on the provided condition clause.</p>
-<section id="id46">
-<h2>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<section id="id47">
+<h3>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>condition_clause<span class="classifier">dict[str, Any]</span></dt><dd><p>The condition clause to be evaluated.</p>
 </dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Specifies whether to immediately terminate the process when a validation error is
+encountered.</p>
+</dd>
 </dl>
 </section>
-<section id="id47">
-<h2>Returns<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<section id="id48">
+<h3>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>A boolean indicating whether the condition is satisfied.</p>
 </dd>
@@ -922,24 +936,84 @@ is disabled.</p>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array">
-<span class="sig-name descname"><span class="pre">_evaluate_condition_clause_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_clause_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array'"><span>#</span></a></dt>
-<dd><p>Evaluates if all conditions in the provided condition clause array are satisfied.</p>
-<section id="id48">
-<h2>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._validate_condition_clause">
+<span class="sig-name descname"><span class="pre">_validate_condition_clause</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_clause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._validate_condition_clause" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._validate_condition_clause'"><span>#</span></a></dt>
+<dd><p>Validate the whole condition block.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field">
+<span class="sig-name descname"><span class="pre">_log_missing_condition_clause_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">missing_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field'"><span>#</span></a></dt>
+<dd><p>Helper method to log the missing essential field in conditional clause.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._validate_relationship">
+<span class="sig-name descname"><span class="pre">_validate_relationship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relationship</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._validate_relationship" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._validate_relationship'"><span>#</span></a></dt>
+<dd><p>Validate if a valid relationship check is given.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_equal_condition">
+<span class="sig-name descname"><span class="pre">_evaluate_equal_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_equal_condition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_equal_condition'"><span>#</span></a></dt>
+<dd><p>Evaluates equal condition.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_greater_condition">
+<span class="sig-name descname"><span class="pre">_evaluate_greater_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_greater_condition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_greater_condition'"><span>#</span></a></dt>
+<dd><p>Evaluates greater than condition</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_is_null">
+<span class="sig-name descname"><span class="pre">_evaluate_is_null</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_is_null" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_is_null'"><span>#</span></a></dt>
+<dd><p>Evaluates is null condition.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_is_type">
+<span class="sig-name descname"><span class="pre">_evaluate_is_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_is_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_is_type'"><span>#</span></a></dt>
+<dd><p>Evaluates the if_type condition</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_regex">
+<span class="sig-name descname"><span class="pre">_evaluate_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_hand_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_regex" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_regex'"><span>#</span></a></dt>
+<dd><p>Check if a value matches a given regex pattern.</p>
+<section id="id49">
+<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>condition_clause_array<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>An array of condition clauses to be evaluated.</p>
+<dt>left_hand_value<span class="classifier">str</span></dt><dd><p>The string to check.</p>
+</dd>
+<dt>right_hand_value<span class="classifier">str</span></dt><dd><p>The regex pattern to match.</p>
 </dd>
 </dl>
 </section>
-<section id="id49">
-<h2>Returns<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
+<section id="id50">
+<h3>Returns<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the value fully matches the regex pattern, otherwise False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array">
+<span class="sig-name descname"><span class="pre">_evaluate_condition_clause_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_clause_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array'"><span>#</span></a></dt>
+<dd><p>Evaluates if all conditions in the provided condition clause array are satisfied.</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>condition_clause_array<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>An array of condition clauses to be evaluated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Specifies whether to immediately terminate the process when a validation error is
+encountered.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>A boolean indicating whether all conditions in the array are satisfied.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -1004,6 +1078,14 @@ is disabled.</p>
 <li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_expression'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_expression"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_expression()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._validate_expression_block_with_complex_variable_values'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._validate_expression_block_with_complex_variable_values"><code class="docutils literal notranslate"><span class="pre">CrossValidator._validate_expression_block_with_complex_variable_values()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_condition'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_condition"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_condition()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._validate_condition_clause'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._validate_condition_clause"><code class="docutils literal notranslate"><span class="pre">CrossValidator._validate_condition_clause()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field"><code class="docutils literal notranslate"><span class="pre">CrossValidator._log_missing_condition_clause_field()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._validate_relationship'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._validate_relationship"><code class="docutils literal notranslate"><span class="pre">CrossValidator._validate_relationship()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_equal_condition'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_equal_condition"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_equal_condition()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_greater_condition'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_greater_condition"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_greater_condition()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_is_null'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_is_null"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_is_null()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_is_type'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_is_type"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_is_type()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_regex'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_regex"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_regex()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array'" class="reference internal" href="#RUFAS.data_validator.CrossValidator._evaluate_condition_clause_array"><code class="docutils literal notranslate"><span class="pre">CrossValidator._evaluate_condition_clause_array()</span></code></a></li>
 </ul>
 </li>
