@@ -1623,9 +1623,32 @@ class DataValidator:
 
 
 class CrossValidator:
+    """
+    This class is will be utilized for cross-validation.
+
+    Attributes
+    ----------
+    _alias_pool : dict[str, Any]
+        Alias pool storing data for cross validation.
+    _event_logs : list[dict[str, str | dict[str, str]]]
+        Logs for the events that will be handled by output manager.
+    relation_mapping : dict[str, Any]
+        A mapping for all the supported relationship evaluation functions.
+
+    """
     def __init__(self) -> None:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
+        self.relation_mapping: dict[str, Any] = {
+            "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
+            "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
+            "greater_or_equals_to": lambda left, right, _eager_termination: (
+                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)),
+            "not_equal": lambda left, right, _eager_termination: not self._evaluate_equal_condition(left, right),
+            "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
+            "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
+            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right)
+        }
 
     def cross_validate_data(
         self, im_variable_pool: dict[str, Any], cross_validation_rules: list[dict[str, Any]]
@@ -1902,7 +1925,7 @@ class CrossValidator:
                 return False
         return True
 
-    def _evaluate_condition(self, condition_clause: dict[str, Any]) -> bool:
+    def _evaluate_condition(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
         """
         Evaluates if a single condition is satisfied based on the provided condition clause.
 
@@ -1910,15 +1933,177 @@ class CrossValidator:
         ----------
         condition_clause : dict[str, Any]
             The condition clause to be evaluated.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
 
         Returns
         -------
         bool
             A boolean indicating whether the condition is satisfied.
-        """
-        pass
 
-    def _evaluate_condition_clause_array(self, condition_clause_array: list[dict[str, Any]]) -> bool:
+        """
+        if not self._validate_condition_clause(condition_clause, eager_termination):
+            return False
+
+        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
+        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
+
+        if not (left_evaluated and right_evaluated):
+            return False
+
+        evaluation_function = self.relation_mapping.get(condition_clause["relationship"])
+        return evaluation_function(left_hand, right_hand, eager_termination)
+
+    def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
+        """Validate the whole condition block."""
+        left_expression = condition_clause.get("left_hand", False)
+        right_expression = condition_clause.get("right_hand", False)
+        relationship = condition_clause.get("relationship", False)
+        fields = {
+            "left hand": left_expression,
+            "right hand": right_expression,
+            "relationship": relationship,
+        }
+        valid = True
+        if self._validate_relationship(relationship, eager_termination):
+            missing = [name for name, val in fields.items() if not val]
+            for name in missing:
+                self._log_missing_condition_clause_field(name)
+            if missing and eager_termination:
+                raise KeyError("Missing required field in conditional clause.")
+            elif missing:
+                valid = False
+
+        else:
+            valid = False
+
+        return valid
+
+    def _log_missing_condition_clause_field(self, missing_field: str) -> None:
+        """Helper method to log the missing essential field in conditional clause."""
+        self._event_logs.append(
+            {
+                "error": "Missing required condition clause field",
+                "message": f"Missing the {missing_field} field in condition clause.",
+                "info_map": {
+                    "class": CrossValidator.__name__,
+                    "function": CrossValidator._log_missing_condition_clause_field.__name__,
+                },
+            }
+        )
+
+    def _validate_relationship(self, relationship: Any, eager_termination: bool) -> bool:
+        """Validate if a valid relationship check is given."""
+        available_relationship = self.relation_mapping.keys()
+        if not isinstance(relationship, str):
+            self._event_logs.append(
+                {
+                    "error": "Relationship must be a string.",
+                    "message": f"Relationship block must be a string, got: {type(relationship)}.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._validate_relationship.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Relationship must be a string.")
+            return False
+        elif relationship not in available_relationship:
+            self._event_logs.append(
+                {
+                    "error": "Invalid relationship.",
+                    "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._validate_relationship.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Invalid relationship provided.")
+            return False
+        else:
+            return True
+
+    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+        """Evaluates equal condition."""
+        return left_hand_value == right_hand_value
+
+    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+        """Evaluates greater than condition"""
+        return left_hand_value > right_hand_value
+
+    def _evaluate_is_null(self, left_hand_value: Any) -> bool:
+        """Evaluates is null condition."""
+        return left_hand_value is None
+
+    def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
+        """Evaluates the if_type condition"""
+        # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
+        if not isinstance(data_type, str):
+            self._event_logs.append(
+                {
+                    "error": "Invalid type validation",
+                    "message": f"Must indicate the type to compare in string data type, got: {type(data_type)}",
+                    "info_map": {
+                        "class": CrossValidator.__name__,
+                        "function": CrossValidator._evaluate_condition.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Invalid type comparison in cross validation.")
+            return False
+        data_type = data_type.strip().lower()
+        checkers = {
+            "string": lambda v: isinstance(v, str),
+            "integer": lambda v: isinstance(v, int) and not isinstance(v, bool),
+            "float": lambda v: isinstance(v, float),
+            "boolean": lambda v: isinstance(v, bool),
+            "number": lambda v: (isinstance(v, (int, float)) and not isinstance(v, bool)),
+        }
+        checker = checkers.get(data_type)
+        if checker is None:
+            supported = ", ".join(sorted({k for k in checkers}))
+            self._event_logs.append(
+                {
+                    "error": "Invalid data type expectation.",
+                    "message": f"Unsupported data type {data_type}. Supported types: {supported}.",
+                    "info_map": {
+                        "class": self.__class__.__name__,
+                        "function": "_evaluate_is_type",
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError(f"Unsupported data type {data_type}. Supported types: {supported}.")
+            return False
+
+        return bool(checker(left_hand_value))
+
+    def _evaluate_regex(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        """
+        Check if a value matches a given regex pattern.
+
+        Parameters
+        ----------
+        left_hand_value : str
+            The string to check.
+        right_hand_value : str
+            The regex pattern to match.
+
+        Returns
+        -------
+        bool
+            True if the value fully matches the regex pattern, otherwise False.
+        """
+        return re.fullmatch(right_hand_value, left_hand_value) is not None
+
+    def _evaluate_condition_clause_array(
+        self, condition_clause_array: list[dict[str, Any]], eager_termination: bool
+    ) -> bool:
         """
         Evaluates if all conditions in the provided condition clause array are satisfied.
 
@@ -1926,10 +2111,30 @@ class CrossValidator:
         ----------
         condition_clause_array : list[dict[str, Any]]
             An array of condition clauses to be evaluated.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
 
         Returns
         -------
         bool
             A boolean indicating whether all conditions in the array are satisfied.
         """
-        pass
+        for clause in condition_clause_array:
+            satisfied = self._evaluate_condition(clause, eager_termination)
+            if not satisfied:
+                self._event_logs.append(
+                    {
+                        "error": "Unsatisfied condition clause in conditional clause array.",
+                        "message": f"Condition not satisfied for condition clause: {clause}",
+                        "info_map": {
+                            "class": CrossValidator.__name__,
+                            "function": CrossValidator._evaluate_condition_clause_array.__name__,
+                        },
+                    }
+                )
+                if not eager_termination:
+                    return False
+                else:
+                    raise ValueError(f"Condition not satisfied for condition clause: {clause}.")
+        return True
