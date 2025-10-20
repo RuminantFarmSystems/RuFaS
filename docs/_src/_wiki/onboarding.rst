@@ -406,7 +406,7 @@ To ensure your dependencies are up to date, you'll just need to run:
 
                   pip install .
 
-  .. image:: /_static/config.png
+  .. image:: /_src/configrufas.png
      :alt: RuFaS Configuration
 
 **Great job!** If you’re reading this, you’ve reached the end of this
