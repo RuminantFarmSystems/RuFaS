@@ -466,7 +466,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert result == expected_sold_heiferIIIs
     assert herd_manager.herd_statistics.sold_heiferIIIs_info == expected_sold_heiferIIIs_info
     assert herd_manager.herd_statistics.heiferIII_num == 97
-    assert herd_manager.herd_statistics.sold_heiferIII_oversupply_num == 3
+    assert herd_manager.herd_statistics.sold_cow_oversupply_num == 3
 
 
 def test_check_if_replacement_heifers_needed(

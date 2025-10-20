@@ -590,7 +590,7 @@ class AnimalModuleReporter:
         }
         om.add_variable(
             "sold_heiferIII_oversupply_num",
-            herd_statistics.sold_heiferIII_oversupply_num,
+            herd_statistics.sold_cow_oversupply_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(

@@ -126,6 +126,7 @@ class HerdManager:
 
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
+        self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
@@ -589,18 +590,19 @@ class HerdManager:
 
         self._update_stillborn_calf_statistics(stillborn_newborn_calves)
 
-        removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
-        newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-        self._update_herd_structure(
-            graduated_animals=graduated_animals,
-            newborn_calves=newborn_calves,
-            newly_added_animals=newly_added_animals,
-            removed_animals=removed_animals,
-            available_feeds=available_feeds,
-            current_day_conditions=weather.get_current_day_conditions(time),
-            total_inventory=total_inventory,
-            simulation_day=time.simulation_day,
-        )
+        if time.simulation_day > 0 and time.simulation_day % 60 == 0:
+            removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
+            newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+            self._update_herd_structure(
+                graduated_animals=graduated_animals,
+                newborn_calves=newborn_calves,
+                newly_added_animals=newly_added_animals,
+                removed_animals=removed_animals,
+                available_feeds=available_feeds,
+                current_day_conditions=weather.get_current_day_conditions(time),
+                total_inventory=total_inventory,
+                simulation_day=time.simulation_day,
+            )
 
         self.record_pen_history(time.simulation_day)
         enteric_methane_emission_by_pen: dict[str, float] = {}
@@ -691,25 +693,26 @@ class HerdManager:
         """
         animals_removed: list[Animal] = []
         while (
-            self.current_herd_size > self.herd_statistics.herd_num * animal_constants.SELLING_THRESHOLD
+            self.current_herd_size > self.herd_statistics.herd_num * animal_constants.SELLING_THRESHOLD # TODO: Change to user input
             and len(self.heiferIIIs) > 0
         ):
-            removed_heiferIII = self.heiferIIIs.pop()
-            animals_removed.append(removed_heiferIII)
-            removed_heiferIII.sold_at_day = simulation_day
+            self.cows.sort(key=lambda cow: cow.milk_production.daily_milk_produced)
+            removed_cow = self.cows.pop()
+            removed_cow.sold_at_day = simulation_day
+            animals_removed.append(removed_cow)
             self.herd_statistics.sold_heiferIIIs_info.append(
                 SoldAnimalTypedDict(
-                    id=removed_heiferIII.id,
-                    animal_type=removed_heiferIII.animal_type.value,
-                    sold_at_day=removed_heiferIII.sold_at_day,
-                    body_weight=removed_heiferIII.body_weight,
+                    id=removed_cow.id,
+                    animal_type=removed_cow.animal_type.value,
+                    sold_at_day=removed_cow.sold_at_day,
+                    body_weight=removed_cow.body_weight,
                     cull_reason="NA",
-                    days_in_milk="NA",
+                    days_in_milk=removed_cow.days_in_milk,
                     parity="NA",
                 )
             )
-            self.herd_statistics.sold_heiferIII_oversupply_num += 1
-            self.herd_statistics.heiferIII_num -= 1
+            self.herd_statistics.cow_num -= 1
+            self.herd_statistics.sold_cow_oversupply_num += 1
         return animals_removed
 
     def _check_if_replacement_heifers_needed(self, time: RufasTime) -> list[Animal]:
@@ -734,7 +737,7 @@ class HerdManager:
         animals_added: list[Animal] = []
         while (
             self.current_herd_size + self.herd_statistics.bought_heifer_num
-            < self.herd_statistics.herd_num * animal_constants.BUYING_THRESHOLD
+            < self.herd_statistics.herd_num * animal_constants.BUYING_THRESHOLD # TODO: change to user input
             and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:
