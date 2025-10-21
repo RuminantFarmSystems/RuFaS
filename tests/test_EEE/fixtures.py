@@ -3367,7 +3367,10 @@ def mock_tractor(
     im = InputManager()
     mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset, deepcopy(EEE_constants)])
     return Tractor(
-        FieldOperationEvent.TILLING, tractor_size=tractor_size, tillage_implement=TillageImplement.DISK_HARROW
+        FieldOperationEvent.TILLING,
+        tractor_size=tractor_size,
+        tillage_implement=TillageImplement.DISK_HARROW,
+        application_depth=10
     )
 
 
@@ -3377,5 +3380,5 @@ def mock_tractor_implement(
     im = InputManager()
     mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset])
     return TractorImplement(
-        FieldOperationEvent.TILLING, OperationType.TILLING, None, TractorSize.SMALL, TillageImplement.DISK_HARROW, None
+        FieldOperationEvent.TILLING, OperationType.TILLING, None, TractorSize.SMALL, TillageImplement.DISK_HARROW, 10
     )

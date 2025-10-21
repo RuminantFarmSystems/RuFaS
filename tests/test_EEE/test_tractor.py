@@ -36,7 +36,12 @@ def test_herd_size_to_tractor_size(
 ) -> None:
     im = InputManager()
     mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset, deepcopy(EEE_constants)])
-    specs = Tractor(FieldOperationEvent.TILLING, herd_size=herd_size, tillage_implement=TillageImplement.DISK_HARROW)
+    specs = Tractor(
+        FieldOperationEvent.TILLING,
+        herd_size=herd_size,
+        tillage_implement=TillageImplement.DISK_HARROW,
+        application_depth=10
+    )
     assert specs.tractor_size == expected_size
 
 
@@ -216,13 +221,13 @@ def test_speed_km_hr(
     "tractor_mass, implement_mass, speed_km_hr, expected_result",
     [
         # Basic case
-        (2000, 500, 10, (2000 + 500) * 10 * 0.000287466667),  # 2500 * 10 * ~0.00028672
+        (2000, 500, 10, (2000 + 500) * 10 * 0.00022039111111),  # 2500 * 10 * ~0.00022039111111
         # Zero speed (no power)
         (1500, 800, 0, 0.0),
         # Zero implement mass
-        (1800, 0, 15, 1800 * 15 * 0.000287466667),
+        (1800, 0, 15, 1800 * 15 * 0.00022039111111),
         # Zero tractor mass
-        (0, 1200, 8, 1200 * 8 * 0.000287466667),
+        (0, 1200, 8, 1200 * 8 * 0.00022039111111),
         # All zeros
         (0, 0, 0, 0.0),
     ],

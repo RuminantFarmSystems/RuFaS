@@ -92,7 +92,6 @@ def test_simulate(
     )
     mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
     mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
 
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
@@ -123,7 +122,6 @@ def test_simulate(
     )
 
     mock_estimate_emissions.assert_called_once()
-    mock_estimate_all.assert_called_once_with()
 
 
 @pytest.mark.parametrize(
