@@ -256,6 +256,7 @@ v0.9.2
 - [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
 - [2605](https://github.com/RuminantFarmSystems/MASM/pull/2605) - [minor change] Adds E2E testing for Feed and Feed Storage modules.
 - [2606](https://github.com/RuminantFarmSystems/MASM/pull/2606) - [minor change] Moves Field/Crop/Soil module to `biophysical` and removes `routines` directory.
+- [2612](https://github.com/RuminantFarmSystems/MASM/pull/2612) - [minor change] Remove the generation of `dummy_path` when running unit tests.
 
 ### v0.9.2
 
