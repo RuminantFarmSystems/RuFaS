@@ -257,6 +257,7 @@ v0.9.2
 - [2605](https://github.com/RuminantFarmSystems/MASM/pull/2605) - [minor change] Adds E2E testing for Feed and Feed Storage modules.
 - [2606](https://github.com/RuminantFarmSystems/MASM/pull/2606) - [minor change] Moves Field/Crop/Soil module to `biophysical` and removes `routines` directory.
 - [2612](https://github.com/RuminantFarmSystems/MASM/pull/2612) - [minor change] Remove the generation of `dummy_path` when running unit tests.
+- [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] Implements the Energy submodule of the EEE module with diesel consumption calculation.
 
 ### v0.9.2
 

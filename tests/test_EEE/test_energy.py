@@ -29,6 +29,7 @@ def test_estimate_all(
         tractor_dataset: dict[str, list[Any]],
         mocker: MockerFixture
 ) -> None:
+    """Tests the estimation routines are called correctly."""
     im, om = InputManager(), OutputManager()
     mock_parse_inputs_for_diesel_consumption_calculation = mocker.patch.object(
         EnergyEstimator,
@@ -153,6 +154,7 @@ def test_report_diesel_consumption(
         expected_add_variable_calls: int,
         mocker: MockerFixture
 ) -> None:
+    """Tests the diesel consumption report function."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
@@ -172,6 +174,7 @@ def test_parse_inputs_for_diesel_consumption_calculation(
         parsed_diesel_consumption_inputs: list[dict[str, Any]],
         mocker: MockerFixture,
 ) -> None:
+    """Tests the diesel consumption calculation inputs are parsed correctly."""
     om = OutputManager()
     mocker.patch.object(
         om,
@@ -201,6 +204,7 @@ def test_calculate_diesel_consumption(
         expected_result: float,
         mocker: MockerFixture
 ) -> None:
+    """Tests the diesel consumption calculation is performed correctly."""
     tractor = MagicMock(auto_spec=Tractor)
     implement_1, implement_2 = MagicMock(auto_spec=TractorImplement), MagicMock(auto_spec=TractorImplement)
     mocker.patch.object(implement_1, "calculate_operation_time_hr", return_value=1.8)
@@ -219,6 +223,7 @@ def test_calculate_diesel_consumption(
 
 
 def test_calculate_total_power_needed(mocker: MockerFixture) -> None:
+    """Tests the total power needed is calculated correctly."""
     tractor, implement = MagicMock(auto_spec=Tractor), MagicMock(auto_spec=TractorImplement)
     mock_calculate_axel_power = mocker.patch.object(tractor, "calculate_axel_power", return_value=18)
     mock_calculate_drawbar_power = mocker.patch.object(implement, "calculate_drawbar_power", return_value=25)

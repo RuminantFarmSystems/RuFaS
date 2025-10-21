@@ -42,10 +42,20 @@ class Tractor:
 
         Parameters
         ----------
+        operation_event : FieldOperationEvent
+            The type of field operation for which the tractor is intended.
+        crop_type : str | None, optional
+            The type of crop for which the tractor is intended.
         tractor_size : TractorSize | None, optional
             The size of the tractor as a `TractorSize` enum value.
         herd_size : int | None, optional
             The size of the herd to determine the tractor size if `tractor_size` is not provided.
+        application_depth : float | None, optional
+            The depth of the application (cm).
+        tillage_implement : TillageImplement | None, optional
+            The type of tillage implement used for the operation.
+        harvest_type : HarvestOperation | None, optional
+            The type of harvest operation for the operation.
 
         Raises
         ------

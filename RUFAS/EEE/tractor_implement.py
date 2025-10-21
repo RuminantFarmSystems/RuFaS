@@ -21,6 +21,26 @@ class TractorImplement:
         application_depth: float | None,
         harvest_type: HarvestOperation | None = None
     ) -> None:
+        """
+        Initializes the TractorImplement object with the specifications of the tractor implement.
+
+        Parameters
+        ----------
+        operation_event : FieldOperationEvent
+            The event type of the field operation.
+        operation_type : OperationType
+            The type of operation to perform.
+        crop_type : str | None, optional
+            The type of crop to perform the operation on.
+        tractor_size : TractorSize
+            The size of the tractor.
+        tillage_implement : TillageImplement | None, optional
+            The type of tillage implement used for the operation.
+        application_depth : float | None, optional
+            The depth of the application (cm).
+        harvest_type : HarvestOperation | None, optional
+            The type of harvest operation for the operation.
+        """
         self.operation_event = operation_event
         self.operation_type = operation_type
         self.crop_type = crop_type

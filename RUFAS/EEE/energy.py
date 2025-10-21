@@ -72,6 +72,20 @@ class EnergyEstimator:
         tractor_size: TractorSize,
         diesel_consumption_tractor_implement_liter_per_ton: float,
     ) -> None:
+        """
+        Reports diesel consumption data for a specific tractor-implement operation.
+
+        Parameters
+        ----------
+        diesel_consumption_data : dict[str, Any]
+            Diesel consumption data for the operation.
+        herd_size : int
+            Number of animals in the herd.
+        tractor_size : TractorSize
+            Size of the tractor used.
+        diesel_consumption_tractor_implement_liter_per_ton : float
+            Diesel consumption per ton of implement.
+        """
         base_info_map = {
             "class": EnergyEstimator.__name__,
             "function": EnergyEstimator.estimate_all.__name__,
@@ -145,6 +159,9 @@ class EnergyEstimator:
         )
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> list[dict[str, Any]]:
+        """
+        Parses the OutputManager variables pool for diesel consumption calculation.
+        """
         crop_and_soil_filters = [
             {
                 "name": FieldOperationEvent.FERTILIZER_APPLICATION,
@@ -299,6 +316,8 @@ class EnergyEstimator:
             The clay percentage of the field under production (unitless).
         application_mass : float | None = None
             The mass of a manure or fertilizer application (kg).
+        application_dm_content : float | None = None
+            The dry matter content of a manure or fertilizer application (kg).
 
         Returns
         -------
@@ -344,6 +363,26 @@ class EnergyEstimator:
         """
         Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
         Implements Helper Function 412 in EEE Functions file.
+
+        Parameters
+        ----------
+        tractor : Tractor
+            The specifications of the tractor.
+        implement : TractorImplement
+            The specifications of the implement.
+        crop_yield_ton_per_ha : float
+            Amount of crop yielded per hectares (metric ton/ha)
+        field_production_size_ha : float
+            The filed area under production (ha)
+        clay_percent : float
+            The clay percentage of the field under production (unitless).
+        application_mass : float | None = None
+            The mass of a manure or fertilizer application (kg).
+
+        Returns
+        -------
+        float
+            The total power needed for the field operation (kW)
         """
         tractor_axel_power = tractor.calculate_axel_power(implement)
         tractor_implement_drawbar_power = implement.calculate_drawbar_power(clay_percent)

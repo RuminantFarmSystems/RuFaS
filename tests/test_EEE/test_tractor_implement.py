@@ -54,6 +54,7 @@ def test_init(
     EEE_constants: list[dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Tests the initialization of TractorImplement with various parameters."""
     im = InputManager()
     mock_get_data = mocker.patch.object(im, "get_data", return_value=deepcopy(EEE_constants))
     mock_determine_implement_parameters = mocker.patch(
@@ -3891,6 +3892,7 @@ def test_determine_implement_parameters(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the determine_implement_parameters function."""
     im = InputManager()
     mock_get_data = mocker.patch.object(
         im, "get_data", side_effect=[deepcopy(EEE_constants), deepcopy(tractor_dataset)]
@@ -3952,6 +3954,7 @@ def test_field_capacity_ha_per_hr(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the field_capacity_ha_per_hr function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
     tractor_implement.operation_type = operation_type
     tractor_implement.throughput = throughput
@@ -3982,6 +3985,7 @@ def test_calculate_operation_time_hr(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_operation_time_hr function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     mock_field_capacity_ha_per_hr = mocker.patch.object(tractor_implement, "field_capacity_ha_per_hr", return_value=1.0)
@@ -4010,6 +4014,7 @@ def test_calculate_drawbar_power(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_drawbar_power function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
     tractor_implement.field_speed_km_per_hr = field_speed_km_per_hr
 
@@ -4072,6 +4077,7 @@ def test_calculate_functional_draft(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_functional_draft function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     tractor_implement.depth_cm = depth_cm
@@ -4112,6 +4118,7 @@ def test_calculate_needed_PTO(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_needed_PTO function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     tractor_implement.E = E
