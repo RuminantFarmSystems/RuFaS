@@ -1,0 +1,8 @@
+{
+  "use_daily_spread": false,
+  "max_nitrogen_masses": 500,
+  "max_phosphorus_masses": 500,
+  "max_potassium_masses": 500,
+  "application_depths": 30,
+  "surface_remainder_fractions": 0.20
+}
