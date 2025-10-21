@@ -62,6 +62,7 @@ class Silage(Storage):
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
             "simulation_day": time.simulation_day,
+            "prefix": self._prefix,
         }
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0

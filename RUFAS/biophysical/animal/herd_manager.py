@@ -354,7 +354,7 @@ class HerdManager:
         """
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
-            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen.values())
+            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen)
 
         return total_requested_feed
 
@@ -595,7 +595,6 @@ class HerdManager:
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-
         self._update_herd_structure(
             graduated_animals=graduated_animals,
             newborn_calves=newborn_calves,
@@ -608,15 +607,17 @@ class HerdManager:
         )
 
         self.record_pen_history(time.simulation_day)
-
+        enteric_methane_emission_by_pen: dict[str, float] = {}
         animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
         herd_manager_output: dict[str, ManureStream] = {}
         for pen in self.all_pens:
             animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
             herd_manager_output.update(pen.get_manure_streams())
+            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
 
+        AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
         AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, time.simulation_day)
         AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
