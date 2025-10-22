@@ -154,7 +154,7 @@ class NutritionSupplyCalculator:
 
         """
         dry_matter_intake = sum([feed.amount for feed in feeds])
-
+        
         total_tdn = sum([feed.amount * feed.info.TDN * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
         tdn_percentage = (
             total_tdn / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE if dry_matter_intake > 0.0 else 0.0
@@ -275,9 +275,9 @@ class NutritionSupplyCalculator:
 
         dNDFbase: float = (
             0.75 * (feed.info.NDF - feed.info.lignin)
-            * (1 - feed.info.lignin / feed.info.NDF) ** 0.667) / feed.info.lignin
+            * (1 - (feed.info.lignin / feed.info.NDF) ** 0.667)) / feed.info.NDF
 
-        dNDF: float = (dNDFbase - 0.0059 * (total_starch - 0.26) - 1.1
+        dNDF: float = (dNDFbase - 0.0059 * (total_starch - 26) - 1.1
                        * ((dry_matter_intake / body_weight) - 0.035))
 
         return dNDF
@@ -289,9 +289,9 @@ class NutritionSupplyCalculator:
         dry_matter_intake: float,
         body_weight: float
     ) -> float:
-        dstarch: float = feed.info.starch_digested - 1.0 * ((dry_matter_intake / body_weight) - 0.035)
+        dstarch: float = feed.info.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION - 1.0 * ((dry_matter_intake / body_weight) - 0.035)
 
-        return dstarch
+        return dstarch 
 
     @classmethod
     def calculate_NASEM_digestible_energy(
@@ -302,27 +302,33 @@ class NutritionSupplyCalculator:
         total_starch: float
     ) -> float:
         digestible_energy_NASEM_dict: dict[RUFAS_ID, float] = {}
-        dFA = 0.73
+        dFA: float = 0.73
+        dROM: float = 0.96
+
         for feed in feeds:
             # TODO check NPN supp calc
             if feed.info.Fd_Category is FeedCategorization.NPN_SUPPLEMENT:
                 NPNsupp: float = feed.info.NPN_source / feed.info.CP
-            else:
+            else: 
                 NPNsupp = 1.0
-            RDP: float = (1 - feed.info.RUP) / feed.info.CP
-            ROM: float = (1 - feed.info.FA / 1.06 - feed.info.ash
-                          - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp))
-            dROM: float = 0.96
-
-            if feed.info.NDF > 0.0:
-                dNDF = cls.calculate_NASEM_dNDF(feed, dry_matter_intake, body_weight, total_starch)
-                dstarch = cls.calculate_NASEM_dstarch(feed, dry_matter_intake, body_weight)
-                digestible_energy_NASEM: float = (0.042 * feed.info.NDF * dNDF + 0.0423 * feed.info.starch
-                                                  * dstarch + 0.0940 * feed.info.FA * dFA + 0.0565
-                                                  * (RDP + feed.info.RUP * feed.info.dRUP - feed.info.NPN_source)
-                                                  + 0.0089 * feed.info.NPN_source + 0.040 * ROM * dROM - 0.318)
+            if feed.info.CP > 0:
+                RUP: float = feed.info.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed.info.CP
+                RDP: float = feed.info.CP - RUP
+                ROM: float = (100 - feed.info.FA / 1.06 - feed.info.ash
+                            - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp))
             else:
-                digestible_energy_NASEM = 0.0
+                RUP = 0.0
+                RDP = 0.0
+                ROM = 0.0
+
+            if feed.info.NDF > 0.0 and feed.info.lignin > 0.0:
+                dNDF = cls.calculate_NASEM_dNDF(feed, dry_matter_intake, body_weight, total_starch)
+            else: dNDF = 0
+            dstarch = cls.calculate_NASEM_dstarch(feed, dry_matter_intake, body_weight)
+            digestible_energy_NASEM: float = (0.042 * feed.info.NDF * dNDF + 0.0423 * feed.info.starch
+                                                * dstarch + 0.0940 * feed.info.FA * dFA + 0.0565
+                                                * (RDP + RUP * feed.info.dRUP * GeneralConstants.PERCENTAGE_TO_FRACTION - feed.info.NPN_source)
+                                                + 0.0089 * feed.info.NPN_source + 0.040 * ROM * dROM - 0.318)
             digestible_energy_NASEM_dict[feed.info.rufas_id] = digestible_energy_NASEM
         total: float = sum([feed.amount * digestible_energy_NASEM_dict[feed.info.rufas_id] for feed in feeds])
 
