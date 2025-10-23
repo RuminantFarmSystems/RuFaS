@@ -1000,16 +1000,16 @@ def test_remove_nutrients_from_storage(
     ],
 )
 def test_compute_stream_after_removal_with_real_manure_stream(
-    init_n,
-    init_p,
-    limiting_flag,
-    available_limiting,
-    removal_prop,
-    exp_remain_n,
-    exp_remain_p,
-    exp_removed_n,
-    exp_removed_p,
-):
+    init_n: float,
+    init_p: float,
+    limiting_flag: bool,
+    available_limiting: float,
+    removal_prop: float,
+    exp_remain_n: float,
+    exp_remain_p: float,
+    exp_removed_n: float,
+    exp_removed_p: float,
+) -> None:
     """
     Verify compute_stream_after_removal() correctly updates only nitrogen and phosphorus
     on a real ManureStream, and leaves all other fields unchanged.
@@ -1028,6 +1028,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
 
     non_lim_fields: list[str] = []
@@ -1050,10 +1051,11 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         "ammoniacal_nitrogen",
         "potassium",
         "ash",
-        "non_degradable_volatile_solids",
         "degradable_volatile_solids",
+        "non_degradable_volatile_solids",
         "total_solids",
         "volume",
+        "bedding_non_degradable_volatile_solids"
     ]:
         assert getattr(new_stream, field_name) == 0.0
 
@@ -1073,7 +1075,9 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         (1.0, 50.0, 50.0),
     ],
 )
-def test_determine_non_limiting_nutrient_removal_amount(portion: float, non_limiting: float, expected_removed: float):
+def test_determine_non_limiting_nutrient_removal_amount(portion: float,
+                                                        non_limiting: float,
+                                                        expected_removed: float) -> None:
     removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
         limiting_nutrient_proportion_to_be_removed=portion,
         non_limiting_nutrients_amount=non_limiting,
@@ -1119,9 +1123,9 @@ def test_determine_limiting_nutrient_with_patched_scaling(
     ],
 )
 def test_determine_limiting_nutrient_proportion_to_be_removed(
-    requested_mass,
-    available,
-    expected_prop,
+    requested_mass: float,
+    available: float,
+    expected_prop: float,
 ):
     prop = ManureManager._determine_nutrient_proportion_to_be_removed(
         limiting_nutrient_requested_mass=requested_mass,
@@ -1186,9 +1190,9 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
 )
 def test_record_manure_request_results_parametrized(
     mocker: MockerFixture,
-    manure_request_results,
-    expected_request_result_values,
-    expected_log_called,
+    manure_request_results: MagicMock,
+    expected_request_result_values: dict[str, float],
+    expected_log_called: bool,
 ) -> None:
     """
     Parametrized unit test for the _record_manure_request_results method of the ManureManager class.
