@@ -448,7 +448,7 @@ def test_check_if_heifers_need_to_be_sold(
         len(herd_manager.cows),
     )
 
-    result = herd_manager._check_if_heifers_need_to_be_sold(simulation_day=0)
+    result = herd_manager._check_if_cows_need_to_be_sold(simulation_day=0)
 
     expected_sold_heiferIIIs = mock_herd["heiferIIIs"][::-1][:3]
     expected_sold_heiferIIIs_info = [
