@@ -118,7 +118,8 @@ class SlurryStorageOutdoor(Storage):
             is_degradable=True,
         )
         storage_methane_from_non_degradable_volatile_solids = self._calculate_methane_emissions(
-            volatile_solids=self._manure_to_process.non_degradable_volatile_solids,
+            volatile_solids=self._manure_to_process.non_degradable_volatile_solids
+            + self._manure_to_process.bedding_non_degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
@@ -131,6 +132,11 @@ class SlurryStorageOutdoor(Storage):
             storage_methane_burned, total_storage_methane = self._calculate_cover_and_flare_methane(
                 total_storage_methane
             )
+        bedding_to_manure_non_degradable_volatile_solids_ratio = (
+            self._manure_to_process.bedding_non_degradable_volatile_solids / (
+                self._manure_to_process.non_degradable_volatile_solids
+                + self._manure_to_process.bedding_non_degradable_volatile_solids)
+        )
 
         self._manure_to_process.total_solids = max(
             0.0,
@@ -147,10 +153,20 @@ class SlurryStorageOutdoor(Storage):
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
-            (
-                self._manure_to_process.non_degradable_volatile_solids
-                - storage_methane_from_non_degradable_volatile_solids
+            self._manure_to_process.non_degradable_volatile_solids
+            - (
+                storage_methane_from_non_degradable_volatile_solids
                 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * (1 - bedding_to_manure_non_degradable_volatile_solids_ratio)
+            ),
+        )
+        self._manure_to_process.bedding_non_degradable_volatile_solids = max(
+            0.0,
+            self._manure_to_process.bedding_non_degradable_volatile_solids
+            - (
+                storage_methane_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * bedding_to_manure_non_degradable_volatile_solids_ratio
             ),
         )
 
