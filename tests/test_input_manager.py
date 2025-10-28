@@ -9,7 +9,7 @@ from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
-from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState
+from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState, CrossValidator
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -3140,7 +3140,7 @@ def test_delete_data_with_valid_key(
     im.meta_data = metadata
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.level1")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.level1")
 
     assert data_delete
     assert metadata_delete
@@ -3160,7 +3160,7 @@ def test_delete_data_with_invalid_data_address(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", side_effect=KeyError("missing"))
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.unknown")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.unknown")
 
     assert not data_delete
     assert metadata_delete
@@ -3188,7 +3188,7 @@ def test_delete_data_metadata_not_found(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im.delete_input_and_metadata("c.nested.another")
+    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.another")
 
     assert data_delete
     assert not metadata_delete
@@ -3196,3 +3196,17 @@ def test_delete_data_metadata_not_found(
     mock_add_error.assert_called_once()
     args, kwargs = mock_add_error.call_args
     assert args[0] == "Validation: metadata not found"
+
+
+def test_extract_target_and_save_block(mocker: MockerFixture) -> None:
+    """Tests the function to extract the target and save block."""
+    im = InputManager()
+    mock_check = mocker.patch.object(CrossValidator, "check_target_and_save_block")
+    mock_get_data = mocker.patch.object(im, "get_data", return_value=1)
+    result = im.extract_target_and_save_block(
+        {"variables": {"a": "test.address.1", "b": "test.address.2"}, "constants": {"c": "value"}}, True
+    )
+
+    assert result == {"a": 1, "b": 1, "c": "value"}
+    mock_check.assert_called_once()
+    assert mock_get_data.call_count == 2

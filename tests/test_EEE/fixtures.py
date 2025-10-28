@@ -3367,7 +3367,10 @@ def mock_tractor(
     im = InputManager()
     mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset, deepcopy(EEE_constants)])
     return Tractor(
-        FieldOperationEvent.TILLING, tractor_size=tractor_size, tillage_implement=TillageImplement.DISK_HARROW
+        FieldOperationEvent.TILLING,
+        tractor_size=tractor_size,
+        tillage_implement=TillageImplement.DISK_HARROW,
+        application_depth=10
     )
 
 
@@ -3377,5 +3380,1474 @@ def mock_tractor_implement(
     im = InputManager()
     mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset])
     return TractorImplement(
-        FieldOperationEvent.TILLING, OperationType.TILLING, None, TractorSize.SMALL, TillageImplement.DISK_HARROW, None
+        FieldOperationEvent.TILLING, OperationType.TILLING, None, TractorSize.SMALL, TillageImplement.DISK_HARROW, 10
     )
+
+
+@pytest.fixture
+def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
+    return [
+        {
+            "mass": 786.1748576537939,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2013,
+            "operation_day": 124,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 609.7560975609756,
+            "application_depth": 0.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2013,
+            "operation_day": 126,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 609.7560975609756,
+            "application_depth": 0.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2017,
+            "operation_day": 126,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 458.66617938634926,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2013,
+            "operation_day": 124,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 609.7560975609756,
+            "application_depth": 0.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2013,
+            "operation_day": 126,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 609.7560975609756,
+            "application_depth": 0.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2017,
+            "operation_day": 126,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+        },
+        {
+            "mass": 16363.30748811621,
+            "dry_matter_fraction": 0.06866050590590597,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2013,
+            "operation_day": 124,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 36488.27689357436,
+            "dry_matter_fraction": 0.15693508905181594,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2014,
+            "operation_day": 311,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 35658.921916153486,
+            "dry_matter_fraction": 0.14562829648184375,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2015,
+            "operation_day": 311,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 34238.376646683995,
+            "dry_matter_fraction": 0.14300734780409236,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 20.0,
+            "operation_year": 2016,
+            "operation_day": 311,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 11939.038999999999,
+            "dry_matter_fraction": 0.04600027600165601,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2013,
+            "operation_day": 124,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 36488.27689134103,
+            "dry_matter_fraction": 0.15693508904228323,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2014,
+            "operation_day": 311,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 35658.92191484071,
+            "dry_matter_fraction": 0.14562829647689898,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2015,
+            "operation_day": 311,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "mass": 34238.37664567743,
+            "dry_matter_fraction": 0.14300734780136215,
+            "application_depth": 30.0,
+            "field_production_size": 10.0,
+            "clay_percent": 21.308,
+            "operation_year": 2016,
+            "operation_day": 311,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+        },
+        {
+            "crop_type": "corn_silage",
+            "crop_yield": 12958.851795252069,
+            "field_production_size": 10.0,
+            "operation_year": 2013,
+            "operation_day": 263,
+            "field_name": "field_1",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2302.807712970885,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 150,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3101.0788300377967,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 179,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3234.487471643309,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 210,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3125.8532063690864,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 242,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2634.7324364973647,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 120,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3256.9502949820544,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 150,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3691.1379316225716,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 179,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3634.679440085259,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 210,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3142.870565390124,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 242,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2428.179792045325,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 120,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3255.7066541436616,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 150,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3402.1964577747176,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 179,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 3260.964927108421,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 210,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2844.369686506972,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 242,
+            "field_name": "field_1",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "corn_silage",
+            "crop_yield": 15089.329513000639,
+            "field_production_size": 10.0,
+            "operation_year": 2017,
+            "operation_day": 263,
+            "field_name": "field_1",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2543.5650211475263,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 150,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2760.7355500562817,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 179,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2729.064015239216,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 210,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2386.1999998533574,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 242,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 1848.8457629511342,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 120,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2068.511390513816,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 150,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2822.444226111104,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 179,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2281.7139980325255,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 210,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "crop_yield": 2107.9674363374415,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 242,
+            "field_name": "field_1",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "corn_grain",
+            "crop_yield": 10202.238523552687,
+            "field_production_size": 10.0,
+            "operation_year": 2013,
+            "operation_day": 298,
+            "field_name": "field_2",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 1953.2691077836596,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 150,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2879.148563971437,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 179,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2925.6916183957055,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 210,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2905.9679829564298,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 242,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2473.692091653217,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 120,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2990.0590699449444,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 150,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 3231.05366286083,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 179,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 3355.716621393541,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 210,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2746.7773592132107,
+            "field_production_size": 10.0,
+            "operation_year": 2015,
+            "operation_day": 242,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2222.87229921061,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 120,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 3007.1744918411423,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 150,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 3238.223522929097,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 179,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2958.6259596832942,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 210,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2638.641203219705,
+            "field_production_size": 10.0,
+            "operation_year": 2016,
+            "operation_day": 242,
+            "field_name": "field_2",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "corn_grain",
+            "crop_yield": 11538.698999892364,
+            "field_production_size": 10.0,
+            "operation_year": 2017,
+            "operation_day": 298,
+            "field_name": "field_2",
+            "harvest_type": "harvest_kill",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2373.59068890197,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 150,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2758.3351876020824,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 179,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2277.6158543731062,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 210,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2452.217533699692,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 242,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2125.7499344328567,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 120,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2382.4000789402176,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 150,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2955.8272482811276,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 179,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2330.3303056522077,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 210,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "crop_yield": 2211.3538812625884,
+            "field_production_size": 10.0,
+            "operation_year": 2019,
+            "operation_day": 242,
+            "field_name": "field_2",
+            "harvest_type": "harvest_only",
+            "operation_event": FieldOperationEvent.HARVEST
+        },
+        {
+            "crop_type": "corn_silage",
+            "clay_percent": 20.0,
+            "field_production_size": 10.0,
+            "operation_year": 2013,
+            "operation_day": 127,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "clay_percent": 20.0,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 89,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "corn_silage",
+            "clay_percent": 20.0,
+            "field_production_size": 10.0,
+            "operation_year": 2017,
+            "operation_day": 127,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "alfalfa_silage",
+            "clay_percent": 20.0,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 89,
+            "field_name": "field_1",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "corn_grain",
+            "clay_percent": 21.308,
+            "field_production_size": 10.0,
+            "operation_year": 2013,
+            "operation_day": 127,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "clay_percent": 21.308,
+            "field_production_size": 10.0,
+            "operation_year": 2014,
+            "operation_day": 89,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "corn_grain",
+            "clay_percent": 21.308,
+            "field_production_size": 10.0,
+            "operation_year": 2017,
+            "operation_day": 127,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.PLANTING
+        },
+        {
+            "crop_type": "alfalfa_hay",
+            "clay_percent": 21.308,
+            "field_production_size": 10.0,
+            "operation_year": 2018,
+            "operation_day": 89,
+            "field_name": "field_2",
+            "operation_event": FieldOperationEvent.PLANTING
+        }
+    ]
+
+
+@pytest.fixture
+def filtered_variable_pool() -> list[dict[str, Any]]:
+    return [
+        {
+            "Fertilizer Application_0.mass": {
+                "values": [
+                    786.1748576537939,
+                    609.7560975609756,
+                    609.7560975609756
+                ]
+            },
+            "Fertilizer Application_0.application_depth": {
+                "values": [
+                    30.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Fertilizer Application_0.year": {
+                "values": [
+                    2013,
+                    2013,
+                    2017
+                ]
+            },
+            "Fertilizer Application_0.day": {
+                "values": [
+                    124,
+                    126,
+                    126
+                ]
+            },
+            "Fertilizer Application_0.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Fertilizer Application_0.field_name": {
+                "values": [
+                    "field_1",
+                    "field_1",
+                    "field_1"
+                ]
+            },
+            "Fertilizer Application_0.average_clay_percent": {
+                "values": [
+                    20.0,
+                    20.0,
+                    20.0
+                ]
+            },
+            "Fertilizer Application_1.mass": {
+                "values": [
+                    458.66617938634926,
+                    609.7560975609756,
+                    609.7560975609756
+                ]
+            },
+            "Fertilizer Application_1.application_depth": {
+                "values": [
+                    30.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Fertilizer Application_1.year": {
+                "values": [
+                    2013,
+                    2013,
+                    2017
+                ]
+            },
+            "Fertilizer Application_1.day": {
+                "values": [
+                    124,
+                    126,
+                    126
+                ]
+            },
+            "Fertilizer Application_1.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Fertilizer Application_1.field_name": {
+                "values": [
+                    "field_2",
+                    "field_2",
+                    "field_2"
+                ]
+            },
+            "Fertilizer Application_1.average_clay_percent": {
+                "values": [
+                    21.308,
+                    21.308,
+                    21.308
+                ]
+            }
+        },
+        {},
+        {
+            "Manure Application_0.dry_matter_mass": {
+                "values": [
+                    16363.30748811621,
+                    36488.27689357436,
+                    35658.921916153486,
+                    34238.376646683995
+                ]
+            },
+            "Manure Application_0.dry_matter_fraction": {
+                "values": [
+                    0.06866050590590597,
+                    0.15693508905181594,
+                    0.14562829648184375,
+                    0.14300734780409236
+                ]
+            },
+            "Manure Application_0.application_depth": {
+                "values": [
+                    30.0,
+                    30.0,
+                    30.0,
+                    30.0
+                ]
+            },
+            "Manure Application_0.day": {
+                "values": [
+                    124,
+                    311,
+                    311,
+                    311
+                ]
+            },
+            "Manure Application_0.year": {
+                "values": [
+                    2013,
+                    2014,
+                    2015,
+                    2016
+                ]
+            },
+            "Manure Application_0.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Manure Application_0.field_name": {
+                "values": [
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1"
+                ]
+            },
+            "Manure Application_0.average_clay_percent": {
+                "values": [
+                    20.0,
+                    20.0,
+                    20.0,
+                    20.0
+                ]
+            },
+            "Manure Application_1.dry_matter_mass": {
+                "values": [
+                    11939.038999999999,
+                    36488.27689134103,
+                    35658.92191484071,
+                    34238.37664567743
+                ]
+            },
+            "Manure Application_1.dry_matter_fraction": {
+                "values": [
+                    0.04600027600165601,
+                    0.15693508904228323,
+                    0.14562829647689898,
+                    0.14300734780136215
+                ]
+            },
+            "Manure Application_1.application_depth": {
+                "values": [
+                    30.0,
+                    30.0,
+                    30.0,
+                    30.0
+                ]
+            },
+            "Manure Application_1.day": {
+                "values": [
+                    124,
+                    311,
+                    311,
+                    311
+                ]
+            },
+            "Manure Application_1.year": {
+                "values": [
+                    2013,
+                    2014,
+                    2015,
+                    2016
+                ]
+            },
+            "Manure Application_1.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Manure Application_1.field_name": {
+                "values": [
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2"
+                ]
+            },
+            "Manure Application_1.average_clay_percent": {
+                "values": [
+                    21.308,
+                    21.308,
+                    21.308,
+                    21.308
+                ]
+            }
+        },
+        {
+            "Harvest_0.crop": {
+                "values": [
+                    "corn_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "corn_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage",
+                    "alfalfa_silage"
+                ]
+            },
+            "Harvest_0.harvest_type": {
+                "values": [
+                    "harvest_kill",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_kill",
+                    "harvest_kill",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only"
+                ]
+            },
+            "Harvest_0.dry_yield": {
+                "values": [
+                    12958.851795252069,
+                    2302.807712970885,
+                    3101.0788300377967,
+                    3234.487471643309,
+                    3125.8532063690864,
+                    2634.7324364973647,
+                    3256.9502949820544,
+                    3691.1379316225716,
+                    3634.679440085259,
+                    3142.870565390124,
+                    2428.179792045325,
+                    3255.7066541436616,
+                    3402.1964577747176,
+                    3260.964927108421,
+                    2844.369686506972,
+                    15089.329513000639,
+                    2543.5650211475263,
+                    2760.7355500562817,
+                    2729.064015239216,
+                    2386.1999998533574,
+                    1848.8457629511342,
+                    2068.511390513816,
+                    2822.444226111104,
+                    2281.7139980325255,
+                    2107.9674363374415
+                ]
+            },
+            "Harvest_0.harvest_year": {
+                "values": [
+                    2013,
+                    2014,
+                    2014,
+                    2014,
+                    2014,
+                    2015,
+                    2015,
+                    2015,
+                    2015,
+                    2015,
+                    2016,
+                    2016,
+                    2016,
+                    2016,
+                    2016,
+                    2017,
+                    2018,
+                    2018,
+                    2018,
+                    2018,
+                    2019,
+                    2019,
+                    2019,
+                    2019,
+                    2019
+                ]
+            },
+            "Harvest_0.harvest_day": {
+                "values": [
+                    263,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242,
+                    263,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242
+                ]
+            },
+            "Harvest_0.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Harvest_0.field_name": {
+                "values": [
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1"
+                ]
+            },
+            "Harvest_1.crop": {
+                "values": [
+                    "corn_grain",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "corn_grain",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay",
+                    "alfalfa_hay"
+                ]
+            },
+            "Harvest_1.harvest_type": {
+                "values": [
+                    "harvest_kill",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_kill",
+                    "harvest_kill",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only",
+                    "harvest_only"
+                ]
+            },
+            "Harvest_1.dry_yield": {
+                "values": [
+                    10202.238523552687,
+                    1953.2691077836596,
+                    2879.148563971437,
+                    2925.6916183957055,
+                    2905.9679829564298,
+                    2473.692091653217,
+                    2990.0590699449444,
+                    3231.05366286083,
+                    3355.716621393541,
+                    2746.7773592132107,
+                    2222.87229921061,
+                    3007.1744918411423,
+                    3238.223522929097,
+                    2958.6259596832942,
+                    2638.641203219705,
+                    11538.698999892364,
+                    2373.59068890197,
+                    2758.3351876020824,
+                    2277.6158543731062,
+                    2452.217533699692,
+                    2125.7499344328567,
+                    2382.4000789402176,
+                    2955.8272482811276,
+                    2330.3303056522077,
+                    2211.3538812625884
+                ]
+            },
+            "Harvest_1.harvest_year": {
+                "values": [
+                    2013,
+                    2014,
+                    2014,
+                    2014,
+                    2014,
+                    2015,
+                    2015,
+                    2015,
+                    2015,
+                    2015,
+                    2016,
+                    2016,
+                    2016,
+                    2016,
+                    2016,
+                    2017,
+                    2018,
+                    2018,
+                    2018,
+                    2018,
+                    2019,
+                    2019,
+                    2019,
+                    2019,
+                    2019
+                ]
+            },
+            "Harvest_1.harvest_day": {
+                "values": [
+                    298,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242,
+                    298,
+                    150,
+                    179,
+                    210,
+                    242,
+                    120,
+                    150,
+                    179,
+                    210,
+                    242
+                ]
+            },
+            "Harvest_1.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Harvest_1.field_name": {
+                "values": [
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2"
+                ]
+            }
+        },
+        {
+            "Planting_0.crop": {
+                "values": [
+                    "corn_silage",
+                    "alfalfa_silage",
+                    "corn_silage",
+                    "alfalfa_silage"
+                ]
+            },
+            "Planting_0.year": {
+                "values": [
+                    2013,
+                    2014,
+                    2017,
+                    2018
+                ]
+            },
+            "Planting_0.day": {
+                "values": [
+                    127,
+                    89,
+                    127,
+                    89
+                ]
+            },
+            "Planting_0.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Planting_0.average_clay_percent": {
+                "values": [
+                    20.0,
+                    20.0,
+                    20.0,
+                    20.0
+                ]
+            },
+            "Planting_0.field_name": {
+                "values": [
+                    "field_1",
+                    "field_1",
+                    "field_1",
+                    "field_1"
+                ]
+            },
+            "Planting_1.crop": {
+                "values": [
+                    "corn_grain",
+                    "alfalfa_hay",
+                    "corn_grain",
+                    "alfalfa_hay"
+                ]
+            },
+            "Planting_1.year": {
+                "values": [
+                    2013,
+                    2014,
+                    2017,
+                    2018
+                ]
+            },
+            "Planting_1.day": {
+                "values": [
+                    127,
+                    89,
+                    127,
+                    89
+                ]
+            },
+            "Planting_1.field_size": {
+                "values": [
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "Planting_1.average_clay_percent": {
+                "values": [
+                    21.308,
+                    21.308,
+                    21.308,
+                    21.308
+                ]
+            },
+            "Planting_1.field_name": {
+                "values": [
+                    "field_2",
+                    "field_2",
+                    "field_2",
+                    "field_2"
+                ]
+            }
+        }
+    ]

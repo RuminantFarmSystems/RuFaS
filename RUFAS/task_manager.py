@@ -9,7 +9,7 @@ from packaging.requirements import Requirement, InvalidRequirement
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable
 
 import numpy
 from SALib.sample import ff as fractional_factorial_sampler
@@ -321,19 +321,19 @@ class TaskManager:
         except Exception as e:
             raise RuntimeError(f"An unexpected error occurred while checking the Python version: {e}")
 
-    def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    def _parse_input_tasks(self) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Parses input tasks into single and multiple run tasks.
 
         Returns
         -------
-        Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]
+        tuple[list[dict[str, Any]], list[dict[str, Any]]]
             Parsed single run and multi-run task arguments.
         """
-        parsed_single_run_args: List[Dict[str, Any]] = []
-        parsed_multi_run_args: List[Dict[str, Any]] = []
-        task_config: Dict[str, Any] = self.input_manager.get_data("tasks")
-        tasks_from_input: List[Dict[str, Any]] = task_config.get("tasks")
+        parsed_single_run_args: list[dict[str, Any]] = []
+        parsed_multi_run_args: list[dict[str, Any]] = []
+        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
+        tasks_from_input: list[dict[str, Any]] = task_config.get("tasks")
         task_manager_metadata_properties = self.input_manager.get_metadata("properties")
         export_input_data_to_csv = task_config.get("export_input_data_to_csv")
         input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
@@ -356,6 +356,10 @@ class TaskManager:
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
+            saved_output_pools = []
+            for saved_pool in input_task.get("saved_output_pools", []):
+                saved_output_pools.append({"name": saved_pool["name"], "path": Path(saved_pool["path"])})
+            input_task["saved_output_pools"] = saved_output_pools
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
@@ -366,21 +370,21 @@ class TaskManager:
                 parsed_single_run_args.append(input_task)
         return parsed_single_run_args, parsed_multi_run_args
 
-    def _expand_multi_runs_to_single_runs(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _expand_multi_runs_to_single_runs(self, multi_run_args: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Expands multi-run tasks into single-run tasks for execution.
 
         Parameters
         ----------
-        multi_run_args : List[Dict[str, Any]]
-            List of multi-run task arguments.
+        multi_run_args : list[dict[str, Any]]
+            list of multi-run task arguments.
 
         Returns
         -------
-        List[Dict[str, Any]]
+        list[dict[str, Any]]
             Expanded list of single-run tasks.
         """
-        expanded_args: List[Dict[str, Any]] = []
+        expanded_args: list[dict[str, Any]] = []
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
@@ -391,7 +395,7 @@ class TaskManager:
 
         return expanded_args
 
-    def _expand_simulation_multi_run_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _expand_simulation_multi_run_args(self, multi_run_args: dict[str, Any]) -> list[dict[str, Any]]:
         single_run_args = []
         for i in range(multi_run_args["multi_run_counts"]):
             new_args = multi_run_args.copy()
@@ -402,14 +406,14 @@ class TaskManager:
 
         return single_run_args
 
-    def _expand_sensitivity_analysis_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _expand_sensitivity_analysis_args(self, multi_run_args: dict[str, Any]) -> list[dict[str, Any]]:
         """Expands sensitivity analysis multi-run tasks into single-run tasks."""
 
-        SA_input_variables: List[Dict[str, float | str]] = multi_run_args["SA_input_variables"]
+        SA_input_variables: list[dict[str, float | str]] = multi_run_args["SA_input_variables"]
 
-        names: List[str] = [str(input_variable["variable_name"]) for input_variable in SA_input_variables]
+        names: list[str] = [str(input_variable["variable_name"]) for input_variable in SA_input_variables]
         variables_count = len(names)
-        bounds: List[List[float]] = [
+        bounds: list[list[float]] = [
             [float(input_variable["lower_bound"]), float(input_variable["upper_bound"])]
             for input_variable in SA_input_variables
         ]
@@ -501,7 +505,7 @@ class TaskManager:
     @staticmethod
     def call_handler(
         handler: Callable[..., None],
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -541,7 +545,7 @@ class TaskManager:
             TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
         try:
-            task_type: TaskType = args.get("task_type")
+            task_type: TaskType = args["task_type"]
             is_end_to_end_test = (
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
@@ -622,7 +626,7 @@ class TaskManager:
             return f"{output_prefix} ({task_id})"
 
     @staticmethod
-    def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
+    def handle_herd_initializaition(args: dict[str, Any], output_manager: OutputManager) -> None:
         """Handles initialization of the herd based on specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -635,7 +639,7 @@ class TaskManager:
         output_manager.add_log("Herd initialization complete", "Herd data initialized.", info_map)
 
     @staticmethod
-    def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
+    def handle_single_simulation_run(args: dict[str, Any], output_manager: OutputManager) -> None:
         """Conducts a single simulation run based on provided arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -652,7 +656,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_end_to_end_testing(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: str,
@@ -731,7 +735,7 @@ class TaskManager:
 
     @staticmethod
     def handle_input_data_audit(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
+        args: dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
         """Validates input data saves metadata properties to CSV."""
         info_map = {
@@ -760,7 +764,7 @@ class TaskManager:
 
     @staticmethod
     def handle_post_processing(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: str,
@@ -775,7 +779,7 @@ class TaskManager:
 
         Parameters
         ----------
-        args : Dict[str, Any]
+        args : dict[str, Any]
             Arguments for post-processing.
         input_manager : InputManager
             Manager to handle input processing.
@@ -789,10 +793,20 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
+        load_saved_output_pools : bool, optional
+            Whether to load multiple saved pools as defined by ``saved_output_pools`` before
+            continuing with post-processing.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
         should_flush_im_pool: bool
             Whether to flush the input manager pool.
+
+        Notes
+        -----
+        - For args, when the optional ``run_eee`` key is set to ``True``, the Emissions, Energy, and Economics
+        estimators are executed before the remaining post-processing steps. When ``load_saved_output_pools`` is
+        ``True`` the saved pools defined in ``saved_output_pools`` are loaded and namespaced prior to
+        post-processing.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -800,6 +814,13 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
+
+        if args.get("run_eee", False):
+            pass
+            # TODO update path to `RUFAS.EEE.EEE_manager` when EEE is finalized and moved in either PR #2524 or #1299
+            # TODO update to be able to run EEE once farmgrown feed emissions are finalized #2580
+            # eee_manager_module = import_module("RUFAS.routines.EEE.EEE_manager")
+            # eee_manager_module.EEEManager.estimate_all()
 
         if export_input_data_to_csv:
             output_manager.create_directory(args["input_data_csv_export_path"])
@@ -809,7 +830,19 @@ class TaskManager:
                 args["input_data_csv_import_path"],
             )
 
-        if load_pool_from_file:
+        if args.get("load_saved_output_pools", False):
+            saved_pools: list[dict[str, Any]] = args.get("saved_output_pools", [])
+            if saved_pools:
+                output_manager.flush_pools()
+                output_manager.load_multiple_variables_pools_from_files(saved_pools)
+                output_manager.set_metadata_prefix("reload")
+            else:
+                output_manager.add_warning(
+                    "No saved pools provided",
+                    "load_saved_output_pools was enabled, but no saved_output_pools were supplied.",
+                    info_map,
+                )
+        elif load_pool_from_file:
             output_manager.flush_pools()
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
@@ -817,6 +850,9 @@ class TaskManager:
         output_manager.print_errors_warnings_logs_counts(task_id)
         if should_flush_im_pool:
             input_manager.flush_pool()
+        if args.get("task_type") == TaskType.POST_PROCESSING:
+            save_results = True
+            produce_graphics = True
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -855,7 +891,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_input_data_audit_tasks(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -876,7 +912,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_compare_metadata_properties_tasks(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -890,7 +926,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_herd_init_tasks(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -910,7 +946,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_simulation_engine_run_tasks(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -934,7 +970,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_postprocessing_tasks(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
@@ -953,7 +989,7 @@ class TaskManager:
 
     @staticmethod
     def _handle_data_collection_app_update(
-        args: Dict[str, Any],
+        args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,

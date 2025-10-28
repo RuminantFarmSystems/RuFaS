@@ -6,7 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage, PurchasedFeed
-from RUFAS.routines.feed.feed import Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 

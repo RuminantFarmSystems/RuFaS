@@ -18,6 +18,12 @@
         "expected_results_path": "input/data/end_to_end_testing/freestall/e2e_json_manure_filter.json",
         "actual_results_path": "freestall_e2e_saved_variables_e2e_manure_",
         "tolerance": 0.1
+      },
+      {
+        "domain": "Feed",
+        "expected_results_path": "input/data/end_to_end_testing/freestall/e2e_json_feed_filter.json",
+        "actual_results_path": "freestall_e2e_saved_variables_e2e_feed_",
+        "tolerance": 0.1
       }
     ],
     "open_lot_e2e": [
@@ -38,6 +44,12 @@
         "expected_results_path": "input/data/end_to_end_testing/open_lot/e2e_json_manure_filter.json",
         "actual_results_path": "open_lot_e2e_saved_variables_e2e_manure_",
         "tolerance": 0.1
+      },
+      {
+        "domain": "Feed",
+        "expected_results_path": "input/data/end_to_end_testing/open_lot/e2e_json_feed_filter.json",
+        "actual_results_path": "open_lot_e2e_saved_variables_e2e_feed_",
+        "tolerance": 0.1
       }
     ],
     "no_animal_e2e": [
@@ -51,6 +63,12 @@
         "domain": "Manure",
         "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_manure_filter.json",
         "actual_results_path": "no_animal_e2e_saved_variables_e2e_manure_",
+        "tolerance": 0.1
+      },
+      {
+        "domain": "Feed",
+        "expected_results_path": "input/data/end_to_end_testing/no_animal/e2e_json_feed_filter.json",
+        "actual_results_path": "no_animal_e2e_saved_variables_e2e_feed_",
         "tolerance": 0.1
       }
     ]

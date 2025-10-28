@@ -156,7 +156,7 @@ class Handler(Processor):
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
-        nitrogen = self.manure_stream.nitrogen
+        manure_total_nitrogen = max(0.0, self.manure_stream.nitrogen - ammonia_emission)
         phosphorus = self.manure_stream.phosphorus
         potassium = self.manure_stream.potassium
         ash = self.manure_stream.ash
@@ -165,6 +165,7 @@ class Handler(Processor):
         volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
         methane_production_potential = self.manure_stream.methane_production_potential
+        bedding_non_degradable_volatile_solids = self.manure_stream.bedding_non_degradable_volatile_solids
 
         self.manure_stream = None
         self._report_processor_output(
@@ -177,7 +178,7 @@ class Handler(Processor):
         output_stream = ManureStream(
             water=manure_water,
             ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-            nitrogen=nitrogen,
+            nitrogen=manure_total_nitrogen,
             phosphorus=phosphorus,
             potassium=potassium,
             ash=ash,
@@ -187,6 +188,7 @@ class Handler(Processor):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 

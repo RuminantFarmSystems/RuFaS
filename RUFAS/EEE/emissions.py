@@ -11,6 +11,50 @@ SLICE_START = -365
 SLICE_END = -364
 FINAL_DAY_SLICE_START = -1
 
+TIME_FILTER = {
+    "name": "RufasTime Filter",
+    "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
+    "which crop yields and nutrient applications to estimate emissions for.",
+    "filters": ["RufasTime.(day|calendar_year)"],
+    "slice_start": SLICE_START,
+    "slice_end": SLICE_END,
+}
+HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS: dict[str, dict[str, Any]] = {
+    "homegrown feeds filter": {
+        "name": "Homegrown Feeds",
+        "description": "Collects all crop harvests that occurred in the simulation.",
+        "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
+        "variables": [".*"],
+        "date_fields": ("harvest_year", "harvest_day"),
+    },
+    "fertilizer applications filter": {
+        "name": "Fertilizer Applications",
+        "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
+        "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
+        "variables": [".*"],
+        "date_fields": ("year", "day"),
+    },
+    "manure applications filter": {
+        "name": "Manure Applications",
+        "description": "Collects all manure applications that occurred in the simulation.",
+        "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
+        "variables": [".*"],
+        "date_fields": ("year", "day"),
+    },
+    "manure requests filter": {
+        "name": "Manure Requests",
+        "description": "Collects all manure requests that occurred in the simulation.",
+        "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
+        "variables": [".*"],
+        "date_fields": ("year", "day"),
+    },
+}
+
+"""
+Patterns for matching purchased feed storage and totals in the output variables.
+"""
+PURCHASED_FEED_PATTERN = r"_(\d+)_fed_to_date.*"
+
 """
 These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
 are in kg CO2e / kg N and kg CO2e / kg P, respectively. The nitrogen and phosphorus constants reference IPCC 2021, GWP
@@ -33,21 +77,58 @@ class EmissionsEstimator:
         An instance of the OutputManager class.
     crop_species_to_purchased_feed_id : dict[str, list[str]]
         A dictionary mapping crop species to their corresponding RuFaS feed IDs.
-
+    purchased_feed_emissions_by_location : dict[str, float]
+        A dictionary mapping RuFaS feed IDs to their emissions factors (kg CO2e / kg dry matter) for the location of
+        the simulation.
+    land_use_change_emissions_by_location : dict[str, float]
+        A dictionary mapping RuFaS feed IDs to their land use change emissions factors (kg CO2e / kg dry matter) for
+        the location of the simulation.
+    _missing_purchased_ids : set[str]
+        A set of RuFaS feed IDs that were used in the simulation but do not have purchased feed emissions data.
+    _missing_land_use_ids : set[str]
+        A set of RuFaS feed IDs that were used in the simulation but do not have land use change emissions data.
     """
 
     def __init__(self) -> None:
         self.im = InputManager()
         self.om = OutputManager()
+        county_code = self.im.get_data("config.FIPS_county_code")
 
-        crop_configurations: list[dict[str, Any]] = self.im.get_data("crop_configurations.crop_configurations")
-        self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {
-            config["name"]: [str(rufas_id) for rufas_id in config["rufas_ids"]] for config in crop_configurations
-        }
+        purchased_feed_emissions_data = self.im.get_data("purchased_feeds_emissions")
+        self.purchased_feed_emissions_by_location = self._get_feed_emissions_data(
+            county_code, purchased_feed_emissions_data
+        )
+
+        land_use_change_emissions_data = self.im.get_data("purchased_feed_land_use_change_emissions")
+        self.land_use_change_emissions_by_location = self._get_feed_emissions_data(
+            county_code, land_use_change_emissions_data
+        )
+        self._missing_purchased_ids: set[str] = set()
+        self._missing_land_use_ids: set[str] = set()
+
+        feed_storage_configs = self.im.get_data("feed_storage_configurations")
+        feed_storage_instances = self.im.get_data("feed_storage_instances")
+
+        all_configs: list[dict[str, Any]] = [
+            storage_config
+            for storage_config_list in feed_storage_configs.values()
+            for storage_config in storage_config_list
+        ]
+        instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+
+        self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {}
+        for config in all_configs:
+            if config["name"] not in instance_names:
+                continue
+            else:
+                if "crop_species" in config and "rufas_ids" in config:
+                    self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
+                        str(rufas_id) for rufas_id in config["rufas_ids"]
+                    ]
 
     def estimate_emissions(self) -> None:
+        """Estimates emissions associated with farmgrown feeds."""
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_purchased_feed_emissions(fertilizer_apps["Homegrown Feeds"])
         self._calculate_homegrown_feed_emissions(
             fertilizer_apps["Homegrown Feeds"],
             fertilizer_apps["Fertilizer Applications"],
@@ -55,26 +136,34 @@ class EmissionsEstimator:
             fertilizer_apps["Manure Requests"],
         )
 
-    def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
-        info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
-        purchased_feeds = self._gather_ration_feed_totals()
-        actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-        self.om.add_variable(
-            "actual_purchased_feed_totals",
-            actual_purchased_feed_totals,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-        )
-        (
-            actual_purchased_feed_emissions,
-            actual_land_use_change_emissions,
-        ) = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
-        emissions_info_map = dict(
-            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
-        )
-        self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
-        self.om.add_variable(
-            "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
-        )
+    def check_available_purchased_feed_data(self, available_feed_ids: list[int]) -> None:
+        """
+        Checks that all purchased feed IDs used in the simulation have emissions data available for them.
+        """
+        available_feeds = {str(feed_id) for feed_id in available_feed_ids}
+        missing_purchased = sorted(available_feeds - set(self.purchased_feed_emissions_by_location.keys()))
+        missing_land_use = sorted(available_feeds - set(self.land_use_change_emissions_by_location.keys()))
+        self._missing_purchased_ids.update(missing_purchased)
+        self._missing_land_use_ids.update(missing_land_use)
+
+        if missing_purchased:
+            info_map = {"class": self.__class__.__name__, "function": self.check_available_purchased_feed_data.__name__}
+            self.om.add_warning(
+                "Missing Purchased Feed Emissions Data",
+                "Missing emissions data for RuFaS feed IDs: "
+                + ", ".join(missing_purchased)
+                + ". These feeds will be omitted from purchased feed emissions estimations.",
+                info_map,
+            )
+        if missing_land_use:
+            info_map = {"class": self.__class__.__name__, "function": self.check_available_purchased_feed_data.__name__}
+            self.om.add_warning(
+                "Missing Land Use Change Purchased Feed Emissions Data",
+                "Missing land use change emissions data for RuFaS feed IDs: "
+                + ", ".join(missing_land_use)
+                + ". These feeds will be omitted from land use change purchased feed emissions estimations.",
+                info_map,
+            )
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
@@ -83,53 +172,14 @@ class EmissionsEstimator:
         Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
         simulation.
         """
-        time_filter = {
-            "name": "RufasTime Filter",
-            "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-            "which crop yields and nutrient applications to estimate emissions for.",
-            "filters": ["RufasTime.(day|calendar_year)"],
-            "slice_start": SLICE_START,
-            "slice_end": SLICE_END,
-        }
-        date_variables = self.om.filter_variables_pool(time_filter)
+        date_variables = self.om.filter_variables_pool(TIME_FILTER)
         day_cutoff = date_variables["RufasTime.day"]["values"][0]
         year_cutoff = date_variables["RufasTime.calendar_year"]["values"][0]
         date_cutoff = RufasTime.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
 
-        filters: dict[str, dict[str, Any]] = {
-            "homegrown feeds filter": {
-                "name": "Homegrown Feeds",
-                "description": "Collects all crop harvests that occurred in the simulation.",
-                "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("harvest_year", "harvest_day"),
-            },
-            "fertilizer applications filter": {
-                "name": "Fertilizer Applications",
-                "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
-                "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-            "manure applications filter": {
-                "name": "Manure Applications",
-                "description": "Collects all manure applications that occurred in the simulation.",
-                "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-            "manure requests filter": {
-                "name": "Manure Requests",
-                "description": "Collects all manure requests that occurred in the simulation.",
-                "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-        }
-
         results = {}
-        for operation_filter_key in filters:
-            operation_filter = filters[operation_filter_key]
+        for operation_filter_key in HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS:
+            operation_filter = HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS[operation_filter_key]
             filtered_data = self._filter_results(operation_filter, date_cutoff, *operation_filter["date_fields"])
             results[operation_filter["name"]] = filtered_data
 
@@ -137,24 +187,6 @@ class EmissionsEstimator:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         return results
-
-    def _gather_ration_feed_totals(self) -> dict[str, float]:
-        """
-        Collects totals of feeds from rations given to animals in the last 365 days of the simulation and collapses them
-        into single set of numbers.
-        """
-        filter = {
-            "name": "Feed Ration Totals",
-            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-            "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
-            "variables": [r"^\d+$"],
-            "slice_start": SLICE_START,
-        }
-        feeds = self.om.filter_variables_pool(filter)
-
-        processed_feeds: dict[str, float] = {key: float(sum(feeds[key]["values"])) for key in feeds.keys()}
-
-        return processed_feeds
 
     def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """
@@ -180,30 +212,6 @@ class EmissionsEstimator:
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
 
-    def _calculate_actual_purchased_feeds(
-        self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]
-    ) -> dict[str, float]:
-        """
-        Calculates the difference between the purchased feeds and feeds grown on the farm.
-        """
-        homegrown_totals = self._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
-
-        actual_purchased_feeds = {}
-        for feed_id, amount in purchased_feeds.items():
-            homegrown_alternatives = [
-                crop for crop in homegrown_totals.keys() if feed_id in self.crop_species_to_purchased_feed_id[crop]
-            ]
-
-            for homegrown_alternative in homegrown_alternatives:
-                alternative_amount_available = homegrown_totals[homegrown_alternative]
-                amount_used = min(amount, alternative_amount_available)
-                amount -= amount_used
-                homegrown_totals[homegrown_alternative] -= amount_used
-
-            actual_purchased_feeds[feed_id] = amount
-
-        return actual_purchased_feeds
-
     def _calculate_total_homegrown_feed_amounts_by_crop_type(
         self, homegrown_feeds: list[dict[str, Any]]
     ) -> dict[str, float]:
@@ -223,52 +231,33 @@ class EmissionsEstimator:
         )
         return homegrown_totals
 
-    def _calculate_actual_purchased_feed_emissions(
+    def calculate_emissions(
         self,
-        actual_purchased_feeds: dict[str, float],
-    ) -> tuple[dict[str, float], dict[str, float]]:
-        """Calculates the emissions from feeds that were actually purchased during the simulation."""
+        purchased_feeds: dict[int, float],
+    ) -> None:
+        """Calculates the emissions from purchased feeds and land use changes. If there are feed IDs with missing
+        emissions factor data, they will be omitted from the calculations and not reported."""
+        purchased_feed_emissions: dict[str, float] = {}
+        land_use_change_emissions: dict[str, float] = {}
 
-        county_code = self.im.get_data("config.FIPS_county_code")
+        for feed_id, feed_amount in purchased_feeds.items():
+            stringified_feed_id = str(feed_id)
 
-        purchased_feed_emissions_data = self.im.get_data("purchased_feeds_emissions")
-        purchased_feed_emissions = self._get_feed_emissions_data(county_code, purchased_feed_emissions_data)
+            factor = self.purchased_feed_emissions_by_location.get(stringified_feed_id)
+            if factor is not None:
+                purchased_feed_emissions[stringified_feed_id] = feed_amount * factor
 
-        land_use_change_emissions_data = self.im.get_data("purchased_feed_land_use_change_emissions")
-        land_use_change_emissions = self._get_feed_emissions_data(county_code, land_use_change_emissions_data)
+            luc_factor = self.land_use_change_emissions_by_location.get(stringified_feed_id)
+            if luc_factor is not None:
+                land_use_change_emissions[stringified_feed_id] = feed_amount * luc_factor
 
-        actual_purchased_feed_emissions = {}
-        actual_land_use_change_emissions = {}
-        for feed_id, amount_fed in actual_purchased_feeds.items():
-            try:
-                purchased_emissions = amount_fed * purchased_feed_emissions[feed_id]
-                actual_purchased_feed_emissions[feed_id] = purchased_emissions
-            except KeyError:
-                info_map = {
-                    "class": self.__class__.__name__,
-                    "function": self._calculate_actual_purchased_feed_emissions.__name__,
-                }
-                self.om.add_warning(
-                    "Missing Purchased Feed Emissions",
-                    f"Missing data for RuFaS feed {feed_id}, omitting from purchased feed emissions estimation.",
-                    info_map,
-                )
-            try:
-                land_use_emissions = amount_fed * land_use_change_emissions[feed_id]
-                actual_land_use_change_emissions[feed_id] = land_use_emissions
-            except KeyError:
-                info_map = {
-                    "class": self.__class__.__name__,
-                    "function": self._calculate_actual_purchased_feed_emissions.__name__,
-                }
-                self.om.add_warning(
-                    "Missing Land Use Change Purchased Feed Emissions",
-                    f"Missing data for RuFaS feed {feed_id}, omitting from land use change purchased feed emissions "
-                    "estimation.",
-                    info_map,
-                )
-
-        return actual_purchased_feed_emissions, actual_land_use_change_emissions
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.calculate_emissions.__name__,
+            "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
+        }
+        self.om.add_variable("purchased_feed_emissions", purchased_feed_emissions, info_map)
+        self.om.add_variable("land_use_change_emissions", land_use_change_emissions, info_map)
 
     def _get_feed_emissions_data(
         self, county_code: int, feed_emissions_data: dict[str, list[float]]
