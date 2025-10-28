@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, List, Tuple
 import pandas as pd
 from deepdiff import DeepDiff
 
-from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability
+from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability, CrossValidator
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -50,6 +50,7 @@ class InputManager:
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
             self.data_validator = DataValidator()
+            self.cross_validator = CrossValidator()
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -727,8 +728,10 @@ class InputManager:
 
         return data_keys
 
-    def delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
+    def __delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
         """
+        NOTE: **Please use extreme caution using this function as it will delete data and metadata from the pool.**
+
         When given a valid address, this function removes the input data and its associated metadata.
 
         Parameters
@@ -744,7 +747,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.delete_input_and_metadata.__name__,
+            "function": self.__delete_input_and_metadata.__name__,
         }
         keys = data_address.split(".")
         timestamp = Utility.get_timestamp(include_millis=True)
@@ -753,7 +756,7 @@ class InputManager:
             self.data_validator.extract_value_by_key_list(self.__pool, keys[:-1]).pop(keys[-1])
             removed_data = True
             self.__delete_data_logs_pool[timestamp] = (
-                f"InputManager.delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
+                f"InputManager.__delete_input_and_metadata() called for {keys}, data deleted from {data_address}"
             )
         except KeyError as keyerror:
             self.om.add_error("Validation: data not found", str(keyerror), info_map)
@@ -1411,3 +1414,35 @@ class InputManager:
         except OSError as e:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
+
+    def extract_target_and_save_block(
+        self, target_and_save_block: dict[str, dict[str, Any]], eager_termination: bool
+    ) -> dict[str, Any]:
+        """
+        Retrieves the alias value to pass to the CrossValidator for processing.
+
+        Parameters
+        ----------
+        target_and_save_block : dict[str, dict[str, Any]]
+            A dictionary containing the "target and save block" of the cross-validation rule.
+        eager_termination : bool
+            Specifies whether to immediately terminate the process when a validation error is
+            encountered.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary mapping variable names to their values.
+
+        """
+        target_and_save_results = {}
+        self.cross_validator.check_target_and_save_block(target_and_save_block, eager_termination)
+        sections = ["variables", "constants"]
+        for section in sections:
+            if section == "variables":
+                for key, address in target_and_save_block[section].items():
+                    target_and_save_results[key] = self.get_data(address)
+            else:
+                for constant_name, value in target_and_save_block[section].items():
+                    target_and_save_results[constant_name] = value
+        return target_and_save_results

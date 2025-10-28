@@ -3,6 +3,7 @@ import enum
 import os
 import re
 import shutil
+from copy import deepcopy
 from pathlib import Path
 from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -57,7 +58,11 @@ class Utility:
             A list of dictionaries with string keys and integer values.
 
         """
-        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
+        try:
+            return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
+        except AttributeError:
+            print(dict_of_lists)
+            raise AttributeError
 
     @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -740,7 +745,7 @@ class Utility:
         }
         """
         result = {}
-        for dict_ in list_of_dicts:
+        for dict_ in deepcopy(list_of_dicts):
             if id_key in dict_:
                 id_value = dict_.pop(id_key)
                 result[id_value] = dict_

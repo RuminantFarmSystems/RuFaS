@@ -3,6 +3,7 @@ from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TillageImplement, TractorSize, OperationType
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 
 input_manager = InputManager()
 
@@ -33,6 +34,7 @@ class Tractor:
         herd_size: int | None = None,
         application_depth: float | None = None,
         tillage_implement: TillageImplement | None = None,
+        harvest_type: HarvestOperation | None = None
     ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
@@ -40,10 +42,20 @@ class Tractor:
 
         Parameters
         ----------
+        operation_event : FieldOperationEvent
+            The type of field operation for which the tractor is intended.
+        crop_type : str | None, optional
+            The type of crop for which the tractor is intended.
         tractor_size : TractorSize | None, optional
             The size of the tractor as a `TractorSize` enum value.
         herd_size : int | None, optional
             The size of the herd to determine the tractor size if `tractor_size` is not provided.
+        application_depth : float | None, optional
+            The depth of the application (cm).
+        tillage_implement : TillageImplement | None, optional
+            The type of tillage implement used for the operation.
+        harvest_type : HarvestOperation | None, optional
+            The type of harvest operation for the operation.
 
         Raises
         ------
@@ -58,7 +70,13 @@ class Tractor:
         self.operation_types = self.determine_operation_type(application_depth)
         self.implements = [
             TractorImplement(
-                operation_event, operation_type, crop_type, self.tractor_size, tillage_implement, application_depth
+                operation_event,
+                operation_type,
+                crop_type,
+                self.tractor_size,
+                tillage_implement,
+                application_depth,
+                harvest_type
             )
             for operation_type in self.operation_types
         ]

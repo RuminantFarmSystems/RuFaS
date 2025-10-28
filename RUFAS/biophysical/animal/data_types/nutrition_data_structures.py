@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.units import MeasurementUnits
 from RUFAS.user_constants import UserConstants
 
 
@@ -48,6 +49,22 @@ class NutritionRequirements:
     dry_matter: float
     activity_energy: float
     essential_amino_acids: EssentialAminoAcidRequirements
+
+    UNITS = {
+        "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+        "NEa_requirement": MeasurementUnits.MEGACALORIES,
+        "NEg_requirement": MeasurementUnits.MEGACALORIES,
+        "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+        "NEl_requirement": MeasurementUnits.MEGACALORIES,
+        "MP_requirement": MeasurementUnits.GRAMS,
+        "Ca_requirement": MeasurementUnits.GRAMS,
+        "P_req": MeasurementUnits.GRAMS,
+        "P_req_process": MeasurementUnits.GRAMS,
+        "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+        "avg_BW": MeasurementUnits.KILOGRAMS,
+        "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
+    }
 
     def __add__(self, other: "NutritionRequirements") -> "NutritionRequirements":
         """Add two NutritionRequirements objects together."""
@@ -199,6 +216,33 @@ class NutritionSupply:
     starch_supply: float
     byproduct_supply: float
     nitrogen_supply: float = field(init=False)
+
+    UNITS = {
+        "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "DE": MeasurementUnits.MEGACALORIES,
+        "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        "fat": MeasurementUnits.GRAMS,
+        "fat_percentage": MeasurementUnits.PERCENT,
+        "forage_ndf": MeasurementUnits.KILOGRAMS,
+        "forage_ndf_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+        "ME": MeasurementUnits.MEGACALORIES,
+        "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES,
+        "NE_lactation": MeasurementUnits.MEGACALORIES,
+        "NE_growth": MeasurementUnits.MEGACALORIES,
+        "metabolizable_protein": MeasurementUnits.GRAMS,
+    }
 
     def __post_init__(self) -> None:
         """Sets the nitrogen supply of a ration based on the crude protein supply."""
@@ -386,6 +430,36 @@ class NutritionEvaluationResults:
     ndf_percent: float
     forage_ndf_percent: float
     fat_percent: float
+
+    UNITS = {
+        "total_energy_difference": MeasurementUnits.MEGACALORIES,
+        "maintenance_energy_difference": MeasurementUnits.MEGACALORIES,
+        "lactation_energy_difference": MeasurementUnits.MEGACALORIES,
+        "growth_energy_difference": MeasurementUnits.MEGACALORIES,
+        "metabolizable_protein_difference": MeasurementUnits.GRAMS,
+        "calcium_difference": MeasurementUnits.GRAMS,
+        "phosphorus_difference": MeasurementUnits.GRAMS,
+        "dry_matter_difference": MeasurementUnits.KILOGRAMS,
+        "ndf_percent_difference": MeasurementUnits.PERCENT,
+        "forage_ndf_percent_difference": MeasurementUnits.PERCENT,
+        "fat_percent_difference": MeasurementUnits.PERCENT,
+    }
+
+    REPORT_UNITS = {
+        "is_valid_heifer_ration": MeasurementUnits.UNITLESS,
+        "is_valid_cow_ration": MeasurementUnits.UNITLESS,
+        "total_energy_acceptable": MeasurementUnits.UNITLESS,
+        "maintenance_energy_acceptable": MeasurementUnits.UNITLESS,
+        "lactation_energy_acceptable": MeasurementUnits.UNITLESS,
+        "growth_energy_acceptable": MeasurementUnits.UNITLESS,
+        "metabolizable_protein_acceptable": MeasurementUnits.UNITLESS,
+        "calcium_acceptable": MeasurementUnits.UNITLESS,
+        "phosphorus_acceptable": MeasurementUnits.UNITLESS,
+        "dry_matter_acceptable": MeasurementUnits.UNITLESS,
+        "ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+        "forage_ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+        "fat_percent_acceptable": MeasurementUnits.UNITLESS,
+    }
 
     @property
     def _are_clamped_values_acceptable(self) -> bool:

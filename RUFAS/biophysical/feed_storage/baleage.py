@@ -1,9 +1,8 @@
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from .storage import Storage
-from RUFAS.input_manager import InputManager
 
 """Number of days over which baled crops dry down after storage."""
 INITIAL_LOSS_PERIOD = 30
@@ -12,6 +11,11 @@ INITIAL_LOSS_PERIOD = 30
 class Baleage(Storage):
     """
     Class representing Baleage storage, a subclass of Storage.
+
+    Parameters
+    ----------
+    config : dict[str, str | float]
+        Configuration dictionary for the baleage storage.
 
     Attributes
     ----------
@@ -26,16 +30,10 @@ class Baleage(Storage):
         Calculates the protein loss specific to Baleage storage.
     """
 
-    def __init__(self, capacity: float = float("inf")):
-        super().__init__(capacity)
-        im = InputManager()
-        self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
-        self.acceptable_crops = [
-            CropCategory.ALFALFA,
-            CropCategory.GRASS,
-            CropCategory.SMALL_GRAIN,
-        ]
-        self.bale_density: float = 0
+    def __init__(self, config: dict[str, str | float]) -> None:
+        super().__init__(config)
+        self.post_wilting_moisture_percentage: float = float(config["post_wilting_moisture_percentage"])
+        self.bale_density: float = float(config["bale_density"])
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """

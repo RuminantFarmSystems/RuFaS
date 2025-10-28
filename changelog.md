@@ -218,6 +218,7 @@ v0.9.2
 - [2500](https://github.com/RuminantFarmSystems/MASM/pull/2500) - [minor change] Moves `AnimalCombination`, `AnimalManureExcretions`, and removes the old `PenManureData`.
 - [2518](https://github.com/RuminantFarmSystems/MASM/pull/2518) - [minor change] Cleanup all TODOs in the codebase.
 - [2502](https://github.com/RuminantFarmSystems/MASM/pull/2502) - [minor change] [Manure] Implement Manure Methane Potential Tracking.
+- [2524](https://github.com/RuminantFarmSystems/MASM/pull/2502) - [minor change] [EEE][FeedManager] Updates calculation method for purchased feed emissions.
 - [2513](https://github.com/RuminantFarmSystems/MASM/pull/2502) - [minor change] [Manure] Add type to separator.
 - [2491](https://github.com/RuminantFarmSystems/MASM/pull/2491) - [minor change] [Manure] Fixes a bug in manure request management when trying to supplement a request from a farm that has no on-farm manure.
 - [2461](https://github.com/RuminantFarmSystems/MASM/pull/2461) [Input] Create Example Input files.
@@ -237,9 +238,29 @@ v0.9.2
 - [2571](https://github.com/RuminantFarmSystems/MASM/pull/2571) - [minor change] Revert manure and animal input changes from PR2552.
 - [2572](https://github.com/RuminantFarmSystems/MASM/pull/2572) - [minor change] [Feed][FeedStorage] Switches duplicate crop storage data warning to log.
 - [2563](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] Changed calculations to support multi method calculations and update inputs.
+- [2582](https://github.com/RuminantFarmSystems/MASM/pull/2582) - [minor change] Reverts the support for multi prediction model usage and replace it with single model selection usage for each animal type.
+- [2574](https://github.com/RuminantFarmSystems/MASM/pull/2574) - [minor change] [Cross Validation] Implement alias pool functions in the cross validator.
+- [2575](https://github.com/RuminantFarmSystems/MASM/pull/2575) - [minor change] Updates feed storage inputs.
+- [2573](https://github.com/RuminantFarmSystems/MASM/pull/2573) - [minor change][Manure] Additional solids calculation changes for manure handler
 - [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
+- [2587](https://github.com/RuminantFarmSystems/MASM/pull/2587) - [major change] [Output Manager] Add cross-scenario aggregation and running EEE to post processing task.
+- [2583](https://github.com/RuminantFarmSystems/MASM/pull/2583) - [minor change] [Github Action] Fix the GitHub Action for forked branches.
+- [2579](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] [Animal] Changed location of milking cow fraction to main animal input file.
+- [2594](https://github.com/RuminantFarmSystems/MASM/pull/2594) - [minor change] [Manure] Fixed splitting-logic for manure_deposition_surface_area based on stream type.
+- [2586](https://github.com/RuminantFarmSystems/MASM/pull/2586) - [minor change] Make `max_daily_feed_recalculations_per_year` an User Input
+- [2584](https://github.com/RuminantFarmSystems/MASM/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
+- [2597](https://github.com/RuminantFarmSystems/MASM/pull/2597) - [minor change] [Cross Validation] Implement conditional clause functions.
+- [2393](https://github.com/RuminantFarmSystems/MASM/pull/2393) - [minor change] Cleans up the AnimalModuleReporter.
+- [2603](https://github.com/RuminantFarmSystems/MASM/pull/2603) - [minor change] Revert pen emission reporting deleted by PR 2393.
+- [2605](https://github.com/RuminantFarmSystems/MASM/pull/2605) - [minor change] Adds E2E testing for Feed and Feed Storage modules.
+- [2606](https://github.com/RuminantFarmSystems/MASM/pull/2606) - [minor change] Moves Field/Crop/Soil module to `biophysical` and removes `routines` directory.
+- [2599](https://github.com/RuminantFarmSystems/MASM/pull/2599) - [minor change] Implement separate tracking of bedding manure in manure module.
+- [2612](https://github.com/RuminantFarmSystems/MASM/pull/2612) - [minor change] Remove the generation of `dummy_path` when running unit tests.
+- [2618](https://github.com/RuminantFarmSystems/MASM/pull/2618) - [minor change] Removes outdated example regional feed inputs.
+- [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] Implements the Energy submodule of the EEE module with diesel consumption calculation.
+
 
 ### v0.9.2
 

@@ -6,6 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.EEE.tractor_implement import TractorImplement
+from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, OperationType, TractorSize, TillageImplement
 from RUFAS.input_manager import InputManager
 from tests.test_EEE.fixtures import EEE_constants, tractor_dataset, mock_tractor_implement
@@ -53,6 +54,7 @@ def test_init(
     EEE_constants: list[dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Tests the initialization of TractorImplement with various parameters."""
     im = InputManager()
     mock_get_data = mocker.patch.object(im, "get_data", return_value=deepcopy(EEE_constants))
     mock_determine_implement_parameters = mocker.patch(
@@ -83,7 +85,7 @@ def test_init(
 @pytest.mark.parametrize(
     "operation_type, crop_type, tractor_size, tillage_implement, application_depth,"
     "expected_A, expected_B, expected_C, expected_E, expected_F, expected_G,"
-    "expected_width, expected_mass, expected_throughput, expected_depth, expected_is_depth_relevant",
+    "expected_width, expected_mass, expected_throughput, expected_depth, expected_is_depth_relevant, harvest_type",
     [
         (
             OperationType.PLANTING,
@@ -102,6 +104,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -120,6 +123,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -138,6 +142,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -156,6 +161,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -174,6 +180,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -192,6 +199,26 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
+        ),
+        (
+            OperationType.COLLECTION,
+            "alfalfa_silage",
+            TractorSize.SMALL,
+            None,
+            10.0,
+            0,
+            0.0,
+            0.0,
+            0,
+            5,
+            0.0,
+            3.1,
+            1860,
+            None,
+            0.0,
+            False,
+            HarvestOperation.KILL_ONLY,
         ),
         (
             OperationType.WINDROWING,
@@ -210,6 +237,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -228,6 +256,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -246,6 +275,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -264,6 +294,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -282,6 +313,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -300,6 +332,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -318,6 +351,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -336,6 +370,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -354,6 +389,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -372,6 +408,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -390,6 +427,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -408,6 +446,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -426,6 +465,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -444,6 +484,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -462,6 +503,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -480,6 +522,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -498,6 +541,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -516,6 +560,7 @@ def test_init(
             35.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -534,6 +579,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -552,6 +598,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -570,6 +617,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -588,6 +636,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -606,6 +655,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -624,6 +674,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -642,6 +693,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -660,6 +712,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -678,6 +731,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -696,6 +750,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -714,6 +769,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -732,6 +788,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -750,6 +807,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -768,6 +826,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -786,6 +845,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -804,6 +864,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -822,6 +883,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -840,6 +902,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -858,6 +921,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -876,6 +940,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -894,6 +959,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -912,6 +978,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -930,6 +997,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -948,6 +1016,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -966,6 +1035,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -984,6 +1054,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1002,6 +1073,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1020,6 +1092,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1038,6 +1111,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1056,6 +1130,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1074,6 +1149,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1092,6 +1168,7 @@ def test_init(
             6.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1110,6 +1187,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1128,6 +1206,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1146,6 +1225,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1164,6 +1244,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1182,6 +1263,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1200,6 +1282,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1218,6 +1301,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1236,6 +1320,7 @@ def test_init(
             14.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1254,6 +1339,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1272,6 +1358,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1290,6 +1377,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1308,6 +1396,7 @@ def test_init(
             8.5,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1326,6 +1415,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1344,6 +1434,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1362,6 +1453,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1380,6 +1472,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1398,6 +1491,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1416,6 +1510,7 @@ def test_init(
             14.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1434,6 +1529,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1452,6 +1548,7 @@ def test_init(
             8.5,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1470,6 +1567,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1488,6 +1586,7 @@ def test_init(
             28.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1506,6 +1605,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1524,6 +1624,7 @@ def test_init(
             35.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1542,6 +1643,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1560,6 +1662,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1578,6 +1681,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1596,6 +1700,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1614,6 +1719,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1632,6 +1738,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1650,6 +1757,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1668,6 +1776,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1686,6 +1795,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1704,6 +1814,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1722,6 +1833,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1740,6 +1852,7 @@ def test_init(
             14.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1758,6 +1871,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -1776,6 +1890,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -1794,6 +1909,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1812,6 +1928,7 @@ def test_init(
             8.5,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1830,6 +1947,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1848,6 +1966,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1866,6 +1985,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1884,6 +2004,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1902,6 +2023,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1920,6 +2042,7 @@ def test_init(
             14.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1938,6 +2061,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1956,6 +2080,7 @@ def test_init(
             8.5,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -1974,6 +2099,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -1992,6 +2118,7 @@ def test_init(
             8.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2010,6 +2137,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2028,6 +2156,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2046,6 +2175,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2064,6 +2194,7 @@ def test_init(
             14.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2082,6 +2213,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2100,6 +2232,7 @@ def test_init(
             8.5,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2118,6 +2251,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2136,6 +2270,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2154,6 +2289,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2172,6 +2308,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2190,6 +2327,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2208,6 +2346,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2226,6 +2365,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2244,6 +2384,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2262,6 +2403,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2280,6 +2422,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2298,6 +2441,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2316,6 +2460,7 @@ def test_init(
             12.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2334,6 +2479,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2352,6 +2498,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2370,6 +2517,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2388,6 +2536,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2406,6 +2555,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2424,6 +2574,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2442,6 +2593,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2460,6 +2612,7 @@ def test_init(
             12.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2478,6 +2631,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2496,6 +2650,7 @@ def test_init(
             35.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2514,6 +2669,7 @@ def test_init(
             None,
             4.45,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2532,6 +2688,7 @@ def test_init(
             55.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2550,6 +2707,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2568,6 +2726,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2586,6 +2745,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2604,6 +2764,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2622,6 +2783,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2640,6 +2802,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2658,6 +2821,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2676,6 +2840,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2694,6 +2859,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2712,6 +2878,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2730,6 +2897,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2748,6 +2916,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2766,6 +2935,7 @@ def test_init(
             None,
             1.27,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.MOWING,
@@ -2784,6 +2954,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.WINDROWING,
@@ -2802,6 +2973,7 @@ def test_init(
             None,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2820,6 +2992,7 @@ def test_init(
             12.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2838,6 +3011,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2856,6 +3030,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2874,6 +3049,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2892,6 +3068,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2910,6 +3087,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2928,6 +3106,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2946,6 +3125,7 @@ def test_init(
             None,
             3.81,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -2964,6 +3144,7 @@ def test_init(
             12.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -2982,6 +3163,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -3000,6 +3182,7 @@ def test_init(
             11.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -3018,6 +3201,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -3036,6 +3220,7 @@ def test_init(
             0.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -3054,6 +3239,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -3072,6 +3258,7 @@ def test_init(
             20.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.PLANTING,
@@ -3090,6 +3277,7 @@ def test_init(
             None,
             3.18,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.COLLECTION,
@@ -3108,6 +3296,7 @@ def test_init(
             12.0,
             0.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
@@ -3124,8 +3313,9 @@ def test_init(
             4.0,
             3240,
             200.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
@@ -3142,8 +3332,9 @@ def test_init(
             3.0,
             3960,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_SURFACE,
@@ -3160,8 +3351,9 @@ def test_init(
             2.0,
             900,
             85.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
@@ -3178,8 +3370,9 @@ def test_init(
             3.0,
             3960,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
@@ -3196,8 +3389,9 @@ def test_init(
             4.0,
             4020,
             200.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
@@ -3214,8 +3408,9 @@ def test_init(
             3.0,
             4740,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_SURFACE,
@@ -3232,8 +3427,9 @@ def test_init(
             3.0,
             1200,
             95.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
@@ -3250,8 +3446,9 @@ def test_init(
             3.0,
             4740,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
@@ -3268,8 +3465,9 @@ def test_init(
             4.0,
             5000,
             200.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
@@ -3286,8 +3484,9 @@ def test_init(
             3.0,
             5720,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_SURFACE,
@@ -3304,8 +3503,9 @@ def test_init(
             4.0,
             1600,
             105.0,
-            10.0,
+            1.0,
             False,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
@@ -3322,8 +3522,9 @@ def test_init(
             3.0,
             5720,
             200.0,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3340,8 +3541,9 @@ def test_init(
             2.7,
             1600,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3358,8 +3560,9 @@ def test_init(
             3.7,
             1400,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3376,8 +3579,9 @@ def test_init(
             3.7,
             1000,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3394,8 +3598,9 @@ def test_init(
             1.4,
             1200,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3412,8 +3617,9 @@ def test_init(
             4.0,
             2100,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3430,8 +3636,9 @@ def test_init(
             3.1,
             1200,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3448,8 +3655,9 @@ def test_init(
             3.4,
             2050,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3466,8 +3674,9 @@ def test_init(
             6.4,
             2250,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3484,8 +3693,9 @@ def test_init(
             5.5,
             2400,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3502,8 +3712,9 @@ def test_init(
             2.3,
             1700,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3520,8 +3731,9 @@ def test_init(
             5.8,
             3300,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3538,8 +3750,9 @@ def test_init(
             4.6,
             1800,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3556,8 +3769,9 @@ def test_init(
             4.9,
             2858,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3574,8 +3788,9 @@ def test_init(
             7.6,
             2650,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3592,8 +3807,9 @@ def test_init(
             6.4,
             3100,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3610,8 +3826,9 @@ def test_init(
             3.2,
             2300,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3628,8 +3845,9 @@ def test_init(
             7.6,
             3950,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
         (
             OperationType.TILLING,
@@ -3646,8 +3864,9 @@ def test_init(
             4.6,
             1800,
             None,
-            10.0,
+            1.0,
             True,
+            HarvestOperation.HARVEST_KILL,
         ),
     ],
 )
@@ -3668,10 +3887,12 @@ def test_determine_implement_parameters(
     expected_throughput: float,
     expected_depth: float | None,
     expected_is_depth_relevant: bool,
+    harvest_type: HarvestOperation,
     EEE_constants: list[dict[str, Any]],
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the determine_implement_parameters function."""
     im = InputManager()
     mock_get_data = mocker.patch.object(
         im, "get_data", side_effect=[deepcopy(EEE_constants), deepcopy(tractor_dataset)]
@@ -3684,6 +3905,7 @@ def test_determine_implement_parameters(
         tractor_size=tractor_size,
         tillage_implement=tillage_implement,
         application_depth=application_depth,
+        harvest_type=harvest_type
     )
 
     assert mock_get_data.call_args_list == [call("EEE_constants.constants"), call("tractor_dataset")]
@@ -3702,20 +3924,21 @@ def test_determine_implement_parameters(
 
 @pytest.mark.parametrize(
     "operation_type, throughput, field_efficiency, field_speed_km_per_hr, width_m, crop_yield_ton_per_ha,"
-    "expected_result",
+    "application_mass, expected_result",
     [
         # CASE 1: COLLECTION logic (418b)
-        (OperationType.COLLECTION, 10.0, 0.75, 0.0, 0.0, 20.0, 1.5),  # 20 / 10 * 0.75 = 1.5
+        (OperationType.COLLECTION, 10.0, 0.75, 0.0, 0.0, 20.0, None, 0.375),  # 10 / 20 * 0.75 = 0.375
         # CASE 2: COLLECTION logic with different values
-        (OperationType.COLLECTION, 8.0, 0.8, 0.0, 0.0, 16.0, 1.6),  # 16 / 8 * 0.8 = 1.6
+        (OperationType.COLLECTION, 8.0, 0.8, 0.0, 0.0, 16.0, None, 0.4),  # 8 / 16 * 0.8 = 0.4
         # CASE 3: Non-COLLECTION logic (418a)
-        (OperationType.PLANTING, 0.0, 0.85, 6.0, 3.0, None, 1.53),  # 0.1 * 6 * 3 * 0.85 = 1.53
+        (OperationType.PLANTING, 0.0, 0.85, 6.0, 3.0, None, None, 1.53),  # 0.1 * 6 * 3 * 0.85 = 1.53
         # CASE 4: Zero efficiency should give zero output
-        (OperationType.MOWING, 0.0, 0.0, 10.0, 2.5, None, 0.0),
+        (OperationType.MOWING, 0.0, 0.0, 10.0, 2.5, None, None, 0.0),
         # CASE 5: Zero width should give zero output
-        (OperationType.MOWING, 0.0, 0.9, 8.0, 0.0, None, 0.0),
+        (OperationType.MOWING, 0.0, 0.9, 8.0, 0.0, None, None, 0.0),
         # CASE 6: Zero speed should give zero output
-        (OperationType.PLANTING, 0.0, 0.75, 0.0, 3.0, None, 0.0),
+        (OperationType.PLANTING, 0.0, 0.75, 0.0, 3.0, None, None, 0.0),
+        (OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE, 10.0, 0.75, 0.0, 0.0, None, 10.0, 0.75)
     ],
 )
 def test_field_capacity_ha_per_hr(
@@ -3725,11 +3948,13 @@ def test_field_capacity_ha_per_hr(
     field_speed_km_per_hr: float,
     width_m: float,
     crop_yield_ton_per_ha: float | None,
+    application_mass: float | None,
     expected_result: float,
     EEE_constants: list[dict[str, Any]],
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the field_capacity_ha_per_hr function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
     tractor_implement.operation_type = operation_type
     tractor_implement.throughput = throughput
@@ -3737,7 +3962,7 @@ def test_field_capacity_ha_per_hr(
     tractor_implement.field_speed_km_per_hr = field_speed_km_per_hr
     tractor_implement.width_m = width_m
 
-    result = tractor_implement.field_capacity_ha_per_hr(crop_yield_ton_per_ha)
+    result = tractor_implement.field_capacity_ha_per_hr(crop_yield_ton_per_ha, application_mass=application_mass)
 
     assert result == pytest.approx(expected_result)
 
@@ -3760,13 +3985,14 @@ def test_calculate_operation_time_hr(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_operation_time_hr function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     mock_field_capacity_ha_per_hr = mocker.patch.object(tractor_implement, "field_capacity_ha_per_hr", return_value=1.0)
 
     result = tractor_implement.calculate_operation_time_hr(field_production_size_ha, crop_yield_ton_per_ha)
 
-    mock_field_capacity_ha_per_hr.assert_called_once_with(crop_yield_ton_per_ha)
+    mock_field_capacity_ha_per_hr.assert_called_once_with(crop_yield_ton_per_ha, None)
     assert result == pytest.approx(expected_result)
 
 
@@ -3788,6 +4014,7 @@ def test_calculate_drawbar_power(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_drawbar_power function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
     tractor_implement.field_speed_km_per_hr = field_speed_km_per_hr
 
@@ -3850,6 +4077,7 @@ def test_calculate_functional_draft(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_functional_draft function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     tractor_implement.depth_cm = depth_cm
@@ -3890,6 +4118,7 @@ def test_calculate_needed_PTO(
     tractor_dataset: dict[str, list[Any]],
     mocker: MockerFixture,
 ) -> None:
+    """Test the calculate_needed_PTO function."""
     tractor_implement = mock_tractor_implement(EEE_constants, tractor_dataset, mocker)
 
     tractor_implement.E = E
@@ -3903,5 +4132,5 @@ def test_calculate_needed_PTO(
 
     result = tractor_implement.calculate_needed_PTO(crop_yield_ton_per_ha, field_production_size_ha)
 
-    mock_calculate_operation_time_hr.assert_called_once_with(field_production_size_ha, crop_yield_ton_per_ha)
+    mock_calculate_operation_time_hr.assert_called_once_with(field_production_size_ha, crop_yield_ton_per_ha, None)
     assert result == pytest.approx(expected_result)

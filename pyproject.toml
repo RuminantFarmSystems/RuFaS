@@ -28,7 +28,7 @@ dependencies = [
     "sphinxawesome-theme>=5.3.2",
     "juliandate>=1.0.5",
     "freezegun>=1.5.1",
-    "salib>=1.5.1",
+    "salib==1.5.1",
     "tqdm>=4.67.1",
     "mypy>=1.15.0",
     "black>=25.1.0",
