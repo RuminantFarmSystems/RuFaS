@@ -696,7 +696,7 @@ class Pen:
             volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
             methane_production_potential=methane_production_potential,
             pen_manure_data=total_pen_manure_data,
-            bedding_non_degradable_volatile_solids=0.0
+            bedding_non_degradable_volatile_solids=0.0,
         )
 
         parlor_stream_proportion = None
@@ -783,10 +783,8 @@ class Pen:
             methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
             bedding_non_degradable_volatile_solids=(
-                0
-                if bedding.bedding_type == BeddingType.SAND
-                else total_bedding_dry_solids
-            )
+                0 if bedding.bedding_type == BeddingType.SAND else total_bedding_dry_solids
+            ),
         )
 
     def _calculate_manure_surface_area(self) -> float:

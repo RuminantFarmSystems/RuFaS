@@ -27,9 +27,7 @@ def stored_manure() -> ManureStream:
         degradable_volatile_solids=80.88,
         total_solids=290.01,
         volume=100.12,
-        methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -47,9 +45,7 @@ def received_manure() -> ManureStream:
         degradable_volatile_solids=8.90,
         total_solids=29.01,
         volume=10.12,
-        methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -188,13 +184,11 @@ def test_process_manure(
             phosphorus=40.44,
             potassium=50.55,
             ash=60.66,
-            non_degradable_volatile_solids=55.53302711402748,
+            non_degradable_volatile_solids=53.379999999999995,
             degradable_volatile_solids=59.32749999999999,
             total_solids=251.0675,
             volume=100.12,
-            methane_production_potential=0.24,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=7.846972885972514
         )
     ],
 )
@@ -215,7 +209,7 @@ def test_apply_methane_emissions(
 
     slurry_storage_underfloor._apply_methane_emissions(dummy_manure_temperature := 25.0)
 
-    assert pytest.approx(slurry_storage_underfloor._manure_to_process) == expected_stored_manure
+    assert slurry_storage_underfloor._manure_to_process == expected_stored_manure
     assert mock_calculate_methane_emissions.call_args_list == [
         call(
             volatile_solids=stored_manure.degradable_volatile_solids,
@@ -223,8 +217,7 @@ def test_apply_methane_emissions(
             is_degradable=True,
         ),
         call(
-            volatile_solids=stored_manure.non_degradable_volatile_solids
-            + stored_manure.bedding_non_degradable_volatile_solids,
+            volatile_solids=stored_manure.non_degradable_volatile_solids,
             manure_temperature=dummy_manure_temperature,
             is_degradable=False,
         ),
@@ -245,9 +238,7 @@ def test_apply_methane_emissions(
             degradable_volatile_solids=80.88,
             total_solids=290.01,
             volume=100.12,
-            methane_production_potential=0.24,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=10
         )
     ],
 )
@@ -293,9 +284,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
-                methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -311,9 +300,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
-                methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -329,9 +316,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
-                methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -347,9 +332,7 @@ def test_apply_ammonia_emissions(
                 degradable_volatile_solids=80.88,
                 total_solids=290.01,
                 volume=100.12,
-                methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
             ),
         ),
     ],

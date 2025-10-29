@@ -19,7 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
 )
-from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.enums import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
@@ -235,7 +235,7 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
     mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     expected_reformulate_ration_single_pen_call_args_list = [
-        call(pen, available_feeds, current_temperature, mock_total_inventory, 15) for pen in herd_manager.all_pens
+        call(pen, available_feeds, current_temperature, mock_total_inventory) for pen in herd_manager.all_pens
     ]
     assert mock_reformulate_ration_single_pen.call_args_list == expected_reformulate_ration_single_pen_call_args_list
 
@@ -326,32 +326,23 @@ def test_reformulate_ration_single_pen(
         30,
         MagicMock(auto_spec=TotalInventory),
     )
+    mock_use_user_defined_ration = mocker.patch.object(mock_pen, "use_user_defined_ration")
     mock_formulate_optimized_ration = mocker.patch.object(mock_pen, "formulate_optimized_ration")
 
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(
-        mock_pen, available_feeds, current_temperature, mock_total_inventory, 15
-    )
+    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, mock_total_inventory)
 
     if use_user_defined_ration:
-        mock_formulate_optimized_ration.assert_called_once_with(
-            True,
-            available_feeds,
-            current_temperature,
-            herd_manager._max_daily_feeds,
-            herd_manager.advance_purchase_allowance,
-            mock_total_inventory,
-            15,
-        )
+        mock_use_user_defined_ration.assert_called_once_with(available_feeds, current_temperature)
+        mock_formulate_optimized_ration.assert_not_called()
     else:
+        mock_use_user_defined_ration.assert_not_called()
         mock_formulate_optimized_ration.assert_called_once_with(
-            False,
             available_feeds,
             current_temperature,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
             mock_total_inventory,
-            15,
         )

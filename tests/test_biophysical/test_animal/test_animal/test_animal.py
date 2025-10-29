@@ -1851,21 +1851,6 @@ def test_sold_property(sold_at_day: int | None, expected: bool, mock_lactating_c
 
 
 @pytest.mark.parametrize(
-    "stillborn_at_day, expected",
-    [
-        (None, False),
-        (-1, False),
-        (0, True),
-        (10, True),
-    ],
-)
-def test_stillborn_property(stillborn_at_day: int | None, expected: bool, mock_lactating_cow: Animal) -> None:
-    animal = mock_lactating_cow
-    animal.stillborn_day = stillborn_at_day
-    assert animal.stillborn == expected
-
-
-@pytest.mark.parametrize(
     "dead_at_day, expected",
     [
         (None, False),
@@ -2142,9 +2127,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     animal.animal_type = AnimalType.HEIFER_III
     mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
     mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
-    mock_daily_digestive_system_update = mocker.patch.object(
-        animal, "_daily_digestive_system_update", return_value={AnimalType.CALF: {"Pattanaik": 0}}
-    )
+    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_reproduction_update = mocker.patch.object(
@@ -2208,9 +2191,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     animal = mock_lactating_cow
     animal.animal_type = AnimalType.DRY_COW
     mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
-    mock_daily_digestive_system_update = mocker.patch.object(
-        animal, "_daily_digestive_system_update", return_value={AnimalType.CALF: {"Pattanaik": 0}}
-    )
+    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_reproduction_update = mocker.patch.object(

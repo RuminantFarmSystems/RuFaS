@@ -4,13 +4,13 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Type, Union, cast
+from typing import Any, Dict, List, Type, Union
 
 import pandas as pd
 import psutil
 import pytest
 from freezegun import freeze_time
-from mock import ANY, PropertyMock, mock_open, patch
+from mock import PropertyMock, mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import CaptureFixture, TempPathFactory, raises
 from pytest_mock.plugin import MockerFixture
@@ -1726,25 +1726,19 @@ def test_dump_variable_names_and_contexts(
     mock_list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
 
 
-def test_dump_variable_names_and_contexts_no_values(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture,
-) -> None:
-    """Test case for function dump_variable_names_and_contexts in output_manager.py when no values are present."""
-    mock_flat_pool: dict[str, dict[str, list[Any]]] = {
+def test_dump_variable_names_and_contexts_no_values(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
+    """Test case for function dump_variable_names_and_contexts in output_manager.py"""
+    mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
         "var1": {
             "no_values": [1],
             "info_maps": [{"test": "value1"}, {"test": "value2"}],
         },
     }
-
     expected_output = [
         "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
         "var1: **NO VARIABLES**" + os.linesep,
     ]
-
-    mocker.patch.object(mock_output_manager, "_get_flat_variables_pool", return_value=mock_flat_pool)
-
+    mock_output_manager.variables_pool = mock_variable_pool
     mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mock_list_to_file_txt = mocker.patch.object(mock_output_manager, "_list_to_file_txt")
 
@@ -1752,163 +1746,6 @@ def test_dump_variable_names_and_contexts_no_values(
 
     mock_generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
-
-
-def test_set_variables_pool_with_override(
-    mock_output_manager: OutputManager,
-) -> None:
-    """Sets variables_pool and uses the explicit override for current_pool_size."""
-    new_pool: dict[str, dict[str, Any]] = {"a": {"values": [1], "info_maps": []}}
-
-    mock_output_manager._set_variables_pool(new_pool, pool_size_override=999)
-
-    assert mock_output_manager.variables_pool is new_pool
-    assert mock_output_manager.current_pool_size == 999
-
-
-def test_set_variables_pool_without_override(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
-    """Sets variables_pool and calculates current_pool_size via sys.getsizeof on repr(new_pool)."""
-    new_pool: dict[str, dict[str, Any]] = {"x": {"values": [1, 2, 3], "info_maps": [{"u": "kg"}]}}
-
-    mocked_getsizeof = mocker.patch("sys.getsizeof", return_value=1234)
-
-    mock_output_manager._set_variables_pool(new_pool)
-
-    assert mock_output_manager.variables_pool is new_pool
-    mocked_getsizeof.assert_called_once_with(new_pool.__repr__())
-    assert mock_output_manager.current_pool_size == 1234
-
-
-def test_get_flat_variables_pool_empty_returns_empty(
-    mock_output_manager: OutputManager,
-) -> None:
-    """Returns {} when variables_pool is empty/falsy."""
-    mock_output_manager.variables_pool = {}
-
-    result = mock_output_manager._get_flat_variables_pool()
-
-    assert result == {}
-
-
-def test_get_flat_variables_pool_already_flat_returns_self(
-    mock_output_manager: OutputManager,
-) -> None:
-    """If all values are dicts containing 'values', return the mapping as-is."""
-    flat_pool: dict[str, dict[str, Any]] = {
-        "var1": {"values": [1], "info_maps": [{"units": "kg"}]},
-        "var2": {"values": [2, 3], "info_maps": [{"units": "kg"}]},
-    }
-    mock_output_manager.variables_pool = flat_pool
-
-    result = mock_output_manager._get_flat_variables_pool()
-
-    assert result is flat_pool
-    assert "var1" in result and "var2" in result
-    assert result["var1"]["values"] == [1]
-
-
-def test_get_flat_variables_pool_nested_is_flattened_and_non_dict_skipped(
-    mock_output_manager: OutputManager,
-) -> None:
-    """Flattens nested pools and skips non-dict entries at the pool level."""
-    mock_output_manager.variables_pool = cast(
-        Any,
-        {
-            "poolA": {
-                "var1": {"values": [1], "info_maps": [{"units": "kg"}]},
-                "var2": {"values": [2], "info_maps": [{"units": "kg"}]},
-            },
-            "poolB": {
-                "v3": {"values": [3], "info_maps": [{"units": "m"}]},
-            },
-            "not_a_pool": 42,
-        },
-    )
-
-    result = mock_output_manager._get_flat_variables_pool()
-
-    assert set(result.keys()) == {"poolA.var1", "poolA.var2", "poolB.v3"}
-    assert result["poolA.var1"]["values"] == [1]
-    assert result["poolB.v3"]["info_maps"][0]["units"] == "m"
-
-
-def test_load_multiple_variables_pools_from_files_mixed_descriptors(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture,
-) -> None:
-    """Loads pools from a tuple(Path) and a dict(str path), passes correct info_map, and namespaces results."""
-    pools_input: Sequence[tuple[str, Path] | dict[str, Any]] = [
-        ("poolA", Path("a.json")),
-        {"name": "poolB", "path": "b.json"},
-    ]
-
-    loaded_pool_a: dict[str, dict[str, Any]] = {"varA": {"values": [1], "info_maps": [{"units": "kg"}]}}
-    loaded_pool_b: dict[str, dict[str, Any]] = {"varB": {"values": [2], "info_maps": [{"units": "m"}]}}
-
-    read_mock = mocker.patch.object(
-        mock_output_manager,
-        "_read_variables_pool_file",
-        side_effect=[loaded_pool_a, loaded_pool_b],
-    )
-    set_pool_mock = mocker.patch.object(mock_output_manager, "_set_variables_pool")
-
-    mock_output_manager.load_multiple_variables_pools_from_files(pools_input)
-
-    expected_class = mock_output_manager.__class__.__name__
-    expected_func = "load_multiple_variables_pools_from_files"
-
-    args0, kwargs0 = read_mock.call_args_list[0]
-    assert args0[0] == Path("a.json")
-    assert args0[1] == {"class": expected_class, "function": expected_func, "pool_name": "poolA"}
-
-    args1, kwargs1 = read_mock.call_args_list[1]
-    assert args1[0] == Path("b.json")
-    assert args1[1] == {"class": expected_class, "function": expected_func, "pool_name": "poolB"}
-
-    set_pool_mock.assert_called_once_with({"poolA": loaded_pool_a, "poolB": loaded_pool_b})
-
-
-def test_load_multiple_variables_pools_from_files_only_tuples(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture,
-) -> None:
-    """Loads pools when all descriptors are (name, Path) tuples and preserves namespacing."""
-    pools_input = [
-        ("X", Path("x.json")),
-        ("Y", Path("y.json")),
-    ]
-
-    loaded_x: dict[str, dict[str, Any]] = {"vx": {"values": [10], "info_maps": [{"units": "kg"}]}}
-    loaded_y: dict[str, dict[str, Any]] = {"vy": {"values": [20], "info_maps": [{"units": "kg"}]}}
-
-    read_mock = mocker.patch.object(
-        mock_output_manager,
-        "_read_variables_pool_file",
-        side_effect=[loaded_x, loaded_y],
-    )
-    set_pool_mock = mocker.patch.object(mock_output_manager, "_set_variables_pool")
-
-    mock_output_manager.load_multiple_variables_pools_from_files(pools_input)
-
-    assert read_mock.call_count == 2
-    assert read_mock.call_args_list[0][0][0] == Path("x.json")
-    assert read_mock.call_args_list[1][0][0] == Path("y.json")
-
-    set_pool_mock.assert_called_once_with({"X": loaded_x, "Y": loaded_y})
-
-
-def test_load_multiple_variables_pools_from_files_empty_input(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture,
-) -> None:
-    """If no pools are provided, _set_variables_pool is called with an empty dict."""
-    read_mock = mocker.patch.object(mock_output_manager, "_read_variables_pool_file")
-    set_pool_mock = mocker.patch.object(mock_output_manager, "_set_variables_pool")
-
-    mock_output_manager.load_multiple_variables_pools_from_files([])
-
-    read_mock.assert_not_called()
-    set_pool_mock.assert_called_once_with({})
 
 
 def test_list_to_file_txt(
@@ -3424,130 +3261,6 @@ def test_print_errors_warnings_logs(
         mock_output_manager.print_errors_warnings_logs_counts(task_id)
         captured = capfd.readouterr()
         assert captured.out == expected_output
-
-
-def test_summarize_e2e_test_results_good_path(
-    tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
-) -> None:
-    """Unit test for the summarize_e2e_test_results() method in OutputManager class."""
-    mock_print = mocker.patch.object(mock_output_manager, "_print_e2e_results_summary")
-
-    data = {
-        "Animal.something": {"values": [True]},
-        "crop_and_soil.other": {"values": [False]},
-        "DISCLAIMER": "ignored",
-    }
-    (tmp_path / "E2E_Animal_comparison.json").write_text(json.dumps(data))
-    (tmp_path / "E2E_Animal_notes.json").write_text("{}")
-    (tmp_path / "E2E_Animal_comparison.txt").write_text("text")
-    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
-    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
-
-    mock_output_manager.summarize_e2e_test_results(tmp_path, ["E2E_Animal"])
-
-    info_map = {"class": OutputManager.__name__, "function": OutputManager.summarize_e2e_test_results.__name__}
-    expected_add_log_calls = [
-        call(
-            "Attempting to open e2e test results directory",
-            "Opening e2e test results directory to read results files",
-            info_map,
-        ),
-        call(
-            "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
-        ),
-    ]
-    mock_add_log.assert_has_calls(expected_add_log_calls)
-
-    mock_add_error.assert_not_called()
-
-    mock_print.assert_called_once()
-    (summary_arg,) = mock_print.call_args.args
-    assert summary_arg == {"E2E_Animal": {"Animal": True, "CropAndSoil": False, "Manure": "n/a"}}
-
-
-def test_summarize_e2e_test_results_invalid_prefix_logs_error(
-    tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
-) -> None:
-    """Unit test for the summarize_e2e_test_results() method in OutputManager class with no matching prefix."""
-    mock_print = mocker.patch.object(mock_output_manager, "_print_e2e_results_summary")
-
-    (tmp_path / "NoMatch_comparison.json").write_text(json.dumps({"Animal.something": {"values": [True]}}))
-    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
-
-    mock_output_manager.summarize_e2e_test_results(tmp_path, ["E2E_Animal"])
-
-    mock_add_error.assert_any_call(
-        "Invalid e2e output prefix",
-        pytest.helpers.contains("NoMatch_comparison.json") if hasattr(pytest, "helpers") else ANY,
-        ANY,
-    )
-
-    mock_print.assert_called_once()
-    (summary_arg,) = mock_print.call_args.args
-    assert summary_arg == {"E2E_Animal": {"Animal": "n/a", "CropAndSoil": "n/a", "Manure": "n/a"}}
-
-
-def test_summarize_e2e_test_results_file_read_error(
-    tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
-) -> None:
-    """Unit test for the summarize_e2e_test_results() method in OutputManager class with a file read error."""
-    mock_print = mocker.patch.object(mock_output_manager, "_print_e2e_results_summary")
-
-    bad_path = tmp_path / "E2E_Animal_comparison.json"
-    bad_path.mkdir()
-    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
-
-    mock_output_manager.summarize_e2e_test_results(tmp_path, ["E2E_Animal"])
-
-    mock_add_error.assert_any_call(
-        "File path invalid.",
-        ANY,
-        ANY,
-    )
-
-    mock_print.assert_called_once()
-    (summary_arg,) = mock_print.call_args.args
-    assert summary_arg == {"E2E_Animal": {"Animal": "n/a", "CropAndSoil": "n/a", "Manure": "n/a"}}
-
-
-def test__print_e2e_results_summary_formats_output(
-    capsys: CaptureFixture[str], mock_output_manager: OutputManager, mocker: MockerFixture
-) -> None:
-    """Unit test for the _print_e2e_results_summary() method in OutputManager class."""
-    summary = {
-        "E2E_Animal": {
-            "Animal": True,
-            "CropAndSoil": False,
-            "Manure": "n/a",
-        }
-    }
-
-    OutputManager._print_e2e_results_summary(mock_output_manager, summary)
-
-    out = capsys.readouterr().out
-    expected = (
-        "Summary of e2e results:\n\n"
-        "E2E_Animal results:\n"
-        "  Animal: Passing\n"
-        "  CropAndSoil: Failing\n"
-        "  Manure: n/a\n"
-        "\n"
-    )
-    assert out == expected
-
-
-@pytest.mark.parametrize(
-    "key, expected",
-    [
-        ("Animal.foo", "Animal"),
-        ("crop_and_soil.bar", "CropAndSoil"),
-        ("manure.moo", "Manure"),
-        ("Other.stuff", "Other"),
-        ("weirdkey", "weirdkey"),
-    ],
-)
-def test__normalize_module_header(key: str, expected: str) -> None:
-    assert OutputManager._normalize_module_header(key) == expected
 
 
 @pytest.mark.parametrize(

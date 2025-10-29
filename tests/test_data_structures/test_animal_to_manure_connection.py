@@ -1,5 +1,5 @@
 from typing import Optional, Type
-from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.enums import AnimalCombination
 import pytest
 from pytest_mock import MockerFixture
 
@@ -8,13 +8,12 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, Stre
 
 @pytest.fixture
 def manure_stream(mocker: MockerFixture) -> ManureStream:
-    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 8.8, 7.7, 10, 9.9, 10, 0.24,
-                        mocker.MagicMock(autospec=PenManureData))
+    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10, mocker.MagicMock(autospec=PenManureData))
 
 
 def test_total_volatile_solids(manure_stream: ManureStream) -> None:
     """Checks that the property method correctly calculated total_volatile_solids."""
-    assert manure_stream.total_volatile_solids == 26.5
+    assert manure_stream.total_volatile_solids == 16.5
 
 
 def test_mass(manure_stream: ManureStream) -> None:
@@ -50,9 +49,7 @@ def manure_stream_1() -> ManureStream:
         degradable_volatile_solids=35.0,
         total_solids=60.0,
         volume=1.0,
-        methane_production_potential=0.24,
         pen_manure_data=pen_data,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -72,7 +69,6 @@ def manure_stream_1() -> ManureStream:
                 degradable_volatile_solids=28.0,
                 total_solids=48.0,
                 volume=0.8,
-                methane_production_potential=0.17,
                 pen_manure_data=PenManureData(
                     num_animals=5,
                     manure_deposition_surface_area=50.0,
@@ -82,7 +78,6 @@ def manure_stream_1() -> ManureStream:
                     manure_urine_nitrogen=3.0,
                     stream_type=StreamType.PARLOR,
                 ),
-                bedding_non_degradable_volatile_solids=2
             ),
             None,
             {
@@ -94,7 +89,6 @@ def manure_stream_1() -> ManureStream:
                 "ash": 27.0,
                 "total_solids": 108.0,
                 "volume": 1.8,
-                "methane_production_potential": 0.21083333,
                 "pen_data_num_animals": 15,
             },
         ),
@@ -111,9 +105,7 @@ def manure_stream_1() -> ManureStream:
                 degradable_volatile_solids=15.0,
                 total_solids=25.0,
                 volume=0.5,
-                methane_production_potential=0.17,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=2
             ),
             None,
             {
@@ -125,7 +117,6 @@ def manure_stream_1() -> ManureStream:
                 "ash": 23.0,
                 "total_solids": 85.0,
                 "volume": 1.5,
-                "methane_production_potential": 0.2205154,
                 "pen_data_num_animals": None,
             },
         ),
@@ -154,7 +145,6 @@ def test_add_manure_streams(
         assert combined.ash == expected_values["ash"]
         assert combined.total_solids == expected_values["total_solids"]
         assert combined.volume == expected_values["volume"]
-        assert pytest.approx(combined.methane_production_potential) == expected_values["methane_production_potential"]
 
         if expected_values["pen_data_num_animals"] is not None:
             assert combined.pen_manure_data is not None
@@ -317,7 +307,7 @@ def test_manure_stream_is_empty() -> None:
     """Test that ManureStream.is_empty() returns True for an empty stream."""
     empty_stream = ManureStream.make_empty_manure_stream()
     assert empty_stream.is_empty
-    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0.24, None, 10)
+    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None)
     assert not non_empty_stream.is_empty
 
 
@@ -334,9 +324,7 @@ def sample_manure_stream(pen_data_2: PenManureData) -> ManureStream:
         degradable_volatile_solids=6.0,
         total_solids=15.0,
         volume=1.0,
-        methane_production_potential=0.24,
         pen_manure_data=pen_data_2,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -355,7 +343,6 @@ def test_split_stream_valid(sample_manure_stream: ManureStream) -> None:
     assert split.pen_manure_data.num_animals == 5
     assert split.pen_manure_data.stream_type == stream_type
     assert split.pen_manure_data.manure_urine_mass == 15.0
-    assert split.methane_production_potential == sample_manure_stream.methane_production_potential
 
 
 def test_split_stream_invalid_ratios(sample_manure_stream: ManureStream) -> None:
@@ -378,12 +365,9 @@ def test_split_stream_without_pen_manure_data() -> None:
         degradable_volatile_solids=3.0,
         total_solids=7.5,
         volume=0.5,
-        methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
     )
 
     split = stream.split_stream(0.5, stream_type=StreamType.GENERAL)
     assert split.pen_manure_data is None
     assert split.water == 25.0
-    assert split.methane_production_potential == stream.methane_production_potential

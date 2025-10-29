@@ -188,7 +188,7 @@ class Handler(Processor):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids,
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 

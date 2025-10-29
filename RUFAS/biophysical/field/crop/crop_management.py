@@ -374,7 +374,7 @@ class CropManagement:
         return harvested_crop
 
     def _record_yield(
-            self, harvest_op : HarvestOperation, field_name: str, field_size: float, year: int, day: int
+        self, harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int
     ) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.

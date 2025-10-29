@@ -3,9 +3,9 @@ from typing import Any
 
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.units import MeasurementUnits
 
 
@@ -22,7 +22,6 @@ def mock_separator() -> Separator:
         ash_efficiency=0.3,
         volatile_solids_efficiency=0.2,
         total_solids_efficiency=0.1,
-        processor_type="ScrewPress",
     )
     return separator
 
@@ -30,7 +29,7 @@ def mock_separator() -> Separator:
 def test_separator_init_with_params(mock_separator: Separator) -> None:
     """Test the initialization of the Separator class with parameters."""
     assert mock_separator.name == "TestSeparator"
-    assert mock_separator._prefix == "Manure.Separator.ScrewPress.TestSeparator"
+    assert mock_separator._prefix == "Manure.Separator.separator_type.TestSeparator"
     assert mock_separator.held_manure is None
     assert mock_separator.separated_solids_dry_matter == 0.8
     assert mock_separator.ammoniacal_nitrogen_efficiency == 0.7
@@ -48,20 +47,20 @@ def test_separator_init_with_params(mock_separator: Separator) -> None:
         # Initial state is None, first manure stream is fully stored
         (
             None,
-            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
         ),
         # Accumulation: Two manure streams are added together
         (
-            ManureStream(5, 1, 2, 3, 4, 5, 7, 6, 10, 8, 0.8, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
-            ManureStream(15, 3, 5, 7, 9, 11, 15, 13, 20, 17, 2.3, 0.24, None),
+            ManureStream(5, 1, 2, 3, 4, 5, 6, 7, 8, 0.8, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
+            ManureStream(15, 3, 5, 7, 9, 11, 13, 15, 17, 2.3, None),
         ),
         # Adding to an empty manure stream
         (
-            ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
+            ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
         ),
     ],
 )
@@ -90,9 +89,7 @@ def mock_manure_stream() -> ManureStream:
         degradable_volatile_solids=15.0,
         total_solids=70.0,
         volume=200.0,
-        methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -161,7 +158,7 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
         {
             "class": "Separator",
             "function": "process_manure",
-            "prefix": "Manure.Separator.ScrewPress.TestSeparator",
+            "prefix": "Manure.Separator.separator_type.TestSeparator",
             "simulation_day": mock_time.simulation_day,
             "units": MeasurementUnits.UNITLESS,
         },
@@ -170,7 +167,7 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
 
 def test_clear_held_manure(mock_separator: Separator) -> None:
     """Test that held_manure is cleared after calling clear_held_manure."""
-    mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None, 10)
+    mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None)
 
     mock_separator.clear_held_manure()
 
