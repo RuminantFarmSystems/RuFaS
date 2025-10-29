@@ -28,9 +28,8 @@ class EconomicPreprocessor:
 
     def __init__(
         self,
-        im: InputManager | None = None,
     ) -> None:
-        self.im = im or InputManager()
+        self.im = InputManager()
         self.om = OutputManager()
         self.mapping = self._load_map()
 
