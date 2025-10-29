@@ -48,6 +48,13 @@
       "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
+    },    
+    "economics_map": {
+      "title": "Economy input data mapping",
+      "description": "Mapping of economic input data for the Economic module preprocessing.",
+      "path": "input/data/EEE/economics_map.json",
+      "type": "json",
+      "properties": "economics_map_properties"
     },
     "emission": {
       "title": "Emissions data",
