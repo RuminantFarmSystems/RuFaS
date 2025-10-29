@@ -22805,6 +22805,16 @@
           "nullable": true
         }
       }
-    }
+    },
+  "feed_storage_instances": {
+    "data_collection_app_compatible": false,
+    "feed_storages": {
+      "type": "array",
+      "description": "A list of feed storage instances that are used on the farm.",
+      "properties": {
+        "type": "string",
+        "description": "The reference to the name of the storage from the `feed_storage_configurations` input."
+        }
+      }
   }
 }
