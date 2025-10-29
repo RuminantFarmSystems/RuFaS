@@ -7,7 +7,6 @@ import pandas as pd
 from RUFAS.input_manager import InputManager
 from .dcfror import DCFRORCalculator
 from .partial_budget import PartialBudget
-from .preprocessing import EconomicPreprocessor
 
 
 class EconomicFramework:
@@ -32,7 +31,6 @@ class EconomicFramework:
     def run_economic_analysis(self) -> None:
         """Execute economic analysis using the Flexible Economic Framework."""
 
-        inputs = EconomicPreprocessor().preprocess()
         capital_present = self._capital_cost_present(self.im)
         partial_budget_requested = self.partial_budget.has_partial_budget_activity(self.im)
 
