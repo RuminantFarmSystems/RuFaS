@@ -18,7 +18,8 @@ class PartialBudget:
     def __init__(self) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-
+        
+    @staticmethod
     def _to_array(value: Any) -> np.ndarray:
         """Convert partial budget inputs to a one-dimensional float array."""
 
@@ -55,7 +56,9 @@ class PartialBudget:
     # scenarios as outlined in `Documentation of Economic Data and Analytical
     # Methods (2).pdf`.
 
-    def calculate_partial_budget(self) -> None:
+    def calculate_partial_budget(
+        self, preprocessed_data: Dict[str, Dict[str, Dict[str, float | None]]] | None = None
+    ) -> None:
         """Perform a partial budget analysis and export multi-year net changes."""
 
         info_map = {
@@ -84,6 +87,7 @@ class PartialBudget:
         )
 
         self.om.add_variable("pba_net_change", net_change.tolist(), info_map)
+        self.om.add_variable("pba_net_change", [net_change], info_map)
         self.om.add_variable("pba_cumulative_net_change", cumulative_change.tolist(), info_map)
         self.om.add_variable("pba_summary", result_df.to_dict(orient="list"), info_map)
         self.om.add_variable("pba_net_change", [net_change], info_map)
