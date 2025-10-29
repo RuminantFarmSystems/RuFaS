@@ -12,7 +12,14 @@ def herd_statistics() -> HerdStatistics:
 
 def test_initialization(herd_statistics: HerdStatistics) -> None:
     """Test that HerdStatistics initializes with correct default values."""
-    assert herd_statistics.avg_calving_to_preg_time == {"1": 0.0, "2": 0.0, "3": 0.0, "greater_than_3": 0.0}
+    assert herd_statistics.avg_calving_to_preg_time == {
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0,
+        "greater_than_5": 0.0,
+    }
     assert herd_statistics.cull_reason_stats is not None
     assert all(value == 0 for value in herd_statistics.cull_reason_stats.values())
     assert herd_statistics.sold_calves_info == []

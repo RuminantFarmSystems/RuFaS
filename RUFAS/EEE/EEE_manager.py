@@ -2,7 +2,7 @@ from RUFAS.output_manager import OutputManager
 
 from .emissions import EmissionsEstimator
 from .energy import EnergyEstimator
-from .economics.framework import EconomicFramework
+from .economics.framework import run_economic_analysis
 
 
 class EEEManager:
@@ -26,5 +26,5 @@ class EEEManager:
         om.add_log("Energy Processing", "Completed processing of energy.", info_map)
 
         om.add_log("Economics Processing", "Starting processing of economics.", info_map)
-        EconomicFramework.run()
+        run_economic_analysis()
         om.add_log("Economics Processing", "Completed processing of economics.", info_map)
