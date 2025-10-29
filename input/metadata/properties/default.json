@@ -5879,7 +5879,7 @@
       }
     }
   },
-  
+
   "economics_map_properties": {
     "data_collection_app_compatible": false,
     "Animal": {
@@ -22805,7 +22805,8 @@
           "nullable": true
         }
       }
-    },
+    }
+  },
   "feed_storage_instances": {
     "data_collection_app_compatible": false,
     "feed_storages": {
@@ -22814,7 +22815,7 @@
       "properties": {
         "type": "string",
         "description": "The reference to the name of the storage from the `feed_storage_configurations` input."
-        }
       }
+    }
   }
 }
