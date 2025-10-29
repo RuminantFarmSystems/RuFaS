@@ -85,24 +85,6 @@ def test_calculate_digester_capital_cost() -> None:
     )
     assert result == expected
 
-    legacy = DigesterCostCalculator.calculate_digester_capital_cost(
-        alpha=1.0,
-        r1=0.5,
-        r2=0.3,
-        area=10.0,
-        volume=20.0,
-        psi1=0.1,
-        psi2=0.2,
-        psi3=0.05,
-        psi4=0.07,
-        f_j=1.0,
-        g_j=0.0,
-        c_j=1.0,
-        s_j=0.0,
-        epsilon=0.0,
-    )
-    assert legacy == expected
-
 
 def test_capital_recovery_factor() -> None:
     result = DigesterCostCalculator.capital_recovery_factor(0.05, 10)
@@ -132,13 +114,17 @@ def test_calculate_digester_operational_cost() -> None:
         steel_flag=0.0,
         beta=1.0,
         omega1=0.3,
+        area=10.0,
         phi1=0.1,
         phi2=0.2,
         phi3=0.05,
         phi4=0.07,
-        epsilon=0.0,
+        f_j=1.0,
+        g_j=0.0,
+        c_j=1.0,
+        s_j=0.0,
     )
-    expected = math.exp(1.0 + 0.3 * math.log(10.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0)
+    expected = 2.0 * math.exp(1.0 + 0.3 * math.log(10.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0)
     assert pytest.approx(result) == expected
 
     assert (
