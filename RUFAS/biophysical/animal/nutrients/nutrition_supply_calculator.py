@@ -307,16 +307,21 @@ class NutritionSupplyCalculator:
         dROM: float = 0.96
 
         for feed in feeds:
-            # TODO check NPN supp calc
             if feed.info.Fd_Category is FeedCategorization.NPN_SUPPLEMENT:
-                NPNsupp: float = feed.info.NPN_source / feed.info.CP
+                if feed.info.CP > 0:
+                    NPNsupp: float = feed.info.NPN_source / feed.info.CP
+                else:
+                    NPNsupp = 1.0
             else:
                 NPNsupp = 1.0
             if feed.info.CP > 0:
                 RUP: float = feed.info.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed.info.CP
                 RDP: float = feed.info.CP - RUP
-                ROM: float = (100 - feed.info.FA / 1.06 - feed.info.ash
-                              - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp))
+                try:
+                    ROM: float = (100 - feed.info.FA / 1.06 - feed.info.ash
+                                  - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp))
+                except ZeroDivisionError:
+                    ROM = 0.0
             else:
                 RUP = 0.0
                 RDP = 0.0
@@ -350,8 +355,6 @@ class NutritionSupplyCalculator:
 
         NASEM_digestible_energy: float = cls.calculate_NASEM_digestible_energy(
             feeds, dry_matter_intake, body_weight, total_starch)
-        # TODO check the conversions below, seem to be in opposite kg-g formats required by calculations,
-        # ensure  this isn't a mistake
         gas_energy: float = 13.28 * enteric_methane * GeneralConstants.GRAMS_TO_KG
         urine_energy: float = 0.0146 * urinary_nitrogen * GeneralConstants.KG_TO_GRAMS
 
@@ -363,7 +366,7 @@ class NutritionSupplyCalculator:
         cls, total_metabolizable_energy: float
     ) -> float:
 
-        net_energy: float = 0.66 * total_metabolizable_energy
+        net_energy: float = AnimalModuleConstants.EFF_OF_ME_USE * total_metabolizable_energy
         return net_energy
 
     @classmethod
