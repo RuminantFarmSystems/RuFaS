@@ -7,13 +7,18 @@ import pandas as pd
 from RUFAS.input_manager import InputManager
 from .dcfror import DCFRORCalculator
 from .partial_budget import PartialBudget
-from .preprocessing import EconomicPreprocessor
 
 
 class EconomicFramework:
     def __init__(self) -> None:
         self.im = InputManager()
         self.partial_budget = PartialBudget()
+
+    @classmethod
+    def run(cls) -> None:
+        """Convenience entry point mirroring the legacy function API."""
+
+        cls().run_economic_analysis()
 
     def _capital_cost_present(self, im: InputManager) -> bool:
         """Return ``True`` if any capital cost is defined."""
@@ -32,9 +37,8 @@ class EconomicFramework:
     def run_economic_analysis(self) -> None:
         """Execute economic analysis using the Flexible Economic Framework."""
 
-        inputs = EconomicPreprocessor().preprocess()
         capital_present = self._capital_cost_present(self.im)
-        partial_budget_requested = self.partial_budget.has_partial_budget_activity(self.im)
+        partial_budget_requested = self.partial_budget.has_partial_budget_activity()
 
         if capital_present:
             calculator = DCFRORCalculator()
