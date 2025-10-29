@@ -47,7 +47,8 @@ class OpenLot(Storage):
         self._manure_to_process = copy(self._received_manure)
 
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
-            self._manure_to_process.total_volatile_solids,
+            self._manure_to_process.degradable_volatile_solids
+            + self._manure_to_process.non_degradable_volatile_solids,
             current_day_conditions.mean_air_temperature,
             self._manure_to_process.methane_production_potential,
         )
@@ -117,13 +118,14 @@ class OpenLot(Storage):
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
             self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
         )
-        non_degradable_volatile_solids_after_losses = (
+        non_degradable_volatile_solids_after_losses = max(0, (
             self._manure_to_process.non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
-        )
-        degradable_volatile_solids_after_losses = (
-            self._manure_to_process.degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
-        )
+        ))
+        degradable_volatile_solids_after_losses = max(0, (
+            self._manure_to_process.degradable_volatile_solids
+            - dry_matter_loss * degradable_volatile_solids_fraction
+        ))
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
         errors = []

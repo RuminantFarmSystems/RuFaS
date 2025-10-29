@@ -890,8 +890,8 @@
         },
         "pen_type": {
           "type": "string",
-          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
-          "pattern": "^(freestall|tiestall|open lot|compost bedded pack barn)$",
+          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, bedded pack)",
+          "pattern": "^(freestall|tiestall|open lot|bedded pack)$",
           "default": "freestall"
         },
         "max_stocking_density": {

@@ -249,7 +249,9 @@ class HerdStatistics:
             "1": 0.0,
             "2": 0.0,
             "3": 0.0,
-            "greater_than_3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "greater_than_5": 0.0,
         }
         self.cull_reason_stats = {
             animal_constants.DEATH_CULL: 0,
@@ -261,10 +263,10 @@ class HerdStatistics:
             animal_constants.UDDER_CULL: 0,
             animal_constants.UNKNOWN_CULL: 0,
         }
-        self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
-        self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
-        self.avg_age_for_calving = {"1": 0.0, "2": 0.0, "3": 0.0, "greater_than_3": 0.0}
-        self.avg_age_for_parity = {"1": 0.0, "2": 0.0, "3": 0.0, "greater_than_3": 0.0}
+        self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.avg_age_for_calving = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
+        self.avg_age_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
         self.cull_reason_stats_percent = {
             animal_constants.DEATH_CULL: 0.0,
             animal_constants.LOW_PROD_CULL: 0.0,
@@ -279,7 +281,9 @@ class HerdStatistics:
             "1": 0.0,
             "2": 0.0,
             "3": 0.0,
-            "greater_than_3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "greater_than_5": 0.0,
         }
 
         self.stillborn_calf_info = []
