@@ -5,7 +5,7 @@ from typing import cast
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
@@ -22,7 +22,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    crop = HarvestedCrop(**sample_crop_data)
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -61,8 +61,9 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
     )
 
     crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
         config_name="test_crop",
-        field_name="test_field",
+        rufas_ids=[1],
         harvest_time=cast(date, rufas_time),
         storage_time=cast(date, rufas_time),
         fresh_mass=100.0,
@@ -108,8 +109,9 @@ def test_remove_dry_matter_mass(
     )
 
     crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
         config_name="test_crop",
-        field_name="test_field",
+        rufas_ids=[1],
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
         fresh_mass=initial_fresh_mass,
@@ -145,9 +147,10 @@ def test_remove_feed_mass_valid(
     mass_to_remove: float,
     expected_fresh_mass: float,
 ) -> None:
-    crop = HarvestedCrop(
+    crop = crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
         config_name="test_crop",
-        field_name="test_field",
+        rufas_ids=[1],
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
         fresh_mass=initial_fresh_mass,
@@ -178,8 +181,9 @@ def test_remove_feed_mass_invalid(
     dm_to_remove: float,
 ) -> None:
     crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
         config_name="test_crop",
-        field_name="test_field",
+        rufas_ids=[1],
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
         fresh_mass=initial_fresh_mass,
@@ -214,7 +218,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
-    crop = HarvestedCrop(**crop_data)
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **crop_data)
 
     actual = crop.dry_matter_mass
 
@@ -224,7 +228,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 @pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
-    crop = HarvestedCrop(**sample_crop_data)
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
@@ -236,7 +240,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 @pytest.mark.parametrize("dry_matter_percentage,expected", [(30.0, 408.0), (15.0, 474.0), (95.0, 122.0)])
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
-    crop = HarvestedCrop(**sample_crop_data)
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
 
     actual = crop._calculate_bale_density()
@@ -250,7 +254,7 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 )
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
-    crop = HarvestedCrop(**sample_crop_data)
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
 

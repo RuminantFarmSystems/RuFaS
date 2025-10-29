@@ -159,14 +159,11 @@ class ManureStream:
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
-    bedding_non_degradable_volatile_solids : float
-        Amount of bedding non-degradable volatile solids (kg).
 
     Class Attributes
     ----------------
     MANURE_STREAM_UNITS : dict[str, MeasurementUnits | None]
         A dictionary mapping manure stream attributes and properties to their respective measurement units.
-
     """
 
     water: float
@@ -175,9 +172,8 @@ class ManureStream:
     phosphorus: float
     potassium: float
     ash: float
-    degradable_volatile_solids: float
     non_degradable_volatile_solids: float
-    bedding_non_degradable_volatile_solids: float
+    degradable_volatile_solids: float
     total_solids: float
     volume: float
     methane_production_potential: float
@@ -190,15 +186,14 @@ class ManureStream:
         "phosphorus": MeasurementUnits.KILOGRAMS,
         "potassium": MeasurementUnits.KILOGRAMS,
         "ash": MeasurementUnits.KILOGRAMS,
-        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
         "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "bedding_non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
         "total_solids": MeasurementUnits.KILOGRAMS,
         "volume": MeasurementUnits.CUBIC_METERS,
         "mass": MeasurementUnits.KILOGRAMS,
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
         "methane_production_potential": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
-        "pen_manure_data": None
+        "pen_manure_data": None,
     }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
@@ -229,10 +224,8 @@ class ManureStream:
             phosphorus=self.phosphorus + other.phosphorus,
             potassium=self.potassium + other.potassium,
             ash=self.ash + other.ash,
-            non_degradable_volatile_solids=self.non_degradable_volatile_solids
-            + other.non_degradable_volatile_solids,
-            degradable_volatile_solids=self.degradable_volatile_solids
-            + other.degradable_volatile_solids,
+            non_degradable_volatile_solids=self.non_degradable_volatile_solids + other.non_degradable_volatile_solids,
+            degradable_volatile_solids=self.degradable_volatile_solids + other.degradable_volatile_solids,
             total_solids=self.total_solids + other.total_solids,
             volume=self.volume + other.volume,
             methane_production_potential=(
@@ -242,8 +235,6 @@ class ManureStream:
             pen_manure_data=(
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
             ),
-            bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids
-            + other.bedding_non_degradable_volatile_solids
         )
 
     @property
@@ -265,15 +256,13 @@ class ManureStream:
                 self.degradable_volatile_solids,
                 self.total_solids,
                 self.volume,
-                self.bedding_non_degradable_volatile_solids
             ]
         )
 
     @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
-        return (self.non_degradable_volatile_solids
-                + self.degradable_volatile_solids + self.bedding_non_degradable_volatile_solids)
+        return self.non_degradable_volatile_solids + self.degradable_volatile_solids
 
     @property
     def mass(self) -> float:
@@ -300,15 +289,9 @@ class ManureStream:
             volume=0.0,
             methane_production_potential=0.0,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=0.0
         )
 
-    def split_stream(
-        self,
-        split_ratio: float,
-        stream_type: StreamType | None = None,
-        manure_stream_deposition_split: float | None = None,
-    ) -> "ManureStream":
+    def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
         """
         Splits this manure stream using the specified ratio.
 
@@ -318,9 +301,6 @@ class ManureStream:
             Proportion of this stream to split into the new stream.
         stream_type : StreamType | None, default None
             Type to assign to the new manure stream's PenManureData, if applicable.
-        manure_stream_deposition_split : float | None, default None
-            Proportion of the manure deposition surface area to assign to the new stream's PenManureData,
-            if applicable. If None, the split_ratio will be used.
 
         Returns
         -------
@@ -347,11 +327,7 @@ class ManureStream:
         if self.pen_manure_data is not None and stream_type is not None:
             split_pen_manure_data = PenManureData(
                 num_animals=self.pen_manure_data.num_animals,
-                manure_deposition_surface_area=(
-                    self.pen_manure_data.manure_deposition_surface_area * manure_stream_deposition_split
-                    if manure_stream_deposition_split is not None
-                    else self.pen_manure_data.manure_deposition_surface_area * split_ratio
-                ),
+                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
                 animal_combination=self.pen_manure_data.animal_combination,
                 pen_type=self.pen_manure_data.pen_type,
                 manure_urine_mass=self.pen_manure_data.manure_urine_mass * split_ratio,
@@ -372,5 +348,4 @@ class ManureStream:
             volume=self.volume * split_ratio,
             methane_production_potential=self.methane_production_potential,
             pen_manure_data=split_pen_manure_data,
-            bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids * split_ratio
         )

@@ -14,6 +14,12 @@ class EconomicFramework:
         self.im = InputManager()
         self.partial_budget = PartialBudget()
 
+    @classmethod
+    def run(cls) -> None:
+        """Convenience entry point mirroring the legacy function API."""
+
+        cls().run_economic_analysis()
+
     def _capital_cost_present(self, im: InputManager) -> bool:
         """Return ``True`` if any capital cost is defined."""
 
@@ -32,7 +38,7 @@ class EconomicFramework:
         """Execute economic analysis using the Flexible Economic Framework."""
 
         capital_present = self._capital_cost_present(self.im)
-        partial_budget_requested = self.partial_budget.has_partial_budget_activity(self.im)
+        partial_budget_requested = self.partial_budget.has_partial_budget_activity()
 
         if capital_present:
             calculator = DCFRORCalculator()
