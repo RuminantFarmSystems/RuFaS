@@ -648,11 +648,15 @@ class TaskManager:
         }
         TaskManager.handle_herd_initializaition(args, output_manager)
 
-        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
+        from RUFAS.EEE.economics.framework import EconomicFramework
+        EconomicFramework().run_economic_analysis()
 
-        simulator.simulate()
-        output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+        # TODO uncomment
+        # output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+        # simulator = SimulationEngine()
+
+        # simulator.simulate()
+        # output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
     def _handle_end_to_end_testing(
