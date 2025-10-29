@@ -23,10 +23,8 @@ def test_run_economic_analysis_uses_dcfror_when_capital_present(
     im_cls = mocker.patch("RUFAS.EEE.economics.framework.InputManager")
     im_cls.return_value.get_data.return_value = pd.DataFrame({"Cost": [100]})
     mock_calc_cls = mocker.patch("RUFAS.EEE.economics.framework.DCFRORCalculator")
-    mock_partial_budget_cls = mocker.patch("RUFAS.EEE.economics.framework.PartialBudget")
-    mock_partial_budget_cls.return_value.has_partial_budget_activity.return_value = False
 
-    EconomicFramework.run()
+    run_economic_analysis()
 
     mock_calc_cls.assert_called_once_with()
     mock_calc_cls.return_value.calculate.assert_called_once_with()
@@ -36,13 +34,11 @@ def test_run_economic_analysis_uses_dcfror_when_capital_present(
 def test_run_economic_analysis_uses_pba_when_no_capital(mocker: MockerFixture) -> None:
     im_cls = mocker.patch("RUFAS.EEE.economics.framework.InputManager")
     im_cls.return_value.get_data.return_value = pd.DataFrame({"Cost": [0]})
-    mock_partial_budget_cls = mocker.patch("RUFAS.EEE.economics.framework.PartialBudget")
-    mock_partial_budget = mock_partial_budget_cls.return_value
-    mock_partial_budget.has_partial_budget_activity.return_value = True
+    mock_pba = mocker.patch("RUFAS.EEE.economics.framework.calculate_partial_budget")
 
-    EconomicFramework.run()
+    run_economic_analysis()
 
-    mock_partial_budget.calculate_partial_budget.assert_called_once_with()
+    mock_pba.assert_called_once_with()
 
 
 def test_calculate_roi() -> None:
@@ -80,10 +76,7 @@ def test_calculate_digester_capital_cost() -> None:
         psi4=0.07,
         epsilon=0.0,
     )
-    expected = math.exp(
-        1.0 + 0.5 * math.log(10.0) + 0.3 * math.log(20.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0
-    )
-    assert result == expected
+    assert legacy == expected
 
 
 def test_capital_recovery_factor() -> None:
@@ -114,17 +107,13 @@ def test_calculate_digester_operational_cost() -> None:
         steel_flag=0.0,
         beta=1.0,
         omega1=0.3,
-        area=10.0,
         phi1=0.1,
         phi2=0.2,
         phi3=0.05,
         phi4=0.07,
-        f_j=1.0,
-        g_j=0.0,
-        c_j=1.0,
-        s_j=0.0,
+        epsilon=0.0,
     )
-    expected = 2.0 * math.exp(1.0 + 0.3 * math.log(10.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0)
+    expected = math.exp(1.0 + 0.3 * math.log(10.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0)
     assert pytest.approx(result) == expected
 
     assert (

@@ -19,7 +19,6 @@ class PartialBudget:
         self.im = InputManager()
         self.om = OutputManager()
 
-    @staticmethod
     def _to_array(value: Any) -> np.ndarray:
         """Convert partial budget inputs to a one-dimensional float array."""
 
@@ -64,7 +63,7 @@ class PartialBudget:
             "function": self.calculate_partial_budget.__name__,
             "units": MeasurementUnits.DOLLARS,
         }
-        inputs = self._load_inputs()
+        inputs = self._load_inputs(self.im)
 
         net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
             inputs["additional_costs"] + inputs["reduced_revenue"]
