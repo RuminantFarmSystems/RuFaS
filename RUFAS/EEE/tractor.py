@@ -34,7 +34,7 @@ class Tractor:
         herd_size: int | None = None,
         application_depth: float | None = None,
         tillage_implement: TillageImplement | None = None,
-        harvest_type: HarvestOperation | None = None,
+        harvest_type: HarvestOperation | None = None
     ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
@@ -76,7 +76,7 @@ class Tractor:
                 self.tractor_size,
                 tillage_implement,
                 application_depth,
-                harvest_type,
+                harvest_type
             )
             for operation_type in self.operation_types
         ]
