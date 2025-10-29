@@ -19,7 +19,7 @@ class TractorImplement:
         tractor_size: TractorSize,
         tillage_implement: TillageImplement | None,
         application_depth: float | None,
-        harvest_type: HarvestOperation | None = None
+        harvest_type: HarvestOperation | None = None,
     ) -> None:
         """
         Initializes the TractorImplement object with the specifications of the tractor implement.
@@ -121,7 +121,7 @@ class TractorImplement:
         elif self.operation_type in [
             OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
             OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
-        ]:      # 418c
+        ]:  # 418c
             return (self.throughput / application_mass) * self.field_efficiency
 
         return (
@@ -130,7 +130,7 @@ class TractorImplement:
             * self.width_m
             * self.field_efficiency
             * GeneralConstants.SQUARE_METERS_TO_HECTARES
-        )       # 418a
+        )  # 418a
 
     def calculate_operation_time_hr(
         self,
