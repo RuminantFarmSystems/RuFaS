@@ -16,7 +16,7 @@
           "AnimalModuleReporter._record_cows_conception_rate.cow_total_num_ai_performed"
         ],
         "economics_files": {
-          "input_manager_location": "im.pool"["animal"]["animal_config"]["management_decisions"]["semen_type"],
+          "input_manager_location": "animal.animal_config.management_decisions.semen_type",
           "conventional": "commodity_prices.semen_conventional.dollar_per_straw.csv",
           "sexed": "commodity_prices.semen_sexed.dollar_per_straw.csv",
           "beef": "commodity_prices.semen_beef.dollar_per_straw.csv"
@@ -25,11 +25,9 @@
         "processing": ""
       },
       "Bedding requirements": {
-        "biophysical_simulation": [
-          "om.variables_pool["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]",
-        ],
+        "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
         "economics_files": {
-          "input_manager_location": "im.pool"["animal"]["pen_information"][".*"]["manure_streams"][0]["bedding_name"],
+          "input_manager_location": "animal.pen_information..*.manure_streams.0.bedding_name",
           "sand": "commodity_prices.bedding_sand.dollar_per_head.csv",
           "staw": "commodity_prices.bedding_straw.dollar_per_head.csv",
           "sawdust": "commodity_prices.bedding_sawdust.dollar_per_head.csv",
