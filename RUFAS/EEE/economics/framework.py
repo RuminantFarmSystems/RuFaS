@@ -79,5 +79,3 @@ class EconomicFramework:
                 self.partial_budget.calculate_partial_budget(preprocessed_results)
         else:
             self.partial_budget.calculate_partial_budget(preprocessed_results)
-
-
