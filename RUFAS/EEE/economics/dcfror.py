@@ -8,8 +8,27 @@ import pandas as pd
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
-from .equations import EconomicEquations
-from .metrics import EconomicMetrics
+from .equations import (
+    annual_capital_spent,
+    annual_cash_income,
+    annual_loan_payment,
+    construct_timeline,
+    construction_interest,
+    depreciation_schedule,
+    discount_factor,
+    equity_contribution,
+    income_tax,
+    interest_payment,
+    loan_principal,
+    loss_carry_forward,
+    net_present_value,
+    net_revenue,
+    npv_capital_plus_interest,
+    present_value,
+    principal_after_payment,
+    taxable_income,
+)
+from .metrics import calculate_mpsp, calculate_net_annual_cash_flow, calculate_payback_period, calculate_roi
 
 
 class DCFRORCalculator:
@@ -205,12 +224,12 @@ class DCFRORCalculator:
     ) -> Tuple[np.ndarray, pd.DataFrame]:
         """Build the annual cash flow table using Equations 7–26."""
 
-        years = EconomicEquations.construct_timeline(construction_term, loan_term, project_term)
+        years = construct_timeline(construction_term, loan_term, project_term)
         n_years = years.size
         construction_mask = years <= 0
         operational_mask = years >= 1
         discount_factors = np.array(
-            [EconomicEquations.discount_factor(internal_rate_of_return, year) for year in years],
+            [discount_factor(internal_rate_of_return, year) for year in years],
             dtype=float,
         )
 
@@ -222,14 +241,12 @@ class DCFRORCalculator:
             rates = rates[:n_construction]
             if not np.allclose(rates.sum(), 1.0) and rates.sum() > 0:
                 rates = rates / rates.sum()
-            capital_schedule = EconomicEquations.annual_capital_spent(capital_cost, rates)
-            equity_schedule = EconomicEquations.equity_contribution(capital_cost, rates, equity_share)
+            capital_schedule = annual_capital_spent(capital_cost, rates)
+            equity_schedule = equity_contribution(capital_cost, rates, equity_share)
             loan_draw_schedule = capital_schedule * financed_share
-            construction_interest_cost = EconomicEquations.construction_interest(
-                loan_draw_schedule, construction_interest_rate
-            )
+            construction_interest_cost = construction_interest(loan_draw_schedule, construction_interest_rate)
             capital_interest_pv = np.zeros(n_years, dtype=float)
-            capital_interest_pv[construction_mask] = EconomicEquations.npv_capital_plus_interest(
+            capital_interest_pv[construction_mask] = npv_capital_plus_interest(
                 capital_schedule,
                 construction_interest_cost,
                 internal_rate_of_return,
@@ -244,7 +261,7 @@ class DCFRORCalculator:
             capital_interest_pv = np.zeros(n_years, dtype=float)
             cumulative_draw = np.zeros(0, dtype=float)
 
-        annual_depreciation = EconomicEquations.depreciation_schedule(capital_cost, depreciation_rate)
+        annual_depreciation = depreciation_schedule(capital_cost, depreciation_rate)
         if dep_term and dep_term < annual_depreciation.size:
             annual_depreciation = annual_depreciation[:dep_term]
 
@@ -256,9 +273,7 @@ class DCFRORCalculator:
         operating_schedule[: min(len(operating_costs), op_years)] = operating_costs[:op_years]
         depreciation_schedule_op[: min(len(annual_depreciation), op_years)] = annual_depreciation[:op_years]
 
-        loan_payment = EconomicEquations.annual_loan_payment(
-            capital_cost, loan_interest_rate, loan_term, financed_share
-        )
+        loan_payment = annual_loan_payment(capital_cost, loan_interest_rate, loan_term, financed_share)
         principal_balance = capital_cost * financed_share
 
         capital_column = np.zeros(n_years, dtype=float)
@@ -294,7 +309,7 @@ class DCFRORCalculator:
             depreciation_y = depreciation_schedule_op[idx]
             loan_pay_y = loan_payment if idx < loan_term else 0.0
             interest_y = (
-                EconomicEquations.interest_payment(principal_balance, loan_interest_rate)
+                interest_payment(principal_balance, loan_interest_rate)
                 if financed_share > 0 and idx < loan_term
                 else 0.0
             )
@@ -302,21 +317,15 @@ class DCFRORCalculator:
             if idx < loan_term:
                 principal_balance = max(
                     0.0,
-                    EconomicEquations.principal_after_payment(
-                        principal_balance, loan_pay_y, interest_y
-                    ),
+                    principal_after_payment(principal_balance, loan_pay_y, interest_y),
                 )
 
-            net_rev_y = EconomicEquations.net_revenue(
-                revenue_y, operating_y, interest_y, depreciation_y
-            )
-            carried_loss = EconomicEquations.loss_carry_forward(prev_taxable)
-            taxable_y = EconomicEquations.taxable_income(net_rev_y, carried_loss)
-            tax_y = EconomicEquations.income_tax(taxable_y, tax_rate)
-            cash_income_y = EconomicEquations.annual_cash_income(
-                revenue_y, operating_y, loan_pay_y, tax_y
-            )
-            pv_y = EconomicEquations.present_value(cash_income_y, discount_factors[year_index])
+            net_rev_y = net_revenue(revenue_y, operating_y, interest_y, depreciation_y)
+            carried_loss = loss_carry_forward(prev_taxable)
+            taxable_y = taxable_income(net_rev_y, carried_loss)
+            tax_y = income_tax(taxable_y, tax_rate)
+            cash_income_y = annual_cash_income(revenue_y, operating_y, loan_pay_y, tax_y)
+            pv_y = present_value(cash_income_y, discount_factors[year_index])
 
             revenue_column[year_index] = revenue_y
             operating_column[year_index] = operating_y
@@ -373,17 +382,17 @@ class DCFRORCalculator:
 
         construction_mask = cash_flow_df["Year"] <= 0
         operational_mask = cash_flow_df["Year"] >= 1
-        npv = EconomicEquations.net_present_value(
+        npv = net_present_value(
             cash_flow_df.loc[operational_mask, "PresentValue"].to_numpy(),
             cash_flow_df.loc[construction_mask, "NPVCapitalPlusInterest"].to_numpy(),
         )
 
         positive_benefits = float(CF[CF > 0].sum())
         investment_costs = float(-CF[CF < 0].sum())
-        roi = EconomicMetrics.calculate_roi(positive_benefits, investment_costs)
-        payback = EconomicMetrics.calculate_payback_period(CF)
-        net_cash_flow = EconomicMetrics.calculate_net_annual_cash_flow(revenue, operating_costs)
-        mpsp = EconomicMetrics.calculate_mpsp(capital_cost + operating_costs.sum(), revenue.sum())
+        roi = calculate_roi(positive_benefits, investment_costs)
+        payback = calculate_payback_period(CF)
+        net_cash_flow = calculate_net_annual_cash_flow(revenue, operating_costs)
+        mpsp = calculate_mpsp(capital_cost + operating_costs.sum(), revenue.sum())
 
         self.om.add_variable("dcfror_npv", npv, info_map)
         self.om.add_variable("dcfror_roi", roi, info_map)
