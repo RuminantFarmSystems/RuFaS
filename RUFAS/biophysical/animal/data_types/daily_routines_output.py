@@ -1,7 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 
 
@@ -27,5 +28,6 @@ class DailyRoutinesOutput:
     """
 
     herd_reproduction_statistics: HerdReproductionStatistics
+    daily_digestion_output: dict[AnimalType, dict[str, float]] = field(default_factory=dict)
     animal_status: AnimalStatus = AnimalStatus.REMAIN
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None

@@ -14,11 +14,7 @@ from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHi
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production import (
-    MilkProductionInputs,
-    MilkProductionOutputs,
-    MilkProductionStatistics,
-)
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
@@ -1077,22 +1073,6 @@ class Animal:
         """
         return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
 
-    @property
-    def milk_statistics(self) -> MilkProductionStatistics:
-        """Returns the milk statistics for the animal."""
-        if not self.animal_type.is_cow:
-            raise TypeError()
-        return MilkProductionStatistics(
-            cow_id=self.id,
-            pen_id=self.pen_history[-1]["pen"],
-            days_in_milk=self.days_in_milk,
-            estimated_daily_milk_produced=self.milk_production.daily_milk_produced,
-            milk_protein=self.milk_production.true_protein_content,
-            milk_fat=self.milk_production.fat_content,
-            milk_lactose=self.milk_production.lactose_content,
-            parity=self.calves,
-        )
-
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1315,7 +1295,7 @@ class Animal:
         )
         self.nutrients.perform_daily_phosphorus_update(nutrients_inputs)
 
-    def _daily_digestive_system_update(self) -> None:
+    def _daily_digestive_system_update(self) -> dict[AnimalType, dict[str, float]]:
         """
         Performs the daily digestive system updates for the animal.
 
@@ -1340,7 +1320,8 @@ class Animal:
             fat_content=MilkProduction.fat_percent,
             protein_content=self.milk_production.true_protein_content,
         )
-        self.digestive_system.process_digestion(digestive_system_inputs)
+        digestion_output = self.digestive_system.process_digestion(digestive_system_inputs)
+        return digestion_output
 
     def daily_milking_update(self, time: RufasTime) -> None:
         """
@@ -1565,7 +1546,8 @@ class Animal:
 
         self._daily_nutrients_update()
 
-        self._daily_digestive_system_update()
+        digestion_outputs = self._daily_digestive_system_update()
+        daily_routines_output.daily_digestion_output = digestion_outputs
 
         self.daily_milking_update(time)
 

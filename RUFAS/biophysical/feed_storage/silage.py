@@ -1,7 +1,8 @@
 from dataclasses import replace
+from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -19,16 +20,6 @@ class Silage(Storage):
     """
     Class representing the Silage storage type, inheriting from Storage.
 
-    Parameters
-    ----------
-    config : dict[str, str | float]
-        Configuration dictionary for the silage storage.
-
-    Attributes
-    ----------
-    om : OutputManager
-        OutputManager instance for logging variables.
-
     Methods
     -------
     calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
@@ -40,8 +31,14 @@ class Silage(Storage):
 
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
-        super().__init__(config)
+    def __init__(self, capacity: float = float("inf")):
+        super().__init__(capacity)
+        self.acceptable_crops = [
+            CropCategory.ALFALFA,
+            CropCategory.CORN,
+            CropCategory.GRASS,
+            CropCategory.SMALL_GRAIN,
+        ]
         self.om = OutputManager()
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
@@ -62,7 +59,6 @@ class Silage(Storage):
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
             "simulation_day": time.simulation_day,
-            "prefix": self._prefix,
         }
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
@@ -309,12 +305,17 @@ class Bunker(Silage):
     Class representing the Bunker type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]):
+    def __init__(self, bunker_size: Optional[str] = None):
         """
-        Initializes a Bunker instance.
+        Initializes a Bunker instance with optional bunker size.
+
+        Parameters
+        ----------
+        bunker_size : Optional[str], optional
+            The size of the bunker, by default None
         """
-        super().__init__(config)
-        self.bunker_size = config["size"]
+        super().__init__()
+        self.bunker_size = bunker_size
 
 
 class Pile(Silage):
@@ -322,12 +323,17 @@ class Pile(Silage):
     Class representing the Pile type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, pile_size: Optional[str] = None):
         """
-        Initializes a Pile instance.
+        Initializes a Pile instance with optional pile size.
+
+        Parameters
+        ----------
+        pile_size : Optional[str], optional
+            The size of the pile, by default None
         """
-        super().__init__(config)
-        self.pile_size = config["size"]
+        super().__init__()
+        self.pile_size = pile_size
 
 
 class Bag(Silage):
@@ -335,9 +341,14 @@ class Bag(Silage):
     Class representing the Bag type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, bag_size: Optional[int] = None):
         """
-        Initializes a Bag instance.
+        Initializes a Bag instance with optional bag size.
+
+        Parameters
+        ----------
+        bag_size : Optional[int], optional
+            The diameter of the bag in feet, by default None
         """
-        super().__init__(config)
-        self.bag_size = config["size"]
+        super().__init__()
+        self.bag_size = bag_size

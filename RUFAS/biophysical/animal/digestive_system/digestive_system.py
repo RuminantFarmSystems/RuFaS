@@ -16,14 +16,14 @@ class DigestiveSystem:
 
     manure_excretion: AnimalManureExcretions
     phosphorus_excreted: float
-    enteric_methane_emission: float
+    enteric_methane_emission: dict[str, float]
 
     def __init__(self) -> None:
         self.manure_excretion = AnimalManureExcretions()
         self.phosphorus_excreted = 0.0
-        self.enteric_methane_emission: float = 0.0
+        self.enteric_methane_emission: dict[str, float] = {}
 
-    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> dict[AnimalType, dict[str, float]]:
         """
         Processes the digestion for different types of animals by calculating methane emission
         and manure excretion based on the provided digestive system inputs.
@@ -33,6 +33,11 @@ class DigestiveSystem:
         digestive_system_inputs : DigestiveSystemInputs
             Contains inputs related to the digestive system of the animal, including animal type,
             body weight, nutrient details, fecal phosphorus, and urine phosphorus requirements.
+
+        Returns
+        -------
+        dict[AnimalType, dict[str, float] | None]
+            A mapping of animal type that maps to the emission results of each model used.
 
         Raises
         ------
@@ -83,6 +88,7 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
+            return {digestive_system_inputs.animal_type: self.enteric_methane_emission}
 
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             if digestive_system_inputs.animal_type == AnimalType.HEIFER_I:
@@ -106,6 +112,7 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
+            return {digestive_system_inputs.animal_type: self.enteric_methane_emission}
 
         elif digestive_system_inputs.animal_type.is_cow:
             methane_emission = EntericMethaneCalculator.calculate_cow_methane(
@@ -133,6 +140,10 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
+            if digestive_system_inputs.is_milking:
+                return {AnimalType.LAC_COW: self.enteric_methane_emission}
+            else:
+                return {AnimalType.DRY_COW: self.enteric_methane_emission}
 
         else:
             om.add_error(

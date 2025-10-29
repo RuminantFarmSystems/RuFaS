@@ -1,5 +1,3 @@
-from typing import Any
-
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     CowReproductionProtocol,
@@ -361,14 +359,14 @@ class AnimalConfig:
         1,
     ]
 
-    methane_model: dict[str, Any] = {
-        "calves": "Pattanaik",
-        "heiferIs": "IPCC",
-        "heiferIIs": "IPCC",
-        "heiferIIIs": "IPCC",
+    methane_model: dict[str, dict[str, bool]] = {
+        "calves": {"Pattanaik": True},
+        "heiferIs": {"IPCC": True},
+        "heiferIIs": {"IPCC": True},
+        "heiferIIIs": {"IPCC": True},
         "cow": {
-            "dry cows": "IPCC",
-            "lactating cows": "IPCC",
+            "dry cows": {"IPCC": True, "Mills": False},
+            "lactating cows": {"IPCC": True, "Mutian": False, "Mills": False},
         },
     }
     methane_mitigation_method: str = "None"
