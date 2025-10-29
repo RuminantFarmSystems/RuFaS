@@ -182,11 +182,8 @@ class RationOptimizer:
                 for func in self.NRC_constraint_functions]
 
             self.heifer_constraints = [
-                constraint
-                for constraint in self.cow_constraints
-                if constraint["fun"] not in [self.NE_total_constraint,
-                                       self.NE_lactation_constraint]
-            ]
+                constraint for constraint in self.cow_constraints
+                if constraint["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint]]
         elif ration_config.nutrient_standard is NutrientStandard.NASEM:
             self.cow_constraints = [
                 {"type": "ineq", "fun": func, "args": (ration_config,)} for func in self.NASEM_constraint_functions]

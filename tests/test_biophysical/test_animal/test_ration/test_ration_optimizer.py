@@ -10,7 +10,8 @@ from scipy.optimize import OptimizeResult
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, FeedComponentType, FeedCategorization, NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed, FeedComponentType, FeedCategorization, NutrientStandard)
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.units import MeasurementUnits
 
@@ -405,7 +406,7 @@ def test_attempt_optimization_success(mocker: MockerFixture) -> None:
 
     result, config = optimizer.attempt_optimization(
         nutrient_standard=NutrientStandard.NRC,
-        pen_average_body_weight = pen_average_body_weight,
+        pen_average_body_weight=pen_average_body_weight,
         pen_average_enteric_methane=0.0, pen_average_urine_nitrogen=0.0,
         requirements=requirements, initial_dry_matter_requirement=1, initial_protein_requirement=1,
         pen_available_feeds=feeds, animal_combination=animal_comb,
