@@ -201,7 +201,7 @@ def test_select_constraints() -> None:
     """Test retrieval of constraint functions for a specific animal type."""
     optimizer = RationOptimizer()
     dummy_config = MagicMock()
-    optimizer.set_constraints((dummy_config,))
+    optimizer.set_constraints(dummy_config)
     result = optimizer._select_constraints(AnimalCombination.LAC_COW)
     assert isinstance(result, list)
     assert all("type" in c for c in result)
