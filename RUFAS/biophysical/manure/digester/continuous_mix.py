@@ -183,8 +183,9 @@ class ContinuousMix(Digester):
                 "date": time.current_date.date(),
                 "simulation_day": time.simulation_day,
                 "degradable_volatile_solids": self._manure_in_digester.degradable_volatile_solids,
-                "total_non_degradable_volatile_solids": self._manure_in_digester.non_degradable_volatile_solids
-                + self._manure_in_digester.bedding_non_degradable_volatile_solids,
+                "total_non_degradable_volatile_solids":
+                    self._manure_in_digester.non_degradable_volatile_solids
+                    + self._manure_in_digester.bedding_non_degradable_volatile_solids,
                 "total_volatile_solids": self._manure_in_digester.total_volatile_solids,
                 "total_volatile_solids_destruction": total_volatile_solids_destruction,
             }
@@ -197,11 +198,13 @@ class ContinuousMix(Digester):
             bedding_non_degradable_volatile_solids = 0.0
         else:
             manure_degradable_volatile_solids_frac = (
-                self._manure_in_digester.degradable_volatile_solids / self._manure_in_digester.total_volatile_solids
+                self._manure_in_digester.degradable_volatile_solids
+                / self._manure_in_digester.total_volatile_solids
             )
 
             manure_non_degradable_volatile_solids_fraction = (
-                self._manure_in_digester.non_degradable_volatile_solids / self._manure_in_digester.total_volatile_solids
+                self._manure_in_digester.non_degradable_volatile_solids
+                / self._manure_in_digester.total_volatile_solids
             )
 
             degradable_volatile_solids = self._manure_in_digester.degradable_volatile_solids - (
@@ -210,10 +213,10 @@ class ContinuousMix(Digester):
             non_degradable_volatile_solids = self._manure_in_digester.non_degradable_volatile_solids - (
                 total_volatile_solids_destruction * manure_non_degradable_volatile_solids_fraction
             )
-            bedding_non_degradable_volatile_solids = self._manure_in_digester.bedding_non_degradable_volatile_solids - (
-                total_volatile_solids_destruction
-                * (1 - manure_degradable_volatile_solids_frac - manure_non_degradable_volatile_solids_fraction)
-            )
+            bedding_non_degradable_volatile_solids = (
+                self._manure_in_digester.bedding_non_degradable_volatile_solids - (
+                    total_volatile_solids_destruction * (
+                        1 - manure_degradable_volatile_solids_frac - manure_non_degradable_volatile_solids_fraction)))
 
         return replace(
             self._manure_in_digester,

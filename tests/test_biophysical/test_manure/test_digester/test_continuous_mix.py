@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -51,7 +51,9 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=12.0,
         total_solids=50.0,
         volume=500.0,
+        methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -172,8 +174,10 @@ def test_calculate_generated_methane(digester: ContinuousMix, mocker: MockerFixt
 
 
 @pytest.mark.parametrize(
-    "degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable, expected_error_count",
-    [(100.0, 100.0, 50.0, 75.0, 75.0, 0), (900.0, 100.0, 100.0, 810.0, 90.0, 0), (50.0, 20.0, 75.0, 0.0, 0.0, 1)],
+    "bedding_non_degradable, degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable,"
+    " expected_error_count",
+    [(50, 100.0, 100.0, 50.0, 80.0, 80.0, 0), (50, 900.0, 100.0, 100.0, 814.2857142857143, 90.47619047619048, 0),
+     (1, 50.0, 20.0, 75.0, 0.0, 0.0, 1)],
 )
 def test_destroy_volatile_solids(
     digester: ContinuousMix,
@@ -181,6 +185,7 @@ def test_destroy_volatile_solids(
     mocker: MockerFixture,
     degradable: float,
     non_degradable: float,
+    bedding_non_degradable: float,
     destroyed: float,
     expected_degradable: float,
     expected_non_degradable: float,
@@ -189,12 +194,13 @@ def test_destroy_volatile_solids(
     """Test that volatile solids are destroyed correctly."""
     digester._manure_in_digester.degradable_volatile_solids = degradable
     digester._manure_in_digester.non_degradable_volatile_solids = non_degradable
+    digester._manure_in_digester.bedding_non_degradable_volatile_solids = bedding_non_degradable
     add_error = mocker.patch.object(digester._om, "add_error")
 
     actual = digester._destroy_volatile_solids(destroyed, time)
 
     assert actual.degradable_volatile_solids == expected_degradable
-    assert actual.non_degradable_volatile_solids == expected_non_degradable
+    assert pytest.approx(actual.non_degradable_volatile_solids) == expected_non_degradable
     assert add_error.call_count == expected_error_count
 
 
@@ -228,10 +234,15 @@ def test_report_continuous_mix_outputs(digester: ContinuousMix, time: RufasTime,
     ]
 
 
-@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
-def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
+@pytest.mark.parametrize(
+    "total_vol_sols, methane_production_potential, expected",
+    [(100.0, 0.24, 24.0), (0.0, 0.24, 0.0), (100.0, 0.17, 17.0), (0.0, 0.17, 0.0)],
+)
+def test_calculate_CSTR_methane_volume(
+    total_vol_sols: float, methane_production_potential: float, expected: float
+) -> None:
     """Test that the generated methane volume is calculated correctly."""
-    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols)
+    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols, methane_production_potential)
 
     assert actual == expected
 

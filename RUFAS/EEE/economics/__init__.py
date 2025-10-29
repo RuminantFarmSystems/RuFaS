@@ -7,7 +7,7 @@ orchestrated via a Flexible Economic Framework that
 selects the appropriate analysis based on input data.
 """
 
-from .framework import EconomicFramework
+from .framework import run_economic_analysis
 from .metrics import (
     calculate_roi,
     calculate_payback_period,
@@ -47,7 +47,7 @@ from .equations import (
 )
 
 __all__ = [
-    "EconomicFramework",
+    "run_economic_analysis",
     "calculate_roi",
     "calculate_payback_period",
     "calculate_net_annual_cash_flow",

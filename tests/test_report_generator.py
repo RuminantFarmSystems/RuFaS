@@ -8,55 +8,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.graph_generator import GraphGenerator
-from RUFAS.report_generator import (
-    AGGREGATION_FUNCTIONS,
-    ReportGenerator,
-    average_aggregator,
-    division_aggregator,
-    product_aggregator,
-    sd_aggregator,
-    subtraction_aggregator,
-    sum_aggregator,
-)
-
-
-def test_average_aggregator() -> None:
-    assert average_aggregator([1, 2, 3, 4, 5]) == 3
-    assert average_aggregator([-1, -2, -3, -4, -5]) == -3
-    assert average_aggregator([]) == 0
-
-
-def test_division_aggregator() -> None:
-    assert division_aggregator([100, 2, 5]) == 10
-    assert division_aggregator([100, -2, 5]) == -10
-    assert division_aggregator([]) is None
-    assert division_aggregator([10]) is None
-    assert division_aggregator([10, 0]) is None
-
-
-def test_product_aggregator() -> None:
-    assert product_aggregator([1, 2, 3, 4, 5]) == 120
-    assert product_aggregator([-1, 2, -3, 4, -5]) == -120
-    assert product_aggregator([]) == 1
-
-
-def test_sd_aggregator() -> None:
-    assert sd_aggregator([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
-    assert sd_aggregator([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
-    assert sd_aggregator([]) == 0
-
-
-def test_sum_aggregator() -> None:
-    assert sum_aggregator([1, 2, 3, 4, 5]) == 15
-    assert sum_aggregator([-1, -2, -3, -4, -5]) == -15
-    assert sum_aggregator([]) == 0
-
-
-def test_subtraction_aggregator() -> None:
-    assert subtraction_aggregator([10, 2, 3]) == 5
-    assert subtraction_aggregator([10, -2, -3]) == 15
-    assert subtraction_aggregator([]) is None
-    assert subtraction_aggregator([10]) is None
+from RUFAS.report_generator import AGGREGATION_FUNCTIONS, ReportGenerator
 
 
 class MockUtility:

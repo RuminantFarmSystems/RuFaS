@@ -1636,7 +1636,6 @@ class CrossValidator:
         A mapping for all the supported relationship evaluation functions.
 
     """
-
     def __init__(self) -> None:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -1644,12 +1643,11 @@ class CrossValidator:
             "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
             "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
             "greater_or_equals_to": lambda left, right, _eager_termination: (
-                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)
-            ),
+                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)),
             "not_equal": lambda left, right, _eager_termination: not self._evaluate_equal_condition(left, right),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
             "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
-            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right),
+            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right)
         }
 
     def cross_validate_data(

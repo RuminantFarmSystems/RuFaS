@@ -8,7 +8,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
@@ -18,7 +18,7 @@ from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
-from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -483,10 +483,6 @@ def mock_herd_manager(
             replacement=replacement,
         )
     )
-    mock_purchased_feed_emissions_estimator_init: MagicMock = mocker.patch(
-        "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
-        return_value=None,
-    )
 
     herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
 
@@ -495,7 +491,6 @@ def mock_herd_manager(
         "mock_initialize_animal_config": mock_initialize_animal_config,
         "mock_set_lactation_parameters": mock_set_lactation_parameters,
         "mock_set_milk_quality": mock_set_milk_quality,
-        "mock_purchased_feed_emissions_estimator_init": mock_purchased_feed_emissions_estimator_init,
     }
 
 
@@ -509,6 +504,7 @@ def mock_animal(
     mature_body_weight: float = 100.0,
     total_phosphorus: float = 18.8,
     sold: bool = False,
+    stillborn: bool = False,
     calves: int = 0,
     calving_interval: int = 0,
     calving_to_pregnancy_time: int = 0,
@@ -526,6 +522,7 @@ def mock_animal(
     milk_protein_content: float = 0.0,
     sold_at_day: int | None = None,
     dead_at_day: int | None = None,
+    stillborn_day: int | None = None,
     cull_reason: str = "",
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
@@ -542,9 +539,11 @@ def mock_animal(
     animal.nutrients = MagicMock(auto_spec=Nutrients)
     animal.nutrients.total_phosphorus_in_animal = total_phosphorus
     animal.sold = sold
+    animal.stillborn = stillborn
     animal.calves = calves
     animal.calving_interval = calving_interval
     animal.sold_at_day = sold_at_day
+    animal.stillborn_day = stillborn_day
     animal.dead_at_day = dead_at_day
     animal.cull_reason = cull_reason
 
@@ -616,3 +615,8 @@ def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
         id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
     )
+
+
+@pytest.fixture
+def mock_stillborn_animal_typed_dict() -> StillbornCalfTypedDict:
+    return StillbornCalfTypedDict(id=0, stillborn_day=23, birth_weight=12)

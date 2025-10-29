@@ -11,7 +11,7 @@ from matplotlib.dates import DateFormatter, date2num
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.util import Utility
+from RUFAS.util import Utility, Aggregator
 
 
 def test_calc_average() -> None:
@@ -891,6 +891,87 @@ def test_combine(
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
 
 
+def test_convert_dict_of_lists_to_list_of_dicts_normal_case():
+    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
+    expected_output = [
+        {"id": 1, "name": "Alice", "age": 25},
+        {"id": 2, "name": "Bob", "age": 30},
+        {"id": 3, "name": "Charlie", "age": 35},
+    ]
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_empty_input():
+    input_dict = {}
+    expected_output = []
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists():
+    input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
+    expected_output = [{"id": 1, "name": "Alice", "age": 25}]
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_list_to_dict_by_key_basic():
+    list_of_dicts = [
+        {"ID": 1, "value": 2, "other_keys": "other values"},
+        {"ID": 3, "value": 4, "other_keys": "other values"},
+    ]
+    expected_output = {1: {"value": 2, "other_keys": "other values"}, 3: {"value": 4, "other_keys": "other values"}}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
+
+
+def test_convert_list_to_dict_by_key_empty_list():
+    list_of_dicts = []
+    expected_output = {}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
+
+
+def test_convert_list_to_dict_by_key_missing_key():
+    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
+    with pytest.raises(KeyError):
+        Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
+
+
+def test_convert_list_to_dict_by_key_different_key():
+    list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
+    expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
+
+
+def test_find_max_index_from_keys_mixed_single_and_multi_digit_numbers() -> None:
+    data = {
+        "Prefix_0.suffix": ["value"],
+        "Prefix_1.suffix": ["value"],
+        "Prefix_10.suffix": ["value"],
+        "Prefix_2.suffix": ["value"],
+        "Prefix_21.suffix": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) == 21
+
+
+def test_find_max_index_from_keys_no_matching_keys() -> None:
+    data = {
+        "NoPrefixOrNumber.suffix": ["value"],
+        "AnotherWithoutNumber": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) is None
+
+
+def test_find_max_index_from_keys_negative_numbers() -> None:
+    data = {
+        "Prefix_-1.suffix": ["value"],
+        "Prefix_-2.suffix": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) is None
+
+
+def test_find_max_index_from_keys_empty_dictionary() -> None:
+    data = {}
+    assert Utility.find_max_index_from_keys(data) is None
+
+
 @pytest.mark.parametrize(
     "test_list,length,expected",
     [
@@ -1073,3 +1154,42 @@ def test_compare_randomized_rate_less_than(
     mocker.patch("RUFAS.util.random", return_value=random_value)
     result = Utility.compare_randomized_rate_less_than(reference_rate)
     assert result == expected_result
+
+
+def test_average_aggregator() -> None:
+    assert Aggregator.average([1, 2, 3, 4, 5]) == 3
+    assert Aggregator.average([-1, -2, -3, -4, -5]) == -3
+    assert Aggregator.average([]) == 0
+
+
+def test_division_aggregator() -> None:
+    assert Aggregator.division([100, 2, 5]) == 10
+    assert Aggregator.division([100, -2, 5]) == -10
+    assert Aggregator.division([]) is None
+    assert Aggregator.division([10]) is None
+    assert Aggregator.division([10, 0]) is None
+
+
+def test_product_aggregator() -> None:
+    assert Aggregator.product([1, 2, 3, 4, 5]) == 120
+    assert Aggregator.product([-1, 2, -3, 4, -5]) == -120
+    assert Aggregator.product([]) == 1
+
+
+def test_sd_aggregator() -> None:
+    assert Aggregator.standard_deviation([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
+    assert Aggregator.standard_deviation([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
+    assert Aggregator.standard_deviation([]) == 0
+
+
+def test_sum_aggregator() -> None:
+    assert Aggregator.sum([1, 2, 3, 4, 5]) == 15
+    assert Aggregator.sum([-1, -2, -3, -4, -5]) == -15
+    assert Aggregator.sum([]) == 0
+
+
+def test_subtraction_aggregator() -> None:
+    assert Aggregator.subtraction([10, 2, 3]) == 5
+    assert Aggregator.subtraction([10, -2, -3]) == 15
+    assert Aggregator.subtraction([]) is None
+    assert Aggregator.subtraction([10]) is None
