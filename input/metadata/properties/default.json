@@ -6411,7 +6411,7 @@
           "nullable": true
         }
       }
-    }
+    },
   "feed_storage_instances": {
     "data_collection_app_compatible": false,
     "feed_storages": {
