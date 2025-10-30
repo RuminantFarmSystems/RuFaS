@@ -290,7 +290,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.##
+        AN.SUP.2
         """
 
         dNDFbase: float = (
@@ -330,7 +330,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.##
+        AN.SUP.3
         """
         dstarch: float = feed.info.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION - 1.0 * (
             (dry_matter_intake / body_weight) - 0.035)
@@ -366,7 +366,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.1 ## and AN.SUP.4 ##
+        AN.SUP.1, AN.SUP.4, AN.SUP.5, and AN.SUP.6
         """
 
         digestible_energy_NASEM_dict: dict[RUFAS_ID, float] = {}
@@ -447,7 +447,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.##
+        AN.SUP.7, AN.SUP.8, and AN.SUP.9
         """
 
         NASEM_digestible_energy: float = cls.calculate_NASEM_digestible_energy(
@@ -477,7 +477,9 @@ class NutritionSupplyCalculator:
         float
             Net energy, Mcal/kg.
         """
-
+ References
+        ----------
+        AN.SUP.10
         net_energy: float = AnimalModuleConstants.EFF_OF_ME_USE * total_metabolizable_energy
         return net_energy
 
