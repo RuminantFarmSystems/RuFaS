@@ -260,6 +260,7 @@ v0.9.2
 - [2612](https://github.com/RuminantFarmSystems/MASM/pull/2612) - [minor change] Remove the generation of `dummy_path` when running unit tests.
 - [2618](https://github.com/RuminantFarmSystems/MASM/pull/2618) - [minor change] Removes outdated example regional feed inputs.
 - [2624](https://github.com/RuminantFarmSystems/MASM/pull/2624) - [minor change] [NoInputChange][NoOutputChange] Updates the PR template and changelog to reflect IO changes.
+- [2600](https://github.com/RuminantFarmSystems/MASM/pull/2600) - [major change] [Animal] [NoInputChange] [NoOutputChange] Updates energy supply calculations and ration formulation to NASEM standards.
 
 ### v0.9.2
 
