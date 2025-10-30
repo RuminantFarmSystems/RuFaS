@@ -121,6 +121,16 @@ class Feed:
         Total digestible nutrients (% dry matter).
     DE : float
         Digestible energy (Mcal / kg).
+    starch_digested : float
+        Base starch digestibility # TODO check this against finalized documentation.
+    NPN_source : float
+        Non-protein nitrogen fraction #TODO check this against finalized documentation.
+    RUP : float
+        Rumen undegradable protein (% crude protein).
+    FA : float
+        Fatty acids (% dry matter).
+    DE_Base : float
+        Digestible energy standard (Mcal / kg).
     amount_available : float
         Amount of feed currently or expected to be available (kg).
     on_farm_cost : float
@@ -164,7 +174,11 @@ class Feed:
     lower_limit: float
     TDN: float
     DE: float
-
+    starch_digested : float
+    NPN_source : float
+    RUP : float
+    FA : float
+    DE_base : float
     amount_available: float
     on_farm_cost: float
     purchase_cost: float
