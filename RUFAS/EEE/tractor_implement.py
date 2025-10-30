@@ -61,7 +61,16 @@ class TractorImplement:
         """
         Assign a tractor implement based on the operation, tractor size, and crop type where applicable. Not all
         operations depend on the crop type.
-        Implements Helper Function 419 in EEE Functions file.
+
+        Parameters
+        ----------
+        application_depth : float | None
+            The depth (in cm) to be used for certain operations that require it, such as fertilizer application.
+            If not applicable, this can be None.
+
+        Reference
+        ---------
+        Helper Function 419 in EEE Functions file.
         """
         dataset_raw = input_manager.get_data("tractor_dataset")
         dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
