@@ -75,6 +75,8 @@ class RationConfig:
 
         Parameters
         ----------
+        nutrient_standard : NutrientStandard
+            Nutrient standard used in supply and requirement calculations.
         animal_requirements : NutritionRequirements
             Nutrition requirements for pen, used in constraint methods.
         pen_available_feeds : list[Feed], optional
@@ -86,9 +88,9 @@ class RationConfig:
         pen_average_body_weight : float
             Average body weight in pen, used in constraint methods, kg.
         pen_average_enteric_methane : float
-            Average enteric methane produced in pen, used in constraint methods.
+            Average enteric methane produced in pen, used in constraint methods, g.
         pen_average_urine_nitrogen : float
-            Average urine nitrogen generated in pen, used in constraint methods.
+            Average urine nitrogen generated in pen, used in constraint methods, kg.
         """
         self.nutrient_standard = nutrient_standard
         if pen_available_feeds is None:
@@ -187,7 +189,6 @@ class RationOptimizer:
         elif ration_config.nutrient_standard is NutrientStandard.NASEM:
             self.cow_constraints = [
                 {"type": "ineq", "fun": func, "args": (ration_config,)} for func in self.NASEM_constraint_functions]
-
             self.heifer_constraints = self.cow_constraints
 
     @staticmethod
@@ -372,7 +373,8 @@ class RationOptimizer:
         ration_configuration: RationConfig
     ) -> float:
         """
-        Constraint method for net energy for lactation. Only applicable to lactating cows.
+        Constraint method for net energy for lactation. Applicable to all animal classes,
+        differing from NRC net energy calculations.
         This constraint is a simple check that the supply exceeds the requirement.
 
         Parameters
@@ -838,8 +840,14 @@ class RationOptimizer:
 
         Parameters
         ----------
+        nutrient_standard : NutrientStandard
+            Nutrient standard used in supply and requirement calculations.
         pen_average_body_weight : float
             Average body weight of animals in pen.
+        pen_average_enteric_methane : float
+            Average enteric methane produced in pen, used in constraint methods, g.
+        pen_average_urine_nitrogen : float
+            Average urine nitrogen generated in pen, used in constraint methods, kg.
         requirements : AnimalRequirements
             Summary of requirements for a group of animals.
         pen_available_feeds : list[Feed]
