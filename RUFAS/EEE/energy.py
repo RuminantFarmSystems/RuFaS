@@ -307,9 +307,9 @@ class EnergyEstimator:
         Parameters
         ----------
         crop_yield: float
-            Amount of crop yielded per hectares (metric ton/ha)
+            Amount of crop yielded per hectares (metric ton/ha).
         field_production_size: float
-            The filed area under production (ha)
+            The filed area under production (ha).
         tractor: Tractor
             The specifications of the tractor.
         clay_percent : float
@@ -322,7 +322,7 @@ class EnergyEstimator:
         Returns
         -------
         float
-            Diesel Consumption for Tractor-Implement (l/ha)
+            Diesel Consumption for Tractor-Implement (l/ha).
         """
         diesel_consumption_tractor_implement_liter_ha = 0.0
         for implement in tractor.implements:

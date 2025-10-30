@@ -822,7 +822,6 @@ def test_record_planting(
 
         clay.assert_called_once()
     actual = field.om.variables_pool[f"Field._record_planting.crop_planting.field='{field_name}'"]
-    print(actual)
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
