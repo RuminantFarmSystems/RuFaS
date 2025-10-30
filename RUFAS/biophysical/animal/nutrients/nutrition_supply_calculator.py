@@ -4,6 +4,7 @@ from typing import Any
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     Feed,
+    NASEMFeed,
     FeedCategorization,
     FeedComponentType,
     NutrientStandard,
@@ -20,7 +21,7 @@ class FeedInRation:
     """
 
     amount: float
-    info: Feed
+    info: Feed | NASEMFeed
 
 
 class NutritionSupplyCalculator:
@@ -476,10 +477,11 @@ class NutritionSupplyCalculator:
         -------
         float
             Net energy, Mcal/kg.
-        """
- References
+
+        References
         ----------
         AN.SUP.10
+        """
         net_energy: float = AnimalModuleConstants.EFF_OF_ME_USE * total_metabolizable_energy
         return net_energy
 
