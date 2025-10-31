@@ -7,8 +7,7 @@
         ],
         "economics_files": [
           "commodity_prices.cow_dairy_heifer_bred_t3.dollar_per_animal.csv"
-        ],
-        "postprocessing": "sum biophysical output for time slice"
+        ]
       },
       "Semen purchased": {
         "biophysical_simulation": [
@@ -21,7 +20,7 @@
           "sexed": "commodity_prices.semen_sexed.dollar_per_straw.csv",
           "beef": "commodity_prices.semen_beef.dollar_per_straw.csv"
         },
-        "preprocessing": "sum of mean of both biophysical outputs, select econ file from user input",
+        "preprocessing": "daily sum of both biophysical outputs, select econ file from user input",
         "processing": ""
       },
       "Bedding requirements": {
@@ -34,7 +33,7 @@
           "manure_solids": "commodity_prices.bedding_manure_solids.dollar_per_head.csv",
           "CBPB": "commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv"
         },
-        "preprocessing": "dollar per head is reported on an annual basis, Map bedding price to number of animals for each bedding type, depending on their pen. Final step will be to get mean, not sum, of daily value over time slice."
+        "preprocessing": "dollar per head is reported on an annual basis, Map bedding price to number of animals for each bedding type, depending on their pen."
       },
       "Animal - Labor hours": {
         "biophysical_simulation": [
@@ -107,15 +106,9 @@
           "Economic_preprocessing.Animal.FPCM"
         ],
         "economics_files": [
-          "commodity_prices.milk_all.dollar_per_liter.csv",
-          "commodity_prices.milk_retail.dollar_per_liter.csv",
-          "commodity_prices.milk_class_2.dollar_per_liter.csv",
-          "commodity_prices.milk_class_3.dollar_per_liter.csv",
-          "commodity_prices.milk_class_4.dollar_per_liter.csv",
-          "commodity_prices.milk_nonfat_dry.dollar_per_kilogram.csv",
-          "commodity_prices.whey_dry.dollar_per_kilogram.csv"
+          "commodity_prices.milk_retail.dollar_per_liter.csv"
         ],
-        "preprocessing": "FPCM calculation from raw values, summed, then logic to select from economics_files options"
+        "preprocessing": "FPCM calculation from raw values, see economic_preprocessing.json as example logic"
       },
       "Sold calves": {
         "biophysical_simulation": [
@@ -123,8 +116,7 @@
         ],
         "economics_files": [
           "commodity_prices.calves_all.dollar_per_kilogram.csv"
-        ],
-        "preprocessing": "sum weight sold"
+        ]
       },
       "Sold heifer IIs": {
         "biophysical_simulation": [
@@ -132,8 +124,7 @@
         ],
         "economics_files": [
           "commodity_prices.cow_dairy_heifer_open.dollar_per_animal.csv"
-        ],
-        "preprocessing": "sum weight sold"
+        ]
       },
       "Sold heifer IIIs": {
         "biophysical_simulation": [
@@ -353,7 +344,6 @@
         "economics_files": [
           "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
         ],
-        "preprocessing": "",
         "future_expansion": "perhaps scale as a percentage of total manure produced? Or preprocessing for excess e.g. not applied to fields"
       },
       "Digester fertilizer production": {
@@ -365,7 +355,7 @@
           "commodity_prices.net_fertilizer_phosphorus.dollar_per_kilogram.csv",
           "commodity_prices.net_fertilizer_potassium.dollar_per_kilogram.csv"
         ],
-        "future_expansion": "Scale to manure module outputs"
+        "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Digester bedding co-product": {
         "biophysical_simulation": [
@@ -374,7 +364,7 @@
         "economics_files": [
           "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
         ],
-        "future_expansion": "Scale to manure module outputs"
+        "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Renewable natural gas (RNG) production": {
         "biophysical_simulation": [
@@ -383,7 +373,7 @@
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
         ],
-        "future_expansion": "Scale to manure module outputs"
+        "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Electricity production from anaerobic digester": {
         "biophysical_simulation": [
@@ -392,7 +382,7 @@
         "economics_files": [
           "commodity_prices.elec_industrial.dollar_per_kwh.csv"
         ],
-        "future_expansion": "Scale to manure module outputs"
+        "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Carbon credits from digester products and activities": {
         "biophysical_simulation": [
@@ -401,7 +391,7 @@
         "economics_files": [
           "commodity_prices.carbon_credits_enteric.dollar_per_tonne.csv"
         ],
-        "future_expansion": "Scale to manure module outputs"
+        "future_expansion": "Placeholder for the future, scale to manure module outputs"
       }
     }
   },
@@ -436,7 +426,7 @@
           "commodity_prices.calf_starter_18cp",
           "commodity_prices.limestone"
         ],
-        "processing": "no commodity price needed, just loop over each feed .*, report separately",
+        "processing": "no commodity price needed, just loop over each feed .*, report separately, but expanded evenly across the subsequent ration interval. To explain this a little more...this isn't reported daily, but on each ration formulation (usually the interval). So this price should be either prorated over the rest of the days, or the 'gaps' for each day should be filled in with 0s. So if the ration interval cost was reported for day 0, and the next on day 30, either the price of day 0 should be evenly divided across days 0-29, or the whole price for 0 should be assigned to the 0th day in the list, and for days 1-29 a price of 0 is assigned.'",
         "future_expansion": "cases where historical references are desired: Instead of cost, select from economics_input options, all end in '.dollar_per_kilogram.csv', compare price in input to this price, scale accordingly (e.g. price was 1, in file is 2, double the final cost)"
       },
       "Feed storage - Labor hours": {
@@ -445,8 +435,7 @@
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
-        ],
-        "notes": ""
+        ]
       }
     },
     "Revenue": {
@@ -479,7 +468,7 @@
           "commodity_prices.calf_starter_18cp",
           "commodity_prices.limestone"
         ],
-        "processing?": "Needs to loop over each field, each harvest, get total yield and map against the commodity prices here, but SUBTRACT from what's fed out...or NEW LOGIC to sell surplus?"
+        "processing?": "Needs to loop over each field, each harvest, get total yield and map against the commodity prices here"
       }
     }
   },
@@ -492,7 +481,7 @@
         "economics_files": [
           "commodity_prices.net_fertilizer_nitrogen.dollar_per_kilogram.csv"
         ],
-        "notes": "translate input to dollar per kilo over specified time slice"
+        "notes": "likely as 'simple' as taking the sum of nitrogen_masses for each fertilizer_schedule file used in the simulation, but this requires some consulting with the soil and crop SMEs"
       },
       "Phosphorus fertilizer used": {
         "biophysical_simulation": [
@@ -501,7 +490,7 @@
         "economics_files": [
           "commodity_prices.net_fertilizer_phosphorus.dollar_per_kilogram.csv"
         ],
-        "notes": "translate input to dollar per kilo over specified time slice"
+        "notes": "likely as 'simple' as taking the sum of phosphorus_masses for each fertilizer_schedule file used in the simulation, but this requires some consulting with the soil and crop SMEs"
       },
       "Potassium fertilizer used": {
         "biophysical_simulation": [
@@ -510,7 +499,7 @@
         "economics_files": [
           "commodity_prices.net_fertilizer_potassium.dollar_per_kilogram.csv"
         ],
-        "notes": "translate input to dollar per kilo over specified time slice"
+        "notes": "likely as 'simple' as taking the sum of potassium_masses for each fertilizer_schedule file used in the simulation, but this requires some consulting with the soil and crop SMEs"
       },
       "Other fertilizer types used": {
         "biophysical_simulation": [
@@ -521,10 +510,12 @@
           "commodity_prices.net_fertilizer_super_phosphate_44to46pct.dollar_per_kilogram.csv",
           "commodity_prices.net_fertilizer_urea.dollar_per_kilogram.csv"
         ],
-        "notes": "translate input to dollar per kilo over specified time slice"
+        "notes": "Placeholder for the future"
       },
       "Seeds costs": {
         "biophysical_simulation": [
+          "both below are from multiple input files, see preprocessing",
+          "field.crop_specification",
           "field.field_size"
         ],
         "economics_files": [
@@ -539,7 +530,7 @@
           "commodity_prices.soybean_seed.dollar_per_square_meter.csv",
           "commodity_prices.wheat_seed.dollar_per_square_meter.csv"
         ],
-        "preprocessing": "map 'crop_specification' in the field input file, e.g. CornSilage to corn_seed, ALSO convert Ha to square meters (div 10000)"
+        "preprocessing": "Map 'crop_specification' in each field input file, e.g. CornSilage to corn_seed to get appropriate economics_file, ALSO convert the field_size from Ha to square meters (divide by 10000). However - note this one isn't reported daily! So easiest way to handle this could be to divide the price for each field evenly across each day of the simulation. e.g. if the cost for corn_seed for a field_size of 100 was 365, and the simulation was two years, the preprocessing would take all that and compute a price of 0.5 for each day in the simulation (e.g. a list consisting of 0.5 repeated for each day of the sim)."
       },
       "Land purchase costs": {
         "biophysical_simulation": [
@@ -548,7 +539,7 @@
         "economics_files": [
           "capital_costs.land_ha.dollar_per_hectare.csv"
         ],
-        "notes": ""
+        "notes": "This 'manual' entry in Economic_inputs fields is meant to be for an entire simulation, so is different from the 'per_day' values, and instead should result only in a single value. The idea for this (and others that are similar, see variables with 'whole_simulation' in them) is that it's a per scenario type value. Adding fields, giving a single cost to rent or buy manually."
       },
       "Land rental costs": {
         "biophysical_simulation": [
@@ -556,8 +547,7 @@
         ],
         "economics_files": [
           "farm_services.land_ha_rent.dollar_per_hectare.csv"
-        ],
-        "notes": ""
+        ]
       },
       "Crop labor hours": {
         "biophysical_simulation": [
@@ -565,8 +555,7 @@
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
-        ],
-        "notes": ""
+        ]
       },
       "Crop water consumption": {
         "biophysical_simulation": [
@@ -578,14 +567,13 @@
       },
       "Tractor hours for crops": {
         "biophysical_simulation": [
-          "SEE NOTES"
+          "Waiting on tractor_implement and other parts of EEE outputs"
         ],
         "economics_files": [
           "farm_services.tractor_small.dollar_per_hour.csv",
           "farm_services.tractor_medium.dollar_per_hour.csv",
           "farm_services.tractor_large.dollar_per_hour.csv"
-        ],
-        "notes": "connect to the other EEE outputs"
+        ]
       }
     },
     "Revenue": {

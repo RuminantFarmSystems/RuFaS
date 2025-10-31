@@ -6249,10 +6249,10 @@
     "Animal": {
       "type": "object",
       "description": "Mappings for animal-related economic metrics.",
-      "additionalProperties": {
+      "properties": {
         "type": "object",
         "description": "Economics metric definitions grouped within a category.",
-        "additionalProperties": {
+        "properties": {
           "type": "object",
           "description": "Mapping details for an individual economics metric.",
           "biophysical_simulation": {
@@ -6271,7 +6271,7 @@
             },
             "minimum_length": 1
           },
-          "additionalProperties": {
+          "properties": {
             "type": "string",
             "description": "Supplemental notes or preprocessing guidance for the metric.",
             "nullable": true
@@ -6279,13 +6279,13 @@
         }
       }
     },
-    "Crop and Soil": {
+    "Soil_and_crop": {
       "type": "object",
       "description": "Mappings for crop and soil economic metrics.",
-      "additionalProperties": {
+      "properties": {
         "type": "object",
         "description": "Economics metric definitions grouped within a category.",
-        "additionalProperties": {
+        "properties": {
           "type": "object",
           "description": "Mapping details for an individual economics metric.",
           "biophysical_simulation": {
@@ -6304,7 +6304,7 @@
             },
             "minimum_length": 1
           },
-          "additionalProperties": {
+          "properties": {
             "type": "string",
             "description": "Supplemental notes or preprocessing guidance for the metric.",
             "nullable": true
@@ -6312,13 +6312,13 @@
         }
       }
     },
-    "Feed": {
+    "Feed_storage": {
       "type": "object",
       "description": "Mappings for feed-related economic metrics.",
-      "additionalProperties": {
+      "properties": {
         "type": "object",
         "description": "Economics metric definitions grouped within a category.",
-        "additionalProperties": {
+        "properties": {
           "type": "object",
           "description": "Mapping details for an individual economics metric.",
           "biophysical_simulation": {
@@ -6337,7 +6337,7 @@
             },
             "minimum_length": 1
           },
-          "additionalProperties": {
+          "properties": {
             "type": "string",
             "description": "Supplemental notes or preprocessing guidance for the metric.",
             "nullable": true
@@ -6353,10 +6353,10 @@
     "Manure": {
       "type": "object",
       "description": "Mappings for manure-related economic metrics.",
-      "additionalProperties": {
+      "properties": {
         "type": "object",
         "description": "Economics metric definitions grouped within a category.",
-        "additionalProperties": {
+        "properties": {
           "type": "object",
           "description": "Mapping details for an individual economics metric.",
           "biophysical_simulation": {
@@ -6375,7 +6375,7 @@
             },
             "minimum_length": 1
           },
-          "additionalProperties": {
+          "properties": {
             "type": "string",
             "description": "Supplemental notes or preprocessing guidance for the metric.",
             "nullable": true
