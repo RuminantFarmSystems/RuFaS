@@ -1651,24 +1651,46 @@ class CrossValidator:
         }
 
     def cross_validate_data(
-        self, im_variable_pool: dict[str, Any], cross_validation_rules: list[dict[str, Any]]
+        self, target_and_save_result: dict[str, Any], cross_validation_block: dict[str, Any], eager_termination: bool
     ) -> bool:
         """
         Performs cross-validation on the provided data using the provided cross validation rules.
 
         Parameters
         ----------
-        im_variable_pool : dict[str, Any]
-            A dictionary containing the InputManager variable pool to be validated.
-        cross_validation_rules : list[dict[str, Any]]
-            A list of dictionaries containing the cross-validation rules to be applied.
+        target_and_save_result : dict[str, Any]
+            A dictionary containing the target and save result to be validated.
+        cross_validation_block : dict[str, Any]
+            A dictionary containing the cross-validation rules to be applied.
+        eager_termination : bool
+            Whether to raise an error if the data does not pass cross-validation.
 
         Returns
         -------
         bool
             A boolean indicating whether the data passed cross-validation.
         """
-        pass
+        self._target_and_save(target_and_save_result)
+
+        apply_when_rules = cross_validation_block.get("apply_when", [])
+        apply_when_conditions_satisfied = self._evaluate_condition_clause_array(
+            apply_when_rules, eager_termination
+        )
+        if not apply_when_conditions_satisfied:
+            return False
+
+        validation_rules = cross_validation_block.get("rules", [])
+        validation_passed = self._evaluate_condition_clause_array(validation_rules, eager_termination)
+        if not validation_passed:
+            return False
+
+        is_cross_validation_successful = True
+        for rule in validation_rules:
+            is_cross_validation_successful = self._evaluate_expression(rule, eager_termination)
+            if not is_cross_validation_successful and eager_termination:
+                break
+
+        return is_cross_validation_successful
 
     def _save_to_alias_pool(self, alias_name: str, value: Any) -> None:
         """
@@ -1712,8 +1734,8 @@ class CrossValidator:
                     "error": "Alias name not found.",
                     "message": f"{alias_name} does not exist in the alias pool of cross validator.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._get_alias_value.__name__,
+                        "class": self.__name__,
+                        "function": self._get_alias_value.__name__,
                     },
                 }
             )
@@ -1750,8 +1772,8 @@ class CrossValidator:
                         "message": "Only constants or variables keys' content will be processed for retrieving and"
                         f" saving values. Unsupported keys {section} provided.",
                         "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator.check_target_and_save_block.__name__,
+                            "class": self.__name__,
+                            "function": self.check_target_and_save_block.__name__,
                         },
                     }
                 )
@@ -1798,8 +1820,8 @@ class CrossValidator:
                     "message": f"Unknown operation {operation} in cross validation rule. Expected one of "
                     f"{list(AGGREGATION_FUNCTIONS.keys())}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__name__,
+                        "function": self._evaluate_expression.__name__,
                     },
                 }
             )
@@ -1814,8 +1836,8 @@ class CrossValidator:
                     "error": "Missing Ordered Variables",
                     "message": "Ordered variables list is empty or missing in cross validation rule.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__name__,
+                        "function": self._evaluate_expression.__name__,
                     },
                 }
             )
@@ -1879,8 +1901,8 @@ class CrossValidator:
                     "message": "Only one list or dict variable can be selected for cross validation in "
                     "a single expression block.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1899,8 +1921,8 @@ class CrossValidator:
                     "message": "The 'apply_to' key is required in expression block "
                     "when a complex data structure is selected.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1914,8 +1936,8 @@ class CrossValidator:
                     "error": "Unknown apply_to value",
                     "message": f"Unknown apply_to value {apply_to} in expression block.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1987,8 +2009,8 @@ class CrossValidator:
                 "error": "Missing required condition clause field",
                 "message": f"Missing the {missing_field} field in condition clause.",
                 "info_map": {
-                    "class": CrossValidator.__name__,
-                    "function": CrossValidator._log_missing_condition_clause_field.__name__,
+                    "class": self.__name__,
+                    "function": self._log_missing_condition_clause_field.__name__,
                 },
             }
         )
@@ -2002,8 +2024,8 @@ class CrossValidator:
                     "error": "Relationship must be a string.",
                     "message": f"Relationship block must be a string, got: {type(relationship)}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship.__name__,
+                        "class": self.__name__,
+                        "function": self._validate_relationship.__name__,
                     },
                 }
             )
@@ -2016,8 +2038,8 @@ class CrossValidator:
                     "error": "Invalid relationship.",
                     "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship.__name__,
+                        "class": self.__name__,
+                        "function": self._validate_relationship.__name__,
                     },
                 }
             )
@@ -2048,8 +2070,8 @@ class CrossValidator:
                     "error": "Invalid type validation",
                     "message": f"Must indicate the type to compare in string data type, got: {type(data_type)}",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_condition.__name__,
+                        "class": self.__name__,
+                        "function": self._evaluate_is_type.__name__,
                     },
                 }
             )
@@ -2073,7 +2095,7 @@ class CrossValidator:
                     "message": f"Unsupported data type {data_type}. Supported types: {supported}.",
                     "info_map": {
                         "class": self.__class__.__name__,
-                        "function": "_evaluate_is_type",
+                        "function": self._evaluate_is_type.__name__,
                     },
                 }
             )
@@ -2128,8 +2150,8 @@ class CrossValidator:
                         "error": "Unsatisfied condition clause in conditional clause array.",
                         "message": f"Condition not satisfied for condition clause: {clause}",
                         "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator._evaluate_condition_clause_array.__name__,
+                            "class": self.__name__,
+                            "function": self._evaluate_condition_clause_array.__name__,
                         },
                     }
                 )

@@ -246,5 +246,21 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": {}
+  "cross-validation": [
+    {"description": "example cross-validation block for freestall dairy metadata validation",
+     "target_and_save": {
+      "variables": {
+        "calf_num": "animal.herd_information.calf_num",
+        "cow_num": "animal.herd_information.cow_num"
+      }
+     },
+     "rules": [
+      {
+        "left_hand": {"ordered_variables": ["calf_num"]},
+        "right_hand": {"ordered_variables": ["cow_num"]},
+        "relationship": "less_than"
+      }
+    ]
+  }
+  ]
 }
