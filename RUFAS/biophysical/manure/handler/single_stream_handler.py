@@ -155,6 +155,7 @@ class SingleStreamHandler(Handler):
             housing_methane_emissions
         )
         methane_production_potential = self.manure_stream.methane_production_potential
+        bedding_non_degradable_solid = self.manure_stream.bedding_non_degradable_volatile_solids
 
         self.manure_stream = None
         self._report_processor_output(
@@ -177,6 +178,7 @@ class SingleStreamHandler(Handler):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_solid
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 
@@ -235,10 +237,12 @@ class SingleStreamHandler(Handler):
 
         """
         if self.manure_stream:
-            degradable_to_total_volatile_solid_ratio = 0.0
-            if self.manure_stream.total_volatile_solids != 0.0:
-                degradable_to_total_volatile_solid_ratio = (
-                    self.manure_stream.degradable_volatile_solids / self.manure_stream.total_volatile_solids
+            degradable_to_total_manure_volatile_solid_ratio = 0.0
+            if self.manure_stream.degradable_volatile_solids + self.manure_stream.non_degradable_volatile_solids != 0.0:
+                degradable_to_total_manure_volatile_solid_ratio = (
+                    self.manure_stream.degradable_volatile_solids / (
+                        self.manure_stream.degradable_volatile_solids
+                        + self.manure_stream.non_degradable_volatile_solids)
                 )
             total_volatile_solid_loss = (
                 ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
@@ -246,12 +250,12 @@ class SingleStreamHandler(Handler):
             degradable_volatile_solid = max(
                 0.0,
                 self.manure_stream.degradable_volatile_solids
-                - (degradable_to_total_volatile_solid_ratio * total_volatile_solid_loss),
+                - (degradable_to_total_manure_volatile_solid_ratio * total_volatile_solid_loss),
             )
             non_degrading_volatile_solid = max(
                 0.0,
                 self.manure_stream.non_degradable_volatile_solids
-                - ((1 - degradable_to_total_volatile_solid_ratio) * total_volatile_solid_loss),
+                - ((1 - degradable_to_total_manure_volatile_solid_ratio) * total_volatile_solid_loss),
             )
             total_solids = max(0.0, self.manure_stream.total_solids - total_volatile_solid_loss)
             return degradable_volatile_solid, non_degrading_volatile_solid, total_solids

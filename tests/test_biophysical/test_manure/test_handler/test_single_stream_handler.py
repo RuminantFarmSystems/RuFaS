@@ -35,6 +35,7 @@ def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.receive_manure(manure_stream)
@@ -57,6 +58,7 @@ def test_receive_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.manure_stream = manure_stream
@@ -85,6 +87,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=pen,
+        bedding_non_degradable_volatile_solids=0.0
     )
     original_stream = handler.manure_stream
     add_error_patch = mocker.patch.object(handler._om, "add_error")
@@ -103,7 +106,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 18
+    assert add_variable_patch.call_count == 19
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -147,6 +150,7 @@ def test_process_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
     try:
@@ -211,6 +215,7 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
             10,
             53.75,
@@ -231,6 +236,7 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
             0,
             100,
@@ -251,6 +257,7 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
             10,
             0,
@@ -272,9 +279,9 @@ def test_apply_volatile_solid_loss(
 
     degradable_solids, non_degradable_solids, total_solids = handler._apply_volatile_solid_loss(housing_emission)
 
-    assert degradable_solids == expected_degradable_solids
+    assert pytest.approx(degradable_solids) == expected_degradable_solids
     assert total_solids == expected_total_solids
-    assert non_degradable_solids == expected_non_degradable_solids
+    assert pytest.approx(non_degradable_solids) == expected_non_degradable_solids
 
 
 def test_report_gas_emissions(handler: SingleStreamHandler, mocker: MockerFixture) -> None:

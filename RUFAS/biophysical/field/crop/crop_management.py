@@ -131,7 +131,7 @@ class CropManagement:
     # ---- Main Methods ----
     def manage_harvest(
         self,
-        harvest_op: HarvestOperation,
+        harvest_operaion: HarvestOperation,
         field_name: str,
         field_size: float,
         time: RufasTime,
@@ -142,7 +142,7 @@ class CropManagement:
 
         Parameters
         ----------
-        harvest_op : HarvestOperation
+        harvest_operaion : HarvestOperation
             The operation to be executed on this crop.
         field_name : str
             The name of the field that contains this crop.
@@ -152,26 +152,30 @@ class CropManagement:
             RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
-        feed_manager : FeedManager
-            Instance of the FeedManager that receives harvested crops.
 
         Returns
         -------
         HarvestedCrop
-            The harvested crop data structure containing mass and nutrional information associated with the
+            The harvested crop data structure containing mass and nutritional information associated with the
             harvest's yield.
         """
         self.determine_harvest_index()
 
         harvested_crop = None
-        if harvest_op in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
+        if harvest_operaion in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.harvest_efficiency)
             harvested_crop = self._get_harvested_crop(time, field_size, field_name)
 
-        if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
+        if harvest_operaion in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
+        self._record_yield(
+            harvest_operaion,
+            field_name,
+            field_size,
+            time.current_calendar_year,
+            time.current_julian_day
+        )
         self._transfer_residue(soil_data, not self.data.is_alive)
 
         return harvested_crop
@@ -373,12 +377,16 @@ class CropManagement:
         )
         return harvested_crop
 
-    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
+    def _record_yield(
+            self, harvest_op : HarvestOperation, field_name: str, field_size: float, year: int, day: int
+    ) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
         Parameters
         ----------
+        harvest_op : HarvestOperation
+            The operation to be executed on this crop.
         field_name : str
             Name of the field that contains this crop.
         field_size : float
@@ -391,6 +399,7 @@ class CropManagement:
         """
         units = {
             "crop": MeasurementUnits.UNITLESS,
+            "harvest_type": MeasurementUnits.UNITLESS,
             "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
             "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
             "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
@@ -418,6 +427,7 @@ class CropManagement:
         }
         value = {
             "crop": self.data.name,
+            "harvest_type": harvest_op.value,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
             "nitrogen": nitrogen_harvested,
