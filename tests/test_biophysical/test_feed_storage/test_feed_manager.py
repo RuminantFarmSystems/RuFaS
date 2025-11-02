@@ -1000,11 +1000,14 @@ def test_lookup_storage_rufas_id_error(feed_manager: FeedManager) -> None:
 
 
 def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
-    """Test that farmgrown feeds are grouped by rufas_id and sorted by storage_time, and that purchased feeds
-    are grouped by rufas_id.
-    """
+    """Test that available feeds are gathered by rufas_id, grouped and sorted correctly."""
     fm = FeedManager.__new__(FeedManager)
     fm.crop_to_rufas_id = {"corn": 1, "alfalfa": 2}
+
+    fm._available_feeds = [
+        MagicMock(spec=["rufas_id"], rufas_id=1),
+        MagicMock(spec=["rufas_id"], rufas_id=2),
+    ]
 
     s1 = MagicMock(spec=["rufas_feed_id", "stored"])
     s1.rufas_feed_id = 1
@@ -1015,9 +1018,9 @@ def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
     newer.dry_matter_mass = 5.0
     newer.storage_time = date(2024, 6, 5)
     zero = MagicMock(spec=["dry_matter_mass", "storage_time"])
-    zero.dry_matter_mass = 0.0  # should be skipped
+    zero.dry_matter_mass = 0.0
     zero.storage_time = date(2024, 6, 3)
-    s1.stored = [newer, older, zero]  # out of order on purpose
+    s1.stored = [newer, older, zero]
 
     s2 = MagicMock(spec=["rufas_feed_id", "stored"])
     s2.rufas_feed_id = 2

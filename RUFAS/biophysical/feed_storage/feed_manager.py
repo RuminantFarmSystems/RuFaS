@@ -714,7 +714,7 @@ class FeedManager:
         farmgrown_by_id: DefaultDict[RUFAS_ID, list[HarvestedCrop]] = defaultdict(list)
         purchased_by_id: DefaultDict[RUFAS_ID, list[PurchasedFeed]] = defaultdict(list)
 
-        valid_feed_ids = set(self.crop_to_rufas_id.values())
+        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
 
         for storage in self.active_storages.values():
             feed_id: RUFAS_ID = storage.rufas_feed_id
