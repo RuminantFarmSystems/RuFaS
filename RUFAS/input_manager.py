@@ -108,7 +108,7 @@ class InputManager:
                 target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
                 is_cross_validation_successful = self.cross_validator.cross_validate_data(
                     target_and_save_result,
-                    cross_validation_blocks,
+                    block,
                     eager_termination,
                 )
 
@@ -1460,10 +1460,10 @@ class InputManager:
         self.cross_validator.check_target_and_save_block(target_and_save_block, eager_termination)
         sections = ["variables", "constants"]
         for section in sections:
-            if section == "variables":
+            if section == "variables" and target_and_save_block.get(section) is not None:
                 for key, address in target_and_save_block[section].items():
                     target_and_save_results[key] = self.get_data(address)
-            else:
+            elif section == "constants" and target_and_save_block.get(section) is not None:
                 for constant_name, value in target_and_save_block[section].items():
                     target_and_save_results[constant_name] = value
         return target_and_save_results

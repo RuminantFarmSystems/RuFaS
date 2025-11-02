@@ -1734,7 +1734,7 @@ class CrossValidator:
                     "error": "Alias name not found.",
                     "message": f"{alias_name} does not exist in the alias pool of cross validator.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._get_alias_value.__name__,
                     },
                 }
@@ -1772,7 +1772,7 @@ class CrossValidator:
                         "message": "Only constants or variables keys' content will be processed for retrieving and"
                         f" saving values. Unsupported keys {section} provided.",
                         "info_map": {
-                            "class": self.__name__,
+                            "class": self.__class__.__name__,
                             "function": self.check_target_and_save_block.__name__,
                         },
                     }
@@ -1820,7 +1820,7 @@ class CrossValidator:
                     "message": f"Unknown operation {operation} in cross validation rule. Expected one of "
                     f"{list(AGGREGATION_FUNCTIONS.keys())}.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._evaluate_expression.__name__,
                     },
                 }
@@ -1836,7 +1836,7 @@ class CrossValidator:
                     "error": "Missing Ordered Variables",
                     "message": "Ordered variables list is empty or missing in cross validation rule.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._evaluate_expression.__name__,
                     },
                 }
@@ -1901,7 +1901,7 @@ class CrossValidator:
                     "message": "Only one list or dict variable can be selected for cross validation in "
                     "a single expression block.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
@@ -1921,7 +1921,7 @@ class CrossValidator:
                     "message": "The 'apply_to' key is required in expression block "
                     "when a complex data structure is selected.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
@@ -1936,7 +1936,7 @@ class CrossValidator:
                     "error": "Unknown apply_to value",
                     "message": f"Unknown apply_to value {apply_to} in expression block.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
@@ -1968,8 +1968,8 @@ class CrossValidator:
         if not self._validate_condition_clause(condition_clause, eager_termination):
             return False
 
-        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
-        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
+        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_hand"], eager_termination)
+        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_hand"], eager_termination)
 
         if not (left_evaluated and right_evaluated):
             return False
@@ -2009,7 +2009,7 @@ class CrossValidator:
                 "error": "Missing required condition clause field",
                 "message": f"Missing the {missing_field} field in condition clause.",
                 "info_map": {
-                    "class": self.__name__,
+                    "class": self.__class__.__name__,
                     "function": self._log_missing_condition_clause_field.__name__,
                 },
             }
@@ -2024,7 +2024,7 @@ class CrossValidator:
                     "error": "Relationship must be a string.",
                     "message": f"Relationship block must be a string, got: {type(relationship)}.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._validate_relationship.__name__,
                     },
                 }
@@ -2038,7 +2038,7 @@ class CrossValidator:
                     "error": "Invalid relationship.",
                     "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._validate_relationship.__name__,
                     },
                 }
@@ -2070,7 +2070,7 @@ class CrossValidator:
                     "error": "Invalid type validation",
                     "message": f"Must indicate the type to compare in string data type, got: {type(data_type)}",
                     "info_map": {
-                        "class": self.__name__,
+                        "class": self.__class__.__name__,
                         "function": self._evaluate_is_type.__name__,
                     },
                 }
@@ -2150,7 +2150,7 @@ class CrossValidator:
                         "error": "Unsatisfied condition clause in conditional clause array.",
                         "message": f"Condition not satisfied for condition clause: {clause}",
                         "info_map": {
-                            "class": self.__name__,
+                            "class": self.__class__.__name__,
                             "function": self._evaluate_condition_clause_array.__name__,
                         },
                     }

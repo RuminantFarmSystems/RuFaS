@@ -256,9 +256,9 @@
      },
      "rules": [
       {
-        "left_hand": {"ordered_variables": ["calf_num"]},
-        "right_hand": {"ordered_variables": ["cow_num"]},
-        "relationship": "less_than"
+        "left_hand": {"ordered_variables": ["cow_num"]},
+        "right_hand": {"ordered_variables": ["calf_num"]},
+        "relationship": "greater"
       }
     ]
   }
