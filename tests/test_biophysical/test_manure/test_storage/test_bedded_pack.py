@@ -49,6 +49,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         pen_manure_data=None,
         methane_production_potential=0.24,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -68,6 +69,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         pen_manure_data=None,
         methane_production_potential=0.24,
+        bedding_non_degradable_volatile_solids=10
     )
 
 

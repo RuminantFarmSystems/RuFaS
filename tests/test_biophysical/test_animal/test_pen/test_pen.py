@@ -888,6 +888,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.SAND,
             ManureStream(
@@ -911,6 +912,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -935,6 +937,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.NONE,
             ManureStream(
@@ -944,7 +947,7 @@ def test_get_manure_streams(
                 phosphorus=35.68,
                 potassium=6.6,
                 ash=0.88,
-                non_degradable_volatile_solids=71.94,
+                non_degradable_volatile_solids=68.8,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
@@ -958,6 +961,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
         (
@@ -982,6 +986,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
             BeddingType.CBPB_SAWDUST,
             ManureStream(
@@ -991,7 +996,7 @@ def test_get_manure_streams(
                 phosphorus=35.68,
                 potassium=6.6,
                 ash=0.88,
-                non_degradable_volatile_solids=71.94,
+                non_degradable_volatile_solids=68.8,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
@@ -1005,6 +1010,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10
             ),
         ),
     ],
@@ -1042,7 +1048,8 @@ def test_apply_bedding(
     assert pytest.approx(result.phosphorus) == expected_result.phosphorus
     assert pytest.approx(result.potassium) == expected_result.potassium
     assert pytest.approx(result.ash) == expected_result.ash
-    assert pytest.approx(result.non_degradable_volatile_solids) == expected_result.non_degradable_volatile_solids
+    assert pytest.approx(
+        result.non_degradable_volatile_solids) == expected_result.non_degradable_volatile_solids
     assert pytest.approx(result.degradable_volatile_solids) == expected_result.degradable_volatile_solids
     assert pytest.approx(result.total_solids) == expected_result.total_solids
     assert pytest.approx(result.volume) == expected_result.volume
@@ -1070,6 +1077,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         volume=12.80,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
     with pytest.raises(ValueError):

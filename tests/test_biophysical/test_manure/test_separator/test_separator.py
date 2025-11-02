@@ -48,20 +48,20 @@ def test_separator_init_with_params(mock_separator: Separator) -> None:
         # Initial state is None, first manure stream is fully stored
         (
             None,
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
         ),
         # Accumulation: Two manure streams are added together
         (
-            ManureStream(5, 1, 2, 3, 4, 5, 6, 7, 8, 0.8, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None),
-            ManureStream(15, 3, 5, 7, 9, 11, 13, 15, 17, 2.3, 0.24, None),
+            ManureStream(5, 1, 2, 3, 4, 5, 7, 6, 10, 8, 0.8, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
+            ManureStream(15, 3, 5, 7, 9, 11, 15, 13, 20, 17, 2.3, 0.24, None),
         ),
         # Adding to an empty manure stream
         (
-            ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None),
+            ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
+            ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None),
         ),
     ],
 )
@@ -92,6 +92,7 @@ def mock_manure_stream() -> ManureStream:
         volume=200.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -169,7 +170,7 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
 
 def test_clear_held_manure(mock_separator: Separator) -> None:
     """Test that held_manure is cleared after calling clear_held_manure."""
-    mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None)
+    mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None, 10)
 
     mock_separator.clear_held_manure()
 
