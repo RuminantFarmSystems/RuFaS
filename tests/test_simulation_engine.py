@@ -74,7 +74,12 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
-def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, start_time: int, end_time: int) -> None:
+def test_simulate(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    start_time: int,
+    end_time: int,
+) -> None:
     """
     Unit test for function simulate() in file RUFAS/simulation_engine.py
     """

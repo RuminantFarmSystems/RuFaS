@@ -224,7 +224,7 @@ def test_manage_harvest(
         get_crop.assert_not_called()
 
     record_yield.assert_called_once_with(
-        field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+        harvest_op, field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
     )
     transfer_residue.assert_called_once_with(soil_data, killed)
 
@@ -381,16 +381,17 @@ def test_store_harvested_crop(
 
 
 @pytest.mark.parametrize(
-    "field_name,field_size,year,day,mass,dry_mass,nitrogen,phosphorus",
+    "harvest_op, field_name,field_size,year,day,mass,dry_mass,nitrogen,phosphorus",
     [
-        ("field_1", 1.8, 1993, 200, 100, 90, 12.5, 5),
-        ("field_2", 2.33, 1998, 216, 1500, 1200, 188, 24.5),
-        ("field_2", 2.33, 1999, 218, 1550, 350, 172, 22.3),
-        ("field_3", 0.98, 2003, 245, 1200, 800, 199, 89.3),
+        (HarvestOperation.HARVEST_KILL, "field_1", 1.8, 1993, 200, 100, 90, 12.5, 5),
+        (HarvestOperation.HARVEST_ONLY, "field_2", 2.33, 1998, 216, 1500, 1200, 188, 24.5),
+        (HarvestOperation.KILL_ONLY, "field_2", 2.33, 1999, 218, 1550, 350, 172, 22.3),
+        (HarvestOperation.HARVEST_ONLY, "field_3", 0.98, 2003, 245, 1200, 800, 199, 89.3),
     ],
 )
 def test_record_yield(
     crop_manager: CropManagement,
+    harvest_op: HarvestOperation,
     field_name: str,
     field_size: float,
     year: int,
@@ -413,6 +414,7 @@ def test_record_yield(
 
     expected_units = {
         "crop": MeasurementUnits.UNITLESS,
+        "harvest_type": MeasurementUnits.UNITLESS,
         "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
         "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
         "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
@@ -437,6 +439,7 @@ def test_record_yield(
     }
     expected_value = {
         "crop": crop_manager.data.name,
+        "harvest_type": harvest_op.value,
         "wet_yield": mass,
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
@@ -453,7 +456,7 @@ def test_record_yield(
         "field_name": field_name,
     }
     add_variable = mocker.patch.object(OutputManager, "add_variable")
-    crop_manager._record_yield(field_name, field_size, year, day)
+    crop_manager._record_yield(harvest_op, field_name, field_size, year, day)
 
     add_variable.assert_called_once_with(
         "harvest_yield",
