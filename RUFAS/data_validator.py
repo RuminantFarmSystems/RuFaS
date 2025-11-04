@@ -1639,7 +1639,7 @@ class CrossValidator:
     def __init__(self) -> None:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
-        self.relation_mapping: dict[str, Any] = {
+        self.relation_mapping: dict[str, Callable[[object, object, bool], bool]] = {
             "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
             "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
             "greater_or_equals_to": lambda left, right, _eager_termination: (
@@ -1861,7 +1861,7 @@ class CrossValidator:
             apply_to = expression_block.get("apply_to", "group")
             result = ordered_values if apply_to == "individual" else [aggregator(ordered_values)]
         else:
-            result = aggregator(ordered_values) if operation == "no_op" else [aggregator(ordered_values)]
+            result = ordered_values if operation == "no_op" else [aggregator(ordered_values)]
 
         if "save_as" in expression_block:
             save_as_alise_name: str = expression_block["save_as"]
@@ -1971,15 +1971,13 @@ class CrossValidator:
         relationship = condition_clause.get("relationship", "")
         left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_hand"], eager_termination,
                                                               relationship)
-        print(f" left_hand: {left_hand}, left_evaluated: {left_evaluated}")
         right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_hand"], eager_termination,
                                                                 relationship)
-        print(f" right_hand: {right_hand}, right_evaluated: {right_evaluated}")
 
         if not (left_evaluated and right_evaluated):
             return False
 
-        evaluation_function = self.relation_mapping.get(condition_clause["relationship"])
+        evaluation_function = self.relation_mapping[condition_clause["relationship"]]
         return evaluation_function(left_hand, right_hand, eager_termination)
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
@@ -2054,17 +2052,17 @@ class CrossValidator:
         else:
             return True
 
-    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """Evaluates equal condition."""
-        return left_hand_value == right_hand_value
+        return bool(left_hand_value == right_hand_value)
 
-    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """Evaluates greater than condition"""
-        return left_hand_value > right_hand_value
+        return bool(left_hand_value > right_hand_value)
 
     def _evaluate_is_null(self, left_hand_value: Any) -> bool:
         """Evaluates is null condition."""
-        return all(value is None for value in left_hand_value)
+        return bool(all(value is None for value in left_hand_value))
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
@@ -2084,7 +2082,7 @@ class CrossValidator:
                 raise ValueError("Invalid type comparison in cross validation.")
             return False
         data_type = data_type[0].strip().lower()
-        checkers = {
+        checkers: dict[str, Callable[[Any], bool]] = {
             "string": lambda v: isinstance(v, str),
             "integer": lambda v: isinstance(v, int) and not isinstance(v, bool),
             "float": lambda v: isinstance(v, float),
@@ -2108,7 +2106,7 @@ class CrossValidator:
                 raise ValueError(f"Unsupported data type {data_type}. Supported types: {supported}.")
             return False
 
-        return all(checker(value) for value in left_hand_value)
+        return bool(all(checker(value) for value in left_hand_value))
 
     def _evaluate_regex(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """
@@ -2126,7 +2124,7 @@ class CrossValidator:
         bool
             True if the value fully matches the regex pattern, otherwise False.
         """
-        return re.fullmatch(right_hand_value, left_hand_value) is not None
+        return bool(re.fullmatch(right_hand_value, left_hand_value) is not None)
 
     def _evaluate_condition_clause_array(
         self, condition_clause_array: list[dict[str, Any]], eager_termination: bool

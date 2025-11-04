@@ -111,7 +111,6 @@ class InputManager:
                     block,
                     eager_termination,
                 )
-        print("is_cross_validation_successful:", is_cross_validation_successful)
         if not is_cross_validation_successful:
             self.data_validator.event_logs.append(
                 {

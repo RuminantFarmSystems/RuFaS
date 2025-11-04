@@ -247,6 +247,130 @@
     }
   },
   "cross-validation": [
+    {
+      "description": "Example extra basic cross-validation block",
+      "target_and_save": {
+        "variables": {
+          "calf_num": "animal.herd_information.calf_num",
+          "cow_num": "animal.herd_information.cow_num"
+      }
+     },
+     "rules": [
+      {
+        "left_hand": {"ordered_variables": ["cow_num"]},
+        "right_hand": {"ordered_variables": ["calf_num"]},
+        "relationship": "greater"
+      }
+    ]
+  },
+  {
+  "description": "Example herd size cross-validation block expanded",
+  "target_and_save": {
+    "variables": {
+        "calf_num": "animal.herd_information.calf_num",
+        "cow_num": "animal.herd_information.cow_num"
+      },
+    "constants": {
+      "min_calf_num": 0,
+      "max_calf_num": 10
+    }
+  },
+  "apply_when": [
+    {
+      "left_hand": {"ordered_variables": ["cow_num"]},
+      "right_hand": {"ordered_variables": ["calf_num"]},
+      "relationship": "greater"
+    }
+  ],
+  "rules": [
+    {
+      "left_hand": {"ordered_variables": ["calf_num"]},
+      "right_hand": {"ordered_variables": ["min_calf_num"]},
+      "relationship": "greater_or_equals_to"
+    },
+    {
+      "left_hand": {"ordered_variables": ["max_calf_num"]},
+      "right_hand": {"ordered_variables": ["calf_num"]},
+      "relationship": "greater_or_equals_to"
+    }
+  ]
+},
+  {
+  "description": "Example sum of one side to compare to a constant cross-validation block",
+  "target_and_save": {
+    "variables": {
+      "p1": "animal.herd_information.parity_fractions.1",
+      "p2": "animal.herd_information.parity_fractions.2",
+      "p3": "animal.herd_information.parity_fractions.3",
+      "p4": "animal.herd_information.parity_fractions.4",
+      "p5": "animal.herd_information.parity_fractions.5"
+    },
+    "constants": {
+      "close_to_one": 1.002
+    }
+  },
+  "rules": [
+    {
+      "left_hand": {
+        "operation": "sum",
+        "ordered_variables": ["p1", "p2", "p3", "p4", "p5"],
+        "save_as": "sum"
+      },
+      "right_hand": {"ordered_variables": ["close_to_one"]},
+      "relationship": "equal"
+    }
+  ]
+},
+{
+  "description": "Example list comparison cross-validation block",
+  "target_and_save": {
+    "variables": {
+      "cull_count": "animal.animal_config.from_literature.culling.cull_day_count"
+    },
+    "constants": {
+      "threshold": 550
+    }
+  },
+  "rules": [
+    {
+      "left_hand": {"ordered_variables": ["threshold"]},
+      "right_hand": {
+        "apply_to": "individual",
+        "ordered_variables": ["cull_count"]
+      },
+      "relationship": "greater_or_equals_to"
+    }
+  ]
+},
+{
+  "description": "Crop name must be string and must match crop name in storage config",
+  "target_and_save": {
+    "variables": {
+      "crop_name": "crop_configurations.crop_configurations.0.name",
+      "storage_crop_name": "feed_storage_configurations.silage_storage.0.crop_name"
+    },
+    "constants": {
+      "string": "string"
+    }
+  },
+  "rules": [
+    {
+      "left_hand": {"ordered_variables": ["crop_name"]},
+      "right_hand": {"ordered_variables": ["string"]},
+      "relationship": "is_of_type"
+    },
+    {
+      "left_hand": {"ordered_variables": ["storage_crop_name"]},
+      "right_hand": {"ordered_variables": ["string"]},
+      "relationship": "is_of_type"
+    },
+    {
+      "left_hand": {"ordered_variables": ["crop_name"]},
+      "right_hand": {"ordered_variables": ["storage_crop_name"]},
+      "relationship": "equal"
+    }
+  ]
+},
 {
   "description": "Example null check cross-validation block",
   "target_and_save": {
