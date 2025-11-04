@@ -48,7 +48,7 @@ class HerdStatistics:
     sold_calf_num : int
         Number of calves sold during a specific period, (unitless).
     sold_cow_oversupply_num : int
-        Number of surplus "Heifer III" animals sold, (unitless).
+        Number of surplus cow sold, (unitless).
     bought_heifer_num : int
         Number of heifers purchased during a specific period, (unitless).
     sold_heiferII_num : int
