@@ -261,7 +261,7 @@ v0.9.2
 - [2618](https://github.com/RuminantFarmSystems/MASM/pull/2618) - [minor change] Removes outdated example regional feed inputs.
 - [2624](https://github.com/RuminantFarmSystems/MASM/pull/2624) - [minor change] [NoInputChange][NoOutputChange] Updates the PR template and changelog to reflect IO changes.
 - [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] [InputChange][OutputChange] Implements the Energy submodule of the EEE module with diesel consumption calculation.
-
+- [2622](https://github.com/RuminantFarmSystems/MASM/pull/2622) - [minor change] [InputChange][OutputChange] Implement 305 days milk production logic and utilizing such merit to maintain herd size.
 
 ### v0.9.2
 
