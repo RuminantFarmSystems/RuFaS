@@ -202,6 +202,7 @@ class Animal:
         self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
         self.milk_yield_305_day: float = 0.0
+        self.milk_prediction_305_day: float = 0.0
 
         self._days_in_milk: int = 0
         self._milk_production_output_days_in_milk: int = 0
@@ -2360,3 +2361,18 @@ class Animal:
             )
 
         return requirements
+
+    def update_305_days_milk_production(self) -> None:
+        if self.days_in_milk == 0:
+            self.milk_prediction_305_day = self.milk_production.calc_305_day_milk_yield(self.milk_production.wood_l,
+                                                                                        self.milk_production.wood_m,
+                                                                                        self.milk_production.wood_n)
+        elif 1 <= self.days_in_milk < 305:
+            self.milk_prediction_305_day = self.milk_production.calculate_mature_equivalent_305_day_milk_yield(
+                self.days_in_milk)
+        else:
+            self.milk_prediction_305_day = self.milk_production.current_lactation_305_day_milk_produced
+
+        parity_factor = {1: 1.25, 2: 1.18}.get(self.calves, 1.0)
+
+        self.milk_prediction_305_day = self.milk_prediction_305_day  * parity_factor

@@ -681,38 +681,48 @@ class HerdManager:
           - Prefer removing cows with reproduction.do_not_breed == True, ordered by lowest daily milk.
           - If none, remove non-DNB cows ordered by lowest 305-day milk.
         """
+        MIN_DIM_FOR_REMOVAL = 60
         animals_removed: list[Animal] = []
 
         while (
             self.current_herd_size > self.herd_statistics.herd_num * self.selling_threshold
             and len(self.cows) > 0
         ):
-            # Partitioning between dnb and non dnb cows
+            # partitioning between dnb and non dnb cows
             dnb_indices: list[int] = []
             non_dnb_indices: list[int] = []
-            for i, c in enumerate(self.cows):
-                if c.reproduction.do_not_breed:
-                    dnb_indices.append(i)
+            for index, cow in enumerate(self.cows):
+                if cow.days_in_milk < MIN_DIM_FOR_REMOVAL:
+                    continue
+                if cow.reproduction.do_not_breed:
+                    dnb_indices.append(index)
                 else:
-                    non_dnb_indices.append(i)
+                    non_dnb_indices.append(index)
+
+            if not dnb_indices and not non_dnb_indices:
+                self.om.add_error("Unable to adjust herd size",
+                                  "There are no cow that's qualified to be sold.",
+                                  {}
+                                  )
+                break
 
             if dnb_indices: # when there is dnb to remove
                 lowest_production_cow_index = 0
                 current_lowest_production_value = math.inf
-                for i in dnb_indices:
-                    daily_milk_produced = self.cows[i].milk_production.daily_milk_produced
+                for index in dnb_indices:
+                    daily_milk_produced = self.cows[index].milk_production.daily_milk_produced
                     if daily_milk_produced < current_lowest_production_value:
                         current_lowest_production_value = daily_milk_produced
-                        lowest_production_cow_index = i
+                        lowest_production_cow_index = index
                 remove_index = lowest_production_cow_index
             else:
                 lowest_production_cow_index = 0
                 current_lowest_estimation_value = math.inf
-                for i in non_dnb_indices:
-                    estimated_production = self.cows[i].milk_production.current_lactation_305_day_milk_produced
+                for index in non_dnb_indices:
+                    estimated_production = self.cows[index].milk_prediction_305_day
                     if estimated_production < current_lowest_estimation_value:
                         current_lowest_estimation_value = estimated_production
-                        lowest_production_cow_index = i
+                        lowest_production_cow_index = index
                 remove_index = lowest_production_cow_index
 
             removed_cow = self.cows.pop(remove_index)
@@ -2043,12 +2053,4 @@ class HerdManager:
 
     def update_milk_305_day_yield_predictions(self) -> None:
         for cow in self.cows:
-            if cow.days_in_milk == 0:
-                cow.milk_yield_305_day = cow.milk_production.calc_305_day_milk_yield(cow.milk_production.wood_l,
-                                                                                     cow.milk_production.wood_m,
-                                                                                     cow.milk_production.wood_n)
-            elif 1 <= cow.days_in_milk < 306:
-                cow.milk_yield_305_day = cow.milk_production.calculate_mature_equivalent_305_day_milk_yield(
-                    cow.calves, cow.days_in_milk)
-            else:
-                cow.milk_yield_305_day = cow.milk_production.current_lactation_305_day_milk_produced
+            cow.update_305_days_milk_production()

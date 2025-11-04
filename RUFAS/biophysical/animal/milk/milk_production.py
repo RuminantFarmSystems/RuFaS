@@ -286,15 +286,10 @@ class MilkProduction:
         result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
         return result
 
-    def calculate_mature_equivalent_305_day_milk_yield(self, parity: int, days_in_milk: int) -> float:
+    def calculate_mature_equivalent_305_day_milk_yield(self, days_in_milk: int) -> float:
         result, _ = quad(MilkProduction.calculate_daily_milk_production, days_in_milk + 1, 305,
                          args=(self.wood_l,self.wood_m, self.wood_n))
-        if parity == 1:
-            return sum(self.milk_production_history[:days_in_milk]) + result # TODO: adjust these numbers regarding adjustment factor?
-        elif parity == 2:
-            return sum(self.milk_production_history[:days_in_milk]) + result
-        else:
-            return sum(self.milk_production_history[:days_in_milk]) + result
+        return sum(history["milk_production"] for history in self.milk_production_history[:days_in_milk]) + result
 
     def _get_milk_production_adjustment(self) -> float:
         """
