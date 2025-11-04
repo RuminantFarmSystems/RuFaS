@@ -3203,7 +3203,7 @@ def test_extract_target_and_save_block(mocker: MockerFixture) -> None:
     im = InputManager()
     mock_check = mocker.patch.object(CrossValidator, "check_target_and_save_block")
     mock_get_data = mocker.patch.object(im, "get_data", return_value=1)
-    result = im.extract_target_and_save_block(
+    result = im._extract_target_and_save_block(
         {"variables": {"a": "test.address.1", "b": "test.address.2"}, "constants": {"c": "value"}}, True
     )
 
