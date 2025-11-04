@@ -1,68 +1,71 @@
 import re
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Literal
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
-SLICE_START = -365
-SLICE_END = -364
-FINAL_DAY_SLICE_START = -1
-
-TIME_FILTER = {
-    "name": "RufasTime Filter",
-    "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-    "which crop yields and nutrient applications to estimate emissions for.",
-    "filters": ["RufasTime.(day|calendar_year)"],
-    "slice_start": SLICE_START,
-    "slice_end": SLICE_END,
-}
-HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS: dict[str, dict[str, Any]] = {
-    "homegrown feeds filter": {
-        "name": "Homegrown Feeds",
+FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
+    "harvest_yield": {
+        "name": "Farmgrown Feeds Yields",
         "description": "Collects all crop harvests that occurred in the simulation.",
         "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-        "variables": [".*"],
+        "variables": [
+            "dry_yield",
+            "crop",
+            "harvest_year",
+            "harvest_day",
+            "field_name",
+            "harvest_type"
+        ],
         "date_fields": ("harvest_year", "harvest_day"),
     },
-    "fertilizer applications filter": {
+    "nitrous_oxide_emissions": {
+        "name": "Nitrous Oxide Emissions",
+        "description": "Collects the nitrous oxide emissions of all soil layers across all fields in the simulation.",
+        "filters": ["FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions"],
+        "date_fields": "simulation_day",
+    },
+    "ammonia_emissions": {
+        "name": "Ammonia Emissions",
+        "description": "Collects the ammonia emissions of all soil layers across all fields in the simulation.",
+        "filters": ["FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions"],
+        "date_fields": "simulation_day",
+    },
+    "fertilizer_applications": {
         "name": "Fertilizer Applications",
         "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-        "variables": [".*"],
+        "variables": [
+            "nitrogen",
+            "phosphorus",
+            "potassium",
+            "year",
+            "day"
+        ],
         "date_fields": ("year", "day"),
     },
-    "manure applications filter": {
+    "manure_applications": {
         "name": "Manure Applications",
         "description": "Collects all manure applications that occurred in the simulation.",
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-        "variables": [".*"],
+        "variables": [
+            "nitrogen",
+            "year",
+            "day"
+        ],
         "date_fields": ("year", "day"),
     },
-    "manure requests filter": {
-        "name": "Manure Requests",
-        "description": "Collects all manure requests that occurred in the simulation.",
-        "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
-        "variables": [".*"],
-        "date_fields": ("year", "day"),
+    "farmgrown_feed_deductions": {
+        "name": "Farmgrown Feed Deductions",
+        "description": "Collects all farmgrown feeds fed to animals in the simulation.",
+        "filters": ["FeedManager._deduct_feeds_from_inventory.farmgrown_feed_.*_fed"],
+        "date_fields": "simulation_day",
     },
 }
-
-"""
-Patterns for matching purchased feed storage and totals in the output variables.
-"""
-PURCHASED_FEED_PATTERN = r"_(\d+)_fed_to_date.*"
-
-"""
-These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
-are in kg CO2e / kg N and kg CO2e / kg P, respectively. The nitrogen and phosphorus constants reference IPCC 2021, GWP
-100, the potassium constant references BASF's Eco-efficiency analysis tool.
-"""
-EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR: float = 5.32
-EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR: float = 3.07
-EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR: float = 1.30
 
 
 class EmissionsEstimator:
@@ -126,16 +129,6 @@ class EmissionsEstimator:
                         str(rufas_id) for rufas_id in config["rufas_ids"]
                     ]
 
-    def estimate_emissions(self) -> None:
-        """Estimates emissions associated with farmgrown feeds."""
-        fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_homegrown_feed_emissions(
-            fertilizer_apps["Homegrown Feeds"],
-            fertilizer_apps["Fertilizer Applications"],
-            fertilizer_apps["Manure Applications"],
-            fertilizer_apps["Manure Requests"],
-        )
-
     def check_available_purchased_feed_data(self, available_feed_ids: list[int]) -> None:
         """
         Checks that all purchased feed IDs used in the simulation have emissions data available for them.
@@ -164,72 +157,6 @@ class EmissionsEstimator:
                 + ". These feeds will be omitted from land use change purchased feed emissions estimations.",
                 info_map,
             )
-
-    def _gather_homegrown_feeds_and_fertilizer_apps(
-        self,
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
-        simulation.
-        """
-        date_variables = self.om.filter_variables_pool(TIME_FILTER)
-        day_cutoff = date_variables["RufasTime.day"]["values"][0]
-        year_cutoff = date_variables["RufasTime.calendar_year"]["values"][0]
-        date_cutoff = RufasTime.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
-
-        results = {}
-        for operation_filter_key in HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS:
-            operation_filter = HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS[operation_filter_key]
-            filtered_data = self._filter_results(operation_filter, date_cutoff, *operation_filter["date_fields"])
-            results[operation_filter["name"]] = filtered_data
-
-        for crop in results["Homegrown Feeds"]:
-            crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
-
-        return results
-
-    def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
-        """
-        Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
-
-        Examples
-        --------
-        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}}
-        >>> _transform_outputs_to_list_of_dicts(a)
-        [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
-
-        """
-        keys = data.keys()
-        values_list = [data[key]["values"] for key in keys]
-        missing_data = not all(len(values_list[index]) == len(values_list[0]) for index in range(len(values_list)))
-        if missing_data:
-            info_map = {"class": self.__class__.__name__, "function": self._transform_outputs_to_list_of_dicts.__name__}
-            self.om.add_error(
-                "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
-                "Ignoring extraneous data.",
-                info_map,
-            )
-        processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
-        return processed_data
-
-    def _calculate_total_homegrown_feed_amounts_by_crop_type(
-        self, homegrown_feeds: list[dict[str, Any]]
-    ) -> dict[str, float]:
-        """Calculates the total amount of each crop species grown on the farm."""
-        homegrown_totals = {key: 0.0 for key in list(self.crop_species_to_purchased_feed_id)}
-        for crop_species in homegrown_totals:
-            yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
-            homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
-        self.om.add_variable(
-            "homegrown_feed_totals",
-            homegrown_totals,
-            {
-                "class": self.__class__.__name__,
-                "function": self._calculate_total_homegrown_feed_amounts_by_crop_type.__name__,
-                "units": MeasurementUnits.KILOGRAMS,
-            },
-        )
-        return homegrown_totals
 
     def calculate_emissions(
         self,
@@ -283,6 +210,102 @@ class EmissionsEstimator:
 
         return feed_emissions_dict
 
+    def estimate_emissions(self) -> None:
+        """Estimates emissions associated with farmgrown feeds."""
+        result = self._gather_farmgrown_feeds_emissions_and_resources_data()
+
+    def _gather_farmgrown_feeds_emissions_and_resources_data(
+        self,
+    ) -> dict[str, dict[int, dict[str, Any]]] | dict[str, dict[str, dict[int, float]]]:
+        """
+        Gathers the yields that were harvested and fertilizer applications applied in the simulation.
+        """
+        result: dict[str, dict[int, dict[str, Any]]] | dict[str, dict[str, dict[int, float]]] = {
+            attribute: {} for attribute in FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS
+        }
+        simulation_start_date: datetime = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
+        for attribute, om_filter in FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS.items():
+            filtered_data = self.om.filter_variables_pool(om_filter)
+            date_field: str | tuple[str, str] = om_filter["date_fields"]
+            if isinstance(date_field, tuple):
+                year_key, day_key = date_field[0], date_field[1]
+                dates = list(
+                    map(
+                        RufasTime.convert_year_jday_to_date,
+                        filtered_data[year_key]["values"],
+                        filtered_data[day_key]["values"]
+                    )
+                )
+                simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
+                for i, simulation_day in enumerate(simulation_days):
+                    result[attribute][simulation_day] = {
+                        variable: filtered_data[variable]["values"][i]
+                        for variable in filtered_data if variable not in [year_key, day_key, "DISCLAIMER"]
+                    }
+
+            elif date_field == "simulation_day":
+                if attribute in ["nitrous_oxide_emissions", "ammonia_emissions"]:
+                    all_fields_by_layer: dict[str, dict[int, dict[int, float]]] = {}
+                    for variable, values in filtered_data.items():
+                        match = re.search(r"field='([^']+)',layer='(\d+)'", variable)
+                        if match:
+                            field_name, layer_number = match.group(1), int(match.group(2))
+                        else:
+                            raise ValueError("No match found.")
+                        if field_name not in all_fields_by_layer:
+                            all_fields_by_layer[field_name] = {}
+                        all_fields_by_layer[field_name][layer_number] = {
+                            info_map["simulation_day"]: values["values"][i]
+                            for i, info_map in enumerate(values["info_maps"])
+                        }
+
+                    for field_name in all_fields_by_layer:
+                        simulation_days = {
+                            day for layer_data in all_fields_by_layer[field_name].values() for day in layer_data
+                        }
+
+                        result[attribute][field_name] = {
+                            simulation_day: sum(
+                                layer_data.get(simulation_day, 0)
+                                for layer_data in all_fields_by_layer[field_name].values()
+                            ) for simulation_day in simulation_days
+                        }
+                elif attribute == "farmgrown_feed_deductions":
+                    for variable, values in filtered_data.items():
+                        match = re.search(r"farmgrown_feed_(\d+)_fed", variable)
+                        if match:
+                            feed_id = int(match.group(1))
+                        else:
+                            raise ValueError("No match found.")
+                        result[attribute][feed_id] = {
+                            info_map["simulation_day"]: values["values"][i]
+                            for i, info_map in enumerate(values["info_maps"])
+                        }
+                else:
+                    raise ValueError(f"Unknown filter key: {attribute}")
+            else:
+                raise ValueError(f"Invalid date field: {date_field}")
+        return result
+
+    def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
+        """
+        Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
+
+        Examples
+        --------
+        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}}
+        >>> _transform_outputs_to_list_of_dicts(a)
+        [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
+
+        """
+        pass
+
+    def _calculate_total_homegrown_feed_amounts_by_crop_type(
+        self, homegrown_feeds: list[dict[str, Any]]
+    ) -> dict[str, float]:
+        """Calculates the total amount of each crop species grown on the farm."""
+        pass
+
     def _calculate_homegrown_feed_emissions(
         self,
         homegrown_feeds: list[dict[str, Any]],
@@ -291,139 +314,11 @@ class EmissionsEstimator:
         manure_requests: list[dict[str, Any]],
     ) -> None:
         """Calculates the emissions associated with feeds grown on the farm."""
-        grouped_feeds: dict[str, list[dict[str, Any]]] = {}
-        for feed in homegrown_feeds:
-            field_name = feed["field_name"]
-            if field_name not in grouped_feeds.keys():
-                grouped_feeds[field_name] = []
-            grouped_feeds[field_name].append(feed)
-
-        fields_with_crops = set(grouped_feeds.keys())
-
-        fields_with_manure_apps = {app["field_name"] for app in manure_applications}
-        all_fields = list(fields_with_manure_apps | fields_with_crops)
-        aggregated_manure_apps = self._aggregate_data(manure_applications, all_fields, ["nitrogen", "phosphorus"])
-
-        aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
-
-        grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(
-            list(grouped_feeds.keys())
-        )
-
-        crops_with_emissions = []
-        for field in grouped_feeds.keys():
-            crops = self._calculate_emissions_by_field(
-                field,
-                grouped_feeds[field],
-                grouped_soil_characteristics[field],
-                aggregated_manure_apps[field],
-                aggregated_manure_requests[field],
-                fertilizer_applications,
-            )
-            crops_with_emissions.extend(crops)
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._calculate_homegrown_feed_emissions.__name__,
-            "units": {
-                "crop_type": MeasurementUnits.UNITLESS,
-                "nitrous_oxide_emissions": MeasurementUnits.KILOGRAMS,
-                "ammonia_emisssions": MeasurementUnits.KILOGRAMS,
-                "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                "nitrogen_fertilizer_used": MeasurementUnits.KILOGRAMS,
-                "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
-                "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
-                "phosphorus_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
-                "potassium_fertilizer_used": MeasurementUnits.KILOGRAMS,
-                "potassium_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
-                "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
-                "manure_nitrogen_requested": MeasurementUnits.KILOGRAMS,
-                "field_name": MeasurementUnits.UNITLESS,
-            },
-        }
-        crop_types: set[str] = {crop["crop"] for crop in crops_with_emissions}
-        for crop_type in crop_types:
-            crops = list(filter(lambda crop: crop["crop"] == crop_type, crops_with_emissions))
-            for crop in crops:
-                emissions_info = {
-                    "crop_type": crop["crop"],
-                    "nitrous_oxide_emissions": crop["nitrous_oxide_emissions"],
-                    "ammonia_emissions": crop["ammonia_emissions"],
-                    "carbon_stock_change": crop["carbon_stock_change"],
-                    "nitrogen_fertilizer_used": crop["nitrogen_fertilizer_used"],
-                    "nitrogen_fertilizer_embedded_CO2_emissions": crop["nitrogen_fertilizer_embedded_CO2_emissions"],
-                    "phosphorus_fertilizer_used": crop["phosphorus_fertilizer_used"],
-                    "phosphorus_fertilizer_embedded_CO2_emissions": crop[
-                        "phosphorus_fertilizer_embedded_CO2_emissions"
-                    ],
-                    "potassium_fertilizer_used": crop["potassium_fertilizer_used"],
-                    "potassium_fertilizer_embedded_CO2_emissions": crop["potassium_fertilizer_embedded_CO2_emissions"],
-                    "manure_nitrogen_used": crop["manure_nitrogen_used"],
-                    "manure_nitrogen_requested": crop["manure_nitrogen_requested"],
-                    "field_name": crop["field_name"],
-                }
-                self.om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
+        pass
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, dict[str, Any]]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
-        soil_info = {}
-        for name in field_names:
-            sanitized_name = re.escape(name)
-            filters: dict[str, dict[str, Any]] = {
-                "ammonia": {
-                    "name": "Soil Ammonia emissions",
-                    "description": "Collects the ammonia emissions from all soil layers in the field in the last "
-                    "year of the simulation.",
-                    "filters": [
-                        f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}'"
-                        f",layer=.*",
-                    ],
-                    "slice_start": SLICE_START,
-                },
-                "nitrous_oxide": {
-                    "name": "Soil Nitrous Oxide emissions",
-                    "description": "Collects the nitrous oxide emissions from all soil layers in the field in the "
-                    "last year of the simulation.",
-                    "filters": [
-                        f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',"
-                        f"layer=.*"
-                    ],
-                    "slice_start": SLICE_START,
-                },
-            }
-            soil_data = self._soil_data_update(filters)
-
-            starting_carbon_stock_filter = {
-                "name": "Starting soil profile carbon stock",
-                "description": "Collects the soil carbon stock level 365 days before the simulation ended.",
-                "filters": [
-                    f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
-                ],
-                "slice_start": SLICE_START,
-                "slice_end": SLICE_END,
-            }
-
-            starting_carbon_stock = self.om.filter_variables_pool(starting_carbon_stock_filter)
-
-            total_starting_carbon = sum(
-                [starting_carbon_stock[key]["values"][0] for key in starting_carbon_stock.keys()]
-            )
-
-            ending_carbon_stock_filter = {
-                "name": "Ending soil profile carbon stock",
-                "description": "Collects the soil carbon stock level on the last day of the simulation.",
-                "filters": [
-                    f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
-                ],
-                "slice_start": FINAL_DAY_SLICE_START,
-            }
-            ending_carbon_stock = self.om.filter_variables_pool(ending_carbon_stock_filter)
-            total_ending_carbon = sum([ending_carbon_stock[key]["values"][0] for key in ending_carbon_stock.keys()])
-
-            soil_data["carbon_stock_change"] = total_ending_carbon - total_starting_carbon
-
-            soil_info[name] = soil_data
-        return soil_info
+        pass
 
     def _calculate_emissions_by_field(
         self,
@@ -437,66 +332,7 @@ class EmissionsEstimator:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops.
         """
-        field_size = feeds_grown[0]["field_size"]
-        total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
-
-        for crop in feeds_grown:
-            crop["nitrous_oxide_emissions"] = 0.0
-            crop["ammonia_emissions"] = 0.0
-            crop["carbon_stock_change"] = 0.0
-            crop["nitrogen_fertilizer_used"] = 0.0
-            crop["nitrogen_fertilizer_embedded_CO2_emissions"] = 0.0
-            crop["phosphorus_fertilizer_used"] = 0.0
-            crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
-            crop["potassium_fertilizer_used"] = 0.0
-            crop["potassium_fertilizer_embedded_CO2_emissions"] = 0.0
-            crop["manure_nitrogen_used"] = 0.0
-            crop["manure_nitrogen_requested"] = 0.0
-
-        if total_dry_mass_per_ha_grown == 0.0:
-            return feeds_grown
-
-        sorted_crops = sorted(feeds_grown, key=lambda crop: (crop["planting_year"], crop["planting_day"]))
-        for crop in sorted_crops:
-            fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = (
-                field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
-            )
-            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
-            crop["carbon_stock_change"] = (
-                field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size
-            )
-            crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
-            crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
-
-        filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
-
-        for fertilizer_application in filtered_fertilizers:
-            fertilizer_application_date = RufasTime.convert_year_jday_to_date(
-                fertilizer_application["year"], fertilizer_application["day"]
-            ).date()
-            applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
-            applied = False
-
-            if len(applied_crops) > 0:
-                self._partition_applied_crop_fertilizer_emissions(fertilizer_application, applied_crops)
-                applied = True
-            else:
-                applied = self._apply_fertilizer_to_next_crop(
-                    fertilizer_application, sorted_crops, fertilizer_application_date
-                )
-            if not applied:
-                self.om.add_warning(
-                    "Fertilizer application not associated with any crops.",
-                    f"Fertilizer applied on {fertilizer_application_date} did not align with any crop "
-                    "planting and harvesting dates.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._calculate_emissions_by_field.__name__,
-                    },
-                )
-
-        return sorted_crops
+        pass
 
     def _partition_applied_crop_fertilizer_emissions(
         self, fertilizer_application: dict[str, float], applied_crops: list[dict[str, Any]]
@@ -505,20 +341,7 @@ class EmissionsEstimator:
         Partitions synthetic emissions from fertilizer applications to crop(s) whose planting and harvesting dates
         encompass the fertilizer application date.
         """
-        for crop in applied_crops:
-            split_factor = 1 / len(applied_crops)
-            crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"] * split_factor
-            crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
-                fertilizer_application["nitrogen"] * split_factor * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"] * split_factor
-            crop["phosphorus_fertilizer_embedded_CO2_emissions"] += (
-                fertilizer_application["phosphorus"] * split_factor * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["potassium_fertilizer_used"] += fertilizer_application["potassium"] * split_factor
-            crop["potassium_fertilizer_embedded_CO2_emissions"] += (
-                fertilizer_application["potassium"] * split_factor * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
-            )
+        pass
 
     def _filter_results(
         self, filters: dict[str, Any], date_cutoff: date, year_key: str, day_key: str
@@ -543,14 +366,7 @@ class EmissionsEstimator:
             Filtered result of the retrieved data.
 
         """
-        filtered_pools = self.om.filter_variables_pool(filters)
-        processed_data = self._transform_outputs_to_list_of_dicts(filtered_pools)
-        return list(
-            filter(
-                lambda app: RufasTime.convert_year_jday_to_date(app[year_key], app[day_key]).date() >= date_cutoff,
-                processed_data,
-            )
-        )
+        pass
 
     def _aggregate_data(
         self, operations: list[dict[str, Any]], all_fields: list[str], nutrients: list[str]
@@ -575,14 +391,7 @@ class EmissionsEstimator:
             A dictionary where keys are field names and values are dictionaries of aggregated nutrient values.
 
         """
-        aggregated_data = {key: {nutrient: 0.0 for nutrient in nutrients} for key in all_fields}
-
-        for app in operations:
-            field_name = app["field_name"]
-            for nutrient in nutrients:
-                aggregated_data[field_name][nutrient] += app[nutrient]
-
-        return aggregated_data
+        pass
 
     def _apply_fertilizer_to_next_crop(
         self,
@@ -594,31 +403,7 @@ class EmissionsEstimator:
         Applies fertilizer to the next available crop after harvest and before the next planting.
         Returns True if fertilizer was applied, False otherwise.
         """
-        for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
-            next_crop_exists = index + 1 < len(sorted_crops)
-
-            if next_crop_exists:
-                next_crop = sorted_crops[index + 1]
-                next_crop_planting_date = RufasTime.convert_year_jday_to_date(
-                    next_crop["planting_year"], next_crop["planting_day"]
-                ).date()
-                if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
-
-                    next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
-                    next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
-                        fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
-                    )
-                    next_crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"]
-                    next_crop["phosphorus_fertilizer_embedded_CO2_emissions"] += (
-                        fertilizer_application["phosphorus"] * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
-                    )
-                    next_crop["potassium_fertilizer_used"] += fertilizer_application["potassium"]
-                    next_crop["potassium_fertilizer_embedded_CO2_emissions"] += (
-                        fertilizer_application["potassium"] * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
-                    )
-                    return True
-        return False
+        pass
 
     def _extract_applied_crops(
         self, sorted_crops: list[dict[str, Any]], fertilizer_application_date: date
@@ -637,14 +422,7 @@ class EmissionsEstimator:
         list[dict[str, Any]]
             A list of the crops whose planting and harvesting dates encompass the fertilizer application date.
         """
-        applied_crops = []
-
-        for crop in sorted_crops:
-            crop_planting_date = RufasTime.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
-            crop_harvest_date = RufasTime.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
-            if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
-                applied_crops.append(crop)
-        return applied_crops
+        pass
 
     def _soil_data_update(self, filters: dict[str, dict[str, Any]]) -> dict[str, int | Literal[0]]:
         """
@@ -661,9 +439,4 @@ class EmissionsEstimator:
             The updated soil data.
 
         """
-        soil_data = {}
-        for key in filters.keys():
-            emissions = self.om.filter_variables_pool(filters[key])
-            soil_data[key] = sum([sum(emissions[key]["values"]) for key in emissions.keys()])
-
-        return soil_data
+        pass
