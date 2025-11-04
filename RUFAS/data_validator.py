@@ -1780,7 +1780,8 @@ class CrossValidator:
                         "target_and_save_block should only have variables and constants blocks."
                     )
 
-    def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool) -> tuple[Any, bool]:
+    def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool, relationship: str
+                             ) -> tuple[Any, bool]:
         """
         Evaluates an expression based on the provided expression block. This function also
         optionally adds to the alias pool if the `save_as` key is present in the expression block.
@@ -1791,6 +1792,8 @@ class CrossValidator:
             A dictionary containing the expression block to be evaluated.
         eager_termination : bool
             Whether to raise an error if the expression is not successfully evaluated.
+        relationship : str
+            The relationship being evaluated.
 
         Returns
         -------
@@ -1844,7 +1847,7 @@ class CrossValidator:
                 return None, False
         ordered_values: list[Any] = []
         for alias_name in ordered_variable_alias:
-            value = self._get_alias_value(alias_name, eager_termination, expression_block.get("relationship", ""))
+            value = self._get_alias_value(alias_name, eager_termination, relationship)
             ordered_values.append(value)
 
         if any(isinstance(value, (list, dict)) for value in ordered_values):
@@ -1855,9 +1858,10 @@ class CrossValidator:
             ordered_values = (
                 ordered_values[0] if isinstance(ordered_values[0], list) else list(ordered_values[0].values())
             )
-            result = ordered_values if expression_block["apply_to"] == "individual" else [aggregator(ordered_values)]
+            apply_to = expression_block.get("apply_to", "group")
+            result = ordered_values if apply_to == "individual" else [aggregator(ordered_values)]
         else:
-            result = [aggregator(ordered_values)] if operation != "no_op" else aggregator(ordered_values)
+            result = aggregator(ordered_values) if operation == "no_op" else [aggregator(ordered_values)]
 
         if "save_as" in expression_block:
             save_as_alise_name: str = expression_block["save_as"]
@@ -1964,9 +1968,13 @@ class CrossValidator:
         """
         if not self._validate_condition_clause(condition_clause, eager_termination):
             return False
-
-        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_hand"], eager_termination)
-        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_hand"], eager_termination)
+        relationship = condition_clause.get("relationship", "")
+        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_hand"], eager_termination,
+                                                              relationship)
+        print(f" left_hand: {left_hand}, left_evaluated: {left_evaluated}")
+        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_hand"], eager_termination,
+                                                                relationship)
+        print(f" right_hand: {right_hand}, right_evaluated: {right_evaluated}")
 
         if not (left_evaluated and right_evaluated):
             return False
@@ -2056,7 +2064,7 @@ class CrossValidator:
 
     def _evaluate_is_null(self, left_hand_value: Any) -> bool:
         """Evaluates is null condition."""
-        return left_hand_value is None
+        return all(value is None for value in left_hand_value)
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""

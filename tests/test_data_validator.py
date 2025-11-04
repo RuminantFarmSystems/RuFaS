@@ -2028,10 +2028,10 @@ def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) 
 
     if eager_termination:
         with pytest.raises(ValueError, match=r"Unknown alias name: missing"):
-            v._get_alias_value("missing", eager_termination=True, relationship="sum")
+            v._get_alias_value("missing", eager_termination=True, relationship="equal")
         assert len(v._event_logs) == 1
     else:
-        result = v._get_alias_value("missing", eager_termination=False, relationship="sum")
+        result = v._get_alias_value("missing", eager_termination=False, relationship="equal")
         assert result is None
         assert len(v._event_logs) == 1
 
@@ -2104,9 +2104,9 @@ def test_evaluate_expression_unknown_operation(
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination)
+            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination)
+        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
         assert result is None
         assert status is False
     mock_get_alias_value.assert_not_called()
@@ -2134,9 +2134,9 @@ def test_evaluate_expression_no_ordered_variables(
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination)
+            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination)
+        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
         assert result is None
         assert status is False
     mock_get_alias_value.assert_not_called()
@@ -2282,7 +2282,7 @@ def test_evaluate_expression_apply_to_individual(
                                                side_effect=selected_variables)
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
-    result, status = cross_validator._evaluate_expression(expression_block, False)
+    result, status = cross_validator._evaluate_expression(expression_block, False, relationship="equal")
     assert result == expected_result
     assert status is True
     mock_get_alias_value.assert_called_once()
@@ -2318,7 +2318,7 @@ def test_evaluate_expression_apply_to_group(
     mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
     mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
-    result, status = cross_validator._evaluate_expression(expression_block, False)
+    result, status = cross_validator._evaluate_expression(expression_block, False, relationship="equal")
     assert result == expected_result
     assert status is True
     if "save_as" in expression_block:
@@ -2411,10 +2411,10 @@ def test_evaluate_greater_condition(a: Any, b: Any, expected: bool) -> None:
 @pytest.mark.parametrize(
     "value,expected",
     [
-        (None, True),
-        (0, False),
-        ("", False),
-        ([], False),
+        ([None], True),
+        ([0], False),
+        ([[""]], False),
+        ([[]], False),
     ],
 )
 def test_evaluate_is_null(value: Any, expected: bool) -> None:

@@ -247,5 +247,20 @@
     }
   },
   "cross-validation": [
+{
+  "description": "Example null check cross-validation block",
+  "target_and_save": {
+    "variables": {
+      "annual_milk_yield": "animal.herd_information.annual_milk_yield"
+    }
+  },
+  "rules": [
+    {
+      "left_hand": {"ordered_variables": ["annual_milk_yield"]},
+      "right_hand": {"ordered_variables": [null]},
+      "relationship": "is_null"
+    }
   ]
+}
+] 
 }
