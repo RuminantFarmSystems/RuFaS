@@ -160,7 +160,7 @@ class AnimalModuleReporter:
 
         for milk_stats in milk_reports:
             updated_milk_data: dict[str, int | float] = asdict(milk_stats)
-            updated_milk_data["lactating"] = milk_stats.is_milking
+            updated_milk_data["is_milking"] = milk_stats.is_milking
             updated_milk_data["estimated_daily_milk_produced"] = milk_stats.estimated_daily_milk_produced
             updated_milk_data["milk_protein"] = milk_stats.milk_protein
             updated_milk_data["milk_fat"] = milk_stats.milk_fat

@@ -663,7 +663,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
             "class": "EmissionsEstimator",
             "function": "_calculate_homegrown_feed_emissions",
             "units": {
-                "ammonia_emisssions": MeasurementUnits.KILOGRAMS,
+                "ammonia_emissions": MeasurementUnits.KILOGRAMS,
                 "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                 "crop_type": MeasurementUnits.UNITLESS,
                 "field_name": MeasurementUnits.UNITLESS,
