@@ -706,7 +706,7 @@ class HerdManager:
                                   )
                 break
 
-            if dnb_indices: # when there is dnb to remove
+            if dnb_indices:  # when there is dnb to remove
                 lowest_production_cow_index = 0
                 current_lowest_production_value = math.inf
                 for index in dnb_indices:
