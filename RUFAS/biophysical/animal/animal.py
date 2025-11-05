@@ -234,7 +234,6 @@ class Animal:
                 )
         else:
             initialize_animal_methods[self.animal_type](args)
-            # TODO: handle birth_year/birth_date
             self.genetics = Genetics(
                 birth_year=(time.current_date - timedelta(days=self.days_born)).year,
                 animal_type=self.animal_type,
