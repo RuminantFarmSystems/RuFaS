@@ -1642,7 +1642,7 @@ class CrossValidator:
         self.relation_mapping: dict[str, Callable[[object, object, bool], bool]] = {
             "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
             "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
-            "greater_or_equals_to": lambda left, right, _eager_termination: (
+            "greater_or_equal_to": lambda left, right, _eager_termination: (
                 self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)),
             "not_equal": lambda left, right, _eager_termination: not self._evaluate_equal_condition(left, right),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
@@ -1971,8 +1971,10 @@ class CrossValidator:
         relationship = condition_clause.get("relationship", "")
         left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_hand"], eager_termination,
                                                               relationship)
+        print(f"Left hand evaluated: {left_hand}, {left_evaluated}")
         right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_hand"], eager_termination,
                                                                 relationship)
+        print(f"Right hand evaluated: {right_hand}, {right_evaluated}")
 
         if not (left_evaluated and right_evaluated):
             return False

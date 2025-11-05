@@ -100,7 +100,7 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
-        is_cross_validation_successful = True
+        failing_cross_validation_blocks: list[str] = []
         cross_validation_blocks = self.__metadata.get("cross-validation", [])
         if cross_validation_blocks:
             for block in cross_validation_blocks:
@@ -111,11 +111,16 @@ class InputManager:
                     block,
                     eager_termination,
                 )
-        if not is_cross_validation_successful:
+                if not is_cross_validation_successful:
+                    failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
+                    if eager_termination:
+                        break
+        if len(failing_cross_validation_blocks) > 0:
             self.data_validator.event_logs.append(
                 {
                     "error": "Cross Validation Failure",
-                    "message": "One or more cross-validation rules failed.",
+                    "message": "One or more cross-validation rules failed: "
+                    f"{', '.join(failing_cross_validation_blocks)}",
                     "info_map": {
                         "class": self.__class__.__name__,
                         "function": self.start_data_processing.__name__,
@@ -123,6 +128,7 @@ class InputManager:
                 }
             )
             is_input_data_valid = False
+        print("cross validation failing blocks:", failing_cross_validation_blocks)
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 

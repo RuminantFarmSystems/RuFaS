@@ -2329,7 +2329,7 @@ def test_evaluate_expression_apply_to_group(
 
 @pytest.mark.parametrize(
     "relationship",
-    ["equal", "greater", "greater_or_equals_to", "not_equal", "is_of_type", "regex"],
+    ["equal", "greater", "greater_or_equal_to", "not_equal", "is_of_type", "regex"],
 )
 @pytest.mark.parametrize("eager_termination", [True, False])
 def test_validate_relationship_valid_values(relationship: str, eager_termination: bool) -> None:
@@ -2542,8 +2542,8 @@ def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination:
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
-def test_evaluate_condition_greater_or_equals_short_circuit(mocker: MockerFixture, eager_termination: bool) -> None:
-    """When 'greater_or_equals_to', greater=True should short-circuit (no equality call)."""
+def test_evaluate_condition_greater_or_equal_short_circuit(mocker: MockerFixture, eager_termination: bool) -> None:
+    """When 'greater_or_equal_to', greater=True should short-circuit (no equality call)."""
     cv = CrossValidator()
     mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[(5, True), (2, True)])
@@ -2551,7 +2551,7 @@ def test_evaluate_condition_greater_or_equals_short_circuit(mocker: MockerFixtur
     mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=False)
 
     valid = cv._evaluate_condition(
-        {"relationship": "greater_or_equals_to", "left_hand": {}, "right_hand": {}}, eager_termination)
+        {"relationship": "greater_or_equal_to", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
     mock_gt.assert_called_once_with(5, 2)
@@ -2559,9 +2559,9 @@ def test_evaluate_condition_greater_or_equals_short_circuit(mocker: MockerFixtur
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
-def test_evaluate_condition_greater_or_equals_falls_back_to_equal(mocker: MockerFixture,
+def test_evaluate_condition_greater_or_equal_falls_back_to_equal(mocker: MockerFixture,
                                                                   eager_termination: bool) -> None:
-    """When 'greater_or_equals_to', if greater=False, equality result is used."""
+    """When 'greater_or_equal_to', if greater=False, equality result is used."""
     cv = CrossValidator()
     mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[(2, True), (2, True)])
@@ -2569,7 +2569,7 @@ def test_evaluate_condition_greater_or_equals_falls_back_to_equal(mocker: Mocker
     mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=True)
 
     valid = cv._evaluate_condition(
-        {"relationship": "greater_or_equals_to", "left_hand": {}, "right_hand": {}}, eager_termination)
+        {"relationship": "greater_or_equal_to", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
     mock_gt.assert_called_once_with(2, 2)
