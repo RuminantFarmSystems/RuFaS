@@ -77,7 +77,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
     "farmgrown_feed_deductions": {
         "name": "Farmgrown Feed Deductions",
         "description": "Collects all farmgrown feeds fed to animals in the simulation.",
-        "filters": ["FeedManager._deduct_feeds_from_inventory.farmgrown_feed_.*_fed"],
+        "filters": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed"],
         "date_fields": "simulation_day",
     },
 }
