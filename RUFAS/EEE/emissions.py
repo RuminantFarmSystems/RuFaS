@@ -225,7 +225,7 @@ class EmissionsEstimator:
 
         return feed_emissions_dict
 
-    def estimate_emissions(self) -> None:
+    def estimate_farmgrown_feed_emissions(self) -> None:
         """Estimates emissions associated with farmgrown feeds."""
         emission_data = self._parse_farmgrown_feeds_emission_data()
         with open("farmgrown_feeds_emission_data.json", "w") as f:
@@ -261,7 +261,8 @@ class EmissionsEstimator:
             daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
         )
 
-        # result = self._gather_farmgrown_feeds_emissions_and_resources_data()
+        farm_grown_feeds_fed_to_animals = list(daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id.keys())
+        self._calculate_and_report_lca_and_luc_emissions(farm_grown_feeds_fed_to_animals, feed_deductions_data)
 
     def _parse_farmgrown_feeds_emission_data(self) -> dict[str, dict[str, dict[int, float]]]:
         """
@@ -635,3 +636,55 @@ class EmissionsEstimator:
                 ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(manure_N_outputs, first_info_map_only=False)
+
+    def _calculate_and_report_lca_and_luc_emissions(
+            self,
+            farm_grown_feeds_fed_to_animals: list[RUFAS_ID],
+            feed_deductions_data: dict[RUFAS_ID, dict[int, float]]
+    ) -> None:
+        """Calculates and reports LCA and LUC emissions."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._calculate_and_report_lca_and_luc_emissions.__name__,
+            "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
+        }
+
+        lca_emissions_by_simulation_day: dict[int, dict[RUFAS_ID, float]] = defaultdict(dict)
+        luc_emissions_by_simulation_day: dict[int, dict[RUFAS_ID, float]] = defaultdict(dict)
+        for feed_id in farm_grown_feeds_fed_to_animals:
+            feed_deductions_for_feed_id_by_simulation_day = feed_deductions_data[feed_id]
+
+            lca_factor = self.purchased_feed_emissions_by_location.get(str(feed_id))
+            if lca_factor is not None:
+                for simulation_day, feed_amount in feed_deductions_for_feed_id_by_simulation_day.items():
+                    lca_emissions_by_simulation_day[simulation_day].update({feed_id: feed_amount * lca_factor})
+
+            luc_factor = self.land_use_change_emissions_by_location.get(str(feed_id))
+            if luc_factor is not None:
+                for simulation_day, feed_amount in feed_deductions_for_feed_id_by_simulation_day.items():
+                    luc_emissions_by_simulation_day[simulation_day].update({feed_id: feed_amount * luc_factor})
+
+        lca_outputs = [
+            (
+                {
+                    f"aggregate_lca_carbon_emissions": sum(lca_emissions_for_day.values())
+                },
+                {
+                    **info_map,
+                    "simulation_day": simulation_day
+                },
+            ) for simulation_day, lca_emissions_for_day in lca_emissions_by_simulation_day.items()
+        ]
+        self.om.add_variable_bulk(lca_outputs, first_info_map_only=False)
+        luc_outputs = [
+            (
+                {
+                    f"lca_land_use_change_emissions": sum(luc_emissions_for_day.values())
+                },
+                {
+                    **info_map,
+                    "simulation_day": simulation_day
+                },
+            ) for simulation_day, luc_emissions_for_day in luc_emissions_by_simulation_day.items()
+        ]
+        self.om.add_variable_bulk(luc_outputs, first_info_map_only=False)

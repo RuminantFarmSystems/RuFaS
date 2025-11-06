@@ -235,7 +235,7 @@ def test_estimate_emissions(
     )
     mock_homegrown = mocker.patch.object(em, "_calculate_homegrown_feed_emissions")
 
-    em.estimate_emissions()
+    em.estimate_farmgrown_feed_emissions()
     mock_gather.assert_called_once()
     mock_homegrown.assert_called_once_with(
         homegrown_feeds, fertilizer_applications, manure_applications, manure_requests
