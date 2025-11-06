@@ -667,7 +667,7 @@ class EmissionsEstimator:
         lca_outputs = [
             (
                 {
-                    f"aggregate_lca_carbon_emissions": sum(lca_emissions_for_day.values())
+                    "aggregate_lca_carbon_emissions": sum(lca_emissions_for_day.values())
                 },
                 {
                     **info_map,
@@ -679,7 +679,7 @@ class EmissionsEstimator:
         luc_outputs = [
             (
                 {
-                    f"lca_land_use_change_emissions": sum(luc_emissions_for_day.values())
+                    "lca_land_use_change_emissions": sum(luc_emissions_for_day.values())
                 },
                 {
                     **info_map,
