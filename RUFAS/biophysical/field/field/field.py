@@ -1276,6 +1276,7 @@ class Field:
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
             "average_clay_percent": MeasurementUnits.PERCENT,
+            "field_name": MeasurementUnits.UNITLESS,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1290,6 +1291,7 @@ class Field:
             "day": day,
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil.data.average_clay_percent,
+            "field_name": self.field_data.name,
         }
         self.om.add_variable("crop_planting", value, info_map)
 

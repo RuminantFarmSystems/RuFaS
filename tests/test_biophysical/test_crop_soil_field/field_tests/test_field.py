@@ -731,6 +731,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -740,6 +741,7 @@ def test_plant_crop(
                 "day": 100,
                 "field_size": 1.3,
                 "average_clay_percent": 40.0,
+                "field_name": "name_1",
             },
         ),
         (
@@ -757,6 +759,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -766,6 +769,7 @@ def test_plant_crop(
                 "day": 120,
                 "field_size": 2.55,
                 "average_clay_percent": 40.0,
+                "field_name": "name_2",
             },
         ),
         (
@@ -783,6 +787,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -792,6 +797,7 @@ def test_plant_crop(
                 "day": 122,
                 "field_size": 0.95,
                 "average_clay_percent": 40.0,
+                "field_name": "name_3",
             },
         ),
     ],
