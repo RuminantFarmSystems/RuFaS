@@ -16,14 +16,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Farmgrown Feeds Yields",
         "description": "Collects all crop harvests that occurred in the simulation.",
         "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-        "variables": [
-            "dry_yield",
-            "crop",
-            "harvest_year",
-            "harvest_day",
-            "field_name",
-            "harvest_type"
-        ],
+        "variables": ["dry_yield", "crop", "harvest_year", "harvest_day", "field_name", "harvest_type"],
         "date_fields": ("harvest_year", "harvest_day"),
     },
     "nitrous_oxide_emissions": {
@@ -42,26 +35,14 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Fertilizer Applications",
         "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-        "variables": [
-            "nitrogen",
-            "phosphorus",
-            "potassium",
-            "field_name",
-            "year",
-            "day"
-        ],
+        "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "year", "day"],
         "date_fields": ("year", "day"),
     },
     "manure_applications": {
         "name": "Manure Applications",
         "description": "Collects all manure applications that occurred in the simulation.",
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-        "variables": [
-            "nitrogen",
-            "field_name",
-            "year",
-            "day"
-        ],
+        "variables": ["nitrogen", "field_name", "year", "day"],
         "date_fields": ("year", "day"),
     },
     "crop_received": {
@@ -227,32 +208,37 @@ class EmissionsEstimator:
 
     def estimate_farmgrown_feed_emissions(self) -> None:
         """Estimates emissions associated with farmgrown feeds."""
+        config_data = self.im.get_data("config")
+        simulation_start_date: datetime = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
+        simulation_end_date: datetime = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
+        all_simulation_days = list(range(0, (simulation_end_date - simulation_start_date).days + 1))
+
         emission_data = self._parse_farmgrown_feeds_emission_data()
         with open("farmgrown_feeds_emission_data.json", "w") as f:
             json.dump(emission_data, f, indent=4)
 
-        resource_data = self._parse_manure_and_fertilizer_application_data()
+        resource_data = self._parse_manure_and_fertilizer_application_data(simulation_start_date)
         with open("manure_and_fertilizer_application_data.json", "w") as f:
             json.dump(resource_data, f, indent=4)
 
         crop_to_feed_id_mapping = self._parse_crop_to_feed_id_mapping()
 
-        harvest_yield_data = self._parse_harvest_data()
+        harvest_yield_data = self._parse_harvest_data(crop_to_feed_id_mapping, simulation_start_date)
         with open("harvest_yield_data.json", "w") as f:
             json.dump(harvest_yield_data, f, indent=4)
 
-        feed_deductions_data = self._parse_farmgrown_feed_deductions_data()
+        feed_deductions_data = self._parse_farmgrown_feed_deductions_data(all_simulation_days)
         with open("feed_deductions_data.json", "w") as f:
             json.dump(feed_deductions_data, f, indent=4)
 
         daily_farmgrown_feed_emissions_and_resources = self._calculate_daily_farmgrown_feed_emissions_and_resources(
-            emission_data, resource_data, crop_to_feed_id_mapping, harvest_yield_data
+            emission_data, resource_data, harvest_yield_data, all_simulation_days
         )
         with open("daily_farmgrown_feed_emissions_and_resources.json", "w") as f:
             json.dump(daily_farmgrown_feed_emissions_and_resources, f, indent=4)
         daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id = (
             self._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
-                daily_farmgrown_feed_emissions_and_resources, feed_deductions_data
+                daily_farmgrown_feed_emissions_and_resources, feed_deductions_data, all_simulation_days
             )
         )
         with open("fed_emissions_and_resources_by_feed_id.json", "w") as f:
@@ -282,29 +268,28 @@ class EmissionsEstimator:
                 if field_name not in all_fields_by_layer:
                     all_fields_by_layer[field_name] = {}
                 all_fields_by_layer[field_name][layer_number] = {
-                    info_map["simulation_day"]: values["values"][i]
-                    for i, info_map in enumerate(values["info_maps"])
+                    info_map["simulation_day"]: values["values"][i] for i, info_map in enumerate(values["info_maps"])
                 }
 
             for field_name in all_fields_by_layer:
-                simulation_days = {
-                    day for layer_data in all_fields_by_layer[field_name].values() for day in layer_data
-                }
+                simulation_days = {day for layer_data in all_fields_by_layer[field_name].values() for day in layer_data}
 
                 result[filter_key][field_name] = {
                     simulation_day: sum(
-                        layer_data.get(simulation_day, 0)
-                        for layer_data in all_fields_by_layer[field_name].values()
-                    ) for simulation_day in simulation_days
+                        layer_data.get(simulation_day, 0) for layer_data in all_fields_by_layer[field_name].values()
+                    )
+                    for simulation_day in simulation_days
                 }
         return result
 
-    def _parse_manure_and_fertilizer_application_data(self) -> dict[str, dict[str, dict[int, dict[str, float]]]]:
+    def _parse_manure_and_fertilizer_application_data(
+        self,
+        simulation_start_date: datetime,
+    ) -> dict[str, dict[str, dict[int, dict[str, float]]]]:
         """
         Parses manure and fertilizer application data from the OutputManager and returns a dictionary with
         application data for each field by simulation day.
         """
-        simulation_start_date: datetime = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
         result: dict[str, dict[str, dict[int, dict[str, float]]]] = defaultdict(dict)
         for filter_key in ["manure_applications", "fertilizer_applications"]:
             resource_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS[filter_key]
@@ -315,7 +300,7 @@ class EmissionsEstimator:
                 map(
                     RufasTime.convert_year_jday_to_date,
                     filtered_data[year_key]["values"],
-                    filtered_data[day_key]["values"]
+                    filtered_data[day_key]["values"],
                 )
             )
             simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
@@ -325,12 +310,16 @@ class EmissionsEstimator:
                     result[filter_key][field_name] = {}
                 result[filter_key][field_name][simulation_day] = {
                     variable: filtered_data[variable]["values"][i]
-                    for variable in filtered_data if variable not in [year_key, day_key, "field_name", "DISCLAIMER"]
+                    for variable in filtered_data
+                    if variable not in [year_key, day_key, "field_name", "DISCLAIMER"]
                 }
 
         return result
 
-    def _parse_farmgrown_feed_deductions_data(self) -> dict[RUFAS_ID, dict[int, float]]:
+    def _parse_farmgrown_feed_deductions_data(
+        self,
+        all_simulation_days: list[int],
+    ) -> dict[RUFAS_ID, dict[int, float]]:
         """Parses farmgrown feed deductions data by feed_id and simulation day from the simulation output manager."""
         filtered_data = self.om.filter_variables_pool(
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_deductions"]
@@ -343,9 +332,12 @@ class EmissionsEstimator:
             else:
                 raise ValueError("No match found.")
             result[feed_id] = {
-                info_map["simulation_day"]: values["values"][i]
-                for i, info_map in enumerate(values["info_maps"])
+                info_map["simulation_day"]: values["values"][i] for i, info_map in enumerate(values["info_maps"])
             }
+            for simulation_day in all_simulation_days:
+                if simulation_day not in result[feed_id]:
+                    result[feed_id][simulation_day] = 0.0
+            result[feed_id] = dict(sorted(result[feed_id].items()))
         return result
 
     def _parse_crop_to_feed_id_mapping(self) -> dict[tuple[str, str], RUFAS_ID]:
@@ -358,75 +350,72 @@ class EmissionsEstimator:
         }
         return crop_to_feed_id_mapping
 
-    def _parse_harvest_data(self) -> dict[int, dict[str, str | float]]:
-        simulation_start_date: datetime = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
-        result: dict[int, dict[str, str | float]] = defaultdict(dict)
+    def _parse_harvest_data(
+        self, crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID], simulation_start_date: datetime
+    ) -> dict[str, dict[int, dict[str, int | str | float]]]:
+        result: dict[str, dict[int, dict[str, int | str | float]]] = defaultdict(dict)
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
         filtered_data = self.om.filter_variables_pool(harvest_filter)
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
-        dates = list(
-            map(
-                RufasTime.convert_year_jday_to_date,
-                filtered_data[year_key]["values"],
-                filtered_data[day_key]["values"]
-            )
-        )
-        simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
-        for i, simulation_day in enumerate(simulation_days):
-            result[simulation_day] = {
-                variable: filtered_data[variable]["values"][i]
-                for variable in filtered_data if variable not in [year_key, day_key, "DISCLAIMER"]
+        for i, field_name in enumerate(filtered_data["field_name"]["values"]):
+            crop_name = filtered_data["crop"]["values"][i]
+            feed_id = crop_to_feed_id_mapping.get((field_name, crop_name), None)
+            harvest_dry_yield_data = filtered_data["dry_yield"]["values"][i]
+            harvest_type = filtered_data["harvest_type"]["values"][i]
+            harvest_year, harvest_day = filtered_data[year_key]["values"][i], filtered_data[day_key]["values"][i]
+            harvest_simulation_day = (
+                RufasTime.convert_year_jday_to_date(harvest_year, harvest_day) - simulation_start_date
+            ).days
+
+            result[field_name][harvest_simulation_day] = {
+                "field_name": field_name,
+                "crop": crop_name,
+                "feed_id": feed_id,
+                "dry_yield": harvest_dry_yield_data,
+                "harvest_type": harvest_type,
             }
+
         return result
 
     def _calculate_daily_farmgrown_feed_emissions_and_resources(
-            self,
-            emission_data: dict[str, dict[str, dict[int, float]]],
-            resource_data: dict[str, dict[str, dict[int, dict[str, float]]]],
-            crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
-            harvest_yield_data: dict[int, dict[str, str | float]],
+        self,
+        emission_data: dict[str, dict[str, dict[int, float]]],
+        resource_data: dict[str, dict[str, dict[int, dict[str, float]]]],
+        harvest_yield_by_field: dict[str, dict[int, dict[str, int | str | float]]],
+        all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
         """Calculates daily emissions and resources used for farmgrown feeds."""
-        config_data = self.im.get_data("config")
-        simulation_start_date: datetime = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
-        simulation_end_date: datetime = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
-        all_simulation_days = list(range(0, (simulation_end_date - simulation_start_date).days + 1))
-        harvest_dates_by_field = defaultdict(dict)
-        for simulation_day, harvest_yield_data_for_day in harvest_yield_data.items():
-            field_name = harvest_yield_data_for_day["field_name"]
-            crop_name = harvest_yield_data_for_day["crop"]
-            feed_id = crop_to_feed_id_mapping.get((field_name, crop_name), None)
-            harvest_dates_by_field[field_name][simulation_day] = {
-                "feed_id": feed_id,
-                "dry_yield": harvest_yield_data_for_day["dry_yield"],
-                "harvest_type": harvest_yield_data_for_day["harvest_type"],
-            }
+
         total_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[str, float]] = defaultdict(dict)
         total_harvest_dry_yield_by_feed_id: dict[RUFAS_ID, float] = defaultdict(float)
         daily_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]] = (
             defaultdict(dict)
         )
+
         harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = {
             feed_id: sorted(
                 [
                     harvest_date
-                    for harvest_date in harvest_dates_by_field[field_name]
-                    if harvest_dates_by_field[field_name][harvest_date]["feed_id"] == feed_id
+                    for harvest_date in harvest_yield_by_field[field_name]
+                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id
                 ]
-            ) for field_name in harvest_dates_by_field
+            )
+            for field_name in harvest_yield_by_field
             for feed_id in set(
-                harvest_dates_by_field[field_name][harvest_date]["feed_id"]
-                for harvest_date in sorted(list(harvest_dates_by_field[field_name].keys()))
+                harvest_yield_by_field[field_name][harvest_date]["feed_id"]
+                for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
             )
         }
-        for field_name in harvest_dates_by_field:
-            harvest_dates = sorted(list(harvest_dates_by_field[field_name].keys()))
+
+        for field_name in harvest_yield_by_field:
+            harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
             last_harvest_date = 0
             for harvest_date in harvest_dates:
-                feed_id = harvest_dates_by_field[field_name][harvest_date]["feed_id"]
+                feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
                 if feed_id is None:
+                    last_harvest_date = harvest_date
                     continue
                 if feed_id not in total_farmgrown_feed_emission_and_resource_by_feed_id:
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = {
@@ -437,105 +426,82 @@ class EmissionsEstimator:
                         "fertilizer_K": 0.0,
                         "manure_N": 0.0,
                     }
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["nitrous_oxide_emissions"] += (
-                    sum(
-                        [
-                            emission_data["nitrous_oxide_emissions"][field_name][simulation_day]
-                            for simulation_day in emission_data["nitrous_oxide_emissions"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["nitrous_oxide_emissions"] += sum(
+                    [
+                        emission_data["nitrous_oxide_emissions"][field_name][simulation_day]
+                        for simulation_day in emission_data["nitrous_oxide_emissions"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["ammonia_emissions"] += (
-                    sum(
-                        [
-                            emission_data["ammonia_emissions"][field_name][simulation_day]
-                            for simulation_day in emission_data["ammonia_emissions"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["ammonia_emissions"] += sum(
+                    [
+                        emission_data["ammonia_emissions"][field_name][simulation_day]
+                        for simulation_day in emission_data["ammonia_emissions"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += (
-                    sum(
-                        [
-                            resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
-                            for simulation_day in resource_data["fertilizer_applications"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += sum(
+                    [
+                        resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
+                        for simulation_day in resource_data["fertilizer_applications"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += (
-                    sum(
-                        [
-                            resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
-                            for simulation_day in resource_data["fertilizer_applications"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += sum(
+                    [
+                        resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
+                        for simulation_day in resource_data["fertilizer_applications"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += (
-                    sum(
-                        [
-                            resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
-                            for simulation_day in resource_data["fertilizer_applications"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += sum(
+                    [
+                        resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
+                        for simulation_day in resource_data["fertilizer_applications"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += (
-                    sum(
-                        [
-                            resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
-                            for simulation_day in resource_data["manure_applications"][field_name]
-                            if last_harvest_date < simulation_day <= harvest_date
-                        ],
-                        start=0.0
-                    )
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += sum(
+                    [
+                        resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
+                        for simulation_day in resource_data["manure_applications"][field_name]
+                        if last_harvest_date < simulation_day <= harvest_date
+                    ],
+                    start=0.0,
                 )
                 next_harvest_date_for_feed_id = (
                     harvest_dates_by_feed_id[feed_id][harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1]
-                    if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1 < len(
-                        harvest_dates_by_feed_id[feed_id]
-                    )
+                    if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1
+                    < len(harvest_dates_by_feed_id[feed_id])
                     else max(all_simulation_days)
                 )
 
-                total_harvest_dry_yield_by_feed_id[feed_id] += (
-                    harvest_dates_by_field[field_name][harvest_date]["dry_yield"]
-                )
+                total_harvest_dry_yield_by_feed_id[feed_id] += harvest_yield_by_field[field_name][harvest_date][
+                    "dry_yield"
+                ]
                 total_dry_yield = total_harvest_dry_yield_by_feed_id[feed_id]
                 total_emission_and_resource = total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]
                 for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
                     daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
                         "nitrous_oxide_emissions": (
-                                total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
+                            total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
                         ),
-                        "ammonia_emissions": (
-                                total_emission_and_resource["ammonia_emissions"] / total_dry_yield
-                        ),
-                        "fertilizer_N": (
-                                total_emission_and_resource["fertilizer_N"] / total_dry_yield
-                        ),
-                        "fertilizer_P": (
-                                total_emission_and_resource["fertilizer_P"] / total_dry_yield
-                        ),
-                        "fertilizer_K": (
-                                total_emission_and_resource["fertilizer_K"] / total_dry_yield
-                        ),
-                        "manure_N": (
-                                total_emission_and_resource["manure_N"] / total_dry_yield
-                        ),
+                        "ammonia_emissions": (total_emission_and_resource["ammonia_emissions"] / total_dry_yield),
+                        "fertilizer_N": (total_emission_and_resource["fertilizer_N"] / total_dry_yield),
+                        "fertilizer_P": (total_emission_and_resource["fertilizer_P"] / total_dry_yield),
+                        "fertilizer_K": (total_emission_and_resource["fertilizer_K"] / total_dry_yield),
+                        "manure_N": (total_emission_and_resource["manure_N"] / total_dry_yield),
                     }
 
                 last_harvest_date = harvest_date
         for (
-                feed_id,
-                daily_farmgrown_feed_emission_and_resource
+            feed_id,
+            daily_farmgrown_feed_emission_and_resource,
         ) in daily_farmgrown_feed_emission_and_resource_by_feed_id.items():
             remaining_days = [
                 remaining_day
@@ -551,21 +517,17 @@ class EmissionsEstimator:
                     "fertilizer_K": 0.0,
                     "manure_N": 0.0,
                 }
-            daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = dict(sorted(
-                daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items()
-            ))
+            daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = dict(
+                sorted(daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items())
+            )
         return daily_farmgrown_feed_emission_and_resource_by_feed_id
 
     def _calculate_daily_farmgrown_feed_fed_emissions_and_resources(
-            self,
-            daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
-            feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+        self,
+        daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
+        feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+        all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
-        config_data = self.im.get_data("config")
-        simulation_start_date: datetime = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
-        simulation_end_date: datetime = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
-        all_simulation_days = list(range(0, (simulation_end_date - simulation_start_date).days + 1))
-
         result: dict[RUFAS_ID, dict[int, dict[str, float]]] = defaultdict(dict)
         for feed_id, feed_deductions in feed_deductions_data.items():
             if feed_id not in daily_farmgrown_feed_emissions_and_resources:
@@ -584,8 +546,8 @@ class EmissionsEstimator:
         return result
 
     def _report_daily_farmgrown_feed_fed_emissions_and_resources(
-            self,
-            daily_farmgrown_feed_fed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
+        self,
+        daily_farmgrown_feed_fed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
     ) -> None:
         """Reports daily farmgrown feed fed emissions and resources."""
         info_map = {
@@ -595,92 +557,60 @@ class EmissionsEstimator:
         for feed_id, daily_data_for_feed_id in daily_farmgrown_feed_fed_emissions_and_resources.items():
             n2o_emissions_outputs = [
                 (
-                    {
-                        f"direct_n2o_nitrogen_emissions_for_feed_{feed_id}": data_for_day["nitrous_oxide_emissions"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"direct_n2o_nitrogen_emissions_for_feed_{feed_id}": data_for_day["nitrous_oxide_emissions"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(n2o_emissions_outputs, first_info_map_only=False)
 
             ammonia_emissions_outputs = [
                 (
-                    {
-                        f"ammonia_nitrogen_emissions_for_feed_{feed_id}": data_for_day["ammonia_emissions"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"ammonia_nitrogen_emissions_for_feed_{feed_id}": data_for_day["ammonia_emissions"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(ammonia_emissions_outputs, first_info_map_only=False)
 
             fertilizer_N_outputs = [
                 (
-                    {
-                        f"nitrogen_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_N"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"nitrogen_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_N"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(fertilizer_N_outputs, first_info_map_only=False)
 
             fertilizer_P_outputs = [
                 (
-                    {
-                        f"phosphorus_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_P"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"phosphorus_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_P"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(fertilizer_P_outputs, first_info_map_only=False)
 
             fertilizer_K_outputs = [
                 (
-                    {
-                        f"potassium_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_K"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"potassium_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_K"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(fertilizer_K_outputs, first_info_map_only=False)
 
             manure_N_outputs = [
                 (
-                    {
-                        f"manure_nitrogen_applied_for_feed_{feed_id}": data_for_day["manure_N"]
-                    },
-                    {
-                        **info_map,
-                        "units": MeasurementUnits.KILOGRAMS,
-                        "simulation_day": simulation_day
-                    },
-                ) for simulation_day, data_for_day in daily_data_for_feed_id.items()
+                    {f"manure_nitrogen_applied_for_feed_{feed_id}": data_for_day["manure_N"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(manure_N_outputs, first_info_map_only=False)
 
     def _calculate_and_report_lca_and_luc_emissions(
-            self,
-            farm_grown_feeds_fed_to_animals: list[RUFAS_ID],
-            feed_deductions_data: dict[RUFAS_ID, dict[int, float]]
+        self, farm_grown_feeds_fed_to_animals: list[RUFAS_ID], feed_deductions_data: dict[RUFAS_ID, dict[int, float]]
     ) -> None:
         """Calculates and reports LCA and LUC emissions."""
         info_map = {
@@ -700,14 +630,10 @@ class EmissionsEstimator:
                     lca_emissions_by_simulation_day[simulation_day].update({feed_id: feed_amount * lca_factor})
                 lca_outputs = [
                     (
-                        {
-                            f"aggregate_lca_carbon_emissions_for_feed_{feed_id}": lca_emissions_for_day[feed_id]
-                        },
-                        {
-                            **info_map,
-                            "simulation_day": simulation_day
-                        },
-                    ) for simulation_day, lca_emissions_for_day in lca_emissions_by_simulation_day.items()
+                        {f"aggregate_lca_carbon_emissions_for_feed_{feed_id}": lca_emissions_for_day[feed_id]},
+                        {**info_map, "simulation_day": simulation_day},
+                    )
+                    for simulation_day, lca_emissions_for_day in lca_emissions_by_simulation_day.items()
                 ]
                 self.om.add_variable_bulk(lca_outputs, first_info_map_only=False)
 
@@ -717,13 +643,9 @@ class EmissionsEstimator:
                     luc_emissions_by_simulation_day[simulation_day].update({feed_id: feed_amount * luc_factor})
                 luc_outputs = [
                     (
-                        {
-                            f"lca_land_use_change_emissions_for_feed_{feed_id}": luc_emissions_for_day[feed_id]
-                        },
-                        {
-                            **info_map,
-                            "simulation_day": simulation_day
-                        },
-                    ) for simulation_day, luc_emissions_for_day in luc_emissions_by_simulation_day.items()
+                        {f"lca_land_use_change_emissions_for_feed_{feed_id}": luc_emissions_for_day[feed_id]},
+                        {**info_map, "simulation_day": simulation_day},
+                    )
+                    for simulation_day, luc_emissions_for_day in luc_emissions_by_simulation_day.items()
                 ]
                 self.om.add_variable_bulk(luc_outputs, first_info_map_only=False)
