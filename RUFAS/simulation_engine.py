@@ -188,6 +188,7 @@ class SimulationEngine:
             A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.
         """
         manure_applications: list[ManureEventNutrientRequestResults] = []
+        is_daily_spread = self.im.get_data("manure")
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
             for manure_event_request in manure_events_requests:
