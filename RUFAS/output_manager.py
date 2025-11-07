@@ -1019,7 +1019,6 @@ class OutputManager(object):
         >>> output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
         ''
         """
-
         if not isinstance(units, dict):
             return f" ({units})" if units else ""
 
