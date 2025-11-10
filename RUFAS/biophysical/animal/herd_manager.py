@@ -643,6 +643,10 @@ class HerdManager:
             AnimalModuleReporter.report_daily_ration_per_pen(
                 str(pen.id), pen.animal_combination.name, current_pen_ration, simulation_day
             )
+            for key, amount in current_pen_ration.items():
+                if key not in herd_total_ration.keys():
+                    herd_total_ration[key] = 0.0
+                herd_total_ration[key] += amount
 
         AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
 

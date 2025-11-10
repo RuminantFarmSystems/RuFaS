@@ -245,6 +245,7 @@ v0.9.2
 - [2581](https://github.com/RuminantFarmSystems/MASM/pull/2581) - [minor change] [Inputs] Update inputs files from default to example metadata and prefixes.
 - [2324](https://github.com/RuminantFarmSystems/MASM/pull/2324) - [minor change] [Manure] Caps total manure excreted by total solids for dry cows and heifers. Also changes calculation of final solids wet mass from using bedding density to manure density.
 - [2413](https://github.com/RuminantFarmSystems/MASM/pull/2413) - [minor change] [Animal] Updates default user defined ration behavior with improved methods.
+- [2598](https://github.com/RuminantFarmSystems/MASM/pull/2598) - [minor change] [FeedManager][Feed Storage] Adjust feed deduction logic to gather and remove available feeds by storage rather than crop.
 - [2587](https://github.com/RuminantFarmSystems/MASM/pull/2587) - [major change] [Output Manager] Add cross-scenario aggregation and running EEE to post processing task.
 - [2583](https://github.com/RuminantFarmSystems/MASM/pull/2583) - [minor change] [Github Action] Fix the GitHub Action for forked branches.
 - [2579](https://github.com/RuminantFarmSystems/MASM/pull/2563) - [minor change] [Animal] Changed location of milking cow fraction to main animal input file.
@@ -263,6 +264,7 @@ v0.9.2
 - [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] [InputChange][OutputChange] Implements the Energy submodule of the EEE module with diesel consumption calculation.
 - [2622](https://github.com/RuminantFarmSystems/MASM/pull/2622) - [minor change] [InputChange][OutputChange] Implement 305 days milk production logic and utilizing such merit to maintain herd size.
 - [2629](https://github.com/RuminantFarmSystems/MASM/pull/2629) - [minor change] [NoInputChange][NoOutputChange][Units][Reporting] Updates a couple units mappings that were incorrect/misspelled.
+- [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 
 
 ### v0.9.2
