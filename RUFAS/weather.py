@@ -54,6 +54,8 @@ class Weather:
 
         max_mean_temperature = max(weather_file["avg"])
         min_mean_temperature = min(weather_file["avg"])
+        max_index, _ = max(enumerate(weather_file["high"]), key=lambda x: x[1])
+        max_temp_julian_day = weather_file["jday"][max_index]
 
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
@@ -70,7 +72,8 @@ class Weather:
                     precipitation=weather_file["precip"][i],
                     irrigation=weather_file["irrigation"][i],
                     max_mean_temperature=max_mean_temperature,
-                    min_mean_temperature=min_mean_temperature
+                    min_mean_temperature=min_mean_temperature,
+                    max_temp_julian_day=max_temp_julian_day
                 )
                 if date_key in self.weather_data.keys():
                     info_map = {

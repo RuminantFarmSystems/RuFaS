@@ -329,7 +329,7 @@ class Processor(ABC):
         amplitude = (current_day_condition.max_mean_temperature - current_day_condition.min_mean_temperature) * 0.6 / 2
         manure_amplitude = amplitude * 0.5
         return current_day_condition.mean_air_temperature + manure_amplitude * math.cos(
-            ((2 * math.pi) / year_end_day) * (day_number - 220))
+            ((2 * math.pi) / year_end_day) * (day_number - current_day_condition.max_temp_julian_day))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:
