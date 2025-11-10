@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from typing import Any
 
@@ -26,6 +25,7 @@ from tests.test_EEE.fixtures import (
     raw_farmgrown_feed_deductions_data,
     expected_farmgrown_feed_deductions_data,
     expected_daily_farmgrown_feed_emissions_and_resources,
+    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id,
 )
 
 
@@ -42,7 +42,8 @@ assert raw_harvest_data is not None
 assert expected_harvest_yield_data is not None
 assert raw_farmgrown_feed_deductions_data is not None
 assert expected_farmgrown_feed_deductions_data is not None
-# assert expected_daily_farmgrown_feed_emissions_and_resources is not None
+assert expected_daily_farmgrown_feed_emissions_and_resources is not None
+assert expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id is not None
 
 
 @pytest.fixture
@@ -57,8 +58,8 @@ def em(mocker: MockerFixture) -> EmissionsEstimator:
         "alfalfa_hay": ["100", "103", "106", "107", "108"],
         "wheat": [],
     }
-    em.purchased_feed_emissions_by_location = {"50": 1.0, "51": 2.0, "52": 3.0, "100": 26.3}
-    em.land_use_change_emissions_by_location = {"50": 0.1, "51": 0.2, "52": 0.3, "100": 2.63}
+    em.purchased_feed_emissions_by_location = {"44": 0.8,"50": 1.0, "51": 2.0, "52": 3.0, "100": 26.3, "110": 1.1}
+    em.land_use_change_emissions_by_location = {"44": 0.6, "50": 0.1, "51": 0.2, "52": 0.3, "100": 2.63, "110": 0.11}
 
     em._missing_purchased_ids = set()
     em._missing_land_use_ids = set()
@@ -192,9 +193,7 @@ def test_estimate_emissions(
 ) -> None:
     """Tests the estimation routines are called correctly."""
     mock_im_get_data = mocker.patch.object(
-        em.im,
-        "get_data",
-        return_value={"start_date": "2000:1", "end_date": "2000:100"}
+        em.im, "get_data", return_value={"start_date": "2000:1", "end_date": "2000:100"}
     )
     mock_parse_farmgrown_feeds_emission_data = mocker.patch.object(em, "_parse_farmgrown_feeds_emission_data")
     mock_parse_manure_and_fertilizer_application_data = mocker.patch.object(
@@ -247,13 +246,11 @@ def test_check_available_purchased_feed_data_with_missing(em: EmissionsEstimator
     assert "Missing Land Use Change Purchased Feed Emissions Data" in titles
     assert (
         "Missing emissions data for RuFaS feed IDs: 103. "
-        "These feeds will be omitted from purchased feed emissions estimations."
-        in messages
+        "These feeds will be omitted from purchased feed emissions estimations." in messages
     )
     assert (
         "Missing land use change emissions data for RuFaS feed IDs: 103. "
-        "These feeds will be omitted from land use change purchased feed emissions estimations."
-        in messages
+        "These feeds will be omitted from land use change purchased feed emissions estimations." in messages
     )
 
     assert em._missing_purchased_ids == {"103"}
@@ -388,11 +385,11 @@ def test_get_feed_emissions_data_invalid_county_code(
 
 
 def test_parse_farmgrown_feeds_emission_data(
-        raw_nitrous_oxide_emissions_data: dict[str, dict[str, list[Any]]],
-        raw_ammonia_emissions_data: dict[str, dict[str, list[Any]]],
-        parsed_emissions_data: dict[str, dict[str, dict[int, float]]],
-        em: EmissionsEstimator,
-        mocker: MockerFixture,
+    raw_nitrous_oxide_emissions_data: dict[str, dict[str, list[Any]]],
+    raw_ammonia_emissions_data: dict[str, dict[str, list[Any]]],
+    parsed_emissions_data: dict[str, dict[str, dict[int, float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
@@ -403,11 +400,11 @@ def test_parse_farmgrown_feeds_emission_data(
 
 
 def test_parse_manure_and_fertilizer_application_data(
-        raw_fertilizer_application_data: dict[str, dict[str, list[Any]]],
-        raw_manure_application_data: dict[str, dict[str, list[Any]]],
-        parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, float]]],
-        em: EmissionsEstimator,
-        mocker: MockerFixture,
+    raw_fertilizer_application_data: dict[str, dict[str, list[Any]]],
+    raw_manure_application_data: dict[str, dict[str, list[Any]]],
+    parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", side_effect=[raw_manure_application_data, raw_fertilizer_application_data]
@@ -418,10 +415,10 @@ def test_parse_manure_and_fertilizer_application_data(
 
 
 def test_parse_crop_to_feed_id_mapping(
-        raw_received_crop_data: dict[str, dict[str, list[Any]]],
-        expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
-        em: EmissionsEstimator,
-        mocker: MockerFixture,
+    raw_received_crop_data: dict[str, dict[str, list[Any]]],
+    expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", return_value=raw_received_crop_data
@@ -432,11 +429,11 @@ def test_parse_crop_to_feed_id_mapping(
 
 
 def test_parse_harvest_data(
-        raw_harvest_data: dict[str, dict[str, list[Any]]],
-        expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
-        expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
-        em: EmissionsEstimator,
-        mocker: MockerFixture,
+    raw_harvest_data: dict[str, dict[str, list[Any]]],
+    expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
+    expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value=raw_harvest_data)
     actual_data = em._parse_harvest_data(expected_crop_to_feed_id_mapping, datetime.strptime("2013:1", "%Y:%j"))
@@ -445,10 +442,10 @@ def test_parse_harvest_data(
 
 
 def test_parse_farmgrown_feed_deductions_data(
-        raw_farmgrown_feed_deductions_data: dict[str, dict[str, list[Any]]],
-        expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
-        em: EmissionsEstimator,
-        mocker: MockerFixture,
+    raw_farmgrown_feed_deductions_data: dict[str, dict[str, list[Any]]],
+    expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", return_value=raw_farmgrown_feed_deductions_data
@@ -460,20 +457,58 @@ def test_parse_farmgrown_feed_deductions_data(
 
 
 def test_calculate_daily_farmgrown_feed_emissions_and_resources(
-        test_emissions_data: dict[str, dict[str, dict[int, float]]],
-        parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, dict[str, float]]]],
-        expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
-        expected_daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
-        em: EmissionsEstimator,
+    test_emissions_data: dict[str, dict[str, dict[int, float]]],
+    parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, dict[str, float]]]],
+    expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
+    expected_daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    em: EmissionsEstimator,
 ) -> None:
     all_simulation_days = list(range(0, 2557))
     actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
         test_emissions_data,
         parsed_fertilizer_and_manure_application_data,
         expected_harvest_yield_data,
-        all_simulation_days
+        all_simulation_days,
     )
     assert actual_data == expected_daily_farmgrown_feed_emissions_and_resources
 
 
+def test_calculate_daily_farmgrown_feed_fed_emissions_and_resources(
+    expected_daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    em: EmissionsEstimator,
+) -> None:
+    all_simulation_days = list(range(0, 2557))
+    actual_data = em._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
+        expected_daily_farmgrown_feed_emissions_and_resources,
+        expected_farmgrown_feed_deductions_data,
+        all_simulation_days,
+    )
+    assert actual_data == expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
 
+
+def test_report_daily_farmgrown_feed_fed_emissions_and_resources(
+    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    mock_add_variable_bulk = mocker.patch.object(em.om, "add_variable_bulk")
+    em._report_daily_farmgrown_feed_fed_emissions_and_resources(
+        expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
+    )
+    assert mock_add_variable_bulk.call_count == 2 * 6
+
+
+def test_calculate_and_report_lca_and_luc_emissions(
+    expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    mock_add_variable_bulk = mocker.patch.object(em.om, "add_variable_bulk")
+    em._calculate_and_report_lca_and_luc_emissions(
+        list(expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id.keys()),
+        expected_farmgrown_feed_deductions_data,
+    )
+    assert mock_add_variable_bulk.call_count == 2 * 2

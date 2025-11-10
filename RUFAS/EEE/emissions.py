@@ -1,4 +1,3 @@
-import json
 import re
 from collections import defaultdict
 from datetime import datetime
@@ -214,35 +213,25 @@ class EmissionsEstimator:
         all_simulation_days = list(range(0, (simulation_end_date - simulation_start_date).days + 1))
 
         emission_data = self._parse_farmgrown_feeds_emission_data()
-        # with open("farmgrown_feeds_emission_data.json", "w") as f:
-        #     json.dump(emission_data, f, indent=4)
 
         resource_data = self._parse_manure_and_fertilizer_application_data(simulation_start_date)
-        # with open("manure_and_fertilizer_application_data.json", "w") as f:
-        #     json.dump(resource_data, f, indent=4)
 
         crop_to_feed_id_mapping = self._parse_crop_to_feed_id_mapping()
 
         harvest_yield_data = self._parse_harvest_data(crop_to_feed_id_mapping, simulation_start_date)
-        # with open("harvest_yield_data.json", "w") as f:
-        #     json.dump(harvest_yield_data, f, indent=4)
 
         feed_deductions_data = self._parse_farmgrown_feed_deductions_data(all_simulation_days)
-        # with open("feed_deductions_data.json", "w") as f:
-        #     json.dump(feed_deductions_data, f, indent=4)
 
         daily_farmgrown_feed_emissions_and_resources = self._calculate_daily_farmgrown_feed_emissions_and_resources(
             emission_data, resource_data, harvest_yield_data, all_simulation_days
         )
-        # with open("daily_farmgrown_feed_emissions_and_resources.json", "w") as f:
-        #     json.dump(daily_farmgrown_feed_emissions_and_resources, f, indent=4)
+
         daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id = (
             self._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
                 daily_farmgrown_feed_emissions_and_resources, feed_deductions_data, all_simulation_days
             )
         )
-        # with open("fed_emissions_and_resources_by_feed_id.json", "w") as f:
-        #     json.dump(daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id, f, indent=4)
+
         self._report_daily_farmgrown_feed_fed_emissions_and_resources(
             daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
         )
