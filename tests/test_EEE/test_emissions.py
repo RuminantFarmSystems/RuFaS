@@ -1,15 +1,40 @@
-from datetime import date, datetime
+import json
+from datetime import datetime
 from typing import Any
-from unittest.mock import call
 
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.EEE.emissions import EmissionsEstimator
-from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+
+from tests.test_EEE.fixtures import (
+    raw_nitrous_oxide_emissions_data,
+    raw_ammonia_emissions_data,
+    parsed_nitrous_oxide_emissions_data,
+    raw_fertilizer_application_data,
+    raw_manure_application_data,
+    parsed_fertilizer_and_manure_application_data,
+    raw_received_crop_data,
+    expected_crop_to_feed_id_mapping,
+    raw_harvest_data,
+    expected_harvest_yield_data
+)
+
+
+assert raw_nitrous_oxide_emissions_data is not None
+assert raw_ammonia_emissions_data is not None
+assert parsed_nitrous_oxide_emissions_data is not None
+assert raw_fertilizer_application_data is not None
+assert raw_manure_application_data is not None
+assert parsed_fertilizer_and_manure_application_data is not None
+assert raw_received_crop_data is not None
+assert expected_crop_to_feed_id_mapping is not None
+assert raw_harvest_data is not None
+assert expected_harvest_yield_data is not None
 
 
 @pytest.fixture
@@ -355,8 +380,8 @@ def test_get_feed_emissions_data_invalid_county_code(
 
 
 def test_parse_farmgrown_feeds_emission_data(
-        raw_nitrous_oxide_emissions_data: dict[str, dict[str, Any]],
-        raw_ammonia_emissions_data: dict[str, dict[str, Any]],
+        raw_nitrous_oxide_emissions_data: dict[str, dict[str, list[Any]]],
+        raw_ammonia_emissions_data: dict[str, dict[str, list[Any]]],
         parsed_nitrous_oxide_emissions_data: dict[str, dict[str, dict[int, float]]],
         em: EmissionsEstimator,
         mocker: MockerFixture,
@@ -364,7 +389,48 @@ def test_parse_farmgrown_feeds_emission_data(
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
     )
-
     actual_data = em._parse_farmgrown_feeds_emission_data()
     assert actual_data == parsed_nitrous_oxide_emissions_data
     assert mock_om_filter_variables_pool.call_count == 2
+
+
+def test_parse_manure_and_fertilizer_application_data(
+        raw_fertilizer_application_data: dict[str, dict[str, list[Any]]],
+        raw_manure_application_data: dict[str, dict[str, list[Any]]],
+        parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, float]]],
+        em: EmissionsEstimator,
+        mocker: MockerFixture,
+) -> None:
+    mock_om_filter_variables_pool = mocker.patch.object(
+        em.om, "filter_variables_pool", side_effect=[raw_manure_application_data, raw_fertilizer_application_data]
+    )
+    actual_data = em._parse_manure_and_fertilizer_application_data(datetime.strptime("2012:1", "%Y:%j"))
+    assert actual_data == parsed_fertilizer_and_manure_application_data
+    assert mock_om_filter_variables_pool.call_count == 2
+
+
+def test_parse_crop_to_feed_id_mapping(
+        raw_received_crop_data: dict[str, dict[str, list[Any]]],
+        expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
+        em: EmissionsEstimator,
+        mocker: MockerFixture,
+) -> None:
+    mock_om_filter_variables_pool = mocker.patch.object(
+        em.om, "filter_variables_pool", return_value=raw_received_crop_data
+    )
+    actual_data = em._parse_crop_to_feed_id_mapping()
+    assert actual_data == expected_crop_to_feed_id_mapping
+    mock_om_filter_variables_pool.assert_called_once()
+
+
+def test_parse_harvest_data(
+        raw_harvest_data: dict[str, dict[str, list[Any]]],
+        expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
+        expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
+        em: EmissionsEstimator,
+        mocker: MockerFixture,
+) -> None:
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value=raw_harvest_data)
+    actual_data = em._parse_harvest_data(expected_crop_to_feed_id_mapping, datetime.strptime("2012:1", "%Y:%j"))
+    assert actual_data == expected_harvest_yield_data
+    mock_om_filter_variables_pool.assert_called_once()

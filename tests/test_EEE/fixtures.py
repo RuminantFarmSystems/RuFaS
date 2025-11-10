@@ -6,6 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.EEE.tractor_implement import TractorImplement
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.input_manager import InputManager
 
@@ -3370,7 +3371,7 @@ def mock_tractor(
         FieldOperationEvent.TILLING,
         tractor_size=tractor_size,
         tillage_implement=TillageImplement.DISK_HARROW,
-        application_depth=10
+        application_depth=10,
     )
 
 
@@ -3395,7 +3396,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 124,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 609.7560975609756,
@@ -3405,7 +3406,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 126,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 609.7560975609756,
@@ -3415,7 +3416,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2017,
             "operation_day": 126,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 458.66617938634926,
@@ -3425,7 +3426,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 124,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 609.7560975609756,
@@ -3435,7 +3436,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 126,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 609.7560975609756,
@@ -3445,7 +3446,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2017,
             "operation_day": 126,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION
+            "operation_event": FieldOperationEvent.FERTILIZER_APPLICATION,
         },
         {
             "mass": 16363.30748811621,
@@ -3456,7 +3457,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 124,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 36488.27689357436,
@@ -3467,7 +3468,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2014,
             "operation_day": 311,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 35658.921916153486,
@@ -3478,7 +3479,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2015,
             "operation_day": 311,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 34238.376646683995,
@@ -3489,7 +3490,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2016,
             "operation_day": 311,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 11939.038999999999,
@@ -3500,7 +3501,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 124,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 36488.27689134103,
@@ -3511,7 +3512,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2014,
             "operation_day": 311,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 35658.92191484071,
@@ -3522,7 +3523,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2015,
             "operation_day": 311,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "mass": 34238.37664567743,
@@ -3533,7 +3534,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2016,
             "operation_day": 311,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.MANURE_APPLICATION
+            "operation_event": FieldOperationEvent.MANURE_APPLICATION,
         },
         {
             "crop_type": "corn_silage",
@@ -3543,7 +3544,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 263,
             "field_name": "field_1",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3553,7 +3554,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3563,7 +3564,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3573,7 +3574,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3583,7 +3584,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3593,7 +3594,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3603,7 +3604,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3613,7 +3614,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3623,7 +3624,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3633,7 +3634,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3643,7 +3644,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3653,7 +3654,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3663,7 +3664,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3673,7 +3674,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3683,7 +3684,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_1",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "corn_silage",
@@ -3693,7 +3694,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 263,
             "field_name": "field_1",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3703,7 +3704,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3713,7 +3714,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3723,7 +3724,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3733,7 +3734,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3743,7 +3744,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3753,7 +3754,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3763,7 +3764,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3773,7 +3774,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -3783,7 +3784,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_1",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "corn_grain",
@@ -3793,7 +3794,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 298,
             "field_name": "field_2",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3803,7 +3804,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3813,7 +3814,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3823,7 +3824,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3833,7 +3834,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3843,7 +3844,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3853,7 +3854,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3863,7 +3864,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3873,7 +3874,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3883,7 +3884,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3893,7 +3894,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3903,7 +3904,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3913,7 +3914,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3923,7 +3924,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3933,7 +3934,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_2",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "corn_grain",
@@ -3943,7 +3944,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 298,
             "field_name": "field_2",
             "harvest_type": "harvest_kill",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3953,7 +3954,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3963,7 +3964,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3973,7 +3974,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3983,7 +3984,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -3993,7 +3994,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 120,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4003,7 +4004,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 150,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4013,7 +4014,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 179,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4023,7 +4024,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 210,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4033,7 +4034,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_day": 242,
             "field_name": "field_2",
             "harvest_type": "harvest_only",
-            "operation_event": FieldOperationEvent.HARVEST
+            "operation_event": FieldOperationEvent.HARVEST,
         },
         {
             "crop_type": "corn_silage",
@@ -4042,7 +4043,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 127,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -4051,7 +4052,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2014,
             "operation_day": 89,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "corn_silage",
@@ -4060,7 +4061,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2017,
             "operation_day": 127,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "alfalfa_silage",
@@ -4069,7 +4070,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2018,
             "operation_day": 89,
             "field_name": "field_1",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "corn_grain",
@@ -4078,7 +4079,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2013,
             "operation_day": 127,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4087,7 +4088,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2014,
             "operation_day": 89,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "corn_grain",
@@ -4096,7 +4097,7 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2017,
             "operation_day": 127,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.PLANTING
+            "operation_event": FieldOperationEvent.PLANTING,
         },
         {
             "crop_type": "alfalfa_hay",
@@ -4105,8 +4106,8 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
             "operation_year": 2018,
             "operation_day": 89,
             "field_name": "field_2",
-            "operation_event": FieldOperationEvent.PLANTING
-        }
+            "operation_event": FieldOperationEvent.PLANTING,
+        },
     ]
 
 
@@ -4114,235 +4115,47 @@ def parsed_diesel_consumption_inputs() -> list[dict[str, Any]]:
 def filtered_variable_pool() -> list[dict[str, Any]]:
     return [
         {
-            "Fertilizer Application_0.mass": {
-                "values": [
-                    786.1748576537939,
-                    609.7560975609756,
-                    609.7560975609756
-                ]
-            },
-            "Fertilizer Application_0.application_depth": {
-                "values": [
-                    30.0,
-                    0.0,
-                    0.0
-                ]
-            },
-            "Fertilizer Application_0.year": {
-                "values": [
-                    2013,
-                    2013,
-                    2017
-                ]
-            },
-            "Fertilizer Application_0.day": {
-                "values": [
-                    124,
-                    126,
-                    126
-                ]
-            },
-            "Fertilizer Application_0.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Fertilizer Application_0.field_name": {
-                "values": [
-                    "field_1",
-                    "field_1",
-                    "field_1"
-                ]
-            },
-            "Fertilizer Application_0.average_clay_percent": {
-                "values": [
-                    20.0,
-                    20.0,
-                    20.0
-                ]
-            },
-            "Fertilizer Application_1.mass": {
-                "values": [
-                    458.66617938634926,
-                    609.7560975609756,
-                    609.7560975609756
-                ]
-            },
-            "Fertilizer Application_1.application_depth": {
-                "values": [
-                    30.0,
-                    0.0,
-                    0.0
-                ]
-            },
-            "Fertilizer Application_1.year": {
-                "values": [
-                    2013,
-                    2013,
-                    2017
-                ]
-            },
-            "Fertilizer Application_1.day": {
-                "values": [
-                    124,
-                    126,
-                    126
-                ]
-            },
-            "Fertilizer Application_1.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Fertilizer Application_1.field_name": {
-                "values": [
-                    "field_2",
-                    "field_2",
-                    "field_2"
-                ]
-            },
-            "Fertilizer Application_1.average_clay_percent": {
-                "values": [
-                    21.308,
-                    21.308,
-                    21.308
-                ]
-            }
+            "Fertilizer Application_0.mass": {"values": [786.1748576537939, 609.7560975609756, 609.7560975609756]},
+            "Fertilizer Application_0.application_depth": {"values": [30.0, 0.0, 0.0]},
+            "Fertilizer Application_0.year": {"values": [2013, 2013, 2017]},
+            "Fertilizer Application_0.day": {"values": [124, 126, 126]},
+            "Fertilizer Application_0.field_size": {"values": [10.0, 10.0, 10.0]},
+            "Fertilizer Application_0.field_name": {"values": ["field_1", "field_1", "field_1"]},
+            "Fertilizer Application_0.average_clay_percent": {"values": [20.0, 20.0, 20.0]},
+            "Fertilizer Application_1.mass": {"values": [458.66617938634926, 609.7560975609756, 609.7560975609756]},
+            "Fertilizer Application_1.application_depth": {"values": [30.0, 0.0, 0.0]},
+            "Fertilizer Application_1.year": {"values": [2013, 2013, 2017]},
+            "Fertilizer Application_1.day": {"values": [124, 126, 126]},
+            "Fertilizer Application_1.field_size": {"values": [10.0, 10.0, 10.0]},
+            "Fertilizer Application_1.field_name": {"values": ["field_2", "field_2", "field_2"]},
+            "Fertilizer Application_1.average_clay_percent": {"values": [21.308, 21.308, 21.308]},
         },
         {},
         {
             "Manure Application_0.dry_matter_mass": {
-                "values": [
-                    16363.30748811621,
-                    36488.27689357436,
-                    35658.921916153486,
-                    34238.376646683995
-                ]
+                "values": [16363.30748811621, 36488.27689357436, 35658.921916153486, 34238.376646683995]
             },
             "Manure Application_0.dry_matter_fraction": {
-                "values": [
-                    0.06866050590590597,
-                    0.15693508905181594,
-                    0.14562829648184375,
-                    0.14300734780409236
-                ]
+                "values": [0.06866050590590597, 0.15693508905181594, 0.14562829648184375, 0.14300734780409236]
             },
-            "Manure Application_0.application_depth": {
-                "values": [
-                    30.0,
-                    30.0,
-                    30.0,
-                    30.0
-                ]
-            },
-            "Manure Application_0.day": {
-                "values": [
-                    124,
-                    311,
-                    311,
-                    311
-                ]
-            },
-            "Manure Application_0.year": {
-                "values": [
-                    2013,
-                    2014,
-                    2015,
-                    2016
-                ]
-            },
-            "Manure Application_0.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Manure Application_0.field_name": {
-                "values": [
-                    "field_1",
-                    "field_1",
-                    "field_1",
-                    "field_1"
-                ]
-            },
-            "Manure Application_0.average_clay_percent": {
-                "values": [
-                    20.0,
-                    20.0,
-                    20.0,
-                    20.0
-                ]
-            },
+            "Manure Application_0.application_depth": {"values": [30.0, 30.0, 30.0, 30.0]},
+            "Manure Application_0.day": {"values": [124, 311, 311, 311]},
+            "Manure Application_0.year": {"values": [2013, 2014, 2015, 2016]},
+            "Manure Application_0.field_size": {"values": [10.0, 10.0, 10.0, 10.0]},
+            "Manure Application_0.field_name": {"values": ["field_1", "field_1", "field_1", "field_1"]},
+            "Manure Application_0.average_clay_percent": {"values": [20.0, 20.0, 20.0, 20.0]},
             "Manure Application_1.dry_matter_mass": {
-                "values": [
-                    11939.038999999999,
-                    36488.27689134103,
-                    35658.92191484071,
-                    34238.37664567743
-                ]
+                "values": [11939.038999999999, 36488.27689134103, 35658.92191484071, 34238.37664567743]
             },
             "Manure Application_1.dry_matter_fraction": {
-                "values": [
-                    0.04600027600165601,
-                    0.15693508904228323,
-                    0.14562829647689898,
-                    0.14300734780136215
-                ]
+                "values": [0.04600027600165601, 0.15693508904228323, 0.14562829647689898, 0.14300734780136215]
             },
-            "Manure Application_1.application_depth": {
-                "values": [
-                    30.0,
-                    30.0,
-                    30.0,
-                    30.0
-                ]
-            },
-            "Manure Application_1.day": {
-                "values": [
-                    124,
-                    311,
-                    311,
-                    311
-                ]
-            },
-            "Manure Application_1.year": {
-                "values": [
-                    2013,
-                    2014,
-                    2015,
-                    2016
-                ]
-            },
-            "Manure Application_1.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Manure Application_1.field_name": {
-                "values": [
-                    "field_2",
-                    "field_2",
-                    "field_2",
-                    "field_2"
-                ]
-            },
-            "Manure Application_1.average_clay_percent": {
-                "values": [
-                    21.308,
-                    21.308,
-                    21.308,
-                    21.308
-                ]
-            }
+            "Manure Application_1.application_depth": {"values": [30.0, 30.0, 30.0, 30.0]},
+            "Manure Application_1.day": {"values": [124, 311, 311, 311]},
+            "Manure Application_1.year": {"values": [2013, 2014, 2015, 2016]},
+            "Manure Application_1.field_size": {"values": [10.0, 10.0, 10.0, 10.0]},
+            "Manure Application_1.field_name": {"values": ["field_2", "field_2", "field_2", "field_2"]},
+            "Manure Application_1.average_clay_percent": {"values": [21.308, 21.308, 21.308, 21.308]},
         },
         {
             "Harvest_0.crop": {
@@ -4371,7 +4184,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "alfalfa_silage",
                     "alfalfa_silage",
                     "alfalfa_silage",
-                    "alfalfa_silage"
+                    "alfalfa_silage",
                 ]
             },
             "Harvest_0.harvest_type": {
@@ -4400,7 +4213,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "harvest_only",
                     "harvest_only",
                     "harvest_only",
-                    "harvest_only"
+                    "harvest_only",
                 ]
             },
             "Harvest_0.dry_yield": {
@@ -4429,7 +4242,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     2068.511390513816,
                     2822.444226111104,
                     2281.7139980325255,
-                    2107.9674363374415
+                    2107.9674363374415,
                 ]
             },
             "Harvest_0.harvest_year": {
@@ -4458,7 +4271,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     2019,
                     2019,
                     2019,
-                    2019
+                    2019,
                 ]
             },
             "Harvest_0.harvest_day": {
@@ -4487,7 +4300,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     150,
                     179,
                     210,
-                    242
+                    242,
                 ]
             },
             "Harvest_0.field_size": {
@@ -4516,7 +4329,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     10.0,
                     10.0,
                     10.0,
-                    10.0
+                    10.0,
                 ]
             },
             "Harvest_0.field_name": {
@@ -4545,7 +4358,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "field_1",
                     "field_1",
                     "field_1",
-                    "field_1"
+                    "field_1",
                 ]
             },
             "Harvest_1.crop": {
@@ -4574,7 +4387,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "alfalfa_hay",
                     "alfalfa_hay",
                     "alfalfa_hay",
-                    "alfalfa_hay"
+                    "alfalfa_hay",
                 ]
             },
             "Harvest_1.harvest_type": {
@@ -4603,7 +4416,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "harvest_only",
                     "harvest_only",
                     "harvest_only",
-                    "harvest_only"
+                    "harvest_only",
                 ]
             },
             "Harvest_1.dry_yield": {
@@ -4632,7 +4445,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     2382.4000789402176,
                     2955.8272482811276,
                     2330.3303056522077,
-                    2211.3538812625884
+                    2211.3538812625884,
                 ]
             },
             "Harvest_1.harvest_year": {
@@ -4661,7 +4474,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     2019,
                     2019,
                     2019,
-                    2019
+                    2019,
                 ]
             },
             "Harvest_1.harvest_day": {
@@ -4690,7 +4503,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     150,
                     179,
                     210,
-                    242
+                    242,
                 ]
             },
             "Harvest_1.field_size": {
@@ -4719,7 +4532,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     10.0,
                     10.0,
                     10.0,
-                    10.0
+                    10.0,
                 ]
             },
             "Harvest_1.field_name": {
@@ -4748,111 +4561,1447 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
                     "field_2",
                     "field_2",
                     "field_2",
-                    "field_2"
+                    "field_2",
                 ]
-            }
+            },
         },
         {
-            "Planting_0.crop": {
-                "values": [
-                    "corn_silage",
-                    "alfalfa_silage",
-                    "corn_silage",
-                    "alfalfa_silage"
-                ]
-            },
-            "Planting_0.year": {
-                "values": [
-                    2013,
-                    2014,
-                    2017,
-                    2018
-                ]
-            },
-            "Planting_0.day": {
-                "values": [
-                    127,
-                    89,
-                    127,
-                    89
-                ]
-            },
-            "Planting_0.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Planting_0.average_clay_percent": {
-                "values": [
-                    20.0,
-                    20.0,
-                    20.0,
-                    20.0
-                ]
-            },
-            "Planting_0.field_name": {
-                "values": [
-                    "field_1",
-                    "field_1",
-                    "field_1",
-                    "field_1"
-                ]
-            },
-            "Planting_1.crop": {
-                "values": [
-                    "corn_grain",
-                    "alfalfa_hay",
-                    "corn_grain",
-                    "alfalfa_hay"
-                ]
-            },
-            "Planting_1.year": {
-                "values": [
-                    2013,
-                    2014,
-                    2017,
-                    2018
-                ]
-            },
-            "Planting_1.day": {
-                "values": [
-                    127,
-                    89,
-                    127,
-                    89
-                ]
-            },
-            "Planting_1.field_size": {
-                "values": [
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0
-                ]
-            },
-            "Planting_1.average_clay_percent": {
-                "values": [
-                    21.308,
-                    21.308,
-                    21.308,
-                    21.308
-                ]
-            },
-            "Planting_1.field_name": {
-                "values": [
-                    "field_2",
-                    "field_2",
-                    "field_2",
-                    "field_2"
-                ]
-            }
-        }
+            "Planting_0.crop": {"values": ["corn_silage", "alfalfa_silage", "corn_silage", "alfalfa_silage"]},
+            "Planting_0.year": {"values": [2013, 2014, 2017, 2018]},
+            "Planting_0.day": {"values": [127, 89, 127, 89]},
+            "Planting_0.field_size": {"values": [10.0, 10.0, 10.0, 10.0]},
+            "Planting_0.average_clay_percent": {"values": [20.0, 20.0, 20.0, 20.0]},
+            "Planting_0.field_name": {"values": ["field_1", "field_1", "field_1", "field_1"]},
+            "Planting_1.crop": {"values": ["corn_grain", "alfalfa_hay", "corn_grain", "alfalfa_hay"]},
+            "Planting_1.year": {"values": [2013, 2014, 2017, 2018]},
+            "Planting_1.day": {"values": [127, 89, 127, 89]},
+            "Planting_1.field_size": {"values": [10.0, 10.0, 10.0, 10.0]},
+            "Planting_1.average_clay_percent": {"values": [21.308, 21.308, 21.308, 21.308]},
+            "Planting_1.field_name": {"values": ["field_2", "field_2", "field_2", "field_2"]},
+        },
     ]
 
 
-@pytest.fixture(autouse=True)
-def raw_nitrous_oxide_emissions_data() -> dict[str, dict[str, Any]]:
-    return {}
+@pytest.fixture
+def raw_nitrous_oxide_emissions_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_1',layer='0'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                7.040903906329182e-06,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_1',layer='1'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                5.1372241206188644e-05,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_1',layer='2'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.00013685485980244856,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_1',layer='3'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.0002154027323813366,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_2',layer='0'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.0002649652476713119,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_2',layer='1'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.003488991743083086,
+                0.004117731787965842,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_2',layer='2'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.0,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_2',layer='3'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                5.600424745345135e-05,
+                0.0,
+                0.0,
+            ],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_2',layer='4'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["Denitrification", "denitrify"],
+                },
+            ],
+            "values": [
+                0.0015048112490548685,
+                0.002008674846664519,
+                0.0020535431716768022,
+            ],
+        },
+    }
+
+
+@pytest.fixture
+def raw_ammonia_emissions_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='0'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='0'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.016728084539383643, 0.013371297926216759, 0.0010679151427994864],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='1'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='1'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.012502826920416718, 0.010488441604891935, 0.0016554953370997525],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='2'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='2'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [6.358851510541607e-06, 5.372908293527906e-06, 1.4698694467805671e-06],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='3'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_1',layer='3'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [1.0121070648223322e-11, 8.347875804542645e-12, 3.849981582505157e-12],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='0'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='0'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.016929310496203765, 0.013541362698449385, 0.0010659711452158404],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='1'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='1'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.0022903451386019377, 0.0019205155329878824, 0.00038740713529979723],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='2'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='2'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [3.2110602483417915e-10, 2.648279957508658e-10, 1.1113673982273009e-10],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='3'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='3'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.0, 0.0, 0.0],
+        },
+        "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='4'": {
+            "info_maps": [
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 0,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 1,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+                {
+                    "suffix": "field='field_2',layer='4'",
+                    "simulation_day": 2,
+                    "units": "kg/ha",
+                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
+                },
+            ],
+            "values": [0.0, 0.0, 0.0],
+        },
+    }
+
+
+@pytest.fixture
+def parsed_nitrous_oxide_emissions_data() -> dict[str, dict[str, dict[int, float]]]:
+    return {
+        "nitrous_oxide_emissions": {
+            "field_1": {0: 0.000410670737296303, 1: 0.0, 2: 0.0},
+            "field_2": {0: 0.005314772487262718, 1: 0.006126406634630361, 2: 0.0020535431716768022},
+        },
+        "ammonia_emissions": {
+            "field_1": {0: 0.029237270321431974, 1: 0.023865112447750098, 2: 0.002724880353196001},
+            "field_2": {0: 0.019219655955911727, 1: 0.015461878496265263, 2: 0.0014533783916523774},
+        },
+    }
+
+
+@pytest.fixture
+def raw_fertilizer_application_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "nitrogen": {
+            "values": [
+                52.871123969561054,
+                499.99999999999994,
+                499.99999999999994,
+                30.84580509652931,
+                499.99999999999994,
+                499.99999999999994,
+            ],
+        },
+        "phosphorus": {
+            "values": [88.11840892012549, 0.0, 0.0, 51.40959871651896, 0.0, 0.0],
+        },
+        "potassium": {
+            "values": [176.23681784025098, 0.0, 0.0, 102.81919743303791, 0.0, 0.0],
+        },
+        "year": {
+            "values": [2013, 2013, 2017, 2013, 2013, 2017],
+        },
+        "day": {
+            "values": [124, 126, 126, 124, 126, 126],
+        },
+        "field_name": {
+            "values": ["field_1", "field_1", "field_1", "field_2", "field_2", "field_2"],
+        },
+    }
+
+
+@pytest.fixture
+def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "nitrogen": {
+            "values": [571.0, 857.0, 857.0, 857.0, 571.0, 857.0, 857.0, 857.0],
+        },
+        "day": {
+            "values": [124, 311, 311, 311, 124, 311, 311, 311],
+        },
+        "year": {
+            "values": [2013, 2014, 2015, 2016, 2013, 2014, 2015, 2016],
+        },
+        "field_name": {
+            "values": ["field_1", "field_1", "field_1", "field_1", "field_2", "field_2", "field_2", "field_2"],
+        },
+    }
+
+
+@pytest.fixture
+def parsed_fertilizer_and_manure_application_data() -> dict[str, dict[str, dict[int, dict[str, float]]]]:
+    return {
+        "manure_applications": {
+            "field_1": {
+                489: {"nitrogen": 571.0},
+                1041: {"nitrogen": 857.0},
+                1406: {"nitrogen": 857.0},
+                1771: {"nitrogen": 857.0},
+            },
+            "field_2": {
+                489: {"nitrogen": 571.0},
+                1041: {"nitrogen": 857.0},
+                1406: {"nitrogen": 857.0},
+                1771: {"nitrogen": 857.0},
+            },
+        },
+        "fertilizer_applications": {
+            "field_1": {
+                489: {"nitrogen": 52.871123969561054, "phosphorus": 88.11840892012549, "potassium": 176.23681784025098},
+                491: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                1952: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+            },
+            "field_2": {
+                489: {"nitrogen": 30.84580509652931, "phosphorus": 51.40959871651896, "potassium": 102.81919743303791},
+                491: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                1952: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+            },
+        },
+    }
+
+
+@pytest.fixture
+def raw_received_crop_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "field_name": {
+            "values": [
+                "field_1",
+                "field_1",
+                "field_2",
+                "field_2",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+            ],
+        },
+        "crop_name": {
+            "values": [
+                "corn_silage",
+                "corn_silage",
+                "corn_grain",
+                "corn_grain",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+            ],
+        },
+        "feed_id": {
+            "values": [
+                51,
+                51,
+                44,
+                44,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                110,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+                108,
+            ],
+        },
+    }
+
+
+@pytest.fixture
+def expected_crop_to_feed_id_mapping() -> dict[tuple[str, str], RUFAS_ID]:
+    return {
+        ("field_1", "corn_silage"): 51,
+        ("field_2", "corn_grain"): 44,
+        ("field_1", "alfalfa_silage"): 110,
+        ("field_2", "alfalfa_hay"): 108,
+    }
+
+
+@pytest.fixture
+def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
+    return {
+        "crop": {
+            "values": [
+                "corn_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "corn_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "alfalfa_silage",
+                "corn_grain",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "corn_grain",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay",
+                "alfalfa_hay"
+            ]
+        },
+        "harvest_type": {
+            "values": [
+                "harvest_kill",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_kill",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only",
+                "harvest_only"
+            ]
+        },
+        "dry_yield": {
+            "values": [
+                12958.851795252069,
+                2302.807712970885,
+                3101.0788300377967,
+                3234.487471643309,
+                3125.8532063690864,
+                2634.7324364973647,
+                3256.9502949820544,
+                3691.1379316225716,
+                3634.679440085259,
+                3142.870565390124,
+                2428.179792045325,
+                3255.7066541436616,
+                3402.1964577747176,
+                3260.964927108421,
+                2844.369686506972,
+                15089.329513000643,
+                2543.5650211475263,
+                2760.7355500562817,
+                2729.064015239216,
+                2386.1999998533574,
+                1848.8457629511342,
+                2068.511390513816,
+                2822.444226111104,
+                2281.7139980325255,
+                2107.9674363374415,
+                10202.238523552687,
+                1953.2691077836596,
+                2879.148563971437,
+                2925.6916183957055,
+                2905.9679829564298,
+                2473.692091653217,
+                2990.0590699449444,
+                3231.05366286083,
+                3355.716621393541,
+                2746.7773592132107,
+                2222.87229921061,
+                3007.1744918411423,
+                3238.223522929097,
+                2958.6259596832942,
+                2638.641203219705,
+                11538.698999892364,
+                2373.59068890197,
+                2758.3351876020824,
+                2277.6158543731062,
+                2452.217533699692,
+                2125.7499344328567,
+                2382.4000789402176,
+                2955.8272482811276,
+                2330.3303056522077,
+                2211.3538812625884
+            ]
+        },
+        "harvest_year": {
+            "values": [
+                2013,
+                2014,
+                2014,
+                2014,
+                2014,
+                2015,
+                2015,
+                2015,
+                2015,
+                2015,
+                2016,
+                2016,
+                2016,
+                2016,
+                2016,
+                2017,
+                2018,
+                2018,
+                2018,
+                2018,
+                2019,
+                2019,
+                2019,
+                2019,
+                2019,
+                2013,
+                2014,
+                2014,
+                2014,
+                2014,
+                2015,
+                2015,
+                2015,
+                2015,
+                2015,
+                2016,
+                2016,
+                2016,
+                2016,
+                2016,
+                2017,
+                2018,
+                2018,
+                2018,
+                2018,
+                2019,
+                2019,
+                2019,
+                2019,
+                2019
+            ]
+        },
+        "harvest_day": {
+            "values": [
+                263,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242,
+                263,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242,
+                298,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242,
+                298,
+                150,
+                179,
+                210,
+                242,
+                120,
+                150,
+                179,
+                210,
+                242
+            ]
+        },
+        "field_name": {
+            "values": [
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_1",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2",
+                "field_2"
+            ]
+        }
+    }
+
+
+@pytest.fixture
+def expected_harvest_yield_data() -> dict[str, dict[int, dict[str, int | str | float]]]:
+    return {
+    "field_1": {
+        628: {
+            "field_name": "field_1",
+            "crop": "corn_silage",
+            "feed_id": 51,
+            "dry_yield": 12958.851795252069,
+            "harvest_type": "harvest_kill"
+        },
+        880: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2302.807712970885,
+            "harvest_type": "harvest_only"
+        },
+        909: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3101.0788300377967,
+            "harvest_type": "harvest_only"
+        },
+        940: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3234.487471643309,
+            "harvest_type": "harvest_only"
+        },
+        972: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3125.8532063690864,
+            "harvest_type": "harvest_only"
+        },
+        1215: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2634.7324364973647,
+            "harvest_type": "harvest_only"
+        },
+        1245: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3256.9502949820544,
+            "harvest_type": "harvest_only"
+        },
+        1274: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3691.1379316225716,
+            "harvest_type": "harvest_only"
+        },
+        1305: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3634.679440085259,
+            "harvest_type": "harvest_only"
+        },
+        1337: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3142.870565390124,
+            "harvest_type": "harvest_only"
+        },
+        1580: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2428.179792045325,
+            "harvest_type": "harvest_only"
+        },
+        1610: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3255.7066541436616,
+            "harvest_type": "harvest_only"
+        },
+        1639: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3402.1964577747176,
+            "harvest_type": "harvest_only"
+        },
+        1670: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 3260.964927108421,
+            "harvest_type": "harvest_only"
+        },
+        1702: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2844.369686506972,
+            "harvest_type": "harvest_kill"
+        },
+        2089: {
+            "field_name": "field_1",
+            "crop": "corn_silage",
+            "feed_id": 51,
+            "dry_yield": 15089.329513000643,
+            "harvest_type": "harvest_kill"
+        },
+        2341: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2543.5650211475263,
+            "harvest_type": "harvest_only"
+        },
+        2370: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2760.7355500562817,
+            "harvest_type": "harvest_only"
+        },
+        2401: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2729.064015239216,
+            "harvest_type": "harvest_only"
+        },
+        2433: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2386.1999998533574,
+            "harvest_type": "harvest_only"
+        },
+        2676: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 1848.8457629511342,
+            "harvest_type": "harvest_only"
+        },
+        2706: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2068.511390513816,
+            "harvest_type": "harvest_only"
+        },
+        2735: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2822.444226111104,
+            "harvest_type": "harvest_only"
+        },
+        2766: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2281.7139980325255,
+            "harvest_type": "harvest_only"
+        },
+        2798: {
+            "field_name": "field_1",
+            "crop": "alfalfa_silage",
+            "feed_id": 110,
+            "dry_yield": 2107.9674363374415,
+            "harvest_type": "harvest_only"
+        }
+    },
+    "field_2": {
+        663: {
+            "field_name": "field_2",
+            "crop": "corn_grain",
+            "feed_id": 44,
+            "dry_yield": 10202.238523552687,
+            "harvest_type": "harvest_kill"
+        },
+        880: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 1953.2691077836596,
+            "harvest_type": "harvest_only"
+        },
+        909: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2879.148563971437,
+            "harvest_type": "harvest_only"
+        },
+        940: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2925.6916183957055,
+            "harvest_type": "harvest_only"
+        },
+        972: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2905.9679829564298,
+            "harvest_type": "harvest_only"
+        },
+        1215: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2473.692091653217,
+            "harvest_type": "harvest_only"
+        },
+        1245: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2990.0590699449444,
+            "harvest_type": "harvest_only"
+        },
+        1274: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 3231.05366286083,
+            "harvest_type": "harvest_only"
+        },
+        1305: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 3355.716621393541,
+            "harvest_type": "harvest_only"
+        },
+        1337: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2746.7773592132107,
+            "harvest_type": "harvest_only"
+        },
+        1580: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2222.87229921061,
+            "harvest_type": "harvest_only"
+        },
+        1610: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 3007.1744918411423,
+            "harvest_type": "harvest_only"
+        },
+        1639: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 3238.223522929097,
+            "harvest_type": "harvest_only"
+        },
+        1670: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2958.6259596832942,
+            "harvest_type": "harvest_only"
+        },
+        1702: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2638.641203219705,
+            "harvest_type": "harvest_kill"
+        },
+        2124: {
+            "field_name": "field_2",
+            "crop": "corn_grain",
+            "feed_id": 44,
+            "dry_yield": 11538.698999892364,
+            "harvest_type": "harvest_kill"
+        },
+        2341: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2373.59068890197,
+            "harvest_type": "harvest_only"
+        },
+        2370: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2758.3351876020824,
+            "harvest_type": "harvest_only"
+        },
+        2401: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2277.6158543731062,
+            "harvest_type": "harvest_only"
+        },
+        2433: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2452.217533699692,
+            "harvest_type": "harvest_only"
+        },
+        2676: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2125.7499344328567,
+            "harvest_type": "harvest_only"
+        },
+        2706: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2382.4000789402176,
+            "harvest_type": "harvest_only"
+        },
+        2735: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2955.8272482811276,
+            "harvest_type": "harvest_only"
+        },
+        2766: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2330.3303056522077,
+            "harvest_type": "harvest_only"
+        },
+        2798: {
+            "field_name": "field_2",
+            "crop": "alfalfa_hay",
+            "feed_id": 108,
+            "dry_yield": 2211.3538812625884,
+            "harvest_type": "harvest_only"
+        }
+    }
+}
