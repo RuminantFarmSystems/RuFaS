@@ -293,7 +293,7 @@ class MilkProduction:
         if 305 > days_in_milk > 0 and milking_history is not None:
             production_history_sum = sum(history["milk_production"] for history in milking_history[:days_in_milk])
 
-        result, _  = quad(
+        result, _ = quad(
             MilkProduction.calculate_daily_milk_production, days_in_milk + 1, 305, args=(l_param, m_param, n_param))
 
         return result + production_history_sum
