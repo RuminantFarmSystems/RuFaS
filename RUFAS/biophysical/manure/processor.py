@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 
@@ -296,7 +297,9 @@ class Processor(ABC):
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
 
     @staticmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+    def _determine_outdoor_storage_temperature(current_day_condition: CurrentDayConditions,
+                                               day_number: int,
+                                               year_end_day: int) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
@@ -323,7 +326,10 @@ class Processor(ABC):
         liquid manure temperature is assumed to be equal to ambient air temperature.
 
         """
-        return float(clip(air_temperature, 0.0, 35.0))
+        amplitude = (current_day_condition.max_mean_temperature - current_day_condition.min_mean_temperature) * 0.6 / 2
+        manure_amplitude = amplitude * 0.5
+        return current_day_condition.mean_air_temperature + manure_amplitude * math.cos(
+            ((2 * math.pi) / year_end_day) * (day_number - 220))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:

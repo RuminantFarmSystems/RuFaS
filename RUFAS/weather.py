@@ -52,6 +52,9 @@ class Weather:
         start_time = time.start_date
         end_time = time.end_date
 
+        max_mean_temperature = max(weather_file["avg"])
+        min_mean_temperature = min(weather_file["avg"])
+
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
@@ -66,6 +69,8 @@ class Weather:
                     max_air_temperature=weather_file["high"][i],
                     precipitation=weather_file["precip"][i],
                     irrigation=weather_file["irrigation"][i],
+                    max_mean_temperature=max_mean_temperature,
+                    min_mean_temperature=min_mean_temperature
                 )
                 if date_key in self.weather_data.keys():
                     info_map = {
