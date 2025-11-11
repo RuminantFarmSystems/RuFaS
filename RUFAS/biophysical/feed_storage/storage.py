@@ -396,7 +396,7 @@ class Storage:
             "crop_received",
             values,
             info_map,
-        ),
+        )
 
     def _record_stored_crops(self, simulation_day: int) -> None:
         """

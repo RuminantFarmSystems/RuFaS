@@ -341,8 +341,8 @@ class EmissionsEstimator:
 
     def _parse_harvest_data(
         self, crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID], simulation_start_date: datetime
-    ) -> dict[str, dict[int, dict[str, int | str | float]]]:
-        result: dict[str, dict[int, dict[str, int | str | float]]] = defaultdict(dict)
+    ) -> dict[str, dict[int, dict[str, Any]]]:
+        result: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
         filtered_data = self.om.filter_variables_pool(harvest_filter)
@@ -372,7 +372,7 @@ class EmissionsEstimator:
         self,
         emission_data: dict[str, dict[str, dict[int, float]]],
         resource_data: dict[str, dict[str, dict[int, dict[str, float]]]],
-        harvest_yield_by_field: dict[str, dict[int, dict[str, int | str | float]]],
+        harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]],
         all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
         """Calculates daily emissions and resources used for farmgrown feeds."""

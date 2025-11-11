@@ -163,7 +163,7 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
         "emissions": [{"50": 0.1, "51": 0.2, "52": 0.3}],
     }
 
-    def get_data_side_effect(key: str):
+    def get_data_side_effect(key: str) -> Any:
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
@@ -402,7 +402,7 @@ def test_parse_farmgrown_feeds_emission_data(
 def test_parse_manure_and_fertilizer_application_data(
     raw_fertilizer_application_data: dict[str, dict[str, list[Any]]],
     raw_manure_application_data: dict[str, dict[str, list[Any]]],
-    parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, float]]],
+    parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, dict[str, float]]]],
     em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
