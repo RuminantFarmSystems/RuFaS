@@ -116,16 +116,14 @@ class InputManager:
                     if eager_termination:
                         break
         if len(failing_cross_validation_blocks) > 0:
-            self.data_validator.event_logs.append(
+            self.om.add_error(
+                "Cross Validation Failure",
+                "One or more cross-validation rules failed: "
+                f"{', '.join(failing_cross_validation_blocks)}",
                 {
-                    "error": "Cross Validation Failure",
-                    "message": "One or more cross-validation rules failed: "
-                    f"{', '.join(failing_cross_validation_blocks)}",
-                    "info_map": {
-                        "class": self.__class__.__name__,
-                        "function": self.start_data_processing.__name__,
-                    },
-                }
+                    "class": self.__class__.__name__,
+                    "function": self.start_data_processing.__name__,
+                },
             )
             is_input_data_valid = False
         self.om.route_logs(self.data_validator.event_logs)

@@ -1659,7 +1659,7 @@ class CrossValidator:
         Parameters
         ----------
         target_and_save_result : dict[str, Any]
-            A dictionary containing the target and save result to be validated.
+            A dictionary containing the target and save result retrieved from IM to be validated.
         cross_validation_block : dict[str, Any]
             A dictionary containing the cross-validation rules to be applied.
         eager_termination : bool

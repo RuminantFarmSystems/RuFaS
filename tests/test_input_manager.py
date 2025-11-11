@@ -282,6 +282,7 @@ def test_start_data_processing(
     mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
 
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
     mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={"dummy": True})
 
@@ -328,16 +329,15 @@ def test_start_data_processing(
         assert isinstance(target_and_save_result, dict)
 
     if expected_fail_blocks:
-        assert any(
-            log.get("error") == "Cross Validation Failure"
-            and all(name in log.get("message", "") for name in expected_fail_blocks)
-            and log.get("info_map", {}).get("class") == mock_input_manager.__class__.__name__
-            and log.get("info_map", {}).get("function") == mock_input_manager.start_data_processing.__name__
-            for log in mock_input_manager.data_validator.event_logs
-        ), "Expected a CV failure event log summarizing failing blocks."
+        add_error.assert_called_once()
+        err, msg, info = add_error.call_args.args
+        assert err == "Cross Validation Failure"
+        for name in expected_fail_blocks:
+            assert name in msg
+        assert info.get("class") == mock_input_manager.__class__.__name__
+        assert info.get("function") == mock_input_manager.start_data_processing.__name__
     else:
-        assert not any(log.get("error") == "Cross Validation Failure" for log
-                       in mock_input_manager.data_validator.event_logs)
+        add_error.assert_not_called()
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 

@@ -1996,7 +1996,7 @@ def test_extract_input_data_by_key_list_key_error(
 
 @pytest.fixture
 def cv(mocker: MockerFixture) -> CrossValidator:
-    # Bypass __init__ in case it has required args
+    """Fixture to create a CrossValidator with mocked methods."""
     cv = CrossValidator.__new__(CrossValidator)
     mocker.patch.object(cv, "_target_and_save")
     mocker.patch.object(cv, "_evaluate_condition_clause_array")
