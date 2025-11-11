@@ -203,3 +203,9 @@ class ManureConstants:
 
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
     """The default mole fraction of oxygen in the air within the decomposing material layer."""
+
+    MINIMUM_ANAEROBIC_LAGOON_TEMPERATURE: float = 5.0
+    """The lower bound of manure temperature for anaerobic lagoon (°C)."""
+
+    ANAEROBIC_LAGOON_MANURE_RETENTION: float = 0.25
+    """The manure retention proportion in the anaerobic lagoon (fraction)."""

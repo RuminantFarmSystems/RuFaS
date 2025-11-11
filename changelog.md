@@ -264,6 +264,7 @@ v0.9.2
 - [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] [InputChange][OutputChange] Implements the Energy submodule of the EEE module with diesel consumption calculation.
 - [2629](https://github.com/RuminantFarmSystems/MASM/pull/2629) - [minor change] [NoInputChange][NoOutputChange][Units][Reporting] Updates a couple units mappings that were incorrect/misspelled.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
+- [2638](https://github.com/RuminantFarmSystems/MASM/pull/2638) - [minor change] [NoInputChange][OutputChange] Institutes 5C minimum temp bound and 25% manure retention for anlag.
 
 ### v0.9.2
 
