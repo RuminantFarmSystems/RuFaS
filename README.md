@@ -39,15 +39,22 @@ RuFaS is grounded in peer-reviewed science and collaborative development. It is 
 
 ### 🚀 Getting Started
 
-1. **Read through the introductory material** on our GitHub Pages site: https://ruminantfarmsystems.github.io/RuFaS/
-2.  **Fork the repository** and create a feature branch following the [branching strategy in RuFaS](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Branching-Strategy-in-RuFaS.html) and [RuFaS GitHub Actions](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) 
-3. **Open an issue** to discuss your idea or bug report.
-4. **Submit a pull request** with a clear description of your changes.
-5. **Tag relevant maintainers** for review.
-
-> Please follow the guidance in [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1)
-
-> For prerequisites and testing read the [PREREQUISITES](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) and [End-to-End Testing](https://ruminantfarmsystems.github.io/RuFaS/_wiki/End%E2%80%90to%E2%80%90End-Testing.html) files.
+1. **Install Python 3.12 or 3.13** - Make sure you have one of these versions installed on your system.
+2. **Set up a virtual environment**
+```bash
+python -m venv venv
+source venv/bin/activate on Mac/Linux or venv\Scripts\activate on Windows
+```
+3. **Install dependencies**
+```bash
+pip install .
+```
+4. **Enable output display** - Navigate to `output/output_filters/` and rename `_csv_all_variables.txt` → `csv_all_variables.txt` (remove the leading underscore).
+5. **Run RuFaS**
+```bash
+python main.py
+```
+6. **Learn more** if you have further questions read through the documentation on our [GitHub Pages site](https://ruminantfarmsystems.github.io/RuFaS/)
 
 ---
 
@@ -63,6 +70,8 @@ RuFaS welcomes coding and noncoding contributions from individuals demonstrating
 - 📣  Promote RuFaS within your networks
 
 > Please see the [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) code of conduct and [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1) for full details.
+
+> For prerequisites and testing read the [PREREQUISITES](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) and [End-to-End Testing](https://ruminantfarmsystems.github.io/RuFaS/_wiki/End%E2%80%90to%E2%80%90End-Testing.html) files.
 
 ---
 
