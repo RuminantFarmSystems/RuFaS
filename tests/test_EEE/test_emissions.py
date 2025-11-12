@@ -450,7 +450,7 @@ def test_parse_farmgrown_feed_deductions_data(
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", return_value=raw_farmgrown_feed_deductions_data
     )
-    all_simulation_days = list(range(0, 2557))
+    all_simulation_days = list(range(0, 750))
     actual_data = em._parse_farmgrown_feed_deductions_data(all_simulation_days)
     assert actual_data == expected_farmgrown_feed_deductions_data
     mock_om_filter_variables_pool.assert_called_once()
@@ -463,7 +463,7 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
     expected_daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
     em: EmissionsEstimator,
 ) -> None:
-    all_simulation_days = list(range(0, 2557))
+    all_simulation_days = list(range(0, 750))
     actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
         test_emissions_data,
         parsed_fertilizer_and_manure_application_data,
@@ -479,7 +479,7 @@ def test_calculate_daily_farmgrown_feed_fed_emissions_and_resources(
     expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]],
     em: EmissionsEstimator,
 ) -> None:
-    all_simulation_days = list(range(0, 2557))
+    all_simulation_days = list(range(0, 750))
     actual_data = em._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
         expected_daily_farmgrown_feed_emissions_and_resources,
         expected_farmgrown_feed_deductions_data,

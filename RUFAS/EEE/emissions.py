@@ -401,7 +401,7 @@ class EmissionsEstimator:
 
         for field_name in harvest_yield_by_field:
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
-            last_harvest_date = 0
+            last_harvest_date = -1
             for harvest_date in harvest_dates:
                 feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
                 if feed_id is None:
