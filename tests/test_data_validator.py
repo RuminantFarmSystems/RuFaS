@@ -2006,37 +2006,42 @@ def cv(mocker: MockerFixture) -> CrossValidator:
 
 def test_early_exit_when_apply_when_fails_and_eager_true(mocker: MockerFixture, cv: CrossValidator) -> None:
     """Test that cross_validate_data exits early when apply_when fails and eager_termination is True."""
-    cv._evaluate_condition_clause_array.return_value = False
     cross_validation_block = {"apply_when": [{"foo": "bar"}], "rules": [{"r": 1}, {"r": 2}]}
+    mock_target_and_save = mocker.patch.object(cv, "_target_and_save")
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition")
+    mock_evaluate_condition_clause_array = mocker.patch.object(cv, "_evaluate_condition_clause_array", return_value=False)
 
     result = cv.cross_validate_data({"x": 1}, cross_validation_block, eager_termination=True)
 
     assert result is True
-    cv._target_and_save.assert_called_once_with({"x": 1})
-    cv._evaluate_condition_clause_array.assert_called_once_with([{"foo": "bar"}], True)
-    cv._evaluate_condition.assert_not_called()
+    mock_target_and_save.assert_called_once_with({"x": 1})
+    mock_evaluate_condition_clause_array.assert_called_once_with([{"foo": "bar"}], True)
+    mock_evaluate_condition.assert_not_called()
 
 
 def test_evaluates_all_rules_when_eager_false_and_returns_last(mocker: MockerFixture, cv: CrossValidator) -> None:
     """Test that cross_validate_data evaluates all rules when eager_termination is False and returns last result."""
-    cv._evaluate_condition_clause_array.return_value = True
-    cv._evaluate_condition.side_effect = [True, False, True]
+    mock_evaluate_condition_clause_array = mocker.patch.object(cv, "_evaluate_condition_clause_array",
+                                                               return_value=True)
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
     rules = [{"r": 1}, {"r": 2}, {"r": 3}]
     cross_validation_block = {"apply_when": [], "rules": rules}
 
     result = cv.cross_validate_data({"y": 2}, cross_validation_block, eager_termination=False)
 
     assert result is True
-    assert cv._evaluate_condition.call_count == 3
-    cv._evaluate_condition.assert_has_calls(
+    assert mock_evaluate_condition.call_count == 3
+    mock_evaluate_condition.assert_has_calls(
         [mocker.call(rules[0], False), mocker.call(rules[1], False), mocker.call(rules[2], False)]
     )
+    mock_evaluate_condition_clause_array.assert_called_once_with([], False)
 
 
 def test_breaks_on_first_failed_rule_when_eager_true(mocker: MockerFixture, cv: CrossValidator) -> None:
     """Test that cross_validate_data breaks on first failed rule when eager_termination is True."""
-    cv._evaluate_condition_clause_array.return_value = True
-    cv._evaluate_condition.side_effect = [True, False, True]
+    mock_evaluate_condition_clause_array = mocker.patch.object(cv, "_evaluate_condition_clause_array",
+                                                               return_value=True)
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
     rules = [{"r": 1}, {"r": 2}, {"r": 3}]
     cross_validation_block = {"rules": rules}
 
@@ -2044,10 +2049,11 @@ def test_breaks_on_first_failed_rule_when_eager_true(mocker: MockerFixture, cv: 
 
     assert result is False
 
-    assert cv._evaluate_condition.call_count == 2
-    cv._evaluate_condition.assert_has_calls(
+    assert mock_evaluate_condition.call_count == 2
+    mock_evaluate_condition.assert_has_calls(
         [mocker.call(rules[0], True), mocker.call(rules[1], True)]
     )
+    mock_evaluate_condition_clause_array.assert_called_once_with([], True)
 
 
 @pytest.mark.parametrize(
