@@ -34,7 +34,7 @@ def main() -> None:
     except Exception as e:
         info_map = {
             "class": "No caller class",
-            "function": main.__name__,
+            "function": main.__name__
         }
         output_manager = OutputManager()
         error_message = "This terminal error occurred during runtime. "
