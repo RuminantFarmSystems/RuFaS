@@ -375,19 +375,15 @@ class NutritionSupplyCalculator:
         dROM: float = 0.96
 
         for feed in feeds:
-            if feed.info.Fd_Category is FeedCategorization.NPN_SUPPLEMENT:
-                if feed.info.CP > 0:
-                    NPNsupp: float = feed.info.NPN_source / feed.info.CP
-                else:
-                    NPNsupp = 1.0
-            else:
-                NPNsupp = 1.0
+            NPN_supply = 1.0
+            if feed.info.Fd_Category is FeedCategorization.NPN_SUPPLEMENT and feed.info.CP > 0:
+                NPN_supply: float = feed.info.NPN_source / feed.info.CP
             if feed.info.CP > 0:
                 RUP: float = feed.info.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed.info.CP
                 RDP: float = feed.info.CP - RUP
                 try:
                     ROM: float = (100 - feed.info.FA / 1.06 - feed.info.ash
-                                  - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPNsupp))
+                                  - feed.info.NDF - feed.info.starch - (feed.info.CP - 0.64 * NPN_supply))
                 except ZeroDivisionError:
                     ROM = 0.0
             else:
