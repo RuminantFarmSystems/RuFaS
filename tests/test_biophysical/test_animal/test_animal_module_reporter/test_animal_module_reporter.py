@@ -124,7 +124,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "milk_fat": 3.4,
                 "milk_lactose": 5.6,
                 "parity": 1,
-                "lactating": True,
+                "is_milking": True,
                 "simulation_day": simulation_day,
             },
             info_map,
@@ -140,7 +140,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "milk_fat": 73,
                 "milk_lactose": 7.9,
                 "parity": 5,
-                "lactating": True,
+                "is_milking": True,
                 "simulation_day": simulation_day,
             },
             info_map,
@@ -156,7 +156,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "milk_fat": 0,
                 "milk_lactose": 0,
                 "parity": 2,
-                "lactating": False,
+                "is_milking": False,
                 "simulation_day": simulation_day,
             },
             info_map,
@@ -499,6 +499,7 @@ def test_report_manure_streams_key_error(mocker: MockerFixture) -> None:
             total_bedding_mass=3.3,
             total_bedding_volume=4.4,
         ),
+        bedding_non_degradable_volatile_solids=10
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -576,6 +577,7 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
         volume=9.9,
         methane_production_potential=10.1,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -614,6 +616,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10.0
         ),
         "stream_2": ManureStream(
             water=1.1,
@@ -636,8 +639,9 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 manure_urine_nitrogen=2.2,
                 stream_type=StreamType.GENERAL,
                 total_bedding_mass=3.3,
-                total_bedding_volume=4.4,
+                total_bedding_volume=4.4
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
         "stream_3": ManureStream(
             water=2.1,
@@ -662,6 +666,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
         "stream_4": ManureStream(
             water=3.1,
@@ -686,12 +691,13 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
+            bedding_non_degradable_volatile_solids=10
         ),
     }
 
     AnimalModuleReporter.report_manure_streams(manure_streams, 10)
 
-    assert mock_om_add_variable.call_count == 15 * len(manure_streams)
+    assert mock_om_add_variable.call_count == 16 * len(manure_streams)
 
 
 def test_report_manure_excretions(mocker: MockerFixture) -> None:

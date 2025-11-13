@@ -328,7 +328,7 @@ class EmissionsEstimator:
             "units": {
                 "crop_type": MeasurementUnits.UNITLESS,
                 "nitrous_oxide_emissions": MeasurementUnits.KILOGRAMS,
-                "ammonia_emisssions": MeasurementUnits.KILOGRAMS,
+                "ammonia_emissions": MeasurementUnits.KILOGRAMS,
                 "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                 "nitrogen_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,

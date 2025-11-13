@@ -45,6 +45,7 @@ def test_processor_init_error() -> None:
                 volume=1.5,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
             True,
         ),
@@ -69,6 +70,7 @@ def test_processor_init_error() -> None:
                 volume=1.5,
                 methane_production_potential=0.24,
                 pen_manure_data=MagicMock(auto_spec=PenManureData),
+                bedding_non_degradable_volatile_solids=10
             ),
             False,
         ),
@@ -93,6 +95,7 @@ def test_processor_init_error() -> None:
                 volume=1.5,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10
             ),
             False,
         ),
@@ -117,6 +120,7 @@ def test_processor_init_error() -> None:
                 volume=1.5,
                 methane_production_potential=0.24,
                 pen_manure_data=MagicMock(auto_spec=PenManureData),
+                bedding_non_degradable_volatile_solids=10
             ),
             True,
         ),
@@ -229,6 +233,7 @@ def manure_stream() -> ManureStream:
         volume=1.5,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -281,6 +286,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasT
         "total_volatile_solids": 40.0,
         "methane_production_potential": 0.24,
         "pen_manure_data": None,
+        "bedding_non_degradable_volatile_solids": 23
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     mock_separator._report_manure_stream(manure_dict, "test_stream", time.simulation_day)

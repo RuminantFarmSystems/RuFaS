@@ -146,11 +146,14 @@ class Separator(Processor):
             ash=self.held_manure.ash * self.ash_efficiency,
             non_degradable_volatile_solids=self.held_manure.non_degradable_volatile_solids
             * self.volatile_solids_efficiency,
-            degradable_volatile_solids=self.held_manure.degradable_volatile_solids * self.volatile_solids_efficiency,
+            degradable_volatile_solids=self.held_manure.degradable_volatile_solids
+            * self.volatile_solids_efficiency,
             total_solids=solid_manure_total_solids,
             volume=solid_manure_volume,
             methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
+            * self.volatile_solids_efficiency
         )
         solid_stream_name = "SeparatedSolids"
         solid_manure_stream_dict = asdict(solid_manure_stream)
@@ -178,6 +181,7 @@ class Separator(Processor):
             volume=liquid_manure_volume,
             methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
         )
         liquid_stream_name = "SeparatedLiquid"
         self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time.simulation_day)

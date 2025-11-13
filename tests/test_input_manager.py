@@ -243,27 +243,138 @@ def test_load_data_from_csv_invalid_data_raises_error(
                 assert add_log.call_count == 1
 
 
+@pytest.mark.parametrize(
+    "cv_scenario, eager_termination, populate_ok, expected_return, expected_cv_calls, expected_fail_blocks",
+    [
+        ("none", True, True, True, 0, []),
+        ("none", False, True, True, 0, []),
+        ("all_pass", True, True, True, 2, []),
+        ("all_pass", False, True, True, 2, []),
+        ("first_fail_eager_true", True, True, False, 1, ["cv1"]),
+        ("two_fail_eager_false", False, True, False, 3, ["cv1", "cv2"]),
+        ("all_pass", True, False, False, 2, []),
+    ],
+    ids=[
+        "no-cv_eager-true",
+        "no-cv_eager-false",
+        "cv-pass_eager-true",
+        "cv-pass_eager-false",
+        "cv-first-fail_eager-true",
+        "cv-two-fail_eager-false",
+        "populate-false_cv-pass",
+    ],
+)
 def test_start_data_processing(
-    mock_input_manager: InputManager,
+    mock_input_manager,
     mocker: MockerFixture,
+    cv_scenario: str,
+    eager_termination: bool,
+    populate_ok: bool,
+    expected_return: bool,
+    expected_cv_calls: int,
+    expected_fail_blocks: list[str],
 ) -> None:
-    """Unit test for function start_data_processing in file input_manager.py"""
-    patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
-    patch_for_populate_pool = mocker.patch.object(InputManager, "_populate_pool", return_value=True)
-    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata", return_value=(True, ""))
-    patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
-    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties", return_value=(True, ""))
+    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
+    eager short-circuit vs collect)."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_load_properties")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
 
-    eager_termination = True
-    mock_metadata_path = "mock/metadata/path"
+    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
-    mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
+    mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={"dummy": True})
 
-    patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
-    patch_for_populate_pool.assert_called_once_with(eager_termination)
-    patch_for_load_properties.assert_called_once()
-    patch_for_validate_metadata.assert_called_once()
-    patch_for_validate_properties.assert_called_once()
+    if cv_scenario == "none":
+        cv_blocks = []
+        side_effect = []
+    elif cv_scenario == "all_pass":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+        ]
+        side_effect = [True, True]
+    elif cv_scenario == "first_fail_eager_true":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+        ]
+        side_effect = [False, True]
+    elif cv_scenario == "two_fail_eager_false":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+            {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+        ]
+        side_effect = [False, False, True]
+    else:
+        raise AssertionError("Unknown test setup")
+
+    setattr(mock_input_manager, "_InputManager__metadata", {"cross-validation": cv_blocks})
+    cv_mock = mock_input_manager.cross_validator
+    cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
+    mock_input_manager.data_validator.event_logs.clear()
+
+    result = mock_input_manager.start_data_processing(Path("mock/metadata/path"), eager_termination)
+
+    assert result is expected_return
+
+    assert cv_call.call_count == expected_cv_calls
+    for idx, cv_call in enumerate(cv_call.call_args_list[:expected_cv_calls]):
+        _, kwargs = cv_call
+        target_and_save_result, block, eager = cv_call.args
+        assert "target_and_save" in block
+        assert eager is eager_termination
+        assert isinstance(target_and_save_result, dict)
+
+    if expected_fail_blocks:
+        add_error.assert_called_once()
+        err, msg, info = add_error.call_args.args
+        assert err == "Cross Validation Failure"
+        for name in expected_fail_blocks:
+            assert name in msg
+        assert info.get("class") == mock_input_manager.__class__.__name__
+        assert info.get("function") == mock_input_manager.start_data_processing.__name__
+    else:
+        add_error.assert_not_called()
+
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+
+
+def test_start_data_processing_invalid_metadata_raises(mock_input_manager, mocker: MockerFixture) -> None:
+    """If validate_metadata returns (False, msg), it should raise ValueError with that message."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(False, "bad meta"))
+    mock_load_props = mocker.patch.object(mock_input_manager, "_load_properties")
+    mock_validate_props = mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties")
+
+    with pytest.raises(ValueError, match="bad meta"):
+        mock_input_manager.start_data_processing(Path("meta"), eager_termination=True)
+
+    mock_load_props.assert_not_called()
+    mock_validate_props.assert_not_called()
+
+
+def test_start_data_processing_invalid_properties_routes_logs_and_raises(
+    mock_input_manager, mocker: MockerFixture
+) -> None:
+    """If validate_properties returns (False, msg), it should route logs and then raise ValueError."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
+    mocker.patch.object(mock_input_manager, "_load_properties")
+    mock_input_manager.data_validator.event_logs[:] = [{"level": "error", "msg": "prop fail"}]
+    mocker.patch.object(
+        type(mock_input_manager.data_validator), "validate_properties", return_value=(False, "bad props")
+    )
+
+    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+
+    with pytest.raises(ValueError, match="bad props"):
+        mock_input_manager.start_data_processing(Path("meta"), eager_termination=False)
+
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
 @pytest.fixture
@@ -3203,7 +3314,7 @@ def test_extract_target_and_save_block(mocker: MockerFixture) -> None:
     im = InputManager()
     mock_check = mocker.patch.object(CrossValidator, "check_target_and_save_block")
     mock_get_data = mocker.patch.object(im, "get_data", return_value=1)
-    result = im.extract_target_and_save_block(
+    result = im._extract_target_and_save_block(
         {"variables": {"a": "test.address.1", "b": "test.address.2"}, "constants": {"c": "value"}}, True
     )
 
