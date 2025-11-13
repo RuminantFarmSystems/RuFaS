@@ -537,14 +537,14 @@ class AnimalConfig:
 
         average_phenotype = im.get_data("animal_mean_phenotype")
         cls.average_phenotype = {
-            trait: dict(
-                zip(average_phenotype["birth_year"], values)
-            ) for trait, values in average_phenotype.items() if trait != "birth_year"
+            trait: dict(zip(average_phenotype["birth_year"], values))
+            for trait, values in average_phenotype.items()
+            if trait != "birth_year"
         }
 
         top_listing_semen = im.get_data("animal_top_listing_semen")
         cls.top_listing_semen = {
-            trait: dict(
-                zip(top_listing_semen["year_month"], values)
-            ) for trait, values in top_listing_semen.items() if trait != "year_month"
+            trait: dict(zip(top_listing_semen["year_month"], values))
+            for trait, values in top_listing_semen.items()
+            if trait != "year_month"
         }

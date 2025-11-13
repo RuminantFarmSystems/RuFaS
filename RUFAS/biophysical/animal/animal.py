@@ -222,7 +222,7 @@ class Animal:
                     animal_type=AnimalType.CALF,
                     initialize_new_born_calf=True,
                     dam_tbv_fat=dam_tbv_fat,
-                    dam_tbv_protein=dam_tbv_protein
+                    dam_tbv_protein=dam_tbv_protein,
                 )
             # initializing herd for herd generation
             else:
@@ -230,7 +230,7 @@ class Animal:
                     birth_year=time.current_date.year,
                     animal_type=AnimalType.CALF,
                     initialize_new_born_calf=False,
-                    parity=self.calves
+                    parity=self.calves,
                 )
         else:
             initialize_animal_methods[self.animal_type](args)
@@ -238,7 +238,7 @@ class Animal:
                 birth_year=(time.current_date - timedelta(days=self.days_born)).year,
                 animal_type=self.animal_type,
                 initialize_new_born_calf=False,
-                parity=self.calves
+                parity=self.calves,
             )
 
     @classmethod

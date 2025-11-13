@@ -644,11 +644,7 @@ class Utility:
 
     @staticmethod
     def generate_bivariate_random_numbers(
-            mu_x: float,
-            mu_y: float,
-            sigma_x: float,
-            sigma_y: float,
-            rho: float
+        mu_x: float, mu_y: float, sigma_x: float, sigma_y: float, rho: float
     ) -> tuple[float, float]:
         """
         Generates multivariate random numbers based on provided parameters.
@@ -683,8 +679,7 @@ class Utility:
         if not (-1.0 <= rho <= 1.0):
             raise ValueError("rho must be between -1 and 1 (inclusive).")
         mean = [mu_x, mu_y]
-        cov = [[sigma_x ** 2, rho * sigma_x * sigma_y],
-               [rho * sigma_x * sigma_y, sigma_y ** 2]]
+        cov = [[sigma_x**2, rho * sigma_x * sigma_y], [rho * sigma_x * sigma_y, sigma_y**2]]
         return tuple(np.random.multivariate_normal(mean, cov))
 
     @staticmethod
