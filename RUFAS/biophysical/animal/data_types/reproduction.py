@@ -25,8 +25,10 @@ class ReproductionInputs:
         The number of days the animal has been in pregnancy, (simulation days).
     days_in_milk : int
         The number of days the animal has been lactating, (simulation days).
-    net_merit : float
-        The genetic merit score of the animal, (lifetime USD).
+    dam_tbv_fat : float
+        The True Breeding Value for fat of the animal, (kg).
+    dam_tbv_protein : float
+        The True Breeding Value for protein of the animal, (kg).
     phosphorus_for_gestation_required_for_calf : float
         The amount of phosphorus required for fetal development during the
         gestation period in the animal.
@@ -38,7 +40,8 @@ class ReproductionInputs:
     days_born: int
     days_in_pregnancy: int
     days_in_milk: int
-    net_merit: float
+    dam_tbv_fat: float
+    dam_tbv_protein: float
     phosphorus_for_gestation_required_for_calf: float
 
     @property
@@ -291,8 +294,10 @@ class ReproductionDataStream:
         The current number of days the animal has been milking, (simulation days).
     events : AnimalEvents
         Associated events relevant to the animal’s lifecycle and reproduction.
-    net_merit : float
-        Net merit value, representing the economic value of the animal, (lifetime USD).
+    dam_tbv_fat : float
+        The True Breeding Value for fat of the animal, (kg).
+    dam_tbv_protein : float
+        The True Breeding Value for protein of the animal, (kg).
     phosphorus_for_gestation_required_for_calf : float
         The phosphorus needed for gestation, specifically for the growth of the calf, (kg).
         individual animal.
@@ -310,7 +315,8 @@ class ReproductionDataStream:
     days_in_pregnancy: int
     days_in_milk: int
     events: AnimalEvents
-    net_merit: float
+    dam_tbv_fat: float
+    dam_tbv_protein: float
     phosphorus_for_gestation_required_for_calf: float
 
     herd_reproduction_statistics: HerdReproductionStatistics

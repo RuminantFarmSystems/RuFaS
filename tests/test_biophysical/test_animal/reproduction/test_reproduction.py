@@ -378,7 +378,6 @@ def test_reproduction_update(animal_type: AnimalType, mock_reproduction: Reprodu
         days_in_pregnancy=mock_inputs.days_in_pregnancy,
         days_in_milk=mock_inputs.days_in_milk,
         events=AnimalEvents(),
-        net_merit=mock_inputs.net_merit,
         phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
         herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,

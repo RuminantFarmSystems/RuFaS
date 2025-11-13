@@ -1,4 +1,5 @@
 import sys
+from datetime import timedelta
 from random import random
 from typing import Any, Callable
 
@@ -7,6 +8,7 @@ from numpy import sqrt
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -151,7 +153,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
-        simulation_day: int = 0,
+        time: RufasTime | None = None,
     ) -> None:
         """
         Initializes an Animal object.
@@ -181,7 +183,6 @@ class Animal:
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
-        self.net_merit = args.get("net_merit", 0.0)
         self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
 
         self.cull_reason = ""
@@ -212,9 +213,33 @@ class Animal:
         self._daily_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
-            self._initialize_newborn_calf(args, simulation_day)
+            self._initialize_newborn_calf(args, time.simulation_day)
+            dam_tbv_fat, dam_tbv_protein = args.get("dam_tbv_fat"), args.get("dam_tbv_protein")
+            if dam_tbv_fat and dam_tbv_protein:
+                self.genetics = Genetics(
+                    birth_year=time.current_date.year,
+                    birth_month=time.current_date.month,
+                    animal_type=AnimalType.CALF,
+                    initialize_new_born_calf=True,
+                    dam_tbv_fat=dam_tbv_fat,
+                    dam_tbv_protein=dam_tbv_protein
+                )
+            # initializing herd for herd generation
+            else:
+                self.genetics = Genetics(
+                    birth_year=time.current_date.year,
+                    animal_type=AnimalType.CALF,
+                    initialize_new_born_calf=False,
+                    parity=self.calves
+                )
         else:
             initialize_animal_methods[self.animal_type](args)
+            self.genetics = Genetics(
+                birth_year=(time.current_date - timedelta(days=self.days_born)).year,
+                animal_type=self.animal_type,
+                initialize_new_born_calf=False,
+                parity=self.calves
+            )
 
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
@@ -1508,7 +1533,8 @@ class Animal:
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
             days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
+            dam_tbv_fat=self.genetics.TBV_fat,
+            dam_tbv_protein=self.genetics.TBV_protein,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
         )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
@@ -1950,7 +1976,7 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
+            # net_merit=self.net_merit,
         )
 
     def _get_heiferI_values(self) -> HeiferIValuesTypedDict:
@@ -1973,7 +1999,7 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
+            # net_merit=self.net_merit,
         )
 
     def _get_heiferII_values(self) -> HeiferIIValuesTypedDict:
@@ -1996,7 +2022,7 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
+            # net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.reproduction.reproduction_statistics.estrus_count,
@@ -2030,7 +2056,7 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
+            # net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.reproduction.reproduction_statistics.estrus_count,
@@ -2064,7 +2090,7 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
+            # net_merit=self.net_merit,
             calf_birth_weight=self.calf_birth_weight,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,

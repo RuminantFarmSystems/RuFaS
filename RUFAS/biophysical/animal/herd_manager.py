@@ -6,7 +6,7 @@ from typing import Any
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
@@ -466,7 +466,7 @@ class HerdManager:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
                     newborn_calf = self._create_newborn_calf(
-                        animal_daily_routines_output.newborn_calf_config, simulation_day=time.simulation_day
+                        animal_daily_routines_output.newborn_calf_config, time=time
                     )
                     if newborn_calf.stillborn:
                         stillborn_newborn_calves.append(newborn_calf)
@@ -474,6 +474,10 @@ class HerdManager:
                         sold_newborn_calves.append(newborn_calf)
                     else:
                         newborn_calves.append(newborn_calf)
+                    # TODO: handle birth_year
+                    animal.genetics.recalculate_values_at_lactation_start(
+                        birth_year=2018, animal_type=animal.animal_type, parity=animal.calves
+                    )
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
@@ -646,7 +650,7 @@ class HerdManager:
 
         AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
 
-    def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
+    def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, time: RufasTime) -> Animal:
         """
         Creates a new newborn calf instance and records its entry event in the herd if it
         is not sold.
@@ -655,8 +659,8 @@ class HerdManager:
         ----------
         newborn_calf_config : NewBornCalfValuesTypedDict
             Configuration for the newborn calf containing its attributes.
-        simulation_day : int
-            The current day in the simulation.
+        time : RufasTime
+            The current time in the simulation.
 
         Returns
         -------
@@ -665,9 +669,9 @@ class HerdManager:
 
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
-        newborn_calf: Animal = Animal(args=newborn_calf_config, simulation_day=simulation_day)
+        newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
         if not (newborn_calf.sold or newborn_calf.stillborn):
-            newborn_calf.events.add_event(newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD)
+            newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
     def _check_if_heifers_need_to_be_sold(
@@ -749,8 +753,8 @@ class HerdManager:
                 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
             )
             replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
-            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
+            replacement.genetics = Genetics(
+                birth_year=replacement_birth_date.year, animal_type=replacement.animal_type, parity=replacement.calves
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1

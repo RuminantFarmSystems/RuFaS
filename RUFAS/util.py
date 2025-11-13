@@ -643,6 +643,51 @@ class Utility:
         return np.random.normal(mean, std_dev)
 
     @staticmethod
+    def generate_bivariate_random_numbers(
+            mu_x: float,
+            mu_y: float,
+            sigma_x: float,
+            sigma_y: float,
+            rho: float
+    ) -> tuple[float, float]:
+        """
+        Generates multivariate random numbers based on provided parameters.
+
+        This method generates two correlated random numbers from a bivariate
+        normal distribution, using the specified means, standard deviations,
+        and correlation coefficient.
+
+        Parameters
+        ----------
+        mu_x : float
+            Mean of the first random variable.
+        mu_y : float
+            Mean of the second random variable.
+        sigma_x : float
+            Standard deviation of the first random variable.
+        sigma_y : float
+            Standard deviation of the second random variable.
+        rho : float
+            Correlation coefficient between the two random variables.
+
+        Returns
+        -------
+        tuple[float, float]
+            A tuple containing two correlated random numbers generated
+            from the bivariate normal distribution.
+        """
+        # TODO: update this error message.
+        if sigma_x <= 0 or sigma_y <= 0:
+            print(sigma_x, sigma_y)
+            raise ValueError("sigma_x and sigma_y must be positive.")
+        if not (-1.0 <= rho <= 1.0):
+            raise ValueError("rho must be between -1 and 1 (inclusive).")
+        mean = [mu_x, mu_y]
+        cov = [[sigma_x ** 2, rho * sigma_x * sigma_y],
+               [rho * sigma_x * sigma_y, sigma_y ** 2]]
+        return tuple(np.random.multivariate_normal(mean, cov))
+
+    @staticmethod
     def flatten_dictionary(
         input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
     ) -> dict[str, Any]:
