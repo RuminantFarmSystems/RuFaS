@@ -79,7 +79,6 @@ class AnaerobicLagoon(Storage):
 
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature,
-            lower_bound_temperature=ManureConstants.MINIMUM_ANAEROBIC_LAGOON_TEMPERATURE
         )
 
         total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)

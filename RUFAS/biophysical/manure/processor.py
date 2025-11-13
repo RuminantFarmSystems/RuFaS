@@ -296,7 +296,7 @@ class Processor(ABC):
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
 
     @staticmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float, lower_bound_temperature: float = 0.0) -> float:
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
@@ -304,8 +304,6 @@ class Processor(ABC):
         ----------
         air_temperature : float
             The current day's ambient air temperature (°C).
-        lower_bound_temperature : float, optional
-            The minimum temperature for the stored manure (°C). Default is 0.0.
 
         Returns
         -------
@@ -321,11 +319,11 @@ class Processor(ABC):
 
         Notes
         -----
-        This function clamps stored manure temperature to between the lower_bound_temperature and 35 °C.
-        Between the lower_bound_temperature and 35 °C, outdoor stored liquid manure temperature is assumed to be equal
-        to ambient air temperature.
+        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature.
+
         """
-        return float(clip(air_temperature, lower_bound_temperature, 35.0))
+        return float(clip(air_temperature, 0.0, 35.0))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:
