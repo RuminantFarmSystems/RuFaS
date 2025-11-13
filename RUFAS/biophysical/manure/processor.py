@@ -322,14 +322,15 @@ class Processor(ABC):
 
         Notes
         -----
-        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        This function clamps stored manure temperature to betw 0 and 35 °C. Between 0 and 35 °C, outdoor stored
         liquid manure temperature is assumed to be equal to ambient air temperature.
 
         """
         amplitude = (current_day_condition.max_mean_temperature - current_day_condition.min_mean_temperature) * 0.6 / 2
         manure_amplitude = amplitude * 0.5
-        return current_day_condition.mean_air_temperature + manure_amplitude * math.cos(
-            ((2 * math.pi) / year_end_day) * (day_number - current_day_condition.max_temp_julian_day))
+        mean_temp = 6.64
+        phase_shift = 203
+        return mean_temp + manure_amplitude * math.cos(2 * math.pi / 365 * (day_number - phase_shift))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:
