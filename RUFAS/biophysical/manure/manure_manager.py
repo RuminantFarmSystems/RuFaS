@@ -84,8 +84,13 @@ class ManureManager:
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
 
     def run_daily_update(
-        self, manure_streams: dict[str, ManureStream], time: RufasTime, current_day_conditions: CurrentDayConditions,
-        sin: list[float], cos: list[float], means: list[float]
+        self,
+        manure_streams: dict[str, ManureStream],
+        time: RufasTime,
+        current_day_conditions: CurrentDayConditions,
+        sin: list[float],
+        cos: list[float],
+        means: list[float],
     ) -> None:
         """
         Executes the daily update for all processors in the defined processing order.
@@ -902,7 +907,7 @@ class ManureManager:
             "non_degradable_volatile_solids",
             "degradable_volatile_solids",
             "total_solids",
-            "bedding_non_degradable_volatile_solids"
+            "bedding_non_degradable_volatile_solids",
         ]
 
         for name, processor in self.all_processors.items():

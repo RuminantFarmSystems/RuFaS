@@ -80,7 +80,7 @@ class Weather:
                     irrigation=weather_file["irrigation"][i],
                     max_mean_temperature=max_mean_temperature,
                     min_mean_temperature=min_mean_temperature,
-                    max_temp_julian_day=max_temp_julian_day
+                    max_temp_julian_day=max_temp_julian_day,
                 )
                 if date_key in self.weather_data.keys():
                     info_map = {

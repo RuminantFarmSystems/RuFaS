@@ -46,8 +46,14 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool,
-                 sin: list[float] | None = None, cos: list[float] | None = None, means: list[float] | None = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        is_housing_emissions_calculator: bool,
+        sin: list[float] | None = None,
+        cos: list[float] | None = None,
+        means: list[float] | None = None,
+    ) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
@@ -302,13 +308,15 @@ class Processor(ABC):
         """
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
 
-    def _determine_outdoor_storage_temperature(self,
-                                               current_day_condition: CurrentDayConditions,
-                                               day_number: int,
-                                               year_end_day: int,
-                                               sin: list[float] | None = None,
-                                               cos: list[float] | None = None,
-                                               means: list[float] | None = None) -> float:
+    def _determine_outdoor_storage_temperature(
+        self,
+        current_day_condition: CurrentDayConditions,
+        day_number: int,
+        year_end_day: int,
+        sin: list[float] | None = None,
+        cos: list[float] | None = None,
+        means: list[float] | None = None,
+    ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
@@ -351,9 +359,9 @@ class Processor(ABC):
         phase_angle = math.atan2(sin_coef, cos_coef)
         value = (phase_angle / (2 * math.pi) * 365) + 365
         if value > 365:
-            phase_shift =  (phase_angle / (2 * math.pi) * 365) - 365
+            phase_shift = (phase_angle / (2 * math.pi) * 365) - 365
         else:
-            phase_shift =  value
+            phase_shift = value
         manure_amplitude = amplitude * 0.5
 
         return mean_temp + manure_amplitude * math.cos(2 * math.pi / 365 * (day_number - phase_shift))
