@@ -226,7 +226,7 @@ class Crop:
 
     def manage_crop_harvest(
         self,
-        harvest_op: HarvestOperation,
+        harvest_operation: HarvestOperation,
         field_name: str,
         field_size: float,
         time: RufasTime,
@@ -236,7 +236,7 @@ class Crop:
 
         Parameters
         ----------
-        harvest_op : HarvestOperation
+        harvest_operation : HarvestOperation
             The operation to be executed on this crop.
         field_name : str
             The name of the field that contains this crop.
@@ -253,7 +253,7 @@ class Crop:
             A harvested crop data structure.
 
         """
-        return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
+        return self._crop_management.manage_harvest(harvest_operation, field_name, field_size, time, soil_data)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""

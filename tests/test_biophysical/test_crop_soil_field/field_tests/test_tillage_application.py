@@ -209,6 +209,7 @@ def test_record_tillage(
         "day": MeasurementUnits.ORDINAL_DAY,
         "field_size": MeasurementUnits.HECTARE,
         "average_clay_percent": MeasurementUnits.PERCENT,
+        "field_name": MeasurementUnits.UNITLESS,
     }
     expected_info_map = {
         "class": TillageApplication.__name__,
@@ -225,6 +226,7 @@ def test_record_tillage(
         "day": day,
         "field_size": 1.5,
         "average_clay_percent": expected_clay_percent,
+        "field_name": "field1",
     }
 
     mock_add = mocker.patch.object(till_app.om, "add_variable")

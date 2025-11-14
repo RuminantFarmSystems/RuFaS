@@ -74,7 +74,12 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
-def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, start_time: int, end_time: int) -> None:
+def test_simulate(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    start_time: int,
+    end_time: int,
+) -> None:
     """
     Unit test for function simulate() in file RUFAS/simulation_engine.py
     """
@@ -239,7 +244,9 @@ def test_daily_simulation(
     mock_record_weather = mocker.patch.object(mock_weather, "record_weather")
     mocker.patch.object(simulation_engine.feed_manager, "report_feed_storage_levels")
     mocker.patch.object(simulation_engine.feed_manager, "report_cumulative_purchased_feeds")
-    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions_estimator, "calculate_emissions")
+    mock_calc_emissions = mocker.patch.object(
+        simulation_engine.emissions_estimator, "calculate_purchased_feed_emissions"
+    )
     mock_report_cumulative_purchased_feeds = mocker.patch.object(
         simulation_engine.feed_manager, "report_cumulative_purchased_feeds"
     )
