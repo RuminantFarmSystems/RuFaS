@@ -446,8 +446,9 @@ def test_translate_crop_config_name_to_rufas_id(
     assert result == expected_next_harvest_dates_rufas_ids
 
 
-def test_receive_crop_routes_to_matching_storage(mocker: MockerFixture, feed_manager: FeedManager,
-                                                 harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_routes_to_matching_storage(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     """Tests that receive_crop routes to the correct storage, and warns if no match."""
     storage = next(iter(feed_manager.active_storages.values()))
     storage.crop_name = harvested_crop.config_name
@@ -463,8 +464,9 @@ def test_receive_crop_routes_to_matching_storage(mocker: MockerFixture, feed_man
     mock_add_warning.assert_not_called()
 
 
-def test_receive_crop_warns_when_no_matching_storage(mocker: MockerFixture, feed_manager: FeedManager,
-                                                     harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_warns_when_no_matching_storage(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     """Tests that receive_crop warns when no storage matches the crop."""
     for s in feed_manager.active_storages.values():
         s.crop_name = "not-" + harvested_crop.config_name

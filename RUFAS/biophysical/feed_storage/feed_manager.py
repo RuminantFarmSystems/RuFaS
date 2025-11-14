@@ -188,9 +188,7 @@ class FeedManager:
             combo_to_names[(crop_name, field_name)].append(name)
 
         duplicate_details = {
-            combo: names
-            for combo, names in combo_to_names.items()
-            if len(names) > 1 and None not in combo
+            combo: names for combo, names in combo_to_names.items() if len(names) > 1 and None not in combo
         }
 
         if duplicate_details:
@@ -615,8 +613,9 @@ class FeedManager:
                 remaining_amount_needed -= farmgrown_deducted
 
             if remaining_amount_needed > 1e-3:
-                purchased_deducted = \
-                    self._deduct_from_storage(feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ()))
+                purchased_deducted = self._deduct_from_storage(
+                    feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ())
+                )
                 if purchased_deducted:
                     total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
                     remaining_amount_needed -= purchased_deducted
@@ -699,12 +698,14 @@ class FeedManager:
             amount_to_remove = min(remaining, available)
             if isinstance(storage, HarvestedCrop):
                 storage.remove_feed_mass(amount_to_remove)
-                self._cumulative_farmgrown_feeds_fed[feed_id] = \
+                self._cumulative_farmgrown_feeds_fed[feed_id] = (
                     self._cumulative_farmgrown_feeds_fed.get(feed_id, 0.0) + amount_to_remove
+                )
             else:
                 storage.remove_dry_matter_mass(amount_to_remove)
-                self._cumulative_purchased_feeds_fed[feed_id] = \
+                self._cumulative_purchased_feeds_fed[feed_id] = (
                     self._cumulative_purchased_feeds_fed.get(feed_id, 0.0) + amount_to_remove
+                )
             remaining -= amount_to_remove
             deducted += amount_to_remove
 
