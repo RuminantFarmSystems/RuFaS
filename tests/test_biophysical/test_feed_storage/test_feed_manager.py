@@ -294,6 +294,81 @@ def test_create_all_storages(
     assert add_warning.call_count == expected_warning_calls
 
 
+def test_validate_crop_field_mapping_all_unique(feed_manager: FeedManager) -> None:
+    """No error is raised when all feed storage config (crop_name, field_name) combos are unique."""
+    all_configs = [
+        {
+            "name": "storage_1",
+            "crop_name": "alfalfa_hay",
+            "field_name": "field_1",
+        },
+        {
+            "name": "storage_2",
+            "crop_name": "alfalfa_hay",
+            "field_name": "field_2",
+        },
+        {
+            "name": "storage_3",
+            "crop_name": "corn_silage",
+            "field_name": "field_1",
+        },
+    ]
+
+    feed_manager._validate_crop_field_mapping(all_configs)
+
+
+def test_validate_crop_field_mapping_raises_on_duplicate_combo(feed_manager: FeedManager) -> None:
+    """Raises ValueError when the same (crop_name, field_name) combo is used by multiple storage configs."""
+    all_configs = [
+        {
+            "name": "triticale_hay_storage_1",
+            "crop_name": "winter_wheat_hay",
+            "field_name": "field_1",
+        },
+        {
+            "name": "winter_wheat_hay_storage_1",
+            "crop_name": "winter_wheat_hay",
+            "field_name": "field_1",
+        },
+    ]
+
+    with pytest.raises(ValueError) as excinfo:
+        feed_manager._validate_crop_field_mapping(all_configs)
+
+    msg = str(excinfo.value)
+    assert "Duplicate (crop_name, field_name) combinations found" in msg
+    assert "Combination ('winter_wheat_hay', 'field_1')" in msg
+    assert "triticale_hay_storage_1" in msg
+    assert "winter_wheat_hay_storage_1" in msg
+
+
+def test_validate_storage_config_names_all_unique(feed_manager: FeedManager):
+    """Should NOT raise when all storage config names are unique."""
+    configs = [
+        {"name": "S1", "other": 1},
+        {"name": "S2", "other": 2},
+        {"name": "S3", "other": 3},
+    ]
+
+    feed_manager._validate_storage_config_names(configs)
+
+
+def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManager):
+    """Should raise ValueError if two storage configs share the same name."""
+    configs = [
+        {"name": "S1"},
+        {"name": "S1"},
+        {"name": "S2"},
+    ]
+
+    with pytest.raises(ValueError) as excinfo:
+        feed_manager._validate_storage_config_names(configs)
+
+    msg = str(excinfo.value)
+    assert "Duplicate storage config names found" in msg
+    assert "['S1']" in msg
+
+
 def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
     """Test for FeedManager available_feeds property."""
     feed_manager._available_feeds = mock_available_feeds
