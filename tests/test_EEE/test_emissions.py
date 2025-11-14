@@ -211,9 +211,7 @@ def test_estimate_emissions(
     mock_report_daily_farmgrown_feed_fed_emissions_and_resources = mocker.patch.object(
         em, "_report_daily_farmgrown_feed_fed_emissions_and_resources"
     )
-    mock_calculate_and_report_lca_and_luc_emissions = mocker.patch.object(
-        em, "_calculate_and_report_lca_emissions"
-    )
+    mock_calculate_and_report_lca_and_luc_emissions = mocker.patch.object(em, "_calculate_and_report_lca_emissions")
 
     em.estimate_farmgrown_feed_emissions()
 

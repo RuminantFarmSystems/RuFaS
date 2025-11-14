@@ -384,7 +384,7 @@ class Storage:
                 "field_name": MeasurementUnits.UNITLESS,
                 "crop_name": MeasurementUnits.UNITLESS,
                 "feed_id": MeasurementUnits.UNITLESS,
-            }
+            },
         }
         values = {
             "field_name": self.field_name,
@@ -825,8 +825,11 @@ class Storage:
 
         fraction_of_nutrient_in_lost_dry_matter = loss_coefficient * dry_matter_loss_fraction
         if initial_nutrient_fraction < fraction_of_nutrient_in_lost_dry_matter:
-            info_map = {"class": self.__class__.__name__, "function": self.recalculate_nutrient_percentage.__name__,
-                        "prefix": self._prefix}
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.recalculate_nutrient_percentage.__name__,
+                "prefix": self._prefix,
+            }
             warning_title = (
                 f"Nutrient fraction {initial_nutrient_fraction} is less than nutrient fraction in dry matter loss "
                 + f"{fraction_of_nutrient_in_lost_dry_matter}"
