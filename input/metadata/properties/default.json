@@ -6217,21 +6217,6 @@
   },
   "feed_storage_instances": {
     "data_collection_app_compatible": false,
-    "hay_bale_diameter": {
-      "type": "number",
-      "description": "Diameter of hay bales (meters).",
-      "minimum": 0.5,
-      "maximum": 4,
-      "default": 2.5
-    },
-    "post_wilting_moisture_percentage": {
-      "type": "number",
-      "description": "The post-wilting moisture level that baleage will dry down to.",
-      "minimum": 30,
-      "maximum": 60,
-      "default": 45
-    }
-  },
   "feed_storages": {
     "type": "array",
     "description": "A list of feed storage instances that are used on the farm.",
@@ -6239,6 +6224,7 @@
       "type": "string",
       "description": "The reference to the name of the storage from the `feed_storage_configurations` input."
     }
+  }
   },
   "commodity_prices_calves_all_dollar_per_kilogram_csv_properties": {
     "data_collection_app_compatible": false,
