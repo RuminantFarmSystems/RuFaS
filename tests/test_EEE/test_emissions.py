@@ -212,7 +212,7 @@ def test_estimate_emissions(
         em, "_report_daily_farmgrown_feed_fed_emissions_and_resources"
     )
     mock_calculate_and_report_lca_and_luc_emissions = mocker.patch.object(
-        em, "_calculate_and_report_lca_and_luc_emissions"
+        em, "_calculate_and_report_lca_emissions"
     )
 
     em.estimate_farmgrown_feed_emissions()
@@ -279,7 +279,7 @@ def test_calculate_emissions_string_keys_basic(em: EmissionsEstimator, mocker: M
     """Emissions are calculated for known string feed IDs; unknown IDs are ignored."""
     mock_add_variable = mocker.patch.object(em.om, "add_variable")
 
-    em.calculate_emissions({50: 10.0, 51: 5.0, 999: 7.0})
+    em.calculate_purchased_feed_emissions({50: 10.0, 51: 5.0, 999: 7.0})
 
     expected_purchased = {"50": 10.0 * 1.0, "51": 5.0 * 2.0}
     expected_luc = {"50": 10.0 * 0.1, "51": 5.0 * 0.2}
@@ -289,13 +289,13 @@ def test_calculate_emissions_string_keys_basic(em: EmissionsEstimator, mocker: M
     name1, val1, info1 = mock_add_variable.call_args_list[0].args
     assert name1 == "purchased_feed_emissions"
     assert val1 == expected_purchased
-    assert info1["function"] == "calculate_emissions"
+    assert info1["function"] == "calculate_purchased_feed_emissions"
     assert info1["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
     name2, val2, info2 = mock_add_variable.call_args_list[1].args
     assert name2 == "land_use_change_emissions"
     assert val2 == expected_luc
-    assert info2["function"] == "calculate_emissions"
+    assert info2["function"] == "calculate_purchased_feed_emissions"
     assert info2["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
 
@@ -303,7 +303,7 @@ def test_calculate_emissions_int_keys_stringified(em: EmissionsEstimator, mocker
     """Int feed IDs are stringified for factor lookup, but output dict keeps original key types."""
     mock_add_variable = mocker.patch.object(em.om, "add_variable")
 
-    em.calculate_emissions({50: 1.5, 100: 2.0})
+    em.calculate_purchased_feed_emissions({50: 1.5, 100: 2.0})
 
     expected_purchased = {"50": 1.5 * 1.0, "100": 2.0 * 26.3}
     expected_luc = {"50": 1.5 * 0.1, "100": 2.0 * 2.63}
@@ -313,13 +313,13 @@ def test_calculate_emissions_int_keys_stringified(em: EmissionsEstimator, mocker
     name1, val1, info1 = mock_add_variable.call_args_list[0].args
     assert name1 == "purchased_feed_emissions"
     assert val1 == expected_purchased
-    assert info1["function"] == "calculate_emissions"
+    assert info1["function"] == "calculate_purchased_feed_emissions"
     assert info1["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
     name2, val2, info2 = mock_add_variable.call_args_list[1].args
     assert name2 == "land_use_change_emissions"
     assert val2 == expected_luc
-    assert info2["function"] == "calculate_emissions"
+    assert info2["function"] == "calculate_purchased_feed_emissions"
     assert info2["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
 
@@ -327,20 +327,20 @@ def test_calculate_emissions_empty_input(em: EmissionsEstimator, mocker: MockerF
     """Empty input still logs two variables with empty dicts."""
     mock_add_variable = mocker.patch.object(em.om, "add_variable")
 
-    em.calculate_emissions({})
+    em.calculate_purchased_feed_emissions({})
 
     assert mock_add_variable.call_count == 2
 
     name1, val1, info1 = mock_add_variable.call_args_list[0].args
     assert name1 == "purchased_feed_emissions"
     assert val1 == {}
-    assert info1["function"] == "calculate_emissions"
+    assert info1["function"] == "calculate_purchased_feed_emissions"
     assert info1["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
     name2, val2, info2 = mock_add_variable.call_args_list[1].args
     assert name2 == "land_use_change_emissions"
     assert val2 == {}
-    assert info2["function"] == "calculate_emissions"
+    assert info2["function"] == "calculate_purchased_feed_emissions"
     assert info2["units"] == MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER
 
 
@@ -507,7 +507,7 @@ def test_calculate_and_report_lca_and_luc_emissions(
     mocker: MockerFixture,
 ) -> None:
     mock_add_variable_bulk = mocker.patch.object(em.om, "add_variable_bulk")
-    em._calculate_and_report_lca_and_luc_emissions(
+    em._calculate_and_report_lca_emissions(
         list(expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id.keys()),
         expected_farmgrown_feed_deductions_data,
     )

@@ -134,7 +134,7 @@ class SimulationEngine:
         is_ok_to_feed_animals, daily_feeds_fed = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
 
         daily_purchased_feeds_fed = daily_feeds_fed.get("purchased", {})
-        self.emissions_estimator.calculate_emissions(daily_purchased_feeds_fed)
+        self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
 
         if not is_ok_to_feed_animals:
             info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}

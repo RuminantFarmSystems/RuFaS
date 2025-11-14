@@ -244,7 +244,7 @@ def test_daily_simulation(
     mock_record_weather = mocker.patch.object(mock_weather, "record_weather")
     mocker.patch.object(simulation_engine.feed_manager, "report_feed_storage_levels")
     mocker.patch.object(simulation_engine.feed_manager, "report_cumulative_purchased_feeds")
-    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions_estimator, "calculate_emissions")
+    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions_estimator, "calculate_purchased_feed_emissions")
     mock_report_cumulative_purchased_feeds = mocker.patch.object(
         simulation_engine.feed_manager, "report_cumulative_purchased_feeds"
     )

@@ -368,13 +368,12 @@ class Storage:
 
     def _record_received_crop(self, simulation_day: int) -> None:
         """
-        Records the details of harvested crops received and updates the specified records
-        within a system for a particular simulation day.
+        Records the details of harvested crops received.
 
         Parameters
         ----------
         simulation_day : int
-            The day on which the crop was received, in the simulation timeline.
+            The day on which the crop was received.
         """
         info_map = {
             "class": self.__class__.__name__,
