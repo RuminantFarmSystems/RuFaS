@@ -100,6 +100,31 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
+        failing_cross_validation_blocks: list[str] = []
+        cross_validation_blocks = self.__metadata.get("cross-validation", [])
+        if cross_validation_blocks:
+            for block in cross_validation_blocks:
+                target_and_save_block = block.get("target_and_save", {})
+                target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
+                is_cross_validation_successful = self.cross_validator.cross_validate_data(
+                    target_and_save_result,
+                    block,
+                    eager_termination,
+                )
+                if not is_cross_validation_successful:
+                    failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
+                    if eager_termination:
+                        break
+        if len(failing_cross_validation_blocks) > 0:
+            self.om.add_error(
+                "Cross Validation Failure",
+                "One or more cross-validation rules failed: " f"{', '.join(failing_cross_validation_blocks)}",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self.start_data_processing.__name__,
+                },
+            )
+            is_input_data_valid = False
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
@@ -1415,7 +1440,7 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def extract_target_and_save_block(
+    def _extract_target_and_save_block(
         self, target_and_save_block: dict[str, dict[str, Any]], eager_termination: bool
     ) -> dict[str, Any]:
         """
@@ -1439,10 +1464,10 @@ class InputManager:
         self.cross_validator.check_target_and_save_block(target_and_save_block, eager_termination)
         sections = ["variables", "constants"]
         for section in sections:
-            if section == "variables":
+            if section == "variables" and target_and_save_block.get(section) is not None:
                 for key, address in target_and_save_block[section].items():
                     target_and_save_results[key] = self.get_data(address)
-            else:
+            elif section == "constants" and target_and_save_block.get(section) is not None:
                 for constant_name, value in target_and_save_block[section].items():
                     target_and_save_results[constant_name] = value
         return target_and_save_results
