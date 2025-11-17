@@ -46,6 +46,9 @@ class CurrentDayConditions:
     min_air_temperature: float
     mean_air_temperature: float
     max_air_temperature: float
+    max_mean_temperature: float
+    min_mean_temperature: float
+    max_temp_julian_day: int
     daylength: Optional[float] = None
     annual_mean_air_temperature: Optional[float] = None
     snowfall: float = 0.0
