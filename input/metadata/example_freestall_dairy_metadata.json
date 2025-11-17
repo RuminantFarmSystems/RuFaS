@@ -231,6 +231,13 @@
       "type": "json",
       "properties": "EEE_constants_properties"
     },
+    "economic_inputs": {
+      "title": "Manual economics levers",
+      "description": "Resource use and scenario-wide economic overrides consumed by the Economic module.",
+      "path": "input/data/EEE/economic_inputs.json",
+      "type": "json",
+      "properties": "economic_inputs_properties"
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
