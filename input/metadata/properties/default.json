@@ -2713,6 +2713,235 @@
       }
     }
   },
+    "economic_inputs_properties": {
+    "data_collection_app_compatible": false,
+    "Animal": {
+      "type": "object",
+      "description": "Daily resource use for animal facilities (liters/day, kWh/day, m³/day, labor hours).",
+      "diesel_liters_per_day": {
+        "type": "number",
+        "description": "Diesel burned daily by animal operations (L/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "gasoline_liters_per_day": {
+        "type": "number",
+        "description": "Gasoline burned daily by animal operations (L/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "propane_liters_per_day": {
+        "type": "number",
+        "description": "Propane burned daily by animal operations (L/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "natural_gas_megajoule_per_day": {
+        "type": "number",
+        "description": "Natural gas energy used daily by animal operations (MJ/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "electricity_kwh_per_day": {
+        "type": "number",
+        "description": "Grid electricity used daily by animal operations (kWh/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "water_cubic_meter_per_day": {
+        "type": "number",
+        "description": "Potable/process water used daily by animal operations (m³/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "labor_hours_per_day": {
+        "type": "number",
+        "description": "Labor dedicated to animal operations (hours/day).",
+        "minimum": 0,
+        "default": 0
+      }
+    },
+    "Manure": {
+      "type": "object",
+      "description": "Manual manure-management levers (labor, utilities, hauled quantities, and sales).",
+      "general": {
+        "type": "object",
+        "description": "Whole-farm manure support labor.",
+        "labor_hours": {
+          "type": "number",
+          "description": "Total manure-handling labor not tied to a specific asset (hours/day).",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "slurry_storage": {
+        "type": "object",
+        "description": "Daily resource use for slurry storages.",
+        "labor_hours": {
+          "type": "number",
+          "description": "Labor for slurry storage (hours/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "diesel_liters_per_day": {
+          "type": "number",
+          "description": "Diesel for slurry storage equipment (L/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "gasoline_liters_per_day": {
+          "type": "number",
+          "description": "Gasoline for slurry storage equipment (L/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "megajoules_per_day": {
+          "type": "number",
+          "description": "Natural-gas energy for slurry storage (MJ/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "kwh_per_day": {
+          "type": "number",
+          "description": "Electricity for slurry storage (kWh/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "cubic_meters_water_per_day": {
+          "type": "number",
+          "description": "Water used for slurry storage operations (m³/day).",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "digester": {
+        "type": "object",
+        "description": "Daily resource use and coproduct outputs for the anaerobic digester.",
+        "labor_hours_per_day": {
+          "type": "number",
+          "description": "Labor for digester operations (hours/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "diesel_liters_per_day": {
+          "type": "number",
+          "description": "Diesel used by the digester complex (L/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "gasoline_liters_per_day": {
+          "type": "number",
+          "description": "Gasoline used by the digester complex (L/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "propane_liters_per_day": {
+          "type": "number",
+          "description": "Propane used by the digester complex (L/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "megajoules_per_day": {
+          "type": "number",
+          "description": "Natural-gas energy consumed by the digester (MJ/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "kwh_per_day": {
+          "type": "number",
+          "description": "Electricity drawn by the digester (kWh/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "cubic_meters_water_per_day": {
+          "type": "number",
+          "description": "Water used by the digester (m³/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "kwh_per_day_produced": {
+          "type": "number",
+          "description": "Electricity exported from the digester (kWh/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "digester_rng_produced": {
+          "type": "number",
+          "description": "Renewable natural gas produced (MJ/day).",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "manure_disposal_kg": {
+        "type": "number",
+        "description": "Mass of manure hauled off-farm for disposal (kg/day or scenario total).",
+        "minimum": 0,
+        "default": 0
+      },
+      "manure_disposal_price_per_kg": {
+        "type": "number",
+        "description": "User-defined hauling/tipping price per kilogram (USD/kg).",
+        "minimum": 0,
+        "default": 0
+      },
+      "manure_disposal_km": {
+        "type": "number",
+        "description": "Distance traveled to dispose manure (km per haul or scenario total).",
+        "minimum": 0,
+        "default": 0
+      },
+      "manure_disposal_price_per_km": {
+        "type": "number",
+        "description": "Price per kilometer for manure hauling (USD/km).",
+        "minimum": 0,
+        "default": 0
+      },
+      "manure_sales": {
+        "type": "number",
+        "description": "Quantity of manure sold for bedding/fertilizer markets (kg/day or scenario total).",
+        "minimum": 0,
+        "default": 0
+      }
+    },
+    "Soil_and_crop": {
+      "type": "object",
+      "description": "Scenario-wide land and crop economics levers.",
+      "land_ha_purchased_whole_simulation": {
+        "type": "number",
+        "description": "Hectares of land purchased for the scenario (ha).",
+        "minimum": 0,
+        "default": 0
+      },
+      "land_ha_rented_whole_simulation": {
+        "type": "number",
+        "description": "Hectares of land rented for the scenario (ha).",
+        "minimum": 0,
+        "default": 0
+      },
+      "labor_hours_per_day": {
+        "type": "number",
+        "description": "Daily labor devoted to soil and crop tasks (hours/day).",
+        "minimum": 0,
+        "default": 0
+      },
+      "carbon_credits_whole_simulation_tonnes": {
+        "type": "number",
+        "description": "Tonnes of carbon credits earned from soil practices over the scenario (t).",
+        "minimum": 0,
+        "default": 0
+      }
+    },
+    "Feed_storage": {
+      "type": "object",
+      "description": "Daily labor requirements for feed-storage operations.",
+      "labor_hours_per_day": {
+        "type": "number",
+        "description": "Labor dedicated to feed-storage management (hours/day).",
+        "minimum": 0,
+        "default": 0
+      }
+    }
+  },
   "emissions_properties": {
     "data_collection_app_compatible": false,
     "alfalfa_tillage_emissions": {
