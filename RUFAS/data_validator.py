@@ -1636,39 +1636,56 @@ class CrossValidator:
         A mapping for all the supported relationship evaluation functions.
 
     """
+
     def __init__(self) -> None:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
-        self.relation_mapping: dict[str, Any] = {
+        self.relation_mapping: dict[str, Callable[[object, object, bool], bool]] = {
             "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
             "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
-            "greater_or_equals_to": lambda left, right, _eager_termination: (
-                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)),
+            "greater_or_equal_to": lambda left, right, _eager_termination: (
+                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)
+            ),
             "not_equal": lambda left, right, _eager_termination: not self._evaluate_equal_condition(left, right),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
             "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
-            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right)
+            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right),
         }
 
     def cross_validate_data(
-        self, im_variable_pool: dict[str, Any], cross_validation_rules: list[dict[str, Any]]
+        self, target_and_save_result: dict[str, Any], cross_validation_block: dict[str, Any], eager_termination: bool
     ) -> bool:
         """
         Performs cross-validation on the provided data using the provided cross validation rules.
 
         Parameters
         ----------
-        im_variable_pool : dict[str, Any]
-            A dictionary containing the InputManager variable pool to be validated.
-        cross_validation_rules : list[dict[str, Any]]
-            A list of dictionaries containing the cross-validation rules to be applied.
+        target_and_save_result : dict[str, Any]
+            A dictionary containing the target and save result retrieved from IM to be validated.
+        cross_validation_block : dict[str, Any]
+            A dictionary containing the cross-validation rules to be applied.
+        eager_termination : bool
+            Whether to raise an error if the data does not pass cross-validation.
 
         Returns
         -------
         bool
             A boolean indicating whether the data passed cross-validation.
         """
-        pass
+        self._target_and_save(target_and_save_result)
+
+        apply_when_rules = cross_validation_block.get("apply_when", [])
+        apply_when_conditions_satisfied = self._evaluate_condition_clause_array(apply_when_rules, eager_termination)
+        if not apply_when_conditions_satisfied:
+            return True
+
+        is_cross_validation_successful = True
+        validation_rules = cross_validation_block.get("rules", [])
+        for rule in validation_rules:
+            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination)
+            if not is_cross_validation_successful and eager_termination:
+                break
+        return is_cross_validation_successful
 
     def _save_to_alias_pool(self, alias_name: str, value: Any) -> None:
         """
@@ -1683,7 +1700,7 @@ class CrossValidator:
         """
         self._alias_pool[alias_name] = value
 
-    def _get_alias_value(self, alias_name: str, eager_termination: bool) -> Any:
+    def _get_alias_value(self, alias_name: str, eager_termination: bool, relationship: str) -> Any:
         """
         Retrieves the value associated with the specified alias name from the alias pool.
 
@@ -1693,6 +1710,8 @@ class CrossValidator:
             The alias of the value to retrieve.
         eager_termination : bool
             Whether to raise an error if the expression is not successfully evaluated.
+        relationship : str
+            The relationship being evaluated.
 
         Returns
         -------
@@ -1706,14 +1725,14 @@ class CrossValidator:
 
         """
         value = self._alias_pool.get(alias_name, None)
-        if value is None:
+        if value is None and relationship != "is_null":
             self._event_logs.append(
                 {
                     "error": "Alias name not found.",
                     "message": f"{alias_name} does not exist in the alias pool of cross validator.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._get_alias_value.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._get_alias_value.__name__,
                     },
                 }
             )
@@ -1750,8 +1769,8 @@ class CrossValidator:
                         "message": "Only constants or variables keys' content will be processed for retrieving and"
                         f" saving values. Unsupported keys {section} provided.",
                         "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator.check_target_and_save_block.__name__,
+                            "class": self.__class__.__name__,
+                            "function": self.check_target_and_save_block.__name__,
                         },
                     }
                 )
@@ -1761,7 +1780,9 @@ class CrossValidator:
                         "target_and_save_block should only have variables and constants blocks."
                     )
 
-    def _evaluate_expression(self, expression_block: dict[str, Any], eager_termination: bool) -> tuple[Any, bool]:
+    def _evaluate_expression(
+        self, expression_block: dict[str, Any], eager_termination: bool, relationship: str
+    ) -> tuple[Any, bool]:
         """
         Evaluates an expression based on the provided expression block. This function also
         optionally adds to the alias pool if the `save_as` key is present in the expression block.
@@ -1772,6 +1793,8 @@ class CrossValidator:
             A dictionary containing the expression block to be evaluated.
         eager_termination : bool
             Whether to raise an error if the expression is not successfully evaluated.
+        relationship : str
+            The relationship being evaluated.
 
         Returns
         -------
@@ -1798,8 +1821,8 @@ class CrossValidator:
                     "message": f"Unknown operation {operation} in cross validation rule. Expected one of "
                     f"{list(AGGREGATION_FUNCTIONS.keys())}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._evaluate_expression.__name__,
                     },
                 }
             )
@@ -1814,8 +1837,8 @@ class CrossValidator:
                     "error": "Missing Ordered Variables",
                     "message": "Ordered variables list is empty or missing in cross validation rule.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._evaluate_expression.__name__,
                     },
                 }
             )
@@ -1825,7 +1848,7 @@ class CrossValidator:
                 return None, False
         ordered_values: list[Any] = []
         for alias_name in ordered_variable_alias:
-            value = self._get_alias_value(alias_name, eager_termination)
+            value = self._get_alias_value(alias_name, eager_termination, relationship)
             ordered_values.append(value)
 
         if any(isinstance(value, (list, dict)) for value in ordered_values):
@@ -1836,9 +1859,10 @@ class CrossValidator:
             ordered_values = (
                 ordered_values[0] if isinstance(ordered_values[0], list) else list(ordered_values[0].values())
             )
-            result = ordered_values if expression_block["apply_to"] == "individual" else aggregator(ordered_values)
+            apply_to = expression_block.get("apply_to", "group")
+            result = ordered_values if apply_to == "individual" else [aggregator(ordered_values)]
         else:
-            result = aggregator(ordered_values)
+            result = ordered_values if operation == "no_op" else [aggregator(ordered_values)]
 
         if "save_as" in expression_block:
             save_as_alise_name: str = expression_block["save_as"]
@@ -1879,8 +1903,8 @@ class CrossValidator:
                     "message": "Only one list or dict variable can be selected for cross validation in "
                     "a single expression block.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1899,8 +1923,8 @@ class CrossValidator:
                     "message": "The 'apply_to' key is required in expression block "
                     "when a complex data structure is selected.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1914,8 +1938,8 @@ class CrossValidator:
                     "error": "Unknown apply_to value",
                     "message": f"Unknown apply_to value {apply_to} in expression block.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_expression.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._validate_expression_block_with_complex_variable_values.__name__,
                     },
                 }
             )
@@ -1945,14 +1969,18 @@ class CrossValidator:
         """
         if not self._validate_condition_clause(condition_clause, eager_termination):
             return False
-
-        left_hand, left_evaluated = self._evaluate_expression(condition_clause["left_expression"], eager_termination)
-        right_hand, right_evaluated = self._evaluate_expression(condition_clause["right_expression"], eager_termination)
+        relationship = condition_clause.get("relationship", "")
+        left_hand, left_evaluated = self._evaluate_expression(
+            condition_clause["left_hand"], eager_termination, relationship
+        )
+        right_hand, right_evaluated = self._evaluate_expression(
+            condition_clause["right_hand"], eager_termination, relationship
+        )
 
         if not (left_evaluated and right_evaluated):
             return False
 
-        evaluation_function = self.relation_mapping.get(condition_clause["relationship"])
+        evaluation_function = self.relation_mapping[condition_clause["relationship"]]
         return evaluation_function(left_hand, right_hand, eager_termination)
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
@@ -1987,8 +2015,8 @@ class CrossValidator:
                 "error": "Missing required condition clause field",
                 "message": f"Missing the {missing_field} field in condition clause.",
                 "info_map": {
-                    "class": CrossValidator.__name__,
-                    "function": CrossValidator._log_missing_condition_clause_field.__name__,
+                    "class": self.__class__.__name__,
+                    "function": self._log_missing_condition_clause_field.__name__,
                 },
             }
         )
@@ -2002,8 +2030,8 @@ class CrossValidator:
                     "error": "Relationship must be a string.",
                     "message": f"Relationship block must be a string, got: {type(relationship)}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._validate_relationship.__name__,
                     },
                 }
             )
@@ -2016,8 +2044,8 @@ class CrossValidator:
                     "error": "Invalid relationship.",
                     "message": f"Relationship block must be one of {available_relationship}," f" got: {relationship}.",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._validate_relationship.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._validate_relationship.__name__,
                     },
                 }
             )
@@ -2027,37 +2055,37 @@ class CrossValidator:
         else:
             return True
 
-    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """Evaluates equal condition."""
-        return left_hand_value == right_hand_value
+        return bool(left_hand_value == right_hand_value)
 
-    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> Any:
+    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """Evaluates greater than condition"""
-        return left_hand_value > right_hand_value
+        return bool(left_hand_value > right_hand_value)
 
     def _evaluate_is_null(self, left_hand_value: Any) -> bool:
         """Evaluates is null condition."""
-        return left_hand_value is None
+        return bool(all(value is None for value in left_hand_value))
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
         # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
-        if not isinstance(data_type, str):
+        if not isinstance(data_type[0], str):
             self._event_logs.append(
                 {
                     "error": "Invalid type validation",
                     "message": f"Must indicate the type to compare in string data type, got: {type(data_type)}",
                     "info_map": {
-                        "class": CrossValidator.__name__,
-                        "function": CrossValidator._evaluate_condition.__name__,
+                        "class": self.__class__.__name__,
+                        "function": self._evaluate_is_type.__name__,
                     },
                 }
             )
             if eager_termination:
                 raise ValueError("Invalid type comparison in cross validation.")
             return False
-        data_type = data_type.strip().lower()
-        checkers = {
+        data_type = data_type[0].strip().lower()
+        checkers: dict[str, Callable[[Any], bool]] = {
             "string": lambda v: isinstance(v, str),
             "integer": lambda v: isinstance(v, int) and not isinstance(v, bool),
             "float": lambda v: isinstance(v, float),
@@ -2073,7 +2101,7 @@ class CrossValidator:
                     "message": f"Unsupported data type {data_type}. Supported types: {supported}.",
                     "info_map": {
                         "class": self.__class__.__name__,
-                        "function": "_evaluate_is_type",
+                        "function": self._evaluate_is_type.__name__,
                     },
                 }
             )
@@ -2081,7 +2109,7 @@ class CrossValidator:
                 raise ValueError(f"Unsupported data type {data_type}. Supported types: {supported}.")
             return False
 
-        return bool(checker(left_hand_value))
+        return bool(all(checker(value) for value in left_hand_value))
 
     def _evaluate_regex(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """
@@ -2099,7 +2127,7 @@ class CrossValidator:
         bool
             True if the value fully matches the regex pattern, otherwise False.
         """
-        return re.fullmatch(right_hand_value, left_hand_value) is not None
+        return bool(re.fullmatch(right_hand_value, left_hand_value) is not None)
 
     def _evaluate_condition_clause_array(
         self, condition_clause_array: list[dict[str, Any]], eager_termination: bool
@@ -2125,16 +2153,13 @@ class CrossValidator:
             if not satisfied:
                 self._event_logs.append(
                     {
-                        "error": "Unsatisfied condition clause in conditional clause array.",
+                        "log": "Unsatisfied condition clause in conditional clause array.",
                         "message": f"Condition not satisfied for condition clause: {clause}",
                         "info_map": {
-                            "class": CrossValidator.__name__,
-                            "function": CrossValidator._evaluate_condition_clause_array.__name__,
+                            "class": self.__class__.__name__,
+                            "function": self._evaluate_condition_clause_array.__name__,
                         },
                     }
                 )
-                if not eager_termination:
-                    return False
-                else:
-                    raise ValueError(f"Condition not satisfied for condition clause: {clause}.")
+                return False
         return True
