@@ -150,7 +150,12 @@ class SimulationEngine:
         )
 
         self.manure_manager.run_daily_update(
-            all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
+            all_manure_data,
+            self.time,
+            self.weather.get_current_day_conditions(self.time),
+            self.weather.sin,
+            self.weather.cos,
+            self.weather.mean,
         )
 
         self.time.record_time()
