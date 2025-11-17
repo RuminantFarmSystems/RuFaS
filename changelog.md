@@ -270,6 +270,7 @@ v0.9.2
 - [2639](https://github.com/RuminantFarmSystems/MASM/pull/2639) - [minor change] [InputChange][NoOutputChange][EEE] Add Economics prices dataset.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 - [2641](https://github.com/RuminantFarmSystems/MASM/pull/2641) - [minor change] [NoInputChange][NoOutputChange][ReadMe] Fix Readme badges.
+- [2644](https://github.com/RuminantFarmSystems/MASM/pull/2644) - [minor change] [NoInputChange][NoOutputChange] Ensures a particular crop-field pair can only match one particular storage.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
 - [2633](https://github.com/RuminantFarmSystems/MASM/pull/2633) - [minor change] [NoInputChange][OutputChange][EEE] Refactors the Farmgrown Feed Emissions calculation and reporting.
 
