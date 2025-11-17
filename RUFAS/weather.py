@@ -73,7 +73,7 @@ class Weather:
                     mean_air_temperature=weather_file["avg"][i],
                     max_air_temperature=weather_file["high"][i],
                     precipitation=weather_file["precip"][i],
-                    irrigation=weather_file["irrigation"][i]
+                    irrigation=weather_file["irrigation"][i],
                 )
                 if date_key in self.weather_data.keys():
                     info_map = {
