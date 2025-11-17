@@ -3248,7 +3248,7 @@
         "minimum": 0,
         "default": 0
       },
-      "manure_disposal_km": {
+      "manure_disposal_transport_km": {
         "type": "number",
         "description": "Distance traveled to dispose manure (km per haul or scenario total).",
         "minimum": 0,
