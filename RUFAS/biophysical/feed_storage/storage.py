@@ -144,7 +144,7 @@ class Storage:
     def stored_mass(self) -> float:
         """The total mass (kg) of currently stored crops"""
         return sum(crop.fresh_mass for crop in self.stored)
-    
+
     @property
     def stored_ndf(self) -> float:
         """The total NDF (kg) of currently stored crops"""
