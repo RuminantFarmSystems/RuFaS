@@ -152,10 +152,7 @@ class SimulationEngine:
         self.manure_manager.run_daily_update(
             all_manure_data,
             self.time,
-            self.weather.get_current_day_conditions(self.time),
-            self.weather.sin,
-            self.weather.cos,
-            self.weather.mean,
+            self.weather.get_current_day_conditions(self.time)
         )
 
         self.time.record_time()
@@ -279,7 +276,7 @@ class SimulationEngine:
             available_feeds=self.feed_manager.available_feeds,
         )
 
-        self.manure_manager: ManureManager = ManureManager()
+        self.manure_manager: ManureManager = ManureManager(self.weather.sin, self.weather.cos, self.weather.mean)
 
         self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
         feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]

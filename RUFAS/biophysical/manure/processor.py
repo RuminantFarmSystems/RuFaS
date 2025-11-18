@@ -36,6 +36,12 @@ class Processor(ABC):
         Instance of the OutputManager.
     _prefix : str
         Prefix in a standardized format for reporting daily outputs from the Processor.
+    sin: list[float] | None
+        List of sin values calculated from each day's daily temperature in the simulation.
+    cos: list[float] | None
+        List of cos values calculated from each day's daily temperature in the simulation.
+    means: list[float] | None
+        List of daily mean temperature values during the simulation.
 
     Methods
     -------
@@ -57,9 +63,10 @@ class Processor(ABC):
         self._om = OutputManager()
         base_class_name = self.__class__.__bases__[0].__name__
         self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"
-        self.sin = []
-        self.cos = []
-        self.means = []
+
+        self.sin: list[float] | None = None
+        self.cos: list[float] | None = None
+        self.means: list[float] | None = None
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
@@ -307,15 +314,15 @@ class Processor(ABC):
 
     def _determine_outdoor_storage_temperature(
         self,
-        day_number: int,
+        day: int,
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
         Parameters
         ----------
-        air_temperature : float
-            The current day's ambient air temperature (°C).
+        day : int
+            Current simulation day.
 
         Returns
         -------
@@ -356,7 +363,7 @@ class Processor(ABC):
             phase_shift = value
         manure_amplitude = amplitude * 0.5
 
-        return mean_temp + manure_amplitude * math.cos(2 * math.pi / 365 * (day_number - phase_shift))
+        return mean_temp + manure_amplitude * math.cos(2 * math.pi / 365 * (day - phase_shift))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:
