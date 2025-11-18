@@ -3351,7 +3351,7 @@ def test_load_runtime_metadata_invalid_metadata(
 
     add_error.assert_called_with(
         "Runtime metadata load failure",
-        f"Runtime metadata document at '{tmp_path}\\econ_metadata.json' failed validation.",
+        f"Runtime metadata document at '{runtime_metadata_path}' failed validation.",
         {"class": "InputManager", "function": "load_runtime_metadata"},
     )
 
