@@ -139,12 +139,8 @@ class FeedManager:
             for storage_config_list in feed_storage_configs.values()
             for storage_config in storage_config_list
         ]
-        storage_name_counts = Counter(storage_config.get("name") for storage_config in all_configs)
-        duplicate_names = [name for name, count in storage_name_counts.items() if count > 1]
-        if duplicate_names:
-            raise ValueError(
-                f"Duplicate storage config names found: {duplicate_names}. Each storage config must have a unique name."
-            )
+        self._validate_storage_config_names(all_configs)
+        self._validate_crop_field_mapping(all_configs)
 
         configs_by_name: dict[str, dict[str, Any]] = {
             config["name"]: config for config in all_configs if "name" in config
@@ -169,6 +165,64 @@ class FeedManager:
                         "function": self.receive_crop.__name__,
                     },
                 )
+
+    def _validate_storage_config_names(self, all_configs: list[dict[str, Any]]) -> None:
+        """Validates that all storage configuration names are unique."""
+        storage_name_counts = Counter(storage_config.get("name") for storage_config in all_configs)
+        duplicate_names = [name for name, count in storage_name_counts.items() if count > 1]
+        if duplicate_names:
+            self._om.add_error(
+                "Duplicate Storage Config Names",
+                f"Duplicate storage config names found: {duplicate_names}. "
+                "Each storage config must have a unique name.",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._validate_storage_config_names.__name__,
+                },
+            )
+            raise ValueError(
+                f"Duplicate storage config names found: {duplicate_names}. Each storage config must have a unique name."
+            )
+
+    def _validate_crop_field_mapping(self, all_configs: list[dict[str, Any]]) -> None:
+        """
+        Validates that the combination of `crop_name` and `field_name` is unique across all storage configurations.
+        """
+        combo_to_names: dict[tuple[str | None, str | None], list[str]] = defaultdict(list)
+
+        for config in all_configs:
+            crop_name = config.get("crop_name")
+            field_name = config.get("field_name")
+            name = config.get("name", "<unnamed_storage>")
+            combo_to_names[(crop_name, field_name)].append(name)
+
+        duplicate_details = {
+            combo: names for combo, names in combo_to_names.items() if len(names) > 1 and None not in combo
+        }
+
+        if duplicate_details:
+            detail_lines = [
+                f"Combination {combo} used by storages: {', '.join(sorted(names))}"
+                for combo, names in duplicate_details.items()
+            ]
+            details = "\n".join(detail_lines)
+
+            self._om.add_error(
+                "Duplicate (crop_name, field_name) combinations",
+                f"Duplicate (crop_name, field_name) combinations found:\n"
+                f"{details}\n"
+                "Each combination must be unique across all storage configurations.",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._validate_crop_field_mapping.__name__,
+                },
+            )
+
+            raise ValueError(
+                "Duplicate (crop_name, field_name) combinations found:\n"
+                f"{details}\n"
+                "Each combination must be unique across all storage configurations."
+            )
 
     def report_feed_manager_balance(self, simulation_day: int) -> None:
         """Reports the balance of feed purchased, requested, and fed to date."""
@@ -579,8 +633,9 @@ class FeedManager:
                 remaining_amount_needed -= farmgrown_deducted
 
             if remaining_amount_needed > 1e-3:
-                purchased_deducted = \
-                    self._deduct_from_storage(feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ()))
+                purchased_deducted = self._deduct_from_storage(
+                    feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ())
+                )
                 if purchased_deducted:
                     total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
                     remaining_amount_needed -= purchased_deducted
@@ -663,12 +718,14 @@ class FeedManager:
             amount_to_remove = min(remaining, available)
             if isinstance(storage, HarvestedCrop):
                 storage.remove_feed_mass(amount_to_remove)
-                self._cumulative_farmgrown_feeds_fed[feed_id] = \
+                self._cumulative_farmgrown_feeds_fed[feed_id] = (
                     self._cumulative_farmgrown_feeds_fed.get(feed_id, 0.0) + amount_to_remove
+                )
             else:
                 storage.remove_dry_matter_mass(amount_to_remove)
-                self._cumulative_purchased_feeds_fed[feed_id] = \
+                self._cumulative_purchased_feeds_fed[feed_id] = (
                     self._cumulative_purchased_feeds_fed.get(feed_id, 0.0) + amount_to_remove
+                )
             remaining -= amount_to_remove
             deducted += amount_to_remove
 

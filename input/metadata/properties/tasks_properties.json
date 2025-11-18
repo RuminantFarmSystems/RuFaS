@@ -34,19 +34,18 @@
         },
         "metadata_file_path": {
           "type": "string",
-          "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
-          "description": "The path to the metadata JSON files to load and use in the Input Manager of this task",
-          "default": "input/metadata/example_freestall_dairy_metadata.json"
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
+          "description": "The path to the metadata JSON files to load and use in the Input Manager of this task"
         },
         "properties_file_path": {
           "type": "string",
-          "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
           "description": "The path to the first metadata properties JSON file to load and compare to the other metadata file loaded",
           "default": "input/metadata/properties/default.json"
         },
         "comparison_properties_file_path": {
           "type": "string",
-          "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
           "description": "The path to the second metadata properties JSON file to load and compare to the other metadata file loaded",
           "default": "input/metadata/properties/default.json"
         },
@@ -91,43 +90,43 @@
         },
         "save_animals_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The saving directory for animals if save_animals is set to true",
           "default": "output/"
         },
         "filters_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The directory for the files containing the output filters",
           "default": "output/output_filters/"
         },
         "csv_output_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The directory for the csv output files to be saved",
           "default": "output/CSVs/"
         },
         "json_output_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The directory for the JSON output files to be saved.",
           "default": "output/JSONs/"
         },
         "report_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The directory for reports to be saved to.",
           "default": "output/reports/"
         },
         "graphics_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The saving directory for graphics",
           "default": "output/graphics/"
         },
         "logs_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
           "description": "The directory for saving log message files, variable names, and other simulation outputs to.",
           "default": "output/logs/"
         },
@@ -158,7 +157,7 @@
               },
               "path": {
                 "type": "string",
-                "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+                "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
                 "description": "File path to the saved output pool JSON file."
               }
             },
@@ -166,7 +165,7 @@
         },
         "output_pool_path": {
           "type": "string",
-          "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9._-]+[\\\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
           "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
           "default": ""
         },
