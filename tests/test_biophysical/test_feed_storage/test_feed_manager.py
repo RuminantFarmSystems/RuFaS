@@ -360,6 +360,18 @@ def test_validate_storage_config_names_all_unique(feed_manager: FeedManager, moc
     add_error.assert_not_called()
 
 
+def test_validate_storage_config_unique_name_duplicate_other(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Should not raise ValueError if two storage configs share a duplicate other."""
+    configs = [
+        {"name": "S1", "other": 1},
+        {"name": "S2", "other": 1},
+        {"name": "S3", "other": 2},
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+    feed_manager._validate_storage_config_names(configs)
+    add_error.assert_not_called()
+
+
 def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Should raise ValueError if two storage configs share the same name."""
     configs = [
