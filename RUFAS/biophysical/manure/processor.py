@@ -52,11 +52,7 @@ class Processor(ABC):
 
     """
 
-    def __init__(
-        self,
-        name: str,
-        is_housing_emissions_calculator: bool
-    ) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
