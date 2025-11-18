@@ -148,10 +148,7 @@ class Storage:
     @property
     def stored_ndf(self) -> float:
         """The total NDF (kg) of currently stored crops"""
-        return sum(
-            crop.ndf * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass
-            for crop in self.stored
-        )
+        return sum(crop.ndf * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass for crop in self.stored)
 
     def receive_crop(self, crop: HarvestedCrop, simulation_day: int) -> None:
         """
