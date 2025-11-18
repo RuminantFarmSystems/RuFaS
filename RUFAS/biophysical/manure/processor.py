@@ -49,10 +49,7 @@ class Processor(ABC):
     def __init__(
         self,
         name: str,
-        is_housing_emissions_calculator: bool,
-        sin: list[float] | None = None,
-        cos: list[float] | None = None,
-        means: list[float] | None = None,
+        is_housing_emissions_calculator: bool
     ) -> None:
         """Initializes a new Processor."""
         self.name = name
@@ -60,9 +57,9 @@ class Processor(ABC):
         self._om = OutputManager()
         base_class_name = self.__class__.__bases__[0].__name__
         self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"
-        self.sin = sin
-        self.cos = cos
-        self.means = means
+        self.sin = []
+        self.cos = []
+        self.means = []
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
@@ -310,12 +307,7 @@ class Processor(ABC):
 
     def _determine_outdoor_storage_temperature(
         self,
-        current_day_condition: CurrentDayConditions,
         day_number: int,
-        year_end_day: int,
-        sin: list[float] | None = None,
-        cos: list[float] | None = None,
-        means: list[float] | None = None,
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
