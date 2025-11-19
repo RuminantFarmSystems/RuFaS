@@ -73,10 +73,19 @@ def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
     """Tests the stored_mass property of Storage."""
-    assert storage.stored_mass == 0.0  # Initially empty
+    assert storage.stored_mass == 0.0
     storage.receive_crop(harvested_crop, 15)
     storage.receive_crop(harvested_crop, 15)
-    assert storage.stored_mass == 200.0  # After adding a crop
+    assert storage.stored_mass == 200.0
+
+
+def test_stored_ndf(storage: Storage, harvested_crop: HarvestedCrop) -> None:
+    """Tests the stored_ndf property of Storage."""
+    assert storage.stored_ndf == 0.0
+    storage.receive_crop(harvested_crop, 15)
+    storage.receive_crop(harvested_crop, 15)
+    expected_ndf = 2 * (harvested_crop.ndf * GeneralConstants.PERCENTAGE_TO_FRACTION * harvested_crop.dry_matter_mass)
+    assert storage.stored_ndf == expected_ndf
 
 
 def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop) -> None:
@@ -146,7 +155,7 @@ def test_process_degradations(
         "class": storage.__class__.__name__,
         "function": storage.process_degradations.__name__,
         "units": MeasurementUnits.KILOGRAMS,
-        "prefix": "Feed.object.Storage.Test Storage"
+        "prefix": "Feed.object.Storage.Test Storage",
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
@@ -478,7 +487,7 @@ def test_process_moisture_loss(
         "class": storage.__class__.__name__,
         "function": storage._process_moisture_loss.__name__,
         "units": MeasurementUnits.KILOGRAMS,
-        "prefix": "Feed.object.Storage.Test Storage"
+        "prefix": "Feed.object.Storage.Test Storage",
     }
     harvested_crop.initial_dry_matter_percentage = 100.0 - moisture
     harvested_crop.initial_dry_matter_mass = (
