@@ -273,6 +273,7 @@ v0.9.2
 - [2644](https://github.com/RuminantFarmSystems/MASM/pull/2644) - [minor change] [NoInputChange][NoOutputChange] Ensures a particular crop-field pair can only match one particular storage.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
 - [2633](https://github.com/RuminantFarmSystems/MASM/pull/2633) - [minor change] [NoInputChange][OutputChange][EEE] Refactors the Farmgrown Feed Emissions calculation and reporting.
+- [2653](https://github.com/RuminantFarmSystems/MASM/pull/2653) - [minor change] [NoInputChange][OutputChange][Unit Test] Separate Unit Tests for `photosynthesize()` and `partition_biomass()` in `allocate_biomass()`.
 
 ### v0.9.2
 
