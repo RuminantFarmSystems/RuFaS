@@ -21,6 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
     TotalInventory,
+    NutrientStandard,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
@@ -511,7 +512,11 @@ class Pen:
             self.insert_single_animal_into_animals_in_pen_map(animal)
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
             nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
+                feeds_used=available_feeds,
+                ration_formulation=self.ration,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrition_supply = nutrient_supply
             animal.nutrients.set_dry_matter_intake(nutrient_supply.dry_matter)
@@ -696,7 +701,7 @@ class Pen:
             volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
             methane_production_potential=methane_production_potential,
             pen_manure_data=total_pen_manure_data,
-            bedding_non_degradable_volatile_solids=0.0
+            bedding_non_degradable_volatile_solids=0.0,
         )
 
         parlor_stream_proportion = None
@@ -783,10 +788,8 @@ class Pen:
             methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
             bedding_non_degradable_volatile_solids=(
-                0
-                if bedding.bedding_type == BeddingType.SAND
-                else total_bedding_dry_solids
-            )
+                0 if bedding.bedding_type == BeddingType.SAND else total_bedding_dry_solids
+            ),
         )
 
     def _calculate_manure_surface_area(self) -> float:
@@ -909,7 +912,11 @@ class Pen:
         for animal in self.animals_in_pen.values():
             animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
+                feeds_used=feeds_used,
+                ration_formulation=ration_formulation,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
             animal.nutrients.set_phosphorus_intake(animal.nutrition_supply.phosphorus)
@@ -1076,9 +1083,25 @@ class Pen:
         else:
             user_defined_ration_dictionary = None
             tolerance = None
+        nutrient_standard = list(self.animals_in_pen.values())[0].nutrient_standard
+
+        if nutrient_standard is NutrientStandard.NASEM:
+            enteric_methane_list = []
+            urine_nitrogen_list = []
+            for animal in self.animals_in_pen.values():
+                enteric_methane_list.append(animal.digestive_system.enteric_methane_emission)
+                urine_nitrogen_list.append(animal.digestive_system.manure_excretion.urine_nitrogen)
+            pen_average_enteric_methane = sum(enteric_methane_list) / len(enteric_methane_list)
+            pen_average_urine_nitrogen = sum(urine_nitrogen_list) / len(urine_nitrogen_list)
+        else:
+            pen_average_enteric_methane = None
+            pen_average_urine_nitrogen = None
 
         return self.ration_optimizer.attempt_optimization(
+            nutrient_standard=nutrient_standard,
             pen_average_body_weight=self.average_body_weight,
+            pen_average_enteric_methane=pen_average_enteric_methane,
+            pen_average_urine_nitrogen=pen_average_urine_nitrogen,
             requirements=self.average_nutrition_requirements,
             initial_dry_matter_requirement=initial_dry_matter_requirement,
             initial_protein_requirement=initial_protein_requirement,
