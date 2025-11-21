@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import WHOLE_MILK_ID, CalfMilkType
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
     TotalInventory,
@@ -93,14 +93,16 @@ def test_set_milk_type_in_calf_ration_manager(
 ) -> None:
     """Unit test for set_milk_type_in_calf_ration_manager()."""
     calf_ration = {WHOLE_MILK_ID: 0.0} if WHOLE_MILK_ID_in_calf_ration else {}
-    UserDefinedRationManager.user_defined_rations = {AnimalCombination.CALF: calf_ration}
+    calf_feeds = list(calf_ration.keys())
+    RationManager.user_defined_rations = {AnimalCombination.CALF: calf_ration}
+    RationManager.ration_feeds = {AnimalCombination.CALF: calf_feeds}
 
     expected_milk_type = CalfMilkType.WHOLE if WHOLE_MILK_ID_in_calf_ration else CalfMilkType.REPLACER
     info_map = {
         "class": herd_manager.__class__.__name__,
         "function": herd_manager.set_milk_type_in_calf_ration_manager.__name__,
         "milk_type": expected_milk_type.value,
-        "calf_ration": calf_ration,
+        "calf_feeds": calf_feeds,
     }
 
     mock_set_milk_type = mocker.patch(
@@ -221,7 +223,7 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
     ]
 
     mock_udr_key = mocker.MagicMock()
-    mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
+    mocker.patch.object(RationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
 
     mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=available_feeds)
 

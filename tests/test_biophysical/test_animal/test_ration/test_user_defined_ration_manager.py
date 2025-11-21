@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 
@@ -38,14 +38,14 @@ def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] 
 def test_set_user_defined_rations_valid(
     mocker: MockerFixture, valid_ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
 ) -> None:
-    mocker.patch.object(UserDefinedRationManager._om, "add_variable")
-    mock_log = mocker.patch.object(UserDefinedRationManager._om, "add_log")
+    mocker.patch.object(RationManager._om, "add_variable")
+    mock_log = mocker.patch.object(RationManager._om, "add_log")
 
-    UserDefinedRationManager.set_user_defined_rations(valid_ration_config)
+    RationManager.set_user_defined_rations(valid_ration_config)
 
     assert (
-        UserDefinedRationManager.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP]
-        == UserDefinedRationManager.user_defined_rations[AnimalCombination.CLOSE_UP]
+        RationManager.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP]
+        == RationManager.user_defined_rations[AnimalCombination.CLOSE_UP]
     )
     mock_log.assert_called_once()
 
@@ -53,10 +53,10 @@ def test_set_user_defined_rations_valid(
 def test_set_user_defined_rations_invalid(
     mocker: MockerFixture, invalid_ration_config: dict[str, dict[str, list[dict[str, float]] | float]]
 ) -> None:
-    mock_error = mocker.patch.object(UserDefinedRationManager._om, "add_error")
+    mock_error = mocker.patch.object(RationManager._om, "add_error")
 
     with pytest.raises(ValueError):
-        UserDefinedRationManager.set_user_defined_rations(invalid_ration_config)
+        RationManager.set_user_defined_rations(invalid_ration_config)
 
     assert mock_error.call_count == 3
 
@@ -180,9 +180,9 @@ def test_get_user_defined_ration(
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]],
     expected_output: dict[RUFAS_ID, float],
 ) -> None:
-    UserDefinedRationManager.user_defined_rations = user_defined_rations
+    RationManager.user_defined_rations = user_defined_rations
 
-    result = UserDefinedRationManager.get_user_defined_ration(animal_combination, requirements)
+    result = RationManager.get_user_defined_ration(animal_combination, requirements)
 
     for key, expected_value in expected_output.items():
         assert math.isclose(result[key], expected_value, rel_tol=1e-3)
