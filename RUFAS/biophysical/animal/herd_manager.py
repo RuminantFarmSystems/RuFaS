@@ -929,7 +929,8 @@ class HerdManager:
 
             if self.is_ration_defined_by_user:
                 user_defined_ration_feed_ids = RationManager.get_user_defined_ration_feeds(
-                    pen_with_min_stocking_density.animal_combination)
+                    pen_with_min_stocking_density.animal_combination
+                )
                 pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
             else:
                 pen_available_feeds = self._find_pen_available_feeds(available_feeds, RationManager.ration_feeds)
@@ -1437,8 +1438,7 @@ class HerdManager:
                 pen.ration = {}
                 continue
             if self.is_ration_defined_by_user:
-                ration_feed_ids = RationManager.get_user_defined_ration_feeds(
-                    pen.animal_combination)
+                ration_feed_ids = RationManager.get_user_defined_ration_feeds(pen.animal_combination)
             else:
                 ration_feed_ids = RationManager.get_ration_feeds(pen.animal_combination)
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, ration_feed_ids)
@@ -1481,7 +1481,8 @@ class HerdManager:
                 ration_fraction = 100 / len(pen_available_feeds)
                 RationManager.user_defined_rations = {}
                 RationManager.user_defined_rations[AnimalCombination.CALF] = {
-                    feed_id.rufas_id: ration_fraction for feed_id in pen_available_feeds}
+                    feed_id.rufas_id: ration_fraction for feed_id in pen_available_feeds
+                }
             pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(

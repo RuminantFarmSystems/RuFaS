@@ -1431,9 +1431,7 @@ def test_use_user_defined_ration(
         Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply)
     )
     mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
-    mock_get_ration = mocker.patch.object(
-        RationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6}
-    )
+    mock_get_ration = mocker.patch.object(RationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6})
     mock_set_animal_requirements = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_set_animal_supplies = mocker.patch.object(pen, "set_animal_nutritional_supply")
 

@@ -31,9 +31,7 @@ class RationManager:
     tolerance: float | None = 0.0
 
     @classmethod
-    def set_ration_feeds(
-        cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
-    ) -> None:
+    def set_ration_feeds(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]) -> None:
         """
         Maps the input feeds available for each ration to Animal combinations.
 
@@ -45,10 +43,10 @@ class RationManager:
         """
         cls.ration_feeds = {animal_combination: {} for animal_combination in AnimalCombination}
 
-        cls.ration_feeds[AnimalCombination.CALF] = ration_config['calf_feeds']
-        cls.ration_feeds[AnimalCombination.GROWING] = ration_config['growing_feeds']
-        cls.ration_feeds[AnimalCombination.CLOSE_UP] = ration_config['close_up_feeds']
-        cls.ration_feeds[AnimalCombination.LAC_COW] = ration_config['lac_cow_feeds']
+        cls.ration_feeds[AnimalCombination.CALF] = ration_config["calf_feeds"]
+        cls.ration_feeds[AnimalCombination.GROWING] = ration_config["growing_feeds"]
+        cls.ration_feeds[AnimalCombination.CLOSE_UP] = ration_config["close_up_feeds"]
+        cls.ration_feeds[AnimalCombination.LAC_COW] = ration_config["lac_cow_feeds"]
 
     @classmethod
     def get_ration_feeds(cls, animal_combination: AnimalCombination) -> list[RUFAS_ID]:
