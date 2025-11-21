@@ -28,7 +28,7 @@ class RationManager:
     _om = OutputManager()
     ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
-    tolerance: float | None
+    tolerance: float | None = 0.0
 
     @classmethod
     def set_ration_feeds(
