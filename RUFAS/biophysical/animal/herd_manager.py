@@ -28,7 +28,7 @@ from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import RationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -133,8 +133,11 @@ class HerdManager:
 
         self.is_ration_defined_by_user = is_ration_defined_by_user
         ration_feed_config = self.im.get_data("feed")
-        UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
-        UserDefinedRationManager.set_user_defined_ration_tolerance(ration_feed_config)
+        if self.is_ration_defined_by_user:
+            RationManager.set_user_defined_rations(ration_feed_config)
+            RationManager.set_user_defined_ration_tolerance(ration_feed_config)
+        else:
+            RationManager.set_ration_feeds(ration_feed_config)
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
@@ -923,10 +926,14 @@ class HerdManager:
             pen_with_min_stocking_density.set_animal_nutritional_requirements(
                 temperature=current_day_conditions.mean_air_temperature, available_feeds=available_feeds
             )
-            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
-                pen_with_min_stocking_density.animal_combination
-            )
-            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
+
+            if self.is_ration_defined_by_user:
+                user_defined_ration_feed_ids = RationManager.get_user_defined_ration_feeds(
+                    pen_with_min_stocking_density.animal_combination
+                )
+                pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
+            else:
+                pen_available_feeds = self._find_pen_available_feeds(available_feeds, RationManager.ration_feeds)
             self._reformulate_ration_single_pen(
                 pen=pen_with_min_stocking_density,
                 pen_available_feeds=pen_available_feeds,
@@ -1287,9 +1294,12 @@ class HerdManager:
         Sets the milk type of calves to be either whole or replacement depending on the diet configured by the user.
 
         """
-        calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
+        if self.is_ration_defined_by_user:
+            calf_feeds = list(RationManager.user_defined_rations[AnimalCombination.CALF].keys())
+        else:
+            calf_feeds = RationManager.ration_feeds[AnimalCombination.CALF]
 
-        if WHOLE_MILK_ID in calf_ration.keys():
+        if WHOLE_MILK_ID in calf_feeds:
             milk_type = CalfMilkType.WHOLE
         else:
             milk_type = CalfMilkType.REPLACER
@@ -1300,7 +1310,7 @@ class HerdManager:
             "class": self.__class__.__name__,
             "function": self.set_milk_type_in_calf_ration_manager.__name__,
             "milk_type": milk_type.value,
-            "calf_ration": calf_ration,
+            "calf_feeds": calf_feeds,
         }
         self.om.add_log(
             "Milk type set for calf ration",
@@ -1427,10 +1437,11 @@ class HerdManager:
             if not pen.is_populated:
                 pen.ration = {}
                 continue
-            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
-                pen.animal_combination
-            )
-            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
+            if self.is_ration_defined_by_user:
+                ration_feed_ids = RationManager.get_user_defined_ration_feeds(pen.animal_combination)
+            else:
+                ration_feed_ids = RationManager.get_ration_feeds(pen.animal_combination)
+            pen_available_feeds = self._find_pen_available_feeds(available_feeds, ration_feed_ids)
             self._reformulate_ration_single_pen(
                 pen, pen_available_feeds, current_temperature, total_inventory, simulation_day
             )
@@ -1466,6 +1477,12 @@ class HerdManager:
             for animal in pen.animals_in_pen:
                 pen.animals_in_pen[animal].daily_milking_update_without_history()
         if pen.animal_combination == AnimalCombination.CALF:
+            if not self.is_ration_defined_by_user:
+                ration_fraction = 100 / len(pen_available_feeds)
+                RationManager.user_defined_rations = {}
+                RationManager.user_defined_rations[AnimalCombination.CALF] = {
+                    feed_id.rufas_id: ration_fraction for feed_id in pen_available_feeds
+                }
             pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(
