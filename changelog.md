@@ -274,6 +274,7 @@ v0.9.2
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
 - [2633](https://github.com/RuminantFarmSystems/MASM/pull/2633) - [minor change] [NoInputChange][OutputChange][EEE] Refactors the Farmgrown Feed Emissions calculation and reporting.
 - [2600](https://github.com/RuminantFarmSystems/MASM/pull/2600) - [major change] [Animal] [InputChange] [NoOutputChange] Updates energy supply calculations and ration formulation to NASEM standards.
+- [2655](https://github.com/RuminantFarmSystems/MASM/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 
 ### v0.9.2
 
