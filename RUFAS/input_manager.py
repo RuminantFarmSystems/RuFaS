@@ -73,9 +73,7 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(
-        self, metadata_path: Path, input_root: Path, eager_termination: bool = True
-    ) -> bool:
+    def start_data_processing(self, metadata_path: Path, input_root: Path, eager_termination: bool = True) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
