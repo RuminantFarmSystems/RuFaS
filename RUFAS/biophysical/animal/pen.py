@@ -651,31 +651,7 @@ class Pen:
 
         """
         animal_manure_streams: dict[str, ManureStream] = {}
-        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
-            total_animals_in_pen = len(self.animals_in_pen)
-            num_growing = len(
-                [
-                    animal
-                    for animal in self.animals_in_pen.values()
-                    if animal.animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II]
-                ]
-            )
-            num_close_up = len(
-                [
-                    animal
-                    for animal in self.animals_in_pen.values()
-                    if animal.animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW]
-                ]
-            )
-            methane_production_potential = (
-                (0.17 * num_growing / total_animals_in_pen + 0.24 * num_close_up / total_animals_in_pen)
-                if total_animals_in_pen > 0
-                else 0.0
-            )
-        else:
-            methane_production_potential = (
-                0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
-            )
+        methane_production_potential = self._calculate_methane_production_potential()
 
         pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = PenManureData(
@@ -720,6 +696,7 @@ class Pen:
             animal_manure_streams[parlor_stream_name] = parlor_stream
         else:
             general_stream_proportion = 1.0
+        # general_stream_proportion = 1.0 if parlor_stream_proportion is None else 1 - parlor_stream_proportion
 
         self._validate_general_manure_stream_proportions()
         for stream in self.manure_streams:
@@ -740,6 +717,42 @@ class Pen:
             animal_manure_streams[stream_name] = manure_stream
 
         return animal_manure_streams
+
+    def _calculate_methane_production_potential(self) -> float:
+        """
+        Calculates the methane production potential based on the combination and type of animals in the pen.
+
+        Returns
+        -------
+        float
+            The methane production potential for the animals in the pen.
+        """
+        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+            total_animals_in_pen = len(self.animals_in_pen)
+            num_growing = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II]
+                ]
+            )
+            num_close_up = len(
+                [
+                    animal
+                    for animal in self.animals_in_pen.values()
+                    if animal.animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW]
+                ]
+            )
+            methane_production_potential = (
+                (0.17 * num_growing / total_animals_in_pen + 0.24 * num_close_up / total_animals_in_pen)
+                if total_animals_in_pen > 0
+                else 0.0
+            )
+        else:
+            methane_production_potential = (
+                0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
+            )
+        return methane_production_potential
 
     def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
         """
