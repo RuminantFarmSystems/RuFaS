@@ -77,8 +77,9 @@ class ManureManager:
         processor_connections_by_name = self._validate_and_parse_processor_connections(
             processor_connections_input, processor_configs_by_name
         )
-        self._create_all_processors(processor_connections_by_name, processor_configs_by_name,
-                                    intercept_mean_temp, phase_shift, amplitude)
+        self._create_all_processors(
+            processor_connections_by_name, processor_configs_by_name, intercept_mean_temp, phase_shift, amplitude
+        )
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
@@ -675,7 +676,7 @@ class ManureManager:
         processor_configs_by_name: dict[str, dict[str, Any]],
         intercept_mean_temp: float,
         phase_shift: float,
-        amplitude: float
+        amplitude: float,
     ) -> None:
         """
         Creates and initializes all processors based on their definitions.
