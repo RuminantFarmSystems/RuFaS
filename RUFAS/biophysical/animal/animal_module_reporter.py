@@ -965,6 +965,11 @@ class AnimalModuleReporter:
             )
             om.add_variable("days_in_milk", animal["days_in_milk"], dict(info_map, **{"units": MeasurementUnits.DAYS}))
             om.add_variable("parity", animal["parity"], dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+            om.add_variable(
+                "genetic_history",
+                animal["genetic_history"],
+                dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            )
 
     @classmethod
     def report_stillborn_calves_information(
@@ -1130,6 +1135,7 @@ class AnimalModuleReporter:
         time: RufasTime,
         heiferII_events_by_id: dict[str, str],
         cow_events_by_id: dict[str, str],
+        all_animals_genetic_history: dict[int, str]
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1146,6 +1152,8 @@ class AnimalModuleReporter:
             The dictionary of HeiferII events.
         cow_events_by_id : dict[str, str]
             The dictionary of Cow events.
+        all_animals_genetic_history : dict[int, str]
+            The dict of genetic histories for all animals in the herd by their IDs.
         """
         empty_sold_animals: list[SoldAnimalTypedDict] = [{"sold_at_day": 0, "body_weight": 0}]
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
@@ -1220,6 +1228,7 @@ class AnimalModuleReporter:
 
         AnimalModuleReporter._record_heiferIIs_conception_rate(herd_reproduction_statistics)
         AnimalModuleReporter._record_cows_conception_rate(herd_reproduction_statistics)
+        AnimalModuleReporter._report_all_animals_genetic_history(all_animals_genetic_history)
 
     @classmethod
     def _record_animal_events(cls, animal_events_by_id: dict[str, str], simulation_day: int) -> None:
@@ -1342,6 +1351,20 @@ class AnimalModuleReporter:
             "cow_overall_conception_rate",
             herd_reproduction_statistics.cow_conception_rate,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )
+
+    @classmethod
+    def _report_all_animals_genetic_history(cls, all_animals_genetic_history: dict[int, str]) -> None:
+        """Report all animals genetic history."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter._report_all_animals_genetic_history.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        om.add_variable(
+            "animals_genetic_history",
+            all_animals_genetic_history,
+            info_map
         )
 
     @classmethod

@@ -182,6 +182,7 @@ class SoldAnimalTypedDict(TypedDict):
     cull_reason: str | None
     days_in_milk: int | str
     parity: int | str
+    genetic_history: str
 
 
 class StillbornCalfTypedDict(TypedDict):

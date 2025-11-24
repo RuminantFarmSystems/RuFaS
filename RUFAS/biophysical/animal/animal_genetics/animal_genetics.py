@@ -46,26 +46,6 @@ class Genetics:
     EBV_protein: float
     ranking_index: float
 
-    """
-    id
-    days_in_milk
-    parity
-    animal_type
-    days_in_pregnancy
-    
-    at the beginning of simulation after initializing the herd.
-    we would keep a genetic history of all animals.
-    report the genetic history of sold animals when they're sold.
-    report the genetic history of all animals at the end of the simulation.
-    
-    on a daily basis, 
-    - when reporting milking stats for lactating cows,
-    we would include the genetic values.
-    - herd average genetic values.
-    - average genetic values for each animal type.
-    
-    """
-
     def __init__(
         self,
         birth_year: int,

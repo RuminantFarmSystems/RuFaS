@@ -355,6 +355,18 @@ class HerdManager:
         """
         return [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]
 
+    @property
+    def animal_genetic_history_by_id(self) -> dict[int, str]:
+        """
+        Retrieve a dict of genetic histories for all animals in the herd by id.
+
+        Returns
+        -------
+        dict[int, str]
+            A dict of genetic histories for all animals by id.
+        """
+        return {animal.id: str(animal.genetic_history) for animal in self.all_animals}
+
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
         Collects total amount of feeds needed for all animals on the current day.
@@ -759,6 +771,7 @@ class HerdManager:
                     cull_reason="NA",
                     days_in_milk="NA",
                     parity="NA",
+                    genetic_history=str(removed_heiferIII.genetic_history)
                 )
             )
             self.herd_statistics.sold_heiferIII_oversupply_num += 1
@@ -1852,6 +1865,7 @@ class HerdManager:
                 cull_reason=cow.cull_reason,
                 days_in_milk=cow.days_in_milk,
                 parity=cow.reproduction.calves,
+                genetic_history=str(cow.genetic_history)
             )
             for cow in sold_and_died_cows
         ]
@@ -1870,6 +1884,7 @@ class HerdManager:
                 cull_reason=cow.cull_reason,
                 days_in_milk=cow.days_in_milk,
                 parity=cow.reproduction.calves,
+                genetic_history=str(cow.genetic_history)
             )
             for cow in sold_cows
         ]
@@ -1914,6 +1929,7 @@ class HerdManager:
                 cull_reason="NA",
                 days_in_milk="NA",
                 parity="NA",
+                genetic_history=str(heiferII.genetic_history)
             )
             for heiferII in sold_heiferIIs
         ]
@@ -1945,6 +1961,7 @@ class HerdManager:
                 cull_reason="NA",
                 days_in_milk="NA",
                 parity="NA",
+                genetic_history=str(calf.genetic_history) if calf.genetic_history else "NA"
             )
             for calf in sold_newborn_calves
         ]
