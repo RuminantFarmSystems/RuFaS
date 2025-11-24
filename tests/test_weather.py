@@ -417,7 +417,7 @@ def test_set_LINEST_temperature_factors(
     mock_weather.cos = [0.0] * 3
     mock_weather.sin = [0.0] * 3
 
-    Weather.set_LINEST_temperature_factors(mock_weather)
+    mock_weather.set_LINEST_temperature_factors()
 
     assert mock_weather.intercept_mean_temp == expected_intercept
     assert mock_weather.amplitude == expected_amplitude
