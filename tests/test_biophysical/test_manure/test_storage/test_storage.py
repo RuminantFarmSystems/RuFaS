@@ -104,7 +104,7 @@ def test_storage_init() -> None:
                     volume=1500.0,
                     methane_production_potential=0.24,
                     pen_manure_data=None,
-                    bedding_non_degradable_volatile_solids=10
+                    bedding_non_degradable_volatile_solids=10,
                 ),
                 ManureStream(
                     water=100.0,
@@ -119,7 +119,7 @@ def test_storage_init() -> None:
                     volume=1500.0,
                     methane_production_potential=0.24,
                     pen_manure_data=None,
-                    bedding_non_degradable_volatile_solids=10
+                    bedding_non_degradable_volatile_solids=10,
                 ),
             ],
             ManureStream(
@@ -135,7 +135,7 @@ def test_storage_init() -> None:
                 volume=3000.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=20
+                bedding_non_degradable_volatile_solids=20,
             ),
         ),
     ],
@@ -216,7 +216,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             volume=10.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         )
     )
     storage.stored_manure = (
@@ -233,7 +233,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             volume=100.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         )
     )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure
@@ -281,8 +281,9 @@ def test_is_overflowing(storage: Storage, volume: float, capacity: float, expect
 @pytest.mark.parametrize(
     "emptying_fraction, is_valid", [(0.0, True), (0.5, True), (1.0, True), (-0.1, False), (1.1, False)]
 )
-def test_validate_emptying_fraction(storage: Storage, mocker: MockerFixture, emptying_fraction: float, is_valid: bool
-                                    ) -> None:
+def test_validate_emptying_fraction(
+    storage: Storage, mocker: MockerFixture, emptying_fraction: float, is_valid: bool
+) -> None:
     """Test that the _validate_emptying_fraction method in Storage works correctly."""
     mock_add_error = mocker.patch.object(storage._om, "add_error", return_value=None)
 
