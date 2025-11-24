@@ -1,4 +1,5 @@
 import numpy as np
+from RUFAS.units import MeasurementUnits
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -15,6 +16,20 @@ E_TEMPORARY_PROTEIN_STD = 20.1
 E_TEMPORARY_CORRELATION = 0.95
 FAT_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
 PROTEIN_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
+
+UNITS = {
+    "TBV_fat": MeasurementUnits.KILOGRAMS,
+    "TBV_protein": MeasurementUnits.KILOGRAMS,
+    "E_permanent_fat": MeasurementUnits.KILOGRAMS,
+    "E_permanent_protein": MeasurementUnits.KILOGRAMS,
+    "E_temporary_fat": MeasurementUnits.KILOGRAMS,
+    "E_temporary_protein": MeasurementUnits.KILOGRAMS,
+    "phenotype_fat": MeasurementUnits.KILOGRAMS,
+    "phenotype_protein": MeasurementUnits.KILOGRAMS,
+    "EBV_fat": MeasurementUnits.KILOGRAMS,
+    "EBV_protein": MeasurementUnits.KILOGRAMS,
+    "ranking_index": MeasurementUnits.UNITLESS,
+}
 
 
 class Genetics:

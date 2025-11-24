@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
+from RUFAS.biophysical.animal.data_types.genetic_history import GeneticHistory
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import (
     MilkProductionInputs,
@@ -89,6 +90,8 @@ class Animal:
         The body weight of the animal at weaning, (kg).
     genetics: Genetics
         The genetic attributes of the animal.
+    genetic_history: list[GeneticHistory]
+        The genetic history of the animal.
     body_condition_score_5: float
         The body condition score on a scale of 1 to 5, (unitless).
     cull_reason: str
@@ -188,6 +191,7 @@ class Animal:
         self.cull_reason = ""
         self.body_weight_history: list[BodyWeightHistory] = []
         self.pen_history: list[PenHistory] = []
+        self.genetic_history: list[GeneticHistory] = []
         self.sold_at_day: int | None = None
         self.stillborn_day: int | None = None
         self.dead_at_day: int | None = None
@@ -240,6 +244,7 @@ class Animal:
                 initialize_new_born_calf=False,
                 parity=self.calves,
             )
+        self.update_genetic_history(simulation_day=time.simulation_day)
 
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
@@ -1116,6 +1121,20 @@ class Animal:
             milk_fat=self.milk_production.fat_content,
             milk_lactose=self.milk_production.lactose_content,
             parity=self.calves,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            animal_type=self.animal_type,
+            TBV_fat=self.genetics.TBV_fat,
+            TBV_protein=self.genetics.TBV_protein,
+            E_permanent_fat=self.genetics.E_permanent_fat,
+            E_permanent_protein=self.genetics.E_permanent_protein,
+            E_temporary_fat=self.genetics.E_temporary_fat,
+            E_temporary_protein=self.genetics.E_temporary_protein,
+            phenotype_fat=self.genetics.phenotype_fat,
+            phenotype_protein=self.genetics.phenotype_protein,
+            EBV_fat=self.genetics.EBV_fat,
+            EBV_protein=self.genetics.EBV_protein,
+            ranking_index=self.genetics.ranking_index,
         )
 
     def _assign_sex_to_newborn_calf(self) -> None:
@@ -2388,3 +2407,28 @@ class Animal:
             )
 
         return requirements
+
+    def update_genetic_history(self, simulation_day: int) -> None:
+        if simulation_day not in [data_point["simulation_day"] for data_point in self.genetic_history]:
+            self.genetic_history.append(
+                GeneticHistory(
+                    simulation_day=simulation_day,
+                    id=self.id,
+                    days_born=self.days_born,
+                    animal_type=self.animal_type,
+                    days_in_milk=self.days_in_milk,
+                    days_in_pregnancy=self.days_in_pregnancy,
+                    parity=self.calves,
+                    TBV_fat=self.genetics.TBV_fat,
+                    TBV_protein=self.genetics.TBV_protein,
+                    E_permanent_fat=self.genetics.E_permanent_fat,
+                    E_permanent_protein=self.genetics.E_permanent_protein,
+                    E_temporary_fat=self.genetics.E_temporary_fat,
+                    E_temporary_protein=self.genetics.E_temporary_protein,
+                    phenotype_fat=self.genetics.phenotype_fat,
+                    phenotype_protein=self.genetics.phenotype_protein,
+                    EBV_fat=self.genetics.EBV_fat,
+                    EBV_protein=self.genetics.EBV_protein,
+                    ranking_index=self.genetics.ranking_index,
+                )
+            )

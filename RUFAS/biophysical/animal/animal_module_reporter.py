@@ -2,6 +2,7 @@ import sys
 from dataclasses import asdict
 from typing import Any
 
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
@@ -159,7 +160,7 @@ class AnimalModuleReporter:
         }
 
         for milk_stats in milk_reports:
-            updated_milk_data: dict[str, int | float] = asdict(milk_stats)
+            updated_milk_data: dict[str, int | float | str] = asdict(milk_stats)
             updated_milk_data["is_milking"] = milk_stats.is_milking
             updated_milk_data["estimated_daily_milk_produced"] = milk_stats.estimated_daily_milk_produced
             updated_milk_data["milk_protein"] = milk_stats.milk_protein
@@ -169,7 +170,44 @@ class AnimalModuleReporter:
             updated_milk_data["cow_id"] = milk_stats.cow_id
             updated_milk_data["pen_id"] = milk_stats.pen_id
             updated_milk_data["simulation_day"] = simulation_day
+            updated_milk_data["animal_type"] = milk_stats.animal_type.name
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
+
+    @classmethod
+    def report_average_genetics(
+            cls,
+            average_genetics: dict[str, float],
+            variable_name_prefix: str,
+            simulation_day: int
+    ) -> None:
+        """
+        Reports the average genetics data with associated simulation metadata. The
+        method adds the given genetics data to a managed output variable, using
+        a specific variable name prefix and simulation day.
+
+        Parameters
+        ----------
+        average_genetics : dict[str, float]
+            A dictionary containing genetic measurements, where the key is
+            the measurement name and the value is the averaged measurement.
+        variable_name_prefix : str
+            A prefix to be appended to the variable name for distinguishing
+            the reported data in the output.
+        simulation_day : int
+            The specific day in the simulation timeline, used to annotate the
+            reported data for temporal tracking.
+
+        Returns
+        -------
+        None
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_average_genetics.__name__,
+            "units": genetics_units,
+            "simulation_day": simulation_day,
+        }
+        om.add_variable(f"{variable_name_prefix}_average_genetics", average_genetics, info_map)
 
     @classmethod
     def report_ration_per_animal(

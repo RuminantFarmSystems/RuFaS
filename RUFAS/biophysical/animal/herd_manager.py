@@ -493,6 +493,7 @@ class HerdManager:
                     )
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
+            animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
     def _update_herd_structure(
@@ -629,8 +630,6 @@ class HerdManager:
             enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
-        # sum_genetics = sum([animal.genetics for animal in self.all_animals])
-        print(f"avg_genetics: {Genetics.calculate_average_genetic_values([animal.genetics for animal in self.all_animals])}")
 
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
@@ -640,8 +639,39 @@ class HerdManager:
         AnimalModuleReporter.report_milk(self.daily_milk_report, time.simulation_day)
         AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
         self._report_ration(time.simulation_day)
+        self._calculate_and_report_average_genetics(time.simulation_day)
 
         return herd_manager_output
+
+    def _calculate_and_report_average_genetics(self, simulation_day: int) -> None:
+        """
+        Calculates and reports the average genetics for the herd, calves, heiferIs, heiferIIs, heiferIIIs, and cows.
+        """
+        herd_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.all_animals]
+        )
+        AnimalModuleReporter.report_average_genetics(herd_average_genetics, "herd", simulation_day)
+
+        calf_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.calves]
+        )
+        AnimalModuleReporter.report_average_genetics(calf_average_genetics, "calves", simulation_day)
+        heiferI_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferI_average_genetics, "heiferI", simulation_day)
+        heiferII_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferII_average_genetics, "heiferII", simulation_day)
+        heiferIII_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIIIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferIII_average_genetics, "heiferIII", simulation_day)
+        cow_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.cows]
+        )
+        AnimalModuleReporter.report_average_genetics(cow_average_genetics, "cow", simulation_day)
 
     def _report_ration(self, simulation_day: int) -> None:
         """Report the ration for all pens."""
