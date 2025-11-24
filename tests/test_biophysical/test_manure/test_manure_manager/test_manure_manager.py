@@ -84,7 +84,7 @@ def test_init(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._populate_adjacency_matrix"
     )
 
-    ManureManager()
+    ManureManager(0.5, 0.5, 15)
 
     assert mock_get_data.call_args_list == [call("manure_management"), call("manure_processor_connection")]
     mock_get_processor_configs_by_name.assert_called_once_with(manure_management_input_json)
@@ -92,7 +92,7 @@ def test_init(
         processor_connections_input_json, expected_processor_definitions_by_name
     )
     mock_create_all_processors.assert_called_once_with(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 15
     )
     mock_populate_adjacency_matrix.assert_called_once_with(expected_processor_connections_by_name)
 
@@ -380,7 +380,7 @@ def test_create_all_processors(
     )
 
     manure_manager._create_all_processors(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 0.5
     )
 
     assert mock_separator_init.call_count == 2

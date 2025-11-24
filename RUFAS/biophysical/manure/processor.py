@@ -318,7 +318,7 @@ class Processor(ABC):
         Parameters
         ----------
         simulation_day : int
-            Current simulation day.
+            Current julian day of the year.
 
         Returns
         -------

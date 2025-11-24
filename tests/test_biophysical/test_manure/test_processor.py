@@ -344,10 +344,14 @@ def test_report_manure_stream_mismatched_keys(
     )
 
 
-@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
-def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
+@pytest.mark.parametrize("day, expected", [(1, 19.642735977830725), (15, 20.452903438767468), (20, 20.66776260955936)])
+def test_determine_outdoor_storage_temperature(mock_separator: Separator, day: int, expected: float) -> None:
     """Test that the temperature of manure in outdoor storages is calculated correctly."""
-    actual = Processor._determine_outdoor_storage_temperature(temp)
+    mock_separator.intercept_mean_temp = 15
+    mock_separator.phase_shift = 12
+    mock_separator.amplitude = 12.2
+
+    actual = mock_separator._determine_outdoor_storage_temperature(day)
 
     assert actual == expected
 

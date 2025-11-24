@@ -171,8 +171,7 @@ def test_process_manure(
     )
 
     mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
+    mock_determine_outdoor_storage_temperature.assert_called_once_with(dummy_time.current_julian_day
     )
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
