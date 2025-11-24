@@ -210,8 +210,8 @@ class ManureConstants:
 
     MANURE_TEMPERATURE_LAG: int = 30
     """
-    Number of days that elapse between peak air temperature and manure temperature. Note that this constant is 
-    subtracted in the equation for calculation daily air temperature; a positive value for this constant indicates 
+    Number of days that elapse between peak air temperature and manure temperature. Note that this constant is
+    subtracted in the equation for calculation daily air temperature; a positive value for this constant indicates
     manure temperature peaks later than air temperature, whereas a negative value indicates manure temperature peaks
     earlier than air temperature.
     """

@@ -1,9 +1,6 @@
 import math
 from abc import ABC, abstractmethod
 from dataclasses import asdict
-from typing import Optional
-
-import numpy as np
 from numpy import clip
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
