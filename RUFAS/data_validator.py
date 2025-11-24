@@ -641,7 +641,7 @@ class DataValidator:
         return True, ""
 
     def validate_metadata(
-        self, metadata: dict[str, Any], valid_data_types: set[str], address_to_data: str
+        self, metadata: dict[str, Any], valid_data_types: set[str], address_to_data: str, input_root: str,
     ) -> tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
         info_map = {
@@ -682,8 +682,8 @@ class DataValidator:
                     }
                 )
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
-
-            if not os.path.isfile(data["path"]):
+            full_path = os.path.join(input_root, data["path"])
+            if not os.path.isfile(full_path):
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",

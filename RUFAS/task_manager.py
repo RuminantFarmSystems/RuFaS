@@ -744,7 +744,8 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
-        is_data_valid = input_manager.start_data_processing(Path(args["metadata_file_path"]), eager_termination)
+        is_data_valid = input_manager.start_data_processing(Path(args["metadata_file_path"]), Path(args["input_root"]),
+                                                            eager_termination)
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
