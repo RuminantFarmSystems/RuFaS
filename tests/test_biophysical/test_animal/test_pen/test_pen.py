@@ -25,7 +25,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import Nutri
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import RationManager
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed, NutrientStandard
@@ -1202,7 +1202,7 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
 
 def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW: first attempt fails, second succeeds."""
-    mocker.patch("RUFAS.biophysical.animal.pen.UserDefinedRationManager.tolerance", 0.0, create=True)
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
 
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
@@ -1431,9 +1431,7 @@ def test_use_user_defined_ration(
         Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply)
     )
     mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
-    mock_get_ration = mocker.patch.object(
-        UserDefinedRationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6}
-    )
+    mock_get_ration = mocker.patch.object(RationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6})
     mock_set_animal_requirements = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_set_animal_supplies = mocker.patch.object(pen, "set_animal_nutritional_supply")
 
