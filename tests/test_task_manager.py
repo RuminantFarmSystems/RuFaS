@@ -619,6 +619,7 @@ def test_input_data_audit(
         "suppress_log_files": suppress_logs,
         "export_input_data_to_csv": export_input_data_to_csv,
         "input_data_csv_export_path": Path("/fake/output/saved_input"),
+        "input_root": "",
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
