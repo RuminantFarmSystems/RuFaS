@@ -310,7 +310,8 @@ class Processor(ABC):
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
 
     def _determine_outdoor_storage_temperature(
-        self, simulation_day: int,
+        self,
+        simulation_day: int,
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
@@ -340,8 +341,9 @@ class Processor(ABC):
         """
         manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
 
-        return self.intercept_mean_temp + manure_amplitude * math.cos(2 * math.pi / 365 * (
-            simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG))
+        return self.intercept_mean_temp + manure_amplitude * math.cos(
+            2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+        )
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:

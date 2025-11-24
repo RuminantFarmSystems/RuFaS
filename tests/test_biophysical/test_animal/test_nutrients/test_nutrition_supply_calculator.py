@@ -190,7 +190,7 @@ def test_calculate_nutrient_supply(
     expected_supply: NutritionSupply,
 ) -> None:
     """Test that the nutritive and energy content of a ration is calculated correctly."""
-
+    mocker.patch.object(NutritionSupplyCalculator, "nutrient_standard", NutrientStandard.NRC)
     mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_intake_discount", return_value=0.3)
     mocker.patch.object(
         NutritionSupplyCalculator, "calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
@@ -225,7 +225,9 @@ def test_calculate_nutrient_supply(
         NutritionSupplyCalculator, "_calculate_nutritive_content", side_effect=mock_nutritive_content
     )
 
-    actual_supply = NutritionSupplyCalculator.calculate_nutrient_supply(mock_feeds, ration_formulation, body_weight)
+    actual_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
+        mock_feeds, ration_formulation, body_weight, enteric_methane=1, urinary_nitrogen=1
+    )
 
     assert actual_supply.metabolizable_energy == expected_supply.metabolizable_energy
     assert actual_supply.maintenance_energy == expected_supply.maintenance_energy

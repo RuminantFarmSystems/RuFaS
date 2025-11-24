@@ -60,7 +60,6 @@ class Weather:
         self.intercept_mean_temp: float = 0.0
         self.amplitude: float = 0.0
 
-
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
@@ -129,7 +128,6 @@ class Weather:
             self.phase_shift = (phase_angle / (2 * math.pi) * 365) - 365
         else:
             self.phase_shift = phase_shift_unwrapped
-
 
     def get_current_day_conditions(self, time: RufasTime, latitude: float | None = None) -> CurrentDayConditions:
         """

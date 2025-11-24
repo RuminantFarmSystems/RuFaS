@@ -10,7 +10,12 @@ from scipy.optimize import OptimizeResult
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, FeedComponentType, FeedCategorization
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
+    FeedComponentType,
+    FeedCategorization,
+    NutrientStandard,
+)
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.units import MeasurementUnits
 
@@ -107,6 +112,7 @@ def full_mock_requirements() -> NutritionRequirements:
 @pytest.fixture
 def full_config(full_mock_feed: Feed, full_mock_requirements: NutritionRequirements) -> RationConfig:
     return RationConfig(
+        NutrientStandard.NRC,
         full_mock_requirements,
         [full_mock_feed],
         initial_dry_matter_requirement=10,
@@ -123,6 +129,7 @@ def optimizer() -> RationOptimizer:
 @pytest.fixture
 def ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> RationConfig:
     return RationConfig(
+        NutrientStandard.NRC,
         mock_requirements,
         [mock_feed],
         initial_dry_matter_requirement=30,
@@ -133,7 +140,7 @@ def ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> 
 
 def test_ration_config_initialization(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
     """Test initialization of RationConfig and derived attributes."""
-    config = RationConfig(mock_requirements, [mock_feed], 1, 1, 600)
+    config = RationConfig(NutrientStandard.NRC, mock_requirements, [mock_feed], 1, 1, 600)
     assert config.animal_requirements == mock_requirements
     assert str(config.feeds_used[0].rufas_id) == "feed1"
     assert config.price_list == [2.0]
@@ -145,7 +152,7 @@ def test_ration_config_initialization(mock_feed: Feed, mock_requirements: Nutrit
 
 def test_ration_config_initialization_no_feeds(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
     """Test initialization of RationConfig and derived attributes."""
-    config = RationConfig(mock_requirements, None, 1, 1, 600)
+    config = RationConfig(NutrientStandard.NRC, mock_requirements, None, 1, 1, 600)
     assert config.animal_requirements == mock_requirements
     assert config.feeds_used == []
     assert config.price_list == []
@@ -199,7 +206,7 @@ def test_select_constraints() -> None:
     """Test retrieval of constraint functions for a specific animal type."""
     optimizer = RationOptimizer()
     dummy_config = MagicMock()
-    optimizer.set_constraints((dummy_config,))
+    optimizer.set_constraints(dummy_config)
     result = optimizer._select_constraints(AnimalCombination.LAC_COW)
     assert isinstance(result, list)
     assert all("type" in c for c in result)
@@ -402,7 +409,16 @@ def test_attempt_optimization_success(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.minimize", return_value=mock_result)
 
     result, config = optimizer.attempt_optimization(
-        pen_average_body_weight, requirements, 1, 1, feeds, animal_comb, previous_ration
+        nutrient_standard=NutrientStandard.NRC,
+        pen_average_body_weight=pen_average_body_weight,
+        pen_average_enteric_methane=0.0,
+        pen_average_urine_nitrogen=0.0,
+        requirements=requirements,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
+        pen_available_feeds=feeds,
+        animal_combination=animal_comb,
+        previous_ration=previous_ration,
     )
 
     assert result == mock_result
@@ -438,7 +454,10 @@ def test_attempt_optimization_clips_initial_values(mocker: MockerFixture) -> Non
     )
 
     optimizer.attempt_optimization(
+        nutrient_standard=NutrientStandard.NRC,
         pen_average_body_weight=pen_average_body_weight,
+        pen_average_enteric_methane=0.0,
+        pen_average_urine_nitrogen=0.0,
         requirements=requirements,
         initial_dry_matter_requirement=1,
         initial_protein_requirement=1,
