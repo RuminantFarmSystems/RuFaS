@@ -203,3 +203,15 @@ class ManureConstants:
 
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
     """The default mole fraction of oxygen in the air within the decomposing material layer."""
+
+    MANURE_DAMPING_FACTOR: float = 0.5
+    """Unitless factor representing the reduction of the amplitude of manure temperature in the sin/cosin equation
+     compared to air temperature amplitude."""
+
+    MANURE_TEMPERATURE_LAG: int = 30
+    """
+    Number of days that elapse between peak air temperature and manure temperature. Note that this constant is
+    subtracted in the equation for calculation daily air temperature; a positive value for this constant indicates
+    manure temperature peaks later than air temperature, whereas a negative value indicates manure temperature peaks
+    earlier than air temperature.
+    """

@@ -84,7 +84,7 @@ def test_init(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._populate_adjacency_matrix"
     )
 
-    ManureManager()
+    ManureManager(0.5, 0.5, 15)
 
     assert mock_get_data.call_args_list == [call("manure_management"), call("manure_processor_connection")]
     mock_get_processor_configs_by_name.assert_called_once_with(manure_management_input_json)
@@ -92,7 +92,7 @@ def test_init(
         processor_connections_input_json, expected_processor_definitions_by_name
     )
     mock_create_all_processors.assert_called_once_with(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 15
     )
     mock_populate_adjacency_matrix.assert_called_once_with(expected_processor_connections_by_name)
 
@@ -380,7 +380,7 @@ def test_create_all_processors(
     )
 
     manure_manager._create_all_processors(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 0.5
     )
 
     assert mock_separator_init.call_count == 2
@@ -1028,7 +1028,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=0.0
+        bedding_non_degradable_volatile_solids=0.0,
     )
 
     non_lim_fields: list[str] = []
@@ -1055,7 +1055,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         "non_degradable_volatile_solids",
         "total_solids",
         "volume",
-        "bedding_non_degradable_volatile_solids"
+        "bedding_non_degradable_volatile_solids",
     ]:
         assert getattr(new_stream, field_name) == 0.0
 
@@ -1075,9 +1075,9 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         (1.0, 50.0, 50.0),
     ],
 )
-def test_determine_non_limiting_nutrient_removal_amount(portion: float,
-                                                        non_limiting: float,
-                                                        expected_removed: float) -> None:
+def test_determine_non_limiting_nutrient_removal_amount(
+    portion: float, non_limiting: float, expected_removed: float
+) -> None:
     removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
         limiting_nutrient_proportion_to_be_removed=portion,
         non_limiting_nutrients_amount=non_limiting,

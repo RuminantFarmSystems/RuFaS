@@ -1,8 +1,9 @@
+import math
 from abc import ABC, abstractmethod
 from dataclasses import asdict
-
 from numpy import clip
 
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
@@ -33,6 +34,12 @@ class Processor(ABC):
         Instance of the OutputManager.
     _prefix : str
         Prefix in a standardized format for reporting daily outputs from the Processor.
+    sin: list[float] | None
+        List of sin values calculated from each day's daily temperature in the simulation.
+    cos: list[float] | None
+        List of cos values calculated from each day's daily temperature in the simulation.
+    means: list[float] | None
+        List of daily mean temperature values during the simulation.
 
     Methods
     -------
@@ -50,6 +57,10 @@ class Processor(ABC):
         self._om = OutputManager()
         base_class_name = self.__class__.__bases__[0].__name__
         self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"
+
+        self.intercept_mean_temp: float | None = None
+        self.phase_shift: float | None = None
+        self.amplitude: float | None = None
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
@@ -295,15 +306,17 @@ class Processor(ABC):
         """
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
 
-    @staticmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+    def _determine_outdoor_storage_temperature(
+        self,
+        simulation_day: int,
+    ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
         Parameters
         ----------
-        air_temperature : float
-            The current day's ambient air temperature (°C).
+        simulation_day : int
+            Current julian day of the year.
 
         Returns
         -------
@@ -319,11 +332,15 @@ class Processor(ABC):
 
         Notes
         -----
-        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        This function clamps stored manure temperature to betw 0 and 35 °C. Between 0 and 35 °C, outdoor stored
         liquid manure temperature is assumed to be equal to ambient air temperature.
 
         """
-        return float(clip(air_temperature, 0.0, 35.0))
+        manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
+
+        return self.intercept_mean_temp + manure_amplitude * math.cos(
+            2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+        )
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:

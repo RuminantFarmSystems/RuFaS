@@ -1,4 +1,5 @@
 import datetime
+import math
 
 import numpy as np
 
@@ -52,6 +53,13 @@ class Weather:
         start_time = time.start_date
         end_time = time.end_date
 
+        self.cos: list[float] = []
+        self.sin: list[float] = []
+        self.means: list[float] = []
+        self.phase_shift: float = 0.0
+        self.intercept_mean_temp: float = 0.0
+        self.amplitude: float = 0.0
+
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
@@ -59,6 +67,9 @@ class Weather:
 
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
+                self.cos.append(math.cos(2 * math.pi / 365 * jday))
+                self.sin.append(math.sin(2 * math.pi / 365 * jday))
+                self.means.append(weather_file["avg"][i])
                 conditions = CurrentDayConditions(
                     incoming_light=weather_file["Hday"][i],
                     min_air_temperature=weather_file["low"][i],
@@ -80,6 +91,8 @@ class Weather:
 
         self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
 
+        self.set_LINEST_temperature_factors()
+
         info_map = {
             "class": self.__class__.__name__,
             "function": "__init__",
@@ -90,6 +103,31 @@ class Weather:
             self.mean_annual_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
+
+    def set_LINEST_temperature_factors(self) -> None:
+        """Set the factors related to least-squares regression calculations."""
+        # Convert to numpy arrays
+        y = np.array(self.means, dtype=float)
+        x1 = np.array(self.cos, dtype=float)
+        x2 = np.array(self.sin, dtype=float)
+
+        # Build design matrix with intercept: [x1, x2, 1]
+        X = np.column_stack((x1, x2, np.ones_like(y)))
+
+        beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+
+        cos_coef, sin_coef, mean_temp = beta
+
+        self.intercept_mean_temp = mean_temp
+
+        self.amplitude = math.sqrt(cos_coef**2 + sin_coef**2)
+
+        phase_angle = math.atan2(sin_coef, cos_coef)
+        phase_shift_unwrapped = (phase_angle / (2 * math.pi) * 365) + 365
+        if phase_shift_unwrapped > 365:
+            self.phase_shift = (phase_angle / (2 * math.pi) * 365) - 365
+        else:
+            self.phase_shift = phase_shift_unwrapped
 
     def get_current_day_conditions(self, time: RufasTime, latitude: float | None = None) -> CurrentDayConditions:
         """
