@@ -135,3 +135,6 @@ class AnimalModuleConstants:
 
     MINIMUM_TDN_DISCOUNT: float = 0.6
     """Minimum allowable TDN discount for use in energetic calculations, unitless."""
+
+    EFF_OF_ME_USE: float = 0.66
+    """Efficiency of metabolizable energy use, e.g. conversion rate of metabolizable energy to net energy, unitless."""

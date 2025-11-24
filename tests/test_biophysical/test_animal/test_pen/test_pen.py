@@ -28,11 +28,7 @@ from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, Ra
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    RUFAS_ID,
-    RequestedFeed,
-    Feed,
-)
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed, NutrientStandard
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -641,11 +637,16 @@ def test_update_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Moc
 def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
     """Tests the function to adda list of animals into the pen."""
     mock_supply_1 = MagicMock(spec=NutritionSupply)
+    digestive_system = MagicMock(spec=DigestiveSystem)
+    digestive_system.configure_mock(
+        manure_excretion=AnimalManureExcretions(urine_nitrogen=15), enteric_methane_emission=69.4
+    )
     animal_3 = create_autospec(Animal)
     animal_3.configure_mock(
         id=3,
         animal_type=AnimalType.CALF,
         nutrition_supply=mock_supply_1,
+        digestive_system=digestive_system,
         feeds_used=[MagicMock(spec=Feed)],
         body_weight=10,
     )
@@ -654,6 +655,7 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
         id=3,
         animal_type=AnimalType.CALF,
         nutrition_supply=mock_supply_1,
+        digestive_system=digestive_system,
         feeds_used=[MagicMock(spec=Feed)],
         body_weight=10,
     )
@@ -888,7 +890,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.SAND,
             ManureStream(
@@ -912,7 +914,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -937,7 +939,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.NONE,
             ManureStream(
@@ -961,7 +963,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -986,7 +988,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.CBPB_SAWDUST,
             ManureStream(
@@ -1010,7 +1012,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
     ],
@@ -1048,8 +1050,7 @@ def test_apply_bedding(
     assert pytest.approx(result.phosphorus) == expected_result.phosphorus
     assert pytest.approx(result.potassium) == expected_result.potassium
     assert pytest.approx(result.ash) == expected_result.ash
-    assert pytest.approx(
-        result.non_degradable_volatile_solids) == expected_result.non_degradable_volatile_solids
+    assert pytest.approx(result.non_degradable_volatile_solids) == expected_result.non_degradable_volatile_solids
     assert pytest.approx(result.degradable_volatile_solids) == expected_result.degradable_volatile_solids
     assert pytest.approx(result.total_solids) == expected_result.total_solids
     assert pytest.approx(result.volume) == expected_result.volume
@@ -1077,7 +1078,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         volume=12.80,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
     with pytest.raises(ValueError):
@@ -1266,7 +1267,7 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
-        None,
+        False,
         pen_available_feeds=_mock_feeds(),
         temperature=21.0,
         max_daily_feeds={},
@@ -1279,11 +1280,13 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     pen.om.add_error.assert_not_called()
 
 
-def test_attempt_formulation(mocker: MockerFixture, pen: Pen) -> None:
+def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the function _attempt_formulation"""
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
     mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization", return_value=mock_result)
+    pen.animals_in_pen = animals_in_pen
+    pen.animals_in_pen[1].nutrient_standard = NutrientStandard.NRC
     result = pen._attempt_formulation(
         is_ration_defined_by_user=False,
         pen_feeds=_mock_feeds(),

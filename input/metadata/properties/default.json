@@ -4090,7 +4090,7 @@
       "description": "The general type or category of the feed.",
       "properties": {
         "type": "string",
-        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No)$"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No|Fat)$"
       }
     },
     "Fd_Category": {
@@ -4098,7 +4098,7 @@
       "description": "Feed Category.",
       "properties": {
         "type": "string",
-        "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+        "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral|NPN Supplement)$"
       }
     },
     "DM": {
@@ -4417,7 +4417,7 @@
       "description": "Feed Category.",
       "properties": {
         "type": "string",
-        "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+        "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral|NPN Supplement)$"
       }
     },
     "feed_type": {
@@ -4425,7 +4425,7 @@
       "description": "The general type or category of the feed.",
       "properties": {
         "type": "string",
-        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Fat)$"
       }
     },
     "DM": {
@@ -5104,7 +5104,14 @@
       "properties": {
         "type": "number"
       }
-    }
+    },
+    "DE": {
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+        }
+      }
   },
   "manure_management_properties": {
     "data_collection_app_compatible": false,
