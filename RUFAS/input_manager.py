@@ -74,7 +74,7 @@ class InputManager:
         self.__pool = incoming_pool
 
     def start_data_processing(
-        self, metadata_path: Path, input_root: Path = Path(""), eager_termination: bool = True
+        self, metadata_path: Path, input_root: Path, eager_termination: bool = True
     ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -83,7 +83,7 @@ class InputManager:
         ----------
         metadata_path : Path
             File path to the metadata.
-        input_root : Path, default=Path("")
+        input_root : Path
             Root directory for all input files.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.

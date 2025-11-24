@@ -130,7 +130,7 @@ class TaskManager:
             "function": TaskManager.start.__name__,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path)
+        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""))
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         for task in task_config.get("tasks", []):
             filters_path = Path(task["filters_directory"])

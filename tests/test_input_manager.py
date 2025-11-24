@@ -351,7 +351,7 @@ def test_start_data_processing_invalid_metadata_raises(mock_input_manager: Input
     mock_validate_props = mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties")
 
     with pytest.raises(ValueError, match="bad meta"):
-        mock_input_manager.start_data_processing(Path("meta"), eager_termination=True)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=True)
 
     mock_load_props.assert_not_called()
     mock_validate_props.assert_not_called()
@@ -372,7 +372,7 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     with pytest.raises(ValueError, match="bad props"):
-        mock_input_manager.start_data_processing(Path("meta"), eager_termination=False)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=False)
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
