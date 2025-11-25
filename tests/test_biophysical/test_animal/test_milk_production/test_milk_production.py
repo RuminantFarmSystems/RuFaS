@@ -202,7 +202,7 @@ def test_calculate_daily_milk_production(
 )
 def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
     """Test the calc_305_day_milk_yield method of the MilkProduction class."""
-    assert MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param) == pytest.approx(expected, rel=1e-6)
+    assert MilkProduction.calculate_305_day_milk_yield(l_param, m_param, n_param, None) == pytest.approx(expected, rel=1e-6)
 
 
 @pytest.mark.parametrize(

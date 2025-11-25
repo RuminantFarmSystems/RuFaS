@@ -127,6 +127,7 @@ class SimulationEngine:
         is_time_to_reformulate_ration = self.time.current_date.date() == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
             self._formulate_ration()
+            self.herd_manager.update_milk_305_day_yield_predictions()
 
         requested_feed = self.herd_manager.collect_daily_feed_request()
         self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")

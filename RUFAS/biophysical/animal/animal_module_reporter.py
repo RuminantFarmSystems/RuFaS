@@ -589,8 +589,8 @@ class AnimalModuleReporter:
             "data_origin": [("HerdManager", "daily_update")],
         }
         om.add_variable(
-            "sold_heiferIII_oversupply_num",
-            herd_statistics.sold_heiferIII_oversupply_num,
+            "sold_cow_oversupply_num",
+            herd_statistics.sold_cow_oversupply_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
