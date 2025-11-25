@@ -688,7 +688,7 @@ class HerdManager:
         MIN_DIM_FOR_REMOVAL = 60
         animals_removed: list[Animal] = []
 
-        while self.current_herd_size > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
+        while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
             # partitioning between dnb and non dnb cows
             dnb_indices: list[int] = []
             non_dnb_indices: list[int] = []
@@ -764,7 +764,7 @@ class HerdManager:
         """
         animals_added: list[Animal] = []
         while (
-            self.current_herd_size + self.herd_statistics.bought_heifer_num
+            len(self.cows)
             < self.herd_statistics.herd_num * self.buying_threshold
             and time.simulation_day > 1
         ):
