@@ -5104,14 +5104,7 @@
       "properties": {
         "type": "number"
       }
-    },
-    "DE": {
-      "type": "array",
-      "description": "",
-      "properties": {
-        "type": "number"
-        }
-      }
+    }
   },
   "manure_management_properties": {
     "data_collection_app_compatible": false,

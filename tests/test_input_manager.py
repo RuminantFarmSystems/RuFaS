@@ -265,7 +265,7 @@ def test_load_data_from_csv_invalid_data_raises_error(
     ],
 )
 def test_start_data_processing(
-    mock_input_manager,
+    mock_input_manager: InputManager,
     mocker: MockerFixture,
     cv_scenario: str,
     eager_termination: bool,
@@ -317,7 +317,7 @@ def test_start_data_processing(
     cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
     mock_input_manager.data_validator.event_logs.clear()
 
-    result = mock_input_manager.start_data_processing(Path("mock/metadata/path"), eager_termination)
+    result = mock_input_manager.start_data_processing(Path("mock/metadata/path"), Path(""), eager_termination)
 
     assert result is expected_return
 
@@ -343,7 +343,7 @@ def test_start_data_processing(
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
-def test_start_data_processing_invalid_metadata_raises(mock_input_manager, mocker: MockerFixture) -> None:
+def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """If validate_metadata returns (False, msg), it should raise ValueError with that message."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
     mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(False, "bad meta"))
@@ -351,14 +351,14 @@ def test_start_data_processing_invalid_metadata_raises(mock_input_manager, mocke
     mock_validate_props = mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties")
 
     with pytest.raises(ValueError, match="bad meta"):
-        mock_input_manager.start_data_processing(Path("meta"), eager_termination=True)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=True)
 
     mock_load_props.assert_not_called()
     mock_validate_props.assert_not_called()
 
 
 def test_start_data_processing_invalid_properties_routes_logs_and_raises(
-    mock_input_manager, mocker: MockerFixture
+    mock_input_manager: InputManager, mocker: MockerFixture
 ) -> None:
     """If validate_properties returns (False, msg), it should route logs and then raise ValueError."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
@@ -372,7 +372,7 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     with pytest.raises(ValueError, match="bad props"):
-        mock_input_manager.start_data_processing(Path("meta"), eager_termination=False)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=False)
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
@@ -419,7 +419,7 @@ def test_populate_pool_valid(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=True)
+    result = input_manager._populate_pool(Path(""), eager_termination=True)
 
     # Assert
     assert result
@@ -452,7 +452,7 @@ def test_populate_pool_invalid(
     mocker.patch.object(input_manager, "elements_counter", elements_counter)
 
     # Act
-    result = input_manager._populate_pool(eager_termination=False)
+    result = input_manager._populate_pool(Path(""), eager_termination=False)
 
     # Assert
     assert not result
@@ -480,7 +480,7 @@ def test_populate_pool_partial_invalid(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=False)
+    result = input_manager._populate_pool(Path(""), eager_termination=False)
 
     # Assert
     assert result is False
@@ -515,7 +515,7 @@ def test_populate_pool_eager_termination(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=True)
+    result = input_manager._populate_pool(Path(""), eager_termination=True)
 
     # Assert
     assert result is False
@@ -541,7 +541,7 @@ def test_populate_pool_raises_keyerror(
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
             with pytest.raises(KeyError):
-                mock_input_manager._populate_pool(eager_termination=True)
+                mock_input_manager._populate_pool(Path(""), eager_termination=True)
 
             assert add_log.call_count == 0
             assert add_warning.call_count == 0
