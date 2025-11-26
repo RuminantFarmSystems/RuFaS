@@ -891,7 +891,7 @@ def test_combine(
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
 
 
-def test_convert_dict_of_lists_to_list_of_dicts_normal_case():
+def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
     input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
     expected_output = [
         {"id": 1, "name": "Alice", "age": 25},
@@ -901,19 +901,19 @@ def test_convert_dict_of_lists_to_list_of_dicts_normal_case():
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
-def test_convert_dict_of_lists_to_list_of_dicts_empty_input():
+def test_convert_dict_of_lists_to_list_of_dicts_empty_input() -> None:
     input_dict = {}
     expected_output = []
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
-def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists():
+def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists() -> None:
     input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
-def test_convert_list_to_dict_by_key_basic():
+def test_convert_list_to_dict_by_key_basic() -> None:
     list_of_dicts = [
         {"ID": 1, "value": 2, "other_keys": "other values"},
         {"ID": 3, "value": 4, "other_keys": "other values"},
@@ -922,19 +922,19 @@ def test_convert_list_to_dict_by_key_basic():
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
 
 
-def test_convert_list_to_dict_by_key_empty_list():
+def test_convert_list_to_dict_by_key_empty_list() -> None:
     list_of_dicts = []
     expected_output = {}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
 
 
-def test_convert_list_to_dict_by_key_missing_key():
+def test_convert_list_to_dict_by_key_missing_key() -> None:
     list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
     with pytest.raises(KeyError):
         Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
 
 
-def test_convert_list_to_dict_by_key_different_key():
+def test_convert_list_to_dict_by_key_different_key() -> None:
     list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
     expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
