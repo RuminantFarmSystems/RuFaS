@@ -274,8 +274,8 @@ v0.9.2
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
 - [2633](https://github.com/RuminantFarmSystems/MASM/pull/2633) - [minor change] [NoInputChange][OutputChange][EEE] Refactors the Farmgrown Feed Emissions calculation and reporting.
 - [2600](https://github.com/RuminantFarmSystems/MASM/pull/2600) - [major change] [Animal] [InputChange] [NoOutputChange] Updates energy supply calculations and ration formulation to NASEM standards.
-- [2653](https://github.com/RuminantFarmSystems/MASM/pull/2653) - [minor change] [NoInputChange][NoOutputChange][Unit Test] Separate Unit Tests for `photosynthesize()` and `partition_biomass()` in `allocate_biomass()`.
-
+- [2636](https://github.com/RuminantFarmSystems/MASM/pull/2636) - [minor change] [Manure] [NoInputChange] [OutputChange] Improve temperature estimation of slurry of liquid manure in storage.
+- 
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
