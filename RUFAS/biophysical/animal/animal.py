@@ -217,6 +217,7 @@ class Animal:
         self._daily_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
+            print(time.simulation_day)
             self._initialize_newborn_calf(args, time.simulation_day)
             dam_tbv_fat, dam_tbv_protein = args.get("dam_tbv_fat"), args.get("dam_tbv_protein")
             if dam_tbv_fat and dam_tbv_protein:

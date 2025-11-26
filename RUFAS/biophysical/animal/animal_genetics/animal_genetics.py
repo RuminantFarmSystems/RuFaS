@@ -33,6 +33,34 @@ UNITS = {
 
 
 class Genetics:
+    """
+    Genetic attributes of an animal.
+
+    Attributes
+    ----------
+    TBV_fat : float
+        True Breeding Value for fat, (kg).
+    TBV_protein : float
+        True Breeding Value for protein, (kg).
+    E_permanent_fat : float
+        Permanent Environment Effect for fat, (kg).
+    E_permanent_protein : float
+        Permanent Environment Effect for protein, (kg).
+    E_temporary_fat : float
+        Temporary Environment Effect for fat, (kg).
+    E_temporary_protein : float
+        Temporary Environment Effect for protein, (kg).
+    phenotype_fat : float
+        Phenotype for fat, (kg).
+    phenotype_protein : float
+        Phenotype for protein, (kg).
+    EBV_fat : float
+        Estimated Breeding Value for fat, (kg).
+    EBV_protein : float
+        Estimated Breeding Value for protein, (kg).
+    ranking_index : float
+        Ranking index for animal performance.
+    """
     TBV_fat: float
     TBV_protein: float
     E_permanent_fat: float
@@ -156,20 +184,20 @@ class Genetics:
         return 0.318 * self.EBV_fat + 0.13 * self.EBV_protein
 
     @staticmethod
-    def calculate_average_genetic_values(list_of_genetics: list["Genetics"]) -> dict[str, float]:
+    def calculate_average_genetic_values(list_of_genetics: list["Genetics"]) -> dict[str, float | None]:
         if (num_animal := len(list_of_genetics)) <=0 :
             return {
-                "TBV_fat": 0.0,
-                "TBV_protein": 0.0,
-                "E_permanent_fat": 0.0,
-                "E_permanent_protein": 0.0,
-                "E_temporary_fat": 0.0,
-                "E_temporary_protein": 0.0,
-                "phenotype_fat": 0.0,
-                "phenotype_protein": 0.0,
-                "EBV_fat": 0.0,
-                "EBV_protein": 0.0,
-                "ranking_index": 0.0,
+                "TBV_fat": None,
+                "TBV_protein": None,
+                "E_permanent_fat": None,
+                "E_permanent_protein": None,
+                "E_temporary_fat": None,
+                "E_temporary_protein": None,
+                "phenotype_fat": None,
+                "phenotype_protein": None,
+                "EBV_fat": None,
+                "EBV_protein": None,
+                "ranking_index": None,
             }
         else:
             return {

@@ -7,6 +7,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -411,7 +412,8 @@ def test_create_newborn_calf(
         days_born=0,
         birth_weight=10.1,
         initial_phosphorus=10.0,
-        net_merit=18.8,
+        dam_tbv_fat=10.0,
+        dam_tbv_protein=10.0,
     )
     animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold, stillborn=is_newborn_calf_stillborn)
     animal.events = MagicMock(auto_spec=AnimalEvents)
@@ -419,11 +421,16 @@ def test_create_newborn_calf(
 
     mock_animal_init = mocker.patch("RUFAS.biophysical.animal.herd_manager.Animal", return_value=animal)
 
-    herd_manager._create_newborn_calf(newborn_calf_config, 0)
+
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 100
+    mock_time.current_date = datetime.today()
+
+    herd_manager._create_newborn_calf(newborn_calf_config, mock_time)
 
     expected_newborn_calf_config = newborn_calf_config.copy()
     expected_newborn_calf_config["id"] = AnimalPopulation.current_animal_id
-    mock_animal_init.assert_called_once_with(args=expected_newborn_calf_config, simulation_day=0)
+    mock_animal_init.assert_called_once_with(args=expected_newborn_calf_config, time=mock_time)
 
     if not (is_newborn_calf_stillborn or is_newborn_calf_sold):
         animal.events.add_event.assert_called_once()
@@ -460,6 +467,7 @@ def test_check_if_heifers_need_to_be_sold(
             "cull_reason": "NA",
             "days_in_milk": "NA",
             "parity": "NA",
+            "genetic_history": str(removed_heiferIII.genetic_history),
         }
         for removed_heiferIII in expected_sold_heiferIIIs[:3]
     ]
@@ -492,15 +500,11 @@ def test_check_if_replacement_heifers_needed(
     for replacement in herd_manager.replacement_market:
         replacement.days_born = 10
 
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics."
-        "assign_net_merit_value_to_animals_entering_herd",
-        return_vale=8.8,
-    )
-
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today()
+    AnimalConfig.average_phenotype["fat_kg"] = {mock_time.current_date.year: 10.0}
+    AnimalConfig.average_phenotype["protein_kg"] = {mock_time.current_date.year: 10.0}
 
     result = herd_manager._check_if_replacement_heifers_needed(mock_time)
 
