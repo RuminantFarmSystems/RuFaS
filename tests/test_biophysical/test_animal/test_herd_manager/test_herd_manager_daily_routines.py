@@ -329,8 +329,8 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         side_effect=mock_perform_daily_routines_for_animals_side_effect,
     )
     mock_update_sold_animal_statistics = mocker.patch.object(herd_manager, "_update_sold_animal_statistics")
-    mock_check_if_heifers_need_to_be_sold = mocker.patch.object(
-        herd_manager, "_check_if_heifers_need_to_be_sold", return_value=sold_oversupply_heiferIIIs
+    mock_check_if_cows_need_to_be_sold = mocker.patch.object(
+        herd_manager, "_check_if_cows_need_to_be_sold", return_value=sold_oversupply_heiferIIIs
     )
     mock_check_if_replacement_heifers_needed = mocker.patch.object(
         herd_manager, "_check_if_replacement_heifers_needed", return_value=bought_replacement_heiferIIIs
@@ -375,18 +375,9 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_update_sold_animal_statistics.assert_called_once_with(
         sold_newborn_calves=[], sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
     )
-    mock_check_if_heifers_need_to_be_sold.assert_called_once_with(simulation_day=mock_time.simulation_day)
-    mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
-    mock_update_herd_structure.assert_called_once_with(
-        graduated_animals=graduated_animals,
-        newborn_calves=newborn_calves,
-        newly_added_animals=bought_replacement_heiferIIIs,
-        removed_animals=removed_animals,
-        available_feeds=[mock_feed],
-        current_day_conditions=mock_weather.get_current_day_conditions(),
-        total_inventory=mock_total_inventory,
-        simulation_day=15,
-    )
+    assert mock_check_if_cows_need_to_be_sold.call_count == 0
+    assert mock_check_if_replacement_heifers_needed.call_count == 0
+    assert mock_update_herd_structure.call_count == 0
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()
     mock_report_manure_streams.assert_called_once()
@@ -429,7 +420,7 @@ def test_create_newborn_calf(
         animal.events.add_event.assert_called_once()
 
 
-def test_check_if_heifers_need_to_be_sold(
+def test_check_if_cows_need_to_be_sold(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
     """Unit test for _check_if_heifers_need_to_be_sold()"""
@@ -448,7 +439,7 @@ def test_check_if_heifers_need_to_be_sold(
         len(herd_manager.cows),
     )
 
-    result = herd_manager._check_if_heifers_need_to_be_sold(simulation_day=0)
+    result = herd_manager._check_if_cows_need_to_be_sold(simulation_day=0)
 
     expected_sold_heiferIIIs = mock_herd["heiferIIIs"][::-1][:3]
     expected_sold_heiferIIIs_info = [
@@ -466,7 +457,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert result == expected_sold_heiferIIIs
     assert herd_manager.herd_statistics.sold_heiferIIIs_info == expected_sold_heiferIIIs_info
     assert herd_manager.herd_statistics.heiferIII_num == 97
-    assert herd_manager.herd_statistics.sold_heiferIII_oversupply_num == 3
+    assert herd_manager.herd_statistics.sold_cow_oversupply_num == 3
 
 
 def test_check_if_replacement_heifers_needed(

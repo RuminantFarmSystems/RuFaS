@@ -2451,56 +2451,6 @@ def test_animal_life_stage_update_not_cow(
     )
 
 
-@pytest.mark.parametrize("future_cull_date,future_death_date,expected_status", [(15, 15, AnimalStatus.SOLD)])
-def test_animal_life_stage_update_low_production(
-    mock_lactating_cow: Animal,
-    mocker: MockerFixture,
-    future_cull_date: int,
-    future_death_date: int,
-    expected_status: AnimalStatus,
-) -> None:
-    mock_lactating_cow.animal_type = AnimalType.LAC_COW
-    mock_lactating_cow.future_cull_date = future_cull_date
-    mock_lactating_cow.future_death_date = future_death_date
-    mock_lactating_cow.reproduction.do_not_breed = True
-    mock_lactating_cow.milk_production.daily_milk_produced = 5
-    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=5)
-    time = RufasTime(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
-    mock_update = mocker.patch.object(
-        mock_lactating_cow,
-        "_cow_life_stage_update",
-        return_value=(
-            AnimalStatus.LIFE_STAGE_CHANGED,
-            NewBornCalfValuesTypedDict(
-                breed="test_breed",
-                animal_type="test_type",
-                birth_date="test_bd",
-                days_born=5,
-                birth_weight=15.3,
-                initial_phosphorus=18.4,
-                net_merit=75.1,
-            ),
-        ),
-    )
-
-    status, output = mock_lactating_cow.animal_life_stage_update(time)
-
-    mock_update.assert_called_once()
-
-    assert mock_lactating_cow.cull_reason == animal_constants.LOW_PROD_CULL
-    assert mock_lactating_cow.sold_at_day == 5
-    assert status == AnimalStatus.SOLD
-    assert output == NewBornCalfValuesTypedDict(
-        breed="test_breed",
-        animal_type="test_type",
-        birth_date="test_bd",
-        days_born=5,
-        birth_weight=15.3,
-        initial_phosphorus=18.4,
-        net_merit=75.1,
-    )
-
-
 @pytest.mark.parametrize("born_days, expected", [(10, False), (60, True)])
 def test_evaluate_calf_for_heiferI(mock_lactating_cow: Animal, born_days: int, expected: bool) -> None:
     mock_lactating_cow.days_born = born_days
