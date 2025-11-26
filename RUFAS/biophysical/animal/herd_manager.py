@@ -606,7 +606,6 @@ class HerdManager:
                 simulation_day=time.simulation_day,
             )
 
-
         # removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day)
         # newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
         # self._update_herd_structure(
@@ -619,7 +618,7 @@ class HerdManager:
         #     total_inventory=total_inventory,
         #     simulation_day=time.simulation_day,
         # )
-            #print(newly_added_animals)
+        # print(newly_added_animals)
 
         self.record_pen_history(time.simulation_day)
         enteric_methane_emission_by_pen: dict[str, float] = {}
@@ -631,7 +630,6 @@ class HerdManager:
             enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
-
 
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
@@ -704,7 +702,7 @@ class HerdManager:
         MIN_DIM_FOR_REMOVAL = 60
         animals_removed: list[Animal] = []
         while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
-            #print(str(simulation_day) + " sold")
+            # print(str(simulation_day) + " sold")
             # partitioning between dnb and non dnb cows
             dnb_indices: list[int] = []
             non_dnb_indices: list[int] = []
