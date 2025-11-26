@@ -1,9 +1,7 @@
-import math
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 from numpy import clip
 
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
