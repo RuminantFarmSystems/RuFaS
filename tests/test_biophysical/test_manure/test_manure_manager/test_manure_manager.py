@@ -911,7 +911,7 @@ def test_request_nutrients(
     mock_time.current_calendar_year = 2025
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     mock_add_log = mocker.patch.object(OutputManager, "add_log")
-    manure_manager = ManureManager()
+    manure_manager = ManureManager(0.6, 0.6, 0.6)
     manure_manager._manure_nutrient_manager = ManureNutrientManager()
     manure_manager._om = OutputManager()
 
@@ -1098,7 +1098,7 @@ def test_determine_limiting_nutrient_with_patched_scaling(
     n_mass,
     p_mass,
     expected_is_nitrogen_limiting,
-):
+) -> None:
     seq = [n_mass, p_mass]
     mocker.patch.object(
         ManureNutrientManager, "calculate_projected_manure_mass", side_effect=lambda requested, fraction: seq.pop(0)
@@ -1204,7 +1204,7 @@ def test_record_manure_request_results_parametrized(
     mock_time.current_calendar_year = 2025
 
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
-    manure_manager = ManureManager()
+    manure_manager = ManureManager(0.5, 0.5, 0.5)
 
     mock_output_manager = mocker.MagicMock()
     manure_manager._om = mock_output_manager
@@ -1352,7 +1352,7 @@ def test_calculate_supplemental_manure_needed(
     """
     # Arrange
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
-    manure_manager = ManureManager()
+    manure_manager = ManureManager(0.6, 0.6, 0.6)
     # Act
     actual_result = manure_manager._calculate_supplemental_manure_needed(on_farm_manure, nutrient_request)
 
