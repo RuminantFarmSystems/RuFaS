@@ -336,3 +336,29 @@ def test_calculate_surface_area(mocker: MockerFixture) -> None:
     )
     storage.__post_init__()
     assert storage._surface_area == pytest.approx(97.8713558537714)
+
+@pytest.mark.parametrize("day, expected", [(1, 19.642735977830725), (15, 20.452903438767468), (20, 20.66776260955936)])
+def test_determine_outdoor_storage_temperature(storage: Storage, day: int, expected: float) -> None:
+    """Test that the temperature of manure in outdoor storages is calculated correctly."""
+    storage.intercept_mean_temp = 15
+    storage.phase_shift = 12
+    storage.amplitude = 12.2
+
+    actual = storage._determine_outdoor_storage_temperature(day)
+
+    assert actual == expected
+
+
+def test_determine_outdoor_storage_temperature_missing_factors_error(storage: Storage) -> None:
+    """
+    Tests that a ValueError is raised when all required attributes (amplitude,
+    intercept, and phase_shift) are missing from the instance.
+    """
+    storage.amplitude = None
+    storage.intercept_mean_temp = None
+    storage.phase_shift = None
+
+    with pytest.raises(ValueError) as e:
+        storage._determine_outdoor_storage_temperature(1)
+
+    assert str(e.value) == "No data for outdoor storage temperature calculations."

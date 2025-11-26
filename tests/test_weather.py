@@ -1,7 +1,9 @@
+import math
 from datetime import datetime
 from typing import Callable
 from unittest.mock import MagicMock, patch
 
+import numpy as np
 import pytest
 from pytest_mock.plugin import MockerFixture
 
@@ -44,6 +46,9 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_weather = Weather({}, mock_time)
     mock_weather.om = OutputManager()
+    mock_weather.means = [10.0, 20.0, 30.0]
+    mock_weather.cos = [0.5, 0.6, 0.7]
+    mock_weather.sin = [0.1, 0.2, 0.3]
     weather_data = {
         datetime(2023, 9, 24): CurrentDayConditions(
             incoming_light=1,
@@ -363,3 +368,57 @@ def test_check_adequate_weather_data_error(weather_file: dict, mocker: MockerFix
         patch_add_error.assert_called_once()
     except ValueError as e:
         assert e.args[0] == "Not enough weather data provided to support the duration of simulation period"
+
+
+@pytest.mark.parametrize(
+    "lstsq_result, expected_intercept, expected_amplitude, expected_phase_shift",
+    [
+        (
+            (np.array([10.0, 0.0, 20.0]), None, None, None),
+            20.0,
+            10.0,
+            365.0,
+        ),
+        (
+            (np.array([0.0, 10.0, 15.0]), None, None, None),
+            15.0,
+            10.0,
+            -273.75,
+        ),
+        (
+            (np.array([3.0, 4.0, 5.0]), None, None, None),
+            5.0,
+            5.0,
+            ((math.atan2(4.0, 3.0) / (2 * math.pi) * 365) - 365),
+        ),
+        (
+            (np.array([-3.0, 4.0, 10.0]), None, None, None),
+            10.0,
+            5.0,
+            ((math.atan2(4.0, -3.0) / (2 * math.pi) * 365) - 365),
+        ),
+    ],
+)
+def test_set_LINEST_temperature_factors(
+    mock_weather: Weather,
+    mocker: MockerFixture,
+    lstsq_result: tuple,
+    expected_intercept: float,
+    expected_amplitude: float,
+    expected_phase_shift: float,
+) -> None:
+    """
+    Tests that LINEST factors (amplitude, intercept, phase shift) are correctly
+    calculated and set as attributes based on regression coefficients.
+    """
+    mocker.patch("numpy.linalg.lstsq", return_value=lstsq_result)
+
+    mock_weather.means = [0.0] * 3
+    mock_weather.cos = [0.0] * 3
+    mock_weather.sin = [0.0] * 3
+
+    mock_weather.set_LINEST_temperature_factors()
+
+    assert mock_weather.intercept_mean_temp == expected_intercept
+    assert mock_weather.amplitude == expected_amplitude
+    assert mock_weather.phase_shift == pytest.approx(expected_phase_shift, abs=1e-4)

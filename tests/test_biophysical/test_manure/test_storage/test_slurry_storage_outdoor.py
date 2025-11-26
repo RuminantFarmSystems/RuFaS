@@ -32,7 +32,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -52,7 +52,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -171,9 +171,7 @@ def test_process_manure(
     )
 
     mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
-    )
+    mock_determine_outdoor_storage_temperature.assert_called_once_with(dummy_time.current_julian_day)
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure.nitrogen)
@@ -235,7 +233,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514
+                bedding_non_degradable_volatile_solids=7.846972885972514,
             ),
         ),
         (
@@ -253,7 +251,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514
+                bedding_non_degradable_volatile_solids=7.846972885972514,
             ),
         ),
         (
@@ -271,7 +269,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514
+                bedding_non_degradable_volatile_solids=7.846972885972514,
             ),
         ),
         (
@@ -289,7 +287,7 @@ def test_process_manure(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514
+                bedding_non_degradable_volatile_solids=7.846972885972514,
             ),
         ),
     ],
@@ -370,7 +368,7 @@ def test_apply_methane_emissions(
             volume=100.12,
             methane_production_potential=0.24,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         )
     ],
 )
@@ -418,7 +416,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -436,7 +434,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -454,7 +452,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -472,7 +470,7 @@ def test_apply_ammonia_emissions(
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
     ],

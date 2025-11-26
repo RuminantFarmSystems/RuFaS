@@ -1,3 +1,4 @@
+import math
 from dataclasses import replace
 from math import inf
 from numpy import exp
@@ -81,6 +82,10 @@ class Storage(Processor):
         self._manure_to_process = ManureStream.make_empty_manure_stream()
         self.__post_init__()
 
+        self.intercept_mean_temp: float | None = None
+        self.phase_shift: float | None = None
+        self.amplitude: float | None = None
+
     def __post_init__(self) -> None:
         """
         Post-initialization method to calculate the surface area of the storage.
@@ -92,6 +97,45 @@ class Storage(Processor):
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self.stored_manure.volume > self._capacity
+
+    def _determine_outdoor_storage_temperature(
+        self,
+        simulation_day: int,
+    ) -> float:
+        """
+        Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        simulation_day : int
+            Current julian day of the year.
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        References
+        ----------
+        The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
+        (april.leytem@usda.gov) and A. VanderZaag (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work
+        from Genedy and Ogejo, 2021 (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and
+        maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.
+
+        Notes
+        -----
+        This function clamps stored manure temperature to betw 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature.
+
+        """
+        if self.amplitude and self.intercept_mean_temp and self.phase_shift:
+            manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
+
+            return self.intercept_mean_temp + manure_amplitude * math.cos(
+                2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+            )
+        else:
+            raise ValueError("No data for outdoor storage temperature calculations.")
 
     def _calculate_surface_area(self) -> None:
         """
