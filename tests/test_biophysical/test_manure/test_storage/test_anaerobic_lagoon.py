@@ -31,7 +31,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -51,7 +51,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -230,7 +230,7 @@ def test_apply_methane_emissions_no_flare(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
 
@@ -270,7 +270,7 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
         volume=5.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
     mock_calculate_ammonia_emissions = mocker.patch.object(
