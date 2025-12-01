@@ -104,9 +104,18 @@ class Storage(Processor):
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self.stored_manure.volume > self._capacity
 
+    @property
+    def _emptying_fraction(self) -> float:
+        """
+        The fraction of the storage that is emptied when the storage is emptied. Defaults to 1.0
+        where the entire storage is emptied.
+        """
+        return 1.0
+
     def _determine_outdoor_storage_temperature(
         self,
         simulation_day: int,
+        minimum_manure_temperature: float,
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
@@ -115,6 +124,8 @@ class Storage(Processor):
         ----------
         simulation_day : int
             Current julian day of the year.
+        minimum_manure_temperature : float
+            The minimum temperature of the manure in storage (°C).
 
         Returns
         -------
@@ -133,10 +144,10 @@ class Storage(Processor):
         """
         if self.amplitude and self.intercept_mean_temp and self.phase_shift:
             manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
-
-            return self.intercept_mean_temp + manure_amplitude * math.cos(
+            estimated_temperature = self.intercept_mean_temp + manure_amplitude * math.cos(
                 2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
             )
+            return max(minimum_manure_temperature, estimated_temperature)
         else:
             raise ValueError("No data for outdoor storage temperature calculations.")
 
@@ -182,19 +193,46 @@ class Storage(Processor):
         is_emptying_day = (
             self._storage_time_period is not None and (time.simulation_day + 1) % self._storage_time_period == 0
         )
-        if is_emptying_day:
-            self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
-            manure_to_be_returned = {"manure": replace(self.stored_manure)}
-            self.stored_manure = ManureStream.make_empty_manure_stream()
-        else:
+        if not is_emptying_day:
             empty_stream = ManureStream.make_empty_manure_stream()
             self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
             manure_to_be_returned = {}
+        else:
+            self._validate_emptying_fraction()
+            if 0.0 < self._emptying_fraction < 1.0:
+                emptied_stream = self.stored_manure.split_stream(self._emptying_fraction)
+                retained_stream = self.stored_manure.split_stream(1.0 - self._emptying_fraction)
+                self._report_manure_stream(emptied_stream, "emptied", time.simulation_day)
+                self.stored_manure = retained_stream
+                manure_to_be_returned = {"manure": replace(self.stored_manure)}
+            elif self._emptying_fraction == 0.0:
+                empty_stream = ManureStream.make_empty_manure_stream()
+                self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
+                manure_to_be_returned = {}
+            else:
+                self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
+                manure_to_be_returned = {"manure": replace(self.stored_manure)}
+                self.stored_manure = ManureStream.make_empty_manure_stream()
 
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
         return manure_to_be_returned
+
+    def _validate_emptying_fraction(self) -> None:
+        """Validates that the emptying fraction is between 0.0 and 1.0."""
+        if not 0.0 <= self._emptying_fraction <= 1.0:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+                "processor_name": self.name,
+            }
+            error_message = (
+                f"Processor '{self.name}' has an invalid emptying fraction of {self._emptying_fraction}. "
+                "The emptying fraction must be between 0.0 and 1.0. Check retention constants if applicable."
+            )
+            self._om.add_error("Invalid Emptying Fraction", error_message, info_map)
+            raise ValueError(error_message)
 
     def handle_overflowing_manure(self, time: RufasTime) -> None:
         """
