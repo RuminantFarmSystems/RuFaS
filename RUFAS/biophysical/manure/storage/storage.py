@@ -111,6 +111,7 @@ class Storage(Processor):
         where the entire storage is emptied.
         """
         return 1.0
+
     def _determine_outdoor_storage_temperature(
         self,
         simulation_day: int,
