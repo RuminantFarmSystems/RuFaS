@@ -62,7 +62,9 @@ class SlurryStorageOutdoor(Storage):
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
-        manure_temperature = self._determine_outdoor_storage_temperature(time.current_julian_day)
+        manure_temperature = self._determine_outdoor_storage_temperature(
+            time.current_julian_day, ManureConstants.SLURRY_OUTDOOR_MINIMUM_TEMPERATURE
+        )
 
         storage_methane_burned, total_storage_methane = self._apply_methane_emissions(manure_temperature)
         storage_ammonia_nitrogen = self._apply_ammonia_emissions(manure_temperature)

@@ -115,6 +115,7 @@ class Storage(Processor):
     def _determine_outdoor_storage_temperature(
         self,
         simulation_day: int,
+        minimum_manure_temperature: float,
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
@@ -123,6 +124,8 @@ class Storage(Processor):
         ----------
         simulation_day : int
             Current julian day of the year.
+        minimum_manure_temperature : float
+            The minimum temperature of the manure in storage (°C).
 
         Returns
         -------
@@ -141,10 +144,10 @@ class Storage(Processor):
         """
         if self.amplitude and self.intercept_mean_temp and self.phase_shift:
             manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
-
-            return self.intercept_mean_temp + manure_amplitude * math.cos(
+            estimated_temperature = self.intercept_mean_temp + manure_amplitude * math.cos(
                 2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
             )
+            return max(minimum_manure_temperature, estimated_temperature)
         else:
             raise ValueError("No data for outdoor storage temperature calculations.")
 
