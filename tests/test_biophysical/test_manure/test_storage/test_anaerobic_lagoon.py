@@ -165,6 +165,13 @@ def test_process_manure_cover_behaviors(
         [
             call("storage_methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
             call(
+                "outdoor_storage_manure_temperature",
+                str(25.0),
+                "process_manure",
+                MeasurementUnits.DEGREES_CELSIUS,
+                dummy_time.simulation_day,
+            ),
+            call(
                 "storage_methane_burned",
                 0.12 if expect_flare else 0.0,
                 "process_manure",

@@ -77,6 +77,13 @@ class SlurryStorageOutdoor(Storage):
         data_origin_name = self.process_manure.__name__
         units = MeasurementUnits.KILOGRAMS
         self._report_processor_output(
+            "outdoor_storage_manure_temperature",
+            str(manure_temperature),
+            data_origin_name,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
             "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day
         )
         self._report_processor_output(

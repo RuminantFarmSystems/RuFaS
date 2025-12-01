@@ -178,6 +178,13 @@ def test_process_manure(
     assert mock_report_manure_stream.call_count == 2
     assert mock_report_processor_output.call_args_list == [
         call(
+            "outdoor_storage_manure_temperature",
+            str(dummy_manure_temperature),
+            expected_data_origin_name,
+            MeasurementUnits.DEGREES_CELSIUS,
+            dummy_time.simulation_day,
+        ),
+        call(
             "storage_methane",
             dummy_total_storage_methane,
             expected_data_origin_name,

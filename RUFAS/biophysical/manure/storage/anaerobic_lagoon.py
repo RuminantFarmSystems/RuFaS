@@ -96,6 +96,13 @@ class AnaerobicLagoon(Storage):
             "storage_methane", total_storage_methane, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
         )
         self._report_processor_output(
+            "outdoor_storage_manure_temperature",
+            str(manure_temperature),
+            function_name,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
             "storage_methane_burned",
             storage_methane_burned,
             function_name,
