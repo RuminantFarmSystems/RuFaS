@@ -594,8 +594,8 @@ class HerdManager:
         self._update_stillborn_calf_statistics(stillborn_newborn_calves)
 
         if time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0:
-            #print("Balance---------------------------")
-            #print(len(graduated_heiferIIIs), len(sold_and_died_cows))
+            # print("Balance---------------------------")
+            # print(len(graduated_heiferIIIs), len(sold_and_died_cows))
             removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day)
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
             self._update_herd_structure(
@@ -644,7 +644,7 @@ class HerdManager:
             enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
-        #print(len(self.cows))
+        # print(len(self.cows))
 
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
@@ -853,7 +853,6 @@ class HerdManager:
         new_array.append(animal)
         if animal.animal_type is AnimalType.LAC_COW or animal.animal_type is AnimalType.DRY_COW:
             print(str(len(new_array)) + "after")
-
 
     def _update_animal_array(self, animal: Animal) -> None:
         """
