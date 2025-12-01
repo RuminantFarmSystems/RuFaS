@@ -140,12 +140,12 @@ class HarvestedCrop:
 
     def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
         """Removes the specified amount of dry matter mass from the crop."""
-        new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
-        self.fresh_mass -= mass_to_remove
+        self.dry_matter_mass -= mass_to_remove
+        new_fresh_mass = self.fresh_mass - mass_to_remove
         if self.fresh_mass == 0.0:
             self.dry_matter_percentage = 0.0
             return
-        self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
+        self.dry_matter_percentage = (self.dry_matter_mass / new_fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def remove_feed_mass(self, dm_to_remove: float) -> None:
         """
