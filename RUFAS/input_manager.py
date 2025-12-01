@@ -73,7 +73,7 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
+    def start_data_processing(self, metadata_path: Path, input_root: Path, eager_termination: bool = True) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
@@ -81,6 +81,8 @@ class InputManager:
         ----------
         metadata_path : Path
             File path to the metadata.
+        input_root : Path
+            Root directory for all input files.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
@@ -90,8 +92,11 @@ class InputManager:
         bool
             True if data is valid, otherwise False.
         """
-        self._load_metadata(metadata_path)
-        valid, message = self.data_validator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        full_metadata_path = Path(input_root) / metadata_path
+        self._load_metadata(full_metadata_path)
+        valid, message = self.data_validator.validate_metadata(
+            self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, input_root
+        )
         if not valid:
             raise ValueError(message)
         self._load_properties()
@@ -99,7 +104,7 @@ class InputManager:
         if not valid:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
-        is_input_data_valid = self._populate_pool(eager_termination)
+        is_input_data_valid = self._populate_pool(input_root, eager_termination)
         failing_cross_validation_blocks: list[str] = []
         cross_validation_blocks = self.__metadata.get("cross-validation", [])
         if cross_validation_blocks:
@@ -291,17 +296,19 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _populate_pool(self, eager_termination: bool) -> bool:
+    def _populate_pool(self, input_root: Path, eager_termination: bool) -> bool:
         """
         Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
         then adds data to the pool.
 
         Parameters
         ----------
+        input_root : Path
+            The root directory for all input files.
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data,
-            If invalid data is found.
+            If False, the process will be terminated after going through and validating the entire data
+            if invalid data is found.
 
         Returns
         -------
@@ -315,13 +322,13 @@ class InputManager:
 
         """
 
-        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]] = {
+        data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
-            file_path = file_details["path"]
+            file_path = Path(input_root) / file_details["path"]
             if file_details["type"] == "json":
                 self.csv_report_generation_list.append(file_blob_key)
 
