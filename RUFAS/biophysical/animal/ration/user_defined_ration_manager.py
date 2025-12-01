@@ -17,7 +17,9 @@ class RationManager:
     ----------
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
         A mapping of animal groupings to their respective ration formulations.
-    ration_tolerance : float
+    ration_feeds : dict[AnimalCombination, list[RUFAS_ID]]
+        A mapping of animal groupings to the list of RuFaS feed IDs available to formulate their ration.
+    tolerance : float
         Fraction +/- of target user defined ration value (as a fraction of dry matter intake estimate) allowable in
         ration formulation.
 
@@ -38,7 +40,7 @@ class RationManager:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the feeds available for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
 
         """
         cls.ration_feeds = {animal_combination: {} for animal_combination in AnimalCombination}
@@ -76,7 +78,7 @@ class RationManager:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the user-defined rations for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
 
         """
         cls.tolerance = ration_config["user_defined_ration_percentages"]["tolerance"]
@@ -91,7 +93,7 @@ class RationManager:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the user-defined rations for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
 
         """
         info_map = {"class": cls.__name__, "function": cls.set_user_defined_rations.__name__}
