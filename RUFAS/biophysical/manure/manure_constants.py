@@ -206,3 +206,15 @@ class ManureConstants:
 
     ANAEROBIC_LAGOON_MANURE_RETENTION: float = 0.1
     """The manure retention proportion in the anaerobic lagoon (fraction)."""
+
+    MANURE_DAMPING_FACTOR: float = 0.5
+    """Unitless factor representing the reduction of the amplitude of manure temperature in the sin/cosin equation
+     compared to air temperature amplitude."""
+
+    MANURE_TEMPERATURE_LAG: int = 30
+    """
+    Number of days that elapse between peak air temperature and manure temperature. Note that this constant is
+    subtracted in the equation for calculation daily air temperature; a positive value for this constant indicates
+    manure temperature peaks later than air temperature, whereas a negative value indicates manure temperature peaks
+    earlier than air temperature.
+    """

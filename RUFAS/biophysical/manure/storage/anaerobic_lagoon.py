@@ -77,9 +77,7 @@ class AnaerobicLagoon(Storage):
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
-        manure_temperature = self._determine_outdoor_storage_temperature(
-            air_temperature=current_day_conditions.mean_air_temperature,
-        )
+        manure_temperature = self._determine_outdoor_storage_temperature(time.current_julian_day)
 
         total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)
         storage_ammonia = self._apply_ammonia_emissions(manure_temperature)
@@ -101,6 +99,13 @@ class AnaerobicLagoon(Storage):
         function_name = self.process_manure.__name__
         self._report_processor_output(
             "storage_methane", total_storage_methane, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "outdoor_storage_manure_temperature",
+            str(manure_temperature),
+            function_name,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
         )
         self._report_processor_output(
             "storage_methane_burned",
