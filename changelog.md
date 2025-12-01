@@ -277,6 +277,8 @@ v0.9.2
 - [2636](https://github.com/RuminantFarmSystems/MASM/pull/2636) - [minor change] [Manure] [NoInputChange] [OutputChange] Improve temperature estimation of slurry of liquid manure in storage.
 - [2660](https://github.com/RuminantFarmSystems/MASM/pull/2660) - [minor change] [InputChange][NoOutputChange][Input][Properties] Adds task property to allow running simulations using inputs from external repos.
 - [2653](https://github.com/RuminantFarmSystems/MASM/pull/2653) - [minor change] [NoInputChange][NoOutputChange][Unit Test] Separate Unit Tests for `photosynthesize()` and `partition_biomass()` in `allocate_biomass()`.
+- [2608](https://github.com/RuminantFarmSystems/MASM/pull/2608) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
+
 
 ### v0.9.2
 

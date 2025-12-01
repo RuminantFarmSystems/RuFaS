@@ -6,7 +6,7 @@ from typing import Any
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
@@ -342,6 +342,31 @@ class HerdManager:
             else 0.0
         )
 
+    @property
+    def all_animals(self) -> list[Animal]:
+        """
+        Retrieve a combined list of all animals in the herd.
+
+        Returns
+        -------
+        list[Animal]
+            A list of all animals, including calves, heiferIs, heiferIIs, heiferIIIs,
+            and cows.
+        """
+        return [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]
+
+    @property
+    def animal_genetic_history_by_id(self) -> dict[int, str]:
+        """
+        Retrieve a dict of genetic histories for all animals in the herd by id.
+
+        Returns
+        -------
+        dict[int, str]
+            A dict of genetic histories for all animals by id.
+        """
+        return {animal.id: str(animal.genetic_history) for animal in self.all_animals}
+
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
         Collects total amount of feeds needed for all animals on the current day.
@@ -466,7 +491,7 @@ class HerdManager:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
                     newborn_calf = self._create_newborn_calf(
-                        animal_daily_routines_output.newborn_calf_config, simulation_day=time.simulation_day
+                        animal_daily_routines_output.newborn_calf_config, time=time
                     )
                     if newborn_calf.stillborn:
                         stillborn_newborn_calves.append(newborn_calf)
@@ -474,8 +499,13 @@ class HerdManager:
                         sold_newborn_calves.append(newborn_calf)
                     else:
                         newborn_calves.append(newborn_calf)
+                    birth_year = Utility.back_track_birth_date(animal.days_born, time.current_date).year
+                    animal.genetics.recalculate_values_at_lactation_start(
+                        birth_year=birth_year, animal_type=animal.animal_type, parity=animal.calves
+                    )
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
+            animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
     def _update_herd_structure(
@@ -621,8 +651,35 @@ class HerdManager:
         AnimalModuleReporter.report_milk(self.daily_milk_report, time.simulation_day)
         AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
         self._report_ration(time.simulation_day)
+        self._calculate_and_report_average_genetics(time.simulation_day)
 
         return herd_manager_output
+
+    def _calculate_and_report_average_genetics(self, simulation_day: int) -> None:
+        """
+        Calculates and reports the average genetics for the herd, calves, heiferIs, heiferIIs, heiferIIIs, and cows.
+        """
+        herd_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.all_animals]
+        )
+        AnimalModuleReporter.report_average_genetics(herd_average_genetics, "herd", simulation_day)
+
+        calf_average_genetics = Genetics.calculate_average_genetic_values([animal.genetics for animal in self.calves])
+        AnimalModuleReporter.report_average_genetics(calf_average_genetics, "calves", simulation_day)
+        heiferI_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferI_average_genetics, "heiferI", simulation_day)
+        heiferII_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferII_average_genetics, "heiferII", simulation_day)
+        heiferIII_average_genetics = Genetics.calculate_average_genetic_values(
+            [animal.genetics for animal in self.heiferIIIs]
+        )
+        AnimalModuleReporter.report_average_genetics(heiferIII_average_genetics, "heiferIII", simulation_day)
+        cow_average_genetics = Genetics.calculate_average_genetic_values([animal.genetics for animal in self.cows])
+        AnimalModuleReporter.report_average_genetics(cow_average_genetics, "cow", simulation_day)
 
     def _report_ration(self, simulation_day: int) -> None:
         """Report the ration for all pens."""
@@ -646,7 +703,7 @@ class HerdManager:
 
         AnimalModuleReporter.report_daily_herd_total_ration(herd_total_ration, simulation_day)
 
-    def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
+    def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, time: RufasTime) -> Animal:
         """
         Creates a new newborn calf instance and records its entry event in the herd if it
         is not sold.
@@ -655,8 +712,8 @@ class HerdManager:
         ----------
         newborn_calf_config : NewBornCalfValuesTypedDict
             Configuration for the newborn calf containing its attributes.
-        simulation_day : int
-            The current day in the simulation.
+        time : RufasTime
+            The current time in the simulation.
 
         Returns
         -------
@@ -665,9 +722,9 @@ class HerdManager:
 
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
-        newborn_calf: Animal = Animal(args=newborn_calf_config, simulation_day=simulation_day)
+        newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
         if not (newborn_calf.sold or newborn_calf.stillborn):
-            newborn_calf.events.add_event(newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD)
+            newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
     def _check_if_heifers_need_to_be_sold(
@@ -710,6 +767,7 @@ class HerdManager:
                     cull_reason="NA",
                     days_in_milk="NA",
                     parity="NA",
+                    genetic_history=str(removed_heiferIII.genetic_history),
                 )
             )
             self.herd_statistics.sold_heiferIII_oversupply_num += 1
@@ -749,8 +807,8 @@ class HerdManager:
                 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
             )
             replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
-            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
+            replacement.genetics = Genetics(
+                birth_year=replacement_birth_date.year, animal_type=replacement.animal_type, parity=replacement.calves
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
@@ -1803,6 +1861,7 @@ class HerdManager:
                 cull_reason=cow.cull_reason,
                 days_in_milk=cow.days_in_milk,
                 parity=cow.reproduction.calves,
+                genetic_history=str(cow.genetic_history),
             )
             for cow in sold_and_died_cows
         ]
@@ -1821,6 +1880,7 @@ class HerdManager:
                 cull_reason=cow.cull_reason,
                 days_in_milk=cow.days_in_milk,
                 parity=cow.reproduction.calves,
+                genetic_history=str(cow.genetic_history),
             )
             for cow in sold_cows
         ]
@@ -1865,6 +1925,7 @@ class HerdManager:
                 cull_reason="NA",
                 days_in_milk="NA",
                 parity="NA",
+                genetic_history=str(heiferII.genetic_history),
             )
             for heiferII in sold_heiferIIs
         ]
@@ -1896,6 +1957,7 @@ class HerdManager:
                 cull_reason="NA",
                 days_in_milk="NA",
                 parity="NA",
+                genetic_history=str(calf.genetic_history) if calf.genetic_history else "NA",
             )
             for calf in sold_newborn_calves
         ]
