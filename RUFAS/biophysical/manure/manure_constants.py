@@ -24,8 +24,9 @@ class ManureConstants:
     """
 
     DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
-    """Default pH for manure on tiestall or freestall barn floors (unitless).
-     Default is set to 7.7."""
+    """
+    Default pH for manure on tiestall or freestall barn floors (unitless).
+    """
 
     MILKING_FRESH_WATER_USE_RATE: float = 30.0
     """
@@ -49,13 +50,12 @@ class ManureConstants:
     # Liquid manure storage-related constants
     VS_TO_METHANE_LOSS_RATIO: float = 6.665
     """
-    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-    ratio of 1:3 (methane : carbon dioxide).
+    Factor to determine kg of VS degraded per kg CH4 emitted from stored manure (kg VS / kg CH4).
     """
 
     METHANE_DESTRUCTION_EFFICIENCY = 81
     """
-    The percentage of methane destroyed in systems using a cap and flare
+    The percentage of methane destroyed in systems using a cap and flare (percent).
     """
 
     STORAGE_RESISTANCE = 4.1
