@@ -1,3 +1,4 @@
+import math
 from dataclasses import replace
 from math import inf
 from numpy import exp
@@ -58,6 +59,12 @@ class Storage(Processor):
         Surface area of the manure storage (m^2).
     _manure_to_process : ManureStream
         The manure that is processed during the `process_manure()` method call.
+    intercept_mean_temp : float
+        The intercept mean temperature calculate from linest function.
+    phase_shift : float
+        Temperature phase shift of the weather data.
+    amplitude : float
+        The temperature amplitude of the weather data.
 
     """
 
@@ -81,6 +88,10 @@ class Storage(Processor):
         self._manure_to_process = ManureStream.make_empty_manure_stream()
         self.__post_init__()
 
+        self.intercept_mean_temp: float | None = None
+        self.phase_shift: float | None = None
+        self.amplitude: float | None = None
+
     def __post_init__(self) -> None:
         """
         Post-initialization method to calculate the surface area of the storage.
@@ -92,6 +103,42 @@ class Storage(Processor):
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self.stored_manure.volume > self._capacity
+
+    def _determine_outdoor_storage_temperature(
+        self,
+        simulation_day: int,
+    ) -> float:
+        """
+        Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        simulation_day : int
+            Current julian day of the year.
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        Notes
+        -----
+        This function determines daily temperature of manure in liquid storage by fitting a sin/cos function. Several
+        parameters of this function are derived and utilized here. The amplitude of simulation-wide average air
+        temperature data, which is derived by least squares fitting cos and sin waves to temperature data, is adjusted
+        by a fixed damping factor to reflect the smaller degree of annual variation in temperature compared to air
+        temperature. The phase shift (time of peak of annual temperature) is also determined from simulation weather
+        data and is adjusted to reflect the time of manure temperature change based on a fixed lag constant.
+
+        """
+        if self.amplitude and self.intercept_mean_temp and self.phase_shift:
+            manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
+
+            return self.intercept_mean_temp + manure_amplitude * math.cos(
+                2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+            )
+        else:
+            raise ValueError("No data for outdoor storage temperature calculations.")
 
     def _calculate_surface_area(self) -> None:
         """

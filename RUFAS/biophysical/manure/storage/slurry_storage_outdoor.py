@@ -62,9 +62,7 @@ class SlurryStorageOutdoor(Storage):
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
-        manure_temperature = self._determine_outdoor_storage_temperature(
-            air_temperature=current_day_conditions.mean_air_temperature
-        )
+        manure_temperature = self._determine_outdoor_storage_temperature(time.current_julian_day)
 
         storage_methane_burned, total_storage_methane = self._apply_methane_emissions(manure_temperature)
         storage_ammonia_nitrogen = self._apply_ammonia_emissions(manure_temperature)
@@ -78,6 +76,13 @@ class SlurryStorageOutdoor(Storage):
 
         data_origin_name = self.process_manure.__name__
         units = MeasurementUnits.KILOGRAMS
+        self._report_processor_output(
+            "outdoor_storage_manure_temperature",
+            str(manure_temperature),
+            data_origin_name,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
+        )
         self._report_processor_output(
             "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day
         )
@@ -133,9 +138,11 @@ class SlurryStorageOutdoor(Storage):
                 total_storage_methane
             )
         bedding_to_manure_non_degradable_volatile_solids_ratio = (
-            self._manure_to_process.bedding_non_degradable_volatile_solids / (
+            self._manure_to_process.bedding_non_degradable_volatile_solids
+            / (
                 self._manure_to_process.non_degradable_volatile_solids
-                + self._manure_to_process.bedding_non_degradable_volatile_solids)
+                + self._manure_to_process.bedding_non_degradable_volatile_solids
+            )
         )
 
         self._manure_to_process.total_solids = max(
