@@ -608,6 +608,17 @@ class HerdManager:
                 total_inventory=total_inventory,
                 simulation_day=time.simulation_day,
             )
+        else:
+            self._update_herd_structure(
+                graduated_animals=graduated_animals,
+                newborn_calves=newborn_calves,
+                newly_added_animals=[],
+                removed_animals=removed_animals,
+                available_feeds=available_feeds,
+                current_day_conditions=weather.get_current_day_conditions(time),
+                total_inventory=total_inventory,
+                simulation_day=time.simulation_day,
+            )
 
 
         # removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day)
