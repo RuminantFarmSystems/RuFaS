@@ -181,10 +181,7 @@ class AnaerobicLagoon(Storage):
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             self._manure_to_process.degradable_volatile_solids
-            - (
-                storage_methane_from_degradable_volatile_solids
-                * ManureConstants.VS_TO_METHANE_LOSS_RATIO
-            ),
+            - (storage_methane_from_degradable_volatile_solids * ManureConstants.VS_TO_METHANE_LOSS_RATIO),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
