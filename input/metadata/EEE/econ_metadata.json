@@ -1,0 +1,739 @@
+{
+  "files": {
+    "_default_values": {
+      "title": "Defaults",
+      "description": "Fallback series providing default economic values used when localized data is unavailable.",
+      "path": "input/data/EEE/econ/_default_values.csv",
+      "type": "csv",
+      "properties": "_default_values_csv_properties"
+    },
+    "capital_costs.land_ha.dollar_per_hectare": {
+      "title": "Capital costs",
+      "description": "County-level 2023 cropland value expressed in dollars per hectare.",
+      "path": "input/data/EEE/econ/capital_costs.land_ha.dollar_per_hectare.csv",
+      "type": "csv",
+      "properties": "capital_costs_land_ha_dollar_per_hectare_csv_properties"
+    },
+    "commodity_prices.alfalfa_hay.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Alfalfa hay price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.alfalfa_hay.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_alfalfa_hay_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.alfalfa_silage.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Alfalfa Silage",
+      "path": "input/data/EEE/econ/commodity_prices.alfalfa_silage.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_alfalfa_silage_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.almond_hulls.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Almond Hulls",
+      "path": "input/data/EEE/econ/commodity_prices.almond_hulls.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_almond_hulls_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.barley_seed.dollar_per_square_meter": {
+      "title": "Seeds",
+      "description": "Barley Seed",
+      "path": "input/data/EEE/econ/commodity_prices.barley_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_barley_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.barley_silage.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Barley Silage",
+      "path": "input/data/EEE/econ/commodity_prices.barley_silage.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_barley_silage_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.bedding_compost_bedded_pack.dollar_per_head": {
+      "title": "Bedding",
+      "description": "Estimated annual bedding cost for compost bedded pack barns in dollars per head.",
+      "path": "input/data/EEE/econ/commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv",
+      "type": "csv",
+      "properties": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head_csv_properties"
+    },
+    "commodity_prices.bedding_manure_solids.dollar_per_head": {
+      "title": "Bedding",
+      "description": "Estimated annual bedding cost using manure solids in dollars per head.",
+      "path": "input/data/EEE/econ/commodity_prices.bedding_manure_solids.dollar_per_head.csv",
+      "type": "csv",
+      "properties": "commodity_prices_bedding_manure_solids_dollar_per_head_csv_properties"
+    },
+    "commodity_prices.bedding_sand.dollar_per_head": {
+      "title": "Bedding",
+      "description": "Estimated annual bedding cost using sand in dollars per head.",
+      "path": "input/data/EEE/econ/commodity_prices.bedding_sand.dollar_per_head.csv",
+      "type": "csv",
+      "properties": "commodity_prices_bedding_sand_dollar_per_head_csv_properties"
+    },
+    "commodity_prices.bedding_sawdust.dollar_per_head": {
+      "title": "Bedding",
+      "description": "Estimated annual bedding cost using sawdust in dollars per head.",
+      "path": "input/data/EEE/econ/commodity_prices.bedding_sawdust.dollar_per_head.csv",
+      "type": "csv",
+      "properties": "commodity_prices_bedding_sawdust_dollar_per_head_csv_properties"
+    },
+    "commodity_prices.bedding_straw.dollar_per_head": {
+      "title": "Bedding",
+      "description": "Estimated annual bedding cost using straw in dollars per head.",
+      "path": "input/data/EEE/econ/commodity_prices.bedding_straw.dollar_per_head.csv",
+      "type": "csv",
+      "properties": "commodity_prices_bedding_straw_dollar_per_head_csv_properties"
+    },
+    "commodity_prices.calcium_phosphate_di.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Calcium Phosphate (di)",
+      "path": "input/data/EEE/econ/commodity_prices.calcium_phosphate_di.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calcium_phosphate_di_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_ heifer_2.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "No.2 heifer calf prices (0-14 days, 85-120 lbs) expressed in dollars per kilogram.",
+      "path": "input/data/EEE/econ/commodity_prices.calf_ heifer_2.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf__heifer_2_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_bull_1.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "No.1 Bull Calves (0-14 days) with weight 90-130 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.calf_bull_1.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf_bull_1_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_bull_2.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "No.2 Bull Calves (0-14 days) with weight 85-120 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.calf_bull_2.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf_bull_2_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_heifer_1.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "No.1 Heifer Calves (0-14 days) with weight 80-130 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.calf_heifer_1.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf_heifer_1_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_heifer_2.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "No.2 Heifer Calves (0-14 days) with weight 85-120 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.calf_heifer_2.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf_heifer_2_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calf_starter_18cp.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Calf Feed 18% Crude Protein",
+      "path": "input/data/EEE/econ/commodity_prices.calf_starter_18cp.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calf_starter_18cp_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.calves_all.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Price received for calves",
+      "path": "input/data/EEE/econ/commodity_prices.calves_all.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_calves_all_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.carbon_credits_enteric.dollar_per_tonne_CO2e": {
+      "title": "Carbon credits",
+      "description": "Carbon credit price applied to enteric methane reductions in dollars per tonne CO\u2082e.",
+      "path": "input/data/EEE/econ/commodity_prices.carbon_credits_enteric.dollar_per_tonne_CO2e.csv",
+      "type": "csv",
+      "properties": "commodity_prices_carbon_credits_enteric_dollar_per_tonne_CO2e_csv_properties"
+    },
+    "commodity_prices.carbon_credits_soil.dollar_per_tonne_CO2e": {
+      "title": "Carbon credits",
+      "description": "Carbon credit price for soil carbon sequestration in dollars per tonne CO\u2082e.",
+      "path": "input/data/EEE/econ/commodity_prices.carbon_credits_soil.dollar_per_tonne_CO2e.csv",
+      "type": "csv",
+      "properties": "commodity_prices_carbon_credits_soil_dollar_per_tonne_CO2e_csv_properties"
+    },
+    "commodity_prices.corn_grain.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Historical U.S. corn grain prices received by farmers in dollars per kilogram.",
+      "path": "input/data/EEE/econ/commodity_prices.corn_grain.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_corn_grain_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.corn_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Corn Seed",
+      "path": "input/data/EEE/econ/commodity_prices.corn_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_corn_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.corn_silage.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Corn silage price received by farmers assuming the silage is already harvested and stored",
+      "path": "input/data/EEE/econ/commodity_prices.corn_silage.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_corn_silage_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cotton_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Cotton Seed",
+      "path": "input/data/EEE/econ/commodity_prices.cotton_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cotton_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.cotton_seed_hulls.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Cotton Seed Hulls",
+      "path": "input/data/EEE/econ/commodity_prices.cotton_seed_hulls.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cotton_seed_hulls_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cotton_seed_meal.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Cotton Seed Meal",
+      "path": "input/data/EEE/econ/commodity_prices.cotton_seed_meal.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cotton_seed_meal_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cotton_seed_whole.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Whole Cotton Seeds",
+      "path": "input/data/EEE/econ/commodity_prices.cotton_seed_whole.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cotton_seed_whole_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cow_dairy_bred_t3.dollar_per_animal": {
+      "title": "Cattle",
+      "description": "T3 Bred Dairy Cow (mature and pregnant) with weight 1,000-1,600 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cow_dairy_bred_t3.dollar_per_animal.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cow_dairy_bred_t3_dollar_per_animal_csv_properties"
+    },
+    "commodity_prices.cow_dairy_fresh.dollar_per_animal": {
+      "title": "Cattle",
+      "description": "Fresh Dairy Cow Replacements (recently gave birth and lactating) with weight 1,000-1,600 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cow_dairy_fresh.dollar_per_animal.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cow_dairy_fresh_dollar_per_animal_csv_properties"
+    },
+    "commodity_prices.cow_dairy_heifer_bred_t3.dollar_per_animal": {
+      "title": "Cattle",
+      "description": "T3 Bred Dairy Heifer (pregnant and never calved before) with weight 800-1,400 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cow_dairy_heifer_bred_t3.dollar_per_animal.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cow_dairy_heifer_bred_t3_dollar_per_animal_csv_properties"
+    },
+    "commodity_prices.cow_dairy_heifer_open.dollar_per_animal": {
+      "title": "Cattle",
+      "description": "Open Dairy Heifer (not yet been bred or is not currently pregnant) with weight 600-900 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cow_dairy_heifer_open.dollar_per_animal.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cow_dairy_heifer_open_dollar_per_animal_csv_properties"
+    },
+    "commodity_prices.cows_all.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Price received for cows",
+      "path": "input/data/EEE/econ/commodity_prices.cows_all.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cows_all_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cows_ge_500.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Price received for cattle greater than or equal to 500 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cows_ge_500.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cows_ge_500_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.cows_milk.dollar_per_animal": {
+      "title": "Cattle",
+      "description": "Price received for Milk Cows",
+      "path": "input/data/EEE/econ/commodity_prices.cows_milk.dollar_per_animal.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cows_milk_dollar_per_animal_csv_properties"
+    },
+    "commodity_prices.cows_steers_and_heifers_ge_500.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Price received for Steers and Heifers greater than or equal to 500 lbs",
+      "path": "input/data/EEE/econ/commodity_prices.cows_steers_and_heifers_ge_500.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_cows_steers_and_heifers_ge_500_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.diesel.dollar_per_liter": {
+      "title": "Diesel fuel",
+      "description": "Retail prices",
+      "path": "input/data/EEE/econ/commodity_prices.diesel.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_diesel_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.digester_bedding_coproduct.dollars_per_kg_bedding": {
+      "title": "Digester coproducts",
+      "description": "Assumed market value of anaerobic digester bedding coproduct in dollars per kilogram.",
+      "path": "input/data/EEE/econ/commodity_prices.digester_bedding_coproduct.dollars_per_kg_bedding.csv",
+      "type": "csv",
+      "properties": "commodity_prices_digester_bedding_coproduct_dollars_per_kg_bedding_csv_properties"
+    },
+    "commodity_prices.digester_carbon_credits.dollar_per_tonne_CO2e": {
+      "title": "Carbon credits",
+      "description": "Carbon credit price assumed for anaerobic digester projects in dollars per tonne CO\u2082e.",
+      "path": "input/data/EEE/econ/commodity_prices.digester_carbon_credits.dollar_per_tonne_CO2e.csv",
+      "type": "csv",
+      "properties": "commodity_prices_digester_carbon_credits_dollar_per_tonne_CO2e_csv_properties"
+    },
+    "commodity_prices.distiller_grains_dried_10pct.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Dried Distiller Grains with 10% moisture",
+      "path": "input/data/EEE/econ/commodity_prices.distiller_grains_dried_10pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_distiller_grains_dried_10pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.distiller_grains_modified_wet_50pct.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Modified Wet Distiller Grains with 50-55% moisture",
+      "path": "input/data/EEE/econ/commodity_prices.distiller_grains_modified_wet_50pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_distiller_grains_modified_wet_50pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.distiller_grains_wet_65pct.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Wet Distiller Grains with 65-70% moisture",
+      "path": "input/data/EEE/econ/commodity_prices.distiller_grains_wet_65pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_distiller_grains_wet_65pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.elec_commercial.dollar_per_kwh": {
+      "title": "Electricity prices",
+      "description": "Commercial rates",
+      "path": "input/data/EEE/econ/commodity_prices.elec_commercial.dollar_per_kwh.csv",
+      "type": "csv",
+      "properties": "commodity_prices_elec_commercial_dollar_per_kwh_csv_properties"
+    },
+    "commodity_prices.elec_industrial.dollar_per_kwh": {
+      "title": "Electricity prices",
+      "description": "Industrial rates",
+      "path": "input/data/EEE/econ/commodity_prices.elec_industrial.dollar_per_kwh.csv",
+      "type": "csv",
+      "properties": "commodity_prices_elec_industrial_dollar_per_kwh_csv_properties"
+    },
+    "commodity_prices.elec_residential.dollar_per_kwh": {
+      "title": "Electricity prices",
+      "description": "Residential rates",
+      "path": "input/data/EEE/econ/commodity_prices.elec_residential.dollar_per_kwh.csv",
+      "type": "csv",
+      "properties": "commodity_prices_elec_residential_dollar_per_kwh_csv_properties"
+    },
+    "commodity_prices.gasoline.dollar_per_liter": {
+      "title": "Gasoline fuel",
+      "description": "Retail prices",
+      "path": "input/data/EEE/econ/commodity_prices.gasoline.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_gasoline_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.hay_all.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Hay price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.hay_all.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_hay_all_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.hay_excluding_alfalfa.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Hay excluding alfalfa price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.hay_excluding_alfalfa.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_hay_excluding_alfalfa_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.limestone.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Limestone",
+      "path": "input/data/EEE/econ/commodity_prices.limestone.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_limestone_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.milk_all.dollar_per_liter": {
+      "title": "Commodity prices",
+      "description": "Milk",
+      "path": "input/data/EEE/econ/commodity_prices.milk_all.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_all_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.milk_class_2.dollar_per_liter": {
+      "title": "Commodity prices",
+      "description": "Class 2 Milk (Used for soft dairy products like yogurt, ice cream)",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_2.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_class_2_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.milk_class_3.dollar_per_liter": {
+      "title": "Commodity prices",
+      "description": "Class 3 Milk (Used for cheese production)",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_3.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_class_3_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.milk_class_4.dollar_per_liter": {
+      "title": "Commodity prices",
+      "description": "Class 4 Milk (Used for butter and nonfat dry milk)",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_4.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_class_4_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.milk_nonfat_dry.dollar_per_kilogram": {
+      "title": "Commodity prices",
+      "description": "Nonfat Dry Milk",
+      "path": "input/data/EEE/econ/commodity_prices.milk_nonfat_dry.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_nonfat_dry_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.milk_retail.dollar_per_liter": {
+      "title": "Feed prices",
+      "description": "Whole Milk Retail Prices",
+      "path": "input/data/EEE/econ/commodity_prices.milk_retail.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_milk_retail_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.natgas_commercial.dollar_per_megajoule": {
+      "title": "Natural Gas",
+      "description": "Commercial prices",
+      "path": "input/data/EEE/econ/commodity_prices.natgas_commercial.dollar_per_megajoule.csv",
+      "type": "csv",
+      "properties": "commodity_prices_natgas_commercial_dollar_per_megajoule_csv_properties"
+    },
+    "commodity_prices.natgas_industrial.dollar_per_megajoule": {
+      "title": "Natural Gas",
+      "description": "U.S. dollars per megajoule of natural gas",
+      "path": "input/data/EEE/econ/commodity_prices.natgas_industrial.dollar_per_megajoule.csv",
+      "type": "csv",
+      "properties": "commodity_prices_natgas_industrial_dollar_per_megajoule_csv_properties"
+    },
+    "commodity_prices.natgas_residential.dollar_per_megajoule": {
+      "title": "Natural Gas",
+      "description": "Residential prices",
+      "path": "input/data/EEE/econ/commodity_prices.natgas_residential.dollar_per_megajoule.csv",
+      "type": "csv",
+      "properties": "commodity_prices_natgas_residential_dollar_per_megajoule_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_ammonium_nitrate.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Ammonium Nitrate prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_ammonium_nitrate.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_ammonium_nitrate_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_anhydrous-ammonia.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Anhydrous Ammonia prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_anhydrous-ammonia.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_anhydrous-ammonia_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_anhydrous_ammonia.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Anhydrous ammonia fertilizer prices expressed in dollars per kilogram.",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_anhydrous_ammonia.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_anhydrous_ammonia_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_diammonium_phosphate.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Diammonium Phosphate 18-46-0 prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_diammonium_phosphate.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_diammonium_phosphate_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_nitrogen.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Nitrogen prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_nitrogen.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_nitrogen_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_nitrogen_solutions_30pct.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Nitrogen Solutions (30% nitrogen) prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_nitrogen_solutions_30pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_nitrogen_solutions_30pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_phosphorus.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Phosphorus prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_phosphorus.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_phosphorus_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_potassium.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Potassium prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_potassium.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_potassium_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_potassium_chloride.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Potassium Chloride (60pct potassium) prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_potassium_chloride.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_potassium_chloride_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_sulfate_of_ammonium.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Sulfate of Ammonium prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_sulfate_of_ammonium.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_sulfate_of_ammonium_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_super_phosphate_20pct.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Super Phosphate (20% phosphate) prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_super_phosphate_20pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_super_phosphate_20pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_super_phosphate_44to46pct.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Super Phosphate (44-46% phosphate) prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_super_phosphate_44to46pct.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_super_phosphate_44to46pct_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.net_fertilizer_urea.dollar_per_kilogram": {
+      "title": "Fertilizer",
+      "description": "Urea (44-46% nitrogen) prices",
+      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_urea.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_net_fertilizer_urea_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.oat_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Oat Seed",
+      "path": "input/data/EEE/econ/commodity_prices.oat_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_oat_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.peanut_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Peanut Seed",
+      "path": "input/data/EEE/econ/commodity_prices.peanut_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_peanut_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.propane_residential.dollar_per_liter": {
+      "title": "Propane",
+      "description": "Residential prices",
+      "path": "input/data/EEE/econ/commodity_prices.propane_residential.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_propane_residential_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.propane_wholesale.dollar_per_liter": {
+      "title": "Propane",
+      "description": "Wholesale prices",
+      "path": "input/data/EEE/econ/commodity_prices.propane_wholesale.dollar_per_liter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_propane_wholesale_dollar_per_liter_csv_properties"
+    },
+    "commodity_prices.rice_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Rice Seed",
+      "path": "input/data/EEE/econ/commodity_prices.rice_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_rice_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.rye_grain.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Rye price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.rye_grain.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_rye_grain_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.semen_beef.dollar_per_straw": {
+      "title": "Genetics",
+      "description": "Price per straw for beef semen.",
+      "path": "input/data/EEE/econ/commodity_prices.semen_beef.dollar_per_straw.csv",
+      "type": "csv",
+      "properties": "commodity_prices_semen_beef_dollar_per_straw_csv_properties"
+    },
+    "commodity_prices.semen_conventional.dollar_per_straw": {
+      "title": "Genetics",
+      "description": "Price per straw for conventional dairy semen.",
+      "path": "input/data/EEE/econ/commodity_prices.semen_conventional.dollar_per_straw.csv",
+      "type": "csv",
+      "properties": "commodity_prices_semen_conventional_dollar_per_straw_csv_properties"
+    },
+    "commodity_prices.semen_sexed.dollar_per_straw": {
+      "title": "Genetics",
+      "description": "Price per straw for sexed dairy semen.",
+      "path": "input/data/EEE/econ/commodity_prices.semen_sexed.dollar_per_straw.csv",
+      "type": "csv",
+      "properties": "commodity_prices_semen_sexed_dollar_per_straw_csv_properties"
+    },
+    "commodity_prices.sorghum_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Sorghum Seed",
+      "path": "input/data/EEE/econ/commodity_prices.sorghum_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_sorghum_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.soybean_grain.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Soybean price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.soybean_grain.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_soybean_grain_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.soybean_hulls.dollar_per_kilogram": {
+      "title": "Feeds",
+      "description": "Soybean Hulls",
+      "path": "input/data/EEE/econ/commodity_prices.soybean_hulls.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_soybean_hulls_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.soybean_meal.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Soybean meal commodity price",
+      "path": "input/data/EEE/econ/commodity_prices.soybean_meal.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_soybean_meal_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.soybean_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Soybean Seed",
+      "path": "input/data/EEE/econ/commodity_prices.soybean_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_soybean_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.steer_holstein_300.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Feeder Holstein Steers (300-500 lbs)",
+      "path": "input/data/EEE/econ/commodity_prices.steer_holstein_300.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_steer_holstein_300_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.steer_holstein_500.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Feeder Holstein Steers (500-700 lbs)",
+      "path": "input/data/EEE/econ/commodity_prices.steer_holstein_500.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_steer_holstein_500_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.steer_holstein_700.dollar_per_kilogram": {
+      "title": "Cattle",
+      "description": "Feeder Holstein Steers (700-1,000 lbs)",
+      "path": "input/data/EEE/econ/commodity_prices.steer_holstein_700.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_steer_holstein_700_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.sundan_silage.dollar_per_kilogram": {
+      "title": "Feed prices",
+      "description": "Sudangrass Silage",
+      "path": "input/data/EEE/econ/commodity_prices.sundan_silage.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_sundan_silage_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.water_irrigation.dollar_per_cubic_meter": {
+      "title": "Water",
+      "description": "Irrigation prices",
+      "path": "input/data/EEE/econ/commodity_prices.water_irrigation.dollar_per_cubic_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_water_irrigation_dollar_per_cubic_meter_csv_properties"
+    },
+    "commodity_prices.water_municipal.dollar_per_cubic_meter": {
+      "title": "Water",
+      "description": "Municipal prices",
+      "path": "input/data/EEE/econ/commodity_prices.water_municipal.dollar_per_cubic_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_water_municipal_dollar_per_cubic_meter_csv_properties"
+    },
+    "commodity_prices.wheat_seed.dollar_per_square_meter": {
+      "title": "",
+      "description": "Wheat Seed",
+      "path": "input/data/EEE/econ/commodity_prices.wheat_seed.dollar_per_square_meter.csv",
+      "type": "csv",
+      "properties": "commodity_prices_wheat_seed_dollar_per_square_meter_csv_properties"
+    },
+    "commodity_prices.whey_dry.dollar_per_kilogram": {
+      "title": "Commodity prices",
+      "description": "Dry Whey (A byproduct of cheese production)",
+      "path": "input/data/EEE/econ/commodity_prices.whey_dry.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_whey_dry_dollar_per_kilogram_csv_properties"
+    },
+    "commodity_prices.winter_wheat_grain.dollar_per_kilogram": {
+      "title": "Crops",
+      "description": "Winter wheat price received by farmers",
+      "path": "input/data/EEE/econ/commodity_prices.winter_wheat_grain.dollar_per_kilogram.csv",
+      "type": "csv",
+      "properties": "commodity_prices_winter_wheat_grain_dollar_per_kilogram_csv_properties"
+    },
+    "farm_services.grain_transportation.dollars_per_tonne_km": {
+      "title": "Logistics",
+      "description": "Cost to transport grain in dollars per tonne-kilometer.",
+      "path": "input/data/EEE/econ/farm_services.grain_transportation.dollars_per_tonne_km.csv",
+      "type": "csv",
+      "properties": "farm_services_grain_transportation_dollars_per_tonne_km_csv_properties"
+    },
+    "farm_services.labor_hours.dollar_per_hour": {
+      "title": "Labor",
+      "description": "Hired wages",
+      "path": "input/data/EEE/econ/farm_services.labor_hours.dollar_per_hour.csv",
+      "type": "csv",
+      "properties": "farm_services_labor_hours_dollar_per_hour_csv_properties"
+    },
+    "farm_services.labor_hours_animal_manure.hours_per_head_per_year": {
+      "title": "Labor",
+      "description": "Hours of labor per head per year allocated to manure-related animal tasks.",
+      "path": "input/data/EEE/econ/farm_services.labor_hours_animal_manure.hours_per_head_per_year.csv",
+      "type": "csv",
+      "properties": "farm_services_labor_hours_animal_manure_hours_per_head_per_year_csv_properties"
+    },
+    "farm_services.labor_hours_animal_nonmanure.hours_per_head_per_year": {
+      "title": "Labor",
+      "description": "Hours of labor per head per year for non-manure animal tasks.",
+      "path": "input/data/EEE/econ/farm_services.labor_hours_animal_nonmanure.hours_per_head_per_year.csv",
+      "type": "csv",
+      "properties": "farm_services_labor_hours_animal_nonmanure_hours_per_head_per_year_csv_properties"
+    },
+    "farm_services.labor_hours_animal_total.hours_per_head_per_year": {
+      "title": "Labor",
+      "description": "Total labor hours per head per year for animal operations.",
+      "path": "input/data/EEE/econ/farm_services.labor_hours_animal_total.hours_per_head_per_year.csv",
+      "type": "csv",
+      "properties": "farm_services_labor_hours_animal_total_hours_per_head_per_year_csv_properties"
+    },
+    "farm_services.labor_hours_crop.hours_per_ha_per_year": {
+      "title": "Labor",
+      "description": "Crop labor requirement in hours per hectare per year.",
+      "path": "input/data/EEE/econ/farm_services.labor_hours_crop.hours_per_ha_per_year.csv",
+      "type": "csv",
+      "properties": "farm_services_labor_hours_crop_hours_per_ha_per_year_csv_properties"
+    },
+    "farm_services.land_ha_rent.dollar_per_hectare": {
+      "title": "Land rent",
+      "description": "County-level 2023 land rent in dollars per hectare.",
+      "path": "input/data/EEE/econ/farm_services.land_ha_rent.dollar_per_hectare.csv",
+      "type": "csv",
+      "properties": "farm_services_land_ha_rent_dollar_per_hectare_csv_properties"
+    },
+    "farm_services.tractor_large.dollar_per_hour": {
+      "title": "Machinery",
+      "description": "Custom rate for large tractor services in dollars per hour.",
+      "path": "input/data/EEE/econ/farm_services.tractor_large.dollar_per_hour.csv",
+      "type": "csv",
+      "properties": "farm_services_tractor_large_dollar_per_hour_csv_properties"
+    },
+    "farm_services.tractor_medium.dollar_per_hour": {
+      "title": "Machinery",
+      "description": "Custom rate for medium tractor services in dollars per hour.",
+      "path": "input/data/EEE/econ/farm_services.tractor_medium.dollar_per_hour.csv",
+      "type": "csv",
+      "properties": "farm_services_tractor_medium_dollar_per_hour_csv_properties"
+    },
+    "farm_services.tractor_small.dollar_per_hour": {
+      "title": "Machinery",
+      "description": "Custom rate for small tractor services in dollars per hour.",
+      "path": "input/data/EEE/econ/farm_services.tractor_small.dollar_per_hour.csv",
+      "type": "csv",
+      "properties": "farm_services_tractor_small_dollar_per_hour_csv_properties"
+    }
+  }
+}
