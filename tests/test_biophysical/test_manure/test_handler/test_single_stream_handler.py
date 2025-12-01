@@ -218,8 +218,8 @@ def test_determine_housing_carbon_dioxide_emissions(
                 bedding_non_degradable_volatile_solids=10
             ),
             10,
-            53.75,
-            53.75,
+            66.675,
+            66.675,
             0.0,
         ),
         (

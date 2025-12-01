@@ -176,14 +176,14 @@ class AnaerobicLagoon(Storage):
             storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
             total_methane = adjusted
 
-        mass_loss = total_methane * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        mass_loss = total_methane * ManureConstants.VS_TO_METHANE_LOSS_RATIO
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - mass_loss)
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             self._manure_to_process.degradable_volatile_solids
             - (
                 storage_methane_from_degradable_volatile_solids
-                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * ManureConstants.VS_TO_METHANE_LOSS_RATIO
             ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
@@ -191,7 +191,7 @@ class AnaerobicLagoon(Storage):
             self._manure_to_process.non_degradable_volatile_solids
             - (
                 storage_methane_from_non_degradable_volatile_solids
-                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * ManureConstants.VS_TO_METHANE_LOSS_RATIO
                 * (1 - bedding_to_manure_non_degradable_volatile_solids_ratio)
             ),
         )
@@ -200,7 +200,7 @@ class AnaerobicLagoon(Storage):
             self._manure_to_process.bedding_non_degradable_volatile_solids
             - (
                 storage_methane_from_non_degradable_volatile_solids
-                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * ManureConstants.VS_TO_METHANE_LOSS_RATIO
                 * bedding_to_manure_non_degradable_volatile_solids_ratio
             ),
         )
