@@ -369,7 +369,7 @@ class CropManagement:
             sugar=self.data.sugar_at_harvest,
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash_at_harvest,
-            dry_matter_mass=self.dry_matter_yield_collected * field_size
+            dry_matter_mass=self.dry_matter_yield_collected * field_size,
         )
         return harvested_crop
 
