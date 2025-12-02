@@ -121,10 +121,10 @@ class HarvestedCrop:
     @property
     def fresh_mass(self) -> float:
         """
-        Calculates the dry matter mass of this crop in kg.
+        Calculates the fresh matter mass of this crop in kg.
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        return 1 - dry_matter_fraction * self.dry_matter_mass
+        return self.dry_matter_mass / dry_matter_fraction
 
     @property
     def is_alfalfa(self) -> bool:
@@ -156,16 +156,16 @@ class HarvestedCrop:
         dm_to_remove : float
             Dry-matter to remove. (kg).
         """
-        dm_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        fresh_to_remove = dm_to_remove / dm_fraction
+        if dm_to_remove > self.dry_matter_mass + 1e-6:
+            dm_frac = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            fresh_req = dm_to_remove / dm_frac if dm_frac > 0 else 0
 
-        if fresh_to_remove > self.fresh_mass + 1e-6:
             raise ValueError(
                 f"Cannot remove {dm_to_remove:.3f} kg DM "
-                f"({fresh_to_remove:.3f} kg fresh) - only {self.fresh_mass:.3f} kg fresh available."
+                f"({fresh_req:.3f} kg fresh) - only {self.dry_matter_mass:.3f} kg dry matter available."
             )
 
-        self.fresh_mass -= fresh_to_remove
+        self.dry_matter_mass -= dm_to_remove
 
     def estimate_maximum_effluent(self) -> float:
         """
