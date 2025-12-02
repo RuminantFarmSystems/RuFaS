@@ -171,7 +171,9 @@ def test_process_manure(
     )
 
     mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(dummy_time.current_julian_day)
+    mock_determine_outdoor_storage_temperature.assert_called_once_with(
+        dummy_time.current_julian_day, ManureConstants.SLURRY_OUTDOOR_MINIMUM_TEMPERATURE
+    )
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure.nitrogen)
@@ -234,13 +236,13 @@ def test_process_manure(
                 phosphorus=40.44,
                 potassium=50.55,
                 ash=60.66,
-                non_degradable_volatile_solids=55.53302711402748,
-                degradable_volatile_solids=59.32749999999999,
-                total_solids=251.0675,
+                non_degradable_volatile_solids=59.7911433205398,
+                degradable_volatile_solids=65.35055,
+                total_solids=261.95035,
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514,
+                bedding_non_degradable_volatile_solids=8.448656679460196,
             ),
         ),
         (
@@ -252,13 +254,13 @@ def test_process_manure(
                 phosphorus=40.44,
                 potassium=50.55,
                 ash=60.66,
-                non_degradable_volatile_solids=55.53302711402748,
-                degradable_volatile_solids=59.32749999999999,
-                total_solids=251.0675,
+                non_degradable_volatile_solids=59.7911433205398,
+                degradable_volatile_solids=65.35055,
+                total_solids=261.95035,
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514,
+                bedding_non_degradable_volatile_solids=8.448656679460196,
             ),
         ),
         (
@@ -270,13 +272,13 @@ def test_process_manure(
                 phosphorus=40.44,
                 potassium=50.55,
                 ash=60.66,
-                non_degradable_volatile_solids=55.53302711402748,
-                degradable_volatile_solids=59.32749999999999,
-                total_solids=251.0675,
+                non_degradable_volatile_solids=59.7911433205398,
+                degradable_volatile_solids=65.35055,
+                total_solids=261.95035,
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514,
+                bedding_non_degradable_volatile_solids=8.448656679460196,
             ),
         ),
         (
@@ -288,13 +290,13 @@ def test_process_manure(
                 phosphorus=40.44,
                 potassium=50.55,
                 ash=60.66,
-                non_degradable_volatile_solids=55.53302711402748,
-                degradable_volatile_solids=59.32749999999999,
-                total_solids=252.1775,
+                non_degradable_volatile_solids=59.7911433205398,
+                degradable_volatile_solids=65.35055,
+                total_solids=262.75014999999996,
                 volume=100.12,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=7.846972885972514,
+                bedding_non_degradable_volatile_solids=8.448656679460196,
             ),
         ),
     ],
