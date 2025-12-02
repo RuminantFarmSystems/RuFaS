@@ -107,8 +107,8 @@ class Storage(Processor):
     @property
     def _emptying_fraction(self) -> float:
         """
-        The fraction of the storage that is emptied when the storage is emptied. Defaults to 1.0
-        where the entire storage is emptied.
+        The fraction of the accumulated stored manure that is removed from storage when the emptying time is reached.
+        Defaults to 1.0.
         """
         return 1.0
 
