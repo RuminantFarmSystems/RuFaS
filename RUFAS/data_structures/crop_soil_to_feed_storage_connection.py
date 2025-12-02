@@ -124,7 +124,7 @@ class HarvestedCrop:
         Calculates the dry matter mass of this crop in kg.
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        return 1- dry_matter_fraction * self.dry_matter_mass
+        return 1 - dry_matter_fraction * self.dry_matter_mass
 
     @property
     def is_alfalfa(self) -> bool:
