@@ -200,6 +200,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = storage._storage_time_period - 1 if is_emptying_day else 1
     mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
+    mock_validate_emptying_fraction = mocker.patch.object(storage, "_validate_emptying_fraction", return_value=None)
 
     storage._received_manure = (
         dummy_received_manure := ManureStream(
@@ -240,10 +241,12 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
 
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
+        mock_validate_emptying_fraction.assert_called_once()
         assert result["manure"] == dummy_total_manure
         assert storage.stored_manure == ManureStream.make_empty_manure_stream()
         mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
+        mock_validate_emptying_fraction.assert_not_called()
         assert result == {}
         assert storage.stored_manure == dummy_total_manure
         mock_report_manure_stream.assert_called_once()
@@ -273,6 +276,25 @@ def test_is_overflowing(storage: Storage, volume: float, capacity: float, expect
     actual = storage.is_overflowing
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "emptying_fraction, is_valid", [(0.0, True), (0.5, True), (1.0, True), (-0.1, False), (1.1, False)]
+)
+def test_validate_emptying_fraction(
+    storage: Storage, mocker: MockerFixture, emptying_fraction: float, is_valid: bool
+) -> None:
+    """Test that the _validate_emptying_fraction method in Storage works correctly."""
+    mock_add_error = mocker.patch.object(storage._om, "add_error", return_value=None)
+
+    mocker.patch.object(Storage, "_emptying_fraction", new_callable=mocker.PropertyMock, return_value=emptying_fraction)
+    if is_valid:
+        storage._validate_emptying_fraction()
+        mock_add_error.assert_not_called()
+    else:
+        with pytest.raises(ValueError):
+            storage._validate_emptying_fraction()
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -345,7 +367,7 @@ def test_determine_outdoor_storage_temperature(storage: Storage, day: int, expec
     storage.phase_shift = 12
     storage.amplitude = 12.2
 
-    actual = storage._determine_outdoor_storage_temperature(day)
+    actual = storage._determine_outdoor_storage_temperature(day, -20.0)
 
     assert actual == expected
 
@@ -360,6 +382,6 @@ def test_determine_outdoor_storage_temperature_missing_factors_error(storage: St
     storage.phase_shift = None
 
     with pytest.raises(ValueError) as e:
-        storage._determine_outdoor_storage_temperature(1)
+        storage._determine_outdoor_storage_temperature(1, -20.0)
 
     assert str(e.value) == "No data for outdoor storage temperature calculations."
