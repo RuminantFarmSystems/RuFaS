@@ -26,7 +26,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
@@ -999,10 +999,10 @@ class Pen:
                 break
 
             adjusted_dry_matter_lower = initial_dry_matter_requirement_fixed * (
-                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance
+                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
             )
             adjusted_dry_matter_upper = initial_dry_matter_requirement_fixed * (
-                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance
+                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
             )
             need_dry_matter_increase = bool(
                 set(
@@ -1078,8 +1078,8 @@ class Pen:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
         if is_ration_defined_by_user:
-            user_defined_ration_dictionary = UserDefinedRationManager.user_defined_rations[self.animal_combination]
-            tolerance = UserDefinedRationManager.tolerance
+            user_defined_ration_dictionary = RationManager.user_defined_rations[self.animal_combination]
+            tolerance = RationManager.tolerance
         else:
             user_defined_ration_dictionary = None
             tolerance = None
@@ -1134,7 +1134,7 @@ class Pen:
         pen_feeds : list[Feed]
             Feeds available in a given pen.
         """
-        self.ration = UserDefinedRationManager.get_user_defined_ration(
+        self.ration = RationManager.get_user_defined_ration(
             self.animal_combination, self.average_nutrition_requirements
         )
         self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
@@ -1231,9 +1231,7 @@ class Pen:
         if animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements
-        )
+        ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1251,9 +1249,7 @@ class Pen:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-                ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements
-                )
+                ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     self.average_nutrition_requirements,
