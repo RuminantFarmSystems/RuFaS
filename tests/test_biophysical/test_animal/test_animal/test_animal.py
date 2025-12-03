@@ -24,7 +24,9 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs, MilkProductionStatistics
+from RUFAS.biophysical.animal.data_types.milk_production import (
+    MilkProductionInputs, MilkProductionOutputs, MilkProductionStatistics
+)
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
@@ -2027,7 +2029,8 @@ def test_daily_milking_update_without_history_cow_updates_output(
     mock_lactating_cow: Animal,
     mocker: MockerFixture,
 ) -> None:
-    """For cows, daily_milking_update_without_history should call the milk_production update and store the output DIM."""
+    """For cows, daily_milking_update_without_history should call the milk_production
+    update and store the output DIM."""
     cow = mock_lactating_cow
     cow.days_in_milk = 12
     cow.days_born = 34
