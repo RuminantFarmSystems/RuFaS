@@ -369,17 +369,15 @@ class NutritionSupplyCalculator:
             if feed.info.CP > 0:
                 RUP: float = feed.info.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed.info.CP
                 RDP: float = feed.info.CP - RUP
-                try:
-                    ROM: float = (
-                        100
-                        - feed.info.FA / 1.06
-                        - feed.info.ash
-                        - feed.info.NDF
-                        - feed.info.starch
-                        - (feed.info.CP - 0.64 * NPN_supply)
-                    )
-                except ZeroDivisionError:
-                    ROM = 0.0
+                ROM: float = max(
+                    0,
+                    100
+                    - feed.info.FA / 1.06
+                    - feed.info.ash
+                    - feed.info.NDF
+                    - feed.info.starch
+                    - (feed.info.CP - 0.64 * NPN_supply)
+                )
             else:
                 RUP = 0.0
                 RDP = 0.0
