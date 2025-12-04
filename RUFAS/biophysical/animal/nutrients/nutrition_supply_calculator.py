@@ -376,7 +376,7 @@ class NutritionSupplyCalculator:
                     - feed.info.ash
                     - feed.info.NDF
                     - feed.info.starch
-                    - (feed.info.CP - 0.64 * NPN_supply)
+                    - (feed.info.CP - 0.64 * NPN_supply),
                 )
             else:
                 RUP = 0.0

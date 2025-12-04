@@ -112,10 +112,7 @@ def test_phosphorus_concentration_by_animal_class(
 
 def test_heiferII_events_by_id_returns_expected_mapping(herd_manager: HerdManager) -> None:
     """heiferII_events_by_id should map 'HEIFER_II_<id>' -> events for each HeiferII."""
-    expected = {
-        f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events
-        for heiferII in herd_manager.heiferIIs
-    }
+    expected = {f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events for heiferII in herd_manager.heiferIIs}
 
     result = herd_manager.heiferII_events_by_id
 
@@ -134,10 +131,7 @@ def test_heiferII_events_by_id_empty_when_no_heiferIIs(herd_manager: HerdManager
 def test_cow_events_by_id_returns_expected_mapping(herd_manager: HerdManager) -> None:
     """cow_events_by_id should map 'COWTYPE_<id>' -> events for each cow."""
 
-    expected = {
-        f"{cow.animal_type.name}_{cow.id}": cow.events
-        for cow in herd_manager.cows
-    }
+    expected = {f"{cow.animal_type.name}_{cow.id}": cow.events for cow in herd_manager.cows}
 
     result = herd_manager.cow_events_by_id
 

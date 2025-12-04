@@ -233,9 +233,7 @@ def test_total_pen_ration_no_animals(pen: Pen) -> None:
     assert pen.total_pen_ration == {}
 
 
-def test_total_pen_ration_scales_ration_and_adds_totals(
-    pen: Pen, animals_in_pen: dict[int, Animal]
-) -> None:
+def test_total_pen_ration_scales_ration_and_adds_totals(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """
     Tests that total_pen_ration scales the ration by the number of animals and adds total dry matter
     intake and byproducts.
@@ -1342,9 +1340,7 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     pen.om.add_error.assert_not_called()
 
 
-def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(
-    mocker: MockerFixture, pen: Pen
-) -> None:
+def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW + user-defined ration: failed first attempt triggers DMI increase and retry."""
     mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
 
@@ -1401,9 +1397,7 @@ def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(
     mock_apply_user_defined.assert_not_called()
 
 
-def test_formulation_lac_cow_user_defined_dmi_decrease_triggers_retry(
-    mocker: MockerFixture, pen: Pen
-) -> None:
+def test_formulation_lac_cow_user_defined_dmi_decrease_triggers_retry(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW + user-defined ration: failed first attempt triggers DMI decrease and retry."""
     mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
 
@@ -1459,9 +1453,7 @@ def test_formulation_lac_cow_user_defined_dmi_decrease_triggers_retry(
     mock_apply_user_defined.assert_not_called()
 
 
-def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(
-    mocker: MockerFixture, pen: Pen
-) -> None:
+def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(mocker: MockerFixture, pen: Pen) -> None:
     """
     LAC_COW + user-defined ration: failed formulation triggers user-defined reduce handler,
     then falls back to applying the user-defined ration and logs the event.
@@ -1755,10 +1747,8 @@ def test_reduce_on_lactation_failure_success(mocker: MockerFixture, pen: Pen) ->
     [
         # 1. Milk too low → immediate True, one log
         (0.0, None, True, 1),
-
         # 2. Milk okay but reduce_milk_production() fails → True, one log
         (10.0, False, True, 1),
-
         # 3. Milk okay + reduction works → False, no logs
         (10.0, True, False, 0),
     ],

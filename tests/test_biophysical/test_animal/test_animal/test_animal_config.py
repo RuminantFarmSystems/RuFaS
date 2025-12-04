@@ -17,9 +17,9 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
 @pytest.mark.parametrize(
     "heifer_method, expected_subprogram_type",
     [
-        ("TAI", HeiferTAISubProtocol),          # if branch
+        ("TAI", HeiferTAISubProtocol),  # if branch
         ("SynchED", HeiferSynchEDSubProtocol),  # elif branch
-        ("ED", HeiferTAISubProtocol),           # else fallback to default TAI subprogram
+        ("ED", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
     ],
     ids=["heifer_tai", "heifer_synched", "heifer_other_fallback"],
 )
@@ -190,12 +190,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
 def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryoff(
     mocker: "pytest_mock.MockerFixture",
 ) -> None:
-    mock_im_cls = mocker.patch(
-        "RUFAS.biophysical.animal.animal_config.InputManager"
-    )
-    mock_om_cls = mocker.patch(
-        "RUFAS.biophysical.animal.animal_config.OutputManager"
-    )
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
 
     mock_im = mock_im_cls.return_value
     mock_om = mock_om_cls.return_value
@@ -212,7 +208,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
             "milk_fat_percent": 4,
-            "milk_protein_percent": 3.2
+            "milk_protein_percent": 3.2,
         },
         "farm_level": {
             "calf": {
@@ -221,7 +217,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "keep_female_calf_rate": 1,
                 "wean_day": 60,
                 "wean_length": 7,
-                "milk_type": "whole"
+                "milk_type": "whole",
             },
             "repro": {
                 "voluntary_waiting_period": 50,
@@ -236,10 +232,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
                     "repro_sub_protocol": "2P",
-                    "repro_sub_properties": {
-                        "conception_rate": 0.6,
-                        "estrus_detection_rate": 0.9
-                    }
+                    "repro_sub_properties": {"conception_rate": 0.6, "estrus_detection_rate": 0.9},
                 },
                 "cows": {
                     "estrus_detection_rate": 0.6,
@@ -249,8 +242,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                     "ovsynch_program": "OvSynch 56",
                     "ovsynch_program_start_day": 64,
                     "ovsynch_program_conception_rate": 0.6,
-                    "resynch_program": "TAIafterPD"
-                }
+                    "resynch_program": "TAIafterPD",
+                },
             },
             "bodyweight": {
                 "birth_weight_avg_ho": 43.9,
@@ -259,8 +252,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "birth_weight_std_je": 1,
                 "target_heifer_preg_day": 399,
                 "mature_body_weight_avg": 740.1,
-                "mature_body_weight_std": 73.5
-            }
+                "mature_body_weight_std": 73.5,
+            },
         },
         "from_literature": {
             "repro": {
@@ -277,42 +270,40 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "avg_estrus_cycle_cow": 21,
                 "std_estrus_cycle_cow": 4,
                 "avg_estrus_cycle_after_pgf": 5,
-                "std_estrus_cycle_after_pgf": 2
+                "std_estrus_cycle_after_pgf": 2,
             },
             "culling": {
                 "cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
                 "feet_leg_cull": {
                     "probability": 0.1633,
-                    "cull_day_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1]
+                    "cull_day_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
                 },
                 "injury_cull": {
                     "probability": 0.2883,
-                    "cull_day_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1]
+                    "cull_day_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
                 },
                 "mastitis_cull": {
                     "probability": 0.2439,
-                    "cull_day_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1]
+                    "cull_day_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
                 },
                 "disease_cull": {
                     "probability": 0.1391,
-                    "cull_day_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1]
+                    "cull_day_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
                 },
                 "udder_cull": {
                     "probability": 0.0645,
-                    "cull_day_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1]
+                    "cull_day_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
                 },
                 "unknown_cull": {
                     "probability": 0.1009,
-                    "cull_day_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1]
+                    "cull_day_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
                 },
                 "parity_death_prob": [0.039, 0.056, 0.085, 0.117],
                 "parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
-                "death_day_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
+                "death_day_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
             },
-            "life_cycle": {
-                "still_birth_rate": 0.065
-            }
-        }
+            "life_cycle": {"still_birth_rate": 0.065},
+        },
     }
 
     animal_data = {

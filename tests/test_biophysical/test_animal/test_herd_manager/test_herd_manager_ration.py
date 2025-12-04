@@ -92,7 +92,7 @@ def test_end_ration_interval(
 @pytest.mark.parametrize(
     "is_ration_defined_by_user, WHOLE_MILK_ID_in_calf_ration",
     [
-        (True, True),   # uses user_defined_rations, contains WHOLE_MILK_ID
+        (True, True),  # uses user_defined_rations, contains WHOLE_MILK_ID
         (True, False),  # uses user_defined_rations, does NOT contain WHOLE_MILK_ID
         (False, True),  # uses ration_feeds, contains WHOLE_MILK_ID (hits the else branch)
         (False, False),  # uses ration_feeds, does NOT contain WHOLE_MILK_ID (else branch)
@@ -248,8 +248,7 @@ def test_formulate_rations(
     mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
 
     mock_pen_get_requested_feed = [
-        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({}))
-        for pen in herd_manager.all_pens
+        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
     ]
 
     mock_ration_feed_ids = mocker.sentinel.ration_feed_ids
@@ -261,9 +260,7 @@ def test_formulate_rations(
         mock_get_default = mocker.patch.object(RationManager, "get_ration_feeds")
     else:
         mock_get_user_defined = mocker.patch.object(RationManager, "get_user_defined_ration_feeds")
-        mock_get_default = mocker.patch.object(
-            RationManager, "get_ration_feeds", return_value=mock_ration_feed_ids
-        )
+        mock_get_default = mocker.patch.object(RationManager, "get_ration_feeds", return_value=mock_ration_feed_ids)
 
     mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=available_feeds)
 
@@ -281,8 +278,7 @@ def test_formulate_rations(
     mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     expected_reformulate_ration_single_pen_call_args_list = [
-        call(pen, available_feeds, current_temperature, mock_total_inventory, 15)
-        for pen in herd_manager.all_pens
+        call(pen, available_feeds, current_temperature, mock_total_inventory, 15) for pen in herd_manager.all_pens
     ]
     assert mock_reformulate_ration_single_pen.call_args_list == expected_reformulate_ration_single_pen_call_args_list
 
@@ -505,21 +501,11 @@ def test_report_ration_interval_data(
 
     herd_manager.all_pens = [pen_unpopulated, pen_calf, pen_lac_cow]
 
-    mock_report_ration_per_animal = mocker.patch.object(
-        AnimalModuleReporter, "report_ration_per_animal"
-    )
-    mock_report_nutrient_amounts = mocker.patch.object(
-        AnimalModuleReporter, "report_nutrient_amounts"
-    )
-    mock_report_me_diet = mocker.patch.object(
-        AnimalModuleReporter, "report_me_diet"
-    )
-    mock_report_avg_reqs = mocker.patch.object(
-        AnimalModuleReporter, "report_average_nutrient_requirements"
-    )
-    mock_report_avg_eval = mocker.patch.object(
-        AnimalModuleReporter, "report_average_nutrient_evaluation_results"
-    )
+    mock_report_ration_per_animal = mocker.patch.object(AnimalModuleReporter, "report_ration_per_animal")
+    mock_report_nutrient_amounts = mocker.patch.object(AnimalModuleReporter, "report_nutrient_amounts")
+    mock_report_me_diet = mocker.patch.object(AnimalModuleReporter, "report_me_diet")
+    mock_report_avg_reqs = mocker.patch.object(AnimalModuleReporter, "report_average_nutrient_requirements")
+    mock_report_avg_eval = mocker.patch.object(AnimalModuleReporter, "report_average_nutrient_evaluation_results")
 
     herd_manager.report_ration_interval_data(simulation_day)
 

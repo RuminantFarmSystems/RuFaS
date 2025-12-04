@@ -52,12 +52,8 @@ def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> No
 
 def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture) -> None:
     """HerdManager.__init__ should call RationManager.set_ration_feeds when is_ration_defined_by_user is False."""
-    mock_im_cls = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.InputManager"
-    )
-    mock_om_cls = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.OutputManager"
-    )
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.herd_manager.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
     mock_im = mock_im_cls.return_value
     _ = mock_om_cls.return_value
 
@@ -80,17 +76,13 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mock_set_user_defined_ration_tolerance = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.RationManager.set_user_defined_ration_tolerance"
     )
-    mock_set_ration_feeds = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.RationManager.set_ration_feeds"
-    )
+    mock_set_ration_feeds = mocker.patch("RUFAS.biophysical.animal.herd_manager.RationManager.set_ration_feeds")
 
     mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.AdvancePurchaseAllowance",
         return_value=MagicMock(),
     )
-    mock_nutrient_standard_cls = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.NutrientStandard"
-    )
+    mock_nutrient_standard_cls = mocker.patch("RUFAS.biophysical.animal.herd_manager.NutrientStandard")
     mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.Animal.set_nutrient_standard",
         return_value=None,

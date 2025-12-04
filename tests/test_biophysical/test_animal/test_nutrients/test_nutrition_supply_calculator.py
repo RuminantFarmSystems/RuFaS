@@ -437,9 +437,7 @@ def test_calculate_actual_maintenance_net_energy(
         feeds[i].is_fat = is_fat[i]
         feeds[i].feed_type = feed_types[i]
 
-    feeds_in_ration = [
-        FeedInRation(amounts[i], feeds[i]) for i in range(3)
-    ]
+    feeds_in_ration = [FeedInRation(amounts[i], feeds[i]) for i in range(3)]
 
     actual = NutritionSupplyCalculator.calculate_actual_maintenance_net_energy(
         feeds_in_ration,
@@ -467,11 +465,7 @@ def test_calculate_NASEM_dNDF(feeds: tuple[Feed, Feed, Feed]) -> None:
     ndf = feed.NDF
     lignin = feed.lignin
     dndf_base = 0.75 * (ndf - lignin) * (1 - (lignin / ndf) ** 0.667) / ndf
-    expected_dndf = (
-        dndf_base
-        - 0.0059 * (total_starch - 26.0)
-        - 1.1 * ((dry_matter_intake / body_weight) - 0.035)
-    )
+    expected_dndf = dndf_base - 0.0059 * (total_starch - 26.0) - 1.1 * ((dry_matter_intake / body_weight) - 0.035)
 
     actual_dndf = NutritionSupplyCalculator.calculate_NASEM_dNDF(
         feed_in_ration,
@@ -497,9 +491,8 @@ def test_calculate_NASEM_dstarch(feeds: tuple[Feed, Feed, Feed]) -> None:
     dry_matter_intake = 20.0
     body_weight = 600.0
 
-    expected_dstarch = (
-        feed.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION
-        - ((dry_matter_intake / body_weight) - 0.035)
+    expected_dstarch = feed.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION - (
+        (dry_matter_intake / body_weight) - 0.035
     )
 
     actual_dstarch = NutritionSupplyCalculator.calculate_NASEM_dstarch(
@@ -568,14 +561,7 @@ def test_calculate_NASEM_digestible_energy_branches(
     NPN_supply1 = feed1.NPN_source / feed1.CP
     RUP1 = feed1.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed1.CP
     RDP1 = feed1.CP - RUP1  # 12.0
-    ROM1 = (
-        100
-        - feed1.FA / 1.06
-        - feed1.ash
-        - feed1.NDF
-        - feed1.starch
-        - (feed1.CP - 0.64 * NPN_supply1)
-    )
+    ROM1 = 100 - feed1.FA / 1.06 - feed1.ash - feed1.NDF - feed1.starch - (feed1.CP - 0.64 * NPN_supply1)
 
     dNDF1 = 0.5
     dstarch1 = 0.7
@@ -584,12 +570,7 @@ def test_calculate_NASEM_digestible_energy_branches(
         0.042 * feed1.NDF * dNDF1
         + 0.0423 * feed1.starch * dstarch1
         + 0.0940 * feed1.FA * dFA
-        + 0.0565
-        * (
-            RDP1
-            + RUP1 * feed1.dRUP * GeneralConstants.PERCENTAGE_TO_FRACTION
-            - feed1.NPN_source
-        )
+        + 0.0565 * (RDP1 + RUP1 * feed1.dRUP * GeneralConstants.PERCENTAGE_TO_FRACTION - feed1.NPN_source)
         + 0.0089 * feed1.NPN_source
         + 0.040 * ROM1 * dROM
         - 0.318
@@ -604,12 +585,7 @@ def test_calculate_NASEM_digestible_energy_branches(
         0.042 * feed2.NDF * dNDF2
         + 0.0423 * feed2.starch * dstarch2
         + 0.0940 * feed2.FA * dFA
-        + 0.0565
-        * (
-            RDP2
-            + RUP2 * feed2.dRUP * GeneralConstants.PERCENTAGE_TO_FRACTION
-            - feed2.NPN_source
-        )
+        + 0.0565 * (RDP2 + RUP2 * feed2.dRUP * GeneralConstants.PERCENTAGE_TO_FRACTION - feed2.NPN_source)
         + 0.0089 * feed2.NPN_source
         + 0.040 * ROM2 * dROM
         - 0.318
@@ -673,10 +649,10 @@ def test_calculate_NASEM_metabolizable_energy_uses_de_and_subtracts_losses(
 @pytest.mark.parametrize(
     "efficiency, total_me",
     [
-        (0.0, 10.0),      # efficiency zero → result always zero
-        (0.64, 12.5),     # typical efficiency
-        (0.75, 0.0),      # zero ME input
-        (1.2, -5.0),      # negative ME (should just multiply)
+        (0.0, 10.0),  # efficiency zero → result always zero
+        (0.64, 12.5),  # typical efficiency
+        (0.75, 0.0),  # zero ME input
+        (1.2, -5.0),  # negative ME (should just multiply)
     ],
     ids=["eff_zero", "typical", "zero_me", "negative_me"],
 )

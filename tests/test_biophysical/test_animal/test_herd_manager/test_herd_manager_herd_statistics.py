@@ -989,9 +989,7 @@ def test_update_average_cow_parity(herd_manager: HerdManager) -> None:
 
 def test_update_total_enteric_methane_merges_and_accumulates(herd_manager: HerdManager) -> None:
     """_update_total_enteric_methane should merge and accumulate emissions by animal type and gas key."""
-    herd_manager.herd_statistics.total_enteric_methane = {
-        AnimalType.LAC_COW: {"CH4": 10.0, "CO2": 5.0}
-    }
+    herd_manager.herd_statistics.total_enteric_methane = {AnimalType.LAC_COW: {"CH4": 10.0, "CO2": 5.0}}
 
     digestive_outputs = [
         {

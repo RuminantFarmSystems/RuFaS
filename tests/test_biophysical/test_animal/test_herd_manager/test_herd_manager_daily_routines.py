@@ -290,10 +290,7 @@ def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
         animals=[dead_animal, calving_animal],
     )
 
-    assert (
-        herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.LAC_COW]
-        == before_deaths + 1
-    )
+    assert herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.LAC_COW] == before_deaths + 1
     assert sold_animals == [dead_animal]
     assert graduated_animals == [calving_animal]
     mock_create_newborn_calf.assert_called_once()

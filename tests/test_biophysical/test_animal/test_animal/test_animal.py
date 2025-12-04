@@ -25,7 +25,9 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import (
-    MilkProductionInputs, MilkProductionOutputs, MilkProductionStatistics
+    MilkProductionInputs,
+    MilkProductionOutputs,
+    MilkProductionStatistics,
 )
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
