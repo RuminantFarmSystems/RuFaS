@@ -9,7 +9,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, TotalInventory, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
@@ -523,6 +523,45 @@ def test_fully_update_animal_to_pen_id_map_warns_if_pen_is_overstocked(
     assert "Pen 99" in args[1]
     assert kwargs["info_map"]["function"] == "fully_update_animal_to_pen_id_map"
     assert kwargs["info_map"]["simulation_day"] == 15
+
+
+@pytest.mark.parametrize(
+    "all_feed_ids, user_defined_ids, expected_ids",
+    [
+        # 1. Single match
+        ([1, 2], [1], [1]),
+        # 2. No matches
+        ([1, 2], [3], []),
+        # 3. Multiple matches (order should be preserved from all_available_feeds)
+        ([1, 2, 3], [3, 1], [1, 3]),
+        # 4. Both lists empty
+        ([], [], []),
+        # 5. user_defined_ids empty → always returns []
+        ([1], [], []),
+    ],
+)
+def test_find_pen_available_feeds(
+    all_feed_ids: list[int],
+    user_defined_ids: list[int],
+    expected_ids: list[int],
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Tests for _find_pen_available_feeds filtering behavior."""
+    all_available_feeds = []
+    for feed_id in all_feed_ids:
+        feed = mocker.MagicMock(spec=Feed)
+        feed.rufas_id = RUFAS_ID(feed_id)
+        all_available_feeds.append(feed)
+
+    user_defined_ration_feed_ids = [RUFAS_ID(feed_id) for feed_id in user_defined_ids]
+
+    result = herd_manager._find_pen_available_feeds(
+        all_available_feeds=all_available_feeds,
+        user_defined_ration_feed_ids=user_defined_ration_feed_ids,
+    )
+
+    assert [feed.rufas_id for feed in result] == expected_ids
 
 
 def test_gather_pen_history(
