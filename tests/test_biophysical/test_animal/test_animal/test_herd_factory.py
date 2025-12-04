@@ -1154,6 +1154,132 @@ def test_random_sample_with_replacement_by_type(
 
 
 @pytest.mark.parametrize(
+    "animal_type_str, parity_key, milking_fraction, is_milking, expected_k",
+    [
+        # milking cows: use milking_fraction as-is
+        ("cows_parity_1_milking", "1", 0.5, True, 1),
+        # not-milking cows: use (1 - milking_fraction)
+        ("cows_parity_1_not_milking", "1", 0.6, False, 1),
+    ],
+)
+def test_random_sample_with_replacement_by_type_parity_branches(
+    mocker: MockerFixture,
+    animal_type_str: str,
+    parity_key: str,
+    milking_fraction: float,
+    is_milking: bool,
+    expected_k: int,
+) -> None:
+    """Covers the parity/milking branch, including inversion of milking fraction for non-milking cows."""
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
+    )
+    herd_factory = HerdFactory()
+
+    pre_animals = [MagicMock() for _ in range(5)]
+    pre_pop = MagicMock()
+    pre_pop.filter_cow_status.return_value = pre_animals
+    herd_factory.pre_animal_population = pre_pop
+
+    mock_im = MagicMock()
+    herd_factory.im = mock_im
+
+    parity_input_name = f"animal.herd_information.parity_fractions.{parity_key}"
+
+    def get_data_side_effect(key: str) -> float:
+        if key == "animal.herd_information.milking_cow_fraction":
+            return milking_fraction
+        if key == parity_input_name:
+            return 0.2 if is_milking else 0.25
+        if key == "animal.herd_information.cow_num":
+            return 10
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    mock_choices = mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.random.choices",
+        return_value=[0] * expected_k,
+    )
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.copy.deepcopy",
+        side_effect=lambda x: x,
+    )
+    mocker.patch.object(AnimalPopulation, "next_id", return_value=1)
+
+    result = herd_factory._random_sample_with_replacement_by_type(animal_type_str)
+
+    pre_pop.filter_cow_status.assert_any_call(int(parity_key), is_milking)
+    mock_choices.assert_called_once()
+    assert len(result) == expected_k
+
+
+def test_random_sample_with_replacement_by_type_exception_zero_animals_logs_missing_group_warning(
+    mocker: MockerFixture,
+) -> None:
+    """Covers except-block branch where animal_num == 0."""
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
+    )
+    herd_factory = HerdFactory()
+
+    herd_factory.pre_animal_population = MagicMock()
+    herd_factory.pre_animal_population.calves = [MagicMock()]
+
+    mock_im = MagicMock()
+    herd_factory.im = mock_im
+    mock_im.get_data.return_value = 0
+
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.random.choices",
+        side_effect=RuntimeError("boom"),
+    )
+
+    mock_om = mocker.patch("RUFAS.biophysical.animal.herd_factory.om")
+
+    result = herd_factory._random_sample_with_replacement_by_type("calf")
+
+    assert result == []
+    mock_om.add_warning.assert_called_once()
+    args, kwargs = mock_om.add_warning.call_args
+    assert "Missing calf" in args[0]
+    assert "No animals sampled for calf." in args[1]
+
+
+def test_random_sample_with_replacement_by_type_exception_nonzero_animals_logs_population_file_warning(
+    mocker: MockerFixture,
+) -> None:
+    """Covers except-block branch where animal_num > 0."""
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
+    )
+    herd_factory = HerdFactory()
+
+    herd_factory.pre_animal_population = MagicMock()
+    herd_factory.pre_animal_population.calves = [MagicMock()]
+
+    mock_im = MagicMock()
+    herd_factory.im = mock_im
+    mock_im.get_data.return_value = 5
+
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_factory.random.choices",
+        side_effect=RuntimeError("boom"),
+    )
+
+    mock_om = mocker.patch("RUFAS.biophysical.animal.herd_factory.om")
+
+    result = herd_factory._random_sample_with_replacement_by_type("calf")
+
+    assert result == []
+    mock_om.add_warning.assert_called_once()
+    args, kwargs = mock_om.add_warning.call_args
+    assert "Missing calf animal population file" in args[0]
+    assert "No animals in group calf found in animal population file." in args[1]
+    assert "Full error" in args[1]
+
+
+@pytest.mark.parametrize(
     "pre_num, post_num",
     [
         (0, 0),

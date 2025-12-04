@@ -205,6 +205,56 @@ def test_is_populated(pen: Pen, animals_in_pen: dict[int, Animal], expected: boo
     assert pen.is_populated == expected
 
 
+def test_total_enteric_methane_sums_animal_emissions(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """total_enteric_methane should return the sum of enteric methane for all animals in the pen."""
+    pen.animals_in_pen = animals_in_pen
+
+    result = pen.total_enteric_methane
+
+    expected = 69.4 * len(animals_in_pen)
+
+    assert result == pytest.approx(expected)
+
+
+def test_total_enteric_methane_zero_when_no_animals(pen: Pen) -> None:
+    """total_enteric_methane should be 0.0 when there are no animals in the pen."""
+    pen.animals_in_pen = {}
+
+    result = pen.total_enteric_methane
+
+    assert result == 0.0
+
+
+def test_total_pen_ration_no_animals(pen: Pen) -> None:
+    """total_pen_ration should return an empty dict when no animals are housed in the pen."""
+    pen.animals_in_pen = {}
+    pen.ration = {RUFAS_ID(1): 5.0}
+
+    assert pen.total_pen_ration == {}
+
+
+def test_total_pen_ration_scales_ration_and_adds_totals(
+    pen: Pen, animals_in_pen: dict[int, Animal]
+) -> None:
+    """
+    Tests that total_pen_ration scales the ration by the number of animals and adds total dry matter
+    intake and byproducts.
+    """
+    pen.animals_in_pen = animals_in_pen
+    pen.ration = {RUFAS_ID(1): 5.0, RUFAS_ID(2): 3.0}
+
+    result = pen.total_pen_ration
+
+    expected = {
+        "1": 10.0,
+        "2": 6.0,
+        "dry_matter_intake_total": 16.0,
+        "byproducts_total": 40.0,
+    }
+
+    assert result == expected
+
+
 @pytest.mark.parametrize(
     "ration, is_populated, expected", [({}, True, True), ({}, False, False), ({3: 2.5}, True, False)]
 )
@@ -779,6 +829,13 @@ def test_clear(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
             ],
             ["single_general_stream_GROWING_PEN_1"],
         ),
+        (
+            AnimalCombination.GROWING_AND_CLOSE_UP,
+            [
+                {"stream_name": "single_general_stream", "stream_proportion": 1.0, "bedding_name": "bedding_1"},
+            ],
+            ["single_general_stream_GROWING_AND_CLOSE_UP_PEN_1"],
+        ),
     ],
 )
 def test_get_manure_streams(
@@ -798,6 +855,11 @@ def test_get_manure_streams(
     pen.parlor_stream_name = "test_stream"
     pen.minutes_away_for_milking = 360
 
+    if animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+        first_animal = next(iter(animals_in_pen.values()))
+        second_animal = list(animals_in_pen.values())[1]
+        first_animal.animal_type = AnimalType.HEIFER_I
+        second_animal.animal_type = AnimalType.DRY_COW
     apply_bedding_side_effects = [MagicMock(spec=ManureStream) for _ in manure_streams]
     mock_apply_bedding = mocker.patch.object(pen, "_apply_bedding", side_effect=apply_bedding_side_effects)
 
@@ -1280,6 +1342,186 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     pen.om.add_error.assert_not_called()
 
 
+def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(
+    mocker: MockerFixture, pen: Pen
+) -> None:
+    """LAC_COW + user-defined ration: failed first attempt triggers DMI increase and retry."""
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 5
+    pen.om = MagicMock(spec=OutputManager)
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 100.0
+    avg_reqs.metabolizable_protein = 50.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    failing_solution = _mock_solution(False)
+    succeeding_solution = _mock_solution(True)
+    mock_attempt = mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        side_effect=[(failing_solution, MagicMock()), (succeeding_solution, MagicMock())],
+    )
+
+    mocker.patch.object(
+        pen.ration_optimizer,
+        "handle_failed_constraints",
+        return_value=["NE_total_constraint"],
+    )
+
+    mock_reduce_user_defined = mocker.patch.object(pen, "_reduce_on_lactation_failure_user_defined")
+    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
+    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
+
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=25.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=10,
+    )
+
+    assert mock_attempt.call_count == 2
+    mock_apply_success.assert_called_once()
+
+    mock_reduce_user_defined.assert_not_called()
+    mock_reduce_auto.assert_not_called()
+    mock_apply_user_defined.assert_not_called()
+
+
+def test_formulation_lac_cow_user_defined_dmi_decrease_triggers_retry(
+    mocker: MockerFixture, pen: Pen
+) -> None:
+    """LAC_COW + user-defined ration: failed first attempt triggers DMI decrease and retry."""
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 7
+    pen.om = MagicMock(spec=OutputManager)
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 100.0
+    avg_reqs.metabolizable_protein = 50.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    failing_solution = _mock_solution(False)
+    succeeding_solution = _mock_solution(True)
+    mock_attempt = mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        side_effect=[(failing_solution, MagicMock()), (succeeding_solution, MagicMock())],
+    )
+
+    mocker.patch.object(
+        pen.ration_optimizer,
+        "handle_failed_constraints",
+        return_value=["protein_constraint_upper"],
+    )
+
+    mock_reduce_user_defined = mocker.patch.object(pen, "_reduce_on_lactation_failure_user_defined")
+    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
+    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
+
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=26.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=12,
+    )
+
+    assert mock_attempt.call_count == 2
+    mock_apply_success.assert_called_once()
+    mock_reduce_user_defined.assert_not_called()
+    mock_reduce_auto.assert_not_called()
+    mock_apply_user_defined.assert_not_called()
+
+
+def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(
+    mocker: MockerFixture, pen: Pen
+) -> None:
+    """
+    LAC_COW + user-defined ration: failed formulation triggers user-defined reduce handler,
+    then falls back to applying the user-defined ration and logs the event.
+    """
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 6
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    failing_solution = _mock_solution(False)
+    mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        return_value=(failing_solution, MagicMock()),
+    )
+
+    mocker.patch.object(
+        pen.ration_optimizer,
+        "handle_failed_constraints",
+        return_value=["some_other_constraint"],
+    )
+
+    mock_reduce_user_defined = mocker.patch.object(
+        pen,
+        "_reduce_on_lactation_failure_user_defined",
+        return_value=True,
+    )
+    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+
+    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
+    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
+
+    feeds = _mock_feeds()
+
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=feeds,
+        temperature=20.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        total_inventory=MagicMock(),
+        simulation_day=11,
+    )
+
+    mock_reduce_user_defined.assert_called_once()
+    mock_reduce_auto.assert_not_called()
+    mock_apply_success.assert_not_called()
+
+    mock_apply_user_defined.assert_called_once()
+    (called_feeds,), _ = mock_apply_user_defined.call_args
+    assert isinstance(called_feeds, list)
+    assert len(called_feeds) == len(feeds)
+
+    pen.om.add_log.assert_called_once()
+
+
 def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the function _attempt_formulation"""
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
@@ -1298,6 +1540,64 @@ def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: di
     mock_set.assert_called_once()
     mock_attempt.assert_called_once()
     assert result == mock_result
+
+
+def test_attempt_formulation_user_defined_and_nasem(
+    mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]
+) -> None:
+    """Covers user-defined ration path and NASEM nutrient standard averaging."""
+    pen.animals_in_pen = animals_in_pen
+    for animal in pen.animals_in_pen.values():
+        animal.nutrient_standard = NutrientStandard.NASEM
+
+    user_defined_for_combo = {"feed1": 1.0, "feed2": 2.0}
+    mocker.patch.object(
+        RationManager,
+        "user_defined_rations",
+        {pen.animal_combination: user_defined_for_combo},
+        create=True,
+    )
+    mocker.patch.object(RationManager, "tolerance", 0.123, create=True)
+
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 100.0
+    avg_reqs.metabolizable_protein = 50.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
+    mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
+    mock_attempt = mocker.patch.object(
+        RationOptimizer,
+        "attempt_optimization",
+        return_value=mock_result,
+    )
+
+    feeds = _mock_feeds()
+
+    result = pen._attempt_formulation(
+        is_ration_defined_by_user=True,
+        pen_feeds=feeds,
+        temperature=25.0,
+        previous_ration={"prev": "ration"},
+        initial_dry_matter_requirement=1.5,
+        initial_protein_requirement=2.5,
+    )
+
+    mock_set.assert_called_once()
+    mock_attempt.assert_called_once()
+    assert result == mock_result
+
+    _, kwargs = mock_attempt.call_args
+
+    assert kwargs["user_defined_ration_dictionary"] == user_defined_for_combo
+    assert kwargs["user_defined_ration_tolerance"] == pytest.approx(0.123)
+    assert kwargs["pen_average_enteric_methane"] == pytest.approx(69.4)
+    assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(15.0)
 
 
 def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:
@@ -1340,6 +1640,60 @@ def test_apply_successful_solution_not_populated(mocker: MockerFixture, pen: Pen
 
     assert str(pen.average_nutrition_evaluation) == "empty"
     mock_empty.assert_called_once()
+
+
+@pytest.mark.parametrize("is_populated", [True, False])
+def test_apply_user_defined_ration_populated_flag_controls_evaluation(
+    mocker: MockerFixture, pen: Pen, is_populated: bool
+) -> None:
+    """_apply_user_defined_ration sets ration, supply, and evaluation depending on is_populated."""
+    avg_reqs = MagicMock()
+    avg_supply = MagicMock()
+
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_supply",
+        new_callable=PropertyMock,
+        return_value=avg_supply,
+    )
+
+    mocker.patch.object(type(pen), "is_populated", new_callable=PropertyMock, return_value=is_populated)
+
+    fake_ration = {"A": 1.0, "B": 2.0}
+    mocker.patch.object(
+        RationManager,
+        "get_user_defined_ration",
+        return_value=fake_ration,
+        create=True,
+    )
+
+    mock_set_supply = mocker.patch.object(pen, "set_animal_nutritional_supply")
+
+    fake_eval = MagicMock()
+    mocker.patch.object(
+        NutritionEvaluator,
+        "evaluate_nutrition_supply",
+        return_value=("ignored", fake_eval),
+    )
+
+    feeds = _mock_feeds()
+
+    pen._apply_user_defined_ration(feeds)
+
+    assert pen.ration == fake_ration
+    mock_set_supply.assert_called_once_with(feeds_used=feeds, ration_formulation=fake_ration)
+
+    if is_populated:
+        assert pen.average_nutrition_evaluation is fake_eval
+    else:
+        empty_eval = NutritionEvaluationResults.make_empty_evaluation_results()
+        assert pen.average_nutrition_evaluation == empty_eval
 
 
 def test_reduce_on_lactation_failure_low_milk(mocker: MockerFixture, pen: Pen) -> None:
@@ -1394,6 +1748,56 @@ def test_reduce_on_lactation_failure_success(mocker: MockerFixture, pen: Pen) ->
 
     pen._reduce_on_lactation_failure({"ok": "yes"})
     pen.om.add_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "avg_milk, reduce_return, expected_return, expected_log_calls",
+    [
+        # 1. Milk too low → immediate True, one log
+        (0.0, None, True, 1),
+
+        # 2. Milk okay but reduce_milk_production() fails → True, one log
+        (10.0, False, True, 1),
+
+        # 3. Milk okay + reduction works → False, no logs
+        (10.0, True, False, 0),
+    ],
+    ids=[
+        "milk_too_low",
+        "reduce_failed",
+        "reduce_succeeded",
+    ],
+)
+def test_reduce_on_lactation_failure_user_defined(
+    mocker: MockerFixture,
+    pen: Pen,
+    avg_milk: float,
+    reduce_return: bool | None,
+    expected_return: bool,
+    expected_log_calls: int,
+) -> None:
+    """Covers all branches of _reduce_on_lactation_failure_user_defined."""
+    mocker.patch(
+        "RUFAS.biophysical.animal.pen.AnimalModuleConstants.MINIMUM_AVG_PEN_MILK",
+        5.0,
+    )
+
+    mocker.patch.object(
+        type(pen),
+        "average_milk_production",
+        new_callable=PropertyMock,
+        return_value=avg_milk,
+    )
+    if reduce_return is not None:
+        mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_return)
+
+    pen.om = MagicMock()
+    info_map = {"class": "Pen"}
+
+    result = pen._reduce_on_lactation_failure_user_defined(info_map)
+
+    assert result == expected_return
+    assert pen.om.add_log.call_count == expected_log_calls
 
 
 @pytest.mark.parametrize(
