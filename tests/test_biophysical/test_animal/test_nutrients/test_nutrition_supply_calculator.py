@@ -12,6 +12,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
     FeedCategorization,
     FeedComponentType,
+    NASEMFeed,
     NutrientStandard,
 )
 from RUFAS.units import MeasurementUnits
@@ -477,7 +478,7 @@ def test_calculate_NASEM_dNDF(feeds: tuple[Feed, Feed, Feed]) -> None:
     assert actual_dndf == pytest.approx(expected_dndf, rel=1e-9)
 
 
-def test_calculate_NASEM_dstarch(feeds: tuple[Feed, Feed, Feed]) -> None:
+def test_calculate_NASEM_dstarch(feeds: tuple[NASEMFeed, NASEMFeed, NASEMFeed]) -> None:
     """
     Test that calculate_NASEM_dstarch computes digestible starch according
     to the NASEM formula, including the dry matter intake / body weight
@@ -505,7 +506,7 @@ def test_calculate_NASEM_dstarch(feeds: tuple[Feed, Feed, Feed]) -> None:
 
 
 def test_calculate_NASEM_digestible_energy_branches(
-    feeds: tuple[Feed, Feed, Feed],
+    feeds: tuple[NASEMFeed, NASEMFeed, NASEMFeed],
     mocker: MockerFixture,
 ) -> None:
     """
@@ -656,7 +657,7 @@ def test_calculate_NASEM_metabolizable_energy_uses_de_and_subtracts_losses(
     ],
     ids=["eff_zero", "typical", "zero_me", "negative_me"],
 )
-def test_calculate_NASEM_net_energy(monkeypatch: MockerFixture, efficiency: float, total_me: float) -> None:
+def test_calculate_NASEM_net_energy(monkeypatch: pytest.MonkeyPatch, efficiency: float, total_me: float) -> None:
     """Net energy should be efficiency * total metabolizable energy."""
     monkeypatch.setattr(AnimalModuleConstants, "EFF_OF_ME_USE", efficiency)
     result = NutritionSupplyCalculator.calculate_NASEM_net_energy(total_me)

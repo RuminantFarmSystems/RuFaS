@@ -647,7 +647,7 @@ def test_reformulate_ration_single_pen_calf_branch(
     mock_formulate_optimized_ration = mocker.patch.object(pen, "formulate_optimized_ration")
 
     if is_ration_defined_by_user:
-        RationManager.user_defined_rations = {"preexisting": "keep_me"}
+        RationManager.user_defined_rations = {AnimalCombination.CALF: {1: 1.0}}
     else:
         RationManager.user_defined_rations = {}
 
@@ -668,4 +668,4 @@ def test_reformulate_ration_single_pen_calf_branch(
         expected_ration = {feed.rufas_id: ration_fraction for feed in pen_available_feeds}
         assert RationManager.user_defined_rations == {AnimalCombination.CALF: expected_ration}
     else:
-        assert RationManager.user_defined_rations == {"preexisting": "keep_me"}
+        assert RationManager.user_defined_rations == {AnimalCombination.CALF: {1: 1.0}}

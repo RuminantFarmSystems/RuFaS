@@ -331,7 +331,7 @@ def test_add_animal_to_pen_and_id_map_uses_default_ration_feeds_when_not_user_de
     herd_manager.animal_to_pen_id_map = {}
     herd_manager.is_ration_defined_by_user = False
     mock_feed = MagicMock(auto_spec=Feed)
-    available_feeds = [mock_feed]
+    available_feeds: list[Feed] = [mock_feed]
     total_inventory = TotalInventory({}, datetime.today().date())
 
     animal_combination = herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)

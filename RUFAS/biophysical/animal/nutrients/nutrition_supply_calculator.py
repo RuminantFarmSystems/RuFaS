@@ -363,9 +363,9 @@ class NutritionSupplyCalculator:
         dROM: float = 0.96
 
         for feed in feeds:
-            NPN_supply = 1.0
+            NPN_supply: float = 1.0
             if feed.info.Fd_Category is FeedCategorization.NPN_SUPPLEMENT and feed.info.CP > 0:
-                NPN_supply: float = feed.info.NPN_source / feed.info.CP
+                NPN_supply = feed.info.NPN_source / feed.info.CP
             if feed.info.CP > 0:
                 RUP: float = feed.info.RUP * GeneralConstants.PERCENTAGE_TO_FRACTION * feed.info.CP
                 RDP: float = feed.info.CP - RUP

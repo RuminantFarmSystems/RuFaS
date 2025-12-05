@@ -37,55 +37,57 @@ def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] 
 
 def test_set_ration_feeds_maps_config_to_animal_combinations() -> None:
     """set_ration_feeds should initialize ration_feeds for all combos and map config lists correctly."""
-    ration_config = {
-        "calf_feeds": ["calf_1", "calf_2"],
-        "growing_feeds": ["grow_1"],
-        "close_up_feeds": ["close_1", "close_2", "close_3"],
-        "lac_cow_feeds": ["lac_1"],
+    ration_config: dict[str, list[int]] = {
+        "calf_feeds": [1, 2],
+        "growing_feeds": [3],
+        "close_up_feeds": [4, 5, 6],
+        "lac_cow_feeds": [7],
     }
 
     RationManager.set_ration_feeds(ration_config)
 
-    assert set(RationManager.ration_feeds.keys()) == set(AnimalCombination)
+    assert RationManager.ration_feeds is not None
+    ration_feeds = RationManager.ration_feeds
 
-    assert RationManager.ration_feeds[AnimalCombination.CALF] == ration_config["calf_feeds"]
-    assert RationManager.ration_feeds[AnimalCombination.GROWING] == ration_config["growing_feeds"]
-    assert RationManager.ration_feeds[AnimalCombination.CLOSE_UP] == ration_config["close_up_feeds"]
-    assert RationManager.ration_feeds[AnimalCombination.LAC_COW] == ration_config["lac_cow_feeds"]
+    assert set(ration_feeds.keys()) == set(AnimalCombination)
 
-    for combo, value in RationManager.ration_feeds.items():
+    assert ration_feeds[AnimalCombination.CALF] == ration_config["calf_feeds"]
+    assert ration_feeds[AnimalCombination.GROWING] == ration_config["growing_feeds"]
+    assert ration_feeds[AnimalCombination.CLOSE_UP] == ration_config["close_up_feeds"]
+    assert ration_feeds[AnimalCombination.LAC_COW] == ration_config["lac_cow_feeds"]
+
+    for combo, value in ration_feeds.items():
         if combo not in {
             AnimalCombination.CALF,
             AnimalCombination.GROWING,
             AnimalCombination.CLOSE_UP,
             AnimalCombination.LAC_COW,
         }:
-            assert value == {}
+            assert value == []
 
 
 def test_get_ration_feeds_returns_expected_list() -> None:
     """get_ration_feeds should return the exact list stored in ration_feeds for that animal combination."""
-    fake_mapping = {
-        AnimalCombination.CALF: ["feedA", "feedB"],
-        AnimalCombination.GROWING: ["feedC"],
+    # Use ints to match the type: dict[AnimalCombination, list[int]]
+    fake_mapping: dict[AnimalCombination, list[int]] = {
+        AnimalCombination.CALF: [1, 2],
+        AnimalCombination.GROWING: [3],
         AnimalCombination.CLOSE_UP: [],
-        AnimalCombination.LAC_COW: ["feedD", "feedE"],
+        AnimalCombination.LAC_COW: [4, 5],
     }
-
-    for combo in AnimalCombination:
-        fake_mapping.setdefault(combo, [])
 
     RationManager.ration_feeds = fake_mapping
 
     result = RationManager.get_ration_feeds(AnimalCombination.CALF)
 
-    assert result == ["feedA", "feedB"]
-    assert RationManager.get_ration_feeds(AnimalCombination.LAC_COW) == ["feedD", "feedE"]
+    assert result == [1, 2]
+    assert RationManager.get_ration_feeds(AnimalCombination.LAC_COW) == [4, 5]
 
 
 def test_set_user_defined_ration_tolerance_updates_class_attribute() -> None:
     """set_user_defined_ration_tolerance should store the tolerance value from the config."""
-    config = {"user_defined_ration_percentages": {"tolerance": 0.15}}
+    config: dict[str, dict[str, list[dict[str, int | float]] | float]] \
+        = {"user_defined_ration_percentages": {"tolerance": 0.15}}
 
     RationManager.set_user_defined_ration_tolerance(config)
 

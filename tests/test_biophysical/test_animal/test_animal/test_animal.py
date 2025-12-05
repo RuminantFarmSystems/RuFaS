@@ -1897,7 +1897,7 @@ def test_milk_statistics_returns_expected_values_for_cow(mock_lactating_cow: Ani
     cow.id = 123
     cow.days_in_milk = 42
     cow.calves = 3
-    cow.pen_history = [{"pen": "PenA"}]
+    cow.pen_history = [{"pen": 1, "start_date": 0, "end_date": 100, "animal_types_in_pen": [AnimalType.LAC_COW]}]
 
     milk_prod = MagicMock()
     milk_prod.daily_milk_produced = 35.5
@@ -1910,7 +1910,7 @@ def test_milk_statistics_returns_expected_values_for_cow(mock_lactating_cow: Ani
 
     assert isinstance(stats, MilkProductionStatistics)
     assert stats.cow_id == 123
-    assert stats.pen_id == "PenA"
+    assert stats.pen_id == 1
     assert stats.days_in_milk == 42
     assert stats.estimated_daily_milk_produced == 35.5
     assert stats.milk_protein == 3.1

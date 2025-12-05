@@ -33,17 +33,17 @@ class RationManager:
     tolerance: float | None = 0.0
 
     @classmethod
-    def set_ration_feeds(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]) -> None:
+    def set_ration_feeds(cls, ration_config: dict[str, list[int]]) -> None:
         """
         Maps the input feeds available for each ration to Animal combinations.
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        ration_config : dict[str, list[int]]
             Collection of animal requirements and feed supply information for ration formulation.
 
         """
-        cls.ration_feeds = {animal_combination: {} for animal_combination in AnimalCombination}
+        cls.ration_feeds = {animal_combination: [] for animal_combination in AnimalCombination}
 
         cls.ration_feeds[AnimalCombination.CALF] = ration_config["calf_feeds"]
         cls.ration_feeds[AnimalCombination.GROWING] = ration_config["growing_feeds"]
@@ -66,6 +66,8 @@ class RationManager:
             A list of feed RuFaS IDs that user defined to be used as the feed for the given animal combination.
 
         """
+        if cls.ration_feeds is None:
+            raise ValueError("Ration feeds have not been set.")
         return cls.ration_feeds[animal_combination]
 
     @classmethod

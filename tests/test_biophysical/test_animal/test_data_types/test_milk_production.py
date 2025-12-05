@@ -40,7 +40,7 @@ def test_inputs_is_milking_property(days_in_milk: int, expected: bool) -> None:
     assert inputs.is_milking is expected
 
 
-def test_initialization_outputs_values():
+def test_initialization_outputs_values() -> None:
     """Dataclass should store provided values correctly."""
     mock_events = MagicMock()
 

@@ -1280,7 +1280,7 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
-        None,
+        False,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
@@ -1657,7 +1657,7 @@ def test_apply_user_defined_ration_populated_flag_controls_evaluation(
 
     mocker.patch.object(type(pen), "is_populated", new_callable=PropertyMock, return_value=is_populated)
 
-    fake_ration = {"A": 1.0, "B": 2.0}
+    fake_ration = {1: 1.0, 2: 2.0}
     mocker.patch.object(
         RationManager,
         "get_user_defined_ration",

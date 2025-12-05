@@ -227,7 +227,7 @@ def test_perform_daily_routines_for_animals(
 
 def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
     herd_manager: HerdManager,
-    mocker,
+    mocker: MockerFixture,
 ) -> None:
     """Covers:
     - animal_status == DEAD increments herd_statistics.animals_deaths_by_stage
@@ -388,7 +388,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows + sold_oversupply_heiferIIIs
     )
 
-    mock_perform_daily_routines_for_animals_side_effect = [
+    mock_perform_daily_routines_for_animals_side_effect: list[tuple[list[Animal],
+                                                                    list[Animal],
+                                                                    list[Animal],
+                                                                    list[Animal],
+                                                                    list[Animal]]] = [
         (graduated_calves, sold_calves, [], [], []),
         (graduated_heiferIs, sold_heiferIs, [], [], []),
         (graduated_heiferIIs, sold_heiferIIs, [], [], []),
