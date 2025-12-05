@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, PropertyMock
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -38,6 +39,16 @@ def test_process_digestion_valid_animals(
     Test the process_digestion function for valid animal types.
     """
     digestive_system = DigestiveSystem()
+    mocker.patch.object(
+        AnimalConfig,
+        "methane_model",
+        {
+            "calves": object(),
+            "heiferIs": object(),
+            "heiferIIs": object(),
+            "heiferIIIs": object(),
+        },
+    )
 
     mock_inputs = MagicMock(spec=DigestiveSystemInputs)
     mock_inputs.animal_type = animal_type
@@ -49,8 +60,13 @@ def test_process_digestion_valid_animals(
     mock_inputs.phosphorus_endogenous_loss = 0.2
 
     mock_manure_excretion = mocker.MagicMock(spec=AnimalManureExcretions)
-    mock_methane = mocker.patch.object(EntericMethaneCalculator, methane_func, return_value=5.0)
-    mock_manure = mocker.patch.object(ManureExcretionCalculator, manure_func, return_value=(0.3, mock_manure_excretion))
+
+    mock_methane = mocker.patch.object(
+        EntericMethaneCalculator, methane_func, return_value=5.0
+    )
+    mock_manure = mocker.patch.object(
+        ManureExcretionCalculator, manure_func, return_value=(0.3, mock_manure_excretion)
+    )
 
     digestive_system.process_digestion(mock_inputs)
 

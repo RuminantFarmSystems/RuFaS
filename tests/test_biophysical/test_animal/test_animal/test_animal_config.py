@@ -1,3 +1,5 @@
+from collections.abc import Generator
+import types
 from typing import Any
 import pytest
 import pytest_mock
@@ -12,6 +14,34 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     CowTAISubProtocol,
     CowReSynchSubProtocol,
 )
+
+
+@pytest.fixture(autouse=True)
+def reset_animal_config_state() -> Generator[None, None, None]:
+    """
+    Snapshot AnimalConfig's non-callable class attributes before each test
+    and restore them afterwards, so tests that call initialize_animal_config()
+    don't leak global state into the rest of the suite.
+    """
+    original_attrs = {
+        name: value
+        for name, value in AnimalConfig.__dict__.items()
+        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
+    }
+    original_names = set(original_attrs.keys())
+
+    yield
+
+    for name, value in list(AnimalConfig.__dict__.items()):
+        if name.startswith("__"):
+            continue
+        if isinstance(value, (types.FunctionType, classmethod, staticmethod)):
+            continue
+        if name not in original_names:
+            delattr(AnimalConfig, name)
+
+    for name, value in original_attrs.items():
+        setattr(AnimalConfig, name, value)
 
 
 @pytest.mark.parametrize(
@@ -188,7 +218,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
 
 
 def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryoff(
-    mocker: "pytest_mock.MockerFixture",
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
     mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")

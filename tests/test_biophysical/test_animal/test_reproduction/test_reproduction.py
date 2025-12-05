@@ -36,7 +36,7 @@ from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
-def mock_reproduction(mocker: MockerFixture) -> Reproduction:
+def mock_reproduction() -> Reproduction:
     return Reproduction()
 
 
