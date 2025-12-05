@@ -124,7 +124,10 @@ class HarvestedCrop:
         Calculates the fresh matter mass of this crop in kg.
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        return self.dry_matter_mass / dry_matter_fraction
+        if dry_matter_fraction == 0:
+            return 0.0
+        else:
+            return self.dry_matter_mass / dry_matter_fraction
 
     @property
     def is_alfalfa(self) -> bool:
@@ -139,7 +142,7 @@ class HarvestedCrop:
         return "alfalfa" in self.config_name.lower()
 
     def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
-        if mass_to_remove > self.dry_matter_mass + 1e-6:
+        if mass_to_remove > self.fresh_mass+ 1e-6:
             raise ValueError(
                 f"Cannot remove {mass_to_remove:.3f} kg DM - "
                 f"only {self.dry_matter_mass:.3f} kg dry matter available."
@@ -155,6 +158,7 @@ class HarvestedCrop:
             self.dry_matter_percentage = 0.0
             return
         self.dry_matter_percentage = (self.dry_matter_mass / new_fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
+
 
     def remove_feed_mass(self, dm_to_remove: float) -> None:
         """
