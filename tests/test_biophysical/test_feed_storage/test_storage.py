@@ -504,7 +504,7 @@ def test_project_moisture_loss(
     mocker: MockerFixture,
 ) -> None:
     """Test that mooisture loss is projected correctly."""
-    moisture_loss_values = {"fresh_mass": 900.0, "dry_matter_percentage": 33.0, "moisture_loss": 20.0}
+    moisture_loss_values = {"dry_matter_mass": 900.0, "dry_matter_percentage": 33.0, "moisture_loss": 20.0}
     expected_moisture_loss: dict[str, float] = {
         "fresh_mass": 900.0,
         "dry_matter_percentage": 33.0,
@@ -513,13 +513,13 @@ def test_project_moisture_loss(
     crops_with_moisture_loss = [
         replace(
             crop,
-            fresh_mass=expected_moisture_loss["fresh_mass"],
+            dry_matter_mass=expected_moisture_loss["fresh_mass"],
             dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"],
         )
         for crop in storage.stored
     ]
     for crop in crops_with_moisture_loss:
-        object.__setattr__(crop, "fresh_mass", expected_moisture_loss["fresh_mass"])
+        object.__setattr__(crop, "dry_matter_mass", expected_moisture_loss["fresh_mass"])
         object.__setattr__(crop, "dry_matter_percentage", expected_moisture_loss["dry_matter_percentage"])
     calculate_moisture_loss = mocker.patch.object(
         storage, "_calculate_values_after_moisture_loss", side_effect=[copy(moisture_loss_values) for _ in range(3)]
@@ -624,7 +624,7 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         storage,
         "_calculate_mass_attributes_after_loss",
         return_value={
-            "fresh_mass": 900.0,
+            "dry_matter_mass": 900.0,
             "dry_matter_percentage": 32.0,
         },
     )
@@ -639,7 +639,7 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         "ndf": 4.0,
         "lignin": 5.0,
         "ash": 6.0,
-        "fresh_mass": 900.0,
+        "dry_matter_mass": 900.0,
         "dry_matter_percentage": 32.0,
         "last_time_degraded": date(2025, 6, 10),
     }

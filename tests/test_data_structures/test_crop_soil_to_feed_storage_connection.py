@@ -14,16 +14,13 @@ from tests.test_biophysical.test_feed_storage.sample_crop_data import sample_cro
 
 def test_attributes(mocker: MockerFixture) -> None:
     """Tests that HarvestedCrop's are initialized correctly."""
-    mock_dry_mass = mocker.patch.object(
-        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
-    )
     mock_effluent = mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
     mock_bale_density = mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
     crop = HarvestedCrop(**sample_crop_data)
-    assert crop.fresh_mass == sample_crop_data["fresh_mass"]
+    assert crop.dry_matter_mass == sample_crop_data["dry_matter_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_mass == 100.0
@@ -43,13 +40,12 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_effluent.assert_called_once()
     mock_bale_density.assert_called_once()
     mock_heat_generated.assert_called_once()
-    mock_dry_mass.assert_called_once()
 
 
 def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None:
     """Test that RufasTime objects passed into HarvestedCrop are converted to dates."""
     mock_datetime = datetime(2025, 6, 7)
-    mocker.patch.object(HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0)
+    mocker.patch.object(HarvestedCrop, "fresh_mass", new_callable=mocker.PropertyMock, return_value=100.0)
     mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
     mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
     mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0)
@@ -65,7 +61,7 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
         field_name="test_field",
         harvest_time=cast(date, rufas_time),
         storage_time=cast(date, rufas_time),
-        fresh_mass=100.0,
+        dry_matter_mass=100.0,
         dry_matter_percentage=50.0,
         dry_matter_digestibility=70.0,
         crude_protein_percent=10.0,
@@ -100,19 +96,12 @@ def test_remove_dry_matter_mass(
     expected_dmp: float,
 ) -> None:
     """Test the removal of dry matter mass and corresponding updates to the crop."""
-    mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=0.0)
-    mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=0.0)
-    mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=0.0)
-    mocker.patch.object(
-        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=initial_dry_matter_mass
-    )
-
     crop = HarvestedCrop(
         config_name="test_crop",
         field_name="test_field",
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
-        fresh_mass=initial_fresh_mass,
+        dry_matter_mass=initial_dry_matter_mass,
         dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
         dry_matter_digestibility=70.0,
         crude_protein_percent=10.0,
@@ -140,7 +129,7 @@ def test_remove_dry_matter_mass(
     ],
 )
 def test_remove_feed_mass_valid(
-    initial_fresh_mass: float,
+    initial_fresh_mass,
     initial_dry_matter_mass: float,
     mass_to_remove: float,
     expected_fresh_mass: float,
@@ -150,7 +139,7 @@ def test_remove_feed_mass_valid(
         field_name="test_field",
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
-        fresh_mass=initial_fresh_mass,
+        dry_matter_mass=initial_dry_matter_mass,
         dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
         dry_matter_digestibility=70.0,
         crude_protein_percent=10.0,
@@ -182,7 +171,7 @@ def test_remove_feed_mass_invalid(
         field_name="test_field",
         harvest_time=date(2025, 6, 1),
         storage_time=date(2025, 6, 2),
-        fresh_mass=initial_fresh_mass,
+        dry_matter_mass=20,
         dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
         dry_matter_digestibility=70.0,
         crude_protein_percent=10.0,
@@ -202,31 +191,31 @@ def test_remove_feed_mass_invalid(
 @pytest.mark.parametrize(
     "mass,percentage,expected",
     [
-        (100.0, 25.0, 25.0),
-        (230.0, 22.0, 50.6),
+        (25.0, 25.0, 100),
+        (230.0, 22.0, 1045.4545454545455),
         (145.0, 100.0, 145.0),
         (20.4, 0.0, 0.0),
         (0.0, 0.0, 0.0),
     ],
 )
-def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> None:
+def test_fresh_mass(mass: float, percentage: float, expected: float) -> None:
     """Test dry_matter_mass property in Harvested Crop."""
     crop_data = copy.deepcopy(sample_crop_data)
-    crop_data["fresh_mass"] = mass
+    crop_data["dry_matter_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
     crop = HarvestedCrop(**crop_data)
 
-    actual = crop.dry_matter_mass
+    actual = crop.fresh_mass
 
     assert actual == expected
 
 
-@pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
+@pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 200.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
     crop = HarvestedCrop(**sample_crop_data)
     crop.dry_matter_percentage = dry_matter
-    crop.fresh_mass = mass
+    crop.dry_matter_mass = mass
 
     actual = crop.estimate_maximum_effluent()
 
