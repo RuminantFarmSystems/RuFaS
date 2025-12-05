@@ -72,7 +72,7 @@ class Silage(Storage):
             total_effluent_moisture_loss += effluent_loss_values["moisture_loss"]
             crop.non_protein_nitrogen = effluent_loss_values["non_protein_nitrogen"]
             crop.crude_protein_percent = effluent_loss_values["crude_protein_percent"]
-            crop.fresh_mass = effluent_loss_values["fresh_mass"]
+            crop.dry_matter_mass = effluent_loss_values["dry_matter_mass"]
             crop.dry_matter_percentage = effluent_loss_values["dry_matter_percentage"]
 
         self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
@@ -129,7 +129,7 @@ class Silage(Storage):
 
         """
         post_loss_values = {
-            "fresh_mass": crop.fresh_mass,
+            "dry_matter_mass": crop.dry_matter_mass,
             "dry_matter_percentage": crop.dry_matter_percentage,
             "non_protein_nitrogen": crop.non_protein_nitrogen,
             "crude_protein_percent": crop.crude_protein_percent,

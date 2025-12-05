@@ -8,7 +8,7 @@ sample_crop_data: dict[str, Any] = {
     "storage_time": harvest_storage_date,
     "field_name": "field_1",
     "config_name": "alfalfa_data",
-    "fresh_mass": 100.0,
+    "dry_matter_mass": 100.0,
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,
     "crude_protein_percent": 10.0,
