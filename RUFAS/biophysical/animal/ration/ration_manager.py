@@ -66,8 +66,6 @@ class RationManager:
             A list of feed RuFaS IDs that user defined to be used as the feed for the given animal combination.
 
         """
-        if cls.ration_feeds is None:
-            raise ValueError("Ration feeds have not been set.")
         return cls.ration_feeds[animal_combination]
 
     @classmethod

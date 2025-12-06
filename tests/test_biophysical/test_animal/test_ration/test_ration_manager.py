@@ -83,14 +83,6 @@ def test_get_ration_feeds_returns_expected_list() -> None:
     assert RationManager.get_ration_feeds(AnimalCombination.LAC_COW) == [4, 5]
 
 
-def test_get_ration_feeds_raises_error_if_not_set() -> None:
-    """get_ration_feeds should raise ValueError if ration_feeds is not set."""
-    RationManager.ration_feeds = None
-
-    with pytest.raises(ValueError, match="Ration feeds have not been set."):
-        RationManager.get_ration_feeds(AnimalCombination.CALF)
-
-
 def test_set_user_defined_ration_tolerance_updates_class_attribute() -> None:
     """set_user_defined_ration_tolerance should store the tolerance value from the config."""
     config: dict[str, dict[str, list[dict[str, int | float]] | float]] \

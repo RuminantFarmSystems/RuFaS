@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, Callable, cast
 
 import pytest
 import numpy as np
@@ -153,7 +153,9 @@ def nasem_ration_config(mock_feed: Feed, mock_requirements: NutritionRequirement
     )
 
 
-def test_set_constraints_nrc_builds_expected_cow_and_heifer_constraints(nrc_ration_config: RationConfig) -> None:
+def test_set_constraints_nrc_builds_expected_cow_and_heifer_constraints(
+    nrc_ration_config: RationConfig,
+) -> None:
     """Test that setting NRC constraints builds the expected cow and heifer constraints."""
     optimizer = RationOptimizer()
 
@@ -177,9 +179,11 @@ def test_set_constraints_nrc_builds_expected_cow_and_heifer_constraints(nrc_rati
     ]
 
     assert optimizer.NRC_constraint_functions == expected_nrc_funcs
-
+    assert isinstance(optimizer.cow_constraints, list)
     assert len(optimizer.cow_constraints) == len(expected_nrc_funcs)
+
     for constraint_dict, func in zip(optimizer.cow_constraints, expected_nrc_funcs):
+        assert isinstance(constraint_dict, dict)
         assert constraint_dict["type"] == "ineq"
         assert constraint_dict["fun"] is func
         assert constraint_dict["args"] == (nrc_ration_config,)
@@ -187,14 +191,19 @@ def test_set_constraints_nrc_builds_expected_cow_and_heifer_constraints(nrc_rati
     excluded = {optimizer.NE_total_constraint, optimizer.NE_lactation_constraint}
     expected_heifer_funcs = [f for f in expected_nrc_funcs if f not in excluded]
 
+    assert isinstance(optimizer.heifer_constraints, list)
     assert len(optimizer.heifer_constraints) == len(expected_heifer_funcs)
-    assert [c["fun"] for c in optimizer.heifer_constraints] == expected_heifer_funcs
-    for constraint_dict in optimizer.heifer_constraints:
+
+    for constraint_dict, expected_func in zip(optimizer.heifer_constraints, expected_heifer_funcs):
+        assert isinstance(constraint_dict, dict)
+
+        assert constraint_dict["fun"] is expected_func
         assert constraint_dict["type"] == "ineq"
         assert constraint_dict["args"] == (nrc_ration_config,)
 
 
-def test_NASEM_net_energy_constraint(mocker: MockerFixture, nasem_ration_config: RationConfig) -> None:
+def test_NASEM_net_energy_constraint(mocker: MockerFixture, nasem_ration_config: RationConfig,
+                                     full_mock_requirements: NutritionRequirements) -> None:
     """NASEM constraint should return ME_net_supply - energy_requirement."""
     decision_vector = np.array([5.0, 3.0], dtype=float)
 
@@ -204,6 +213,7 @@ def test_NASEM_net_energy_constraint(mocker: MockerFixture, nasem_ration_config:
     fake_feed2 = mocker.Mock()
     fake_feed2.amount = 3.0
     fake_feed2.info.starch = 20.0
+    nasem_ration_config.animal_requirements = full_mock_requirements
 
     mock_convert = mocker.patch.object(
         RationOptimizer,
@@ -227,8 +237,6 @@ def test_NASEM_net_energy_constraint(mocker: MockerFixture, nasem_ration_config:
         return_value=40.0,
     )
 
-    nasem_ration_config.animal_requirements.total_energy_requirement = 30.0
-
     result = RationOptimizer.NASEM_net_energy_constraint(
         decision_vector,
         nasem_ration_config,
@@ -247,7 +255,7 @@ def test_NASEM_net_energy_constraint(mocker: MockerFixture, nasem_ration_config:
 
     mock_calc_NE.assert_called_once_with(total_metabolizable_energy=50.0)
 
-    assert result == pytest.approx(10.0)
+    assert result == pytest.approx(35.0)
 
 
 def test_set_constraints_nasem_builds_expected_cow_and_heifer_constraints(
@@ -273,15 +281,22 @@ def test_set_constraints_nasem_builds_expected_cow_and_heifer_constraints(
     ]
 
     assert optimizer.NASEM_constraint_functions == expected_nasem_funcs
-
+    assert isinstance(optimizer.cow_constraints, list)
     assert len(optimizer.cow_constraints) == len(expected_nasem_funcs)
+
     for constraint_dict, func in zip(optimizer.cow_constraints, expected_nasem_funcs):
+        assert isinstance(constraint_dict, dict)
         assert constraint_dict["type"] == "ineq"
         assert constraint_dict["fun"] is func
         assert constraint_dict["args"] == (nasem_ration_config,)
 
     assert optimizer.heifer_constraints is optimizer.cow_constraints
-    assert [c["fun"] for c in optimizer.heifer_constraints] == expected_nasem_funcs
+    assert isinstance(optimizer.heifer_constraints, list)
+    assert len(optimizer.heifer_constraints) == len(expected_nasem_funcs)
+
+    for constraint_dict, func in zip(optimizer.heifer_constraints, expected_nasem_funcs):
+        assert isinstance(constraint_dict, dict)
+        assert constraint_dict["fun"] is func
 
 
 def test_ration_config_initialization(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
@@ -432,7 +447,8 @@ def test_constraints_run(
 def test_is_constraint_violated(full_config: RationConfig) -> None:
     """Test if a single violated constraint is detected."""
     vec = np.array([5.0])
-    constraint = {"type": "ineq", "fun": lambda x, cfg: -1.0}
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] \
+        = {"type": "ineq", "fun": lambda x, cfg: -1.0}
     violated = RationOptimizer.is_constraint_violated(vec, constraint, full_config)
     assert violated is True
 
@@ -442,7 +458,8 @@ def test_is_constraint_violated_eq_not_close() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {"type": "eq", "fun": lambda x, cfg: 0.5}  # Not close to 0
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] \
+        = {"type": "eq", "fun": lambda x, cfg: 0.5}
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is True
@@ -453,7 +470,8 @@ def test_is_constraint_violated_eq_close_to_zero() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {"type": "eq", "fun": lambda x, cfg: 1e-9}
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] \
+        = {"type": "eq", "fun": lambda x, cfg: 1e-9}
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is False
@@ -488,7 +506,7 @@ def test_ndf_constraint_upper_zero_intake() -> None:
 
 def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture) -> None:
     """Tests forage_NDF_constraint for non-zero intake."""
-    decision_vector = np.array([1.0, 2.0, 3.0])  # sum = 6.0
+    decision_vector = np.array([1.0, 2.0, 3.0])
     config = MagicMock(RationConfig)
     mock_feeds = MagicMock()
 
@@ -711,7 +729,7 @@ def test_attempt_optimization_uses_user_defined_bounds(mocker: MockerFixture) ->
 )
 def test_build_bounds_user_defined_ration(
     monkeypatch: pytest.MonkeyPatch,
-    user_defined_ration_dictionary: dict[int | str, float],
+    user_defined_ration_dictionary: dict[int, float],
     user_defined_ration_tolerance: float,
     expected_bounds: list[tuple[float, float]],
     nrc_ration_config: RationConfig,
