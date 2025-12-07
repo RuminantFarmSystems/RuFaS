@@ -1,3 +1,4 @@
+import math
 from dataclasses import replace
 from math import inf
 from numpy import exp
@@ -58,6 +59,12 @@ class Storage(Processor):
         Surface area of the manure storage (m^2).
     _manure_to_process : ManureStream
         The manure that is processed during the `process_manure()` method call.
+    intercept_mean_temp : float
+        The intercept mean temperature calculate from linest function.
+    phase_shift : float
+        Temperature phase shift of the weather data.
+    amplitude : float
+        The temperature amplitude of the weather data.
 
     """
 
@@ -81,6 +88,10 @@ class Storage(Processor):
         self._manure_to_process = ManureStream.make_empty_manure_stream()
         self.__post_init__()
 
+        self.intercept_mean_temp: float | None = None
+        self.phase_shift: float | None = None
+        self.amplitude: float | None = None
+
     def __post_init__(self) -> None:
         """
         Post-initialization method to calculate the surface area of the storage.
@@ -92,6 +103,53 @@ class Storage(Processor):
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self.stored_manure.volume > self._capacity
+
+    @property
+    def _emptying_fraction(self) -> float:
+        """
+        The fraction of the accumulated stored manure that is removed from storage when the emptying time is reached.
+        Defaults to 1.0.
+        """
+        return 1.0
+
+    def _determine_outdoor_storage_temperature(
+        self,
+        simulation_day: int,
+        minimum_manure_temperature: float,
+    ) -> float:
+        """
+        Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        simulation_day : int
+            Current julian day of the year.
+        minimum_manure_temperature : float
+            The minimum temperature of the manure in storage (°C).
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        Notes
+        -----
+        This function determines daily temperature of manure in liquid storage by fitting a sin/cos function. Several
+        parameters of this function are derived and utilized here. The amplitude of simulation-wide average air
+        temperature data, which is derived by least squares fitting cos and sin waves to temperature data, is adjusted
+        by a fixed damping factor to reflect the smaller degree of annual variation in temperature compared to air
+        temperature. The phase shift (time of peak of annual temperature) is also determined from simulation weather
+        data and is adjusted to reflect the time of manure temperature change based on a fixed lag constant.
+
+        """
+        if self.amplitude and self.intercept_mean_temp and self.phase_shift:
+            manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
+            estimated_temperature = self.intercept_mean_temp + manure_amplitude * math.cos(
+                2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+            )
+            return max(minimum_manure_temperature, estimated_temperature)
+        else:
+            raise ValueError("No data for outdoor storage temperature calculations.")
 
     def _calculate_surface_area(self) -> None:
         """
@@ -135,19 +193,46 @@ class Storage(Processor):
         is_emptying_day = (
             self._storage_time_period is not None and (time.simulation_day + 1) % self._storage_time_period == 0
         )
-        if is_emptying_day:
-            self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
-            manure_to_be_returned = {"manure": replace(self.stored_manure)}
-            self.stored_manure = ManureStream.make_empty_manure_stream()
-        else:
+        if not is_emptying_day:
             empty_stream = ManureStream.make_empty_manure_stream()
             self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
             manure_to_be_returned = {}
+        else:
+            self._validate_emptying_fraction()
+            if 0.0 < self._emptying_fraction < 1.0:
+                emptied_stream = self.stored_manure.split_stream(self._emptying_fraction)
+                retained_stream = self.stored_manure.split_stream(1.0 - self._emptying_fraction)
+                self._report_manure_stream(emptied_stream, "emptied", time.simulation_day)
+                self.stored_manure = retained_stream
+                manure_to_be_returned = {"manure": replace(self.stored_manure)}
+            elif self._emptying_fraction == 0.0:
+                empty_stream = ManureStream.make_empty_manure_stream()
+                self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
+                manure_to_be_returned = {}
+            else:
+                self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
+                manure_to_be_returned = {"manure": replace(self.stored_manure)}
+                self.stored_manure = ManureStream.make_empty_manure_stream()
 
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
         return manure_to_be_returned
+
+    def _validate_emptying_fraction(self) -> None:
+        """Validates that the emptying fraction is between 0.0 and 1.0."""
+        if not 0.0 <= self._emptying_fraction <= 1.0:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+                "processor_name": self.name,
+            }
+            error_message = (
+                f"Processor '{self.name}' has an invalid emptying fraction of {self._emptying_fraction}. "
+                "The emptying fraction must be between 0.0 and 1.0. Check retention constants if applicable."
+            )
+            self._om.add_error("Invalid Emptying Fraction", error_message, info_map)
+            raise ValueError(error_message)
 
     def handle_overflowing_manure(self, time: RufasTime) -> None:
         """

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict, Any, List, Union, Optional, Type
 
 import pytest
@@ -1474,7 +1475,7 @@ def test_validate_input_by_type_key_error() -> None:
 def test_validate_metadata(
     mocker: MockerFixture,
     does_file_exist: bool,
-    metadata: Dict[str, Any],
+    metadata: dict[str, Any],
     expected_exception: bool,
 ) -> None:
     mocker.patch("os.path.isfile", return_value=does_file_exist)
@@ -1485,11 +1486,11 @@ def test_validate_metadata(
     dv = DataValidator()
 
     if expected_exception:
-        valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files")
+        valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files", Path(""))
         assert not valid
         assert dv.event_logs == [{"error": "Metadata Validation", "message": mocker.ANY, "info_map": info_map}]
     else:
-        dv.validate_metadata(metadata, {"json", "csv"}, "files")
+        dv.validate_metadata(metadata, {"json", "csv"}, "files", Path(""))
         assert dv.event_logs == [
             {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         ]
