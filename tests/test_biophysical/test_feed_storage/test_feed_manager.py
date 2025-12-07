@@ -927,7 +927,7 @@ def test_deduct_feeds_from_inventory(
     expected_purchased: float,
 ) -> None:
     """Test that feeds are removed correctly from inventory."""
-    harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = grown_amount, 100.0
+    harvested_crop.dry_matter_mass, harvested_crop.dry_matter_percentage = grown_amount, 100.0
     harvested_crop.storage_time = grown_date
     harvested_crop.config_name = "corn"
     purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, purchased_amount
@@ -962,7 +962,7 @@ def test_deduct_feeds_from_inventory_error(
     feed_manager: FeedManager, harvested_crop: HarvestedCrop, purchased_feed: PurchasedFeed, mocker: MockerFixture
 ) -> None:
     """Test that an error is raised correctly when too much feed is deducted from inventory."""
-    harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = 100.0, 100.0
+    harvested_crop.dry_matter_mass, harvested_crop.dry_matter_percentage = 100.0, 100.0
     harvested_crop.storage_time = date(2024, 6, 1)
     harvested_crop.config_name = "corn"
     purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, 0.0
