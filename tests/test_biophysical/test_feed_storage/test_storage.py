@@ -332,8 +332,10 @@ def test_calculate_mass_attributes_after_loss(
 
     actual = storage._calculate_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
 
-    assert pytest.approx(actual) == {"dry_matter_mass": fresh * percentage / 100 - dry_loss,
-                                     "dry_matter_percentage": expected_percentage}
+    assert pytest.approx(actual) == {
+        "dry_matter_mass": fresh * percentage / 100 - dry_loss,
+        "dry_matter_percentage": expected_percentage,
+    }
 
 
 def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
