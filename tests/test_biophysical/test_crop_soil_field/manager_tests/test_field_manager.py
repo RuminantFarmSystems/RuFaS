@@ -1941,7 +1941,7 @@ def test_setup_field(
     )
     mock_setup_manure_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_manure_events",
-        return_value=mock_manure_events
+        return_value=mock_manure_events,
     )
     mock_setup_tillage_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_tillage_events",
