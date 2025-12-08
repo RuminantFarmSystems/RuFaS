@@ -1032,7 +1032,6 @@ class Pen:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
-            # For lac cow
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
                     break

@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, Callable, cast
 
 import pytest
 import numpy as np
@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 from pytest_mock import MockerFixture
 from scipy.optimize import OptimizeResult
 
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
@@ -17,6 +18,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NutrientStandard,
 )
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.units import MeasurementUnits
 
 
@@ -127,7 +129,7 @@ def optimizer() -> RationOptimizer:
 
 
 @pytest.fixture
-def ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> RationConfig:
+def nrc_ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> RationConfig:
     return RationConfig(
         NutrientStandard.NRC,
         mock_requirements,
@@ -136,6 +138,166 @@ def ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> 
         initial_protein_requirement=100,
         pen_average_body_weight=600,
     )
+
+
+@pytest.fixture
+def nasem_ration_config(mock_feed: Feed, mock_requirements: NutritionRequirements) -> RationConfig:
+    """Same as above, but using NASEM as the nutrient standard."""
+    return RationConfig(
+        NutrientStandard.NASEM,
+        mock_requirements,
+        [mock_feed],
+        initial_dry_matter_requirement=30,
+        initial_protein_requirement=100,
+        pen_average_body_weight=600,
+    )
+
+
+def test_set_constraints_nrc_builds_expected_cow_and_heifer_constraints(
+    nrc_ration_config: RationConfig,
+) -> None:
+    """Test that setting NRC constraints builds the expected cow and heifer constraints."""
+    optimizer = RationOptimizer()
+
+    optimizer.set_constraints(nrc_ration_config)
+
+    expected_nrc_funcs = [
+        optimizer.NE_total_constraint,
+        optimizer.NE_maintenance_and_activity_constraint,
+        optimizer.NE_lactation_constraint,
+        optimizer.NE_growth_constraint,
+        optimizer.calcium_constraint,
+        optimizer.phosphorus_constraint,
+        optimizer.protein_constraint_lower,
+        optimizer.protein_constraint_upper,
+        optimizer.NDF_constraint_lower,
+        optimizer.NDF_constraint_upper,
+        optimizer.forage_NDF_constraint,
+        optimizer.fat_constraint,
+        optimizer.DMI_constraint_upper,
+        optimizer.DMI_constraint_lower,
+    ]
+
+    assert optimizer.NRC_constraint_functions == expected_nrc_funcs
+    assert isinstance(optimizer.cow_constraints, list)
+    assert len(optimizer.cow_constraints) == len(expected_nrc_funcs)
+
+    for constraint_dict, func in zip(optimizer.cow_constraints, expected_nrc_funcs):
+        assert isinstance(constraint_dict, dict)
+        assert constraint_dict["type"] == "ineq"
+        assert constraint_dict["fun"] is func
+        assert constraint_dict["args"] == (nrc_ration_config,)
+
+    excluded = {optimizer.NE_total_constraint, optimizer.NE_lactation_constraint}
+    expected_heifer_funcs = [f for f in expected_nrc_funcs if f not in excluded]
+
+    assert isinstance(optimizer.heifer_constraints, list)
+    assert len(optimizer.heifer_constraints) == len(expected_heifer_funcs)
+
+    for constraint_dict, expected_func in zip(optimizer.heifer_constraints, expected_heifer_funcs):
+        assert isinstance(constraint_dict, dict)
+
+        assert constraint_dict["fun"] is expected_func
+        assert constraint_dict["type"] == "ineq"
+        assert constraint_dict["args"] == (nrc_ration_config,)
+
+
+def test_NASEM_net_energy_constraint(
+    mocker: MockerFixture, nasem_ration_config: RationConfig, full_mock_requirements: NutritionRequirements
+) -> None:
+    """NASEM constraint should return ME_net_supply - energy_requirement."""
+    decision_vector = np.array([5.0, 3.0], dtype=float)
+
+    fake_feed1 = mocker.Mock()
+    fake_feed1.amount = 5.0
+    fake_feed1.info.starch = 30.0
+    fake_feed2 = mocker.Mock()
+    fake_feed2.amount = 3.0
+    fake_feed2.info.starch = 20.0
+    nasem_ration_config.animal_requirements = full_mock_requirements
+
+    mock_convert = mocker.patch.object(
+        RationOptimizer,
+        "convert_decision_vec_to_feeds",
+        return_value=[fake_feed1, fake_feed2],
+    )
+
+    mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
+
+    expected_total_starch = 2.10
+
+    mock_calc_ME = mocker.patch.object(
+        NutritionSupplyCalculator,
+        "calculate_NASEM_metabolizable_energy",
+        return_value=50.0,
+    )
+
+    mock_calc_NE = mocker.patch.object(
+        NutritionSupplyCalculator,
+        "calculate_NASEM_net_energy",
+        return_value=40.0,
+    )
+
+    result = RationOptimizer.NASEM_net_energy_constraint(
+        decision_vector,
+        nasem_ration_config,
+    )
+
+    mock_convert.assert_called_once_with(nasem_ration_config, decision_vector)
+
+    mock_calc_ME.assert_called_once_with(
+        feeds=[fake_feed1, fake_feed2],
+        dry_matter_intake=decision_vector.sum(),
+        body_weight=nasem_ration_config.pen_average_body_weight,
+        total_starch=pytest.approx(expected_total_starch),
+        enteric_methane=nasem_ration_config.pen_average_enteric_methane,
+        urinary_nitrogen=nasem_ration_config.pen_average_urine_nitrogen,
+    )
+
+    mock_calc_NE.assert_called_once_with(total_metabolizable_energy=50.0)
+
+    assert result == pytest.approx(35.0)
+
+
+def test_set_constraints_nasem_builds_expected_cow_and_heifer_constraints(
+    nasem_ration_config: RationConfig,
+) -> None:
+    """Test that setting NASEM constraints builds the expected cow and heifer constraints."""
+    optimizer = RationOptimizer()
+
+    optimizer.set_constraints(nasem_ration_config)
+
+    expected_nasem_funcs = [
+        optimizer.calcium_constraint,
+        optimizer.phosphorus_constraint,
+        optimizer.protein_constraint_lower,
+        optimizer.protein_constraint_upper,
+        optimizer.NDF_constraint_lower,
+        optimizer.NDF_constraint_upper,
+        optimizer.forage_NDF_constraint,
+        optimizer.fat_constraint,
+        optimizer.DMI_constraint_upper,
+        optimizer.DMI_constraint_lower,
+        optimizer.NASEM_net_energy_constraint,
+    ]
+
+    assert optimizer.NASEM_constraint_functions == expected_nasem_funcs
+    assert isinstance(optimizer.cow_constraints, list)
+    assert len(optimizer.cow_constraints) == len(expected_nasem_funcs)
+
+    for constraint_dict, func in zip(optimizer.cow_constraints, expected_nasem_funcs):
+        assert isinstance(constraint_dict, dict)
+        assert constraint_dict["type"] == "ineq"
+        assert constraint_dict["fun"] is func
+        assert constraint_dict["args"] == (nasem_ration_config,)
+
+    assert optimizer.heifer_constraints is optimizer.cow_constraints
+    assert isinstance(optimizer.heifer_constraints, list)
+    assert len(optimizer.heifer_constraints) == len(expected_nasem_funcs)
+
+    for constraint_dict, func in zip(optimizer.heifer_constraints, expected_nasem_funcs):
+        assert isinstance(constraint_dict, dict)
+        assert constraint_dict["fun"] is func
 
 
 def test_ration_config_initialization(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
@@ -150,7 +312,7 @@ def test_ration_config_initialization(mock_feed: Feed, mock_requirements: Nutrit
     assert config.initial_dry_matter_requirement == 1.0
 
 
-def test_ration_config_initialization_no_feeds(mock_feed: Feed, mock_requirements: NutritionRequirements) -> None:
+def test_ration_config_initialization_no_feeds(mock_requirements: NutritionRequirements) -> None:
     """Test initialization of RationConfig and derived attributes."""
     config = RationConfig(NutrientStandard.NRC, mock_requirements, None, 1, 1, 600)
     assert config.animal_requirements == mock_requirements
@@ -162,10 +324,10 @@ def test_ration_config_initialization_no_feeds(mock_feed: Feed, mock_requirement
     assert config.initial_dry_matter_requirement == 1.0
 
 
-def test_convert_decision_vec_to_feeds(ration_config: RationConfig) -> None:
+def test_convert_decision_vec_to_feeds(nrc_ration_config: RationConfig) -> None:
     """Test conversion of decision vector to feed list."""
     vec = np.array([5.0])
-    feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_config, vec)
+    feeds = RationOptimizer.convert_decision_vec_to_feeds(nrc_ration_config, vec)
     assert len(feeds) == 1
     assert feeds[0].amount == 5.0
     assert str(feeds[0].info.rufas_id) == "feed1"
@@ -181,9 +343,9 @@ def test_make_ration_from_solution(mock_feed: Feed) -> None:
     assert result["feed1"] == 3.0
 
 
-def test_build_initial_value_no_previous(ration_config: RationConfig) -> None:
+def test_build_initial_value_no_previous(nrc_ration_config: RationConfig) -> None:
     """Test building initial values with no prior solution."""
-    result = RationOptimizer._build_initial_value(None, ration_config)
+    result = RationOptimizer._build_initial_value(None, nrc_ration_config)
     assert isinstance(result, list)
     assert len(result) == 1
 
@@ -196,9 +358,9 @@ def test_build_initial_value_with_previous() -> None:
     assert result == [2.0]
 
 
-def test_build_bounds(ration_config: RationConfig) -> None:
+def test_build_bounds(nrc_ration_config: RationConfig) -> None:
     """Test construction of feed bounds from config."""
-    bounds = RationOptimizer._build_bounds(ration_config)
+    bounds = RationOptimizer._build_bounds(nrc_ration_config)
     assert bounds == [(0.0, 10.0)]
 
 
@@ -244,9 +406,9 @@ def test_select_constraints_invalid_combination() -> None:
         optimizer._select_constraints(invalid_combination)
 
 
-def test_objective(ration_config: RationConfig) -> None:
+def test_objective(nrc_ration_config: RationConfig) -> None:
     """Test objective cost function value from decision vector."""
-    result = RationOptimizer.objective(np.array([5.0]), ration_config)
+    result = RationOptimizer.objective(np.array([5.0]), nrc_ration_config)
     assert result == 10.0
 
 
@@ -286,7 +448,10 @@ def test_constraints_run(
 def test_is_constraint_violated(full_config: RationConfig) -> None:
     """Test if a single violated constraint is detected."""
     vec = np.array([5.0])
-    constraint = {"type": "ineq", "fun": lambda x, cfg: -1.0}
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] = {
+        "type": "ineq",
+        "fun": lambda x, cfg: -1.0,
+    }
     violated = RationOptimizer.is_constraint_violated(vec, constraint, full_config)
     assert violated is True
 
@@ -296,7 +461,10 @@ def test_is_constraint_violated_eq_not_close() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {"type": "eq", "fun": lambda x, cfg: 0.5}  # Not close to 0
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] = {
+        "type": "eq",
+        "fun": lambda x, cfg: 0.5,
+    }
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is True
@@ -307,7 +475,10 @@ def test_is_constraint_violated_eq_close_to_zero() -> None:
     solution_x = np.array([1.0, 2.0])
     config = MagicMock(RationConfig)
 
-    constraint = {"type": "eq", "fun": lambda x, cfg: 1e-9}
+    constraint: dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] = {
+        "type": "eq",
+        "fun": lambda x, cfg: 1e-9,
+    }
 
     result = RationOptimizer.is_constraint_violated(solution_x, constraint, config)
     assert result is False
@@ -342,7 +513,7 @@ def test_ndf_constraint_upper_zero_intake() -> None:
 
 def test_forage_ndf_constraint_non_zero_intake(mocker: MockerFixture) -> None:
     """Tests forage_NDF_constraint for non-zero intake."""
-    decision_vector = np.array([1.0, 2.0, 3.0])  # sum = 6.0
+    decision_vector = np.array([1.0, 2.0, 3.0])
     config = MagicMock(RationConfig)
     mock_feeds = MagicMock()
 
@@ -468,6 +639,127 @@ def test_attempt_optimization_clips_initial_values(mocker: MockerFixture) -> Non
 
     passed_x0 = minimize_mock.call_args[0][1]
     assert np.array_equal(passed_x0, np.array([0.0, 10.0], dtype=float))
+
+
+def test_attempt_optimization_uses_user_defined_bounds(mocker: MockerFixture) -> None:
+    """If user_defined_ration_dictionary is provided, _build_bounds_user_defined_ration is used."""
+
+    optimizer = RationOptimizer()
+
+    pen_average_body_weight = 600.0
+    requirements = MagicMock(NutritionRequirements)
+    feeds = cast(list[Feed], [MagicMock()])
+    animal_comb = MagicMock(AnimalCombination)
+
+    mock_config = MagicMock(RationConfig)
+    ration_config_mock = mocker.patch(
+        "RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig",
+        return_value=mock_config,
+    )
+
+    mocker.patch.object(optimizer, "_build_initial_value", return_value=[1.0, 2.0])
+
+    user_defined_bounds = [(0.0, 5.0), (0.0, 5.0)]
+    build_user_bounds_mock = mocker.patch.object(
+        optimizer,
+        "_build_bounds_user_defined_ration",
+        return_value=user_defined_bounds,
+    )
+    build_bounds_mock = mocker.patch.object(optimizer, "_build_bounds")
+
+    mocker.patch.object(optimizer, "_check_initial_bounds", return_value=np.array([1.0, 2.0]))
+
+    mocker.patch.object(optimizer, "set_constraints")
+    mocker.patch.object(optimizer, "_select_constraints", return_value=[])
+    mocker.patch.object(optimizer, "objective", return_value=0.0)
+
+    minimize_mock = mocker.patch(
+        "RUFAS.biophysical.animal.ration.ration_optimizer.minimize",
+        return_value=MagicMock(OptimizeResult),
+    )
+
+    user_defined_ration_dictionary: dict[int, float] = {1: 0.5}
+    tolerance = 0.1
+
+    optimizer.attempt_optimization(
+        nutrient_standard=NutrientStandard.NRC,
+        pen_average_body_weight=pen_average_body_weight,
+        pen_average_enteric_methane=0.0,
+        pen_average_urine_nitrogen=0.0,
+        requirements=requirements,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
+        pen_available_feeds=feeds,
+        animal_combination=animal_comb,
+        previous_ration=None,
+        user_defined_ration_dictionary=user_defined_ration_dictionary,
+        user_defined_ration_tolerance=tolerance,
+    )
+
+    ration_config_mock.assert_called_once()
+
+    build_user_bounds_mock.assert_called_once_with(
+        ration_config=mock_config,
+        user_defined_ration_dictionary=user_defined_ration_dictionary,
+        user_defined_ration_tolerance=tolerance,
+    )
+
+    build_bounds_mock.assert_not_called()
+
+    _, _, kwargs = minimize_mock.mock_calls[0]
+    assert kwargs["bounds"] == user_defined_bounds
+
+
+@pytest.mark.parametrize(
+    "user_defined_ration_dictionary, user_defined_ration_tolerance, expected_bounds",
+    [
+        # Case 1: normal tolerance, no negative lower bounds
+        (
+            {2: 50.0, 1: 25.0},
+            0.10,
+            [
+                (4.5, 5.5),
+                (9.0, 10.0),
+            ],
+        ),
+        # Case 2: large tolerance causing negative lower bounds, which should be clipped to 0
+        (
+            {2: 50.0, 1: 25.0},
+            1.50,
+            [
+                (0.0, 10.0),
+                (1.0, 10.0),
+            ],
+        ),
+    ],
+    ids=["normal_tolerance", "large_tolerance_clips_lower"],
+)
+def test_build_bounds_user_defined_ration(
+    monkeypatch: pytest.MonkeyPatch,
+    user_defined_ration_dictionary: dict[int, float],
+    user_defined_ration_tolerance: float,
+    expected_bounds: list[tuple[float, float]],
+    nrc_ration_config: RationConfig,
+) -> None:
+    """
+    _build_bounds_user_defined_ration should:
+    - compute lower/upper target bounds from percentages, tolerance, and DMI
+    - clip lower bounds at 0
+    - trim resulting bounds by feed_minimum_list and feed_maximum_list.
+    """
+    monkeypatch.setattr(AnimalModuleConstants, "DMI_REQUIREMENT_BOOST", 1.0)
+
+    nrc_ration_config.initial_dry_matter_requirement = 20.0
+    nrc_ration_config.feed_minimum_list = [0.0, 1.0]
+    nrc_ration_config.feed_maximum_list = [10.0, 10.0]
+
+    bounds = RationOptimizer._build_bounds_user_defined_ration(
+        ration_config=nrc_ration_config,
+        user_defined_ration_dictionary=user_defined_ration_dictionary,
+        user_defined_ration_tolerance=user_defined_ration_tolerance,
+    )
+
+    assert bounds == pytest.approx(expected_bounds)
 
 
 def test_handle_failed_constraints_lac_cow(mocker: MockerFixture) -> None:
