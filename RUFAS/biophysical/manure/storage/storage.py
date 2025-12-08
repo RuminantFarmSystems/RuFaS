@@ -76,6 +76,11 @@ class Storage(Processor):
         storage_time_period: int | None,
         surface_area: float,
         capacity: float = inf,
+        NATURAL_LOG_ARRHENIUS_CONSTANT=float,
+        ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE=float,
+        ANAEROBIC_LAGOON_MANURE_RETENTION=float,
+        MANURE_DAMPING_FACTOR=float,
+        MANURE_TEMPERATURE_LAG=float
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
@@ -87,6 +92,11 @@ class Storage(Processor):
         self._surface_area = surface_area
         self._manure_to_process = ManureStream.make_empty_manure_stream()
         self.__post_init__()
+        self.NATURAL_LOG_ARRHENIUS_CONSTANT=NATURAL_LOG_ARRHENIUS_CONSTANT
+        self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE=ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE
+        self.ANAEROBIC_LAGOON_MANURE_RETENTION=ANAEROBIC_LAGOON_MANURE_RETENTION
+        self.MANURE_DAMPING_FACTOR=MANURE_DAMPING_FACTOR
+        self.MANURE_TEMPERATURE_LAG=MANURE_TEMPERATURE_LAG
 
         self.intercept_mean_temp: float | None = None
         self.phase_shift: float | None = None
@@ -116,6 +126,9 @@ class Storage(Processor):
         self,
         simulation_day: int,
         minimum_manure_temperature: float,
+        MANURE_DAMPING_FACTOR: float,
+        MANURE_TEMPERATURE_LAG: float
+
     ) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
@@ -143,9 +156,9 @@ class Storage(Processor):
 
         """
         if self.amplitude and self.intercept_mean_temp and self.phase_shift:
-            manure_amplitude = self.amplitude * ManureConstants.MANURE_DAMPING_FACTOR
+            manure_amplitude = self.amplitude * MANURE_DAMPING_FACTOR
             estimated_temperature = self.intercept_mean_temp + manure_amplitude * math.cos(
-                2 * math.pi / 365 * (simulation_day - self.phase_shift - ManureConstants.MANURE_TEMPERATURE_LAG)
+                2 * math.pi / 365 * (simulation_day - self.phase_shift - MANURE_TEMPERATURE_LAG)
             )
             return max(minimum_manure_temperature, estimated_temperature)
         else:
@@ -253,7 +266,7 @@ class Storage(Processor):
         self._om.add_warning(f"Manure storage '{self.name}' is overflowing!", "Handling excess manure", info_map)
 
     @staticmethod
-    def _calculate_methane_emissions(volatile_solids: float, manure_temperature: float, is_degradable: bool) -> float:
+    def _calculate_methane_emissions(volatile_solids: float, manure_temperature: float, is_degradable: bool, NATURAL_LOG_ARRHENIUS_CONSTANT) -> float:
         """
         Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and
         non-degradable volatile solids fractions.
@@ -274,7 +287,7 @@ class Storage(Processor):
 
         """
 
-        arrhenius_exponent = Storage._calculate_arrhenius_exponent(manure_temperature)
+        arrhenius_exponent = Storage._calculate_arrhenius_exponent(manure_temperature, NATURAL_LOG_ARRHENIUS_CONSTANT)
 
         if is_degradable:
             rate_correcting_factor = ManureConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
@@ -292,7 +305,7 @@ class Storage(Processor):
         return methane_emissions
 
     @staticmethod
-    def _calculate_arrhenius_exponent(temperature: float) -> float:
+    def _calculate_arrhenius_exponent(temperature: float, NATURAL_LOG_ARRHENIUS_CONSTANT) -> float:
         """
         Calculate the Arrhenius exponent.
 
@@ -325,7 +338,7 @@ class Storage(Processor):
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
         return float(
             exp(
-                ManureConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+                NATURAL_LOG_ARRHENIUS_CONSTANT
                 - (ManureConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
             )
         )

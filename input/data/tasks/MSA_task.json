@@ -1,0 +1,30 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SENSITIVITY_ANALYSIS",
+      "metadata_file_path": "input/metadata/MSA_metadata.json",
+      "output_prefix": "MSA",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "sampler": "fractional_factorial",
+      "SA_load_balancing_start": 0,
+      "SA_load_balancing_stop": 1,
+      "properties_file_path": "input/metadata/properties/MSA_properties.json",
+      "SA_input_variables": [
+        {
+          "variable_name": "manure_management_properties.storage.NATURAL_LOG_ARRHENIUS_CONSTANT",
+          "lower_bound": 31,
+          "upper_bound": 32,
+          "data_type":"float"
+        },
+        {
+          "variable_name": "manure_management_properties.storage.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE",
+          "lower_bound": 0,
+          "upper_bound": 1,
+          "data_type":"float"
+        }
+      ]
+    }
+]
+}

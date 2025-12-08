@@ -37,6 +37,11 @@ class AnaerobicLagoon(Storage):
         storage_time_period: int | None,
         surface_area: float,
         capacity: float,
+        NATURAL_LOG_ARRHENIUS_CONSTANT: float,
+        ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE: float,
+        ANAEROBIC_LAGOON_MANURE_RETENTION: float,
+        MANURE_DAMPING_FACTOR: float,
+        MANURE_TEMPERATURE_LAG: float        
     ):
         """Initialize Anaerobic Lagoon object."""
         super().__init__(
@@ -46,6 +51,11 @@ class AnaerobicLagoon(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
             capacity=capacity,
+            NATURAL_LOG_ARRHENIUS_CONSTANT=NATURAL_LOG_ARRHENIUS_CONSTANT,
+            ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE=ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE,
+            ANAEROBIC_LAGOON_MANURE_RETENTION=ANAEROBIC_LAGOON_MANURE_RETENTION,
+            MANURE_DAMPING_FACTOR=MANURE_DAMPING_FACTOR,
+            MANURE_TEMPERATURE_LAG=MANURE_TEMPERATURE_LAG
         )
 
     @property
@@ -53,7 +63,7 @@ class AnaerobicLagoon(Storage):
         """
         The fraction of the accumulated stored manure that is removed from storage when the emptying time is reached.
         """
-        return 1.0 - ManureConstants.ANAEROBIC_LAGOON_MANURE_RETENTION
+        return 1.0 - self.ANAEROBIC_LAGOON_MANURE_RETENTION
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """Processes manure in Anaerobic Lagoon.
@@ -80,7 +90,7 @@ class AnaerobicLagoon(Storage):
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
-            time.current_julian_day, ManureConstants.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE
+            time.current_julian_day, self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE, self.MANURE_DAMPING_FACTOR, self.MANURE_TEMPERATURE_LAG
         )
 
         total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)
@@ -156,12 +166,14 @@ class AnaerobicLagoon(Storage):
             volatile_solids=self._manure_to_process.degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=True,
+            NATURAL_LOG_ARRHENIUS_CONSTANT=self.NATURAL_LOG_ARRHENIUS_CONSTANT,
         )
         storage_methane_from_non_degradable_volatile_solids = self._calculate_methane_emissions(
             volatile_solids=self._manure_to_process.non_degradable_volatile_solids
             + self._manure_to_process.bedding_non_degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=False,
+            NATURAL_LOG_ARRHENIUS_CONSTANT=self.NATURAL_LOG_ARRHENIUS_CONSTANT,
         )
         total_methane = (
             storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids

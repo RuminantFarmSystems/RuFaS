@@ -1,0 +1,59 @@
+{
+  "processor_connections": [
+    {
+      "processor_name": "calf_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "compost",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "growing_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "closeup_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "lac_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "anaerobic_lagoon_1",
+      "destinations": []
+    },
+    {
+      "processor_name": "compost",
+      "destinations": []
+    }
+  ],
+  "separator_connections": [
+  ]
+}
