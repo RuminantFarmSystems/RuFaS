@@ -188,7 +188,7 @@ def test_manage_harvest(
                 field_name="mock_field",
                 harvest_time=mock_time.current_date.date(),
                 storage_time=mock_time.current_date.date(),
-                fresh_mass=1234.5,
+                dry_matter_mass=1234.5,
                 dry_matter_percentage=42.0,
                 dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
                 crude_protein_percent=20.0,
