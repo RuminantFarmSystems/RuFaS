@@ -386,20 +386,17 @@ class EmissionsEstimator:
             defaultdict(dict)
         )
 
-        harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = {
-            feed_id: sorted(
-                [
-                    harvest_date
-                    for harvest_date in harvest_yield_by_field[field_name]
-                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id
-                ]
-            )
-            for field_name in harvest_yield_by_field
-            for feed_id in set(
-                harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-                for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
-            )
-        }
+        all_feed_ids = set(harvest_yield_by_field[field_name][harvest_date]["feed_id"]
+                          for field_name in harvest_yield_by_field
+                          for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys())))
+        harvest_dates_by_feed_id = {}
+        for feed_id in all_feed_ids:
+            harvest_dates = []
+            for field_name in harvest_yield_by_field:
+                for harvest_date in harvest_yield_by_field[field_name]:
+                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id:
+                        harvest_dates.append(harvest_date)
+            harvest_dates_by_feed_id[feed_id] = sorted(harvest_dates)
 
         for field_name in harvest_yield_by_field:
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
