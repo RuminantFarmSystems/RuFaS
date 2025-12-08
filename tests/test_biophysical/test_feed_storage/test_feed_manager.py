@@ -89,7 +89,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     mock_pile_config: dict[str, str | float] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
@@ -124,7 +124,7 @@ def storage() -> Storage:
     """
     mock_storage_config: dict[str, str | float] = {
         "name": "Test Storage",
-        "field_name": "Test Field",
+        "field_names": ["Test Field"],
         "crop_name": "corn_silage",
         "rufas_id": 1,
         "initial_storage_dry_matter": 50.0,
@@ -179,7 +179,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 1,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -191,7 +191,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Bag",
                         "rufas_id": 2,
                         "crop_name": "alfalfa",
-                        "field_name": "F2",
+                        "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 200.0,
@@ -212,7 +212,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 1,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -224,7 +224,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Bag",
                         "rufas_id": 2,
                         "crop_name": "alfalfa",
-                        "field_name": "F2",
+                        "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 200.0,
@@ -245,7 +245,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 99,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -300,17 +300,17 @@ def test_validate_crop_field_mapping_all_unique(feed_manager: FeedManager, mocke
         {
             "name": "storage_1",
             "crop_name": "alfalfa_hay",
-            "field_name": "field_1",
+            "field_names": ["field_1"],
         },
         {
             "name": "storage_2",
             "crop_name": "alfalfa_hay",
-            "field_name": "field_2",
+            "field_names": ["field_2"],
         },
         {
             "name": "storage_3",
             "crop_name": "corn_silage",
-            "field_name": "field_1",
+            "field_names": ["field_1"],
         },
     ]
     add_error = mocker.patch.object(feed_manager._om, "add_error")
@@ -327,12 +327,12 @@ def test_validate_crop_field_mapping_raises_on_duplicate_combo(
         {
             "name": "triticale_hay_storage_1",
             "crop_name": "winter_wheat_hay",
-            "field_name": "field_1",
+            "field_names": ["field_1"],
         },
         {
             "name": "winter_wheat_hay_storage_1",
             "crop_name": "winter_wheat_hay",
-            "field_name": "field_1",
+            "field_names": ["field_1"],
         },
     ]
     add_error = mocker.patch.object(feed_manager._om, "add_error")
@@ -472,7 +472,7 @@ def test_receive_crop_routes_to_matching_storage(
     """Tests that receive_crop routes to the correct storage, and warns if no match."""
     storage = next(iter(feed_manager.active_storages.values()))
     storage.crop_name = harvested_crop.config_name
-    storage.field_name = harvested_crop.field_name
+    storage.field_names = harvested_crop.field_name
 
     mocked_receive = mocker.patch.object(storage, "receive_crop")
 
@@ -490,7 +490,7 @@ def test_receive_crop_warns_when_no_matching_storage(
     """Tests that receive_crop warns when no storage matches the crop."""
     for s in feed_manager.active_storages.values():
         s.crop_name = "not-" + harvested_crop.config_name
-        s.field_name = "not-" + harvested_crop.field_name
+        s.field_names = "not-" + harvested_crop.field_name
         mocker.patch.object(s, "receive_crop")
 
     mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
@@ -935,7 +935,7 @@ def test_deduct_feeds_from_inventory(
     bag_config: dict[str, str | float] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
@@ -970,7 +970,7 @@ def test_deduct_feeds_from_inventory_error(
     bag_config: dict[str, str | float] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,

@@ -6008,9 +6008,13 @@
           "type": "string",
           "description": "Name of crop to be stored in the feed storage unit."
         },
-        "field_name": {
-          "type": "string",
-          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        "field_names": {
+          "type": "array",
+          "description": "Name of the all fields associated with the crop to be stored in feed storage unit.",
+          "properties": {
+            "type": "string",
+            "description": "Name of the field associated with the crop to be stored in feed storage unit."
+          }
         },
         "storage_type": {
           "type": "string",
@@ -6058,9 +6062,13 @@
           "type": "string",
           "description": "Name of crop to be stored in the feed storage unit."
         },
-        "field_name": {
-          "type": "string",
-          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        "field_names": {
+          "type": "array",
+          "description": "Name of the all fields associated with the crop to be stored in feed storage unit.",
+          "properties": {
+            "type": "string",
+            "description": "Name of the field associated with the crop to be stored in feed storage unit."
+          }
         },
         "storage_type": {
           "type": "string",
@@ -6122,9 +6130,13 @@
           "type": "string",
           "description": "Name of crop to be stored in the feed storage unit."
         },
-        "field_name": {
-          "type": "string",
-          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        "field_names": {
+          "type": "array",
+          "description": "Name of the all fields associated with the crop to be stored in feed storage unit.",
+          "properties": {
+            "type": "string",
+            "description": "Name of the field associated with the crop to be stored in feed storage unit."
+          }
         },
         "storage_type": {
           "type": "string",
@@ -6179,9 +6191,13 @@
           "type": "string",
           "description": "Name of crop to be stored in the feed storage unit."
         },
-        "field_name": {
-          "type": "string",
-          "description": "Name of the field associated with the crop to be stored in feed storage unit."
+        "field_names": {
+          "type": "array",
+          "description": "Name of the all fields associated with the crop to be stored in feed storage unit.",
+          "properties": {
+            "type": "string",
+            "description": "Name of the field associated with the crop to be stored in feed storage unit."
+          }
         },
         "storage_type": {
           "type": "string",

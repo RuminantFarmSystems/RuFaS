@@ -192,9 +192,11 @@ class FeedManager:
 
         for config in all_configs:
             crop_name = config.get("crop_name")
-            field_name = config.get("field_name")
+            field_names = config.get("field_names")
             name = config.get("name", "<unnamed_storage>")
-            combo_to_names[(crop_name, field_name)].append(name)
+            for field_name in field_names:
+                combo_to_names[(crop_name, field_name)].append(name)
+            # combo_to_names[(crop_name, field_names)].append(name)
 
         duplicate_details = {
             combo: names for combo, names in combo_to_names.items() if len(names) > 1 and None not in combo
@@ -279,7 +281,7 @@ class FeedManager:
         crop_name = harvested_crop.config_name
         field_name = harvested_crop.field_name
         for storage in self.active_storages.values():
-            if storage.crop_name == crop_name and storage.field_name == field_name:
+            if storage.crop_name == crop_name and field_name in storage.field_names:
                 storage.receive_crop(harvested_crop, simulation_day)
                 return
         else:

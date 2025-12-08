@@ -29,7 +29,7 @@ def storage() -> Storage:
     """
     mock_storage_config: dict[str, str | float] = {
         "name": "Test Storage",
-        "field_name": "Test Field",
+        "field_names": ["Test Field"],
         "crop_name": "corn_silage",
         "rufas_id": 1,
         "initial_storage_dry_matter": 50.0,
