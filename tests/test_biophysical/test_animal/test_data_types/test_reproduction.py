@@ -255,6 +255,7 @@ def test_heifer_SynchED_conception_rate(ai_synched: int, successful_synched: int
 
 
 def test_herd_reproduction_statistics_add() -> None:
+    """Test addition of two HerdReproductionStatistics instances."""
     stats1 = HerdReproductionStatistics(
         total_num_ai_performed=10,
         total_num_successful_conceptions=4,
