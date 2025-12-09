@@ -258,9 +258,9 @@ def test_string_type_validator(
     ],
 )
 def test_fix_array_type_fixable_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
-    expected_value: List[Any],
+    dummy_variable_properties: dict[str, Any],
+    dummy_element_hierarchy: list[str | int],
+    expected_value: list[Any],
     expected_result: bool,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
@@ -296,7 +296,10 @@ def test_fix_array_type_fixable_data(
 
     variable_to_check = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
     assert variable_to_check == expected_value
     assert result == expected_result
     assert dv.event_logs == [
@@ -359,14 +362,14 @@ def test_fix_array_type_fixable_data(
     ],
 )
 def test_fix_array_type_critical_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
+    dummy_variable_properties: dict[str, Any],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data: dict[str, Any] | list[Any] = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
         if isinstance(variable_parent, list):
             variable_parent = variable_parent[int(key)]
@@ -475,22 +478,25 @@ def mock_input_string_data_for_fix_data() -> dict[str, str | dict[str, Any]]:
 )
 def test_fix_string_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_value: str,
     expected_result: bool,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
         original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
     info_map = {
@@ -507,10 +513,13 @@ def test_fix_string_type_fixable_data(
         dummy_properties_key,
     )
 
-    variable_to_check = dummy_input_data
+    variable_to_check: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
-    assert variable_to_check == expected_value
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
+    assert str(variable_to_check) == expected_value
     assert result == expected_result
     assert dv.event_logs == [
         {
@@ -532,10 +541,9 @@ def test_fix_string_type_fixable_data(
 
 def test_fix_string_type_csv_data() -> None:
     """Unit test for fixable number-type data from a csv array for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = {"element1": [1, 2, 3, 4, 5]}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"element1": [1, 2, 3, 4, 5]}
     dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
-    dummy_element_hierarchy = ["element1", 4]
+    dummy_element_hierarchy: list[str | int] = ["element1", 4]
     dummy_properties_key = "dummy_variable_properties"
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
     properties_violation_message = (
@@ -545,13 +553,16 @@ def test_fix_string_type_csv_data() -> None:
         "class": DataValidator.__name__,
         "function": DataValidator._fix_data.__name__,
     }
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
-        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
 
     dv: DataValidator = DataValidator()
     result = dv._fix_data(
@@ -563,8 +574,12 @@ def test_fix_string_type_csv_data() -> None:
 
     fixed_variable = dummy_input_data
     for key in dummy_element_hierarchy:
-        fixed_variable = fixed_variable[key]
+        if isinstance(fixed_variable, list):
+            fixed_variable = fixed_variable[int(key)]
+        else:
+            fixed_variable = fixed_variable[key]
 
+    assert isinstance(fixed_variable, int)
     assert fixed_variable == 3
     assert result
     assert dv.event_logs == [
@@ -632,7 +647,7 @@ def test_fix_string_type_csv_data() -> None:
 )
 def test_fix_string_type_critical_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
@@ -691,7 +706,7 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result",
     [
         (
             {
@@ -703,7 +718,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element1"],
             5,
             True,
-            2,
         ),
         (
             {
@@ -715,7 +729,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element2"],
             0,
             True,
-            2,
         ),
         (
             {
@@ -727,7 +740,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element3"],
             5,
             True,
-            2,
         ),
         (
             {
@@ -739,31 +751,32 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element4", "element5"],
             5,
             True,
-            2,
         ),
     ],
 )
 def test_fix_number_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_value: str,
     expected_result: bool,
-    expected_warning_call_count: int,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
-        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
     info_map = {
         "class": DataValidator.__name__,
         "function": DataValidator._fix_data.__name__,
@@ -780,7 +793,10 @@ def test_fix_number_type_fixable_data(
 
     variable_to_check = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
     assert variable_to_check == expected_value
     assert result == expected_result
     assert dv.event_logs == [
@@ -844,7 +860,7 @@ def test_fix_number_type_fixable_data(
 )
 def test_fix_number_type_critical_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
@@ -929,8 +945,8 @@ def test_fix_number_type_critical_data(
     ],
 )
 def test_extract_value_by_key_list(
-    input_data: Union[List[Any], Dict[str, Any]],
-    variable_path: List[Union[str, int]],
+    input_data: dict[str | int, Any] | list[Any],
+    variable_path: list[Union[str, int]],
     expected: Optional[Any],
     expected_exception: Optional[Type[Exception]],
 ) -> None:
@@ -1022,9 +1038,9 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
 )
 def test_object_type_validator(
     mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
+    variable_path: list[Union[str, int]],
+    variable_properties: dict[str, Any],
+    input_data: dict[str | int, Any] | list[Any],
     eager_termination: bool,
     properties_blob_key: str,
     expected_result: bool,
@@ -1280,9 +1296,9 @@ def test_validate_array_container_properties(
 )
 def test_array_type_validator(
     mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
+    variable_path: list[str | int],
+    variable_properties: dict[str, Any],
+    input_data: dict[str | int, Any] | list[Any],
     eager_termination: bool,
     properties_blob_key: str,
     patch_extract_return: Any,
@@ -1366,7 +1382,7 @@ def test_validate_input_by_type(
     # Arrange
     variable_properties = {"type": data_type}
     variable_path: List[Union[str, int]] = ["path", "to", "variable"]
-    input_data = {"path": {"to": {"variable": input_value}}}
+    input_data: dict[str | int, Any] | list[Any] = {"path": {"to": {"variable": input_value}}}
     eager_termination = False
     properties_blob_key = "blobKey"
     elements_counter = mocker.MagicMock()
@@ -1412,7 +1428,7 @@ def test_validate_input_by_type_key_error() -> None:
     variable_properties = {"a": "b"}
     variable_path: list[Union[str, int]] = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
-    input_data = {"valid_key": {"another_valid_key": "value"}}
+    input_data: dict[str | int, Any] | list[Any] = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
     elements_counter = ElementsCounter()
     dv = DataValidator()
@@ -1937,9 +1953,9 @@ def test_validate_metadata_properties_keys(
 
 def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     """Unit tests for making sure data were extracted when no error"""
-    dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_var_path: list[str | int] = ["dummy_var_path"]
-    dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
+    dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     dummy_value = 1
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", return_value=dummy_value)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
@@ -1986,8 +2002,8 @@ def test_extract_input_data_by_key_list_key_error(
     var_path: List[str | int], var_name: str, called_during_initialization: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for making sure data were extracted when error occurs"""
-    dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
-    dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
+    dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", side_effect=KeyError)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
     dv = DataValidator()
