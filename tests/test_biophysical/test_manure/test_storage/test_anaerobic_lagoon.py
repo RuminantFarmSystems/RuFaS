@@ -240,15 +240,15 @@ def test_apply_methane_emissions_no_flare(
 
     expected_total = expected_total
     expected_burned = expected_burned
-    mass_loss = expected_total * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    mass_loss = expected_total * ManureConstants.VS_TO_METHANE_LOSS_RATIO
 
     assert total == expected_total
     assert burned == expected_burned
     assert stored_manure.total_solids == pytest.approx(35.0 - mass_loss, rel=1e-6)
     assert stored_manure.degradable_volatile_solids == pytest.approx(
-        20.0 - 2.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+        20.0 - 2.0 * ManureConstants.VS_TO_METHANE_LOSS_RATIO, rel=1e-6
     )
-    assert stored_manure.non_degradable_volatile_solids == 5.375
+    assert stored_manure.non_degradable_volatile_solids == 6.6675
 
 
 def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:

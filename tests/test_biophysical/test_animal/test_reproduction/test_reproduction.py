@@ -36,7 +36,7 @@ from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
-def mock_reproduction(mocker: MockerFixture) -> Reproduction:
+def mock_reproduction() -> Reproduction:
     return Reproduction()
 
 
@@ -1414,6 +1414,47 @@ def test_execute_cow_ed_protocol(
     assert result == mock_outputs
 
 
+def test_execute_cow_ed_protocol_resets_ed_days_when_pregnant(mocker: MockerFixture) -> None:
+    """If the cow is pregnant, ED_days should be reset to 0."""
+    reproduction = Reproduction()
+    reproduction.reproduction_statistics.ED_days = 5
+    mock_events = MagicMock(spec=AnimalEvents)
+    data_stream = mock_reproduction_data_stream(
+        animal_type=AnimalType.LAC_COW,
+        days_in_milk=0,
+        events=mock_events,
+    )
+    data_stream.days_in_pregnancy = 100
+
+    simulation_day = 100
+
+    mock_repeat_estrus = mocker.patch.object(
+        reproduction,
+        "_repeat_estrus_simulation_before_vwp",
+        return_value=data_stream,
+    )
+    mock_simulate_estrus = mocker.patch.object(
+        reproduction,
+        "_simulate_estrus",
+        return_value=data_stream,
+    )
+    mock_handle_estrus_detection = mocker.patch.object(
+        reproduction,
+        "_handle_estrus_detection",
+        return_value=data_stream,
+    )
+
+    result = reproduction.execute_cow_ed_protocol(data_stream, simulation_day)
+
+    assert reproduction.reproduction_statistics.ED_days == 0
+
+    mock_repeat_estrus.assert_not_called()
+    mock_simulate_estrus.assert_not_called()
+    mock_handle_estrus_detection.assert_not_called()
+
+    assert result is data_stream
+
+
 @pytest.mark.parametrize(
     "is_estrus_detected, expected_on_detected_called, expected_on_not_detected_called",
     [
@@ -1908,14 +1949,24 @@ def test_set_up_hormone_schedule(
 
 
 @pytest.mark.parametrize(
-    "hormone_schedule_empty, expected_hormone_execution, expected_simulate_estrus",
+    "hormone_schedule_empty, clear_schedule_during_execution, expected_hormone_execution, expected_simulate_estrus",
     [
-        (False, True, False),  # Hormone schedule is present; no estrus simulation.
-        (True, False, False),  # Hormone schedule empty; estrus simulation is expected.
+        # 1) Schedule present, not cleared → hormone delivery only, no estrus
+        (False, False, True, False),
+        # 2) Schedule empty from start → nothing happens
+        (True, False, False, False),
+        # 3) Schedule present, cleared by hormone execution → hormone + estrus
+        (False, True, True, True),
+    ],
+    ids=[
+        "schedule_present_no_clear",
+        "schedule_empty_no_action",
+        "schedule_present_then_cleared_trigger_estrus",
     ],
 )
 def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(
     hormone_schedule_empty: bool,
+    clear_schedule_during_execution: bool,
     expected_hormone_execution: bool,
     expected_simulate_estrus: bool,
     mocker: MockerFixture,
@@ -1923,22 +1974,45 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(
     reproduction = Reproduction()
     reproduction.hormone_schedule = {} if hormone_schedule_empty else {0: {"deliver_hormones": ["GnRH"]}}
 
-    mock_time = MagicMock(spec=RufasTime)
-    mock_time.simulation_day = 100
+    simulation_day = 100
 
-    mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, events=MagicMock(spec=AnimalEvents))
-
-    mock_execute_hormone_schedule = mocker.patch.object(
-        reproduction, "_execute_hormone_delivery_schedule", return_value=mock_outputs
+    mock_outputs = mock_reproduction_data_stream(
+        animal_type=AnimalType.HEIFER_II,
+        events=MagicMock(spec=AnimalEvents),
     )
-    mock_simulate_estrus = mocker.patch.object(reproduction, "_simulate_estrus", return_value=mock_outputs)
 
-    result = reproduction._handle_synch_ed_hormone_delivery_and_set_estrus_day(mock_outputs, mock_time.simulation_day)
+    if clear_schedule_during_execution:
+        def _side_effect(repro_stream: ReproductionDataStream, simulation_day: int,
+                         schedule: dict[int, dict[str, list[str]]]) -> ReproductionDataStream:
+            assert reproduction.hormone_schedule
+            reproduction.hormone_schedule = {}
+            return repro_stream
+
+        mock_execute_hormone_schedule = mocker.patch.object(
+            reproduction,
+            "_execute_hormone_delivery_schedule",
+            side_effect=_side_effect,
+        )
+    else:
+        mock_execute_hormone_schedule = mocker.patch.object(
+            reproduction,
+            "_execute_hormone_delivery_schedule",
+            return_value=mock_outputs,
+        )
+
+    mock_simulate_estrus = mocker.patch.object(
+        reproduction,
+        "_simulate_estrus",
+        return_value=mock_outputs,
+    )
+
+    result = reproduction._handle_synch_ed_hormone_delivery_and_set_estrus_day(
+        mock_outputs,
+        simulation_day,
+    )
 
     if expected_hormone_execution:
-        mock_execute_hormone_schedule.assert_called_once_with(
-            mock_outputs, mock_time.simulation_day, reproduction.hormone_schedule
-        )
+        mock_execute_hormone_schedule.assert_called_once()
     else:
         mock_execute_hormone_schedule.assert_not_called()
 
@@ -1946,7 +2020,7 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(
         mock_simulate_estrus.assert_called_once_with(
             mock_outputs,
             mock_outputs.days_born,
-            mock_time.simulation_day,
+            simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             AnimalConfig.average_estrus_cycle_after_pgf,
             AnimalConfig.std_estrus_cycle_after_pgf,
@@ -2206,7 +2280,7 @@ def test_open_cow(
 
     if cow_reproduction_program == CowReproductionProtocol.ED and days_born > estrus_day:
         mock_enter_state.assert_called_once_with(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-        assert mock_outputs.events.add_event.call_count == 2  # one for repro state, one for days in milk
+        assert mock_outputs.events.add_event.call_count == 2
         mock_outputs.events.add_event.assert_any_call(
             mock_outputs.days_born,
             mock_time.simulation_day,
@@ -2239,6 +2313,47 @@ def test_open_cow(
 
     assert result == mock_outputs
     AnimalConfig.cow_resynch_method = default_resynch_method
+
+
+def test_open_cow_sets_do_not_breed_and_returns_when_dryoff_before_third_check(
+    monkeypatch: pytest.MonkeyPatch,
+    mocker: MockerFixture,
+) -> None:
+    """If dry-off happens before/at the third pregnancy check and cow is not milking, mark do_not_breed and return."""
+    reproduction = Reproduction()
+    reproduction.num_conception_rate_decreases = 0
+    reproduction.do_not_breed = False
+
+    monkeypatch.setattr(AnimalConfig, "dry_off_day_of_pregnancy", 150)
+    monkeypatch.setattr(AnimalConfig, "third_pregnancy_check_day", 200)
+
+    data_stream = mock_reproduction_data_stream(
+        animal_type=AnimalType.LAC_COW,
+        days_born=100,
+        days_in_milk=0,
+    )
+
+    mock_simulate_estrus = mocker.patch.object(reproduction, "_simulate_estrus")
+    mock_enter_state = mocker.patch.object(reproduction.repro_state_manager, "enter")
+    mock_handle_open_tai = mocker.patch.object(
+        reproduction,
+        "_handle_open_cow_in_tai_before_pd_resynch",
+    )
+    mock_handle_open_pgf = mocker.patch.object(
+        reproduction,
+        "_handle_open_cow_in_pgf_at_pd_resynch",
+    )
+
+    result = reproduction.open_cow(data_stream, simulation_day=100)
+
+    assert reproduction.do_not_breed is True
+    assert reproduction.num_conception_rate_decreases == 1
+    assert result is data_stream
+
+    mock_simulate_estrus.assert_not_called()
+    mock_enter_state.assert_not_called()
+    mock_handle_open_tai.assert_not_called()
+    mock_handle_open_pgf.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -3547,6 +3662,46 @@ def test_increment_cow_ai_counts() -> None:
     assert result.herd_reproduction_statistics.cow_num_ai_performed == initial_ai_count + 1
 
 
+@pytest.mark.parametrize(
+    "protocol, expected_field",
+    [
+        (CowReproductionProtocol.ED, "cow_num_ai_performed_in_ED"),
+        (CowReproductionProtocol.TAI, "cow_num_ai_performed_in_TAI"),
+    ],
+    ids=["ed_program", "tai_program"],
+)
+def test_increment_cow_ai_counts_increments_program_specific_counters(
+    protocol: CowReproductionProtocol,
+    expected_field: str,
+) -> None:
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = protocol
+
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
+    stats = reproduction_data_stream.herd_reproduction_statistics
+
+    initial_total = stats.total_num_ai_performed
+    initial_cow = stats.cow_num_ai_performed
+    initial_ed = stats.cow_num_ai_performed_in_ED
+    initial_tai = stats.cow_num_ai_performed_in_TAI
+    initial_ed_tai = stats.cow_num_ai_performed_in_ED_TAI
+
+    result = reproduction._increment_cow_ai_counts(reproduction_data_stream)
+    new_stats = result.herd_reproduction_statistics
+
+    assert new_stats.total_num_ai_performed == initial_total + 1
+    assert new_stats.cow_num_ai_performed == initial_cow + 1
+
+    if expected_field == "cow_num_ai_performed_in_ED":
+        assert new_stats.cow_num_ai_performed_in_ED == initial_ed + 1
+        assert new_stats.cow_num_ai_performed_in_TAI == initial_tai
+        assert new_stats.cow_num_ai_performed_in_ED_TAI == initial_ed_tai
+    elif expected_field == "cow_num_ai_performed_in_TAI":
+        assert new_stats.cow_num_ai_performed_in_TAI == initial_tai + 1
+        assert new_stats.cow_num_ai_performed_in_ED == initial_ed
+        assert new_stats.cow_num_ai_performed_in_ED_TAI == initial_ed_tai
+
+
 def test_increment_successful_cow_conceptions() -> None:
     reproduction = Reproduction()
     reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
@@ -3556,6 +3711,46 @@ def test_increment_successful_cow_conceptions() -> None:
     result = reproduction._increment_successful_cow_conceptions(reproduction_data_stream)
 
     assert result.herd_reproduction_statistics.cow_num_successful_conceptions == initial_conception_count + 1
+
+
+@pytest.mark.parametrize(
+    "protocol, expected_field",
+    [
+        (CowReproductionProtocol.ED, "cow_num_successful_conceptions_in_ED"),
+        (CowReproductionProtocol.TAI, "cow_num_successful_conceptions_in_TAI"),
+    ],
+    ids=["ed_program", "tai_program"],
+)
+def test_increment_successful_cow_conceptions_increments_program_specific_counters(
+    protocol: CowReproductionProtocol,
+    expected_field: str,
+) -> None:
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = protocol
+
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
+    stats = reproduction_data_stream.herd_reproduction_statistics
+
+    initial_total = stats.total_num_successful_conceptions
+    initial_cow = stats.cow_num_successful_conceptions
+    initial_ed = stats.cow_num_successful_conceptions_in_ED
+    initial_tai = stats.cow_num_successful_conceptions_in_TAI
+    initial_ed_tai = stats.cow_num_successful_conceptions_in_ED_TAI
+
+    result = reproduction._increment_successful_cow_conceptions(reproduction_data_stream)
+    new_stats = result.herd_reproduction_statistics
+
+    assert new_stats.total_num_successful_conceptions == initial_total + 1
+    assert new_stats.cow_num_successful_conceptions == initial_cow + 1
+
+    if expected_field == "cow_num_successful_conceptions_in_ED":
+        assert new_stats.cow_num_successful_conceptions_in_ED == initial_ed + 1
+        assert new_stats.cow_num_successful_conceptions_in_TAI == initial_tai
+        assert new_stats.cow_num_successful_conceptions_in_ED_TAI == initial_ed_tai
+    elif expected_field == "cow_num_successful_conceptions_in_TAI":
+        assert new_stats.cow_num_successful_conceptions_in_TAI == initial_tai + 1
+        assert new_stats.cow_num_successful_conceptions_in_ED == initial_ed
+        assert new_stats.cow_num_successful_conceptions_in_ED_TAI == initial_ed_tai
 
 
 @pytest.mark.parametrize(

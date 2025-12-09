@@ -985,3 +985,37 @@ def test_update_average_cow_parity(herd_manager: HerdManager) -> None:
     herd_manager._update_average_cow_parity()
 
     assert herd_manager.herd_statistics.avg_parity_num == pytest.approx(expected_average_cow_parity)
+
+
+def test_update_total_enteric_methane_merges_and_accumulates(herd_manager: HerdManager) -> None:
+    """_update_total_enteric_methane should merge and accumulate emissions by animal type and gas key."""
+    herd_manager.herd_statistics.total_enteric_methane = {AnimalType.LAC_COW: {"CH4": 10.0, "CO2": 5.0}}
+
+    digestive_outputs = [
+        {
+            AnimalType.LAC_COW: {
+                "CH4": 2.5,
+                "N2O": 1.0,
+            }
+        },
+        {
+            AnimalType.HEIFER_I: {
+                "CH4": 3.0,
+            }
+        },
+        {
+            AnimalType.LAC_COW: {
+                "CO2": 4.0,
+            }
+        },
+    ]
+
+    herd_manager._update_total_enteric_methane(digestive_outputs)
+
+    totals = herd_manager.herd_statistics.total_enteric_methane[AnimalType.LAC_COW]
+
+    assert totals["CH4"] == pytest.approx(12.5)
+    assert totals["CO2"] == pytest.approx(9.0)
+    assert totals["N2O"] == pytest.approx(1.0)
+
+    assert AnimalType.HEIFER_I not in herd_manager.herd_statistics.total_enteric_methane

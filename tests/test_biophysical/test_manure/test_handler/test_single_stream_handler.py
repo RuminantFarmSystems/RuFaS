@@ -35,7 +35,7 @@ def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.receive_manure(manure_stream)
@@ -58,7 +58,7 @@ def test_receive_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     mock_receive = mocker.patch.object(Handler, "receive_manure")
     handler.manure_stream = manure_stream
@@ -87,7 +87,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=pen,
-        bedding_non_degradable_volatile_solids=0.0
+        bedding_non_degradable_volatile_solids=0.0,
     )
     original_stream = handler.manure_stream
     add_error_patch = mocker.patch.object(handler._om, "add_error")
@@ -150,7 +150,7 @@ def test_process_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=0.0
+        bedding_non_degradable_volatile_solids=0.0,
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
     try:
@@ -215,11 +215,11 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             10,
-            53.75,
-            53.75,
+            66.675,
+            66.675,
             0.0,
         ),
         (
@@ -236,7 +236,7 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             0,
             100,
@@ -257,7 +257,7 @@ def test_determine_housing_carbon_dioxide_emissions(
                 volume=0.0,
                 methane_production_potential=0.24,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=10
+                bedding_non_degradable_volatile_solids=10,
             ),
             10,
             0,

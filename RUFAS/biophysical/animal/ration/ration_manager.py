@@ -6,7 +6,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 
-class UserDefinedRationManager:
+class RationManager:
     """
     Handles the initialization and management of user-defined animal rations.
 
@@ -17,7 +17,9 @@ class UserDefinedRationManager:
     ----------
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
         A mapping of animal groupings to their respective ration formulations.
-    ration_tolerance : float
+    ration_feeds : dict[AnimalCombination, list[RUFAS_ID]]
+        A mapping of animal groupings to the list of RuFaS feed IDs available to formulate their ration.
+    tolerance : float
         Fraction +/- of target user defined ration value (as a fraction of dry matter intake estimate) allowable in
         ration formulation.
 
@@ -26,8 +28,45 @@ class UserDefinedRationManager:
     CALF_DRY_MATTER_INTAKE = 3
 
     _om = OutputManager()
-    user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
-    tolerance: float
+    ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
+    user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
+    tolerance: float | None = 0.0
+
+    @classmethod
+    def set_ration_feeds(cls, ration_config: dict[str, list[int]]) -> None:
+        """
+        Maps the input feeds available for each ration to Animal combinations.
+
+        Parameters
+        ----------
+        ration_config : dict[str, list[int]]
+            Collection of animal requirements and feed supply information for ration formulation.
+
+        """
+        cls.ration_feeds = {animal_combination: [] for animal_combination in AnimalCombination}
+
+        cls.ration_feeds[AnimalCombination.CALF] = ration_config["calf_feeds"]
+        cls.ration_feeds[AnimalCombination.GROWING] = ration_config["growing_feeds"]
+        cls.ration_feeds[AnimalCombination.CLOSE_UP] = ration_config["close_up_feeds"]
+        cls.ration_feeds[AnimalCombination.LAC_COW] = ration_config["lac_cow_feeds"]
+
+    @classmethod
+    def get_ration_feeds(cls, animal_combination: AnimalCombination) -> list[RUFAS_ID]:
+        """
+        Generate a list of feed RuFaS IDs for the given animal combination that user defined to be used as the ration.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+            The combination of animals in the pen.
+
+        Returns
+        -------
+        list[RUFAS_ID]
+            A list of feed RuFaS IDs that user defined to be used as the feed for the given animal combination.
+
+        """
+        return cls.ration_feeds[animal_combination]
 
     @classmethod
     def set_user_defined_ration_tolerance(
@@ -39,7 +78,7 @@ class UserDefinedRationManager:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the user-defined rations for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
 
         """
         cls.tolerance = ration_config["user_defined_ration_percentages"]["tolerance"]
@@ -54,7 +93,7 @@ class UserDefinedRationManager:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the user-defined rations for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
 
         """
         info_map = {"class": cls.__name__, "function": cls.set_user_defined_rations.__name__}

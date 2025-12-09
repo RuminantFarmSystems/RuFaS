@@ -950,7 +950,7 @@ class RationOptimizer:
         Parameters
         ----------
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
-            List of dictionaries containing the user-defined rations for each animal combination.
+            Collection of animal requirements and feed supply information for ration formulation.
         user_defined_ration_dictionary : dict[RUFAS_ID, float]
             Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
         user_defined_ration_tolerance : float

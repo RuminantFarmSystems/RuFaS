@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 
@@ -35,17 +35,76 @@ def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] 
     }
 
 
+def test_set_ration_feeds_maps_config_to_animal_combinations() -> None:
+    """set_ration_feeds should initialize ration_feeds for all combos and map config lists correctly."""
+    ration_config: dict[str, list[int]] = {
+        "calf_feeds": [1, 2],
+        "growing_feeds": [3],
+        "close_up_feeds": [4, 5, 6],
+        "lac_cow_feeds": [7],
+    }
+
+    RationManager.set_ration_feeds(ration_config)
+
+    assert RationManager.ration_feeds is not None
+    ration_feeds = RationManager.ration_feeds
+
+    assert set(ration_feeds.keys()) == set(AnimalCombination)
+
+    assert ration_feeds[AnimalCombination.CALF] == ration_config["calf_feeds"]
+    assert ration_feeds[AnimalCombination.GROWING] == ration_config["growing_feeds"]
+    assert ration_feeds[AnimalCombination.CLOSE_UP] == ration_config["close_up_feeds"]
+    assert ration_feeds[AnimalCombination.LAC_COW] == ration_config["lac_cow_feeds"]
+
+    for combo, value in ration_feeds.items():
+        if combo not in {
+            AnimalCombination.CALF,
+            AnimalCombination.GROWING,
+            AnimalCombination.CLOSE_UP,
+            AnimalCombination.LAC_COW,
+        }:
+            assert value == []
+
+
+def test_get_ration_feeds_returns_expected_list() -> None:
+    """get_ration_feeds should return the exact list stored in ration_feeds for that animal combination."""
+    fake_mapping: dict[AnimalCombination, list[int]] = {
+        AnimalCombination.CALF: [1, 2],
+        AnimalCombination.GROWING: [3],
+        AnimalCombination.CLOSE_UP: [],
+        AnimalCombination.LAC_COW: [4, 5],
+    }
+
+    RationManager.ration_feeds = fake_mapping
+
+    result = RationManager.get_ration_feeds(AnimalCombination.CALF)
+
+    assert result == [1, 2]
+    assert RationManager.get_ration_feeds(AnimalCombination.LAC_COW) == [4, 5]
+
+
+def test_set_user_defined_ration_tolerance_updates_class_attribute() -> None:
+    """set_user_defined_ration_tolerance should store the tolerance value from the config."""
+    config: dict[str, dict[str, list[dict[str, int | float]] | float]] = {
+        "user_defined_ration_percentages": {"tolerance": 0.15}
+    }
+
+    RationManager.set_user_defined_ration_tolerance(config)
+
+    assert RationManager.tolerance == 0.15
+
+
 def test_set_user_defined_rations_valid(
     mocker: MockerFixture, valid_ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
 ) -> None:
-    mocker.patch.object(UserDefinedRationManager._om, "add_variable")
-    mock_log = mocker.patch.object(UserDefinedRationManager._om, "add_log")
+    mocker.patch.object(RationManager._om, "add_variable")
+    mock_log = mocker.patch.object(RationManager._om, "add_log")
 
-    UserDefinedRationManager.set_user_defined_rations(valid_ration_config)
+    RationManager.set_user_defined_rations(valid_ration_config)
 
     assert (
-        UserDefinedRationManager.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP]
-        == UserDefinedRationManager.user_defined_rations[AnimalCombination.CLOSE_UP]
+        RationManager.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP]
+        == RationManager.user_defined_rations[AnimalCombination.CLOSE_UP]
     )
     mock_log.assert_called_once()
 
@@ -53,10 +112,10 @@ def test_set_user_defined_rations_valid(
 def test_set_user_defined_rations_invalid(
     mocker: MockerFixture, invalid_ration_config: dict[str, dict[str, list[dict[str, float]] | float]]
 ) -> None:
-    mock_error = mocker.patch.object(UserDefinedRationManager._om, "add_error")
+    mock_error = mocker.patch.object(RationManager._om, "add_error")
 
     with pytest.raises(ValueError):
-        UserDefinedRationManager.set_user_defined_rations(invalid_ration_config)
+        RationManager.set_user_defined_rations(invalid_ration_config)
 
     assert mock_error.call_count == 3
 
@@ -180,9 +239,23 @@ def test_get_user_defined_ration(
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]],
     expected_output: dict[RUFAS_ID, float],
 ) -> None:
-    UserDefinedRationManager.user_defined_rations = user_defined_rations
+    RationManager.user_defined_rations = user_defined_rations
 
-    result = UserDefinedRationManager.get_user_defined_ration(animal_combination, requirements)
+    result = RationManager.get_user_defined_ration(animal_combination, requirements)
 
     for key, expected_value in expected_output.items():
         assert math.isclose(result[key], expected_value, rel_tol=1e-3)
+
+
+def test_get_user_defined_ration_feeds_returns_keys_for_combination() -> None:
+    """get_user_defined_ration_feeds should return the list of RuFaS IDs defined for that animal combination."""
+
+    RationManager.user_defined_rations = {
+        AnimalCombination.CALF: {101: 25.0, 202: 75.0},
+        AnimalCombination.GROWING: {303: 50.0},
+    }
+
+    result = RationManager.get_user_defined_ration_feeds(AnimalCombination.CALF)
+
+    assert result == [101, 202]
+    assert RationManager.get_user_defined_ration_feeds(AnimalCombination.GROWING) == [303]
