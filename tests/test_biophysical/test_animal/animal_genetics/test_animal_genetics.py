@@ -102,8 +102,8 @@ def test_animal_genetics_init(
     mock_calculate_ep_values.assert_called_once_with()
     mock_calculate_et_values.assert_called_once_with()
     mock_calculate_phenotype_values.assert_called_once_with(birth_year=birth_year)
-    mock_calculate_ebv_values.assert_called_once_with(animal_type=animal_type, parity=parity)
-    mock_calculate_ranking_index.assert_called_once_with()
+    mock_calculate_ebv_values.assert_not_called()
+    mock_calculate_ranking_index.assert_not_called()
 
 
 @pytest.mark.parametrize(

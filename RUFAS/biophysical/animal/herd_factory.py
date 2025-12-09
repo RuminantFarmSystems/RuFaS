@@ -9,6 +9,7 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
@@ -419,6 +420,7 @@ class HerdFactory:
                 herd_data["calves"],
             )
         )
+        self._update_genetic_values(calves)
         heiferIs = list(
             map(
                 self._init_animal_from_data,
@@ -426,6 +428,7 @@ class HerdFactory:
                 herd_data["heiferIs"],
             )
         )
+        self._update_genetic_values(heiferIs)
         heiferIIs = list(
             map(
                 self._init_animal_from_data,
@@ -433,6 +436,7 @@ class HerdFactory:
                 herd_data["heiferIIs"],
             )
         )
+        self._update_genetic_values(heiferIIs)
         heiferIIIs = list(
             map(
                 self._init_animal_from_data,
@@ -440,6 +444,7 @@ class HerdFactory:
                 herd_data["heiferIIIs"],
             )
         )
+        self._update_genetic_values(heiferIIIs)
         cows = list(
             map(
                 self._init_animal_from_data,
@@ -447,6 +452,7 @@ class HerdFactory:
                 herd_data["cows"],
             )
         )
+        self._update_genetic_values(cows)
         replacement = list(
             map(
                 self._init_animal_from_data,
@@ -454,6 +460,7 @@ class HerdFactory:
                 herd_data["replacement"],
             )
         )
+        self._update_genetic_values(replacement)
 
         return AnimalPopulation(
             calves=calves,
@@ -464,6 +471,17 @@ class HerdFactory:
             replacement=replacement,
             current_animal_id=self.pre_animal_population.current_animal_id,
         )
+
+    def _update_genetic_values(
+            self,
+            animals: list[Animal],
+    ) -> None:
+        """Function to update EBV and ranking index values of a specific group of animals."""
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in animals])
+        for animal in animals:
+            animal.genetics.calculate_ebv_and_ranking_index(
+                animal.animal_type, mean_tbv_fat, mean_tbv_protein, animal.calves
+            )
 
     def _random_sample_with_replacement(self) -> AnimalPopulation:
         """Function to randomly sample the herd with replacement"""

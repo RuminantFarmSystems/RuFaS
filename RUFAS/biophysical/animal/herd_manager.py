@@ -500,8 +500,14 @@ class HerdManager:
                     else:
                         newborn_calves.append(newborn_calf)
                     birth_year = Utility.back_track_birth_date(animal.days_born, time.current_date).year
+                    mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+                        [animal.genetics for animal in self.cows])
                     animal.genetics.recalculate_values_at_lactation_start(
-                        birth_year=birth_year, animal_type=animal.animal_type, parity=animal.calves
+                        birth_year=birth_year,
+                        animal_type=animal.animal_type,
+                        parity=animal.calves,
+                        group_specific_TBV_fat_mean=mean_tbv_fat,
+                        group_specific_TBV_protein_mean=mean_tbv_protein
                     )
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
@@ -806,14 +812,23 @@ class HerdManager:
             replacement.nutrients.total_phosphorus_in_animal = (
                 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
             )
-            replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
-            replacement.genetics = Genetics(
-                birth_year=replacement_birth_date.year, animal_type=replacement.animal_type, parity=replacement.calves
-            )
+            self._update_replacement_animal_genetics(replacement, time)
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
 
         return animals_added
+
+    def _update_replacement_animal_genetics(self, replacement: Animal, time: RufasTime) -> None:
+        """
+        Updates the genetic values of a replacement animal.
+        """
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in self.heiferIIIs])
+        replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
+        replacement.genetics = Genetics(
+            birth_year=replacement_birth_date.year, animal_type=replacement.animal_type, parity=replacement.calves
+        )
+        replacement.genetics.calculate_ebv_and_ranking_index(replacement.animal_type, mean_tbv_fat, mean_tbv_protein,
+                                                             replacement.calves)
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:
         """

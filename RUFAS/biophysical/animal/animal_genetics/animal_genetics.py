@@ -102,15 +102,43 @@ class Genetics:
         self.E_permanent_fat, self.E_permanent_protein = self._calculate_ep_values()
         self.E_temporary_fat, self.E_temporary_protein = self._calculate_et_values()
         self.phenotype_fat, self.phenotype_protein = self._calculate_phenotype_values(birth_year=birth_year)
-        self.EBV_fat, self.EBV_protein = self._calculate_ebv_values(animal_type=animal_type, parity=parity)
+        self.EBV_fat, self.EBV_protein = 0.0, 0.0
+        self.ranking_index = 0.0
+
+    def calculate_ebv_and_ranking_index(
+            self,
+            animal_type: AnimalType,
+            group_specific_TBV_fat_mean: float,
+            group_specific_TBV_protein_mean: float,
+            parity: int | None
+    ) -> None:
+        """Calculate EBV and ranking index values."""
+        self.EBV_fat, self.EBV_protein = self._calculate_ebv_values(
+            animal_type=animal_type,
+            group_specific_TBV_fat_mean=group_specific_TBV_fat_mean,
+            group_specific_TBV_protein_mean=group_specific_TBV_protein_mean,
+            parity=parity
+        )
         self.ranking_index = self._calculate_ranking_index()
 
-    def recalculate_values_at_lactation_start(self, birth_year: int, animal_type: AnimalType, parity: int) -> None:
+    def recalculate_values_at_lactation_start(
+            self,
+            birth_year: int,
+            animal_type: AnimalType,
+            parity: int,
+            group_specific_TBV_fat_mean: float,
+            group_specific_TBV_protein_mean: float,
+    ) -> None:
         """Recalculate genetic values at lactation start."""
         self.E_temporary_fat, self.E_temporary_protein = self._calculate_et_values()
         self.phenotype_fat, self.phenotype_protein = self._calculate_phenotype_values(birth_year=birth_year)
         if parity <= 3:
-            self.EBV_fat, self.EBV_protein = self._calculate_ebv_values(animal_type=animal_type, parity=parity)
+            self.EBV_fat, self.EBV_protein = self._calculate_ebv_values(
+                animal_type=animal_type,
+                parity=parity,
+                group_specific_TBV_fat_mean=group_specific_TBV_fat_mean,
+                group_specific_TBV_protein_mean=group_specific_TBV_protein_mean
+            )
         self.ranking_index = self._calculate_ranking_index()
 
     def _calculate_tbv_values(self) -> tuple[float, float]:
@@ -162,13 +190,19 @@ class Genetics:
         phenotype_protein = mean_protein + self.TBV_protein + self.E_permanent_protein + self.E_temporary_protein
         return phenotype_fat, phenotype_protein
 
-    def _calculate_ebv_values(self, animal_type: AnimalType, parity: int | None) -> tuple[float, float]:
+    def _calculate_ebv_values(
+            self,
+            animal_type: AnimalType,
+            group_specific_TBV_fat_mean: float,
+            group_specific_TBV_protein_mean: float,
+            parity: int | None,
+    ) -> tuple[float, float]:
         """Calculate EBV values."""
         parity_index = min(parity, 3) if animal_type.is_cow else 0
         fat_accuracy, protein_accuracy = FAT_ACCURACY_BY_PARITY[parity_index], PROTEIN_ACCURACY_BY_PARITY[parity_index]
 
-        mean_ebv_fat = self.TBV_fat * (fat_accuracy**2)
-        mean_ebv_protein = self.TBV_protein * (protein_accuracy**2)
+        mean_ebv_fat = group_specific_TBV_fat_mean + (self.TBV_fat - group_specific_TBV_fat_mean)  * (fat_accuracy**2)
+        mean_ebv_protein = group_specific_TBV_protein_mean + (self.TBV_protein - group_specific_TBV_protein_mean) * (protein_accuracy**2)
 
         std_ebv_fat = np.sqrt((1 - fat_accuracy**2) * (fat_accuracy**2) * TBV_FAT_STD)
         std_ebv_protein = np.sqrt((1 - protein_accuracy**2) * (protein_accuracy**2) * TBV_PROTEIN_STD)
@@ -186,6 +220,7 @@ class Genetics:
 
     @staticmethod
     def calculate_average_genetic_values(list_of_genetics: list["Genetics"]) -> dict[str, float | None]:
+        """Calculate average genetic values for a list of genetics."""
         if (num_animal := len(list_of_genetics)) <= 0:
             return {
                 "TBV_fat": None,
@@ -214,3 +249,12 @@ class Genetics:
                 "EBV_protein": sum([genetic.EBV_protein for genetic in list_of_genetics]) / num_animal,
                 "ranking_index": sum([genetic.ranking_index for genetic in list_of_genetics]) / num_animal,
             }
+
+    @staticmethod
+    def calculate_average_tbv(list_of_genetics: list["Genetics"]) -> tuple[float | None, float | None]:
+        """Calculate average TBV values for a specific group of animals."""
+        num_animals = len(list_of_genetics)
+        return (
+            sum([genetic.TBV_fat for genetic in list_of_genetics]) / num_animals if num_animals > 0 else 0.0,
+            sum([genetic.TBV_protein for genetic in list_of_genetics]) / num_animals if num_animals > 0 else 0.0,
+        )
