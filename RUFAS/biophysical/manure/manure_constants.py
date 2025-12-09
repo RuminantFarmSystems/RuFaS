@@ -84,9 +84,9 @@ class ManureConstants:
      minimum energy that must be available to microbes for methanogenesis to occur.
     """
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
-    """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
-     manure (g methane / kg manure Volatile Solids / hour)."""
+    #NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    #"""Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
+    # manure (g methane / kg manure Volatile Solids / hour)."""
 
     # Solid manure storage-related constants
     DEFAULT_LAG_TIME = 2
@@ -219,8 +219,8 @@ class ManureConstants:
     earlier than air temperature (days).
     """
 
-    ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE: float = 1.0
-    """The minimum temperature of manure stored in an anaerobic lagoon (°C)."""
+    #ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE: float = 1.0
+    #"""The minimum temperature of manure stored in an anaerobic lagoon (°C)."""
 
     SLURRY_OUTDOOR_MINIMUM_TEMPERATURE: float = -20.0
     """The minimum temperature of manure stored in slurry storage outdoors (°C)."""
