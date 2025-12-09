@@ -772,8 +772,19 @@ class DataValidator:
 
         type_to_validator_map: dict[
             str,
-            Callable[[list[int | str], dict[str, Any], dict[str | int, Any] | list[Any],
-                      bool, str, ElementsCounter, bool, set[str]], bool],
+            Callable[
+                [
+                    list[int | str],
+                    dict[str, Any],
+                    dict[str | int, Any] | list[Any],
+                    bool,
+                    str,
+                    ElementsCounter,
+                    bool,
+                    set[str],
+                ],
+                bool,
+            ],
         ] = {
             "array": self._array_type_validator,
             "object": self._object_type_validator,
@@ -1286,16 +1297,18 @@ class DataValidator:
 
         variable_parent: dict[str | int, Any] | list[Any] = data
         for key in element_hierarchy[:-1]:
-            variable_parent = variable_parent[key] if isinstance(variable_parent, dict) \
-                else variable_parent[int(key)]
+            variable_parent = variable_parent[key] if isinstance(variable_parent, dict) else variable_parent[int(key)]
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
             f"Violates properties defined in metadata properties section '{properties_blob_key}'."
         )
         if "default" not in variable_properties.keys():
-            invalid_value = variable_parent.get(element_hierarchy[-1], "missing required value") if \
-                isinstance(variable_parent, dict) else variable_parent[int(element_hierarchy[-1])]
+            invalid_value = (
+                variable_parent.get(element_hierarchy[-1], "missing required value")
+                if isinstance(variable_parent, dict)
+                else variable_parent[int(element_hierarchy[-1])]
+            )
             error_message = (
                 f"Variable: '{element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
                 f", and cannot be changed to a default value. {properties_violation_message}"
@@ -1557,8 +1570,9 @@ class DataValidator:
                 formatted_path_elems.append(f"{raw_path_elem}")
         return ".".join(formatted_path_elems)
 
-    def extract_value_by_key_list(self, data: list[Any] | dict[str | int, Any],
-                                  variable_path: Sequence[str | int]) -> Any:
+    def extract_value_by_key_list(
+        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int]
+    ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 

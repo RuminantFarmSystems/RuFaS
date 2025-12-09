@@ -375,8 +375,11 @@ def test_fix_array_type_critical_data(
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    invalid_value = variable_parent.get(dummy_element_hierarchy[-1], "missing required value") if \
-        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
+    invalid_value = (
+        variable_parent.get(dummy_element_hierarchy[-1], "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
         f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
@@ -637,13 +640,15 @@ def test_fix_string_type_critical_data(
     dummy_properties_key = "dummy_variable_properties"
     variable_parent = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key] if isinstance(variable_parent, dict) \
-            else variable_parent[int(key)]
+        variable_parent = variable_parent[key] if isinstance(variable_parent, dict) else variable_parent[int(key)]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    invalid_value = variable_parent.get(str(dummy_element_hierarchy[-1]), "missing required value") if \
-        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
+    invalid_value = (
+        variable_parent.get(str(dummy_element_hierarchy[-1]), "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
         f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
@@ -854,8 +859,11 @@ def test_fix_number_type_critical_data(
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    invalid_value = variable_parent.get(dummy_element_hierarchy[-1], "missing required value") if \
-        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
+    invalid_value = (
+        variable_parent.get(dummy_element_hierarchy[-1], "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
         f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
