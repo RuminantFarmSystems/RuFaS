@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator
 
 
-def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
+def mock_input_array_data_for_fix_data() -> dict[str | int, Any] | list[Any]:
     return {
         "element1": [1, 2, 3],
         "element2": [1, 2, 3, 4, 5],
@@ -41,7 +41,7 @@ def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]
 )
 def test_bool_type_validator(
     input_data_value: bool,
-    dummy_variable_properties: Dict[str, Any],
+    dummy_variable_properties: dict[str, Any],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -50,9 +50,9 @@ def test_bool_type_validator(
     """
     # Arrange
     var_path: list[str | int] = ["dummy_var_path"]
-    variable_properties: Dict[str, Any] = dummy_variable_properties
+    variable_properties: dict[str, Any] = dummy_variable_properties
     dummy_properties_key = "dummy_variable_properties"
-    dummy_input_data = {"a": 1, "b": 2}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=input_data_value)
@@ -116,7 +116,7 @@ def test_bool_type_validator(
 )
 def test_number_type_validator(
     dummy_value: int,
-    dummy_variable_properties: Dict[str, int],
+    dummy_variable_properties: dict[str, int],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -124,7 +124,7 @@ def test_number_type_validator(
 
     # Arrange
     dummy_var_path: list[str | int] = ["dummy_num"]
-    dummy_input_data = {"a": 1}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1}
     dummy_properties_key = "dummy_variable_properties"
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
@@ -181,7 +181,7 @@ def test_string_type_validator(
     """Unit test for _string_type_validator function in file input_manager.py"""
     var_path: list[str | int] = ["dummy_var_path"]
     dummy_properties_key = "dummy_variable_properties"
-    dummy_input_data = {"a": 1, "b": 2}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
@@ -264,18 +264,20 @@ def test_fix_array_type_fixable_data(
     expected_result: bool,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key] if isinstance(key, str | int) else variable_parent[str(key)]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
         original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
     info_map = {
@@ -362,17 +364,21 @@ def test_fix_array_type_critical_data(
     expected_result: bool,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
     variable_parent = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = variable_parent.get(dummy_element_hierarchy[-1], "missing required value") if \
+        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -629,15 +635,17 @@ def test_fix_string_type_critical_data(
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
     variable_parent = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        variable_parent = variable_parent[key] if isinstance(variable_parent, dict) \
+            else variable_parent[int(key)]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = variable_parent.get(str(dummy_element_hierarchy[-1]), "missing required value") if \
+        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -789,7 +797,7 @@ def test_fix_number_type_fixable_data(
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_result, " "expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_result,",
     [
         (
             {
@@ -799,7 +807,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element6"],
             False,
-            0,
         ),
         (
             {
@@ -809,7 +816,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element7"],
             False,
-            0,
         ),
         (
             {
@@ -819,7 +825,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element8"],
             False,
-            0,
         ),
         (
             {
@@ -829,7 +834,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element9", "element10"],
             False,
-            0,
         ),
     ],
 )
@@ -837,20 +841,23 @@ def test_fix_number_type_critical_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str],
     expected_result: bool,
-    expected_warning_call_count: int,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = variable_parent.get(dummy_element_hierarchy[-1], "missing required value") if \
+        isinstance(variable_parent, dict) else variable_parent[int(dummy_element_hierarchy[-1])]
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
