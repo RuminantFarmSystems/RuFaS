@@ -473,8 +473,8 @@ class HerdFactory:
         )
 
     def _update_genetic_values(
-            self,
-            animals: list[Animal],
+        self,
+        animals: list[Animal],
     ) -> None:
         """Function to update EBV and ranking index values of a specific group of animals."""
         mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in animals])
