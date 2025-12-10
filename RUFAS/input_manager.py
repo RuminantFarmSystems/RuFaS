@@ -189,6 +189,13 @@ class InputManager:
                 break
 
         self.om.route_logs(self.data_validator.event_logs)
+        if results == []:
+            self.om.add_warning(
+                f"No runtime metadata files were processed for key '{metadata_key}'. "
+                "Check if the configuration is correct or if this key is expected to have no runtime files.",
+                info_map,
+            )
+
         return all(results) if results else True
 
     def _runtime_metadata_guard_failure(self, reason: str, info_map: Dict[str, Any]) -> bool:
