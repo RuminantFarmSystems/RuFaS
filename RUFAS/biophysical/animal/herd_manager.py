@@ -11,6 +11,7 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     NewBornCalfValuesTypedDict,
@@ -279,7 +280,7 @@ class HerdManager:
         return len(self.heiferIIIs) + len(self.cows)
 
     @property
-    def heiferII_events_by_id(self) -> dict[str, str]:
+    def heiferII_events_by_id(self) -> dict[str, AnimalEvents]:
         """
         Returns a dictionary that maps unique identifiers for HeiferII objects to their corresponding events.
 
@@ -287,7 +288,7 @@ class HerdManager:
 
         Returns
         -------
-        dict[str, str]
+        dict[str, AnimalEvents]
             A dictionary where each key is the unique identifier of a HeiferII,
             and the value is the string representation of the events associated with that HeiferII.
 
@@ -295,7 +296,7 @@ class HerdManager:
         return {f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events for heiferII in self.heiferIIs}
 
     @property
-    def cow_events_by_id(self) -> dict[str, str]:
+    def cow_events_by_id(self) -> dict[str, AnimalEvents]:
         """
         Returns a dictionary that maps unique identifiers for Cow objects to their corresponding events.
 
@@ -303,7 +304,7 @@ class HerdManager:
 
         Returns
         -------
-        dict[str, str]
+        dict[str, AnimalEvents]
             A dictionary where each key is the unique identifier of a Cow,
             and the value is the string representation of the events associated with that Cow.
 

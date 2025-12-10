@@ -232,6 +232,8 @@ def test_calculate_growth_energy_requirements(
         (False, 200, None, 30.0, 5.0, 2.419956, 0.582),
         # Test case 3: Non-lactating animal, not pregnant
         (False, None, None, 30.0, 5.0, 0.0, 0.0),
+        # Test case 4: Lactating animal, no day_of_pregnancy, DIM < 100
+        (True, None, 50, 30.0, 5.0, -302.148, -47.96),
     ],
 )
 def test_calculate_pregnancy_energy_requirements(

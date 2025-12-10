@@ -3896,7 +3896,8 @@
           "type": "number",
           "description": "Fractional number 0 to 1 as a cushion for feed purchases to help plan for herd fluctuations and feed shrink.",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 1,
+          "default": 0.15
         }
       }
     },

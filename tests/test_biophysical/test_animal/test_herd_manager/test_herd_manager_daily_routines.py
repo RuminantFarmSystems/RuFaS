@@ -225,6 +225,80 @@ def test_perform_daily_routines_for_animals(
         mock_create_newborn_calf.assert_not_called()
 
 
+def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Covers:
+    - animal_status == DEAD increments herd_statistics.animals_deaths_by_stage
+    - DEAD also adds the animal to sold_animals
+    - newborn_calf.stillborn goes into stillborn_newborn_calves
+    """
+    dead_animal = MagicMock(spec=Animal)
+    dead_animal.animal_type = AnimalType.LAC_COW
+
+    dead_output = DailyRoutinesOutput(
+        animal_status=AnimalStatus.DEAD,
+        newborn_calf_config=None,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
+    )
+    mocker.patch.object(dead_animal, "daily_routines", return_value=dead_output)
+
+    calving_animal = MagicMock(spec=Animal)
+    calving_animal.animal_type = AnimalType.DRY_COW
+
+    newborn_config: NewBornCalfValuesTypedDict = {
+        "breed": Breed.HO.name,
+        "animal_type": AnimalType.CALF.value,
+        "birth_date": "",
+        "days_born": 0,
+        "birth_weight": 10.1,
+        "initial_phosphorus": 10.0,
+        "net_merit": 18.8,
+    }
+
+    calving_output = DailyRoutinesOutput(
+        animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+        newborn_calf_config=newborn_config,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
+    )
+    mocker.patch.object(calving_animal, "daily_routines", return_value=calving_output)
+
+    stillborn_calf = MagicMock(spec=Animal)
+    stillborn_calf.stillborn = True
+    stillborn_calf.sold = False
+
+    mock_create_newborn_calf = mocker.patch.object(
+        herd_manager,
+        "_create_newborn_calf",
+        return_value=stillborn_calf,
+    )
+
+    before_deaths = herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.LAC_COW]
+
+    mock_time = MagicMock(spec=RufasTime)
+    mock_time.simulation_day = 0
+
+    (
+        graduated_animals,
+        sold_animals,
+        stillborn_newborn_calves,
+        newborn_calves,
+        sold_newborn_calves,
+    ) = herd_manager._perform_daily_routines_for_animals(
+        time=mock_time,
+        animals=[dead_animal, calving_animal],
+    )
+
+    assert herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.LAC_COW] == before_deaths + 1
+    assert sold_animals == [dead_animal]
+    assert graduated_animals == [calving_animal]
+    mock_create_newborn_calf.assert_called_once()
+    assert stillborn_newborn_calves == [stillborn_calf]
+    assert newborn_calves == []
+    assert sold_newborn_calves == []
+
+
 def test_update_herd_structure(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
@@ -314,7 +388,9 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows + sold_oversupply_heiferIIIs
     )
 
-    mock_perform_daily_routines_for_animals_side_effect = [
+    mock_perform_daily_routines_for_animals_side_effect: list[
+        tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]
+    ] = [
         (graduated_calves, sold_calves, [], [], []),
         (graduated_heiferIs, sold_heiferIs, [], [], []),
         (graduated_heiferIIs, sold_heiferIIs, [], [], []),
