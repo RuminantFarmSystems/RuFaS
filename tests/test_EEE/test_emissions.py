@@ -420,9 +420,7 @@ def test_parse_manure_and_fertilizer_application_no_data(
     em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
-    mock_om_filter_variables_pool = mocker.patch.object(
-        em.om, "filter_variables_pool", side_effect=[{}, {}]
-    )
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", side_effect=[{}, {}])
     actual_data = em._parse_manure_and_fertilizer_application_data(datetime.strptime("2013:1", "%Y:%j"))
     assert actual_data == defaultdict(dict)
     assert mock_om_filter_variables_pool.call_count == 2
@@ -476,9 +474,7 @@ def test_parse_farmgrown_feed_deductions_no_data(
     em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
-    mock_om_filter_variables_pool = mocker.patch.object(
-        em.om, "filter_variables_pool", return_value={}
-    )
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value={})
     all_simulation_days = list(range(0, 750))
     actual_data = em._parse_farmgrown_feed_deductions_data(all_simulation_days)
     assert actual_data == defaultdict(dict)
