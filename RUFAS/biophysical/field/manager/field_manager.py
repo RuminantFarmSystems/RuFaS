@@ -288,11 +288,9 @@ class FieldManager:
             om = OutputManager()
             info_map = {
                 "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_fertilizer_events.__name__
+                "function": FieldManager._setup_fertilizer_events.__name__,
             }
-            om.add_error("No fertilizer data",
-                         "Field data provided with empty fertilizer data.",
-                         info_map)
+            om.add_error("No fertilizer data", "Field data provided with empty fertilizer data.", info_map)
             raise ValueError("No fertilizer data")
         available_fertilizer_mixes: dict[str, dict[str, float]] = {}
         fertilizer_mix_data: list[dict[str, Any]] = fertilizer_data["available_fertilizer_mixes"]
@@ -344,11 +342,9 @@ class FieldManager:
             om = OutputManager()
             info_map = {
                 "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_manure_events.__name__
+                "function": FieldManager._setup_manure_events.__name__,
             }
-            om.add_error("No manure data",
-                         "Field data provided with empty manure data.",
-                         info_map)
+            om.add_error("No manure data", "Field data provided with empty manure data.", info_map)
             raise ValueError("No manure data")
         manure_type_strings: list[str] = manure_schedule_data["manure_types"]
         manure_supplement_methods_strings: list[str] = manure_schedule_data["supplement_manure_nutrient_deficiencies"]
@@ -396,11 +392,9 @@ class FieldManager:
             om = OutputManager()
             info_map = {
                 "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_tillage_events.__name__
+                "function": FieldManager._setup_tillage_events.__name__,
             }
-            om.add_error("No tillage data",
-                         "Field data provided with empty tillage data.",
-                         info_map)
+            om.add_error("No tillage data", "Field data provided with empty tillage data.", info_map)
             raise ValueError("No tillage data")
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
@@ -446,11 +440,9 @@ class FieldManager:
             om = OutputManager()
             info_map = {
                 "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_fertilizer_events.__name__
+                "function": FieldManager._setup_fertilizer_events.__name__,
             }
-            om.add_error("No crop rotation data",
-                         "Field data provided with empty crop rotation data.",
-                         info_map)
+            om.add_error("No crop rotation data", "Field data provided with empty crop rotation data.", info_map)
             raise ValueError("No crop rotation data")
 
         for index, rotation in enumerate(crop_rotation_data):
