@@ -321,17 +321,18 @@ class FeedManager:
 
     def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
-        feed_report: dict[RUFAS_ID, dict[str, float]] = {
-            feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0} for feed in self._available_feeds
-        }
+        feed_report: dict[RUFAS_ID, dict[str, float]] = {}
 
         for storage in self.active_storages.values():
             for crop in storage.stored:
                 rufas_id = storage.rufas_feed_id
                 if rufas_id not in feed_report:
-                    continue
-                feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
-                feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
+                    feed_report[rufas_id] = {}
+                    feed_report[rufas_id]["dry_matter_mass"] = crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] = crop.fresh_mass
+                else:
+                    feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,

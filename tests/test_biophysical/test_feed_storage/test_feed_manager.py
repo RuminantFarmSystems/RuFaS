@@ -583,7 +583,7 @@ def test_report_stored_farmgrown_feeds(
 
     feed_manager.report_stored_farmgrown_feeds(mock_time, "mock_suffix")
 
-    assert mock_om_add_variable.call_count == 2 * len(mock_available_feeds)
+    assert mock_om_add_variable.call_count == 2 * len(feed_manager.active_storages)
 
 
 def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixture) -> None:
