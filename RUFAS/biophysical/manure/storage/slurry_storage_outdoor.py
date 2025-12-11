@@ -139,13 +139,22 @@ class SlurryStorageOutdoor(Storage):
             storage_methane_burned, total_storage_methane = self._calculate_cover_and_flare_methane(
                 total_storage_methane
             )
-        bedding_to_manure_non_degradable_volatile_solids_ratio = (
-            self._manure_to_process.bedding_non_degradable_volatile_solids
-            / (
-                self._manure_to_process.non_degradable_volatile_solids
-                + self._manure_to_process.bedding_non_degradable_volatile_solids
-            )
+
+        denominator = (
+            self._manure_to_process.non_degradable_volatile_solids
+            + self._manure_to_process.bedding_non_degradable_volatile_solids
         )
+
+        if (
+            self._manure_to_process.non_degradable_volatile_solids == 0
+            or self._manure_to_process.bedding_non_degradable_volatile_solids == 0
+            or denominator == 0
+        ):
+            bedding_to_manure_non_degradable_volatile_solids_ratio = 0
+        else:
+            bedding_to_manure_non_degradable_volatile_solids_ratio = (
+                self._manure_to_process.bedding_non_degradable_volatile_solids / denominator
+            )
 
         self._manure_to_process.total_solids = max(
             0.0,
