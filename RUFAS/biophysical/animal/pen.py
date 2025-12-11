@@ -1025,6 +1025,8 @@ class Pen:
             if is_ration_defined_by_user and (
                 adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper
             ):
+                if num_attempts > RationManager.maximum_attempts:
+                    break
                 if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
