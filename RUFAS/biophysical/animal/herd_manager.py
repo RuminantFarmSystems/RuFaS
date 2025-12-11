@@ -586,7 +586,6 @@ class HerdManager:
         sold_newborn_calves += sold_newborn_calves_from_cows
         newborn_calves += newborn_calves_from_cows
         born_calf_num = len(stillborn_newborn_calves + sold_newborn_calves + newborn_calves)
-        print(len(graduated_heiferIIIs), len(sold_and_died_cows), len(self.cows))
         self.herd_statistics.born_calf_num = born_calf_num
 
         self._update_sold_animal_statistics(
@@ -596,12 +595,11 @@ class HerdManager:
         )
 
         self._update_stillborn_calf_statistics(stillborn_newborn_calves)
-
         if time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0:
-            # print("Balance---------------------------")
-            # print(len(graduated_heiferIIIs), len(sold_and_died_cows))
-            removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day)
+            removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day,
+                                                                    removed_animal=removed_animals)
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+
             self._update_herd_structure(
                 graduated_animals=graduated_animals,
                 newborn_calves=newborn_calves,
@@ -624,20 +622,6 @@ class HerdManager:
                 simulation_day=time.simulation_day,
             )
 
-        # removed_animals += self._check_if_cows_need_to_be_sold(simulation_day=time.simulation_day)
-        # newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-        # self._update_herd_structure(
-        #     graduated_animals=graduated_animals,
-        #     newborn_calves=newborn_calves,
-        #     newly_added_animals=newly_added_animals,
-        #     removed_animals=removed_animals,
-        #     available_feeds=available_feeds,
-        #     current_day_conditions=weather.get_current_day_conditions(time),
-        #     total_inventory=total_inventory,
-        #     simulation_day=time.simulation_day,
-        # )
-        # print(newly_added_animals)
-
         self.record_pen_history(time.simulation_day)
         enteric_methane_emission_by_pen: dict[str, float] = {}
         animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
@@ -648,7 +632,6 @@ class HerdManager:
             enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
-        # print(len(self.cows))
 
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
@@ -710,6 +693,7 @@ class HerdManager:
     def _check_if_cows_need_to_be_sold(
         self,
         simulation_day: int,
+        removed_animal: list[Animal]
     ) -> list[Animal]:
         """
         Checks if surplus cows need to be sold based on herd size.
@@ -721,11 +705,11 @@ class HerdManager:
         MIN_DIM_FOR_REMOVAL = 60
         animals_removed: list[Animal] = []
         while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
-            # print(str(simulation_day) + " sold")
-            # partitioning between dnb and non dnb cows
             dnb_indices: list[int] = []
             non_dnb_indices: list[int] = []
             for index, cow in enumerate(self.cows):
+                if cow in removed_animal:
+                    continue
                 if cow.reproduction.do_not_breed:
                     dnb_indices.append(index)
                 elif cow.days_in_milk > MIN_DIM_FOR_REMOVAL:
@@ -800,7 +784,6 @@ class HerdManager:
             < self.herd_statistics.herd_num * self.buying_threshold
             and time.simulation_day > 1
         ):
-            # print("cow: " + str(len(self.cows)) + "bought: " + str(self.herd_statistics.bought_heifer_num))
             if len(self.replacement_market) == 0:
                 break
             replacement = self.replacement_market.pop(0)
@@ -843,8 +826,6 @@ class HerdManager:
             The animal object to be added to the respective array based on its `animal_type`.
 
         """
-        if animal.animal_type is AnimalType.LAC_COW or animal.animal_type is AnimalType.DRY_COW:
-            print(str(len(self.cows)) + "before")
         animal_type_to_array_map: dict[AnimalType, list[Animal]] = {
             AnimalType.CALF: self.calves,
             AnimalType.HEIFER_I: self.heiferIs,
@@ -855,8 +836,6 @@ class HerdManager:
         }
         new_array = animal_type_to_array_map[animal.animal_type]
         new_array.append(animal)
-        if animal.animal_type is AnimalType.LAC_COW or animal.animal_type is AnimalType.DRY_COW:
-            print(str(len(new_array)) + "after")
 
     def _update_animal_array(self, animal: Animal) -> None:
         """
