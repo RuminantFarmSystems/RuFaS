@@ -43,6 +43,9 @@ def config_json() -> dict[str, Any]:
 def animal_json() -> dict[str, Any]:
     return {
         "herd_information": {
+            "herd_size_adjustment_period": 30,
+            "herd_selling_threshold": 1.03,
+            "herd_buying_threshold": 1.01,
             "calf_num": 8,
             "heiferI_num": 44,
             "heiferII_num": 38,
