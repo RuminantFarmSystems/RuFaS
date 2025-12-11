@@ -139,6 +139,41 @@ class AnaerobicLagoon(Storage):
             time.simulation_day,
         )
 
+        self._report_processor_output(
+            "NATURAL_LOG_ARRHENIUS_CONSTANT",
+            self.NATURAL_LOG_ARRHENIUS_CONSTANT,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "ANAEROBIC_LAGOON_MANURE_RETENTION",
+            self.ANAEROBIC_LAGOON_MANURE_RETENTION,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE",
+            self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "MANURE_DAMPING_FACTOR",
+            self.MANURE_DAMPING_FACTOR,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "MANURE_TEMPERATURE_LAG",
+            self.MANURE_TEMPERATURE_LAG,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
         return manure_to_return
 
     def _apply_methane_emissions(self, manure_temperature: float) -> tuple[float, float]:
@@ -250,3 +285,7 @@ class AnaerobicLagoon(Storage):
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
+    
+    def _helperfunction(self) -> float:
+
+        return self.NATURAL_LOG_ARRHENIUS_CONSTANT, self.ANAEROBIC_LAGOON_MANURE_RETENTION, self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE, self.MANURE_DAMPING_FACTOR, self.MANURE_TEMPERATURE_LAG

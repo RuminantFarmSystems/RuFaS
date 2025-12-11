@@ -11,21 +11,39 @@
       "sampler": "sobol",
       "SA_load_balancing_start": 0,
       "SA_load_balancing_stop": 1,
-      "export_input_data_to_csv": true,
+      "export_input_data_to_csv": false,
       "properties_file_path": "input/metadata/properties/MSA_properties.json",
-      "sampler_n": 8,
+      "sampler_n": 32,
       "SA_input_variables": [
         {
           "variable_name": "manure_management.storage.0.NATURAL_LOG_ARRHENIUS_CONSTANT",
-          "lower_bound": 29,
+          "lower_bound": 28,
           "upper_bound": 32,
           "data_type":"float"
         },
         {
           "variable_name": "manure_management.storage.0.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE",
           "lower_bound": 0,
-          "upper_bound": 2,
+          "upper_bound": 5,
           "data_type":"float"
+        },
+        {
+          "variable_name": "manure_management.storage.0.ANAEROBIC_LAGOON_MANURE_RETENTION",
+          "lower_bound": 0,
+          "upper_bound": 0.5,
+          "data_type":"float"
+        },
+        {
+          "variable_name": "manure_management.storage.0.MANURE_DAMPING_FACTOR",
+          "lower_bound": 0.1,
+          "upper_bound": 0.75,
+          "data_type":"float"
+        },
+        {
+          "variable_name": "manure_management.storage.0.MANURE_TEMPERATURE_LAG",
+          "lower_bound": 0,
+          "upper_bound": 45,
+          "data_type":"int"
         }
       ]
     }
