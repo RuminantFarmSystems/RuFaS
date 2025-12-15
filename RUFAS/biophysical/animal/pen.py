@@ -1031,9 +1031,6 @@ class Pen:
                 if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
-                elif need_dry_matter_decrease:
-                    initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
-                    continue
 
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
