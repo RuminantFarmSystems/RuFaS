@@ -166,13 +166,23 @@ class AnaerobicLagoon(Storage):
         total_methane = (
             storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
         )
-        bedding_to_manure_non_degradable_volatile_solids_ratio = (
-            self._manure_to_process.bedding_non_degradable_volatile_solids
-            / (
-                self._manure_to_process.non_degradable_volatile_solids
-                + self._manure_to_process.bedding_non_degradable_volatile_solids
-            )
+
+        total_non_degradable_VS = (
+            self._manure_to_process.non_degradable_volatile_solids
+            + self._manure_to_process.bedding_non_degradable_volatile_solids
         )
+
+        if (
+            self._manure_to_process.non_degradable_volatile_solids == 0.0
+            or self._manure_to_process.bedding_non_degradable_volatile_solids == 0.0
+            or total_non_degradable_VS == 0.0
+        ):
+            bedding_to_manure_non_degradable_volatile_solids_ratio = 0.0
+        else:
+            bedding_to_manure_non_degradable_volatile_solids_ratio = (
+                self._manure_to_process.bedding_non_degradable_volatile_solids / total_non_degradable_VS
+            )
+
         storage_methane_burned = 0.0
         if self._cover == StorageCover.COVER_AND_FLARE:
             storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
