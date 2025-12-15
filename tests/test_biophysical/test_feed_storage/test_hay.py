@@ -31,7 +31,7 @@ def mock_storage_config() -> dict[str, str | float]:
     return {
         "name": "hay",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 300.0,
         "bale_size": 1.2,
