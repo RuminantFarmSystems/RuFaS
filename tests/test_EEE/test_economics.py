@@ -81,13 +81,7 @@ def test_calculate_digester_capital_cost() -> None:
         epsilon=0.0,
     )
     expected = math.exp(
-        1.0
-        + 0.5 * math.log(10.0)
-        + 0.3 * math.log(20.0)
-        + 0.1 * 1.0
-        + 0.2 * 0.0
-        + 0.05 * 1.0
-        + 0.07 * 0.0
+        1.0 + 0.5 * math.log(10.0) + 0.3 * math.log(20.0) + 0.1 * 1.0 + 0.2 * 0.0 + 0.05 * 1.0 + 0.07 * 0.0
     )
     assert result == expected
 
@@ -213,10 +207,12 @@ def test_equation_helpers() -> None:
     assert ci.tolist() == [1.5, 3.0]
 
     npv_ci = EconomicEquations.npv_capital_plus_interest(cap, ci, 0.1, np.array([-1, 0]))
-    expected_npv = (cap + ci) * np.array([
-        EconomicEquations.discount_factor(0.1, -1),
-        EconomicEquations.discount_factor(0.1, 0),
-    ])
+    expected_npv = (cap + ci) * np.array(
+        [
+            EconomicEquations.discount_factor(0.1, -1),
+            EconomicEquations.discount_factor(0.1, 0),
+        ]
+    )
     assert np.allclose(npv_ci, expected_npv)
 
     payment = EconomicEquations.annual_loan_payment(1000.0, 0.05, 5, 0.8)

@@ -33,9 +33,7 @@ class EconomicMetrics:
         return float("inf")
 
     @staticmethod
-    def calculate_net_annual_cash_flow(
-        revenue: Iterable[float], costs: Iterable[float]
-    ) -> np.ndarray:
+    def calculate_net_annual_cash_flow(revenue: Iterable[float], costs: Iterable[float]) -> np.ndarray:
         """Return the net annual cash flow array (revenue minus costs)."""
         revenue_arr = np.asarray(list(revenue), dtype=float)
         cost_arr = np.asarray(list(costs), dtype=float)
