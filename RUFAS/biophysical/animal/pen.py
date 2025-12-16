@@ -1010,7 +1010,8 @@ class Pen:
                         "NE_total_constraint",
                         "NE_maintenance_and_activity_constraint",
                         "NE_lactation_constraint",
-                        "NE_growth_constraint" "calcium_constraint",
+                        "NE_growth_constraint",
+                        "calcium_constraint",
                         "phosphorus_constraint",
                         "protein_constraint_lower",
                         "DMI_constraint_lower",
@@ -1025,11 +1026,10 @@ class Pen:
             if is_ration_defined_by_user and (
                 adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper
             ):
+                if num_attempts > RationManager.maximum_ration_reformulation_attempts:
+                    break
                 if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
-                    continue
-                elif need_dry_matter_decrease:
-                    initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
                     continue
 
             if is_ration_defined_by_user:
