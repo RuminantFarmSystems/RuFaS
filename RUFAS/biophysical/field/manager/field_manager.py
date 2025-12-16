@@ -440,7 +440,7 @@ class FieldManager:
             om = OutputManager()
             info_map = {
                 "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_fertilizer_events.__name__,
+                "function": FieldManager._setup_crop_schedules.__name__,
             }
             om.add_error("No crop rotation data", "Field data provided with empty crop rotation data.", info_map)
             raise ValueError("No crop rotation data")
