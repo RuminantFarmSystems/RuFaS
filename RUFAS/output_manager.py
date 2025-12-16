@@ -390,7 +390,7 @@ class OutputManager(object):
 
         Parameters
         ----------
-        variables : list[tuple[dict[str, Any]]
+        variables : list[tuple[dict[str, Any], dict[str, Any]]
             Variables to add in bulk packages in a list of tuples. Each tuple contains a dictionary with the key
             being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
@@ -1019,7 +1019,6 @@ class OutputManager(object):
         >>> output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
         ''
         """
-
         if not isinstance(units, dict):
             return f" ({units})" if units else ""
 

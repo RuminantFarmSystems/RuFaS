@@ -187,7 +187,7 @@ def processor_connections_input_json() -> dict[str, list[dict[str, Any]]]:
 @pytest.fixture
 def manure_manager(mocker: MockerFixture) -> ManureManager:
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
-    manure_manager = ManureManager()
+    manure_manager = ManureManager(0.5, 0.5, 0.5)
     mnm = ManureNutrientManager()
     mnm.add_nutrients(
         ManureNutrients(

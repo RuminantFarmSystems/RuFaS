@@ -166,6 +166,7 @@ class HerdStatistics:
     sold_heiferIIs_info: list[SoldAnimalTypedDict]
     sold_cows_info: list[SoldAnimalTypedDict]
     sold_and_died_cows_info: list[SoldAnimalTypedDict]
+    total_enteric_methane: dict[AnimalType, dict[str, float]]
 
     # TODO: Maybe break this list down into smaller lists GitHub Issue #1215
     herd_num = 0

@@ -399,12 +399,15 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
    .. image:: /_static/newterminal.png
       :alt: image
 
-   -  Place your cursor in the terminal and type in the command
+   -  You'll need to have at least the minimum supported versions of each dependency installed to run RuFaS.
+To ensure your dependencies are up to date, you'll just need to run:
 
       ::
 
-                  pip install -r requirements.txt
+                  pip install .
 
+  .. image:: /_static/configrufas.png
+     :alt: RuFaS Configuration
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.

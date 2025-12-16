@@ -167,6 +167,157 @@ def test_perform_daily_milking_update(
         mock_add_event.assert_not_called()
 
 
+@pytest.fixture
+def milk_production() -> MilkProduction:
+    """Create a MilkProduction instance with basic required attributes set."""
+    mp = MilkProduction()
+    mp.crude_protein_percent = 0.03
+    mp.true_protein_percent = 0.03
+    mp.fat_percent = 0.04
+    mp.lactose_percent = 0.05
+    mp.wood_l = 1.0
+    mp.wood_m = 2.0
+    mp.wood_n = 3.0
+    return mp
+
+
+def test_perform_daily_milking_update_without_history_not_milking(
+    milk_production: MilkProduction,
+) -> None:
+    """
+    If the animal is not milking (days_in_milk == 0), daily milk is set to 0 and
+    days_in_milk in the output is unchanged.
+    """
+    milk_production._daily_milk_produced = 10.0
+
+    inputs = MilkProductionInputs(
+        days_in_milk=0,
+        days_born=100,
+        days_in_pregnancy=50,
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 0
+    assert milk_production._daily_milk_produced == 0.0
+
+
+def test_perform_daily_milking_update_without_history_dry_off_day(
+    milk_production: MilkProduction,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker: MockerFixture,
+) -> None:
+    """
+    If today is the dry-off day, all milk/nutrient contents are zeroed and no
+    further calculations are performed.
+    """
+    dry_off_day = 200
+    monkeypatch.setattr(AnimalConfig, "dry_off_day_of_pregnancy", dry_off_day)
+    milk_production._daily_milk_produced = 25.0
+    milk_production.crude_protein_content = 1.0
+    milk_production.true_protein_content = 1.0
+    milk_production.fat_content = 1.0
+    milk_production.lactose_content = 1.0
+    milk_production.current_lactation_305_day_milk_produced = 123.0
+
+    calc_daily_milk = mocker.patch.object(milk_production, "calculate_daily_milk_production")
+    calc_nutrient = mocker.patch.object(milk_production, "_calculate_nutrient_content")
+    rand_gen = mocker.patch.object(Utility, "generate_random_number")
+
+    inputs = MilkProductionInputs(
+        days_in_milk=50,
+        days_born=400,
+        days_in_pregnancy=dry_off_day,
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 50
+
+    assert milk_production._daily_milk_produced == 0.0
+    assert milk_production.crude_protein_content == 0.0
+    assert milk_production.true_protein_content == 0.0
+    assert milk_production.fat_content == 0.0
+    assert milk_production.lactose_content == 0.0
+    assert milk_production.current_lactation_305_day_milk_produced == 0.0
+
+    calc_daily_milk.assert_not_called()
+    calc_nutrient.assert_not_called()
+    rand_gen.assert_not_called()
+
+
+def test_perform_daily_milking_update_without_history_normal_milking_day(
+    milk_production: MilkProduction,
+    mocker: MockerFixture,
+) -> None:
+    """
+    On a normal milking day (milking and not dry-off day), days_in_milk increments,
+    daily milk is calculated, and nutrient contents are updated via _calculate_nutrient_content.
+    """
+    if AnimalConfig.dry_off_day_of_pregnancy > 0:
+        days_in_pregnancy = AnimalConfig.dry_off_day_of_pregnancy - 1
+    else:
+        days_in_pregnancy = AnimalConfig.dry_off_day_of_pregnancy + 1
+
+    inputs = MilkProductionInputs(
+        days_in_milk=30,
+        days_born=400,
+        days_in_pregnancy=days_in_pregnancy,
+    )
+
+    mocker.patch.object(Utility, "generate_random_number", return_value=0.123)
+
+    mocked_daily_milk = 35.0
+    mock_calc_daily_milk = mocker.patch.object(
+        milk_production,
+        "calculate_daily_milk_production",
+        return_value=mocked_daily_milk,
+    )
+
+    previous_crude_protein_content = milk_production.crude_protein_content
+
+    mock_calc_nutrient = mocker.patch.object(
+        milk_production,
+        "_calculate_nutrient_content",
+        side_effect=[1.1, 2.2, 3.3, 4.4],
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 31
+
+    assert milk_production._daily_milk_produced == mocked_daily_milk
+
+    assert milk_production.crude_protein_content == 1.1
+    assert milk_production.true_protein_content == 2.2
+    assert milk_production.fat_content == 3.3
+    assert milk_production.lactose_content == 4.4
+
+    mock_calc_daily_milk.assert_called_once_with(
+        inputs.days_in_milk,
+        milk_production.wood_l,
+        milk_production.wood_m,
+        milk_production.wood_n,
+    )
+    assert mock_calc_nutrient.call_count == 4
+
+    calls = mock_calc_nutrient.call_args_list
+
+    expected_daily_for_nutrients = milk_production.daily_milk_produced
+
+    assert calls[0].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[0].args[1] == previous_crude_protein_content
+
+    assert calls[1].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[1].args[1] == milk_production.true_protein_percent
+
+    assert calls[2].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[2].args[1] == milk_production.fat_percent
+
+    assert calls[3].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[3].args[1] == milk_production.lactose_percent
+
+
 @pytest.mark.parametrize(
     "days_in_milk, l_param, m_param, n_param, expected_output",
     [
@@ -186,7 +337,14 @@ def test_calculate_daily_milk_production(
     ----
     The function tested here uses the @njit decorator which obscures unit test coverage.
     """
-    result: float = MilkProduction.calculate_daily_milk_production(days_in_milk, l_param, m_param, n_param)
+    func = MilkProduction.calculate_daily_milk_production
+    try:
+        calc_func = func.py_func
+    except AttributeError:
+        calc_func = func
+
+    result_raw = calc_func(days_in_milk, l_param, m_param, n_param)
+    result = float(result_raw)
 
     assert isinstance(result, float)
     assert np.isclose(result, expected_output, rtol=1e-3)

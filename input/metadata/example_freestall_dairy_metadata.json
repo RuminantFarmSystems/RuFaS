@@ -87,7 +87,7 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
-      "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
+      "path": "input/data/feed/NASEM_Comp_with_TDN_urea.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
@@ -246,5 +246,137 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": {}
+  "cross-validation": [
+    {
+  "description": "Number of stalls in calf pen",
+  "target_and_save": {
+    "variables": {
+      "number_of_calves": "animal.herd_information.calf_num",
+      "pen_animal_type": "animal.pen_information.0.animal_combination",
+      "pen_stall_num": "animal.pen_information.0.number_of_stalls",
+      "pen_stocking_density": "animal.pen_information.0.max_stocking_density"
+    },
+    "constants": {
+      "calf_pen_type": "CALF"
+    }
+  },
+    "apply_when": [
+    {
+      "left_hand": {
+        "operation": "no_op",
+        "apply_to": "group",
+        "ordered_variables": ["pen_animal_type"]
+      },
+      "right_hand": {
+        "operation": "no_op",
+        "apply_to": "individual",
+        "ordered_variables": ["calf_pen_type"]
+      },
+      "relationship": "equal"
+    }
+  ],
+  "rules": [
+    {
+      "left_hand": {
+        "operation": "sum",
+        "apply_to": "group",
+        "ordered_variables": ["pen_stall_num"]
+      },
+      "right_hand": {
+        "operation": "division",
+        "apply_to": "individual",
+        "ordered_variables": ["number_of_calves", "pen_stocking_density"],
+        "save_as": "min_num_stalls"
+      },
+      "relationship": "greater_or_equal_to"
+    }
+  ]
+},
+{
+  "description": "Number of stalls in growing pens",
+  "target_and_save": {
+    "variables": {
+      "number_of_heifer1s": "animal.herd_information.heiferI_num",
+      "number_of_heifer2s": "animal.herd_information.heiferII_num",
+      "pen_animal_type": "animal.pen_information.1.animal_combination",
+      "pen_stall_num": "animal.pen_information.1.number_of_stalls",
+      "pen_stocking_density": "animal.pen_information.1.max_stocking_density"
+   },
+    "constants": {
+      "growing_pen_type": "GROWING"
+    }
+  },
+  "apply_when": [
+    {
+      "left_hand": {
+        "operation": "no_op",
+        "apply_to": "group",
+        "ordered_variables": ["pen_animal_type"]
+      },
+      "right_hand": {
+        "operation": "no_op",
+        "apply_to": "individual",
+        "ordered_variables": ["growing_pen_type"]
+      },
+      "relationship": "equal"
+    }
+  ],
+  "rules": [
+    {
+      "left_hand": {
+        "operation": "sum",
+        "apply_to": "group",
+        "ordered_variables": ["pen_stall_num"]
+      },
+      "right_hand": {
+        "operation": "division",
+        "apply_to": "individual",
+        "ordered_variables": ["number_of_heifer1s", "pen_stocking_density"],
+        "save_as": "min_num_stalls"         
+      },
+      "relationship": "greater_or_equal_to"
+    },
+    {
+      "left_hand": {
+        "operation": "sum",
+        "apply_to": "group",
+        "ordered_variables": ["pen_stall_num"]
+      },
+      "right_hand": {
+        "operation": "division",
+        "apply_to": "individual",
+        "ordered_variables": ["number_of_heifer2s", "pen_stocking_density"],
+        "save_as": "max_num_stalls"         
+      },
+      "relationship": "greater_or_equal_to"
+    }
+  ]
+},
+  {
+  "description": "Sum of three parity fractions must equal 1.0",
+  "target_and_save": {
+    "variables": {
+      "p1": "animal.herd_information.parity_fractions.1",
+      "p2": "animal.herd_information.parity_fractions.2",
+      "p3": "animal.herd_information.parity_fractions.3",
+      "p4": "animal.herd_information.parity_fractions.4",
+      "p5": "animal.herd_information.parity_fractions.5"
+    },
+    "constants": {
+      "summed_parity_fractions": 1.0
+    }
+  },
+  "rules": [
+    {
+      "left_hand": {
+        "operation": "sum",
+        "ordered_variables": ["p1", "p2", "p3", "p4", "p5"],
+        "save_as": "sum"
+      },
+      "right_hand": {"ordered_variables": ["summed_parity_fractions"]},
+      "relationship": "equal"
+    }
+  ]
+}
+  ]
 }
