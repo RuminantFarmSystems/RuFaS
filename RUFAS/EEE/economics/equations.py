@@ -24,9 +24,7 @@ class EconomicEquations:
         return rates / rates.sum()
 
     @staticmethod
-    def construct_timeline(
-        construction_years: int, loan_term: int, project_term: int | None = None
-    ) -> np.ndarray:
+    def construct_timeline(construction_years: int, loan_term: int, project_term: int | None = None) -> np.ndarray:
         """Return the project year vector using Equation 7."""
 
         construction_years = max(int(construction_years), 0)
@@ -45,9 +43,7 @@ class EconomicEquations:
         return 1 / ((1 + irr) ** period)
 
     @staticmethod
-    def annual_capital_spent(
-        total_capital: float, construction_rate_per_year: list[float] | np.ndarray
-    ) -> np.ndarray:
+    def annual_capital_spent(total_capital: float, construction_rate_per_year: list[float] | np.ndarray) -> np.ndarray:
         """Capital spent each construction year using Equation 11."""
 
         rates = np.asarray(construction_rate_per_year, dtype=float)

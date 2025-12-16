@@ -302,20 +302,14 @@ class DCFRORCalculator:
             if idx < loan_term:
                 principal_balance = max(
                     0.0,
-                    EconomicEquations.principal_after_payment(
-                        principal_balance, loan_pay_y, interest_y
-                    ),
+                    EconomicEquations.principal_after_payment(principal_balance, loan_pay_y, interest_y),
                 )
 
-            net_rev_y = EconomicEquations.net_revenue(
-                revenue_y, operating_y, interest_y, depreciation_y
-            )
+            net_rev_y = EconomicEquations.net_revenue(revenue_y, operating_y, interest_y, depreciation_y)
             carried_loss = EconomicEquations.loss_carry_forward(prev_taxable)
             taxable_y = EconomicEquations.taxable_income(net_rev_y, carried_loss)
             tax_y = EconomicEquations.income_tax(taxable_y, tax_rate)
-            cash_income_y = EconomicEquations.annual_cash_income(
-                revenue_y, operating_y, loan_pay_y, tax_y
-            )
+            cash_income_y = EconomicEquations.annual_cash_income(revenue_y, operating_y, loan_pay_y, tax_y)
             pv_y = EconomicEquations.present_value(cash_income_y, discount_factors[year_index])
 
             revenue_column[year_index] = revenue_y
