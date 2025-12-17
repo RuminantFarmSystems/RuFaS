@@ -149,6 +149,11 @@ def test_task_manager_start(
         metadata_depth_limit=metadata_depth_limit,
     )
 
+    if workers > 1:
+        assert isinstance(tm.pool, multiprocessing.pool.Pool)
+    else:
+        assert tm.pool is None
+
     mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,

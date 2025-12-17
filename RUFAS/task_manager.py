@@ -155,9 +155,9 @@ class TaskManager:
         self.output_manager.add_log(
             "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
         )
-        self.pool = multiprocessing.Pool(
-            workers, maxtasksperchild=1
-        )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
+        self.pool = multiprocessing.Pool(workers, maxtasksperchild=1) if workers > 1 else None
+        # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
+
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         self.output_manager.add_log(
             "Task Manager parsed tasks",
@@ -491,7 +491,10 @@ class TaskManager:
             workers=workers,
             metadata_path=metadata_path,
         )
-        results = self.pool.imap(task_with_args, single_run_args)
+        if self.pool is not None:
+            results = self.pool.imap(task_with_args, single_run_args)
+        else:
+            results = (task_with_args(v) for v in single_run_args)
         failed = []
         for result in results:
             if result is not None:
