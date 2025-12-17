@@ -1,0 +1,57 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {I.}Preface: A Day in the Life on a RuFaS Farm}{5}{section.1}%
+\contentsline {paragraph}{Feeding the Animals}{5}{section.1}%
+\contentsline {paragraph}{Taking Care of the Animals}{5}{section.1}%
+\contentsline {paragraph}{Dealing with the Manure}{6}{section.1}%
+\contentsline {paragraph}{Managing the Fields}{6}{section.1}%
+\contentsline {paragraph}{Storing the Feeds}{6}{section.1}%
+\contentsline {section}{\numberline {II.}Module Introduction}{6}{section.2}%
+\contentsline {subsection}{\numberline {A.}Structural setup of the Manure Module}{7}{subsection.2.1}%
+\contentsline {subsection}{\numberline {B.}Overview of Required Inputs}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {C.}General Assumptions of the Manure Module}{9}{subsection.2.3}%
+\contentsline {section}{\numberline {III.}Animal and Manure Module Connection}{10}{section.3}%
+\contentsline {subsection}{\numberline {A.}Introduction}{10}{subsection.3.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{13}{subsection.3.2}%
+\contentsline {section}{\numberline {IV.}Manure Handler}{18}{section.4}%
+\contentsline {subsection}{\numberline {A.}Introduction}{18}{subsection.4.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{21}{subsection.4.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{27}{subsection.4.3}%
+\contentsline {section}{\numberline {V.}Solid Liquid Separators}{27}{section.5}%
+\contentsline {subsection}{\numberline {A.}Introduction}{27}{subsection.5.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{30}{subsection.5.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{32}{subsection.5.3}%
+\contentsline {section}{\numberline {VI.}Anaerobic Digestion}{34}{section.6}%
+\contentsline {subsection}{\numberline {A.}Introduction}{34}{subsection.6.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{36}{subsection.6.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{40}{subsection.6.3}%
+\contentsline {section}{\numberline {VII.}Slurry Storage}{42}{section.7}%
+\contentsline {subsection}{\numberline {A.}Introduction}{42}{subsection.7.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{44}{subsection.7.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{50}{subsection.7.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{50}{subsection.7.4}%
+\contentsline {section}{\numberline {VIII.}Anaerobic Lagoon}{52}{section.8}%
+\contentsline {subsection}{\numberline {A.}Introduction}{52}{subsection.8.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{54}{subsection.8.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{61}{subsection.8.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{61}{subsection.8.4}%
+\contentsline {section}{\numberline {IX.}Bedded Pack}{63}{section.9}%
+\contentsline {subsection}{\numberline {A.}Introduction}{63}{subsection.9.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{65}{subsection.9.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{70}{subsection.9.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{71}{subsection.9.4}%
+\contentsline {section}{\numberline {X.}Open Lot}{73}{section.10}%
+\contentsline {subsection}{\numberline {A.}Introduction}{73}{subsection.10.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{75}{subsection.10.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{80}{subsection.10.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{81}{subsection.10.4}%
+\contentsline {section}{\numberline {XI.}Composting}{83}{section.11}%
+\contentsline {subsection}{\numberline {A.}Introduction}{83}{subsection.11.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{85}{subsection.11.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{90}{subsection.11.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{91}{subsection.11.4}%
+\contentsline {section}{\numberline {XII.}Daily spread}{92}{section.12}%
+\contentsline {subsection}{\numberline {A.}Introduction}{92}{subsection.12.1}%
+\contentsline {section}{\numberline {XIII.}Key Constants}{94}{section.13}%
+\contentsline {section}{\numberline {XIV.}Abbreviations}{96}{section.14}%
+\contentsline {section}{\numberline {XV.}References}{98}{section.15}%

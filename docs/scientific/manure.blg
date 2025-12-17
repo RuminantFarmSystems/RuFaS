@@ -1,0 +1,17 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'manure.blg'
+[118] biber-MSWIN64:342> INFO - === 
+[169] Biber.pm:421> INFO - Reading 'manure.bcf'
+[288] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[290] Biber.pm:1002> INFO - Found 28 citekeys in bib section 1
+[291] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[308] Biber.pm:4487> INFO - Processing section 1
+[320] Biber.pm:4678> INFO - Looking for bibtex file 'resources/manure.bib' for section 1
+[395] bibtex.pm:1713> INFO - LaTeX decoding ...
+[451] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/manure.bib'
+[630] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[630] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[630] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[630] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[664] bbl.pm:676> INFO - Writing 'manure.bbl' with encoding 'UTF-8'
+[690] bbl.pm:779> INFO - Output to manure.bbl
