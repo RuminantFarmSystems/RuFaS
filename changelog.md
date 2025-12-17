@@ -282,7 +282,8 @@ v0.9.2
 - [2655](https://github.com/RuminantFarmSystems/MASM/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 - [2670](https://github.com/RuminantFarmSystems/MASM/pull/2670) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated Animal module unit testing to 100% coverage.
 - [2673](https://github.com/RuminantFarmSystems/MASM/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
-- [2676](https://github.com/RuminantFarmSystems/MASM/pull/2673) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
+- [2676](https://github.com/RuminantFarmSystems/MASM/pull/2676) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
+- [2688](https://github.com/RuminantFarmSystems/MASM/pull/2688) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Hot fix to correct the missing part of 2640.
 
 ### v0.9.2
 
