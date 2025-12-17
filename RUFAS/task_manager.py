@@ -649,6 +649,7 @@ class TaskManager:
         TaskManager.handle_herd_initializaition(args, output_manager)
 
         from RUFAS.EEE.economics.framework import EconomicFramework
+
         EconomicFramework().run_economic_analysis()
 
         # TODO uncomment

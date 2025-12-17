@@ -18,7 +18,7 @@ class PartialBudget:
     def __init__(self) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        
+
     @staticmethod
     def _to_array(value: Any) -> np.ndarray:
         """Convert partial budget inputs to a one-dimensional float array."""
