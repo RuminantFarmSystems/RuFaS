@@ -99,7 +99,7 @@ def test_load_properties_success(mock_input_manager: InputManager, mocker: Mocke
 
 def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling FileNotFoundError in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=False)
+    mocker.patch.object(Path, "exists", return_value=False)
     mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/missing_properties.json"}}}
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
@@ -110,7 +110,6 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
 
 def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling JSONDecodeError in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
     mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
 
@@ -124,7 +123,6 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
 
 def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling unexpected errors in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
     mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="valid_json"))
     mocker.patch(
@@ -138,6 +136,113 @@ def test_load_properties_unexpected_error(mock_input_manager: InputManager, mock
         with pytest.raises(Exception, match="Unexpected error"):
             mock_input_manager._load_properties()
         assert add_error.call_count == 1
+
+
+def test_load_properties_combines_multiple_files(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """_load_properties should merge properties documents when multiple paths are provided."""
+
+    mocker.patch.object(Path, "exists", return_value=True)
+    first_properties = {"key1": "value1"}
+    second_properties = {"key2": "value2"}
+    mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        side_effect=[first_properties, second_properties],
+    )
+
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": [
+                    "path/to/properties.json",
+                    "path/to/commodity_properties.json",
+                ]
+            }
+        }
+    }
+
+    mock_input_manager._load_properties()
+
+    assert mock_input_manager._InputManager__metadata["properties"] == {
+        "key1": "value1",
+        "key2": "value2",
+    }
+
+
+def test_load_properties_overlapping_keys_last_file_wins(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    """_load_properties should allow later files to override earlier keys and remove properties pointer."""
+
+    mocker.patch.object(Path, "exists", return_value=True)
+    first_properties = {"key1": "value1", "shared": "original"}
+    second_properties = {"shared": "updated"}
+    load_json = mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        side_effect=[first_properties, second_properties],
+    )
+
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": ["path/to/properties.json", "path/to/commodity_properties.json"],
+            }
+        }
+    }
+
+    mock_input_manager._load_properties()
+
+    assert mock_input_manager._InputManager__metadata["properties"] == {
+        "key1": "value1",
+        "shared": "updated",
+    }
+    assert "properties" not in mock_input_manager._InputManager__metadata["files"]
+    assert load_json.call_count == 2
+
+
+def test_load_properties_empty_paths_list_raises_value_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    mocker.patch.object(Path, "exists", return_value=True)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"paths": []}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(ValueError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
+
+
+def test_load_properties_rejects_non_string_paths(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    mocker.patch.object(Path, "exists", return_value=True)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"paths": ["valid/path.json", 123]}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(ValueError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
+
+
+def test_load_properties_missing_second_file_triggers_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    """When any properties path is missing the loader should raise FileNotFoundError."""
+
+    mocker.patch.object(Path, "exists", side_effect=[True, False])
+    mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        return_value={"key1": "value1"},
+    )
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": ["path/to/properties.json", "path/to/missing_properties.json"],
+            }
+        }
+    }
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(FileNotFoundError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
 
 
 def test_load_metadata(mock_input_manager: InputManager) -> None:

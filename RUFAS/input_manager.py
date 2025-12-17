@@ -307,7 +307,7 @@ class InputManager:
 
     def _validate_runtime_metadata(self, runtime_metadata: Dict[str, Any], info_map: Dict[str, Any]) -> bool:
         is_valid, message = self.data_validator.validate_metadata(
-            runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS
+            runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, self.input_root
         )
         if is_valid:
             return True
@@ -488,21 +488,37 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_path = Path(self.__metadata["files"]["properties"]["path"])
+            properties_metadata = self.__metadata["files"]["properties"]
+            properties_paths = properties_metadata.get("paths") or properties_metadata.get("path")
+
+            if isinstance(properties_paths, str):
+                properties_paths = [properties_paths]
+            if not isinstance(properties_paths, list) or len(properties_paths) == 0:
+                raise ValueError("Properties paths must be a non-empty string or list of strings")
+
+            if not all(isinstance(path, str) and path for path in properties_paths):
+                raise ValueError("Each properties path must be a non-empty string")
+
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {properties_path}",
+                f"Attempting to load properties from {properties_paths}",
                 info_map,
             )
-            if not properties_path.exists():
-                raise FileNotFoundError(f"Properties file not found at {properties_path}")
+
+            combined_properties: dict[str, Any] = {}
+            for properties_path_str in properties_paths:
+                properties_path = Path(properties_path_str)
+                if not properties_path.exists():
+                    raise FileNotFoundError(f"Properties file not found at {properties_path}")
+                loaded_properties = self._load_data_from_json(properties_path)
+                combined_properties.update(loaded_properties)
 
             del self.__metadata["files"]["properties"]
 
-            self.__metadata["properties"] = self._load_data_from_json(properties_path)
+            self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {properties_path}",
+                f"Successfully loaded properties from {properties_paths}",
                 info_map,
             )
 
@@ -619,14 +635,14 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
-
+        self.input_root = input_root
         data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
-            file_path = Path(input_root) / file_details["path"]
+            file_path = Path(self.input_root) / file_details["path"]
             if file_details["type"] == "json":
                 self.csv_report_generation_list.append(file_blob_key)
 
