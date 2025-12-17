@@ -268,6 +268,7 @@ v0.9.2
 - [2635](https://github.com/RuminantFarmSystems/MASM/pull/2635) - [minor change] [NoInputChange][NoOutputChange] Updates the ReadMe `Getting Started` section to be more straightforward about how to get RUFAS running.
 - [2634](https://github.com/RuminantFarmSystems/MASM/pull/2634) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 - [2639](https://github.com/RuminantFarmSystems/MASM/pull/2639) - [minor change] [InputChange][NoOutputChange][EEE] Add Economics prices dataset.
+- [2640](https://github.com/RuminantFarmSystems/MASM/pull/2640) - [minor change] [InputChange][NoOutputChange][Input Manager] Add functionality to load data anad metadata lazily.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 - [2638](https://github.com/RuminantFarmSystems/MASM/pull/2638) - [minor change] [NoInputChange][OutputChange] Institutes 25% manure retention for anaerobic lagoon.
 - [2641](https://github.com/RuminantFarmSystems/MASM/pull/2641) - [minor change] [NoInputChange][NoOutputChange][ReadMe] Fix Readme badges.
