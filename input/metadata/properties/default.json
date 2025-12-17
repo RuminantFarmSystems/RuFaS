@@ -844,6 +844,12 @@
         "type": "number",
         "minimum": 0,
         "default": 75
+      },
+      "maximum_ration_reformulation_attempts": {
+        "description": "The maximum number of attempts the ration formulation logic will make before stopping. Meant only to catch edge cases that could cause infinite loops. In normal operation, this value should never be reached.",
+        "type": "number",
+        "minimum": 1,
+        "default": 250
       }
     },
     "pen_information": {
