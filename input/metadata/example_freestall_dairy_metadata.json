@@ -378,5 +378,10 @@
     }
   ]
 }
-  ]
+  ],
+  "runtime_metadata": {
+    "EEE_econ": {
+      "path": "input/metadata/EEE/econ_metadata.json"
+    }
+  }
 }
