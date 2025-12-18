@@ -234,7 +234,10 @@
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
-      "path": "input/metadata/properties/default.json",
+      "paths": [
+        "input/metadata/properties/default.json",
+        "input/metadata/properties/commodity_properties.json"
+      ],
       "type": "json",
       "properties": "NA"
     },
