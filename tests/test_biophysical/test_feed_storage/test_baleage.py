@@ -114,10 +114,10 @@ def test_project_degradations(
     mocker: MockerFixture,
 ) -> None:
     """Tests project_degradations in Hay."""
-    baleage.stored = [replace(harvested_crop, fresh_mass=1000.0) for _ in range(3)]
+    baleage.stored = [replace(harvested_crop, dry_matter_mass=1000.0) for _ in range(3)]
     baleage.post_wilting_moisture_percentage = 43.0
-    crops_with_moisture_loss = [replace(crop, fresh_mass=900.0) for crop in baleage.stored]
-    crops_with_all_loss = [replace(crop, fresh_mass=800.0) for crop in baleage.stored]
+    crops_with_moisture_loss = [replace(crop, dry_matter_mass=900.0) for crop in baleage.stored]
+    crops_with_all_loss = [replace(crop, dry_matter_mass=800.0) for crop in baleage.stored]
     project_moisture_loss = mocker.patch.object(
         baleage, "_project_moisture_loss", return_value=crops_with_moisture_loss
     )

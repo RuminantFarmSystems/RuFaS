@@ -188,7 +188,7 @@ def test_manage_harvest(
                 field_name="mock_field",
                 harvest_time=mock_time.current_date.date(),
                 storage_time=mock_time.current_date.date(),
-                fresh_mass=1234.5,
+                dry_matter_mass=1234.5,
                 dry_matter_percentage=42.0,
                 dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
                 crude_protein_percent=20.0,
@@ -335,22 +335,22 @@ def test_recalculate_biomass_distribution(
 
 
 @pytest.mark.parametrize(
-    "field_size,wet_yield_collected,expected_fresh_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
+    "field_size,dry_yield_collected,expected_dry_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
 )
 def test_store_harvested_crop(
     mock_time: RufasTime,
     mock_crop_data: CropData,
     field_size: float,
-    wet_yield_collected: float,
-    expected_fresh_mass: float,
+    dry_yield_collected: float,
+    expected_dry_mass: float,
 ) -> None:
-    crop_management = CropManagement(crop_data=mock_crop_data, wet_yield_collected=wet_yield_collected)
+    crop_management = CropManagement(crop_data=mock_crop_data, dry_matter_yield_collected=dry_yield_collected)
     expected_harvest_crop = HarvestedCrop(
         config_name=mock_crop_data.name,
         field_name="mock_field",
         harvest_time=mock_time.current_date.date(),
         storage_time=mock_time.current_date.date(),
-        fresh_mass=expected_fresh_mass,
+        dry_matter_mass=expected_dry_mass,
         dry_matter_percentage=mock_crop_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
         crude_protein_percent=mock_crop_data.crude_protein_percent_at_harvest,
@@ -366,7 +366,7 @@ def test_store_harvested_crop(
 
     actual = crop_management._get_harvested_crop(mock_time, field_size, "mock_field")
 
-    assert actual.fresh_mass == expected_fresh_mass
+    assert actual.dry_matter_mass == expected_dry_mass
     assert actual.dry_matter_percentage == expected_harvest_crop.dry_matter_percentage
     assert actual.dry_matter_digestibility == expected_harvest_crop.dry_matter_digestibility
     assert actual.crude_protein_percent == expected_harvest_crop.crude_protein_percent

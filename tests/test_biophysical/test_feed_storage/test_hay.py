@@ -124,9 +124,9 @@ def test_project_degradations(
     mocker: MockerFixture,
 ) -> None:
     """Tests project_degradations in Hay."""
-    hay.stored = [replace(harvested_crop, fresh_mass=1000.0) for _ in range(3)]
-    crops_with_moisture_loss = [replace(crop, fresh_mass=900.0) for crop in hay.stored]
-    crops_with_all_loss = [replace(crop, fresh_mass=800.0) for crop in hay.stored]
+    hay.stored = [replace(harvested_crop, dry_matter_mass=1000.0) for _ in range(3)]
+    crops_with_moisture_loss = [replace(crop, dry_matter_mass=900.0) for crop in hay.stored]
+    crops_with_all_loss = [replace(crop, dry_matter_mass=800.0) for crop in hay.stored]
     project_moisture_loss = mocker.patch.object(hay, "_project_moisture_loss", return_value=crops_with_moisture_loss)
     project_degradations = mocker.patch(
         "RUFAS.biophysical.feed_storage.storage.Storage.project_degradations", return_value=crops_with_all_loss

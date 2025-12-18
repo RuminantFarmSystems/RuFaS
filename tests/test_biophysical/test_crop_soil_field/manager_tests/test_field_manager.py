@@ -154,7 +154,7 @@ def test_daily_update_routine(
                         field_name="test_field",
                         harvest_time=mocked_time,
                         storage_time=mocked_time,
-                        fresh_mass=10.0,
+                        dry_matter_mass=10.0,
                         dry_matter_percentage=0.85,
                         dry_matter_digestibility=0.65,
                         crude_protein_percent=0.12,
@@ -172,7 +172,7 @@ def test_daily_update_routine(
                         field_name="test_field",
                         harvest_time=mocked_time,
                         storage_time=mocked_time,
-                        fresh_mass=10.0,
+                        dry_matter_mass=10.0,
                         dry_matter_percentage=0.85,
                         dry_matter_digestibility=0.65,
                         crude_protein_percent=0.12,
@@ -1941,7 +1941,7 @@ def test_setup_field(
     )
     mock_setup_manure_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_manure_events",
-        return_value=mock_manure_events
+        return_value=mock_manure_events,
     )
     mock_setup_tillage_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_tillage_events",
