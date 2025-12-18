@@ -21,7 +21,7 @@ def mock_silage_config() -> dict[str, str | float]:
     return {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
