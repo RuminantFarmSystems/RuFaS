@@ -502,8 +502,7 @@ class EmissionsEstimator:
         return daily_farmgrown_feed_emission_and_resource_by_feed_id
 
     def _calculate_harvest_dates_by_feed_id(
-            self,
-            harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+        self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
     ) -> dict[RUFAS_ID, list[int]]:
         """Calculates the harvest dates for each feed ID based on the harvest yield data."""
         harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = defaultdict(list)
