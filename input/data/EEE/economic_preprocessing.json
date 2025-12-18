@@ -1,0 +1,111 @@
+{
+  "Animal": {
+    "FPCM": [
+      {
+        "name": "Total milk, kg",
+        "filters": [
+          "AnimalModuleReporter.report_herd_statistics_data.daily_milk_production"
+        ],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+      },
+      {
+        "name": "Milk per cow/d, kg",
+        "filters": [
+          "AnimalModuleReporter.report_herd_statistics_data.daily_milk_production",
+          "AnimalModuleReporter.report_daily_animal_population.num_lactating_cows"
+        ],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+          "AnimalModuleReporter.report_herd_statistics_data.daily_milk_production",
+          "AnimalModuleReporter.report_daily_animal_population.num_lactating_cows"
+        ],
+        "horizontal_first": true,
+        "vertical_aggregation": "average",
+        "slice_start": -365
+      },
+      {
+        "name": "% milk fat",
+        "filters": [
+          "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_fat_percent"
+        ],
+        "constants": {
+          "By 100": 100
+        },
+        "vertical_aggregation": "average",
+        "horizontal_aggregation": "division",
+        "slice_start": -365
+      },
+      {
+        "name": "% milk protein",
+        "filters": [
+          "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_protein_percent"
+        ],
+        "constants": {
+          "By 100": 100
+        },
+        "vertical_aggregation": "average",
+        "horizontal_aggregation": "division",
+        "slice_start": -365
+      },
+      {
+        "name": "Milk fat, kg",
+        "filters": [
+          "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_fat_kg"
+        ],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+      },
+      {
+        "name": "Milk protein, kg",
+        "filters": [
+          "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_protein_kg"
+        ],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+      },
+      {
+        "name": "weighted fat value",
+        "cross_references": [
+          "Milk fat, kg_ver_agg"
+        ],
+        "constants": {
+          "fat weight": 12.2
+        },
+        "horizontal_aggregation": "product"
+      },
+      {
+        "name": "weighted protein value",
+        "cross_references": [
+          "Milk protein, kg_ver_agg"
+        ],
+        "constants": {
+          "protein weight": 7.7
+        },
+        "horizontal_aggregation": "product"
+      },
+      {
+        "name": "weighted milk value",
+        "cross_references": [
+          "Total milk, kg_ver_agg"
+        ],
+        "constants": {
+          "milk weight": 0.25
+        },
+        "horizontal_aggregation": "product"
+      },
+      {
+        "name": "Herd FPCM, kg",
+        "cross_references": [
+          "weighted fat value_hor_agg",
+          "weighted protein value_hor_agg",
+          "weighted milk value_hor_agg"
+        ],
+        "horizontal_aggregation": "sum"
+      }
+    ]
+  },
+  "Crop and Soil": {},
+  "Feed": {},
+  "Manure": {}
+}

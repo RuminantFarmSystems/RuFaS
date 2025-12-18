@@ -3,6 +3,7 @@ from RUFAS.input_manager import InputManager
 
 from .emissions import EmissionsEstimator
 from .energy import EnergyEstimator
+from .economics.framework import EconomicFramework
 
 
 class EEEManager:
@@ -33,3 +34,6 @@ class EEEManager:
                 info_map,
             )
             return
+        om.add_log("Economics Processing", "Starting processing of economics.", info_map)
+        EconomicFramework().run_economic_analysis()
+        om.add_log("Economics Processing", "Completed processing of economics.", info_map)

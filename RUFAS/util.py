@@ -58,7 +58,11 @@ class Utility:
             A list of dictionaries with string keys and integer values.
 
         """
-        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
+        try:
+            return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
+        except AttributeError:
+            print(dict_of_lists)
+            raise AttributeError
 
     @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
