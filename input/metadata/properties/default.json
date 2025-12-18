@@ -83,6 +83,24 @@
         "default": 100,
         "minimum": 6
       },
+      "herd_size_adjustment_period": {
+        "type": "number",
+        "description": "The period between each check to adjust the her's size.",
+        "default": 30,
+        "minimum": 1
+      },
+      "herd_selling_threshold": {
+        "type": "number",
+        "description": "The threshold that should sell animals to maintain herd size.",
+        "default": 1.03,
+        "minimum": 1
+      },
+      "herd_buying_threshold": {
+        "type": "number",
+        "description": "The threshold that should buy animals to maintain herd size.",
+        "default": 0.98,
+        "minimum": 0.0
+      },
       "breed": {
         "type": "string",
         "default": "HO",
