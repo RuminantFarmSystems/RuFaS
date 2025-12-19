@@ -112,7 +112,6 @@
       "type": "json",
       "properties": "manure_processor_connection_properties"
     },
-
     "crop_configurations": {
       "title": "Crop Configurations",
       "description": "Configurations for how crops grow and are managed.",
@@ -235,11 +234,14 @@
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
-      "path": "input/metadata/properties/default.json",
+      "paths": [
+        "input/metadata/properties/default.json",
+        "input/metadata/properties/commodity_properties.json"
+      ],
       "type": "json",
       "properties": "NA"
     },
-     "feed_storage_configurations": {
+    "feed_storage_configurations": {
       "title": "Feed Management",
       "description": "Configurations for feed storage units.",
       "path": "input/data/feed_management/example_feed_storage_configs.json",
