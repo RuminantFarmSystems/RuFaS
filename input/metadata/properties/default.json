@@ -7185,5 +7185,10 @@
         "type": "number"
       }
     }
+  },
+  "economic_preprocessing_properties": {
+    "data_collection_app_compatible": false,
+    "type": "object",
+    "description": "Aggregated biophysical outputs and pricing data produced by the economics preprocessor."
   }
 }
