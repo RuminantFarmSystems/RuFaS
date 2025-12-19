@@ -118,7 +118,7 @@ data pool:
 4. The user can request as broad or narrow a selection of the data as
    they want. More details on this process can be found in the
    docstrings of the IM's ``get_data()`` method:
-   https://github.com/RuminantFarmSystems/MASM/blob/1cd3b73f4f1cca7ae6ee8805bf17ca3949c0a4d8/RUFAS/input_manager.py#L534
+   https://github.com/RuminantFarmSystems/RuFaS/blob/main/RUFAS/input_manager.py#L534
 
 Adding New Input Data to be Validated by Input Manager
 ------------------------------------------------------
@@ -179,9 +179,11 @@ needed to run the RuFaS simulation. These data will be validated by the
 rules and guidelines set in that very same metadata.
 
 | The metadata files are stored within the main input folder within the
-  metadata subfolder (MASM > input > metadata).
+  metadata subfolder (RuFaS > input > metadata). Within that subfolder
+  there is also a ``properties`` directory that contains one or more
+  metadata properties files.
 | The input files to which the metadata points are currently stored
-  within the same input folder but within the data subfolder (MASM >
+  within the same input folder but within the data subfolder (RuFaS >
   input > data). These subfolders are further subdivided into folders
   that closely mimic the structure of the codebase (animal, field, soil,
   manure storage and handling, etc). It is important to note: this
@@ -245,6 +247,37 @@ Examples in action:
          "properties": "animal_properties"
        },
    ...
+
+Loading multiple properties files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``files`` blob includes a special ``properties`` entry that points
+to JSON files containing validation rules for every other file entry.
+This entry can reference a single file via ``path`` or multiple files via
+``paths``. When multiple properties documents are supplied, Input Manager
+loads them in order and merges the resulting dictionaries; if the same
+property key appears in more than one file, the definition in the later
+file overrides the earlier one. The Data Validator checks that the
+``path``/``paths`` attribute is a non-empty string or list of strings
+before loading begins and raises errors when a referenced file is missing
+or malformed.
+
+The default layout keeps these files beside the metadata file under
+``input/metadata/properties``. A typical configuration combines base
+rules with domain-specific extensions:
+
+::
+
+   "properties": {
+     "title": "Metadata Properties",
+     "description": "The properties of input data.",
+     "paths": [
+       "input/metadata/properties/default.json",
+       "input/metadata/properties/commodity_properties.json"
+     ],
+     "type": "json",
+     "properties": "NA"
+   },
 
 The "properties" blob
 ~~~~~~~~~~~~~~~~~~~~~
@@ -455,5 +488,5 @@ This blob is intended to provide a way to ensure input data for
 different parts of the codebase are congruent. This blob is yet to be
 implemented.
 
-.. |RuFaS Overview - IM| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/33d2952d-a49e-4cbd-b2d8-798a0ea69dcc
-.. |Input Manager Data Validation Overview| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/064328ad-eeda-4936-91a7-a026ace4fbf3
+.. |RuFaS Overview - IM| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/33d2952d-a49e-4cbd-b2d8-798a0ea69dcc
+.. |Input Manager Data Validation Overview| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/064328ad-eeda-4936-91a7-a026ace4fbf3
