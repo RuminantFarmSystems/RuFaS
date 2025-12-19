@@ -682,7 +682,7 @@ class DataValidator:
                     {
                         "error": "Metadata Validation",
                         "message": f"'{key}' must define at least one of the keys "
-    "'path' or 'paths', but neither was found.",
+                        "'path' or 'paths', but neither was found.",
                         "info_map": info_map,
                     }
                 )
