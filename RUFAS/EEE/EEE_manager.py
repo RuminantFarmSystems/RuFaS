@@ -25,11 +25,3 @@ class EEEManager:
         EnergyEstimator.estimate_all()
         om.add_log("Energy Processing", "Completed processing of energy.", info_map)
 
-        metadata_loaded = InputManager().load_runtime_metadata("EEE_econ", eager_termination=True)
-        if metadata_loaded is False:
-            om.add_error(
-                "Emissions metadata load failure",
-                "Failed to load runtime metadata for 'EEE_econ'. Aborting emissions estimation.",
-                info_map,
-            )
-            return
