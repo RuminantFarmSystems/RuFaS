@@ -154,3 +154,81 @@ def test_preprocess_handles_invalid_economics_path(monkeypatch: pytest.MonkeyPat
 
     warning_codes = [code for code, _, _ in dummy_om.warnings]
     assert "InvalidEconomicsFilePath" in warning_codes
+
+
+def test_preprocess_skips_pool_check_on_wildcard_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    class CheckingInputManager(DummyInputManager):
+        def check_property_exists_in_pool(self, key):  # type: ignore[override]
+            if "*" in str(key):
+                raise ValueError("invalid literal for int() with base 10: '*'")
+            return key in self._data
+
+    dummy_im = CheckingInputManager({})
+    dummy_om = DummyOutputManager({"Economic_inputs.Misc.value": [1]})
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Section": {
+                "Category": {
+                    "Seeds": {
+                        "biophysical_simulation": ["Economic_inputs.Misc.value"],
+                        "economics_files": ["commodity_prices.*.dollar_per_square_meter.csv"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    preprocessor.preprocess()
+
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingEconomicsFile" in warning_codes
+
+
+def test_preprocess_skips_input_manager_on_wildcard_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    called_keys = []
+
+    class TrackingInputManager(DummyInputManager):
+        def get_data(self, key):  # type: ignore[override]
+            called_keys.append(key)
+            if "*" in str(key):
+                raise AssertionError("Wildcard path should be skipped")
+            return super().get_data(key)
+
+        def check_property_exists_in_pool(self, key):  # type: ignore[override]
+            called_keys.append(f"check:{key}")
+            if "*" in str(key):
+                raise AssertionError("Wildcard path should not reach pool check")
+            return key in self._data
+
+    dummy_im = TrackingInputManager({})
+    dummy_om = DummyOutputManager({"Economic_inputs.Misc.value": [1]})
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Section": {
+                "Category": {
+                    "Seeds": {
+                        "biophysical_simulation": ["Economic_inputs.Misc.value"],
+                        "economics_files": ["commodity_prices.*.dollar_per_square_meter.csv"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    preprocessor.preprocess()
+
+    assert not called_keys
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingEconomicsFile" in warning_codes

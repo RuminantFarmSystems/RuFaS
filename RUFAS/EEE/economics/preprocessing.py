@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Set
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -44,7 +44,39 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
+        self.available_input_keys: Set[str] = self._load_available_input_keys()
         self.mapping = self._build_mapping()
+
+    def _load_available_input_keys(self) -> Set[str]:
+        """Cache the available input keys from the InputManager metadata."""
+
+        try:
+            metadata = self.im.get_metadata("files")
+        except Exception:
+            return set()
+
+        if isinstance(metadata, dict):
+            return set(metadata.keys())
+        return set()
+
+    def _normalize_economics_key(self, path: str) -> str:
+        """Map mapping file paths to InputManager data keys."""
+
+        candidate = path.removesuffix(".csv")
+
+        if not self.available_input_keys:
+            return candidate
+
+        if candidate in self.available_input_keys:
+            return candidate
+
+        prefix_matches = sorted(
+            key for key in self.available_input_keys if key.startswith(f"{candidate}.")
+        )
+        if prefix_matches:
+            return prefix_matches[0]
+
+        return candidate
 
     def _get_data_with_handling(self, path: str, info_map: Dict[str, str]) -> Any:
         """Fetch data from the InputManager while handling invalid paths."""
@@ -57,15 +89,53 @@ class EconomicPreprocessor:
             )
             return None
 
-        try:
-            return self.im.get_data(path)
-        except ValueError as exc:
-            self.om.add_warning(
-                "InvalidEconomicsFilePath",
-                f"Failed to retrieve '{path}': {exc}",
-                info_map,
+        candidate_paths = [path]
+        normalized_path = self._normalize_economics_key(path)
+        if normalized_path != path:
+            candidate_paths.append(normalized_path)
+
+        last_error: ValueError | None = None
+        for candidate in candidate_paths:
+            # Skip InputManager access entirely for wildcard paths (e.g., "*").
+            # These selectors cannot be resolved to a concrete file and only
+            # generate validation spam inside the InputManager. Emit a single
+            # warning and continue.
+            if "*" in str(candidate):
+                self.om.add_warning(
+                    "MissingEconomicsFile",
+                    f"Commodity pricing '{candidate}' uses wildcard and was skipped",
+                    info_map,
+                )
+                continue
+
+            if hasattr(self.im, "check_property_exists_in_pool"):
+                # Wildcard paths are handled above. For concrete paths, perform the
+                # inexpensive existence check when available to avoid repeated
+                # validation warnings from deeper get_data calls.
+                try:
+                    if not self.im.check_property_exists_in_pool(candidate):
+                        continue
+                except ValueError as exc:
+                    last_error = exc
+                    continue
+            try:
+                data = self.im.get_data(candidate)
+            except ValueError as exc:
+                last_error = exc
+                continue
+
+            if data is not None:
+                return data
+
+        if last_error is not None:
+            detail = (
+                f"Failed to retrieve '{path}'"
+                + (f" (normalized to '{normalized_path}')" if normalized_path != path else "")
+                + f": {last_error}"
             )
-            return None
+            self.om.add_warning("InvalidEconomicsFilePath", detail, info_map)
+
+        return None
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""

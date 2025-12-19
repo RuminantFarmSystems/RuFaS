@@ -19,6 +19,36 @@ class PartialBudget:
         self.im = InputManager()
         self.om = OutputManager()
 
+    def _get_optional_input(self, path: str, info_map: Dict[str, str]) -> Any:
+        """Safely retrieve a partial budget input or return zero when missing."""
+
+        if hasattr(self.im, "check_property_exists_in_pool"):
+            try:
+                if not self.im.check_property_exists_in_pool(path):
+                    self.om.add_warning(
+                        "MissingPartialBudgetInput",
+                        f"Partial budget input '{path}' not found in InputManager",
+                        info_map,
+                    )
+                    return 0.0
+            except ValueError:
+                self.om.add_warning(
+                    "MissingPartialBudgetInput",
+                    f"Partial budget input '{path}' not found in InputManager",
+                    info_map,
+                )
+                return 0.0
+
+        try:
+            return self.im.get_data(path)
+        except Exception:
+            self.om.add_warning(
+                "MissingPartialBudgetInput",
+                f"Partial budget input '{path}' not found in InputManager",
+                info_map,
+            )
+            return 0.0
+
     @staticmethod
     def _to_array(value: Any) -> np.ndarray:
         """Convert partial budget inputs to a one-dimensional float array."""
@@ -38,11 +68,21 @@ class PartialBudget:
     def _load_inputs(self) -> Dict[str, np.ndarray]:
         """Load and normalise PBA inputs from the ``InputManager``."""
 
+        info_map = {"class": __name__, "function": self._load_inputs.__name__}
+        
         raw_inputs = {
-            "additional_revenue": self.im.get_data("economics.partial_budget.additional_revenue"),
-            "reduced_costs": self.im.get_data("economics.partial_budget.reduced_costs"),
-            "additional_costs": self.im.get_data("economics.partial_budget.additional_costs"),
-            "reduced_revenue": self.im.get_data("economics.partial_budget.reduced_revenue"),
+            "additional_revenue": self._get_optional_input(
+                "economics.partial_budget.additional_revenue", info_map
+            ),
+            "reduced_costs": self._get_optional_input(
+                "economics.partial_budget.reduced_costs", info_map
+            ),
+            "additional_costs": self._get_optional_input(
+                "economics.partial_budget.additional_costs", info_map
+            ),
+            "reduced_revenue": self._get_optional_input(
+                "economics.partial_budget.reduced_revenue", info_map
+            ),
         }
 
         arrays = {key: self._to_array(value) for key, value in raw_inputs.items()}
@@ -66,7 +106,7 @@ class PartialBudget:
             "function": self.calculate_partial_budget.__name__,
             "units": MeasurementUnits.DOLLARS,
         }
-        inputs = self._load_inputs(self.im)
+        inputs = self._load_inputs()
 
         net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
             inputs["additional_costs"] + inputs["reduced_revenue"]

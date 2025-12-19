@@ -21,7 +21,34 @@ class EconomicFramework:
     def _capital_cost_present(self) -> bool:
         """Return ``True`` when the capital cost table contains any value > 0."""
 
-        cost_data = self.im.get_data("capital_costs.capital_cost_breakdown")
+        info_map = {"class": __name__, "function": self._capital_cost_present.__name__}
+
+        if hasattr(self.im, "check_property_exists_in_pool"):
+            try:
+                if not self.im.check_property_exists_in_pool("capital_costs.capital_cost_breakdown"):
+                    self.om.add_warning(
+                        "MissingCapitalCostData",
+                        "Capital cost breakdown not found in InputManager",
+                        info_map,
+                    )
+                    return False
+            except ValueError:
+                self.om.add_warning(
+                    "MissingCapitalCostData",
+                    "Capital cost breakdown not found in InputManager",
+                    info_map,
+                )
+                return False
+
+        try:
+            cost_data = self.im.get_data("capital_costs.capital_cost_breakdown")
+        except Exception:
+            self.om.add_warning(
+                "MissingCapitalCostData",
+                "Capital cost breakdown not found in InputManager",
+                info_map,
+            )
+            return False
         is_dataframe = isinstance(cost_data, pd.DataFrame)
 
         if is_dataframe:
