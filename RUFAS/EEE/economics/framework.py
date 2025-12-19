@@ -19,7 +19,12 @@ class EconomicFramework:
         self.preprocessor = EconomicPreprocessor()
 
     def _capital_cost_present(self) -> bool:
-        """Return ``True`` when the capital cost table contains any value > 0."""
+        """Return ``True`` when the capital cost table is available.
+
+        The calculation is still executed when all declared costs are zero so
+        the economics module can emit outputs (and warnings) instead of
+        silently skipping DCFROR altogether.
+        """
 
         info_map = {"class": __name__, "function": self._capital_cost_present.__name__}
 
@@ -63,7 +68,13 @@ class EconomicFramework:
                 declared_costs = capital_cost_df["Cost"]
                 numeric_costs = pd.to_numeric(declared_costs, errors="coerce").fillna(0.0)
                 total_declared_costs = float(numeric_costs.sum())
-                return total_declared_costs > 0.0
+                if total_declared_costs == 0.0:
+                    self.om.add_warning(
+                        "ZeroCapitalCost",
+                        "Capital cost breakdown sums to zero; continuing DCFROR with zero costs.",
+                        info_map,
+                    )
+                return True
 
             numeric_columns = capital_cost_df.select_dtypes(include=["number"])
             has_numeric_columns = not numeric_columns.empty
@@ -73,7 +84,13 @@ class EconomicFramework:
 
             numeric_values = numeric_columns.fillna(0.0).to_numpy()
             total_numeric_costs = float(numeric_values.sum())
-            return total_numeric_costs > 0.0
+            if total_numeric_costs == 0.0:
+                self.om.add_warning(
+                    "ZeroCapitalCost",
+                    "Capital cost breakdown sums to zero; continuing DCFROR with zero costs.",
+                    info_map,
+                )
+            return True
 
         is_iterable = hasattr(cost_data, "__iter__") and not isinstance(cost_data, (str, bytes))
 
@@ -84,13 +101,25 @@ class EconomicFramework:
             except Exception:
                 return False
             iterable_total = float(numeric_values.sum())
-            return iterable_total > 0.0
+            if iterable_total == 0.0:
+                self.om.add_warning(
+                    "ZeroCapitalCost",
+                    "Capital cost breakdown sums to zero; continuing DCFROR with zero costs.",
+                    info_map,
+                )
+            return True
 
         try:
             scalar_cost = float(cost_data)
         except (TypeError, ValueError):
             return False
-        return scalar_cost > 0.0
+        if scalar_cost == 0.0:
+            self.om.add_warning(
+                "ZeroCapitalCost",
+                "Capital cost breakdown sums to zero; continuing DCFROR with zero costs.",
+                info_map,
+            )
+        return True
 
     def run_economic_analysis(self) -> None:
         """Execute economic analysis using the Flexible Economic Framework."""

@@ -114,6 +114,13 @@ class PartialBudget:
         cumulative_change = np.cumsum(net_change)
         horizon = net_change.size
 
+        if not np.any(net_change):
+            self.om.add_warning(
+                "ZeroPartialBudget",
+                "All partial budget inputs were zero; resulting metrics will also be zero.",
+                info_map,
+            )
+
         result_df = pd.DataFrame(
             {
                 "Period": np.arange(1, horizon + 1),
@@ -126,11 +133,13 @@ class PartialBudget:
             }
         )
 
+        self.om.add_variable("pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+        self.om.add_variable("pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+        self.om.add_variable("pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+        self.om.add_variable("pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
         self.om.add_variable("pba_net_change", net_change.tolist(), info_map)
-        self.om.add_variable("pba_net_change", [net_change], info_map)
         self.om.add_variable("pba_cumulative_net_change", cumulative_change.tolist(), info_map)
         self.om.add_variable("pba_summary", result_df.to_dict(orient="list"), info_map)
-        self.om.add_variable("pba_net_change", [net_change], info_map)
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
     def has_partial_budget_activity(self) -> bool:
