@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from typing import Any
 
@@ -412,6 +413,19 @@ def test_parse_manure_and_fertilizer_application_data(
     assert mock_om_filter_variables_pool.call_count == 2
 
 
+def test_parse_manure_and_fertilizer_application_no_data(
+    raw_fertilizer_application_data: dict[str, dict[str, list[Any]]],
+    raw_manure_application_data: dict[str, dict[str, list[Any]]],
+    parsed_fertilizer_and_manure_application_data: dict[str, dict[str, dict[int, dict[str, float]]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", side_effect=[{}, {}])
+    actual_data = em._parse_manure_and_fertilizer_application_data(datetime.strptime("2013:1", "%Y:%j"))
+    assert actual_data == defaultdict(dict)
+    assert mock_om_filter_variables_pool.call_count == 2
+
+
 def test_parse_crop_to_feed_id_mapping(
     raw_received_crop_data: dict[str, dict[str, list[Any]]],
     expected_crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID],
@@ -451,6 +465,19 @@ def test_parse_farmgrown_feed_deductions_data(
     all_simulation_days = list(range(0, 750))
     actual_data = em._parse_farmgrown_feed_deductions_data(all_simulation_days)
     assert actual_data == expected_farmgrown_feed_deductions_data
+    mock_om_filter_variables_pool.assert_called_once()
+
+
+def test_parse_farmgrown_feed_deductions_no_data(
+    raw_farmgrown_feed_deductions_data: dict[str, dict[str, list[Any]]],
+    expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value={})
+    all_simulation_days = list(range(0, 750))
+    actual_data = em._parse_farmgrown_feed_deductions_data(all_simulation_days)
+    assert actual_data == defaultdict(dict)
     mock_om_filter_variables_pool.assert_called_once()
 
 
