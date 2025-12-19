@@ -681,7 +681,8 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "message": f"Missing required key 'path' or 'paths' in '{key}'",
+                        "message": f"'{key}' must define at least one of the keys "
+    "'path' or 'paths', but neither was found.",
                         "info_map": info_map,
                     }
                 )
