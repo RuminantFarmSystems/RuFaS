@@ -1,0 +1,34 @@
+{
+  "years": [
+    2025
+  ],
+  "days": [
+    140
+  ],
+  "nitrogen_masses": [
+    0.09715948565400001
+  ],
+  "phosphorus_masses": [
+    0.037013137392
+  ],
+  "potassium_masses": [
+    0.09715948565400001
+  ],
+  "coverage_fractions": [
+    1
+  ],
+  "application_depths": [
+    152.39999999999998
+  ],
+  "manure_types": [
+    "liquid"
+  ],
+  "surface_remainder_fractions": [
+    0.05
+  ],
+  "supplement_manure_nutrient_deficiencies": [
+    "manure"
+  ],
+  "pattern_repeat": 0,
+  "pattern_skip": 0
+}

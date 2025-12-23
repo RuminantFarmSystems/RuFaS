@@ -1,0 +1,60 @@
+{
+  "processor_connections": [
+    {
+      "processor_name": "Pen #1 - Lactating cows - Part of the year (4928 hours) - Parlor - Manure Stream #0 - Manure Handler - Parlor cleaning handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "Pen #1 - Lactating cows - Part of the year (4928 hours) - Parlor - Manure Stream #0 - Storage - Pasture",
+          "proportion": 1
+        }
+      ]
+    },
+    {
+      "processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Main - Manure Stream #0 - Manure Handler - Manual scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Main - Manure Stream #0 - Storage - All effluents - Daily spread",
+          "proportion": 1
+        }
+      ]
+    },
+    {
+      "processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Parlor - Manure Stream #0 - Manure Handler - Parlor cleaning handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Parlor - Manure Stream #0 - Storage - All effluents - Daily spread",
+          "proportion": 1
+        }
+      ]
+    },
+    {
+      "processor_name": "Pen #1 - Lactating cows - Part of the year (4928 hours) - Main - Manure Stream #0 - Storage - Pasture",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #1 - Lactating cows - Part of the year (4928 hours) - Parlor - Manure Stream #0 - Storage - Pasture",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Main - Manure Stream #0 - Storage - All effluents - Daily spread",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #2 - Lactating cows - Remainder of the year (3832 hours) - Parlor - Manure Stream #0 - Storage - All effluents - Daily spread",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #3 - Dry cows - All year - Main - Manure Stream #0 - Storage - Pasture",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #4 - Heifers - All year - Main - Manure Stream #0 - Storage - Pasture",
+      "destinations": []
+    },
+    {
+      "processor_name": "Pen #5 - Calves - All year - Main - Manure Stream #0 - Storage - Calf hutch",
+      "destinations": []
+    }
+  ],
+  "separator_connections": []
+}

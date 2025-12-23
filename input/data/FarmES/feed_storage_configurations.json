@@ -1,0 +1,27 @@
+{
+  "grain_storage": [{
+      "name": "corn_grain_storage_1",
+      "crop_name": "corn_grain",
+      "field_names": ["field_2"],
+      "storage_type": "Dry",
+      "dm_loss_coefficient": 0.1,
+      "initial_storage_dry_matter": 0.86,
+      "rufas_id": 44,
+      "capacity": 1e10
+    }],
+  "silage_storage": [],
+  "baleage_storage": [
+    {
+      "name": "alfalfa_baleage_farm_es_field_0_storage",
+      "crop_name": "alfalfa_baleage",
+      "field_names": ["farm_es_field_0"],
+      "initial_storage_dry_matter": 0.91,
+      "rufas_id": 109,
+      "storage_type": "Baleage",
+      "post_wilting_moisture_percentage": 45,
+      "capacity": 10000000000,
+      "bale_density": 200
+    }
+  ],
+  "hay_storage": []
+}

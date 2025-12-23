@@ -1,0 +1,49 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm1_wcrops_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "farm1",
+      "log_verbosity": "errors",
+      "multi_run_counts": 4
+
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm2_wcrops_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "farm2",
+      "log_verbosity": "errors",
+       "multi_run_counts": 4
+
+    },{
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm3_wcrops_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "farm3",
+      "log_verbosity": "errors",
+       "multi_run_counts": 4
+
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm4_wcrops_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "farm4",
+      "log_verbosity": "errors",
+       "multi_run_counts": 4
+
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm5_wcrops_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "farm5",
+      "log_verbosity": "errors",
+       "multi_run_counts": 4
+
+    }
+]
+}

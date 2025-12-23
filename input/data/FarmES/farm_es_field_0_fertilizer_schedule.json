@@ -1,0 +1,37 @@
+{
+  "available_fertilizer_mixes": [
+    {
+      "name": "Fertlizer01",
+      "N": 0.28,
+      "P": 0,
+      "K": 0,
+      "ammoniumFraction": 0.25
+    }
+  ],
+  "mix_names": [
+    "Fertlizer01"
+  ],
+  "years": [
+    2021
+  ],
+  "days": [
+    90
+  ],
+  "nitrogen_masses": [
+    50
+  ],
+  "phosphorus_masses": [
+    0
+  ],
+  "potassium_masses": [
+    0
+  ],
+  "application_depths": [
+    0
+  ],
+  "surface_remainder_fractions": [
+    1
+  ],
+  "pattern_repeat": 5,
+  "pattern_skip": 0
+}

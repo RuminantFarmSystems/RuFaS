@@ -1,0 +1,41 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "alfalfa_baleage",
+      "harvest_days": [
+        216,
+        216,
+        216,
+        217,
+        216,
+        1
+      ],
+      "harvest_years": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "harvest_operations": [
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_kill"
+      ],
+      "harvest_type": "scheduled",
+      "planting_days": [
+        91
+      ],
+      "planting_years": [
+        2021
+      ],
+      "pattern_repeat": 0,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    }
+  ]
+}
