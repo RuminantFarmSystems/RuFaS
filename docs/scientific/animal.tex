@@ -2,6 +2,8 @@
 
 % Language setting
 \usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \setlength{\parindent}{0pt}
 
 % Useful packages
@@ -560,7 +562,7 @@ The \_random\_sample\_with\_replacement() method selects animals from each of th
 \endhead
 
 \midrule
-\multicolumn{6}{@{}r@{}}{\textit{Continued on next page}} \\
+\multicolumn{5}{@{}r@{}}{\textit{Continued on next page}} \\
 \endfoot
 
 \bottomrule
@@ -1852,16 +1854,10 @@ The following equation is used to translate the protein requirement into the req
 \midrule
 \endfirsthead
 
-\toprule
-\textbf{Variable} & \textbf{Description} & \textbf{Units} \\
-\midrule
-\endhead
-
 \multicolumn{3}{r}{\textit{Continued on next page}} \\
 \endfoot
 
-\bottomrule
-\endlastfoot
+
     
 125 (coefficient)  &  Daily gain in mass of the gravid uterus &  estimated constant 125 grams (g) of protein per kilogram (kg) of wet weight.\\
 AAcalcMilk  &  Estimated AA composition of the true protein (TP) fraction involved in the estimation of AA Supply and recommendations &  g of AA per 100 g of TP.\\
@@ -1888,7 +1884,9 @@ NPMilk  &  Milk's TP yield  &  g/d \\
 NPscurf  &   Net protein requirement for scurf  &  g/d \\
 PEndUrin  &   Net protein requirement for endogenous urinary excretion  &  g/d\\
 TargetEffMP and TargetEffAA &  Proposed target efficiencies of converting metabolizable protein (MP) and essential amino acids (EAA) to export proteins and body gain  & Fixed Value* \\
-    \end{longtable}
+\bottomrule
+\endlastfoot
+\end{longtable}
     \vspace{-0.3cm}
 {\footnotesize\textit{Note:} AA = Amino Acids; MFP= Metabolic Fecal Protein; *Fixed values are establish by \textcite{nrc2021}}
 \vspace{0.5cm}
@@ -2344,9 +2342,9 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
 \subsubsection{Energy and Nutrition Supply }\label{sec:nutsupply}
 \vspace{0.25cm}
 
-\paragraph{General Nutrient Supply}
+\paragraph{Nutrient Supply}
 
-\paragraph{Energy Supply}
+\paragraph{Energy Supply - NRC 2001}
 \vspace{0.2cm}
 
  Energy supply from the feed includes NEm, NEl, and NEg. NEm provides energy for maintenance and activity requirements, NEl provides energy for lactation and pregnancy, and NEg provides energy for growth. Feed actual energy contents are corrected from standard values provided by \textcite{nrc2001}. Minerals do not provide any energy.
@@ -2361,7 +2359,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.1]}\par}
+            {\raggedleft \textbf{[.1]}\par}
             \vspace{0.5cm}
 
     \begin{center}
@@ -2369,7 +2367,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.2]}\par}
+            {\raggedleft \textbf{[AN.SUP.2.1]}\par}
             \vspace{0.5cm}
 
     Otherwise: 
@@ -2380,7 +2378,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.3]}\par}
+            {\raggedleft \textbf{[AN.SUP.3.1]}\par}
             \vspace{0.5cm}
 
     \begin{center}
@@ -2388,7 +2386,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.4]}\par}
+            {\raggedleft \textbf{[AN.SUP.4.1]}\par}
             \vspace{0.5cm}
 
     \item \textbf{\textit{Digestible Energy}} 
@@ -2420,7 +2418,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.5]}\par}
+            {\raggedleft \textbf{[AN.SUP.5.1]}\par}
             \vspace{0.5cm}
 
         \item \textbf{\textit{Net Energy}} 
@@ -2440,7 +2438,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
         \end{center}
         \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.7]}\par}
+            {\raggedleft \textbf{[AN.SUP.7.1]}\par}
             \vspace{0.5cm}
 
         \item Lactation
@@ -2461,7 +2459,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
         \end{center}
         \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.6]}\par}
+            {\raggedleft \textbf{[AN.SUP.6.1]}\par}
             \vspace{0.5cm}
             
         \item Activity
@@ -2477,7 +2475,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
         \end{center}
         \vspace{0.5cm}
     
-            {\raggedleft \textbf{[AN.SUP.8]}\par}
+            {\raggedleft \textbf{[AN.SUP.8.1]}\par}
             \vspace{0.5cm}
             
     \end{enumerate}
@@ -2486,7 +2484,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in calculation of AA.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of net energy in NRC 2001.} \label{nasemminkey} \\
 \toprule
 \multicolumn{1}{c}{\textbf{Variable}} & 
 \multicolumn{1}{c}{\textbf{Description}} & 
@@ -2529,7 +2527,204 @@ TotalTDN\textsuperscript{1} & Dietary TDN content & \\
 \textsuperscript{1} \cite{nrc2001}
 \end{flushleft}
 
+\paragraph{Energy Supply - NASEM 2021}
+\vspace{0.2cm}
 
+ Energy supply in the updated 2021 Nutrient Requirement model \textcite{nrc2021} is estimated based only on the NEl and follows a simplified estimation method when compared to the 2001 model \textcite{nrc2001}.
+    \vspace{0.2cm}
+First, the digestible energy of each feed is estimated based on the nutrient content and the estimated digestibility of that nutrient.
+    \begin{itemize}
+    \item \textbf{\textit{Digestible Energy (DE) of a Feed}} 
+    \vspace{0.25cm}
+
+    \begin{center}
+    \(DE_{\text{i}} = 0.042 * NDF_{\text{i}} * dNDF_{\text{i}} + 0.0423 *Starch_{\text{i}} * dStarch_{\text{i}} + 0.0940 * FA_{\text{i}}* dFA_{\text{i}} + 0.0565 * ( RDP_{\text{i}} + RUP_{\text{i}}*dRUP_{\text{i}} - NPN_{\text supp, i}) + 0.0089*NPN_{\text supp, i} + 0.040* ROM_{\text{i}}* dROM_{\text{i}} - 0.318 \)
+    \end{center}
+    \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.1.2]}\par}
+            \vspace{0.5cm}
+
+Parameter definitions and units are provided in Table 1. The nutrient compositions of each feed \( (NDF_{\text i}, Starch_{\text i}, EE_{\text i}, RUP_{\text i} )\) are provided in the feed library. The digestibilities of each feed are estimated to account for the effects of intake and diet composition:
+\vspace{0.5cm}
+\begin{itemize}
+    \item \textbf{\textit{NDF Digestibility (dNDF)} }
+    \vspace{0.25cm}
+    The digestibility of NDF is adjusted from the base NDF digestibility of the feed to account for the effect of total DMI and starch intake. 
+    \begin{center}
+    \(dNDF_{\text i} = [ (dNDF_{\text base,i} - 0.0059*(Starch_{\text Diet} - 0.26)  - 1.1*(\frac{DMI}{BodyWeight} - 0.035) \)
+    
+    \end{center}
+And the \(dNDF_{\text base,i}\) is calculated based on the lignin and NDF content of the feed.
+    \vspace{0.25cm}
+    
+    \begin{center}
+    \(dNDF_{\text base,i} = [0.75* (NDF_{\text i} - Lignin_{\text i}) * (1-( \frac{ Lignin_{\text i} }{NDF_{\text i} })^{0.667})] / NDF_{\text i} \)
+    
+    \end{center}
+    \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.2.2]}\par}
+            \vspace{0.5cm}
+    \item \textbf{\textit{Starch Digestibility (dStarch)} }
+    \vspace{0.25cm}
+    Similarly, the digestibility of starch is adjusted for the level of intake from a base digestibility: 
+     \begin{center}
+    \(dStarch_{\text i} = dStarch_{\text base,i} - 1.0*(\frac{DMI}{BodyWeight} - 0.035) \)
+    
+    \end{center}
+    \vspace{0.5cm}
+            {\raggedleft \textbf{[AN.SUP.3.2]}\par}
+    \vspace{0.25cm}
+    And the base starch digestibility, \(dStarch_{\text base,i}\), is considered to be an innate property of the feed and is provided in the feed library.
+    \vspace{0.5cm}
+
+    \item \textbf{\textit{Fatty Acid Digestibility (dFA)} }
+    \vspace{0.25cm}
+   Fatty acids are assumed to have a digestibility of 0.73 ( \( dFA_{\text i} = 0.73\) ) unless a digesibility specific to the fat supplement is provided by the manufacturer. 
+    \vspace{0.5cm}
+
+    \item \textbf{\textit{Protein Digestibility (RUP and dRUP)} }
+    \vspace{0.25cm}
+   The rumen degradable protein (RDP) content of a feed is calculated as the proportion of crude protein (CP) that is not considered to be rumen undegradable (RUP). Thus: 
+   
+    \vspace{0.5cm}
+    \begin{center}
+    \(RDP_{\text i} = \frac{1 - RUP_{\text CP,i}}{CP_{\text i}} \)
+    \end{center}
+    \vspace{0.1cm}
+    \begin{center}
+    \(RUP_{\text i} = \frac{RUP_{\text CP,i}}{CP_{\text i}} \)
+    \end{center}
+
+    \vspace{0.5cm}
+            {\raggedleft \textbf{[AN.SUP.4.2]}\par}
+    \vspace{0.5cm}
+    \item \textbf{\textit{Residual Organic Matter (ROM)} }
+    \vspace{0.25cm}
+    The Residual Organic Matter (ROM) fraction of a feed is calculated by difference as the following:
+\begin{center}
+    \(ROM_{\text i} = 1 - \frac{FA_{\text i}}{1.06} - Ash_{\text i} - NDF_{\text i} - Starch_{\text i} - (CP_{\text i} - 0.64*NPN_{\text supp, i}) \)
+    \end{center}
+\vspace{0.25cm}
+The digestibility of ROM is assumed to be 0.96 ( \(dROM_{\text i} = 0.96\)) and \(NPN_{\text supp, i} \) is the supplemented non-protein nitrogen fraction as a proportion of the total CP content. 
+    
+    \vspace{0.5cm}
+            {\raggedleft \textbf{[AN.SUP.5.2]}\par}
+\end{itemize}
+            \vspace{0.5cm}
+
+    \item \textbf{\textit{Digestible Energy of the diet}} 
+    \vspace{0.25cm}
+    \begin{center}
+    \(DE_{\text{Diet}} = \sum_{i=1}^{n} DE_{i} *PropFeed_{i} \)
+    \end{center}
+    \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.6.2]}\par}
+            \vspace{0.5cm}
+
+    \item \textbf{\textit{Metabolizable Energy}} 
+    \vspace{0.25cm}
+The dietary ME is calculated by subtracting the energy found in gaseous losses (i.e. enteric methane) and the energy lost in urine from the total diet digestible energy. 
+\vspace{0.5cm}
+            \begin{center}
+            \(ME_{\text Diet} = DE_{\text Diet} - GasEnergy - UrineEnergy\)
+            \end{center}
+            \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.7.2]}\par}
+            \vspace{0.5cm}
+   
+    \begin{itemize}
+        \item \textbf{\textit{Gaseous Energy}}
+            \vspace{0.25cm}
+            \begin{center}
+            \(GasEnergy = 13.28 * EntericMethane \)
+            \end{center}
+            \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.8.2]}\par}
+            \vspace{0.5cm}
+            \vspace{0.5cm}
+        \item \textbf{\textit{Urine Energy}}
+        \vspace{0.25cm}
+            \begin{center}
+            \(UrineEnergy = 0.0146* UrinaryNitrogen\)
+            \end{center}
+            \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.9.2]}\par}
+            \vspace{0.5cm}
+            \vspace{0.1cm}
+            where \( GasEnergy\) and \( UrineEnergy\) are in units of Mcal/d, \( EntericMethane\) is in units of kg/d, and \( UrinaryNitrogen\) is in units of g/d.
+            \vspace{0.5cm}
+    \end{itemize}
+   \item \textbf{\textit{Net Energy (NE)}}
+   \vspace{0.25 cm}
+   Net energy is simply estimated as metabolizable energy used at an average efficiency of 0.66
+        \begin{center}
+        \(NEl = 0.66*ME \)
+        \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[AN.SUP.10.2]}\par}
+            \vspace{0.5cm}
+
+    \end{itemize}
+
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
+\caption{Key variables used in calculation of net energy supply from NASEM 2021.} \label{nasemminkey} \\
+\toprule
+\multicolumn{1}{c}{\textbf{Variable}} & 
+\multicolumn{1}{c}{\textbf{Description}} & 
+\multicolumn{1}{c}{\textbf{Units}} \\
+\midrule
+\endfirsthead
+
+\toprule
+\multicolumn{1}{c}{\textbf{Variable}} & 
+\multicolumn{1}{c}{\textbf{Description}} & 
+\multicolumn{1}{c}{\textbf{Units}} \\
+\midrule
+\endhead
+
+\multicolumn{3}{r}{\textit{Continued on next page}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+    
+NElact & Actual net energy supply of the diet& Mcal\\
+ME & Actual metabolizable energy supply of the diet& Mcal\\
+$DE_{i}$ & Digestible energy content of feed i & Mcal/kg\\
+$DE_{Diet}$ & Digestible energy content of the diet & Mcal\\
+$PropFeed_{i}$ & Proportion of diet DM that is feed i & proportion\\
+$NDF_{i}$ & Neutral Detergent Fiber content of feed i & \% \\
+$dNDF_{i}$ & Neutral Detergent Fiber digestibility of feed i & proportion\\
+$dNDF_{base,i}$ & The baseline Neutral Detergent Fiber digestibility of feed i & proportion\\
+$Lignin_{i}$ & Lignin content of feed i & \% \\
+$Starch_{i}$ & Starch content of feed i & \% \\
+$dStarch_{i}$ & Starch digestibility of feed i & proportion\\
+$Starch_{Diet}$ & Starch content of the diet & \% \\
+$FA_{i}$ & Fatty Acid content of feed i & \% \\
+$dFA_{i}$ & Fatty Acid digestibility of feed i & proportion\\
+$RDP_{i}$ & Rumen Degradable Protein content of feed i & \% \\
+$RDP_{CP,i}$ & Percent of Crude Protein that is Rumen Degradable i & \% \\
+$RUP_{i}$ & Rumen Undegradable Protein content of feed i & \%\\
+$RUP_{CP,i}$ & Percent of Crude Protein that is Rumen Undegradable i & \% \\
+$dRUP_{i}$ & Rumen Undegradable Protein digestibility of feed i & proportion\\
+$NPN_{supp,i}$ & Supplemental Non-Protein Nitrogen content & \%\\
+$ROM_{i}$ & Residual Organic Matter content of feed i & \% \\
+$dROM_{i}$ & Residual Organic Matter digestibility of feed i & proportion\\
+
+    \end{longtable}
+
+{\textsuperscript{1} \cite{nrc2021}} 
+
+\vspace{0.25cm}
 
     \textbf{ Protein Supply} - Protein supply from the feed includes 3 parts: digestible RUP, digestible MCP, which is produced through RDP, and endogenous protein supply from sloughed cells and enzyme secretion into the gut lumen. MCP production requires a nitrogen source and an energy source, so MCP is either nitrogen-limited (when energy is sufficient) or energy-limited (when nitrogen is sufficient). Minerals do not provide any protein.
     \vspace{0.25cm}
@@ -2964,7 +3159,7 @@ ration.phosphorus\_requirement\_buffer & Increase in phosphorus nutrient require
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
 
-\begin{longtable}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} @{}}
+\begin{longtable}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} C{2cm} @{}}
 \caption{Key inputs found in the feed input file.} \\
 \toprule
 \multicolumn{1}{c}{\textbf{Section}} &
@@ -2987,7 +3182,7 @@ ration.phosphorus\_requirement\_buffer & Increase in phosphorus nutrient require
 \endhead
 
 \midrule
-\multicolumn{5}{@{}r@{}}{\textit{Continued on next page}} \\
+\multicolumn{6}{@{}r@{}}{\textit{Continued on next page}} \\
 \endfoot
 
 \bottomrule
@@ -3175,7 +3370,7 @@ milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary 
 
 
 \paragraph{Methodology}
-The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the user_defined_ration_percentage values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
+The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the user\_defined\_ration\_percentage values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
 
 The ration formulation will proceed as described in the \hyperref[autoration]{Automated Methodology} above, but when formulation fails, different outcomes will occur.
 
@@ -5154,7 +5349,7 @@ If a cow is not pregnant when she reaches the days in milk cutoff specified by t
 
     This module integrates with the process\_digestion method in the DigestiveSystem class to calculate manure excretion on a daily and per-animal basis. It plays a critical role in linking animal-level digestion processes with downstream environmental and nutrient management models.
     
-    The module takes inputs that include general animal properties (e.g., body weight, nutrient intake, and nutrient compositions), milk production characteristics (e.g., fat and protein content), specific nutrient properties (e.g., urine phosphorus requirements), and animal categories (e.g., CALF, HEIFER, COW). The outputs from this module are detailed manure excretion metrics, such as total manure mass, nutrient content, and volatile solids. These outputs are used by the Manure Module for downstream calculations, including manure methane (CH\textsubscript{4}) emissions and nutrient balance tracking.
+    The module takes inputs that include general animal properties (e.g., body weight, nutrient intake, and nutrient compositions), milk production characteristics (e.g., fat and protein content), specific nutrient properties (e.g., urine phosphorus requirements), and animal categories (e.g., CALF, HEIFER, COW). The outputs from this module are detailed manure excretion metrics, such as total manure mass, nutrient content, and volatile solids. In addition, an animal-class specific methane potential is assigned to manure upon excretion. These outputs are used by the Manure Module for downstream calculations, including manure methane (CH\textsubscript{4}) emissions and nutrient balance tracking.
 
 
     \textbf{Required User Inputs}
@@ -5319,6 +5514,7 @@ The outputs from the Manure Excretion Calculator are organized into two main cat
 \cmidrule(lr){1-4}
 
 \multirow{11}{*}{\textbf{Manure Nutrient Composition}} 
+ & Manure Methane Potential & The maximum methane producing capacity of volatile solids from manure & m\textsuperscript{3} CH\textsubscript{4} / kg VS \\  
  & Manure Total Ammoniacal Nitrogen & Total ammoniacal nitrogen excreted in the manure & kg \\ 
  & Urine Nitrogen & Amount of nitrogen excreted via urine & kg \\ 
  & Manure Nitrogen & Total nitrogen excreted in manure & kg \\ 
@@ -5446,8 +5642,8 @@ Manure total ammoniacal nitrogen (kg/d)
             {\raggedleft \textbf{[AN.EXC.9]}\par}
             \vspace{0.5cm} 
 
-        \item \textbf{Heifer Manure Excretion (\text{calculate\_heifer\_manure})}
-        \vspace{0.2cm}
+\item \textbf{Heifer Manure Excretion (\text{calculate\_heifer\_manure})}
+\vspace{0.2cm}
 
 \paragraph{Manure excretions}
 \vspace{-0.25cm}
@@ -5768,7 +5964,7 @@ Manure K excretion (g/d)
             {\raggedleft \textbf{[AN.EXC.27]}\par}
             \vspace{0.5cm} 
 
-        \item \textbf{Dry Cow Manure Excretion (\text{\_calculate\_dry\_cow\_manure})}
+\item \textbf{Dry Cow Manure Excretion (\text{\_calculate\_dry\_cow\_manure})}
 
 \paragraph{Manure excretions}
 \vspace{-0.25cm}
@@ -5932,6 +6128,9 @@ Total P excreted by a cow (g/d)
             \vspace{0.5cm}
 
 
+\item \textbf{Manure Methane Potential}
+  The methane potential of the manure volatile solids are set by the \textbf{get\_manure\_streams()} method based on the Animal Combination of the pen. If the Animal Combination is CALVES or GROWING, the methane potential of the manure is set to 0.17. If the Animal Combination is LAC\_COW or CLOSE\_UP, the methane potential is set to 0.24 \parencite{Hanson2024}.
+    
     \end{itemize}
  
 
@@ -6353,7 +6552,7 @@ Methane Yield Reduction & Change in methane production per unit DMI; negative in
 \end{longtable}
 
 
-    \paragraph Methodology
+    \paragraph{Methodology}
     \begin{itemize}
         \item \textbf{3-NOP Methane Yield Reduction}
         
