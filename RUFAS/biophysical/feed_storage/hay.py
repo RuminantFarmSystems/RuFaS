@@ -52,9 +52,15 @@ class Hay(Storage):
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
-        self.bale_size: float = float(config["bale_size"])
-        self.target_dry_matter: float = float(config["target_dry_matter"])
-        self.additional_dry_matter_loss_coefficient: float = float(config["additional_dry_matter_loss_coefficient"])
+        bale_size = config["bale_size"]
+        assert isinstance(bale_size, (float))
+        self.bale_size: float = bale_size
+        target_dry_matter = config["target_dry_matter"]
+        assert isinstance(target_dry_matter, (float))
+        self.target_dry_matter: float = target_dry_matter
+        additional_dry_matter_loss_coefficient = config["additional_dry_matter_loss_coefficient"]
+        assert isinstance(additional_dry_matter_loss_coefficient, (float))
+        self.additional_dry_matter_loss_coefficient: float = additional_dry_matter_loss_coefficient
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
