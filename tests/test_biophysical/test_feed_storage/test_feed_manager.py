@@ -1164,9 +1164,7 @@ def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
     assert purchased_by_id[2] == [p2]
 
 
-@pytest.mark.parametrize(
-    "standard, feed_rep", [(NutrientStandard.NASEM, NASEMFeed), (NutrientStandard.NRC, NRCFeed)]
-)
+@pytest.mark.parametrize("standard, feed_rep", [(NutrientStandard.NASEM, NASEMFeed), (NutrientStandard.NRC, NRCFeed)])
 def test_setup_available_feeds(
     feed_manager: FeedManager,
     mocker: MockerFixture,
