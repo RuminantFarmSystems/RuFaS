@@ -162,7 +162,7 @@ class FeedManager:
                     "to any feed listed in the available feeds. This storage will not be used for feeding.",
                     {
                         "class": self.__class__.__name__,
-                        "function": self.receive_crop.__name__,
+                        "function": self._create_all_storages.__name__,
                     },
                 )
 
@@ -191,8 +191,8 @@ class FeedManager:
         combo_to_names: dict[tuple[str | None, str | None], list[str]] = defaultdict(list)
 
         for config in all_configs:
-            crop_name = config.get("crop_name")
-            field_names = config.get("field_names")
+            crop_name = config["crop_name"]
+            field_names = config["field_names"]
             name = config.get("name", "<unnamed_storage>")
             for field_name in field_names:
                 combo_to_names[(crop_name, field_name)].append(name)

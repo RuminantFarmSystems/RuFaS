@@ -30,7 +30,7 @@ class Baleage(Storage):
         Calculates the protein loss specific to Baleage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.post_wilting_moisture_percentage: float = float(config["post_wilting_moisture_percentage"])
         self.bale_density: float = float(config["bale_density"])

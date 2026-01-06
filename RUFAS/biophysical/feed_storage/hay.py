@@ -50,7 +50,7 @@ class Hay(Storage):
         Calculates the protein loss in the hay.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.bale_size: float = float(config["bale_size"])
         self.target_dry_matter: float = float(config["target_dry_matter"])
