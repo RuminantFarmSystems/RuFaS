@@ -283,6 +283,10 @@ class EmissionsEstimator:
         for filter_key in ["manure_applications", "fertilizer_applications"]:
             resource_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS[filter_key]
             filtered_data = self.om.filter_variables_pool(resource_filter)
+
+            if len(filtered_data) == 0:
+                continue
+
             date_field: tuple[str, str] = resource_filter["date_fields"]
             year_key, day_key = date_field[0], date_field[1]
             dates = list(
@@ -349,6 +353,8 @@ class EmissionsEstimator:
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
         filtered_data = self.om.filter_variables_pool(harvest_filter)
+        if len(filtered_data) == 0:
+            return harvest_data
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
         for i, field_name in enumerate(filtered_data["field_name"]["values"]):
@@ -386,20 +392,7 @@ class EmissionsEstimator:
             defaultdict(dict)
         )
 
-        harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = {
-            feed_id: sorted(
-                [
-                    harvest_date
-                    for harvest_date in harvest_yield_by_field[field_name]
-                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id
-                ]
-            )
-            for field_name in harvest_yield_by_field
-            for feed_id in set(
-                harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-                for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
-            )
-        }
+        harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
 
         for field_name in harvest_yield_by_field:
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
@@ -513,6 +506,49 @@ class EmissionsEstimator:
                 sorted(daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items())
             )
         return daily_farmgrown_feed_emission_and_resource_by_feed_id
+
+    def _calculate_harvest_dates_by_feed_id(
+        self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+    ) -> dict[RUFAS_ID, list[int]]:
+        """Calculates the harvest dates for each feed ID based on the harvest yield data."""
+        harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = defaultdict(list)
+        for field_name in harvest_yield_by_field:
+            harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
+            for harvest_date in harvest_dates:
+                feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
+                harvest_dates_by_feed_id[feed_id].append(harvest_date)
+        return harvest_dates_by_feed_id
+        """
+        Generates a mapping of feed IDs to their respective harvest dates based on the
+        harvest data of multiple fields.
+
+        Parameters
+        ----------
+        harvest_yield_by_field : dict: dict[str, dict[int, dict[str, Any]]]
+            A dictionary containing harvest data organized by field name. Each field
+            name maps to another dictionary where keys represent harvest dates, and
+            values are dictionaries containing details like "feed_id".
+
+        Returns
+        -------
+        dict: dict[RUFAS_ID, list[int]]
+            A dictionary where each key is a feed ID, and the value is a sorted list
+            of harvest dates associated with that feed ID.
+        """
+        all_feed_ids = set(
+            harvest_yield_by_field[field_name][harvest_date]["feed_id"]
+            for field_name in harvest_yield_by_field
+            for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
+        )
+        harvest_dates_by_feed_id = {}
+        for feed_id in all_feed_ids:
+            harvest_dates = []
+            for field_name in harvest_yield_by_field:
+                for harvest_date in harvest_yield_by_field[field_name]:
+                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id:
+                        harvest_dates.append(harvest_date)
+            harvest_dates_by_feed_id[feed_id] = sorted(harvest_dates)
+        return harvest_dates_by_feed_id
 
     def _calculate_daily_farmgrown_feed_fed_emissions_and_resources(
         self,
