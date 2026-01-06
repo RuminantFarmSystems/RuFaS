@@ -50,11 +50,17 @@ class Hay(Storage):
         Calculates the protein loss in the hay.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
-        self.bale_size: float = float(config["bale_size"])
-        self.target_dry_matter: float = float(config["target_dry_matter"])
-        self.additional_dry_matter_loss_coefficient: float = float(config["additional_dry_matter_loss_coefficient"])
+        bale_size = config["bale_size"]
+        assert isinstance(bale_size, (float))
+        self.bale_size: float = bale_size
+        target_dry_matter = config["target_dry_matter"]
+        assert isinstance(target_dry_matter, (float))
+        self.target_dry_matter: float = target_dry_matter
+        additional_dry_matter_loss_coefficient = config["additional_dry_matter_loss_coefficient"]
+        assert isinstance(additional_dry_matter_loss_coefficient, (float))
+        self.additional_dry_matter_loss_coefficient: float = additional_dry_matter_loss_coefficient
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -263,7 +269,7 @@ class ProtectedIndoors(Hay):
     Represents protected indoors hay storage, a subclass of Hay.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
 
 
@@ -272,7 +278,7 @@ class ProtectedWrapped(Hay):
     Represents protected wrapped hay storage, a subclass of Hay.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.additional_dry_matter_loss_coefficient = PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
@@ -282,7 +288,7 @@ class ProtectedTarped(Hay):
     Represents protected tarped hay storage, a subclass of Hay.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.additional_dry_matter_loss_coefficient = PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
@@ -298,7 +304,7 @@ class Unprotected(Hay):
 
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17

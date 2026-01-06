@@ -134,23 +134,23 @@ class FeedManager:
         feed_storage_instances : dict[str, list[str]]
             A dictionary that contains feed storage instance names.
         """
-        all_configs: list[dict[str, Any]] = [
-            storage_config
+        all_configs_by_name: dict[str, dict[str, Any]] = {
+            storage_config["name"]: storage_config
             for storage_config_list in feed_storage_configs.values()
             for storage_config in storage_config_list
-        ]
-        self._validate_storage_config_names(all_configs)
-        self._validate_crop_field_mapping(all_configs)
-
-        configs_by_name: dict[str, dict[str, Any]] = {
-            config["name"]: config for config in all_configs if "name" in config
+            if "name" in storage_config
         }
 
         instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+        instance_configs_by_name: dict[str, dict[str, Any]] = {
+            name: all_configs_by_name[name] for name in instance_names
+        }
+
+        self._validate_storage_config_names(list(instance_configs_by_name.values()))
+        self._validate_crop_field_mapping(list(instance_configs_by_name.values()))
 
         available_rufas_ids: list[int] = [feed.rufas_id for feed in self.available_feeds]
-        for instance_name in instance_names:
-            storage_config = configs_by_name[instance_name]
+        for instance_name, storage_config in instance_configs_by_name.items():
             storage_type_str = storage_config["storage_type"]
             storage_class = StorageType.get_storage_class(storage_type_str)
             storage = storage_class(storage_config)
@@ -162,7 +162,7 @@ class FeedManager:
                     "to any feed listed in the available feeds. This storage will not be used for feeding.",
                     {
                         "class": self.__class__.__name__,
-                        "function": self.receive_crop.__name__,
+                        "function": self._create_all_storages.__name__,
                     },
                 )
 
@@ -191,10 +191,11 @@ class FeedManager:
         combo_to_names: dict[tuple[str | None, str | None], list[str]] = defaultdict(list)
 
         for config in all_configs:
-            crop_name = config.get("crop_name")
-            field_name = config.get("field_name")
+            crop_name = config["crop_name"]
+            field_names = config["field_names"]
             name = config.get("name", "<unnamed_storage>")
-            combo_to_names[(crop_name, field_name)].append(name)
+            for field_name in field_names:
+                combo_to_names[(crop_name, field_name)].append(name)
 
         duplicate_details = {
             combo: names for combo, names in combo_to_names.items() if len(names) > 1 and None not in combo
@@ -279,7 +280,7 @@ class FeedManager:
         crop_name = harvested_crop.config_name
         field_name = harvested_crop.field_name
         for storage in self.active_storages.values():
-            if storage.crop_name == crop_name and storage.field_name == field_name:
+            if storage.crop_name == crop_name and field_name in storage.field_names:
                 storage.receive_crop(harvested_crop, simulation_day)
                 return
         else:
