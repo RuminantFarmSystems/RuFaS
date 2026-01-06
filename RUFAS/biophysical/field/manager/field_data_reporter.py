@@ -30,15 +30,6 @@ class FieldDataReporter:
 
     def send_daily_variables(self, time: RufasTime) -> None:
         """Sends daily variables of soil and crop module to the output manager"""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.send_daily_variables.__name__,
-        }
-        self.om.add_variable(
-            "simulation_day",
-            time.simulation_day,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Evaporation", "evaporate")]}),
-        )
         for field in self.fields:
             self.send_field_daily_variables(field, time)
 
