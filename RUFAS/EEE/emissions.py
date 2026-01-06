@@ -283,6 +283,10 @@ class EmissionsEstimator:
         for filter_key in ["manure_applications", "fertilizer_applications"]:
             resource_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS[filter_key]
             filtered_data = self.om.filter_variables_pool(resource_filter)
+
+            if len(filtered_data) == 0:
+                continue
+
             date_field: tuple[str, str] = resource_filter["date_fields"]
             year_key, day_key = date_field[0], date_field[1]
             dates = list(
@@ -349,6 +353,8 @@ class EmissionsEstimator:
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
         filtered_data = self.om.filter_variables_pool(harvest_filter)
+        if len(filtered_data) == 0:
+            return harvest_data
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
         for i, field_name in enumerate(filtered_data["field_name"]["values"]):

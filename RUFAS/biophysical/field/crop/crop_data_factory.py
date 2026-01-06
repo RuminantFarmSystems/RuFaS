@@ -80,19 +80,21 @@ class CropDataFactory:
 
         im = InputManager()
         unprocessed_crop_configurations = im.get_data("crop_configurations.crop_configurations")
-        for config in unprocessed_crop_configurations:
-            crop_config = cls._manufacture_crop_configuration(config)
-            if (name := crop_config["name"]) in cls._crop_configurations.keys():
-                info_map = {
-                    "class": cls.__name__,
-                    "function": cls.setup_crop_configurations.__name__,
-                    "name": name,
-                }
-                err_name = "Duplicate crop configuration name."
-                err_msg = f"{name=} is used for more than one crop configuration."
-                cls._om.add_error(err_name, err_msg, info_map)
-                raise ValueError(f"{err_name} {err_msg}")
-            cls._crop_configurations[name] = crop_config
+
+        if unprocessed_crop_configurations:
+            for config in unprocessed_crop_configurations:
+                crop_config = cls._manufacture_crop_configuration(config)
+                if (name := crop_config["name"]) in cls._crop_configurations.keys():
+                    info_map = {
+                        "class": cls.__name__,
+                        "function": cls.setup_crop_configurations.__name__,
+                        "name": name,
+                    }
+                    err_name = "Duplicate crop configuration name."
+                    err_msg = f"{name=} is used for more than one crop configuration."
+                    cls._om.add_error(err_name, err_msg, info_map)
+                    raise ValueError(f"{err_name} {err_msg}")
+                cls._crop_configurations[name] = crop_config
 
     @classmethod
     def _manufacture_crop_configuration(cls, config: dict[str, Any]) -> CropConfiguration:
