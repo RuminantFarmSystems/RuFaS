@@ -26,12 +26,12 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def mock_storage_config() -> dict[str, str | float]:
+def mock_storage_config() -> dict[str, str | float | list[str]]:
     """Fixture to provide a mock storage configuration dictionary."""
     return {
         "name": "hay",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 300.0,
         "bale_size": 1.2,
@@ -41,7 +41,7 @@ def mock_storage_config() -> dict[str, str | float]:
 
 
 @pytest.fixture
-def hay(mock_storage_config: dict[str, str | float]) -> Hay:
+def hay(mock_storage_config: dict[str, str | float | list[str]]) -> Hay:
     """
     Pytest fixture to create a Hay instance for testing.
 
