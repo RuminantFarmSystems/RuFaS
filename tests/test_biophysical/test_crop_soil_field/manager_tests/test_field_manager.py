@@ -1430,8 +1430,7 @@ def test_crop_schedule_setup(
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
-def test_setup_crop_schedule_schedule_no_data(mock_input_manager: InputManager,
-                                              mocker: MockerFixture) -> None:
+def test_setup_crop_schedule_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Test when no crop schedule input data available."""
     mocker.patch.object(mock_input_manager, "get_data", return_value=None)
     crop_configs = ["alfalfa", "corn", "oats"]
