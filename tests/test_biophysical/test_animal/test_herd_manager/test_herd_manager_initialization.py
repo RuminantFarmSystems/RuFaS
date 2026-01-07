@@ -103,7 +103,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
         "herd_information": {"herd_num": 123},
         "housing": "barn",
         "pasture_concentrate": 0,
-        "ration": {"formulation_interval": 7},
+        "ration": {"formulation_interval": 7, "maximum_ration_reformulation_attempts": 250},
         "pen_information": [],
     }
 

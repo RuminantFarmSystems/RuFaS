@@ -22,6 +22,8 @@ class RationManager:
     tolerance : float
         Fraction +/- of target user defined ration value (as a fraction of dry matter intake estimate) allowable in
         ration formulation.
+    maximum_ration_reformulation_attempts : int
+        Maximum number of attempts to formulate a ration in a single ration interval for a single pen.
 
     """
 
@@ -31,6 +33,7 @@ class RationManager:
     ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
     tolerance: float | None = 0.0
+    maximum_ration_reformulation_attempts: int
 
     @classmethod
     def set_ration_feeds(cls, ration_config: dict[str, list[int]]) -> None:
