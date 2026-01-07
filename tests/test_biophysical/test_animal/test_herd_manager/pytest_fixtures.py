@@ -175,7 +175,12 @@ def animal_json() -> dict[str, Any]:
         "housing": "barn",
         "pasture_concentrate": 0,
         "methane_model": "IPCC",
-        "ration": {"phosphorus_requirement_buffer": 0, "user_input": False, "formulation_interval": 30},
+        "ration": {
+            "phosphorus_requirement_buffer": 0,
+            "user_input": False,
+            "formulation_interval": 30,
+            "maximum_ration_reformulation_attempts": 250,
+        },
         "pen_information": [
             {
                 "id": 0,

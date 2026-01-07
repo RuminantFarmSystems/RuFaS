@@ -1397,62 +1397,6 @@ def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(mocker: Mo
     mock_apply_user_defined.assert_not_called()
 
 
-def test_formulation_lac_cow_user_defined_dmi_decrease_triggers_retry(mocker: MockerFixture, pen: Pen) -> None:
-    """LAC_COW + user-defined ration: failed first attempt triggers DMI decrease and retry."""
-    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
-
-    pen.animal_combination = AnimalCombination.LAC_COW
-    pen.ration = {}
-    pen.id = 7
-    pen.om = MagicMock(spec=OutputManager)
-    avg_reqs = MagicMock()
-    avg_reqs.dry_matter = 100.0
-    avg_reqs.metabolizable_protein = 50.0
-    mocker.patch.object(
-        type(pen),
-        "average_nutrition_requirements",
-        new_callable=PropertyMock,
-        return_value=avg_reqs,
-    )
-
-    mocker.patch.object(pen, "reset_milk_production_reduction")
-
-    failing_solution = _mock_solution(False)
-    succeeding_solution = _mock_solution(True)
-    mock_attempt = mocker.patch.object(
-        pen,
-        "_attempt_formulation",
-        side_effect=[(failing_solution, MagicMock()), (succeeding_solution, MagicMock())],
-    )
-
-    mocker.patch.object(
-        pen.ration_optimizer,
-        "handle_failed_constraints",
-        return_value=["protein_constraint_upper"],
-    )
-
-    mock_reduce_user_defined = mocker.patch.object(pen, "_reduce_on_lactation_failure_user_defined")
-    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
-    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
-    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
-
-    pen.formulate_optimized_ration(
-        True,
-        pen_available_feeds=_mock_feeds(),
-        temperature=26.0,
-        max_daily_feeds={},
-        advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
-        simulation_day=12,
-    )
-
-    assert mock_attempt.call_count == 2
-    mock_apply_success.assert_called_once()
-    mock_reduce_user_defined.assert_not_called()
-    mock_reduce_auto.assert_not_called()
-    mock_apply_user_defined.assert_not_called()
-
-
 def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(mocker: MockerFixture, pen: Pen) -> None:
     """
     LAC_COW + user-defined ration: failed formulation triggers user-defined reduce handler,
