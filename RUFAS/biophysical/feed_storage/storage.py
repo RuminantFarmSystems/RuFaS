@@ -124,7 +124,7 @@ class Storage:
 
     def __init__(self, storage_config: dict[str, str | float | list[str]]) -> None:
         capacity = storage_config["capacity"]
-        assert isinstance(capacity, (float))
+        assert isinstance(capacity, (float, int))
         self.capacity: float = capacity
         self.stored: list[HarvestedCrop] = []
         self.storage_name: str = str(storage_config["name"])
@@ -136,7 +136,7 @@ class Storage:
         assert isinstance(rufas_feed_id, int)
         self.rufas_feed_id: int = rufas_feed_id
         initial_storage_dry_matter = storage_config["initial_storage_dry_matter"]
-        assert isinstance(initial_storage_dry_matter, float)
+        assert isinstance(initial_storage_dry_matter, (float, int))
         self.initial_storage_dry_matter: float = initial_storage_dry_matter
         self.crude_protein_loss_coefficient: float = 0.0
         self.starch_loss_coefficient: float = 0.0

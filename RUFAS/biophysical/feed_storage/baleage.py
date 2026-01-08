@@ -33,10 +33,10 @@ class Baleage(Storage):
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         post_wilting_moisture_percentage = config["post_wilting_moisture_percentage"]
-        assert isinstance(post_wilting_moisture_percentage, (float))
+        assert isinstance(post_wilting_moisture_percentage, (float, int))
         self.post_wilting_moisture_percentage: float = post_wilting_moisture_percentage
         bale_density = config["bale_density"]
-        assert isinstance(bale_density, (float))
+        assert isinstance(bale_density, (float, int))
         self.bale_density: float = bale_density
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
