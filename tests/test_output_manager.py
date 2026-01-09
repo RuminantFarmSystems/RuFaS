@@ -2373,7 +2373,7 @@ def test_filter_variables_pool_complex(
                     "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
-                    "use_filter_name": False,
+                    "use_filter_name": None,
                 },
             ),
             call(
@@ -2386,7 +2386,7 @@ def test_filter_variables_pool_complex(
                     "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
-                    "use_filter_name": False,
+                    "use_filter_name": None,
                 },
             ),
         ]
