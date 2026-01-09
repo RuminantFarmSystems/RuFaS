@@ -831,7 +831,7 @@ class OutputManager(object):
             if len(data_origins) != len(sub_data_dict["values"]) or len(units) != len(sub_data_dict["values"]):
                 continue
 
-            detailed_values: list[list[str]] = []
+            detailed_values: list[str] = []
             for index, value in enumerate(sub_data_dict["values"]):
                 for origin in data_origins[index]:
                     detailed_origin_data = {
@@ -1291,7 +1291,7 @@ class OutputManager(object):
             A filtered variables pool based on either inclusion or exclusion.
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
-        use_filter_name: str = filter_content.get("use_name", None)
+        use_filter_name: str = filter_content.get("use_name", "")
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
@@ -1319,13 +1319,9 @@ class OutputManager(object):
 
         selected_variables: list[str] | None = filter_content.get("variables")
 
-        print("matched keys from filtered pool:", sorted(filtered_pool.keys()))
-
         results = self._parse_filtered_variables(
             filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
         )
-
-        print("matched keys from results pool:", sorted(results.keys()))
 
         if filter_content.get("expand_data", False):
             fill_value = filter_content.get("fill_value", np.nan)
