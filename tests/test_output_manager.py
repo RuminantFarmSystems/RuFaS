@@ -12,7 +12,7 @@ import pytest
 from freezegun import freeze_time
 from mock import ANY, PropertyMock, mock_open, patch
 from mock.mock import MagicMock, call
-from pytest import CaptureFixture, TempPathFactory, raises
+from pytest import CaptureFixture, raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
