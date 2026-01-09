@@ -289,6 +289,7 @@ v0.9.2
 - [2672](https://github.com/RuminantFarmSystems/MASM/pull/2672) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Allow multiple crop-field combos to map to the same feed storage.
 - [2677](https://github.com/RuminantFarmSystems/RuFaS/pull/2677) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Removes possibility of infinite loop in ration formulation.
 - [2708](https://github.com/RuminantFarmSystems/RuFaS/pull/2708) - [minor change] [FeedStorage] [NoInputChange] [NoOutputChange] Eases restriction on type for feed storage config inputs.
+- [2709](https://github.com/RuminantFarmSystems/RuFaS/pull/2709) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Updates use-name to allow for exact regex match var name use in outputs.
 
 ### v0.9.2
 
