@@ -510,14 +510,6 @@ class EmissionsEstimator:
     def _calculate_harvest_dates_by_feed_id(
         self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
     ) -> dict[RUFAS_ID, list[int]]:
-        """Calculates the harvest dates for each feed ID based on the harvest yield data."""
-        harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = defaultdict(list)
-        for field_name in harvest_yield_by_field:
-            harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
-            for harvest_date in harvest_dates:
-                feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-                harvest_dates_by_feed_id[feed_id].append(harvest_date)
-        return harvest_dates_by_feed_id
         """
         Generates a mapping of feed IDs to their respective harvest dates based on the
         harvest data of multiple fields.

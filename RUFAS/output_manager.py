@@ -1291,7 +1291,7 @@ class OutputManager(object):
             A filtered variables pool based on either inclusion or exclusion.
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
-        use_filter_name: bool = filter_content.get("use_name", False)
+        use_filter_name: str = filter_content.get("use_name", None)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
@@ -1319,9 +1319,13 @@ class OutputManager(object):
 
         selected_variables: list[str] | None = filter_content.get("variables")
 
+        print("matched keys from filtered pool:", sorted(filtered_pool.keys()))
+
         results = self._parse_filtered_variables(
             filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
         )
+
+        print("matched keys from results pool:", sorted(results.keys()))
 
         if filter_content.get("expand_data", False):
             fill_value = filter_content.get("fill_value", np.nan)
@@ -1353,7 +1357,7 @@ class OutputManager(object):
         filtered_pool: dict[str, OutputManager.pool_element_type],
         selected_variables: list[str] | None,
         filter_name: str,
-        use_filter_name: bool,
+        use_filter_name: str,
         filter_by_exclusion: bool,
     ) -> dict[str, OutputManager.pool_element_type]:
         """
@@ -1367,7 +1371,7 @@ class OutputManager(object):
             list of key names to select or exclude from variables containing dictionaries.
         filter_name : str
             Name of the filter used to collect variables for the filtered pool.
-        use_filter_name : bool
+        use_filter_name : str
             Whether to use the filter name when constructing the key name for data pulled from a dictionary.
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
@@ -1409,7 +1413,10 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
+                    if use_filter_name == "original_name":
+                        combined_key = f"{key}.{filtered_key}"
+                    else:
+                        combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
                         results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
