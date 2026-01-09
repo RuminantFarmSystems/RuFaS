@@ -37,6 +37,11 @@
       "cleaning_water_use_amount": 0.0
     },
     {
+      "name": "lac_alley_scraper2",
+      "processor_type": "AlleyScraper",
+      "cleaning_water_use_amount": 0.0
+    },
+    {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,

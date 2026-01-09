@@ -26,9 +26,17 @@
           "proportion": 1.0
         }
       ]
+    },{
+      "processor_name": "lac_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
     },
     {
-      "processor_name": "lac_alley_scraper",
+      "processor_name": "lac_alley_scraper2",
       "destinations": [
         {
           "receiving_processor_name": "slurry_storage_outdoor_lac",

@@ -159,8 +159,7 @@
 	"ration": {
 		"phosphorus_requirement_buffer": 0,
 		"user_input": true,
-		"formulation_interval": 30,
-		"maximum_ration_reformulation_attempts": 250
+		"formulation_interval": 30
 	},
 	"pen_information": [
 		{
@@ -239,6 +238,28 @@
 					"bedding_name": "lac_and_growing_sand",
 					"stream_proportion": 1.0,
 					"first_processor": "lac_alley_scraper"
+				}
+			]
+		},
+		{
+			"id": 4,
+			"pen_name": "",
+			"animal_combination": "LAC_COW",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 10,
+			"number_of_stalls": 88,
+			"housing_type": "open air barn",
+			"pen_type": "freestall",
+			"max_stocking_density": 1.2,
+			"minutes_away_for_milking": 180,
+			"first_parlor_processor": "parlor_cleaning_handler",
+			"parlor_stream_name": "early_lac_parlor",
+			"manure_streams": [
+				{
+					"stream_name": "early_lac_pen",
+					"bedding_name": "lac_and_growing_sand",
+					"stream_proportion": 1.0,
+					"first_processor": "lac_alley_scraper2"
 				}
 			]
 		}
