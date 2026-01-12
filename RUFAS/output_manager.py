@@ -1395,7 +1395,10 @@ class OutputManager(object):
             data: list[Any] = filtered_pool[key]["values"]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
-                combined_key = f"{filter_name}_{counter}" if use_filter_name else key
+                if use_filter_name == "original_name":
+                    combined_key = key
+                else:
+                    combined_key = f"{filter_name}_{counter}" if use_filter_name else key
                 results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
