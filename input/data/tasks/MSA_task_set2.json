@@ -17,8 +17,8 @@
       "SA_input_variables": [
         {
           "variable_name": "manure_management.storage.0.NATURAL_LOG_ARRHENIUS_CONSTANT",
-          "lower_bound": 28,
-          "upper_bound": 32,
+          "lower_bound": 29.5,
+          "upper_bound": 30.7,
           "data_type":"float"
         },
         {
@@ -30,7 +30,7 @@
         {
           "variable_name": "manure_management.storage.0.ANAEROBIC_LAGOON_MANURE_RETENTION",
           "lower_bound": 0,
-          "upper_bound": 0.5,
+          "upper_bound": 0.25,
           "data_type":"float"
         },
         {
@@ -41,7 +41,7 @@
         },
         {
           "variable_name": "manure_management.storage.0.MANURE_TEMPERATURE_LAG",
-          "lower_bound": 0,
+          "lower_bound": 10,
           "upper_bound": 45,
           "data_type":"int"
         }

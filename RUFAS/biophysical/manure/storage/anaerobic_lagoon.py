@@ -174,6 +174,13 @@ class AnaerobicLagoon(Storage):
             MeasurementUnits.KILOGRAMS,
             time.simulation_day,
         )
+        self._report_processor_output(
+            "Amplitude",
+            self.amplitude,
+            function_name,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
         return manure_to_return
 
     def _apply_methane_emissions(self, manure_temperature: float) -> tuple[float, float]:
@@ -288,4 +295,4 @@ class AnaerobicLagoon(Storage):
     
     def _helperfunction(self) -> float:
 
-        return self.NATURAL_LOG_ARRHENIUS_CONSTANT, self.ANAEROBIC_LAGOON_MANURE_RETENTION, self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE, self.MANURE_DAMPING_FACTOR, self.MANURE_TEMPERATURE_LAG
+        return self.NATURAL_LOG_ARRHENIUS_CONSTANT, self.ANAEROBIC_LAGOON_MANURE_RETENTION, self.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE, self.MANURE_DAMPING_FACTOR, self.MANURE_TEMPERATURE_LAG, self.amplitude

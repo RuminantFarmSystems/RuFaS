@@ -86,7 +86,7 @@
       "cover": "no_crust_or_cover",
       "storage_time_period": 365,
       "surface_area": 1000,
-      "NATURAL_LOG_ARRHENIUS_CONSTANT": 31.2,
+      "NATURAL_LOG_ARRHENIUS_CONSTANT": 30.6,
       "ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE": 1,
       "ANAEROBIC_LAGOON_MANURE_RETENTION": 0.1,
       "MANURE_DAMPING_FACTOR": 0.5,
