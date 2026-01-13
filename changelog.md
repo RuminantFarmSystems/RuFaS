@@ -290,6 +290,7 @@ v0.9.2
 - [2677](https://github.com/RuminantFarmSystems/RuFaS/pull/2677) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Removes possibility of infinite loop in ration formulation.
 - [2708](https://github.com/RuminantFarmSystems/RuFaS/pull/2708) - [minor change] [FeedStorage] [NoInputChange] [NoOutputChange] Eases restriction on type for feed storage config inputs.
 - [2710](https://github.com/RuminantFarmSystems/RuFaS/pull/2710) - [minor change] [Pilot testing] [NoInputChange] [NoOutputChange] Quick fix for farm 4 failure in pilot testing.
+- [2711](https://github.com/RuminantFarmSystems/MASM/pull/2711) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Updates damping factor and Arrhenius constant values
 
 ### v0.9.2
 

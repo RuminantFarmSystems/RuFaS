@@ -298,7 +298,7 @@ def test_validate_emptying_fraction(
 
 
 @pytest.mark.parametrize(
-    "vol_sols,temp,degradable,expected", [(100.0, 20.0, False, 0.003138872), (100.0, -10.0, True, 0.007100907)]
+    "vol_sols,temp,degradable,expected", [(100.0, 20.0, False, 0.001903822474058042), (100.0, -10.0, True, 0.00430691788)]
 )
 def test_calculate_methane_emissions(vol_sols: float, temp: float, degradable: bool, expected: float) -> None:
     """Test that methane emissions from a storage are calculated correctly."""
@@ -307,7 +307,7 @@ def test_calculate_methane_emissions(vol_sols: float, temp: float, degradable: b
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("temp, expected", [(-20.0, 0.000685409), (0.0, 0.0114749106), (10, 0.0404406008)])
+@pytest.mark.parametrize("temp, expected", [(-20.0, 0.00041572185), (0.0, 0.006959885), (10, 0.024528464)])
 def test_calculate_arrhenius_exponent(temp: float, expected: float) -> None:
     """Test that the Arrhenius Exponent is calculated correctly."""
     actual = Storage._calculate_arrhenius_exponent(temp)
@@ -360,7 +360,7 @@ def test_calculate_surface_area(mocker: MockerFixture) -> None:
     assert storage._surface_area == pytest.approx(97.8713558537714)
 
 
-@pytest.mark.parametrize("day, expected", [(1, 19.642735977830725), (15, 20.452903438767468), (20, 20.66776260955936)])
+@pytest.mark.parametrize("day, expected", [(1, 21.03555677117994), (15, 22.08877447039771), (20, 22.36809139242717)])
 def test_determine_outdoor_storage_temperature(storage: Storage, day: int, expected: float) -> None:
     """Test that the temperature of manure in outdoor storages is calculated correctly."""
     storage.intercept_mean_temp = 15
