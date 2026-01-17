@@ -408,8 +408,9 @@ class ReportGenerator:
                 aggregate_report, loop_list, horizontal_aggregator, filter_content.get("simplify_units", True)
             )
             if display_units:
-                aggregate_report = {f"{next(iter(aggregate_report))}_hor_agg_({aggregated_units})":
-                                    horizontally_aggregated}
+                aggregate_report = {
+                    f"{next(iter(aggregate_report))}_hor_agg_({aggregated_units})": horizontally_aggregated
+                }
             else:
                 aggregate_report = {f"{next(iter(aggregate_report))}_hor_agg": horizontally_aggregated}
 
@@ -425,17 +426,22 @@ class ReportGenerator:
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
                     if units is not None:
-                        aggregate_report = {f"{next(iter(vertically_aggregated))}_ver_agg_{units.group(0)}":
-                                            list(vertically_aggregated.values())[0]}
+                        aggregate_report = {
+                            f"{next(iter(vertically_aggregated))}_ver_agg_{units.group(0)}": list(
+                                vertically_aggregated.values()
+                            )[0]
+                        }
                     else:
-                        aggregate_report = {f"{next(iter(vertically_aggregated))}_ver_agg":
-                                            list(vertically_aggregated.values())[0]}
+                        aggregate_report = {
+                            f"{next(iter(vertically_aggregated))}_ver_agg": list(vertically_aggregated.values())[0]
+                        }
             else:
                 if has_dict_variables or has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
-                    aggregate_report = {f"{next(iter(vertically_aggregated))}_ver_agg":
-                                        list(vertically_aggregated.values())[0]}
+                    aggregate_report = {
+                        f"{next(iter(vertically_aggregated))}_ver_agg": list(vertically_aggregated.values())[0]
+                    }
 
         return aggregate_report, event_logs
 
