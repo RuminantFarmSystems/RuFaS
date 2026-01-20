@@ -392,9 +392,6 @@ class ReportGenerator:
         aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units: bool = filter_content.get("display_units", False)
-        report_name = filter_content.get("name")
-        if report_name == "weighted fat value":
-            print("stopping here")
 
         if horizontal_agg_key and vertical_agg_key:
             aggregate_report, event_logs = self._handle_horizontal_and_vertical_aggregations(
