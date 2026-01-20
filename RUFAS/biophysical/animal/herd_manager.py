@@ -753,6 +753,8 @@ class HerdManager:
             )
             self.herd_statistics.cow_num -= 1
             self.herd_statistics.sold_cow_oversupply_num += 1
+            self.herd_statistics.cow_herd_exit_num -= 1
+            self.herd_statistics.sold_cow_num += 1
 
         return animals_removed
 
