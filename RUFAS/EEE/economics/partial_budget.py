@@ -72,16 +72,16 @@ class PartialBudget:
         
         raw_inputs = {
             "additional_revenue": self._get_optional_input(
-                "economics.partial_budget.additional_revenue", info_map
+                "economic_inputs.partial_budget.additional_revenue", info_map
             ),
             "reduced_costs": self._get_optional_input(
-                "economics.partial_budget.reduced_costs", info_map
+                "economic_inputs.partial_budget.reduced_costs", info_map
             ),
             "additional_costs": self._get_optional_input(
-                "economics.partial_budget.additional_costs", info_map
+                "economic_inputs.partial_budget.additional_costs", info_map
             ),
             "reduced_revenue": self._get_optional_input(
-                "economics.partial_budget.reduced_revenue", info_map
+                "economic_inputs.partial_budget.reduced_revenue", info_map
             ),
         }
 

@@ -122,6 +122,34 @@ def test_preprocess_selects_price_by_selector(monkeypatch: pytest.MonkeyPatch) -
     assert dummy_om.warnings == []
 
 
+def test_preprocess_reads_input_manager_values(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({"economic_inputs.Animal.labor_hours_per_day": 4})
+    dummy_om = DummyOutputManager({})
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Section": {
+                "Category": {
+                    "Item": {
+                        "input_manager": ["economic_inputs.Animal.labor_hours_per_day"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    assert results["Section"]["Category"]["Item"]["biophysical_values"] == [4.0]
+    assert results["Section"]["Category"]["Item"]["biophysical_aggregate"] == 4.0
+    assert dummy_om.warnings == []
+
+
 def test_preprocess_handles_invalid_economics_path(monkeypatch: pytest.MonkeyPatch) -> None:
     class RaisingInputManager(DummyInputManager):
         def get_data(self, key):  # type: ignore[override]

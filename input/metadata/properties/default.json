@@ -3077,8 +3077,36 @@
       }
     }
   },
-    "economic_inputs_properties": {
+  "economic_inputs_properties": {
     "data_collection_app_compatible": false,
+    "partial_budget": {
+      "type": "object",
+      "description": "Partial budget inputs for the simulation.",
+      "additional_costs": {
+        "type": "number",
+        "description": "Additional costs incurred due to the implementation of the management practice ($).",
+        "minimum": 0,
+        "default": 0
+      },
+      "reduced_costs": {
+        "type": "number",
+        "description": "Costs saved due to the implementation of the management practice ($).",
+        "minimum": 0,
+        "default": 0
+      },
+      "additional_revenue": {
+        "type": "number",
+        "description": "Additional revenues generated due to the implementation of the management practice ($).",
+        "minimum": 0,
+        "default": 0
+      },
+      "reduced_revenue": {
+        "type": "number",
+        "description": "Revenues lost due to the implementation of the management practice ($).",
+        "minimum": 0,
+        "default": 0
+      }
+    },
     "Animal": {
       "type": "object",
       "description": "Daily resource use for animal facilities (liters/day, kWh/day, m³/day, labor hours).",
@@ -3168,6 +3196,12 @@
         "kwh_per_day": {
           "type": "number",
           "description": "Electricity for slurry storage (kWh/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "propane_liters_per_day": {
+          "type": "number",
+          "description": "Propane burned daily by animal operations (L/day).",
           "minimum": 0,
           "default": 0
         },
@@ -3270,13 +3304,13 @@
     "Soil_and_crop": {
       "type": "object",
       "description": "Scenario-wide land and crop economics levers.",
-      "land_ha_purchased_whole_simulation": {
+      "land_ha_purchased": {
         "type": "number",
         "description": "Hectares of land purchased for the scenario (ha).",
         "minimum": 0,
         "default": 0
       },
-      "land_ha_rented_whole_simulation": {
+      "land_ha_rented": {
         "type": "number",
         "description": "Hectares of land rented for the scenario (ha).",
         "minimum": 0,

@@ -32,6 +32,7 @@ class EconomicItem:
     category: str
     name: str
     biophysical_simulation: List[str]
+    input_manager: List[str]
     economics_files: Any
     preprocessing: str | None
 
@@ -151,18 +152,22 @@ class EconomicPreprocessor:
                     if not isinstance(details, dict):
                         continue
                     biophysical_simulation = details.get("biophysical_simulation") or []
+                    input_manager = details.get("input_manager") or []
                     preprocessing = details.get("preprocessing")
                     economics_files = details.get("economics_files")
-                    if not biophysical_simulation and not economics_files:
+                    if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
                         biophysical_simulation = [biophysical_simulation]
+                    if isinstance(input_manager, str):
+                        input_manager = [input_manager]
                     items.append(
                         EconomicItem(
                             section=section,
                             category=category,
                             name=name,
                             biophysical_simulation=list(biophysical_simulation),
+                            input_manager=list(input_manager),
                             economics_files=economics_files,
                             preprocessing=preprocessing,
                         )
@@ -212,6 +217,23 @@ class EconomicPreprocessor:
                     f"No biophysical outputs matched pattern '{path}'",
                     info_map,
                 )
+        return values
+
+    def _fetch_input_values(self, input_paths: Iterable[str]) -> List[float]:
+        """Collect values from the InputManager for the provided paths."""
+
+        values: List[float] = []
+        info_map = {"class": self.__class__.__name__, "function": self._fetch_input_values.__name__}
+        for path in input_paths:
+            data = self.im.get_data(path)
+            if data is None:
+                self.om.add_warning(
+                    "MissingEconomicInput",
+                    f"No economic input found at '{path}'",
+                    info_map,
+                )
+                continue
+            self._append_from_payload(values, data)
         return values
 
     def _fetch_prices(self, economics_files: Any) -> Dict[str, Any]:
@@ -322,11 +344,15 @@ class EconomicPreprocessor:
             category_data = section_data.setdefault(item.category, {})
 
             values = self._fetch_values(item.biophysical_simulation)
+            input_values = self._fetch_input_values(item.input_manager)
+            values.extend(input_values)
             aggregated_value = self._aggregate(values, item.preprocessing or "")
             if not values:
                 self.om.add_warning(
                     "MissingBiophysicalData",
-                    f"No values found for '{item.name}' using patterns {item.biophysical_simulation}",
+                    "No values found for "
+                    f"'{item.name}' using patterns {item.biophysical_simulation} "
+                    f"and input paths {item.input_manager}",
                     info_map,
                 )
 

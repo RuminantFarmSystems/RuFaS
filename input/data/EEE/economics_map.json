@@ -36,8 +36,8 @@
         "preprocessing": "dollar per head is reported on an annual basis, Map bedding price to number of animals for each bedding type, depending on their pen."
       },
       "Animal - Labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.labor_hours_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.labor_hours_per_day"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -46,8 +46,8 @@
         "future_expansion": "more subcategories, e.g. vet, milker"
       },
       "Animal investment - Gasoline consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.gasoline_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.gasoline_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.gasoline.dollar_per_liter.csv"
@@ -55,8 +55,8 @@
         "notes": ""
       },
       "Animal investment - Diesel consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.diesel_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.diesel_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.diesel.dollar_per_liter.csv"
@@ -64,8 +64,8 @@
         "notes": ""
       },
       "Animal investment - Propane consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.propane_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.propane_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.propane_wholesale.dollar_per_liter.csv"
@@ -73,8 +73,8 @@
         "notes": ""
       },
       "Animal investment - Natural gas consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.natural_gas_megajoule_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.natural_gas_megajoule_per_day"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
@@ -82,8 +82,8 @@
         "notes": ""
       },
       "Animal investment - Electricity consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.electricity_kwh_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.electricity_kwh_per_day"
         ],
         "economics_files": [
           "commodity_prices.elec_industrial.dollar_per_kwh.csv"
@@ -91,8 +91,8 @@
         "notes": ""
       },
       "Animal investment - Water consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Animal.water_cubic_meter_per_day"
+        "input_manager": [
+          "economic_inputs.Animal.water_cubic_meter_per_day"
         ],
         "economics_files": [
           "commodity_prices.water_municipal.dollar_per_cubic_meter.csv"
@@ -168,8 +168,8 @@
         "notes": ""
       },
       "General manure operational costs - Labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.general.labor_hours"
+        "input_manager": [
+          "economic_inputs.Manure.general.labor_hours"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -177,8 +177,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.labor_hours"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.labor_hours"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -186,8 +186,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Diesel consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.diesel_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.diesel_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.diesel.dollar_per_liter.csv"
@@ -195,8 +195,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Gasoline consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.gasoline_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.gasoline_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.gasoline.dollar_per_liter.csv"
@@ -204,8 +204,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Propane consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.propane_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.propane_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.propane_wholesale.dollar_per_liter.csv"
@@ -213,8 +213,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Natural gas consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.megajoules_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.megajoules_per_day"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
@@ -222,8 +222,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Electricity consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.kwh_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.kwh_per_day"
         ],
         "economics_files": [
           "commodity_prices.elec_residential.dollar_per_kwh.csv",
@@ -233,8 +233,8 @@
         "notes": ""
       },
       "Slurry storage operational costs - Water consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.slurry_storage.cubic_meters_water_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.slurry_storage.cubic_meters_water_per_day"
         ],
         "economics_files": [
           "commodity_prices.water_municipal.dollar_per_cubic_meter.csv"
@@ -242,8 +242,8 @@
         "notes": ""
       },
       "Digester operational costs - Labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.labor_hours_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.labor_hours_per_day"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -251,8 +251,8 @@
         "notes": ""
       },
       "Digester operational costs - Diesel consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.diesel_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.diesel_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.diesel.dollar_per_liter.csv"
@@ -260,8 +260,8 @@
         "notes": ""
       },
       "Digester operational costs - Gasoline consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.gasoline_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.gasoline_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.gasoline.dollar_per_liter.csv"
@@ -269,8 +269,8 @@
         "notes": ""
       },
       "Digester operational costs - Propane consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.propane_liters_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.propane_liters_per_day"
         ],
         "economics_files": [
           "commodity_prices.propane_wholesale.dollar_per_liter.csv"
@@ -278,8 +278,8 @@
         "notes": ""
       },
       "Digester operational costs - Natural gas consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.megajoules_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.megajoules_per_day"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
@@ -287,8 +287,8 @@
         "notes": ""
       },
       "Digester operational costs - Electricity consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.kwh_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.kwh_per_day"
         ],
         "economics_files": [
           "commodity_prices.elec_residential.dollar_per_kwh.csv",
@@ -298,8 +298,8 @@
         "notes": ""
       },
       "Digester operational costs - Water consumption": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.cubic_meters_water_per_day"
+        "input_manager": [
+          "economic_inputs.Manure.digester.cubic_meters_water_per_day"
         ],
         "economics_files": [
           "commodity_prices.water_municipal.dollar_per_cubic_meter.csv"
@@ -318,28 +318,28 @@
         "notes": "Get outputs from methods in digester_costs.py"
       },
       "Manure disposal quantity": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.manure_disposal_kg"
+        "input_manager": [
+          "economic_inputs.Manure.manure_disposal_kg"
         ],
         "economics_files": [
-          "Economic_inputs.Manure.manure_disposal_price_per_kg"
+          "economic_inputs.Manure.manure_disposal_price_per_kg"
         ],
         "notes": "FULLY MANUAL"
       },
       "Manure disposal transport distance": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.manure_disposal_transport_km"
+        "input_manager": [
+          "economic_inputs.Manure.manure_disposal_transport_km"
         ],
         "economics_files": [
-          "Economic_inputs.Manure.manure_disposal_price_per_km"
+          "economic_inputs.Manure.manure_disposal_price_per_km"
         ],
         "notes": "FULLY MANUAL"
       }
     },
     "Revenue": {
       "Sold manure": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.manure_sales"
+        "input_manager": [
+          "economic_inputs.Manure.manure_sales"
         ],
         "economics_files": [
           "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
@@ -367,8 +367,8 @@
         "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Renewable natural gas (RNG) production": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.digester_rng_produced"
+        "input_manager": [
+          "economic_inputs.Manure.digester.digester_rng_produced"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
@@ -376,8 +376,8 @@
         "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Electricity production from anaerobic digester": {
-        "biophysical_simulation": [
-          "Economic_inputs.Manure.digester.kwh_per_day_produced"
+        "input_manager": [
+          "economic_inputs.Manure.digester.kwh_per_day_produced"
         ],
         "economics_files": [
           "commodity_prices.elec_industrial.dollar_per_kwh.csv"
@@ -430,8 +430,8 @@
         "future_expansion": "cases where historical references are desired: Instead of cost, select from economics_input options, all end in '.dollar_per_kilogram.csv', compare price in input to this price, scale accordingly (e.g. price was 1, in file is 2, double the final cost)"
       },
       "Feed storage - Labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Feed_storage.labor_hours_per_day"
+        "input_manager": [
+          "economic_inputs.Feed_storage.labor_hours_per_day"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -533,8 +533,8 @@
         "preprocessing": "Map 'crop_specification' in each field input file, e.g. CornSilage to corn_seed to get appropriate economics_file, ALSO convert the field_size from Ha to square meters (divide by 10000). However - note this one isn't reported daily! So easiest way to handle this could be to divide the price for each field evenly across each day of the simulation. e.g. if the cost for corn_seed for a field_size of 100 was 365, and the simulation was two years, the preprocessing would take all that and compute a price of 0.5 for each day in the simulation (e.g. a list consisting of 0.5 repeated for each day of the sim)."
       },
       "Land purchase costs": {
-        "biophysical_simulation": [
-          "Economic_inputs.Soil_and_crop.land_ha_purchased"
+        "input_manager": [
+          "economic_inputs.Soil_and_crop.land_ha_purchased"
         ],
         "economics_files": [
           "capital_costs.land_ha.dollar_per_hectare.csv"
@@ -542,16 +542,16 @@
         "notes": "This 'manual' entry in Economic_inputs fields is meant to be for an entire simulation, so is different from the 'per_day' values, and instead should result only in a single value. The idea for this (and others that are similar, see variables with 'whole_simulation' in them) is that it's a per scenario type value. Adding fields, giving a single cost to rent or buy manually."
       },
       "Land rental costs": {
-        "biophysical_simulation": [
-          "Economic_inputs.Soil_and_crop.land_ha_rented"
+        "input_manager": [
+          "economic_inputs.Soil_and_crop.land_ha_rented"
         ],
         "economics_files": [
           "farm_services.land_ha_rent.dollar_per_hectare.csv"
         ]
       },
       "Crop labor hours": {
-        "biophysical_simulation": [
-          "Economic_inputs.Soil_and_crop.labor_hours_per_day"
+        "input_manager": [
+          "economic_inputs.Soil_and_crop.labor_hours_per_day"
         ],
         "economics_files": [
           "farm_services.labor_hours.dollar_per_hour.csv"
@@ -578,8 +578,8 @@
     },
     "Revenue": {
       "Carbon credits from soil conservation practice": {
-        "biophysical_simulation": [
-          "Economic_inputs.Soil_and_crop.carbon_credits_whole_simulation_tonnes"
+        "input_manager": [
+          "economic_inputs.Soil_and_crop.carbon_credits_whole_simulation_tonnes"
         ],
         "economics_files": [
           "commodity_prices.carbon_credits_soil.dollar_per_tonne.csv"
