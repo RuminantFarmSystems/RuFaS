@@ -139,6 +139,9 @@ class HerdManager:
             RationManager.set_user_defined_ration_tolerance(ration_feed_config)
         else:
             RationManager.set_ration_feeds(ration_feed_config)
+        RationManager.maximum_ration_reformulation_attempts = animal_config_data["ration"][
+            "maximum_ration_reformulation_attempts"
+        ]
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
