@@ -479,8 +479,8 @@ def test_perform_aggregations(
     "report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs",
     [
         ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {"ver_hor_agg": [6]}, []),
-        ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {'hor_agg_(km)': [1, 2, 3]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {'hor_agg': [1, 2, 3]}, []),
+        ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {"hor_agg_(km)": [1, 2, 3]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
         ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"data_(kg)_ver_agg_(kg)": [6]}, []),

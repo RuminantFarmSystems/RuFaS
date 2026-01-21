@@ -2408,11 +2408,9 @@ def test_filter_variables_pool_complex(
     }
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
-
         "DummyClass1.dummy_fun1.dummy_var2.a": {"values": ["A", "AA"]},
         "DummyClass1.dummy_fun1.dummy_var2.b": {"values": [1.0, 2.0]},
         "DummyClass1.dummy_fun1.dummy_var2.c": {"values": [True, True]},
-
         "DummyClass1.dummy_fun2.dummy_var3.a": {"values": ["AAA"]},
         "DummyClass1.dummy_fun2.dummy_var3.b": {"values": [3.0]},
         "DummyClass1.dummy_fun2.dummy_var3.c": {"values": [False]},

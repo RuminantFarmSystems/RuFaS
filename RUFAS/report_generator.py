@@ -404,9 +404,7 @@ class ReportGenerator:
                 aggregate_report, loop_list, horizontal_aggregator, filter_content.get("simplify_units", True)
             )
             if display_units:
-                aggregate_report = {
-                    f"hor_agg_({aggregated_units})": horizontally_aggregated
-                }
+                aggregate_report = {f"hor_agg_({aggregated_units})": horizontally_aggregated}
             else:
                 aggregate_report = {"hor_agg": horizontally_aggregated}
 
