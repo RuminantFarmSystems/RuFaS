@@ -483,10 +483,10 @@ def test_perform_aggregations(
         ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
-        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg_(kg)": [6]}, []),
+        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"data_(kg)_ver_agg_(kg)": [6]}, []),
         ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"ver_agg": [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg": [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"data_ver_agg": [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": True}, None, "sum", {"data_ver_agg": [6]}, []),
     ],
 )
 def test_route_aggregator_functions(
