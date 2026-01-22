@@ -419,8 +419,11 @@ class ReportGenerator:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
-                    column_name = f"{next(iter(vertically_aggregated))}_ver_agg" if not \
-                        filter_content.get("use_compact_ver_agg_name") else "ver_agg"
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if not filter_content.get("use_compact_ver_agg_name")
+                        else "ver_agg"
+                    )
                     if units is not None:
                         aggregate_report = {f"{column_name}_{units.group(0)}": list(vertically_aggregated.values())[0]}
                     else:
@@ -429,11 +432,12 @@ class ReportGenerator:
                 if has_dict_variables or has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
-                    column_name = f"{next(iter(vertically_aggregated))}_ver_agg" if not \
-                        filter_content.get("use_compact_ver_agg_name") else "ver_agg"
-                    aggregate_report = {
-                        column_name: list(vertically_aggregated.values())[0]
-                    }
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if not filter_content.get("use_compact_ver_agg_name")
+                        else "ver_agg"
+                    )
+                    aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
 
         return aggregate_report, event_logs
 
