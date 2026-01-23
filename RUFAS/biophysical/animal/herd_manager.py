@@ -692,72 +692,68 @@ class HerdManager:
             newborn_calf.events.add_event(newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
-    def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
-        """
-        Checks if surplus cows need to be sold based on herd size.
-
-        Rule:
-          - Prefer removing cows with reproduction.do_not_breed == True, ordered by lowest daily milk.
-          - If none, remove non-DNB cows ordered by lowest 305-day milk.
-        """
+    def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
+        """Finds the index of the best candidate cow to sell based on priority rules."""
         MIN_DIM_FOR_REMOVAL = 60
-        animals_removed: list[Animal] = []
-        while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
-            dnb_indices: list[int] = []
-            non_dnb_indices: list[int] = []
-            for index, cow in enumerate(self.cows):
-                if cow in removed_animal:
-                    continue
-                if cow.reproduction.do_not_breed:
-                    dnb_indices.append(index)
-                elif cow.days_in_milk > MIN_DIM_FOR_REMOVAL:
-                    non_dnb_indices.append(index)
+        dnb_indices = []
+        non_dnb_indices = []
 
-            if not dnb_indices and not non_dnb_indices:
-                self.om.add_error("Unable to adjust herd size", "There are no cow that's qualified to be sold.", {})
+        for index, cow in enumerate(self.cows):
+            if cow in removed_animal:
+                continue
+            if cow.reproduction.do_not_breed:
+                dnb_indices.append(index)
+            elif cow.days_in_milk > MIN_DIM_FOR_REMOVAL:
+                non_dnb_indices.append(index)
+
+        if not dnb_indices and not non_dnb_indices:
+            return None
+
+        # Priority 1: DNB cows by lowest daily milk
+        if dnb_indices:
+            return min(dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+
+        # Priority 2: Non-DNB cows by lowest daily milk (qualified by DIM)
+        return min(non_dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+
+    def _record_sold_cow_stats(self, removed_cow: Animal, simulation_day: int) -> None:
+        """Updates herd statistics and metadata for a sold cow."""
+        removed_cow.sold_at_day = simulation_day
+        self.herd_statistics.sold_cows_info.append(
+            SoldAnimalTypedDict(
+                id=removed_cow.id,
+                animal_type=removed_cow.animal_type.value,
+                sold_at_day=removed_cow.sold_at_day,
+                body_weight=removed_cow.body_weight,
+                cull_reason="NA",
+                days_in_milk=removed_cow.days_in_milk,
+                parity="NA",
+            )
+        )
+        self.herd_statistics.cow_num -= 1
+        self.herd_statistics.sold_cow_oversupply_num += 1
+        self.herd_statistics.cow_herd_exit_num -= 1
+        self.herd_statistics.sold_cow_num += 1
+
+    def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
+        """Checks if surplus cows need to be sold based on herd size."""
+        animals_removed: list[Animal] = []
+
+        while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
+            remove_index = self._get_cow_removal_index(removed_animal)
+
+            if remove_index is None:
+                self.om.add_error("Unable to adjust herd size",
+                                  "There are no cow that's qualified to be sold.", {})
                 break
 
-            if dnb_indices:  # when there is dnb to remove
-                lowest_production_cow_index = 0
-                current_lowest_production_value = math.inf
-                for index in dnb_indices:
-                    daily_milk_produced = self.cows[index].milk_production.daily_milk_produced
-                    if daily_milk_produced < current_lowest_production_value:
-                        current_lowest_production_value = daily_milk_produced
-                        lowest_production_cow_index = index
-                remove_index = lowest_production_cow_index
-            else:
-                lowest_production_cow_index = 0
-                current_lowest_estimation_value = math.inf
-                for index in non_dnb_indices:
-                    # estimated_production = self.cows[index].mature_equivalent_milking_prediction_305_day
-                    estimated_production = self.cows[index].milk_production.daily_milk_produced
-                    if estimated_production < current_lowest_estimation_value:
-                        current_lowest_estimation_value = estimated_production
-                        lowest_production_cow_index = index
-                remove_index = lowest_production_cow_index
-
             removed_cow = self.cows.pop(remove_index)
-            removed_cow.sold_at_day = simulation_day
+            self._record_sold_cow_stats(removed_cow, simulation_day)
             animals_removed.append(removed_cow)
 
-            self.herd_statistics.sold_cows_info.append(
-                SoldAnimalTypedDict(
-                    id=removed_cow.id,
-                    animal_type=removed_cow.animal_type.value,
-                    sold_at_day=removed_cow.sold_at_day,
-                    body_weight=removed_cow.body_weight,
-                    cull_reason="NA",
-                    days_in_milk=removed_cow.days_in_milk,
-                    parity="NA",
-                )
-            )
-            self.herd_statistics.cow_num -= 1
-            self.herd_statistics.sold_cow_oversupply_num += 1
-            self.herd_statistics.cow_herd_exit_num -= 1
-            self.herd_statistics.sold_cow_num += 1
-
         return animals_removed
+
+    # estimated_production = self.cows[index].mature_equivalent_milking_prediction_305_day
 
     def _check_if_replacement_heifers_needed(self, time: RufasTime) -> list[Animal]:
         """
