@@ -496,9 +496,7 @@ def test_create_newborn_calf(
         animal.events.add_event.assert_called_once()
 
 
-def _create_sortable_mock_cow(
-    id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int
-) -> MagicMock:
+def _create_sortable_mock_cow(id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int) -> MagicMock:
     """Helper to create a mock cow with specific sorting attributes."""
     cow = MagicMock(spec=Animal)
     cow.id = id_val
@@ -517,9 +515,7 @@ def _create_sortable_mock_cow(
     return cow
 
 
-def test_check_if_cows_need_to_be_sold_comprehensive(
-    herd_manager: HerdManager, mocker: MockerFixture
-) -> None:
+def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """
     Unit test for _check_if_cows_need_to_be_sold().
 
@@ -558,7 +554,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(
         cow_dnb_high_milk,
         cow_normal_low_milk,
         cow_normal_high_milk,
-        cow_protected_low_dim
+        cow_protected_low_dim,
     ] + fillers
 
     herd_manager.cows = all_cows
