@@ -743,8 +743,7 @@ class HerdManager:
             remove_index = self._get_cow_removal_index(removed_animal)
 
             if remove_index is None:
-                self.om.add_error("Unable to adjust herd size",
-                                  "There are no cow that's qualified to be sold.", {})
+                self.om.add_error("Unable to adjust herd size", "There are no cow that's qualified to be sold.", {})
                 break
 
             removed_cow = self.cows.pop(remove_index)
