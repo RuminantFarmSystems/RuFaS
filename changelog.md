@@ -282,6 +282,8 @@ v0.9.2
 - [2655](https://github.com/RuminantFarmSystems/MASM/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 - [2670](https://github.com/RuminantFarmSystems/MASM/pull/2670) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated Animal module unit testing to 100% coverage.
 - [2673](https://github.com/RuminantFarmSystems/MASM/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
+- [2678](https://github.com/RuminantFarmSystems/MASM/pull/2678) - [minor change] [Feed] [InputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation.
+- [2675](https://github.com/RuminantFarmSystems/MASM/pull/2675) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Fixes and clarifies data fixing error messaging for IM.
 - [2676](https://github.com/RuminantFarmSystems/MASM/pull/2673) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2674](https://github.com/RuminantFarmSystems/MASM/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
 - [2676](https://github.com/RuminantFarmSystems/MASM/pull/2676) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
