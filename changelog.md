@@ -264,6 +264,7 @@ v0.9.2
 - [2618](https://github.com/RuminantFarmSystems/MASM/pull/2618) - [minor change] Removes outdated example regional feed inputs.
 - [2624](https://github.com/RuminantFarmSystems/MASM/pull/2624) - [minor change] [NoInputChange][NoOutputChange] Updates the PR template and changelog to reflect IO changes.
 - [1299](https://github.com/RuminantFarmSystems/MASM/pull/1299) - [minor change] [InputChange][OutputChange] Implements the Energy submodule of the EEE module with diesel consumption calculation.
+- [2622](https://github.com/RuminantFarmSystems/MASM/pull/2622) - [minor change] [InputChange][OutputChange] Implement 305 days milk production logic and utilizing such merit to maintain herd size.
 - [2629](https://github.com/RuminantFarmSystems/MASM/pull/2629) - [minor change] [NoInputChange][NoOutputChange][Units][Reporting] Updates a couple units mappings that were incorrect/misspelled.
 - [2635](https://github.com/RuminantFarmSystems/MASM/pull/2635) - [minor change] [NoInputChange][NoOutputChange] Updates the ReadMe `Getting Started` section to be more straightforward about how to get RUFAS running.
 - [2634](https://github.com/RuminantFarmSystems/MASM/pull/2634) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
@@ -293,6 +294,7 @@ v0.9.2
 - [2708](https://github.com/RuminantFarmSystems/RuFaS/pull/2708) - [minor change] [FeedStorage] [NoInputChange] [NoOutputChange] Eases restriction on type for feed storage config inputs.
 - [2710](https://github.com/RuminantFarmSystems/RuFaS/pull/2710) - [minor change] [Pilot testing] [NoInputChange] [NoOutputChange] Quick fix for farm 4 failure in pilot testing.
 - [2711](https://github.com/RuminantFarmSystems/MASM/pull/2711) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Updates damping factor and Arrhenius constant values
+
 
 ### v0.9.2
 
