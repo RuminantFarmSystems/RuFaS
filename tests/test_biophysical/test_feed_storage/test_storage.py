@@ -27,7 +27,7 @@ def storage() -> Storage:
     Storage
         An instance of the Storage class.
     """
-    mock_storage_config: dict[str, str | float] = {
+    mock_storage_config: dict[str, str | float | list[str]] = {
         "name": "Test Storage",
         "field_names": ["Test Field"],
         "crop_name": "corn_silage",

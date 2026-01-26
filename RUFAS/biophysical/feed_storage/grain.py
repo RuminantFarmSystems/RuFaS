@@ -18,7 +18,7 @@ class Grain(Storage):
         Coefficient determining how much dry matter is lost in grain storage (unitless).
     """
 
-    def __init__(self, config: dict[str, str | float]):
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.dm_loss_coefficient = config.get("dm_loss_coefficient")
 
@@ -30,7 +30,7 @@ class Dry(Grain):
     Inherits from Grain.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
 
 
@@ -41,5 +41,5 @@ class HighMoisture(Grain):
     Inherits from Grain.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)

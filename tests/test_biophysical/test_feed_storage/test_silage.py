@@ -17,7 +17,7 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def mock_silage_config() -> dict[str, str | float]:
+def mock_silage_config() -> dict[str, str | float | list[str]]:
     return {
         "name": "silage",
         "rufas_id": 1,
@@ -30,7 +30,7 @@ def mock_silage_config() -> dict[str, str | float]:
 
 
 @pytest.fixture
-def silage(mock_silage_config: dict[str, str | float]) -> Silage:
+def silage(mock_silage_config: dict[str, str | float | list[str]]) -> Silage:
     return Silage(config=mock_silage_config)
 
 
@@ -238,17 +238,17 @@ def test_calculate_crude_protein_after_effluent_loss(
 
 
 @pytest.fixture
-def bunker(mock_silage_config: dict[str, str | float]) -> Bunker:
+def bunker(mock_silage_config: dict[str, str | float | list[str]]) -> Bunker:
     return Bunker(config=mock_silage_config)
 
 
 @pytest.fixture
-def pile(mock_silage_config: dict[str, str | float]) -> Pile:
+def pile(mock_silage_config: dict[str, str | float | list[str]]) -> Pile:
     return Pile(config=mock_silage_config)
 
 
 @pytest.fixture
-def bag(mock_silage_config: dict[str, str | float]) -> Bag:
+def bag(mock_silage_config: dict[str, str | float | list[str]]) -> Bag:
     return Bag(config=mock_silage_config)
 
 

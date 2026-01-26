@@ -30,7 +30,6 @@ from RUFAS.output_manager import OutputManager
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
-
 """Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
@@ -162,7 +161,7 @@ class FeedManager:
                     "to any feed listed in the available feeds. This storage will not be used for feeding.",
                     {
                         "class": self.__class__.__name__,
-                        "function": self.receive_crop.__name__,
+                        "function": self._create_all_storages.__name__,
                     },
                 )
 
@@ -191,8 +190,8 @@ class FeedManager:
         combo_to_names: dict[tuple[str | None, str | None], list[str]] = defaultdict(list)
 
         for config in all_configs:
-            crop_name = config.get("crop_name")
-            field_names = config.get("field_names")
+            crop_name = config["crop_name"]
+            field_names = config["field_names"]
             name = config.get("name", "<unnamed_storage>")
             for field_name in field_names:
                 combo_to_names[(crop_name, field_name)].append(name)
@@ -322,17 +321,18 @@ class FeedManager:
 
     def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
-        feed_report: dict[RUFAS_ID, dict[str, float]] = {
-            feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0} for feed in self._available_feeds
-        }
+        feed_report: dict[RUFAS_ID, dict[str, float]] = {}
 
         for storage in self.active_storages.values():
             for crop in storage.stored:
                 rufas_id = storage.rufas_feed_id
                 if rufas_id not in feed_report:
-                    continue
-                feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
-                feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
+                    feed_report[rufas_id] = {}
+                    feed_report[rufas_id]["dry_matter_mass"] = crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] = crop.fresh_mass
+                else:
+                    feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,
