@@ -417,15 +417,22 @@ class EmissionsEstimator:
             last_harvest_date = -1
             for harvest_date in harvest_dates:
                 feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-                harvest_operation = harvest_yield_by_field[field_name][harvest_date]["harvest_type"]
+                print(f"Harvest date: {harvest_date} for field: {field_name} for feed_id: {feed_id}")
                 if feed_id is None:
                     last_harvest_date = harvest_date
                     continue
                 has_remaining_feed_at_harvest = \
-                    farmgrown_feed_inventory_by_feed_id[feed_id].get("harvest_date", 0.0) == 0.0
+                    farmgrown_feed_inventory_by_feed_id[feed_id].get("harvest_date", 0.0) > 0.0
+                harvest_operation = harvest_yield_by_field[field_name][harvest_date]["harvest_type"]
+                if has_remaining_feed_at_harvest:
+                    print(f"first tier harvest operation: {harvest_operation}")
+                    print(f"Simulation day is {harvest_date}, feed_id is {feed_id}")
+                #     if feed_id in farmgrown_feed_inventory_by_feed_id:
+                #         print(f"harvest operation: {harvest_operation}")
                 if feed_id in farmgrown_feed_inventory_by_feed_id and \
-                    has_remaining_feed_at_harvest and \
+                    not has_remaining_feed_at_harvest and \
                         harvest_operation == "harvest-kill":
+                    print(f"Skipping emissions calculation for feed_id {feed_id} on field {field_name} at harvest date {harvest_date}")
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = {
                         "nitrous_oxide_emissions": 0.0,
                         "ammonia_emissions": 0.0,
