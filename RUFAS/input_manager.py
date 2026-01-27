@@ -307,7 +307,7 @@ class InputManager:
 
     def _validate_runtime_metadata(self, runtime_metadata: Dict[str, Any], info_map: Dict[str, Any]) -> bool:
         is_valid, message = self.data_validator.validate_metadata(
-            runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS
+            runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, self.input_root
         )
         if is_valid:
             return True
@@ -619,14 +619,14 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
-
+        self.input_root = input_root
         data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
-            file_path = Path(input_root) / file_details["path"]
+            file_path = Path(self.input_root) / file_details["path"]
             if file_details["type"] == "json":
                 self.csv_report_generation_list.append(file_blob_key)
 
