@@ -9,7 +9,6 @@ from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility, Aggregator
 
-
 AGGREGATION_FUNCTIONS: dict[str, Callable[[list[float]], float] | Callable[[list[float]], float | None]] = {
     "average": Aggregator.average,
     "division": Aggregator.division,
@@ -420,15 +419,25 @@ class ReportGenerator:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if not filter_content.get("use_compact_ver_agg_name")
+                        else "ver_agg"
+                    )
                     if units is not None:
-                        aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+                        aggregate_report = {f"{column_name}_{units.group(0)}": list(vertically_aggregated.values())[0]}
                     else:
-                        aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                        aggregate_report = {f"{column_name}": list(vertically_aggregated.values())[0]}
             else:
                 if has_dict_variables or has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
-                    aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if not filter_content.get("use_compact_ver_agg_name")
+                        else "ver_agg"
+                    )
+                    aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
 
         return aggregate_report, event_logs
 
