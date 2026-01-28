@@ -94,9 +94,13 @@ class ReportGenerator:
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
-                report_data, aggregation_logs = self._perform_aggregations(cross_reference_data, filter_content)
+                report_data, aggregation_logs, is_report_aggregated = self._perform_aggregations(
+                    cross_reference_data, filter_content
+                )
             else:
-                report_data, aggregation_logs = self._perform_aggregations(filtered_pool, filter_content)
+                report_data, aggregation_logs, is_report_aggregated = self._perform_aggregations(
+                    filtered_pool, filter_content
+                )
             event_logs.extend(aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
@@ -106,7 +110,12 @@ class ReportGenerator:
                 )
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                    (individual_report_name if individual_report_name else col)
+                    if (
+                        (not is_report_aggregated and not filter_content.get("use_verbose_report_name"))
+                        and len(report_data) == 1
+                    )
+                    else (f"{individual_report_name}_{col}" if individual_report_name else col)
                 )
                 report_filter_data[column_name] = {"values": values}
             if should_graph_report_data:
@@ -303,7 +312,7 @@ class ReportGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: dict[str, Any],
-    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
@@ -316,7 +325,7 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
+        tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]
             If no aggregation is specified, all the columns will be returned.
             If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
                 that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
@@ -324,6 +333,7 @@ class ReportGenerator:
             If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
             If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
             The second element is the event logs.
+            The third element is a boolean indicating whether the report data has been aggregated.
 
         Raises
         ------
@@ -353,7 +363,7 @@ class ReportGenerator:
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data, [] if not event_logs else event_logs
+            return report_data, [] if not event_logs else event_logs, False
 
         aggregate_report, aggregation_logs = self._route_aggregator_functions(
             report_data, filter_content, horizontal_agg_key, vertical_agg_key
@@ -361,7 +371,7 @@ class ReportGenerator:
 
         event_logs = event_logs + aggregation_logs
 
-        return aggregate_report, event_logs
+        return aggregate_report, event_logs, True
 
     def _route_aggregator_functions(
         self,
@@ -421,7 +431,7 @@ class ReportGenerator:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
                     column_name = (
                         f"{next(iter(vertically_aggregated))}_ver_agg"
-                        if not filter_content.get("use_compact_ver_agg_name")
+                        if filter_content.get("use_verbose_report_name")
                         else "ver_agg"
                     )
                     if units is not None:
@@ -434,7 +444,7 @@ class ReportGenerator:
                 else:
                     column_name = (
                         f"{next(iter(vertically_aggregated))}_ver_agg"
-                        if not filter_content.get("use_compact_ver_agg_name")
+                        if filter_content.get("use_verbose_report_name")
                         else "ver_agg"
                     )
                     aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
