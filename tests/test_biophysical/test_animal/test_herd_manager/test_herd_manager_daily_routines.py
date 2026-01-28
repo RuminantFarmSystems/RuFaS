@@ -568,7 +568,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
 
     assert herd_manager.herd_statistics.sold_cow_oversupply_num == 5
     assert herd_manager.herd_statistics.sold_cow_num == 5
-    assert herd_manager.herd_statistics.cow_herd_exit_num == 5
+    assert herd_manager.herd_statistics.cow_herd_exit_num == 15
 
     assert len(herd_manager.herd_statistics.sold_cows_info) == 5
     assert herd_manager.herd_statistics.sold_cows_info[0]["id"] == cow_dnb_low_milk.id

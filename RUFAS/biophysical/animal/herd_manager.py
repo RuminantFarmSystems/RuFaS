@@ -732,7 +732,7 @@ class HerdManager:
         )
         self.herd_statistics.cow_num -= 1
         self.herd_statistics.sold_cow_oversupply_num += 1
-        self.herd_statistics.cow_herd_exit_num -= 1
+        self.herd_statistics.cow_herd_exit_num += 1
         self.herd_statistics.sold_cow_num += 1
 
     def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
