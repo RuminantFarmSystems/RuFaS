@@ -161,6 +161,9 @@ class Separator(Processor):
         self._report_manure_stream(solid_manure_stream, solid_stream_name, time.simulation_day)
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
+        if liquid_manure_water <= 0.0:
+            print("Liquid manure volume is negative.")
+            liquid_manure_water = 0.1
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
