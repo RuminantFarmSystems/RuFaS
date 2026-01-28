@@ -1573,8 +1573,8 @@ class Animal:
 
         newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
 
-        (daily_routines_output.animal_status, daily_routines_output.newborn_calf_config) = (
-            self.animal_life_stage_update(time)
+        daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
+            time
         )
 
         if self.animal_type.is_cow and newborn_calf_config is not None:
@@ -1748,14 +1748,6 @@ class Animal:
             self.cull_reason = animal_constants.DEATH_CULL
             animal_status = AnimalStatus.DEAD
 
-        if (
-            self.animal_type.is_cow
-            and self.reproduction.do_not_breed
-            and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production
-        ):
-            self.cull_reason = animal_constants.LOW_PROD_CULL
-            self.sold_at_day = time.simulation_day
-            animal_status = AnimalStatus.SOLD
         return animal_status, newborn_calf_config
 
     def _evaluate_calf_for_heiferI(self) -> bool:

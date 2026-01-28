@@ -380,14 +380,6 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     sold_oversupply_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=True) for _ in range(5)]
     bought_replacement_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=False) for _ in range(5)]
 
-    graduated_animals = (
-        graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs + graduated_cows
-    )
-    newborn_calves = heiferIII_newborn_calves + cow_newborn_calves
-    removed_animals = (
-        sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows + sold_oversupply_heiferIIIs
-    )
-
     mock_perform_daily_routines_for_animals_side_effect: list[
         tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]
     ] = [
@@ -405,8 +397,8 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         side_effect=mock_perform_daily_routines_for_animals_side_effect,
     )
     mock_update_sold_animal_statistics = mocker.patch.object(herd_manager, "_update_sold_animal_statistics")
-    mock_check_if_heifers_need_to_be_sold = mocker.patch.object(
-        herd_manager, "_check_if_heifers_need_to_be_sold", return_value=sold_oversupply_heiferIIIs
+    mock_check_if_cows_need_to_be_sold = mocker.patch.object(
+        herd_manager, "_check_if_cows_need_to_be_sold", return_value=sold_oversupply_heiferIIIs
     )
     mock_check_if_replacement_heifers_needed = mocker.patch.object(
         herd_manager, "_check_if_replacement_heifers_needed", return_value=bought_replacement_heiferIIIs
@@ -451,18 +443,9 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_update_sold_animal_statistics.assert_called_once_with(
         sold_newborn_calves=[], sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
     )
-    mock_check_if_heifers_need_to_be_sold.assert_called_once_with(simulation_day=mock_time.simulation_day)
-    mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
-    mock_update_herd_structure.assert_called_once_with(
-        graduated_animals=graduated_animals,
-        newborn_calves=newborn_calves,
-        newly_added_animals=bought_replacement_heiferIIIs,
-        removed_animals=removed_animals,
-        available_feeds=[mock_feed],
-        current_day_conditions=mock_weather.get_current_day_conditions(),
-        total_inventory=mock_total_inventory,
-        simulation_day=15,
-    )
+    assert mock_check_if_cows_need_to_be_sold.call_count == 0
+    assert mock_check_if_replacement_heifers_needed.call_count == 0
+    assert mock_update_herd_structure.call_count == 1
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()
     mock_report_manure_streams.assert_called_once()
@@ -505,44 +488,105 @@ def test_create_newborn_calf(
         animal.events.add_event.assert_called_once()
 
 
-def test_check_if_heifers_need_to_be_sold(
-    mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
-) -> None:
-    """Unit test for _check_if_heifers_need_to_be_sold()"""
-    herd_manager, _ = mock_herd_manager(
-        calves=mock_herd["calves"],
-        heiferIs=mock_herd["heiferIs"],
-        heiferIIs=mock_herd["heiferIIs"],
-        heiferIIIs=mock_herd["heiferIIIs"] * 25,
-        cows=mock_herd["dry_cows"] + mock_herd["lac_cows"],
-        replacement=mock_herd["replacement"],
-        mocker=mocker,
-        mock_get_data_side_effect=mock_get_data_side_effect,
-    )
-    herd_manager.herd_statistics.heiferIII_num, herd_manager.herd_statistics.cow_num = (
-        len(herd_manager.heiferIIIs),
-        len(herd_manager.cows),
-    )
+def _create_sortable_mock_cow(id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int) -> MagicMock:
+    """Helper to create a mock cow with specific sorting attributes."""
+    cow = MagicMock(spec=Animal)
+    cow.id = id_val
+    cow.animal_type = AnimalType.LAC_COW
+    cow.body_weight = 600.0
+    cow.sold_at_day = None
 
-    result = herd_manager._check_if_heifers_need_to_be_sold(simulation_day=0)
+    cow.reproduction = MagicMock()
+    cow.reproduction.do_not_breed = is_dnb
+    cow.reproduction.calves = 1
 
-    expected_sold_heiferIIIs = mock_herd["heiferIIIs"][::-1][:3]
-    expected_sold_heiferIIIs_info = [
-        {
-            "id": removed_heiferIII.id,
-            "animal_type": removed_heiferIII.animal_type.value,
-            "sold_at_day": removed_heiferIII.sold_at_day,
-            "body_weight": removed_heiferIII.body_weight,
-            "cull_reason": "NA",
-            "days_in_milk": "NA",
-            "parity": "NA",
-        }
-        for removed_heiferIII in expected_sold_heiferIIIs[:3]
-    ]
-    assert result == expected_sold_heiferIIIs
-    assert herd_manager.herd_statistics.sold_heiferIIIs_info == expected_sold_heiferIIIs_info
-    assert herd_manager.herd_statistics.heiferIII_num == 97
-    assert herd_manager.herd_statistics.sold_heiferIII_oversupply_num == 3
+    cow.milk_production = MagicMock()
+    cow.milk_production.daily_milk_produced = daily_milk
+
+    cow.days_in_milk = days_in_milk
+    return cow
+
+
+def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """
+    Unit test for _check_if_cows_need_to_be_sold().
+
+    Verifies:
+    1. Cows marked 'do_not_breed' (DNB) are removed first.
+    2. Within priority groups, cows are removed by lowest milk production.
+    3. Non-DNB cows with DIM < 60 are protected (skipped).
+    4. Error is logged if herd is too large but no cows are eligible.
+    5. Statistics are updated correctly based on source code logic.
+    """
+    HERD_TARGET = 10
+    SELLING_THRESHOLD = 1.0
+    SIMULATION_DAY = 100
+
+    herd_manager.herd_statistics.herd_num = HERD_TARGET
+    herd_manager.selling_threshold = SELLING_THRESHOLD
+    herd_manager.herd_statistics.cow_num = 15
+    herd_manager.herd_statistics.sold_cow_oversupply_num = 0
+    herd_manager.herd_statistics.sold_cow_num = 0
+    herd_manager.herd_statistics.cow_herd_exit_num = 10
+
+    cow_dnb_low_milk = _create_sortable_mock_cow(1, True, 10.0, 100)
+    cow_dnb_high_milk = _create_sortable_mock_cow(2, True, 50.0, 100)
+    cow_normal_low_milk = _create_sortable_mock_cow(3, False, 20.0, 100)
+    cow_normal_high_milk = _create_sortable_mock_cow(4, False, 40.0, 100)
+    cow_protected_low_dim = _create_sortable_mock_cow(5, False, 5.0, 10)
+
+    fillers = []
+    for i in range(10):
+        fillers.append(_create_sortable_mock_cow(10 + i, False, 100.0, 200))
+
+    fillers[0].milk_production.daily_milk_produced = 90.0
+
+    all_cows = [
+        cow_dnb_low_milk,
+        cow_dnb_high_milk,
+        cow_normal_low_milk,
+        cow_normal_high_milk,
+        cow_protected_low_dim,
+    ] + fillers
+
+    herd_manager.cows = all_cows
+
+    mock_om_add_error = mocker.patch.object(herd_manager.om, "add_error")
+
+    removed_cows = herd_manager._check_if_cows_need_to_be_sold(SIMULATION_DAY, [])
+
+    assert len(removed_cows) == 5
+    assert len(herd_manager.cows) == 10
+
+    assert removed_cows[0] == cow_dnb_low_milk
+    assert removed_cows[1] == cow_dnb_high_milk
+    assert removed_cows[2] == cow_normal_low_milk
+    assert removed_cows[3] == cow_normal_high_milk
+    assert removed_cows[4] == fillers[0]
+
+    assert cow_protected_low_dim in herd_manager.cows
+
+    assert herd_manager.herd_statistics.sold_cow_oversupply_num == 5
+    assert herd_manager.herd_statistics.sold_cow_num == 5
+    assert herd_manager.herd_statistics.cow_herd_exit_num == 15
+
+    assert len(herd_manager.herd_statistics.sold_cows_info) == 5
+    assert herd_manager.herd_statistics.sold_cows_info[0]["id"] == cow_dnb_low_milk.id
+    assert herd_manager.herd_statistics.sold_cows_info[0]["sold_at_day"] == SIMULATION_DAY
+
+    herd_manager.herd_statistics.herd_num = 1
+    herd_manager.selling_threshold = 1.0
+
+    cow_prot_1 = _create_sortable_mock_cow(99, False, 100.0, 10)
+    cow_prot_2 = _create_sortable_mock_cow(98, False, 100.0, 10)
+    herd_manager.cows = [cow_prot_1, cow_prot_2]
+
+    stuck_result = herd_manager._check_if_cows_need_to_be_sold(SIMULATION_DAY, [])
+
+    assert len(stuck_result) == 0
+    mock_om_add_error.assert_called_once_with(
+        "Unable to adjust herd size", "There are no cow that's qualified to be sold.", {}
+    )
 
 
 def test_check_if_replacement_heifers_needed(

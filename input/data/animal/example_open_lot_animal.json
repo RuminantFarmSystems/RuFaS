@@ -7,6 +7,9 @@
     "cow_num": 1000,
     "replace_num": 5000,
     "herd_num": 1000,
+	"herd_size_adjustment_period": 30,
+  	"herd_selling_threshold": 1.03,
+  	"herd_buying_threshold": 1.01,
     "breed": "HO",
 	"parity_fractions": {
 		"1": 0.35,

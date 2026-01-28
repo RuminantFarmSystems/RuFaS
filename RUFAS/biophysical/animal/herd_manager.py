@@ -92,8 +92,6 @@ class HerdManager:
             True if user-defined rations are used for the herd, otherwise false.
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
-        feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
-            Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
         self.im = InputManager()
@@ -127,6 +125,9 @@ class HerdManager:
 
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
+        self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
+        self.selling_threshold = animal_config_data["herd_information"]["herd_selling_threshold"]
+        self.buying_threshold = animal_config_data["herd_information"]["herd_buying_threshold"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
@@ -157,7 +158,7 @@ class HerdManager:
 
         if self.simulate_animals:
             herd_population = HerdFactory.post_animal_population
-            (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
+            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
                 herd_population.calves,
                 herd_population.heiferIs,
                 herd_population.heiferIIs,
@@ -595,19 +596,33 @@ class HerdManager:
         )
 
         self._update_stillborn_calf_statistics(stillborn_newborn_calves)
+        if time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0:
+            removed_animals += self._check_if_cows_need_to_be_sold(
+                simulation_day=time.simulation_day, removed_animal=removed_animals
+            )
+            newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
 
-        removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
-        newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-        self._update_herd_structure(
-            graduated_animals=graduated_animals,
-            newborn_calves=newborn_calves,
-            newly_added_animals=newly_added_animals,
-            removed_animals=removed_animals,
-            available_feeds=available_feeds,
-            current_day_conditions=weather.get_current_day_conditions(time),
-            total_inventory=total_inventory,
-            simulation_day=time.simulation_day,
-        )
+            self._update_herd_structure(
+                graduated_animals=graduated_animals,
+                newborn_calves=newborn_calves,
+                newly_added_animals=newly_added_animals,
+                removed_animals=removed_animals,
+                available_feeds=available_feeds,
+                current_day_conditions=weather.get_current_day_conditions(time),
+                total_inventory=total_inventory,
+                simulation_day=time.simulation_day,
+            )
+        else:
+            self._update_herd_structure(
+                graduated_animals=graduated_animals,
+                newborn_calves=newborn_calves,
+                newly_added_animals=[],
+                removed_animals=removed_animals,
+                available_feeds=available_feeds,
+                current_day_conditions=weather.get_current_day_conditions(time),
+                total_inventory=total_inventory,
+                simulation_day=time.simulation_day,
+            )
 
         self.record_pen_history(time.simulation_day)
         enteric_methane_emission_by_pen: dict[str, float] = {}
@@ -677,50 +692,64 @@ class HerdManager:
             newborn_calf.events.add_event(newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
-    def _check_if_heifers_need_to_be_sold(
-        self,
-        simulation_day: int,
-    ) -> list[Animal]:
-        """
-        Checks if surplus heifers need to be sold based on herd size.
+    def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
+        """Finds the index of the best candidate cow to sell based on priority rules."""
+        MIN_DIM_FOR_REMOVAL = 60
+        dnb_indices = []
+        non_dnb_indices = []
 
-        This method evaluates if the current number of heifers and cows exceeds a
-        specified threshold (defined as 3% over the herd statistics' target
-        herd size). If the threshold is surpassed, heiferIIIs are removed from the
-        herd until the herd size falls within the acceptable range.
+        for index, cow in enumerate(self.cows):
+            if cow in removed_animal:
+                continue
+            if cow.reproduction.do_not_breed:
+                dnb_indices.append(index)
+            elif cow.days_in_milk > MIN_DIM_FOR_REMOVAL:
+                non_dnb_indices.append(index)
 
-        Parameters
-        ----------
-        simulation_day : int
-            The simulation day on which the check and potential sale is conducted.
+        if not dnb_indices and not non_dnb_indices:
+            return None
 
-        Returns
-        -------
-        list[Animal]
-            A list of heiferIIIs to be sold.
+        # Priority 1: DNB cows by lowest daily milk
+        if dnb_indices:
+            return min(dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
 
-        """
-        animals_removed: list[Animal] = []
-        while (
-            self.current_herd_size > self.herd_statistics.herd_num * animal_constants.SELLING_THRESHOLD
-            and len(self.heiferIIIs) > 0
-        ):
-            removed_heiferIII = self.heiferIIIs.pop()
-            animals_removed.append(removed_heiferIII)
-            removed_heiferIII.sold_at_day = simulation_day
-            self.herd_statistics.sold_heiferIIIs_info.append(
-                SoldAnimalTypedDict(
-                    id=removed_heiferIII.id,
-                    animal_type=removed_heiferIII.animal_type.value,
-                    sold_at_day=removed_heiferIII.sold_at_day,
-                    body_weight=removed_heiferIII.body_weight,
-                    cull_reason="NA",
-                    days_in_milk="NA",
-                    parity="NA",
-                )
+        # Priority 2: Non-DNB cows by lowest daily milk (qualified by DIM)
+        return min(non_dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+
+    def _record_sold_cow_stats(self, removed_cow: Animal, simulation_day: int) -> None:
+        """Updates herd statistics and metadata for a sold cow."""
+        removed_cow.sold_at_day = simulation_day
+        self.herd_statistics.sold_cows_info.append(
+            SoldAnimalTypedDict(
+                id=removed_cow.id,
+                animal_type=removed_cow.animal_type.value,
+                sold_at_day=removed_cow.sold_at_day,
+                body_weight=removed_cow.body_weight,
+                cull_reason="NA",
+                days_in_milk=removed_cow.days_in_milk,
+                parity="NA",
             )
-            self.herd_statistics.sold_heiferIII_oversupply_num += 1
-            self.herd_statistics.heiferIII_num -= 1
+        )
+        self.herd_statistics.cow_num -= 1
+        self.herd_statistics.sold_cow_oversupply_num += 1
+        self.herd_statistics.cow_herd_exit_num += 1
+        self.herd_statistics.sold_cow_num += 1
+
+    def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
+        """Checks if surplus cows need to be sold based on herd size."""
+        animals_removed: list[Animal] = []
+
+        while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
+            remove_index = self._get_cow_removal_index(removed_animal)
+
+            if remove_index is None:
+                self.om.add_error("Unable to adjust herd size", "There are no cow that's qualified to be sold.", {})
+                break
+
+            removed_cow = self.cows.pop(remove_index)
+            self._record_sold_cow_stats(removed_cow, simulation_day)
+            animals_removed.append(removed_cow)
+
         return animals_removed
 
     def _check_if_replacement_heifers_needed(self, time: RufasTime) -> list[Animal]:
@@ -744,8 +773,8 @@ class HerdManager:
         """
         animals_added: list[Animal] = []
         while (
-            self.current_herd_size + self.herd_statistics.bought_heifer_num
-            < self.herd_statistics.herd_num * animal_constants.BUYING_THRESHOLD
+            len(self.cows) + self.herd_statistics.bought_heifer_num
+            < self.herd_statistics.herd_num * self.buying_threshold
             and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:
@@ -2042,3 +2071,7 @@ class HerdManager:
                     self.herd_statistics.total_enteric_methane[animal_type] = {
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
+
+    def update_milk_305_day_yield_predictions(self) -> None:
+        for cow in self.cows:
+            cow.update_mature_equivalent_305_days_milk_production()
