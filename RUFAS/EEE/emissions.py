@@ -60,7 +60,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Farmgrown Feed Deductions",
         "description": "Collects all farmgrown feeds fed to animals in the simulation.",
         "filters": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed",
-                    ".*RufasTime.simulation_day.*"],
+                    ".*feed_deduction_simulation_days.*"],
         "date_fields": "simulation_day",
     },
 }
@@ -319,7 +319,9 @@ class EmissionsEstimator:
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_deductions"]
         )
         feed_deduction_by_feed_id: dict[RUFAS_ID, dict[int, float]] = defaultdict(dict)
-        simulation_days: list[int] = filtered_data["RufasTime.simulation_day"]["values"]
+        print(filtered_data)
+        simulation_days: list[int] = filtered_data[
+            "FeedManager.report_feed_deduction_days.feed_deduction_simulation_days"]["values"]
         for variable, values in filtered_data.items():
             match = re.search(r"farmgrown_feed_(\d+)_fed", variable)
             if match:

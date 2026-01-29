@@ -94,6 +94,7 @@ class FeedManager:
         self._om = OutputManager()
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.active_storages: dict[str, Storage] = {}
+        self.deduction_days: set[int] = set()
 
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
@@ -486,6 +487,15 @@ class FeedManager:
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
 
+    def report_feed_deduction_days(self) -> None:
+        """Reports the simulation days that feed deductions happens at the end of simulation."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.report_feed_deduction_days.__name__,
+            "units": MeasurementUnits.SIMULATION_DAY
+        }
+        self._om.add_variable(f"feed_deduction_simulation_days", self.deduction_days, info_map)
+
     def _query_available_feed_totals(
         self, query_feed_ids: list[RUFAS_ID], stored_crops: dict[RUFAS_ID, float] | None = None
     ) -> dict[RUFAS_ID, float]:
@@ -682,8 +692,10 @@ class FeedManager:
         }
         for feed_id, amount in total_purchased.items():
             self._om.add_variable(f"purchased_feed_{feed_id}_fed", amount, info_map)
+            self.deduction_days.add(simulation_day)
         for feed_id, amount in total_farmgrown.items():
             self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", amount, info_map)
+            self.deduction_days.add(simulation_day)
 
     def _deduct_from_storage(
         self,
