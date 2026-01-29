@@ -422,10 +422,9 @@ class ReportGenerator:
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
             vertically_aggregated, event_logs = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
 
-            has_dict_variables = filter_content.get("variables") is not None
             has_multiple_columns = len(vertically_aggregated) > 1
             if display_units:
-                if has_dict_variables or has_multiple_columns:
+                if has_multiple_columns:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
@@ -439,7 +438,7 @@ class ReportGenerator:
                     else:
                         aggregate_report = {f"{column_name}": list(vertically_aggregated.values())[0]}
             else:
-                if has_dict_variables or has_multiple_columns:
+                if has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
                     column_name = (
