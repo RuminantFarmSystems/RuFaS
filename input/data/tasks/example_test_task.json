@@ -1,31 +1,12 @@
 {
-  "parallel_workers": 4,
+  "parallel_workers": 2,
   "tasks": [
   
-
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "metadata_file_path": "input/metadata/farm9_metadata.json",
+      "metadata_file_path": "input/metadata/farm7_wcrops_metadata.json",
       "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
-      "output_prefix": "farm9",
-      "log_verbosity": "errors",
-       "multi_run_counts": 4
-
-    },
-    {
-      "task_type": "SIMULATION_MULTI_RUN",
-      "metadata_file_path": "input/metadata/farm11_metadata.json",
-      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
-      "output_prefix": "farm11",
-      "log_verbosity": "errors",
-       "multi_run_counts": 4
-
-    },
-    {
-      "task_type": "SIMULATION_MULTI_RUN",
-      "metadata_file_path": "input/metadata/farm12_metadata.json",
-      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
-      "output_prefix": "farm12",
+      "output_prefix": "farm7",
       "log_verbosity": "errors",
        "multi_run_counts": 4
 
