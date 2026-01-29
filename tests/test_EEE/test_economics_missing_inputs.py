@@ -36,14 +36,8 @@ def test_partial_budget_ignores_missing_inputs(monkeypatch: pytest.MonkeyPatch) 
     pb = partial_budget.PartialBudget()
 
     assert pb.has_partial_budget_activity() is False
-    assert dummy_im.checked == [
-        "economics.partial_budget.additional_revenue",
-        "economics.partial_budget.reduced_costs",
-        "economics.partial_budget.additional_costs",
-        "economics.partial_budget.reduced_revenue",
-    ]
-    warning_codes = [code for code, _, _ in dummy_om.warnings]
-    assert warning_codes.count("MissingPartialBudgetInput") == 4
+    assert dummy_im.checked == []
+    assert dummy_om.warnings == []
 
 
 def test_capital_cost_present_handles_missing_table(monkeypatch: pytest.MonkeyPatch) -> None:

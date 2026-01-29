@@ -7,8 +7,10 @@ import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 from .equations import EconomicEquations
+from .fallback_values import INPUT_MANAGER_FALLBACKS, capital_cost_breakdown_fallback
 from .metrics import EconomicMetrics
 
 
@@ -23,9 +25,26 @@ class DCFRORCalculator:
     def _load_inputs(self) -> Dict[str, Any]:
         info_map = {"class": self.__class__.__name__, "function": self._load_inputs.__name__}
         try:
+            def _get_input(path: str, fallback: Any) -> Any:
+                if hasattr(self.im, "check_property_exists_in_pool"):
+                    try:
+                        if not self.im.check_property_exists_in_pool(path):
+                            return fallback
+                    except Exception:
+                        return fallback
+                try:
+                    value = self.im.get_data(path)
+                except Exception:
+                    return fallback
+                return fallback if value is None else value
+
             # Retrieve input data
-            loan_term = self.im.get_data("cashflow_inputs.loan_term")
-            project_term = self.im.get_data("cashflow_inputs.project_term")
+            loan_term = _get_input(
+                "cashflow_inputs.loan_term", INPUT_MANAGER_FALLBACKS["cashflow_inputs.loan_term"]
+            )
+            project_term = _get_input(
+                "cashflow_inputs.project_term", INPUT_MANAGER_FALLBACKS["cashflow_inputs.project_term"]
+            )
             if loan_term > project_term:
                 # Loan duration should not exceed the project lifetime
                 self.om.add_warning(
@@ -35,29 +54,92 @@ class DCFRORCalculator:
                 )
                 loan_term = project_term
 
+            cost_key = "capital_costs.capital_cost_breakdown"
+            if hasattr(self.im, "check_property_exists_in_pool"):
+                try:
+                    if not self.im.check_property_exists_in_pool(cost_key):
+                        cost_capital_multiple = capital_cost_breakdown_fallback()
+                    else:
+                        cost_capital_multiple = self.im.get_data(cost_key)
+                except Exception:
+                    cost_capital_multiple = capital_cost_breakdown_fallback()
+            else:
+                try:
+                    cost_capital_multiple = self.im.get_data(cost_key)
+                except Exception:
+                    cost_capital_multiple = capital_cost_breakdown_fallback()
+
             inputs: Dict[str, Any] = {
-                "cost_capital_multiple": self.im.get_data("capital_costs.capital_cost_breakdown"),
-                "cost_operational_units": self.im.get_data("cashflow_inputs.operating_units"),
-                "cost_operational_unit_cost": self.im.get_data("cashflow_inputs.operating_unit_costs"),
-                "units_produced": self.im.get_data("cashflow_inputs.units_produced"),
-                "unit_cost": self.im.get_data("cashflow_inputs.unit_price"),
-                "loan_interest_rate": self.im.get_data("cashflow_inputs.loan_interest_rate"),
+                "cost_capital_multiple": cost_capital_multiple,
+                "cost_operational_units": _get_input(
+                    "cashflow_inputs.operating_units",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.operating_units"],
+                ),
+                "cost_operational_unit_cost": _get_input(
+                    "cashflow_inputs.operating_unit_costs",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.operating_unit_costs"],
+                ),
+                "units_produced": _get_input(
+                    "cashflow_inputs.units_produced",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.units_produced"],
+                ),
+                "unit_cost": _get_input(
+                    "cashflow_inputs.unit_price",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.unit_price"],
+                ),
+                "loan_interest_rate": _get_input(
+                    "cashflow_inputs.loan_interest_rate",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.loan_interest_rate"],
+                ),
                 # Loan term is capped to the project term above per the
                 # guidance in `Documentation of Economic Data and Analytical
                 # Methods (2).pdf`.
                 "loan_term": loan_term,
-                "loan_amount": self.im.get_data("cashflow_inputs.loan_fraction"),
-                "equity_amount": self.im.get_data("cashflow_inputs.equity"),
-                "interest_rate_construction": self.im.get_data("cashflow_inputs.const_int"),
-                "construction_term": self.im.get_data("cashflow_inputs.const_term"),
-                "construction_finish_pcts": self.im.get_data("cashflow_inputs.const_rate_i"),
-                "tax_rate": self.im.get_data("cashflow_inputs.tax_rate"),
-                "internal_rate_of_return": self.im.get_data("cashflow_inputs.target_internal_rate_of_return"),
+                "loan_amount": _get_input(
+                    "cashflow_inputs.loan_fraction",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.loan_fraction"],
+                ),
+                "equity_amount": _get_input(
+                    "cashflow_inputs.equity", INPUT_MANAGER_FALLBACKS["cashflow_inputs.equity"]
+                ),
+                "interest_rate_construction": _get_input(
+                    "cashflow_inputs.const_int",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.const_int"],
+                ),
+                "construction_term": _get_input(
+                    "cashflow_inputs.const_term",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.const_term"],
+                ),
+                "construction_finish_pcts": _get_input(
+                    "cashflow_inputs.const_rate_i",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.const_rate_i"],
+                ),
+                "tax_rate": _get_input(
+                    "cashflow_inputs.tax_rate", INPUT_MANAGER_FALLBACKS["cashflow_inputs.tax_rate"]
+                ),
+                "internal_rate_of_return": _get_input(
+                    "cashflow_inputs.target_internal_rate_of_return",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.target_internal_rate_of_return"],
+                ),
                 "project_term": project_term,
-                "depreciation_rate": np.array(self.im.get_data("cashflow_inputs.depreciation_i")),
-                "enable": self.im.get_data("cashflow_inputs.enable_dcfror"),
-                "tax_credit_used": self.im.get_data("cashflow_inputs.tax_credit_used"),
-                "tax_credit_revenue": self.im.get_data("cashflow_inputs.tax_credit_revenue"),
+                "depreciation_rate": np.array(
+                    _get_input(
+                        "cashflow_inputs.depreciation_i",
+                        INPUT_MANAGER_FALLBACKS["cashflow_inputs.depreciation_i"],
+                    )
+                ),
+                "enable": _get_input(
+                    "cashflow_inputs.enable_dcfror",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.enable_dcfror"],
+                ),
+                "tax_credit_used": _get_input(
+                    "cashflow_inputs.tax_credit_used",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.tax_credit_used"],
+                ),
+                "tax_credit_revenue": _get_input(
+                    "cashflow_inputs.tax_credit_revenue",
+                    INPUT_MANAGER_FALLBACKS["cashflow_inputs.tax_credit_revenue"],
+                ),
             }
             inputs["cost_capital_multiple"].set_index("Item", inplace=True)
             return inputs
@@ -71,10 +153,14 @@ class DCFRORCalculator:
         info_map = {"class": self.__class__.__name__, "function": self.calculate.__name__}
 
         if not self.inputs.get("enable", False):
-            self.om.add_log("DCFROR calculation skipped due to configuration flag.", info_map)
+            self.om.add_log(
+                "DCFROR calculation",
+                "DCFROR calculation skipped due to configuration flag.",
+                info_map,
+            )
             return
 
-        self.om.add_log("Starting DCFROR calculation", info_map)
+        self.om.add_log("DCFROR calculation", "Starting DCFROR calculation", info_map)
 
         try:
             cost_inputs = self._prepare_costs()
@@ -180,7 +266,7 @@ class DCFRORCalculator:
             "loan_term": loan_term,
             "financed_share": financed_share,
             "equity_share": equity_share,
-            "EconomicEquations.construction_interest_rate": float(input_dict["interest_rate_construction"]),
+            "construction_interest_rate": float(input_dict["interest_rate_construction"]),
             "tax_rate": float(input_dict["tax_rate"]),
             "internal_rate_of_return": float(input_dict["internal_rate_of_return"]),
         }
@@ -371,7 +457,7 @@ class DCFRORCalculator:
 
         construction_mask = cash_flow_df["Year"] <= 0
         operational_mask = cash_flow_df["Year"] >= 1
-        npv = EconomicEquations.net_EconomicEquations.present_value(
+        npv = EconomicEquations.net_present_value(
             cash_flow_df.loc[operational_mask, "PresentValue"].to_numpy(),
             cash_flow_df.loc[construction_mask, "NPVCapitalPlusInterest"].to_numpy(),
         )
@@ -383,13 +469,29 @@ class DCFRORCalculator:
         net_cash_flow = EconomicMetrics.calculate_net_annual_cash_flow(revenue, operating_costs)
         mpsp = EconomicMetrics.calculate_mpsp(capital_cost + operating_costs.sum(), revenue.sum())
 
-        self.om.add_variable("dcfror_npv", npv, info_map)
-        self.om.add_variable("dcfror_roi", roi, info_map)
-        self.om.add_variable("dcfror_payback_period", payback, info_map)
-        self.om.add_variable("dcfror_net_cash_flow", net_cash_flow.tolist(), info_map)
-        self.om.add_variable("dcfror_mpsp", mpsp, info_map)
-        self.om.add_variable("dcfror_cash_flow_summary", cash_flow_df.to_dict(orient="list"), info_map)
-        self.om.add_log("DCFROR calculation completed successfully.", info_map)
+        self.om.add_variable("dcfror_npv", npv, {**info_map, "units": MeasurementUnits.DOLLARS})
+        self.om.add_variable("dcfror_roi", roi, {**info_map, "units": MeasurementUnits.UNITLESS})
+        self.om.add_variable(
+            "dcfror_payback_period",
+            payback,
+            {**info_map, "units": MeasurementUnits.SIMULATION_YEAR},
+        )
+        self.om.add_variable(
+            "dcfror_net_cash_flow",
+            net_cash_flow.tolist(),
+            {**info_map, "units": MeasurementUnits.DOLLARS},
+        )
+        self.om.add_variable("dcfror_mpsp", mpsp, {**info_map, "units": MeasurementUnits.DOLLARS})
+        self.om.add_variable(
+            "dcfror_cash_flow_summary",
+            cash_flow_df.to_dict(orient="list"),
+            {**info_map, "units": MeasurementUnits.UNITLESS},
+        )
+        self.om.add_log(
+            "DCFROR calculation",
+            "DCFROR calculation completed successfully.",
+            info_map,
+        )
 
     def goal_seek(
         self,

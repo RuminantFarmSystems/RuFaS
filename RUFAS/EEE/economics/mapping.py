@@ -408,7 +408,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "biophysical_simulation": [
                     "ManureManager._record_manure_request_results.off_farm_manure.total_manure_mass"
                 ],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_kilogram"],
+                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
                 "notes": "",
             },
             "Slurry storage operational costs - Diesel consumption": {
@@ -467,7 +467,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Digester bedding co-product": {
                 "biophysical_simulation": ["see " "future_expansion"],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_kilogram"],
+                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
                 "future_expansion": "Placeholder "
                 "for "
                 "the "
@@ -523,7 +523,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Sold manure": {
                 "input_manager": ["economic_inputs.Manure.manure_sales"],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_kilogram"],
+                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
                 "future_expansion": "perhaps scale as "
                 "a percentage of "
                 "total manure "

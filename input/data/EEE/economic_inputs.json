@@ -1,10 +1,4 @@
 {
-  "partial_budget": {
-    "additional_revenue": 1,
-    "reduced_costs": 1,
-    "additional_costs": 1,
-    "reduced_revenue": 1
-  },
   "Animal": {
     "diesel_liters_per_day": 1,
     "gasoline_liters_per_day": 1,

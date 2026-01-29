@@ -163,7 +163,7 @@
           "ManureManager._record_manure_request_results.off_farm_manure.total_manure_mass"
         ],
         "economics_files": [
-          "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
+          "commodity_prices.bedding_manure_solids.dollar_per_head.csv"
         ],
         "notes": ""
       },
@@ -342,7 +342,7 @@
           "economic_inputs.Manure.manure_sales"
         ],
         "economics_files": [
-          "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
+          "commodity_prices.bedding_manure_solids.dollar_per_head.csv"
         ],
         "future_expansion": "perhaps scale as a percentage of total manure produced? Or preprocessing for excess e.g. not applied to fields"
       },
@@ -362,7 +362,7 @@
           "see future_expansion"
         ],
         "economics_files": [
-          "commodity_prices.bedding_manure_solids.dollar_per_kilogram.csv"
+          "commodity_prices.bedding_manure_solids.dollar_per_head.csv"
         ],
         "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
