@@ -29,7 +29,6 @@ from tests.test_EEE.fixtures import (
     expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id,
 )
 
-
 assert raw_nitrous_oxide_emissions_data is not None
 assert raw_ammonia_emissions_data is not None
 assert parsed_emissions_data is not None
