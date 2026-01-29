@@ -2579,7 +2579,7 @@ class OutputManager(object):
             "direction": self.validate_direction,
             "use_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_filter_key_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
-            "use_compact_ver_agg_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():
