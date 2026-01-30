@@ -204,13 +204,14 @@ class ContinuousMix(Digester):
                     "date": time.current_date.date(),
                     "simulation_day": time.simulation_day,
                     "total_volatile_solids": self._manure_in_digester.total_volatile_solids,
-                    "total_manure_mass": self._manure_in_digester.mass
+                    "total_manure_mass": self._manure_in_digester.mass,
                 }
                 self._om.add_warning(
                     f"Anaerobic digester '{self.name}' has zero total volatile solids.",
                     f"Digester has {self._manure_in_digester.mass} kg manure"
                     f"and {self._manure_in_digester.total_volatile_solids} kg volatile solids.",
-                    info_map)
+                    info_map,
+                )
             manure_degradable_volatile_solids_frac = (
                 (self._manure_in_digester.degradable_volatile_solids / self._manure_in_digester.total_volatile_solids)
                 if self._manure_in_digester.total_volatile_solids > 0.0

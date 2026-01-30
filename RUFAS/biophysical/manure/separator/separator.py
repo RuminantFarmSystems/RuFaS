@@ -162,9 +162,11 @@ class Separator(Processor):
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
         if liquid_manure_water <= 0.0:
-            self._om.add_warning(f"Liquid manure volume is {liquid_manure_water}.",
-                                 "Setting liquid manure water to minimum of 0.01 m3.",
-                                 {**info_map})
+            self._om.add_warning(
+                f"Liquid manure volume is {liquid_manure_water}.",
+                "Setting liquid manure water to minimum of 0.01 m3.",
+                {**info_map},
+            )
             liquid_manure_water = 0.01
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
