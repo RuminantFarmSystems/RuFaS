@@ -40,7 +40,7 @@ class Silage(Storage):
 
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
         self.om = OutputManager()
 
@@ -309,7 +309,7 @@ class Bunker(Silage):
     Class representing the Bunker type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]):
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         """
         Initializes a Bunker instance.
         """
@@ -322,7 +322,7 @@ class Pile(Silage):
     Class representing the Pile type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         """
         Initializes a Pile instance.
         """
@@ -335,7 +335,7 @@ class Bag(Silage):
     Class representing the Bag type of Silage storage.
     """
 
-    def __init__(self, config: dict[str, str | float]) -> None:
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         """
         Initializes a Bag instance.
         """

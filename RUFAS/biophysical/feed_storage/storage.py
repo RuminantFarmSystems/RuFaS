@@ -75,8 +75,8 @@ class Storage:
         A list of HarvestedCrop objects representing the crops stored.
     storage_name : str
         Name of the storage.
-    field_name : str
-        Name of the field associated with the storage.
+    field_names : str
+        Names of the fields associated with the storage.
     crop_name : str
         Name of the crop associated with the storage.
     rufas_feed_id : int
@@ -122,14 +122,22 @@ class Storage:
 
     """
 
-    def __init__(self, storage_config: dict[str, str | float]) -> None:
-        self.capacity: float = float(storage_config["capacity"])
+    def __init__(self, storage_config: dict[str, str | float | list[str]]) -> None:
+        capacity = storage_config["capacity"]
+        assert isinstance(capacity, (float, int))
+        self.capacity: float = capacity
         self.stored: list[HarvestedCrop] = []
         self.storage_name: str = str(storage_config["name"])
-        self.field_name: str = str(storage_config["field_name"])
+        field_names = storage_config["field_names"]
+        assert isinstance(field_names, list)
+        self.field_names: list[str] = field_names
         self.crop_name: str = str(storage_config["crop_name"])
-        self.rufas_feed_id: int = int(storage_config["rufas_id"])
-        self.initial_storage_dry_matter: float = float(storage_config["initial_storage_dry_matter"])
+        rufas_feed_id = storage_config["rufas_id"]
+        assert isinstance(rufas_feed_id, int)
+        self.rufas_feed_id: int = rufas_feed_id
+        initial_storage_dry_matter = storage_config["initial_storage_dry_matter"]
+        assert isinstance(initial_storage_dry_matter, (float, int))
+        self.initial_storage_dry_matter: float = initial_storage_dry_matter
         self.crude_protein_loss_coefficient: float = 0.0
         self.starch_loss_coefficient: float = 0.0
         self.adf_loss_coefficient: float = 0.0
@@ -181,7 +189,7 @@ class Storage:
             )
 
         self.stored.append(crop)
-        self._record_received_crop(simulation_day)
+        self._record_received_crop(crop.field_name, simulation_day)
         self._record_stored_crops(simulation_day)
 
         initial_degradation_day_offset = 1
@@ -366,12 +374,14 @@ class Storage:
             dry_matter_percentage = new_dry_matter_mass / new_fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
         return {"fresh_mass": new_fresh_mass, "dry_matter_percentage": dry_matter_percentage}
 
-    def _record_received_crop(self, simulation_day: int) -> None:
+    def _record_received_crop(self, field_name: str, simulation_day: int) -> None:
         """
         Records the details of harvested crops received.
 
         Parameters
         ----------
+        field_name : str
+            The name of the field from which the crop was harvested.
         simulation_day : int
             The day on which the crop was received.
         """
@@ -387,7 +397,7 @@ class Storage:
             },
         }
         values = {
-            "field_name": self.field_name,
+            "field_name": field_name,
             "crop_name": self.crop_name,
             "feed_id": self.rufas_feed_id,
         }
