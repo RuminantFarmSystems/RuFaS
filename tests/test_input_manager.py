@@ -319,10 +319,7 @@ def test_start_data_processing(
     mock_input_manager.data_validator.event_logs.clear()
 
     result = mock_input_manager.start_data_processing(
-        metadata_path=Path("mock/metadata/path"),
-        input_root=Path(""),
-        task_id="1",
-        eager_termination=eager_termination
+        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
     )
 
     assert result is expected_return
@@ -360,7 +357,7 @@ def test_start_data_processing_invalid_metadata_raises(mock_input_manager: Input
     setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
 
     with pytest.raises(ValueError, match="bad meta"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1",eager_termination=True)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=True)
 
     mock_load_props.assert_not_called()
     mock_validate_props.assert_not_called()
@@ -384,7 +381,7 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     with pytest.raises(ValueError, match="bad props"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1",eager_termination=False)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=False)
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
@@ -393,35 +390,93 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
     "input_file_blobs, expected_missing_blobs",
     [
         (
-            {"config", "animal", "animal_population", "animal_net_merit", "animal_top_listing_semen", "lactation",
-             "economy", "emission", "purchased_feeds_emissions", "purchased_feed_land_use_change_emissions", "feed",
-             "NRC_Comp", "NASEM_Comp", "manure_management", "manure_processor_connection", "crop_configurations",
-             "weather", "user_feeds", "tractor_dataset", "EEE_constants", "properties", "feed_storage_configurations",
-             "feed_storage_instances"},
-            []
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            [],
         ),
         (
-            {"config", "animal", "animal_population", "animal_net_merit", "animal_top_listing_semen", "lactation",
-             "economy", "emission", "purchased_feeds_emissions", "purchased_feed_land_use_change_emissions", "feed",
-             "NRC_Comp", "NASEM_Comp", "manure_management", "manure_processor_connection", "crop_configurations",
-             "weather", "tractor_dataset", "EEE_constants", "properties", "feed_storage_configurations",
-             "feed_storage_instances"},
-            ["user_feeds"]
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            ["user_feeds"],
         ),
         (
-            {"config", "animal", "animal_population", "animal_net_merit", "animal_top_listing_semen",
-             "economy", "emission", "purchased_feeds_emissions", "purchased_feed_land_use_change_emissions", "feed",
-             "NRC_Comp", "manure_management", "manure_processor_connection", "crop_configurations",
-             "weather", "user_feeds", "tractor_dataset", "EEE_constants", "properties",
-             "feed_storage_instances"},
-            ["NASEM_Comp", "feed_storage_configurations", "lactation",]
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_instances",
+            },
+            [
+                "NASEM_Comp",
+                "feed_storage_configurations",
+                "lactation",
+            ],
         ),
-    ]
+    ],
 )
 def test_validate_required_file_blobs(
-        input_file_blobs: set[str],
-        expected_missing_blobs: list[str],
-        mock_input_manager: InputManager
+    input_file_blobs: set[str], expected_missing_blobs: list[str], mock_input_manager: InputManager
 ) -> None:
     """Unit test for function _validate_required_file_blobs in file input_manager.py"""
     if expected_missing_blobs:
