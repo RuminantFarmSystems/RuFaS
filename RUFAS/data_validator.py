@@ -18,6 +18,32 @@ AGGREGATION_FUNCTIONS: dict[
     "no_op": Aggregator.no_op,
 }
 
+REQUIRED_FILE_BLOBS: set[str] = {
+    "config",
+    "animal",
+    "animal_population",
+    "animal_net_merit",
+    "animal_top_listing_semen",
+    "lactation",
+    "economy",
+    "emission",
+    "purchased_feeds_emissions",
+    "purchased_feed_land_use_change_emissions",
+    "feed",
+    "NRC_Comp",
+    "NASEM_Comp",
+    "manure_management",
+    "manure_processor_connection",
+    "crop_configurations",
+    "weather",
+    "user_feeds",
+    "tractor_dataset",
+    "EEE_constants",
+    "properties",
+    "feed_storage_configurations",
+    "feed_storage_instances",
+}
+
 
 class ElementState(Enum):
     """
@@ -654,6 +680,7 @@ class DataValidator:
             "function": DataValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[address_to_data]
+        self._validate_required_file_blobs(set(metadata_files.keys()))
         required_keys = {"path", "type", "properties"}
         optional_keys = {"title", "description"}
         valid_keys = required_keys | optional_keys
@@ -712,6 +739,32 @@ class DataValidator:
             {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         )
         return True, ""
+
+    def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> bool:
+        """Validates that all required file blobs are present in the metadata."""
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._validate_required_file_blobs.__name__,
+        }
+        if not REQUIRED_FILE_BLOBS.issubset(metadata_file_names):
+            missing_blobs = REQUIRED_FILE_BLOBS - metadata_file_names
+            self.event_logs.append(
+                {
+                    "error": "Missing required file blobs.",
+                    "message": f"Missing required file blobs: {list(missing_blobs)}",
+                    "info_map": info_map
+                }
+            )
+            return False
+        else:
+            self.event_logs.append(
+                {
+                    "log": "Required Metadata File Blob Validation",
+                    "message": "",
+                    "info_map": info_map
+                }
+            )
+            return True
 
     def validate_data_by_type(
         self,
