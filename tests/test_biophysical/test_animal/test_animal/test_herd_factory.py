@@ -29,10 +29,6 @@ def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
     """Returns an HerdFactory object"""
     mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mock_im_get_data([], mocker)
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
-        return_value=None,
-    )
     return HerdFactory()
 
 
@@ -80,10 +76,6 @@ def test_init(
     """Unit test for __init__()"""
     mock_time_init = mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mock_get_data = mock_im_get_data([], mocker)
-    mock_animal_genetics_initialize_class_variables = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
-        return_value=None,
-    )
     mock_animal_population_init = mocker.patch(
         "RUFAS.biophysical.animal.data_types.animal_population.AnimalPopulation.__init__",
         return_value=None,
@@ -98,7 +90,6 @@ def test_init(
         call("animal.herd_initialization.initial_animal_num"),
         call("animal.herd_initialization.simulation_days"),
     ]
-    mock_animal_genetics_initialize_class_variables.assert_called_once_with()
     assert mock_animal_population_init.call_args_list == [
         call(
             calves=[],
@@ -458,12 +449,6 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_herd_factory.time = mock_time
 
-    mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_newborn_calf",
-        return_value=108.8,
-    )
-
     mock_pre_animal_population = AnimalPopulation(
         calves=[],
         heiferIs=[],
@@ -491,15 +476,13 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
             days_born=0,
             initial_phosphorus=8.8,
             birth_weight=18.8,
-            net_merit=0.0,
             animal_type=AnimalType.CALF.value,
-        )
+        ),
+        mock_time,
     )
     if is_calf_sold:
-        mock_genetics_assign_net_merit_value_to_newborn_calf.assert_not_called()
         assert mock_herd_factory.pre_animal_population.calves == []
     else:
-        mock_genetics_assign_net_merit_value_to_newborn_calf.assert_called_once_with(mock_time, Breed.HO, 99.9)
         assert mock_herd_factory.pre_animal_population.calves == [mock_calf]
 
 
@@ -798,11 +781,6 @@ def test_generate_animals(
     mock_time.current_date = datetime.today()
 
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=None)
-    mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
-        return_value=108.8,
-    )
 
     mock_herd_factory.time = mock_time
     mock_herd_factory.breed = Breed.HO
@@ -834,12 +812,8 @@ def test_generate_animals(
     assert mock_cows_update.call_count == simulation_days
 
     if is_calf_sold:
-        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == 0
-        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == 0
         assert len(result.calves) == 0
     else:
-        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == initial_animal_num
-        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == initial_animal_num
         assert len(result.calves) == initial_animal_num
 
 
@@ -883,19 +857,9 @@ def test_init_animal_from_data(
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data", "breed": "dummy", "days_born": 15}
 
-    mock_genetics_assignment = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
-        return_value=0.0,
-    )
-
     mocked_animal = MagicMock(auto_spec=Animal)
     mocked_animal.breed = Breed.HO
     mock_animal_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mocked_animal)
-
-    mock_backtrack_animal_birth_date = mocker.patch.object(
-        mock_herd_factory, "_backtrack_animal_birth_date", return_value=""
-    )
 
     mock_pre_animal_population = MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.next_id.return_value = dummy_animal_id
@@ -909,9 +873,7 @@ def test_init_animal_from_data(
     if animal_type == "calf":
         dummy_animal_data.update(p_init=0)
 
-    mock_animal_init.assert_called_once_with(dummy_animal_data)
-    mock_backtrack_animal_birth_date.assert_called_once_with(dummy_animal_data["days_born"], mock_time)
-    mock_genetics_assignment.assert_called_once_with(birth_date="", breed=Breed.HO)
+    mock_animal_init.assert_called_once_with(dummy_animal_data, mock_time)
 
     assert result == mocked_animal
 
@@ -931,10 +893,6 @@ def test_initialize_herd_from_data(
 ) -> None:
     """Unit test for _init_herd_from_data()"""
     mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
-        return_value=None,
-    )
     mock_get_data = mock_im_get_data(
         [
             {
@@ -1104,10 +1062,6 @@ def test_random_sample_with_replacement_by_type(
     }
 
     mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
-        return_value=None,
-    )
     mock_get_data = mock_im_get_data([post_num], mocker)
 
     herd_factory = HerdFactory()
@@ -1171,9 +1125,7 @@ def test_random_sample_with_replacement_by_type_parity_branches(
     expected_k: int,
 ) -> None:
     """Covers the parity/milking branch, including inversion of milking fraction for non-milking cows."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     pre_animals = [MagicMock() for _ in range(5)]
@@ -1218,9 +1170,7 @@ def test_random_sample_with_replacement_by_type_exception_zero_animals_logs_miss
     mocker: MockerFixture,
 ) -> None:
     """Covers except-block branch where animal_num == 0."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     herd_factory.pre_animal_population = MagicMock()
@@ -1250,9 +1200,7 @@ def test_random_sample_with_replacement_by_type_exception_nonzero_animals_logs_p
     mocker: MockerFixture,
 ) -> None:
     """Covers except-block branch where animal_num > 0."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     herd_factory.pre_animal_population = MagicMock()
@@ -1299,10 +1247,6 @@ def test_random_sample_with_replacement_by_type_replacement(
 ) -> None:
     """Unit test for _random_sample_with_replacement_by_type() with replacement cows"""
     mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
-        return_value=None,
-    )
     mock_get_data = mock_im_get_data([post_num], mocker)
 
     herd_factory = HerdFactory()
