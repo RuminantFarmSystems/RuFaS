@@ -75,7 +75,6 @@ class SimulationEngine:
             self.herd_manager.heiferII_events_by_id,
             self.herd_manager.cow_events_by_id,
         )
-        self.feed_manager.report_feed_deduction_days()
         EEEManager.estimate_all()
         t_end_sim = timer.time()
 
