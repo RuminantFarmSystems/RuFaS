@@ -9,7 +9,6 @@ from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility, Aggregator
 
-
 AGGREGATION_FUNCTIONS: dict[str, Callable[[list[float]], float] | Callable[[list[float]], float | None]] = {
     "average": Aggregator.average,
     "division": Aggregator.division,
@@ -95,9 +94,13 @@ class ReportGenerator:
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
-                report_data, aggregation_logs = self._perform_aggregations(cross_reference_data, filter_content)
+                report_data, aggregation_logs, is_report_aggregated = self._perform_aggregations(
+                    cross_reference_data, filter_content
+                )
             else:
-                report_data, aggregation_logs = self._perform_aggregations(filtered_pool, filter_content)
+                report_data, aggregation_logs, is_report_aggregated = self._perform_aggregations(
+                    filtered_pool, filter_content
+                )
             event_logs.extend(aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
@@ -107,7 +110,12 @@ class ReportGenerator:
                 )
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                    (individual_report_name if individual_report_name else col)
+                    if (
+                        (not is_report_aggregated and not filter_content.get("use_verbose_report_name"))
+                        and len(report_data) == 1
+                    )
+                    else (f"{individual_report_name}_{col}" if individual_report_name else col)
                 )
                 report_filter_data[column_name] = {"values": values}
             if should_graph_report_data:
@@ -304,7 +312,7 @@ class ReportGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: dict[str, Any],
-    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
@@ -317,7 +325,7 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
+        tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]
             If no aggregation is specified, all the columns will be returned.
             If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
                 that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
@@ -325,6 +333,7 @@ class ReportGenerator:
             If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
             If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
             The second element is the event logs.
+            The third element is a boolean indicating whether the report data has been aggregated.
 
         Raises
         ------
@@ -354,7 +363,7 @@ class ReportGenerator:
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data, [] if not event_logs else event_logs
+            return report_data, [] if not event_logs else event_logs, False
 
         aggregate_report, aggregation_logs = self._route_aggregator_functions(
             report_data, filter_content, horizontal_agg_key, vertical_agg_key
@@ -362,7 +371,7 @@ class ReportGenerator:
 
         event_logs = event_logs + aggregation_logs
 
-        return aggregate_report, event_logs
+        return aggregate_report, event_logs, True
 
     def _route_aggregator_functions(
         self,
@@ -413,22 +422,31 @@ class ReportGenerator:
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
             vertically_aggregated, event_logs = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
 
-            has_dict_variables = filter_content.get("variables") is not None
             has_multiple_columns = len(vertically_aggregated) > 1
             if display_units:
-                if has_dict_variables or has_multiple_columns:
+                if has_multiple_columns:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if filter_content.get("use_verbose_report_name")
+                        else "ver_agg"
+                    )
                     if units is not None:
-                        aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+                        aggregate_report = {f"{column_name}_{units.group(0)}": list(vertically_aggregated.values())[0]}
                     else:
-                        aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                        aggregate_report = {f"{column_name}": list(vertically_aggregated.values())[0]}
             else:
-                if has_dict_variables or has_multiple_columns:
+                if has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
-                    aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                    column_name = (
+                        f"{next(iter(vertically_aggregated))}_ver_agg"
+                        if filter_content.get("use_verbose_report_name")
+                        else "ver_agg"
+                    )
+                    aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
 
         return aggregate_report, event_logs
 
