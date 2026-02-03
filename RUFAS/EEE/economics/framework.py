@@ -6,6 +6,7 @@ import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from .dcfror import DCFRORCalculator
 from .fallback_values import capital_cost_breakdown_fallback
 from .partial_budget import PartialBudget
@@ -114,6 +115,15 @@ class EconomicFramework:
         """Execute economic analysis using the Flexible Economic Framework."""
 
         preprocessed_results = self.preprocessor.preprocess()
+        self.om.add_variable(
+            "economic.preprocessed_results",
+            preprocessed_results,
+            info_map={
+                "class": __name__,
+                "function": self.run_economic_analysis.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            },
+        )
         capital_present = self._capital_cost_present()
         partial_budget_requested = self.partial_budget.has_partial_budget_activity(preprocessed_results)
 
