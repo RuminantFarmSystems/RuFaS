@@ -26,7 +26,7 @@ from tests.test_EEE.fixtures import (
     raw_farmgrown_feed_deductions_data,
     expected_farmgrown_feed_deductions_data,
     expected_daily_farmgrown_feed_emissions_and_resources,
-    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id,
+    expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
 )
 
 
@@ -391,7 +391,9 @@ def test_parse_farmgrown_feeds_emission_data(
     mocker: MockerFixture,
 ) -> None:
     mock_om_filter_variables_pool = mocker.patch.object(
-        em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
+        em.om, "filter_variables_pool", side_effect=[
+                                                     raw_nitrous_oxide_emissions_data,
+                                                     raw_ammonia_emissions_data]
     )
     actual_data = em._parse_farmgrown_feeds_emission_data()
     assert actual_data == parsed_emissions_data

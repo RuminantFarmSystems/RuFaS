@@ -682,9 +682,11 @@ class FeedManager:
             "simulation_day": simulation_day,
         }
         for feed_id, amount in total_purchased.items():
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed", amount, info_map)
+            value: tuple[int, float] = (simulation_day, amount)
+            self._om.add_variable(f"purchased_feed_{feed_id}_fed", value, info_map)
         for feed_id, amount in total_farmgrown.items():
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", amount, info_map)
+            value: tuple[int, float] = (simulation_day, amount)
+            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", value, info_map)
 
     def _deduct_from_storage(
         self,
