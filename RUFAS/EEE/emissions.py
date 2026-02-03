@@ -425,8 +425,11 @@ class EmissionsEstimator:
                 has_remaining_feed_at_harvest = (
                     farmgrown_feed_inventory_by_feed_id[feed_id].get(day_before_harvest, 0.0) > 0.0
                 )
-                last_harvest_operation = harvest_yield_by_field[field_name][last_harvest_date]["harvest_type"] if \
-                    last_harvest_date >= 0 else None
+                last_harvest_operation = (
+                    harvest_yield_by_field[field_name][last_harvest_date]["harvest_type"]
+                    if last_harvest_date >= 0
+                    else None
+                )
                 if (
                     feed_id in farmgrown_feed_inventory_by_feed_id
                     and not has_remaining_feed_at_harvest
