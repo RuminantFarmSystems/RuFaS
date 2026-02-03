@@ -6,7 +6,9 @@ import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from .dcfror import DCFRORCalculator
+from .fallback_values import capital_cost_breakdown_fallback
 from .partial_budget import PartialBudget
 from .preprocessing import EconomicPreprocessor
 
@@ -28,32 +30,20 @@ class EconomicFramework:
 
         info_map = {"class": __name__, "function": self._capital_cost_present.__name__}
 
+        cost_key = "capital_costs.capital_cost_breakdown"
         if hasattr(self.im, "check_property_exists_in_pool"):
             try:
-                if not self.im.check_property_exists_in_pool("capital_costs.capital_cost_breakdown"):
-                    self.om.add_warning(
-                        "MissingCapitalCostData",
-                        "Capital cost breakdown not found in InputManager",
-                        info_map,
-                    )
-                    return False
-            except ValueError:
-                self.om.add_warning(
-                    "MissingCapitalCostData",
-                    "Capital cost breakdown not found in InputManager",
-                    info_map,
-                )
-                return False
-
-        try:
-            cost_data = self.im.get_data("capital_costs.capital_cost_breakdown")
-        except Exception:
-            self.om.add_warning(
-                "MissingCapitalCostData",
-                "Capital cost breakdown not found in InputManager",
-                info_map,
-            )
-            return False
+                if not self.im.check_property_exists_in_pool(cost_key):
+                    cost_data = capital_cost_breakdown_fallback()
+                else:
+                    cost_data = self.im.get_data(cost_key)
+            except Exception:
+                cost_data = capital_cost_breakdown_fallback()
+        else:
+            try:
+                cost_data = self.im.get_data(cost_key)
+            except Exception:
+                cost_data = capital_cost_breakdown_fallback()
         is_dataframe = isinstance(cost_data, pd.DataFrame)
 
         if is_dataframe:
@@ -125,8 +115,17 @@ class EconomicFramework:
         """Execute economic analysis using the Flexible Economic Framework."""
 
         preprocessed_results = self.preprocessor.preprocess()
+        self.om.add_variable(
+            "preprocessed_economic_inputs",
+            preprocessed_results,
+            info_map={
+                "class": __name__,
+                "function": self.run_economic_analysis.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            },
+        )
         capital_present = self._capital_cost_present()
-        partial_budget_requested = self.partial_budget.has_partial_budget_activity()
+        partial_budget_requested = self.partial_budget.has_partial_budget_activity(preprocessed_results)
 
         if capital_present:
             calculator = DCFRORCalculator()

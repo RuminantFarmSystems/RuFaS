@@ -3077,7 +3077,7 @@
       }
     }
   },
-    "economic_inputs_properties": {
+  "economic_inputs_properties": {
     "data_collection_app_compatible": false,
     "Animal": {
       "type": "object",
@@ -3168,6 +3168,12 @@
         "kwh_per_day": {
           "type": "number",
           "description": "Electricity for slurry storage (kWh/day).",
+          "minimum": 0,
+          "default": 0
+        },
+        "propane_liters_per_day": {
+          "type": "number",
+          "description": "Propane burned daily by animal operations (L/day).",
           "minimum": 0,
           "default": 0
         },
@@ -3270,13 +3276,13 @@
     "Soil_and_crop": {
       "type": "object",
       "description": "Scenario-wide land and crop economics levers.",
-      "land_ha_purchased_whole_simulation": {
+      "land_ha_purchased": {
         "type": "number",
         "description": "Hectares of land purchased for the scenario (ha).",
         "minimum": 0,
         "default": 0
       },
-      "land_ha_rented_whole_simulation": {
+      "land_ha_rented": {
         "type": "number",
         "description": "Hectares of land rented for the scenario (ha).",
         "minimum": 0,

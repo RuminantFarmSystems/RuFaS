@@ -69,7 +69,13 @@ def test_preprocess_collects_values_and_prices(monkeypatch: pytest.MonkeyPatch) 
                 "Item": {
                     "biophysical_values": [1.0, 2.0, 3.0],
                     "biophysical_aggregate": 6.0,
+                    "biophysical_values_by_scenario": {"baseline": [1.0, 2.0, 3.0]},
+                    "biophysical_aggregate_by_scenario": {"baseline": 6.0},
                     "price_data": {"price.csv": {"cost": 10}},
+                    "price_values": [10.0],
+                    "price_aggregate": 10.0,
+                    "line_item_values_by_scenario": {"baseline": 60.0},
+                    "flow_type": "cost",
                 }
             }
         }
@@ -118,8 +124,49 @@ def test_preprocess_selects_price_by_selector(monkeypatch: pytest.MonkeyPatch) -
     energy_data = results["Section"]["Category"]["Energy"]
     assert energy_data["biophysical_values"] == [2.0, 3.0]
     assert energy_data["biophysical_aggregate"] == pytest.approx(2.5)
+    assert energy_data["biophysical_values_by_scenario"] == {"baseline": [2.0, 3.0]}
+    assert energy_data["biophysical_aggregate_by_scenario"] == {"baseline": pytest.approx(2.5)}
     assert energy_data["price_data"] == {"price_premium": {"cost": 25}}
+    assert energy_data["price_values"] == [25.0]
+    assert energy_data["price_aggregate"] == 25.0
+    assert energy_data["line_item_values_by_scenario"] == {"baseline": pytest.approx(62.5)}
+    assert energy_data["flow_type"] == "cost"
     assert dummy_om.warnings == []
+
+
+def test_preprocess_reads_input_manager_values(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({"economic_inputs.Animal.labor_hours_per_day": 4})
+    dummy_om = DummyOutputManager({})
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Section": {
+                "Category": {
+                    "Item": {
+                        "input_manager": ["economic_inputs.Animal.labor_hours_per_day"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Section"]["Category"]["Item"]
+    assert item["biophysical_values"] == [4.0]
+    assert item["biophysical_aggregate"] == 4.0
+    assert item["biophysical_values_by_scenario"] == {"baseline": [4.0]}
+    assert item["biophysical_aggregate_by_scenario"] == {"baseline": 4.0}
+    assert item["price_values"] == []
+    assert item["price_aggregate"] is None
+    assert item["flow_type"] == "cost"
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingPriceForLineItem" in warning_codes
 
 
 def test_preprocess_handles_invalid_economics_path(monkeypatch: pytest.MonkeyPatch) -> None:
