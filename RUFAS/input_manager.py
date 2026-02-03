@@ -99,7 +99,9 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True) -> bool:
+    def start_data_processing(
+        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+    ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
@@ -172,16 +174,14 @@ class InputManager:
         if not REQUIRED_FILE_BLOBS.issubset(metadata_file_names):
             missing_blobs = REQUIRED_FILE_BLOBS - metadata_file_names
             self.om.add_error(
-                "Missing required file blobs.",
-                f"Missing required file blobs: {list(missing_blobs)}",
-                info_map
+                "Missing required file blobs.", f"Missing required file blobs: {list(missing_blobs)}", info_map
             )
             raise ValueError(f"Missing required file blobs: {list(missing_blobs)}")
         else:
             self.om.add_log(
                 "Required Metadata File Blob Validation",
                 "All required file blobs are present in the metadata.",
-                info_map
+                info_map,
             )
 
     def load_runtime_metadata(self, metadata_key: str, eager_termination: bool) -> bool:
