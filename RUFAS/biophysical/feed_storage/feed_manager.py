@@ -619,7 +619,9 @@ class FeedManager:
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
         total_purchased_deducted: dict[RUFAS_ID, float] = {}
-        total_farmgrown_deducted: dict[RUFAS_ID, float] = {}
+        total_farmgrown_deducted: dict[RUFAS_ID, float] = {
+            farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
+        }
 
         for feed_id, amount_needed in feeds_to_deduct.items():
             remaining_amount_needed = float(amount_needed)
@@ -792,6 +794,23 @@ class FeedManager:
                 purchased_by_id[feed_id].append(stored_feed)
 
         return dict(farmgrown_by_id), dict(purchased_by_id)
+
+    def _gather_valid_farmgrown_feed_ids(self) -> set[RUFAS_ID]:
+        """
+        Gathers the ids of valid farm-grown feeds.
+
+        Returns
+        -------
+        set[RUFAS_ID]
+            A set of valid farm-grown feed ids.
+        """
+        farmgrown_ids: set[RUFAS_ID] = set()
+        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
+        for storage in self.active_storages.values():
+            feed_id: RUFAS_ID = storage.rufas_feed_id
+            if feed_id in valid_feed_ids:
+                farmgrown_ids.add(feed_id)
+        return farmgrown_ids
 
     def _setup_available_feeds(
         self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
