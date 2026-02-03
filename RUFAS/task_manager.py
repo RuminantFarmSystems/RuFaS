@@ -130,7 +130,7 @@ class TaskManager:
             "function": TaskManager.start.__name__,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""))
+        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""), task_id="TASK MANAGER")
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         for task in task_config.get("tasks", []):
             filters_path = Path(task["filters_directory"])
@@ -745,7 +745,7 @@ class TaskManager:
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
         is_data_valid = input_manager.start_data_processing(
-            Path(args["metadata_file_path"]), Path(args["input_root"]), eager_termination
+            Path(args["metadata_file_path"]), Path(args["input_root"]), args["task_id"], eager_termination
         )
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
