@@ -654,8 +654,8 @@ class DataValidator:
             "function": DataValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[address_to_data]
-        required_keys = {"path", "type", "properties"}
-        optional_keys = {"title", "description"}
+        required_keys = {"type", "properties"}
+        optional_keys = {"title", "description", "path", "paths"}
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
@@ -677,6 +677,17 @@ class DataValidator:
                 )
                 return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
 
+            if "path" not in data and "paths" not in data:
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "message": f"'{key}' must define at least one of the keys "
+                        "'path' or 'paths', but neither was found.",
+                        "info_map": info_map,
+                    }
+                )
+                return False, f"Missing required key 'path' or 'paths' in '{key}'"
+
             if data["type"] not in valid_data_types:
                 self.event_logs.append(
                     {
@@ -687,16 +698,65 @@ class DataValidator:
                     }
                 )
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
-            full_path = os.path.join(input_root, data["path"])
-            if not os.path.isfile(full_path):
-                self.event_logs.append(
-                    {
-                        "error": "Metadata Validation",
-                        "message": f"Invalid path '{data['path']}' in '{key}'",
-                        "info_map": info_map,
-                    }
-                )
-                return False, f"Invalid path '{data['path']}' in '{key}'"
+            paths_to_check: list[str] = []
+            if "path" in data:
+                path_value = data.get("path")
+                if not isinstance(path_value, str) or not path_value:
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid path value '{path_value}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid path value '{path_value}' in '{key}'"
+                paths_to_check.append(path_value)
+            if "paths" in data:
+                paths_value = data.get("paths")
+                if isinstance(paths_value, list):
+                    if not paths_value:
+                        self.event_logs.append(
+                            {
+                                "error": "Metadata Validation",
+                                "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                                "info_map": info_map,
+                            }
+                        )
+                        return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+                    invalid_path_entries = [path for path in paths_value if not isinstance(path, str) or not path]
+                    if invalid_path_entries:
+                        self.event_logs.append(
+                            {
+                                "error": "Metadata Validation",
+                                "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                                "info_map": info_map,
+                            }
+                        )
+                        return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+                    paths_to_check.extend(paths_value)
+                else:
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+            for path in paths_to_check:
+                full_path = os.path.join(input_root, path)
+                if not os.path.isfile(full_path):
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid path '{path}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid path '{path}' in '{key}'"
 
             if data["properties"] is None or data["properties"] == "":
                 self.event_logs.append(
