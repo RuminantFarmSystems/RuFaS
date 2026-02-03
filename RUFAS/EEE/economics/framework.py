@@ -116,7 +116,7 @@ class EconomicFramework:
 
         preprocessed_results = self.preprocessor.preprocess()
         self.om.add_variable(
-            "economic.preprocessed_results",
+            "preprocessed_economic_inputs",
             preprocessed_results,
             info_map={
                 "class": __name__,
