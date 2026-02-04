@@ -88,7 +88,6 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
     ],
 )
 def test_remove_dry_matter_mass(
-    mocker: MockerFixture,
     initial_fresh_mass: float,
     initial_dry_matter_mass: float,
     mass_to_remove: float,
