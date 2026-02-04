@@ -169,6 +169,11 @@ class Separator(Processor):
                 f"value for separator '{self.name}' may need to be increased.",
                 {**info_map},
             )
+            raise ValueError(
+                f"Separator '{self.name}' attempted to separate more water into manure solids fraction than was "
+                "present in manure entering separator. The separated_solids_dry_matter "
+                f"value for separator '{self.name}' may need to be increased."
+            )
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
