@@ -162,7 +162,8 @@ class HarvestedCrop:
 
         new_fresh_mass = current_fresh_mass - mass_to_remove
 
-        if new_fresh_mass <= 0.0:
+        if self.dry_matter_mass <= 0.0:
+            self.dry_matter_mass = 0.0
             self.dry_matter_percentage = 0.0
             return
         self.dry_matter_percentage = (self.dry_matter_mass / new_fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
