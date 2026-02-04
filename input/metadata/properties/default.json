@@ -1597,30 +1597,30 @@
       }
     }
   },
-  "animal_mean_phenotype_properties": {
+  "animal_net_merit_properties": {
     "data_collection_app_compatible": false,
-    "birth_year": {
+    "year_month": {
       "type": "array",
-      "description": "The birth year of the animal.",
+      "description": "The birth year and month of the animal.",
       "properties": {
-        "type": "number",
-        "description": "The birth year of the animal."
+        "type": "string",
+        "description": "The birth year and month of the animal."
       }
     },
-    "fat_kg": {
+    "average": {
       "type": "array",
-      "description": "The average fat phenotype values of the animal.",
+      "description": "The average net-merit values of the animal.",
       "properties": {
         "type": "number",
-        "description": "The average fat phenotype values of the animal born in the given birth year."
+        "description": "The average net-merit values of the animal born on the given birth year and month."
       }
     },
-    "protein_kg": {
+    "std": {
       "type": "array",
-      "description": "The mean protein phenotype values of the animal.",
+      "description": "The standard deviation of the net-merit values of the animal.",
       "properties": {
         "type": "number",
-        "description": "The mean protein phenotype values of the animal born in the given birth year.",
+        "description": "The standard deviation of the net-merit values of the animal born on the given birth year and month.",
         "minimum": 0
       }
     }
@@ -1635,20 +1635,12 @@
         "description": "The birth year and month of the baby calf."
       }
     },
-    "estimated_protein": {
+    "estimated_PTA": {
       "type": "array",
-      "description": "The estimated protein value for the top listing semen.",
+      "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen.",
       "properties": {
         "type": "number",
-        "description": "The estimated protein value for the top listing semen."
-      }
-    },
-    "estimated_fat": {
-      "type": "array",
-      "description": "The estimated fat value for the top listing semen.",
-      "properties": {
-        "type": "number",
-        "description": "The estimated fat value for the top listing semen."
+        "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen."
       }
     }
   },

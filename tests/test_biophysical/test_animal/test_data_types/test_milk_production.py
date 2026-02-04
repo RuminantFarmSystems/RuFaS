@@ -1,6 +1,4 @@
 from unittest.mock import MagicMock
-
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.milk_production import (
     MilkProductionInputs,
     MilkProductionOutputs,
@@ -87,20 +85,6 @@ def test_statistics_initializes_with_given_values() -> None:
         milk_fat=1.3,
         milk_lactose=1.5,
         parity=2,
-        days_born=100,
-        days_in_pregnancy=100,
-        animal_type=AnimalType.LAC_COW,
-        TBV_fat=10.0,
-        TBV_protein=10.0,
-        E_permanent_fat=10.0,
-        E_temporary_fat=10.0,
-        E_permanent_protein=10.0,
-        E_temporary_protein=10.0,
-        phenotype_fat=10.0,
-        phenotype_protein=10.0,
-        EBV_fat=10.0,
-        EBV_protein=10.0,
-        ranking_index=10.0,
     )
 
     assert stats.cow_id == 101
@@ -133,20 +117,6 @@ def test_statistics_milking_status_flag(days_in_milk: int, expected_flag: bool) 
         milk_fat=1.2,
         milk_lactose=1.4,
         parity=1,
-        days_born=100,
-        days_in_pregnancy=100,
-        animal_type=AnimalType.LAC_COW,
-        TBV_fat=10.0,
-        TBV_protein=10.0,
-        E_permanent_fat=10.0,
-        E_temporary_fat=10.0,
-        E_permanent_protein=10.0,
-        E_temporary_protein=10.0,
-        phenotype_fat=10.0,
-        phenotype_protein=10.0,
-        EBV_fat=10.0,
-        EBV_protein=10.0,
-        ranking_index=10.0,
     )
 
     assert stats.is_milking is expected_flag
@@ -155,17 +125,6 @@ def test_statistics_milking_status_flag(days_in_milk: int, expected_flag: bool) 
 def test_statistics_units_mapping_is_consistent() -> None:
     """UNITS dict should contain expected keys and associated measurement units."""
     expected_units = {
-        "EBV_fat": MeasurementUnits.KILOGRAMS,
-        "EBV_protein": MeasurementUnits.KILOGRAMS,
-        "E_permanent_fat": MeasurementUnits.KILOGRAMS,
-        "E_permanent_protein": MeasurementUnits.KILOGRAMS,
-        "E_temporary_fat": MeasurementUnits.KILOGRAMS,
-        "E_temporary_protein": MeasurementUnits.KILOGRAMS,
-        "TBV_fat": MeasurementUnits.KILOGRAMS,
-        "TBV_protein": MeasurementUnits.KILOGRAMS,
-        "animal_type": MeasurementUnits.UNITLESS,
-        "days_born": MeasurementUnits.DAYS,
-        "days_in_pregnancy": MeasurementUnits.DAYS,
         "cow_id": MeasurementUnits.UNITLESS,
         "pen_id": MeasurementUnits.UNITLESS,
         "days_in_milk": MeasurementUnits.DAYS,
@@ -174,9 +133,6 @@ def test_statistics_units_mapping_is_consistent() -> None:
         "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY,
         "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY,
         "parity": MeasurementUnits.UNITLESS,
-        "phenotype_fat": MeasurementUnits.KILOGRAMS,
-        "phenotype_protein": MeasurementUnits.KILOGRAMS,
-        "ranking_index": MeasurementUnits.UNITLESS,
         "is_milking": MeasurementUnits.UNITLESS,
         "simulation_day": MeasurementUnits.SIMULATION_DAY,
     }
