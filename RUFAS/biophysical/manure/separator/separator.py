@@ -162,12 +162,11 @@ class Separator(Processor):
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
         if liquid_manure_water <= 0.0:
-            self._om.add_warning(
+            self._om.add_error(
                 f"Liquid manure volume is {liquid_manure_water}.",
-                "Setting liquid manure water to minimum of 0.01 m3.",
+                f"Separator {self.name} attempted to separate more water into manure solids fraction than was present in manure entering separator. {self.separated_solids_dry_matter} value for separator {self.name} may need to be increased.",
                 {**info_map},
             )
-            liquid_manure_water = 0.01
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
