@@ -6,7 +6,8 @@
       "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
       "output_prefix": "freestall",
       "log_verbosity": "errors",
-      "random_seed": 42
+      "random_seed": 42,
+      "exclude_info_maps": true
     }
 ]
 }

@@ -4585,6 +4585,7 @@ def filtered_variable_pool() -> list[dict[str, Any]]:
 @pytest.fixture
 def raw_nitrous_oxide_emissions_data() -> dict[str, dict[str, list[Any]]]:
     return {
+        "RufasTime.simulation_day": {"values": [0, 1, 2]},
         "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field='field_1',layer='0'": {
             "info_maps": [
                 {
@@ -4834,6 +4835,7 @@ def raw_nitrous_oxide_emissions_data() -> dict[str, dict[str, list[Any]]]:
 @pytest.fixture
 def raw_ammonia_emissions_data() -> dict[str, dict[str, list[Any]]]:
     return {
+        "RufasTime.simulation_day": {"values": [0, 1, 2]},
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='0'": {
             "info_maps": [
                 {
@@ -4858,187 +4860,27 @@ def raw_ammonia_emissions_data() -> dict[str, dict[str, list[Any]]]:
             "values": [0.016728084539383643, 0.013371297926216759, 0.0010679151427994864],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='1'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_1',layer='1'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='1'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='1'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [0.012502826920416718, 0.010488441604891935, 0.0016554953370997525],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='2'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_1',layer='2'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='2'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='2'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [6.358851510541607e-06, 5.372908293527906e-06, 1.4698694467805671e-06],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_1',layer='3'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_1',layer='3'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='3'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_1',layer='3'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [1.0121070648223322e-11, 8.347875804542645e-12, 3.849981582505157e-12],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='0'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_2',layer='0'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='0'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='0'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [0.016929310496203765, 0.013541362698449385, 0.0010659711452158404],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='1'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_2',layer='1'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='1'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='1'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [0.0022903451386019377, 0.0019205155329878824, 0.00038740713529979723],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='2'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_2',layer='2'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='2'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='2'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [3.2110602483417915e-10, 2.648279957508658e-10, 1.1113673982273009e-10],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='3'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_2',layer='3'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='3'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='3'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [0.0, 0.0, 0.0],
         },
         "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field='field_2',layer='4'": {
-            "info_maps": [
-                {
-                    "suffix": "field='field_2',layer='4'",
-                    "simulation_day": 0,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='4'",
-                    "simulation_day": 1,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-                {
-                    "suffix": "field='field_2',layer='4'",
-                    "simulation_day": 2,
-                    "units": "kg/ha",
-                    "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                },
-            ],
             "values": [0.0, 0.0, 0.0],
         },
     }
