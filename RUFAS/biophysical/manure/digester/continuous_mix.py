@@ -207,7 +207,8 @@ class ContinuousMix(Digester):
                     "total_manure_mass": self._manure_in_digester.mass,
                 }
                 self._om.add_warning(
-                    f"Anaerobic digester '{self.name}' has zero total volatile solids.",
+                    f"Anaerobic digester '{self.name}' receieved manure containing 0 total volatile solids."
+                    "Moving manure to next processor unchanged.",
                     f"Digester has {self._manure_in_digester.mass} kg manure"
                     f"and {self._manure_in_digester.total_volatile_solids} kg volatile solids.",
                     info_map,
