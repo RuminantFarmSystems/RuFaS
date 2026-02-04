@@ -499,7 +499,7 @@ def test_report_manure_streams_key_error(mocker: MockerFixture) -> None:
             total_bedding_mass=3.3,
             total_bedding_volume=4.4,
         ),
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -577,7 +577,7 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
         volume=9.9,
         methane_production_potential=10.1,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
     manure_streams = {
         "stream_1": manure_stream,
@@ -616,7 +616,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
-            bedding_non_degradable_volatile_solids=10.0
+            bedding_non_degradable_volatile_solids=10.0,
         ),
         "stream_2": ManureStream(
             water=1.1,
@@ -639,9 +639,9 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 manure_urine_nitrogen=2.2,
                 stream_type=StreamType.GENERAL,
                 total_bedding_mass=3.3,
-                total_bedding_volume=4.4
+                total_bedding_volume=4.4,
             ),
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         ),
         "stream_3": ManureStream(
             water=2.1,
@@ -666,7 +666,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         ),
         "stream_4": ManureStream(
             water=3.1,
@@ -691,7 +691,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
                 total_bedding_mass=3.3,
                 total_bedding_volume=4.4,
             ),
-            bedding_non_degradable_volatile_solids=10
+            bedding_non_degradable_volatile_solids=10,
         ),
     }
 
