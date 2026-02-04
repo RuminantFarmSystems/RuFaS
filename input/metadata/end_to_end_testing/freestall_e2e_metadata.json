@@ -38,7 +38,7 @@
     "animal_top_listing_semen": {
       "title": "Animal Top Listing Semen data",
       "description": "The top listing semen value for new born calves.",
-      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
+      "path": "input/data/animal_genetics/TopListingSemen_HO.csv",
       "type": "csv",
       "properties": "animal_top_listing_semen_properties"
     },
