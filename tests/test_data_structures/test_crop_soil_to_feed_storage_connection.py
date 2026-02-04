@@ -84,7 +84,7 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
         # Normal case: partial removal
         (100.0, 40.0, 10.0, 90.0, (30.0 / 90.0) * GeneralConstants.FRACTION_TO_PERCENTAGE),
         # Edge case: full removal
-        (50.0, 20.0, 50.0, 0.0, 0.0),
+        (50.0, 20.0, 40.0, 0.0, 0.0),
     ],
 )
 def test_remove_dry_matter_mass(
