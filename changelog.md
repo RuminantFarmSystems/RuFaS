@@ -294,6 +294,7 @@ v0.9.2
 - [2709](https://github.com/RuminantFarmSystems/RuFaS/pull/2709) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Updates use-name to allow for exact regex match var name use in outputs.
 - [2710](https://github.com/RuminantFarmSystems/RuFaS/pull/2710) - [minor change] [Pilot testing] [NoInputChange] [NoOutputChange] Quick fix for farm 4 failure in pilot testing.
 - [2711](https://github.com/RuminantFarmSystems/MASM/pull/2711) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Updates damping factor and Arrhenius constant values
+- [2721](https://github.com/RuminantFarmSystems/MASM/pull/2721) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds error for instances of negative liquid manure water, and adds protection against division by 0 errors in digesters.
 - [2726](https://github.com/RuminantFarmSystems/MASM/pull/2726) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Report the Farm Grown Feed Emissions on a daily basis.
 - [2608](https://github.com/RuminantFarmSystems/MASM/pull/2608) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
 
