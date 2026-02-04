@@ -150,12 +150,6 @@ class HarvestedCrop:
         mass_to_remove : float
             Dry-matter to remove. (kg).
         """
-        if mass_to_remove > self.fresh_mass + 1e-6:
-            raise ValueError(
-                f"Cannot remove {mass_to_remove:.3f} kg DM - "
-                f"only {self.dry_matter_mass:.3f} kg dry matter available."
-            )
-
         current_fresh_mass = self.fresh_mass
 
         self.dry_matter_mass -= mass_to_remove
