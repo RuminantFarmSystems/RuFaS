@@ -237,7 +237,7 @@ class Storage:
             crop.lignin = degraded_crop_values["lignin"]
             crop.ash = degraded_crop_values["ash"]
             crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
-            crop.fresh_mass = degraded_crop_values["fresh_mass"]
+            crop.dry_matter_mass = degraded_crop_values["dry_matter_mass"]
             crop.dry_matter_percentage = degraded_crop_values["dry_matter_percentage"]
 
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
@@ -330,7 +330,7 @@ class Storage:
             "ndf": ndf,
             "lignin": lignin,
             "ash": ash,
-            "fresh_mass": mass_values["fresh_mass"],
+            "dry_matter_mass": mass_values["dry_matter_mass"],
             "dry_matter_percentage": mass_values["dry_matter_percentage"],
             "last_time_degraded": last_time_degraded,
         }
@@ -372,7 +372,7 @@ class Storage:
             dry_matter_percentage = 0.0
         else:
             dry_matter_percentage = new_dry_matter_mass / new_fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
-        return {"fresh_mass": new_fresh_mass, "dry_matter_percentage": dry_matter_percentage}
+        return {"dry_matter_mass": new_dry_matter_mass, "dry_matter_percentage": dry_matter_percentage}
 
     def _record_received_crop(self, field_name: str, simulation_day: int) -> None:
         """
@@ -666,7 +666,7 @@ class Storage:
                 crop, time, loss_period, final_moisture_percentage
             )
             total_moisture_loss += moisture_loss_values["moisture_loss"]
-            crop.fresh_mass = moisture_loss_values["fresh_mass"]
+            crop.dry_matter_mass = moisture_loss_values["dry_matter_mass"]
             crop.dry_matter_percentage = moisture_loss_values["dry_matter_percentage"]
 
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
