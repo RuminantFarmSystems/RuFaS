@@ -7,7 +7,6 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -180,7 +179,8 @@ class Reproduction:
             days_in_pregnancy=reproduction_inputs.days_in_pregnancy,
             days_in_milk=reproduction_inputs.days_in_milk,
             events=AnimalEvents(),
-            net_merit=reproduction_inputs.net_merit,
+            dam_tbv_fat=reproduction_inputs.dam_tbv_fat,
+            dam_tbv_protein=reproduction_inputs.dam_tbv_protein,
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None,
@@ -450,9 +450,6 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
-        newborn_calf_net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
-            time, reproduction_data_stream.breed, reproduction_data_stream.net_merit
-        )
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             animal_type=AnimalType.CALF.value,
@@ -460,7 +457,8 @@ class Reproduction:
             days_born=0,
             birth_weight=self.calf_birth_weight,
             initial_phosphorus=reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
-            net_merit=newborn_calf_net_merit,
+            dam_tbv_fat=reproduction_data_stream.dam_tbv_fat,
+            dam_tbv_protein=reproduction_data_stream.dam_tbv_protein,
         )
 
         return reproduction_data_stream
@@ -1267,7 +1265,7 @@ class Reproduction:
                     pregnancy_check_config["on_preg"],
                 )
                 if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                    (reproduction_data_stream) = (
+                    reproduction_data_stream = (
                         self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
                             reproduction_data_stream, simulation_day
                         )
@@ -1592,7 +1590,7 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Set up the presynch program for cows on the start day if applicable."""
-        (should_set_up_hormone_delivery_for_presynch, reproduction_data_stream) = (
+        should_set_up_hormone_delivery_for_presynch, reproduction_data_stream = (
             self._should_set_up_hormone_delivery_for_presynch(reproduction_data_stream, simulation_day)
         )
 
@@ -1630,7 +1628,7 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Set up an OvSynch program for cows on the OvSynch start day if applicable."""
-        (should_set_up_hormone_delivery_for_ovsynch, reproduction_data_stream) = (
+        should_set_up_hormone_delivery_for_ovsynch, reproduction_data_stream = (
             self._should_set_up_hormone_delivery_for_ovsynch(reproduction_data_stream, simulation_day)
         )
 
