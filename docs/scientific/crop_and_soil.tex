@@ -9,6 +9,7 @@
 \usepackage{array}     % More control over column formatting
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{csquotes}
 \usepackage{float} % Allows strict image placement
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}% hyperref makes the TOC clickable
 \usepackage[most]{tcolorbox}
@@ -587,10 +588,10 @@ The first step in execution of a fertilizer application is to calculate the tota
             \vspace{0.5cm}        
     
     \begin{center}
-        \(fert\_massnitrogen=\frac{mass\_requested\_nitrogen}{fert\_nitrogen\_frac
+        \(fert\_mass_{nitrogen}=\frac{mass\_requested\_nitrogen}{fert\_nitrogen\_frac
 fert\_mass}\) \\ 
-        \(phosphorus=\frac{mass_requested_phosphorus}{fert_phosphorus_frac}\) \\
-        \(fert\_masspotassium=\frac{mass\_requested\_potassium}{fert\_potssium\_frac}\)
+        \(fert\_mass_{phosphorus}=\frac{mass\_requested\_phosphorus}{fert\_phosphorus\_frac}\) \\
+        \(fert\_mass_{potassium}=\frac{mass\_requested\_potassium}{fert\_potassium\_frac}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -598,7 +599,7 @@ fert\_mass}\) \\
             \vspace{0.5cm} 
     
     \begin{center}
-        \(applied\_mass = maxfert\_mass_{nitrogen},\ fert\_mass_{phosphorus}\ fert\_mass_{potassium} \)
+        \(applied\_mass = max[fert\_mass_{nitrogen},\ fert\_mass_{phosphorus}\ fert\_mass_{potassium}] \)
     \end{center}
         \vspace{0.5cm} 
     
@@ -608,9 +609,9 @@ fert\_mass}\) \\
 \paragraph{Where:}
 \begin{itemize}
     \item applied\_mass (kg) is the mass of the given fertilizer required to satisfy all nutrient requests.
-    \item fert\_massnitrogen (kg) is the mass nitrogen requested.
-    \item fert\_massphosphorus (kg) is the mass of phosphorus requested.
-    \item fert\_masspotassium (kg) is the mass of potassium requested.
+    \item fert\_mass\textsubscript{nitrogen} (kg) is the mass nitrogen requested.
+    \item fert\_mass\textsubscript{phosphorus} (kg) is the mass of phosphorus requested.
+    \item fert\_mass\textsubscript{potassium} (kg) is the mass of potassium requested.
     \item fert\_nitrogen\_frac (proportion) is the fraction of nitrogen in the fertilizer mix.
     \item fert\_phosphorus\_frac (proportion) is the fraction of phosphorus in the fertilizer mix.
     \item fert\_potassium\_frac (proportion) is the fraction of potassium in the fertilizer mix.
@@ -946,6 +947,11 @@ The last management practice the Field class checks is the harvesting event sche
 
 The soil submodule spatially and dynamically models agronomic and biogeochemical processes taking place on the surface of and within the soil profile. It tracks plant roots/residue, hydrological movement, and dissolved/undissolved carbon, nitrogen, and phosphorus cycling. Carbon and nitrogen nutrient cycling and hydrology are based on the SWAT+ model and phosphorus nutrient cycling on the SurPhos model \parencite{vadas2007}. 
 
+\paragraph{Soil Initialization}
+\vspace{-0.25cm}
+
+RuFaS can simulate soils of any combination of textures in as many layers delineated by depth as the user wishes to specify. A single soil type and profile can represent all fields in a simulation or can be specific to individual fields. Each specified soil is stored by RuFaS as a SoilData object consisting of a list of LayerData objects that in turn represent a set of variables specific to each layer of soil. At the start of the simulation the user's soil specifications generate the soil layers for each field and pools of water, carbon, nitrogen, and phosphorus are initialized in each layer.
+
 
 \begin{landscape}
 \paragraph{Required Inputs}
@@ -1036,14 +1042,12 @@ residue\_fresh \_organic\_mineralization\_rate & The fraction of residue that wi
 \end{landscape}
 
 \subsection{Methodology}
+Soil temperature and water content/flow are the main drivers of soil biogeochemical cycling.
 
-
-\textbf{ \large Soil Temperature} (Implemented in soil\_temp.py)
-
-Soil temperature fluctuates diurnally and seasonally and is estimated daily as a function of the previous day’s soil temperature, average annual air temperature, the current day’s soil surface temperature and depth in the soil profile for each soil layer by using the following equations from SWAT 2009 documentation. 
-
-\paragraph{Base equation}
+\paragraph{Soil Temperature}
 \vspace{-0.25cm}
+
+Soil temperature fluctuates diurnally and seasonally and is estimated daily as a function of the previous day’s soil temperature, average annual air temperature, the current day’s soil surface temperature and depth in the soil profile for each soil layer by using the following equations from SWAT 2009 documentation.
 
     \begin{center}
 \(T_{soil}\ (z,\ d_n) = (L * T_{soil,(z,dn-1)})+(1-L) * [df * (T_{aair}-T_{surf}) +T_{surf}]\)
@@ -1097,7 +1101,7 @@ Damping depth is a function of soil water and max damping depth. \(dd_{max}\)  i
         \vspace{0.2cm}
 
     \begin{center}
-\(dd_{\max}=1000 + \frac{2500 BD}{BD + 686\exp(-5.63 BD)}\)
+\(dd_{max}=1000 + \frac{2500BD}{BD+686\exp(-5.63BD)}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1105,7 +1109,7 @@ Damping depth is a function of soil water and max damping depth. \(dd_{max}\)  i
             \vspace{0.5cm}
 
     \begin{center}
-\(dd = dd_{\max} \times \exp\left\{ \ln \left(\frac{500}{dd_{\max}}\right) \times \left[\frac{(1-\text{scale})}{(1+\text{scale})}\right]^2 \right\}\)
+\(dd = dd_{max} * exp\{ln (\frac{500}{dd_{max}}) * [\frac{(1-scale)}{(1+scale)}]^2\}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1118,7 +1122,7 @@ Damping depth is a function of soil water and max damping depth. \(dd_{max}\)  i
             \vspace{0.5cm}
 
     \begin{center}
-\(scale=\frac{SW}{[(0.356-0.144×BD)*Ztot]}\)
+\(scale=\frac{SW}{[(0.356-0.144*BD)*Ztot]}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1174,7 +1178,7 @@ The impact of plant and snow cover is quantified as a weighting factor, bcv, giv
             \vspace{0.5cm}
 
     \begin{center}
-\(bcv= \frac{plant\_cover}{plant\_cove+exp(7.563-0.0001297) * plant\_cove}\)
+\(bcv= \frac{plant\_cover}{plant\_cover+exp(7.563-0.0001297) * plant\_cover}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1194,7 +1198,7 @@ The impact of plant and snow cover is quantified as a weighting factor, bcv, giv
             
         \begin{itemize}
             \item SNOW	=	snow water content on the current day (mm)	
-            \item plant\_cove = Total aboveground plant biomass and residue on the current day (kg per hectare)
+            \item plant\_cover = Total aboveground plant biomass and residue on the current day (kg per hectare)
 
         \end{itemize}
             \vspace{0.5cm}
@@ -1216,16 +1220,18 @@ Surface temperature is dependent on the previous day’s soil temperature and is
 \vspace{0.5cm}
 
 \textbf{\large Soil Hydrology}
+The soil hydrological processes calculated in RuFaS are limited to infiltration, the downward movement of water through the soil profile, and evapotranspiration, the movement of water from the soil profile into the atmosphere.
+\vspace{0.25cm}
 \paragraph{Infiltration (implemented in infiltration.py)}
 \vspace{-0.25cm}
 
-The movement of soil water into and through the soil profile. When application of water to the ground surface exceeds the rate of infiltration, it results in surface runoff. Soil texture (percentage of sand, silt, and clay), bulk density, presence of pores, pore diameter, and continuity affect the soil infiltration rate. Slow soil infiltration rate results in ponding in the level areas, surface runoff, and erosion in sloping areas. High infiltration rates can lead to nutrient leaching. Surface runoff is estimated using the NRCS curve number method. 
+The Infiltration class is implemented in infiltration.py and calculates both infiltration and runoff. Infiltration is the movement of soil water into and through the soil profile and surface runoff results when application of water to the ground surface exceeds the infiltration rate. Infiltration is calculated as the difference between the amount of water applied to the surface and the amount of surface water run off. Surface water is thus calculated first and then used to calculate soil water infiltration. Soil texture (percentage of sand, silt, and clay), bulk density, presence of pores, pore diameter, and continuity affect the soil infiltration rate. Slow soil infiltration rate results in ponding in the level areas, surface runoff, and erosion in sloping areas. High infiltration rates can lead to nutrient leaching. Surface runoff is estimated using the NRCS curve number method.
 
 Runoff has a minimum of 0 and is calculated as:
             \vspace{0.5cm}
 
     \begin{center}
-\(if R > 0.2S,\ runoff=R-0.2S2R+0.8S\) \\
+\(if R > 0.2S,\ runoff=R-0.2S*2R+0.8S\) \\
 \(if\ not,\ runoff=0	\)
     \end{center}
         \vspace{0.5cm} 
@@ -1365,16 +1371,16 @@ Infiltration into the soil is daily rainfall less daily runoff.
 \paragraph{Evapotranspiration}
 \vspace{-0.25cm}
 
-Evapotranspiration (ET) is one of the most important hydrological processes of soil water balance in the soil and crop module. It is the sum of all processes by which water moves from the land surface to the atmosphere via soil evaporation, plant canopy transpiration, and sublimation. The Hargreaves method requires air temperature only. RuFaS adapts the Hargreaves method \parencite{hargreaves1985} to estimate ET which only requires temperature as an input.
+Evapotranspiration (ET) is one of the most important hydrological processes of soil water balance in the soil and crop module. It is the sum of all processes by which water moves from the land surface to the atmosphere via soil evaporation, plant canopy transpiration, and sublimation. RuFaS adapts the Hargreaves method \parencite{hargreaves1985} to estimate ET which only requires temperature as an input.
 \vspace{0.2cm}
 
 Potential evapotranspiration (PET) is the maximum amount of water that could be removed due to surface evaporation and plant canopy transpiration with no limitation on water availability, while evapotranspiration (ET) is the actual amount of water lost due to evaporation and transpiration. 
 \vspace{0.5cm}
 
-\paragraph{Potential Evapotranspiration  (Implemented in field.py)}        
+\paragraph{Potential Evapotranspiration  (Implemented in field.py)}  is the larger of 0.001 or function of the radiation, daily temperature range, and heat of vaporization
 
     \begin{center}
- \( LHV * ET_{max}=0.0023 * H_0 * (T_{max} - T_{min})^{0.5} * (T_{avg} + 17.8) \)
+ \( ET_{max}=\max\{\frac{0.0023 * H_0 * (T_{max} - T_{min})^{0.5} * (T_{avg} + 17.8))}{LHV},0.001\} \)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1390,7 +1396,6 @@ Potential evapotranspiration (PET) is the maximum amount of water that could be 
             \item T\textsubscript{max}	=	maximum air temperature for a given day (\(^\circ C\))
             \item T\textsubscript{min}	=	minimum air temperature for a given day (\(^\circ C\))
             \item T\textsubscript{avg}	=	mean air temperature for a given day (\(^\circ C\))
-            \item ET\textsubscript{max} is taken as the maximum between 0.001 and the value calculated by solving for ET\textsubscript{max} in the equation above.
         \end{itemize}
 \vspace{0.2cm}
 
@@ -1406,7 +1411,7 @@ LHV is calculated as:
 
 
 
-\paragraph{Maximum crop transpiration (implemented in water\_dynamics.py)}        
+Maximum crop transpiration (implemented in water\_dynamics.py) is the proportion of potential evapotranspiration that is transpired through the plant canopy. LAI lower than 3.0 and available water in the rooting zone limit transpiration.
 
     \begin{center}
  \( trans_{max}=\frac{ET_{max} * LAI_{act}}{3.0}	\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if 0 \leq LAI_{act} \leq 3.0 \) \\
@@ -1425,8 +1430,8 @@ LHV is calculated as:
         \end{itemize}
 \vspace{0.2cm}
 
-LAI lower than 3.0 limits evapotranspiration. Actual transpiration values may be less than the calculated maximum amount due to lack of available water in the rooting depth of the soil profile. 
-\paragraph{Sublimation and soil evaporation (implemented in field.py)}        
+
+Sublimation and soil evaporation (implemented in field.py) refer to the phase changes of solid and liquid water to gas which transfer water from land to atmosphere.
 
     \begin{center}
  \( evap_{max}=ET_{max} * SoilCov\)
@@ -1463,7 +1468,6 @@ Potential evaporation is adjusted based on trans\textsubscript{max} as:
     \vspace{0.2cm}
 
     \begin{center}
- \(evap_{max}=min\ \{      evapmaxevapmaxETmaxevapmax+transmax \} \)
 
 \[
 evap_{\text{max}} = min\left\{ \frac{evap_{\text{max}} \cdot ET_{\text{max}}}{evap_{\text{max}} + trans_{\text{max}}},\ evap_{\text{max}} \right\}
@@ -1476,7 +1480,7 @@ evap_{\text{max}} = min\left\{ \frac{evap_{\text{max}} \cdot ET_{\text{max}}}{ev
             {\raggedleft \textbf{[SC.EVP.6]}\par}
             \vspace{0.5cm}
 
-\paragraph{Partition evaporation within soil profile (implemented in evaporation.py)}     
+Partition evaporation within soil profile (implemented in evaporation.py) vertically subsets the maximum evaporation to calculate evaporation demand within each layer of the soil profile
 \vspace{0.5cm}
 
     \begin{center}
@@ -1507,11 +1511,11 @@ The evaporation demand for a given soil layer is the difference between evaporat
             \vspace{0.5cm}
 
 When the water content of a soil layer is below field capacity, the
-evaporative demand for the layer is reduced according to the following equation: evaporation.py
+evaporative demand for the layer is reduced according to the following equation
 \vspace{0.5cm}
 
     \begin{center}
- \(evap_{ly}=evap_{ly} * exp[2.5 * \frac{SW-FC}{FC-WP}]\ \ \ \ \ \ \ if\ SW<FC\)
+ \(evap_{ly}_reduced=evap_{ly} * exp[2.5 * \frac{SW-FC}{FC-WP}]\ \ \ \ \ \ \ if\ SW<FC\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1521,6 +1525,7 @@ evaporative demand for the layer is reduced according to the following equation:
         \textbf{Where:}
             
         \begin{itemize}
+            \item evap\textsubscript{ly}	=	evaporation demand of the layer
             \item SW	=	soil water content for the layer (mm H\textsubscript{2}O)
             \item WP	=	soil water content held at wilting point (mm H\textsubscript{2}O)
             \item FC	=	field capacity for soil water (mm H\textsubscript{2}O)
@@ -1533,7 +1538,7 @@ In addition, the daily amount of water removed by evaporation is limited to 80\%
     \begin{center}
 
 \[
-evap_{ly}=min = min\left\{ 0.8 * SW-WP,\ evap_{ly} \right\}
+evap_{ly} = min\left\{ 0.8 * SW-WP,\ evap_{ly} \right\}
 \]
 
  
@@ -1543,12 +1548,12 @@ evap_{ly}=min = min\left\{ 0.8 * SW-WP,\ evap_{ly} \right\}
             {\raggedleft \textbf{[SC.EVP.10]}\par}
             \vspace{0.5cm}
 
-Evaporation for each layer is added to ETact, the total actual amount of water lost in evapotranspiration.
+The total actual amount of water lost in evapotranspiration (ETact) is equal to the sum of evaporation from each layer
 
 \paragraph{Percolation (implemented in percolation.py)}
 
 
-Percolation is the process of water movement downward through the soil profile. When the soil layer water is less than or equal to field capacity no percolation occurs. Percolation is not calculated for frozen layers.  \vspace{0.5cm}
+Percolation is the process of water movement downward through the soil profile. When the soil water content in a layer is less than or equal to field capacity no percolation occurs. Percolation is not calculated for frozen layers.  \vspace{0.5cm}
 
     \begin{center}
  \(perc=SW_{perc} * [1-exp(\frac{-t}{TT})]\)
@@ -1596,19 +1601,16 @@ TT for each soil layer is calculated as:
         \end{itemize}
 \vspace{0.5cm}
 
-\textbf{\large {Soil Erosion} (Implemented as  soil\_erosion.py)}
+\subsection{Soil Erosion (Implemented as  soil\_erosion.py)}
 \vspace{0.2cm}
 
-\textbf{\textit{Base Equation, Rainfall Intensity, and Peak Runoff}}
-\vspace{0.2cm}
-
-Soil erosion is a geological process whereby surface soil is removed by water/wind and  anthropogenically. In RuFaS, erosion is modeled from individual crop fields using the Modified Universal Soil Loss Equations (MUSLE, SWAT 2009 documentation). The MUSLE input variables include rainfall (rainfall amount and intensity), soil erodibility factor, soil cover/management, best management practices and the topographic factor. 
+Soil erosion is a geological process whereby surface soil is removed by water/wind and  anthropogenically. In RuFaS, erosion is modeled from individual crop fields using the Modified Universal Soil Loss Equations (MUSLE, SWAT 2009 documentation). The MUSLE input variables include rainfall (rainfall amount and intensity), soil erodibility factor, soil cover/management, best management practices, and the topographic factor.
  \vspace{0.5cm}
 
- \subsection{Base Equation, Rainfall Intensity, and Peak Runoff}
+ \paragraph{Base Equation, Rainfall Intensity, and Peak Runoff}
 
     \begin{center}
- \(sed=11.8 *( Qsurf*qpeak*field\_size)^{0.56} * K * C * P * LS\)
+ \(sed=11.8 *( Qsurf*qpeak*field\_size)^{0.56} * K * C * P * LS * CFRG\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1626,6 +1628,7 @@ Soil erosion is a geological process whereby surface soil is removed by water/wi
             \item C		=	USLE cover and management factor
             \item P		=	USLE support practice factor
             \item LS		=	USLE topographic factor
+            \item CFRG  = the coarse fragment factor
         \end{itemize}
     \vspace{0.5cm}
 
@@ -1688,7 +1691,7 @@ Rainfall intensity is rainfall over time for the time of concentration
     \vspace{0.5cm}
 
     \begin{center}
- \(Tconc=\frac{Length^{0.6} * n^{0.6}}{18 × slope^{0.3}}\)
+ \(Tconc=\frac{Length^{0.6} * n^{0.6}}{18 * slope^{0.3}}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1756,10 +1759,10 @@ Soil erodibility factor K is calculated as:
         \textbf{Where:}
             
         \begin{itemize}
-            \item Fcsand	=	gives low factors for soils with high sand contents and high values for soils with little sand
-            \item Fcl-si	=	gives low factors for soils with high clay to silt ratios
-            \item Forgc	=	reduces soil erodibility for soils with high organic carbon content
-            \item Fsand	=	reduces soil erodibility for soils with high sand contents
+            \item F\textsubscript{csand}	=	gives low factors for soils with high sand contents and high values for soils with little sand
+            \item F\textsubscript{cl-si}	=	gives low factors for soils with high clay to silt ratios
+            \item F\textsubscript{orgc}	=	reduces soil erodibility for soils with high organic carbon content
+            \item F\textsubscript{sand}	=	reduces soil erodibility for soils with high sand contents
         \end{itemize}
     \vspace{0.5cm}
 
@@ -1828,7 +1831,7 @@ LS is a topographic factor and is the expected ratio of soil loss per unit area 
             \vspace{0.5cm}
             
     \begin{center}
- \(LS= \frac{Lhill}{22.1}^m * [65.41 * sin^2(alphahill) + 4.56 * sin(alphahill)+0.065]\)
+ \(LS= \frac{Lhill}{22.1}^m * [65.41 * \text{sin}^2(alphahill) + 4.56 * \text{sin}(alphahill)+0.065]\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1894,11 +1897,11 @@ Coarse Fragment factor (CFRG) is calculated as :
         \end{itemize}
     \vspace{0.5cm}
 
-\textbf{\large {Soil Nitrogen}}
+\subsection{Soil Nitrogen Cycling}
 \vspace{0.2cm}
 
 
-RuFaS tracks soil N as ammonium, nitrate, and five pools based on nitrogen form and lability. Three pools are organic N; fresh, active, and stable. Two are inorganic N; NH\textsubscript{4}\textsuperscript{+} and NO\textsubscript{3}\textsuperscript{-}. Nitrogen enters the cycle as synthetic fertilizer, manure, and crop residue. Synthetic fertilizers are partitioned into nitrate and ammonium. Manure organic N is partitioned into active and stable organic N pools by 92.86\% and 7.14\% respectively. Active and stable organic N can interconvert. N in the active pool can also get percolated to the second layer. Furthermore, manure dry matter mass goes into ammonium and nitrate pools using certain equations. Residue biomass also gets converted into fresh and active organic N pools via mineralization. If residue is in top 2 cm it goes into the fresh organic N pool while if residue is below 2 cm it goes into the active organic N pool. 80\% of fresh organic N is converted into nitrate and 20\% into active pool via decomposition. Active N is converted into NH\textsubscript{4}\textsuperscript{+} after mineralization. NH\textsubscript{4}\textsuperscript{+} can be converted into NO\textsubscript{3}\textsuperscript{-} via nitrification, taken up by plants, volatilized, percolated, or lost via runoff. NO\textsubscript{3}\textsuperscript{-} can be taken up by plants, percolate, runoff, or denitrify to NO, N\textsubscript{2}O, and N\textsubscript{2} gas. 
+RuFaS tracks soil N as five pools based on nitrogen form and lability. Three pools are organic N; fresh, active, and stable. Two are inorganic N; NH\textsubscript{4}\textsuperscript{+} and NO\textsubscript{3}\textsuperscript{-}. Nitrogen enters the cycle as synthetic fertilizer, manure, and crop residue. Synthetic fertilizers are partitioned into nitrate and ammonium. Manure organic N is partitioned into active and stable organic N pools by 92.86\% and 7.14\% respectively. Active and stable organic N can interconvert. N in the active pool can also get percolated to the second layer. Furthermore, manure dry matter mass goes into ammonium and nitrate pools using certain equations. Residue biomass also gets converted into fresh and active organic N pools via mineralization. If residue is in top 2 cm it goes into the fresh organic N pool while if residue is below 2 cm it goes into the active organic N pool. 80\% of fresh organic N is converted into nitrate and 20\% into active pool via decomposition. Active N is converted into NH\textsubscript{4}\textsuperscript{+} after mineralization. NH\textsubscript{4}\textsuperscript{+} can be converted into NO\textsubscript{3}\textsuperscript{-} via nitrification, taken up by plants, volatilized, percolated, or lost via runoff. NO\textsubscript{3}\textsuperscript{-} can be taken up by plants, percolate, runoff, or denitrify to NO, N\textsubscript{2}O, and N\textsubscript{2} gas.
 \vspace{0.5cm}
 
 \textbf{\large Initialize soil N Pools (Implemented in layer\_data.py)}
@@ -1989,7 +1992,7 @@ While pool sizes are initialized as concentration (mg kg\textsuperscript{-1}), a
 \vspace{0.2cm}
             
     \begin{center}
- \(mass (kgN ha^{-1})=\frac{(nutrient conc (mg kg^{-1}) * BD * depth * field size)}{field size}\)
+ \(nitrogen\_mass\_kg\_ha=\frac{(nitrogen\_mass\_mg\_kg * BD * depth * field size)}{field size}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -1997,7 +2000,7 @@ While pool sizes are initialized as concentration (mg kg\textsuperscript{-1}), a
             \vspace{0.5cm}
 
      \begin{center}
- \(mass (kgN ha^{-1})=mg kg^{-1} * BD * depth10\)
+ \(nitrogen\_mass\_kg\_ha= nitrogen\_mass\_mg\_kg * BD * depth * 10\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -2013,12 +2016,11 @@ While pool sizes are initialized as concentration (mg kg\textsuperscript{-1}), a
         \end{itemize}
     \vspace{0.5cm}
 
-All pools have a lower limit of 0. If a transfer of N from one pool to another would is greater than the N in the pool of origin, the destination pool receives only the amount that depletes the pool of origin. The rest of the N cycle is in the nitrogen\_cycling folder and run by nitrogen\_cycling.py, which is called from the soil routine.
+All pools have a lower limit of 0. If a transfer of N from one pool to another is greater than the N in the pool of origin, the destination pool receives only the amount that depletes the pool of origin. The rest of the N cycle is in the nitrogen\_cycling folder and run by nitrogen\_cycling.py, which is called from the soil routine.
 
 \paragraph{Nitrification and Volatilization (Implemented in nitirification\_volatilization.py)}
 
-\textit{Nitrification}
-Nitrification is conversion of  NH\textsubscript{4}\textsuperscript{+} to NO\textsubscript{3}\textsuperscript{-} via microbial oxidation of NH\textsubscript{4}\textsuperscript{+} under suitable soil temperature and moisture conditions. Nitrification occurs only at soil temperatures greater than 5\(^\circ C\) and is modeled as a function of soil temperature and water factors, temp\_factor and water\_factor.  
+Nitrification is the conversion of  NH\textsubscript{4}\textsuperscript{+} to NO\textsubscript{3}\textsuperscript{-} via microbial oxidation of NH\textsubscript{4}\textsuperscript{+} under suitable soil temperature and moisture conditions. Nitrification occurs only at soil temperatures greater than 5\(^\circ C\) and is modeled as a function of soil temperature and water factors, temp\_factor and water\_factor.
 \vspace{0.5cm}
             
     \begin{center}
@@ -2039,8 +2041,9 @@ Nitrification is conversion of  NH\textsubscript{4}\textsuperscript{+} to NO\tex
         \textbf{If:}
             
     \begin{center}
- \(water\_content \geq 0.25 * field\_capacity - 0.75 * wilting\_point
-	water\_factor = 1\)
+ \(water\_content \geq 0.25 * field\_capacity - 0.75 * wilting\_point\)
+    \vspace{0.5cm}
+	\(water\_factor = 1\)
     \end{center}
         \vspace{0.5cm} 
         
@@ -2061,7 +2064,6 @@ Nitrification is conversion of  NH\textsubscript{4}\textsuperscript{+} to NO\tex
         \end{itemize}
     \vspace{0.5cm}
 
-\textit{Volatilization}
 The volatilization of aqueous soil ammonium to ammonia gas (NH\textsubscript{3}) occurs even when nitrification does not. NH\textsubscript{3} volatilization is influenced by temperature, moisture, fertilizer application, pH, and depth \parencite{mu-extsoil}.
 \vspace{0.5cm}
 
@@ -2083,7 +2085,6 @@ The volatilization depth factor (DepthFac) is unitless and calculated as:
         \end{itemize}
     \vspace{0.5cm}
 
-\textit{Nitrification and Volatilization Regulation}
 The impact of environmental factors on nitrification and NH\textsubscript{3} volatilization are estimated by nitrification and volatilization regulator equations. Nitrification and volatilization only occur if the soil temperature is greater than 5\(^\circ C\).
 \vspace{0.5cm}
 
@@ -2108,7 +2109,7 @@ A nitrification regulator (nitrification\_regulator) and a volatilization regula
         \end{itemize}
     \vspace{0.5cm}
 
-The total amount of NH\textsubscript{4} (kg N ha\textsuperscript{-1}) converted through nitrification and volatilization is given by:
+The total mass of NH\textsubscript{4} (kg N ha\textsuperscript{-1}) converted through nitrification and volatilization is given by:
 \vspace{0.5cm}
             
     \begin{center}
@@ -2163,7 +2164,7 @@ The amount of N removed from the NH\textsubscript{4} pool via nitrification and 
         \vspace{0.5cm}
 
 \paragraph{N loss in leaching and runoff (Implemented in leaching\_runoff\_erosion.py)}
-N can be transported with moving water vertically through the soil profile or into streams and water bodies via leaching, runoff, and erosion.  Leaching is the process where N ions move down the soil profile with percolating soil water (Wang and Li, 2019). Runoff and erosion N is removed exclusively from the surface soil layer. Lateral flow is not accounted for. 
+N can be transported with the movement of water through and out of the soil profile through leaching, runoff, and erosion.  Leaching is the process by which N ions move down the soil profile with percolating soil water (Wang and Li, 2019). Leaching affects inorganic and active organic pools.  If percolation is 0, then percolated N is also 0. NO\textsubscript{3}, NH\textsubscript{4} and active N lost to percolation in each layer is removed from the layer of origin and added to the layer below. The water and N percolated from the bottom layer is lost from the soil profile to the vadose layer. Runoff and erosion N is removed exclusively from the surface soil layer. Lateral flow is not taken into account.
 \vspace{0.2cm}
 
 The concentration of NO\textsubscript{3} and NH\textsubscript{4} (kg N mm\textsuperscript{-1} H\textsubscript{2}0) in the mobile water fraction for a given layer (NConc\textsubscript{1}) is: 
@@ -2245,12 +2246,12 @@ The amount/mass (kg N ha\textsuperscript{-1}) of NO\textsubscript{3} and NH\text
 
 \paragraph{N erosion (Implemented in leaching\_runoff\_erosion.py)}
 
-Soil N is eroded from the organic N pools; fresh, active, and stable. 
+Soil N is eroded from the organic N pools: fresh, active, and stable.
 \vspace{0.5cm}
             
     \begin{center}
 
- \(NConc= \frac{100 * N(kg N/ha)}{bulk\_density * depth}\)
+ \(nitrogen\_erosion\_concentration= \frac{100 * N(kg N/ha)}{bulk\_density * depth}\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2298,11 +2299,6 @@ Organic N mass loss in erosion (kg N ha\textsuperscript{-1}) is calculated as:
             {\raggedleft \textbf{[SC.LCH.4]}\par}
             \vspace{0.5cm}
 
-        \textbf{Notes:}
-            
-        \begin{itemize}
-            \item Leaching affects the inorganic and active organic pools.  If percolation is 0, then percolated N is also 0. NO\textsubscript{3}, NH\textsubscript{4} and active N lost to percolation in each layer is removed from the layer of origin and added to the layer below. Water and N percolated from the bottom layer are lost from the soil profile into the vadose layer.
-        \end{itemize}
 \vspace{0.5cm}
             
     \begin{center}
@@ -2360,8 +2356,8 @@ The amount of nitrate that is lost to denitrification (DenitrN) (kg N ha\textsup
             \item denitrification\_rate\_coefficienct is the user defined denitrification rate coefficient which can have values between 0-3 with a default value of 1.4
             \item temp\_factor\textsubscript{layer[i]}  is the nutrient cycling temperature factor for each layer,
             \item organic\_carbon\_percent\textsubscript{layer[i]}  is the amount of organic carbon in the layer (\%) calculated as organic\_carbon\_fraction\textsubscript{layer[i]}  * 100
-            \item nutrient\_cycling\_soil\_water\_factorlayer[i] is the nutrient cycling water factor for the layer i
-            \item soil\_water\_threshold is the nutrient cycling water factor threshold value for the layer. According to Wen et al. (2024) the value for the SWthr is typically set to 1.0 meaning that denitrification is allowed to occur when water content is above field capacity. 
+            \item nutrient\_cycling\_soil\_water\_factor\textsubscript{layer[i]} is the nutrient cycling water factor for the layer i
+            \item soil\_water\_threshold is the nutrient\_cycling\_water\_factor threshold value for the soil profile and is a user input with a default of 1.0. According to Wen et al. (2024) the value for the soil\_water\_threshold is typically set to 1.0 so denitrification is allowed to occur when water content is above field capacity.
 
         \end{itemize}
         \vspace{0.5cm}
@@ -2381,7 +2377,7 @@ Partitioning factor is used to partition denitrified nitrates into N\textsubscri
             \vspace{0.5cm}
             
    \begin{center}
-\(NO3\_effect=(1.0-[0.5+\{atan(pi*0.01*\frac{(NO3\_content-190)}{pi})\}] *25)\)
+\(NO3\_effect=(1.0-[0.5+\text{arctan}(\pi*0.01*\frac{(NO3\_content-190)}{\pi})\}] *25)\)
   \end{center}
     \vspace{0.5cm}
 
@@ -2389,7 +2385,7 @@ Partitioning factor is used to partition denitrified nitrates into N\textsubscri
             \vspace{0.5cm}
 
    \begin{center}
-\(Ceffect=13 +\{\frac{[30.78*atan[pi*0.07*(Cresp*1000-13)]}{pi} \}\)
+\(C\_effect=13 +\{\frac{[30.78*\text{arctan}[\pi*0.07*(C_{resp}*1000-13)]}{\pi} \}\)
   \end{center}
     \vspace{0.5cm}
 
@@ -2420,9 +2416,9 @@ Partitioning factor is used to partition denitrified nitrates into N\textsubscri
         \begin{itemize}
             \item NO3\_effect is the effect of nitrate on partitioning (unitless)
             \item C\_effect is the effect of carbon on partitioning (unitless)
-            \item atan= the arc tangents measured in radians of x (values are between -pi/2 and pi/2)
+            \item arctan= the arc tangents measured in radians of x (values are between -pi/2 and pi/2)
             \item NO3\_content is the amount of nitrate in the layer (ug N/g soil)
-            \item Cresp is carbon respiration from the soil layer (kg ha\textsuperscript{-1})
+            \item C\textsubscript{resp} is carbon respiration from the soil layer (kg ha\textsuperscript{-1})
             \item WFPS is the water filled pore space in the soil layer (unitless). 
         \end{itemize}
         \vspace{0.5cm}
@@ -2431,14 +2427,14 @@ The amount of N\textsubscript{2}O-N emissions (kg N ha\textsuperscript{-1}) are 
 \vspace{0.5cm}
             
     \begin{center}
-\(nitrous\_oxide\_nitrogen = (\frac{denitrified\_nitrates}{(1 + partition_factor)})* 0.001\)
+\(nitrous\_oxide\_nitrogen = (\frac{denitrified\_nitrates}{(1 + partitioning_factor)})* 0.001\)
     \end{center}
         \vspace{0.5cm} 
     
             {\raggedleft \textbf{[SC.NDN.7]}\par}
             \vspace{0.5cm}
     \begin{center}
-\(N_2O(kg)=(\frac{nitrates}{(1 + partition_factor)})* 0.001 \)
+\(N_2(kg)=(\frac{denitrified\_nitrates}{-1(partitioning\_factor)})* 0.001 \)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2466,7 +2462,7 @@ N mineralized from the active N pool (Nminact) (kg N ha\textsuperscript{-1}) is 
 \vspace{0.5cm}
             
     \begin{center}
-\(Nminact=Minrate * (temp\_factor * water\_factor)^{0.5} * activeN\)
+\(N\_min\_active=Min\_rate * (temp\_factor * water\_factor)^{0.5} * activeN\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2477,45 +2473,28 @@ N mineralized from the active N pool (Nminact) (kg N ha\textsuperscript{-1}) is 
         \textbf{Where:}
             
         \begin{itemize}
-            \item Minrate is the rate coefficient for mineralization of the humus active organic nitrogen
-            \item TempFac is the nutrient cycling temperature factor for the layer
-            \item WaterFac is the nutrient cycling water factor for the layer
-            \item ActiveN is the amount of N in the active organic pool (kg N ha\textsuperscript{-1}). 
+            \item humus\_min\_rate is the rate coefficient for mineralization of the humus active organic nitrogen
+            \item temp\_factor is the nutrient cycling temperature factor for the layer
+            \item water\_factor is the nutrient cycling water factor for the layer
+            \item activeN is the amount of N in the active organic pool (kg N ha\textsuperscript{-1}).
         \end{itemize}
         \vspace{0.5cm}
 
-N mineralized from the active pool is transferred from the active pool to the NH\textsubscript{4} pool. Decomposition and mineralization are a function of a daily decay rate constant that is calculated with the C:N and C:P ratios of the residue, and temperature and soil water factors. The C:N and C:P ratios of the residues in the soil layer are calculated as:
+N mineralized from the active pool is transferred from the active pool to the NH\textsubscript{4} pool. Decomposition and mineralization are a function of a daily decay rate constant that is calculated with the C:N and C:P ratios of the residue, and temperature and soil water factors. The C:N and C:P ratios of the residues in the soil layer are currently fixed at:
 \vspace{0.5cm}
-            
-    \begin{center}
-\(C:N=\frac{structural\ litter + metabolic\ litter}{FreshN + NO3}\ \ \ \ \ \ C:N=0\ if\ FreshN + NO3 \leq 0\)
-\vspace{0.1cm}
-
-\(C:N=\frac{structural\ litter + metabolic\ litter}{FreshOrganicP + Psol}\ \ \ \ if FreshOrganicP+LabileP \leq 0\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.NMN.2]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item res is the above ground soil residue (kg ha\textsuperscript{-1})
-            \item C is the sum of structural and metabolic litter in the soil layer (kg ha\textsuperscript{-1})
-            \item freshN is the N in the fresh organic pool in the layer (kg ha\textsuperscript{-1})
-            \item NO\textsubscript{3} is the amount of nitrate in the layer
-            \item FreshOrganicP is the P in the fresh organic  pool in the layer (kg P ha\textsuperscript{-1})
-            \item LabileP is the amount of P in the solution in the layer (kg P ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
+\begin{center}
+\(C:N = 25\)
+\(C:P = 200\)
+\end{center}
+ \vspace{0.5cm}
+    {\raggedleft \textbf{[SC.NMN.2]}\par}
+    \vspace{0.5cm}
 
 The decay rate constant, the same as that used to calculate residue in crop defines the fraction of residue that is decomposed as: 
 \vspace{0.5cm}
             
     \begin{center}
-\(Decay=MinCoeff * ResComp * (TempFac * WaterFac)^{0.5}\)
+\(decay\_rate\_constant=min\_coeff * residue\_comp\_factor * (temp\_factor * water\_factor)^{0.5}\)
 \vspace{0.1cm}
 
 \(ResComp = 1.0\)
@@ -2529,18 +2508,18 @@ The decay rate constant, the same as that used to calculate residue in crop defi
         \textbf{Where:}
             
         \begin{itemize}
-            \item ResComp is the nutrient cycling residue composition factor
-            \item MinCoeff is the rate coefficient for mineralization of the residue fresh organic nutrients (user-defined, default - 0.05)
+            \item residue\_comp\_factor is the nutrient cycling residue composition factor
+            \item min\_coeff is the rate coefficient for mineralization of the residue fresh organic nutrients (user-defined, default - 0.05)
             \item temp\_factor is temperature’s effect on nutrient cycling for the layer
             \item water\_factor is water’s effect on nutrient cycling for the layer
         \end{itemize}
         \vspace{0.5cm}
         
-Mineralization of the residue fresh organic N (FreshMin) (kg N ha\textsuperscript{-1}) is calculated as:
+Mineralization of the residue fresh organic N (kg N ha\textsuperscript{-1}) is calculated as:
 \vspace{0.5cm}
             
     \begin{center}
-\(FreshMin=Decay * FreshN	\)
+\(residue\_freshN\_mineralization=decay\_rate\_constant * freshN	\)
 \vspace{0.1cm}
 
 \(ResComp = 1.0\)
@@ -2554,11 +2533,13 @@ Mineralization of the residue fresh organic N (FreshMin) (kg N ha\textsuperscrip
         \textbf{Where:}
             
         \begin{itemize}
-            \item Decay is the residue decay rate constant, FreshN is the N in the fresh organic pool in the layer (kg N ha\textsuperscript{-1}). 20\% of the N decomposed from the FreshMin is then transferred to the active organic N pool, and 80\% is transferred to the NO\textsubscript{3}  pool. N in the fresh organic pool is set to 0 in all layers except the top layer. In the top layer, 0.15\% of residue is decomposed into fresh organic N pools. 
+            \item decay\_rate\_constant is the residue decay rate constant
+            \item freshN is the N in the fresh organic pool in the layer (kg N ha\textsuperscript{-1}).
         \end{itemize}
         \vspace{0.5cm}
+20\% of the N decomposed from the residue\_freshN\_mineralization is then transferred to the active organic N pool, and 80\% is transferred to the NO\textsubscript{3}  pool. In the top layer, 0.15\% of residue is decomposed into fresh organic N pools.
 
-\textit{Mineralization (Implemented in humus\_mineralization.py)}
+\textit{Humus Mineralization (Implemented in humus\_mineralization.py)}
 \vspace{0.2cm}
 
 In general, the term humus describes the transformed products formed from a wide variety of organic substrates without any intent to assign chemical composition or structure \parencite{hayes2020vindication}. Humus mineralization allows N to move between the active and stable organic pools.  N mineralized from the humus active organic pool is added to the NO\textsubscript{3} pool in the layer. 
@@ -2568,7 +2549,7 @@ The amount of N transferred between the active and stable organic pools (Ntrans)
 \vspace{0.5cm}
             
     \begin{center}
-\(amount\_transferred=0.00001 * active\_organic\_nitrogen  *[\frac{1}{FracN}-1]-stable\_organic\_nitrogen \)
+\(amount\_transferred=humus\_mineralization\_rate* active\_organic\_nitrogen  *[\frac{1}{fracN}-1]-stable\_organic\_nitrogen \)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2579,9 +2560,9 @@ The amount of N transferred between the active and stable organic pools (Ntrans)
         \textbf{Where:}
             
         \begin{itemize}
-            \item 10\textsuperscript{-5} is the humus mineralization rate constant
+            \item humus\_mineralization\_rate is the humus mineralization rate constant 10\textsuperscript{-5}
             \item active\_organic\_nitrogen is the amount of N in the active organic pool (kg N ha\textsuperscript{-1})
-            \item FracN is the fraction\_of\_humic\_nitrogen\_in\_the\_active\_ pool (0.02)
+            \item fracN is the fraction\_of\_humic\_nitrogen\_in\_the\_active\_ pool (0.02)
             \item stable\_organic\_nitrogen is the amount of N in the stable organic pool (kg N ha\textsuperscript{-1})  
         \end{itemize}
         \vspace{0.5cm}
@@ -2589,13 +2570,13 @@ The amount of N transferred between the active and stable organic pools (Ntrans)
 When Ntrans is positive, N moves from the active to stable organic pool. When Ntrans is negative, N moves from stable to active organic pool.
 \vspace{0.5cm}
 
-\subsection{Phosphorus Cycling}
+\subsection{Soil Phosphorus Cycling}
 \vspace{0.2cm}
 
 
-Equations based on the SurPhos model theoretical documentation \parencite{vadas2007}. RuFaS identifies eight different pools of P in the soil where two of them are organic and six inorganic pools. Organic pools are divided into stable and water extractable and inorganic pools are divided into stable, water extractable, active, labile, recalcitrant, and available. 
+Soil phosphorus cycling is based on the SurPhos model theoretical documentation \parencite{vadas2007}, which identifies eight soil phosphorus pools; two organic and six inorganic. Organic pools are divided into stable and water extractable and inorganic pools are divided into stable, water extractable, active, labile, recalcitrant, and available. RuFaS handles phosphorus cycling via the PhosphorusCycling class, which contains and manages the simulated aspects of phosphorus in a soil profile. These aspects are divided into fertilizer (implemented in fertilizer.py), manure (implemented in manure.py), mineralization (implemented in phosphorus\_mineralization.py), and soluble phosphorus (implemented in soluble\_phosphorus.py). The cycle\_phosphorus method calls each of the daily routines that manage surface and subsurface phosphorus.
 
-\paragraph{Initialization (Implemented in layer\_data.py)}
+\paragraph{Phosphorus Initialization (Implemented in layer\_data.py)}
 The P sorption parameter (PSP) is initialized before the simulation begins. The PSP represents how much of any inorganic P added to soil remains labile P upon reaching relative equilibrium. A PSP of 0.5 means 50\% of added P remains labile P and 50\% becomes active P. 
 \vspace{0.2cm}
 
@@ -2643,17 +2624,18 @@ PSP is initialized as:
             {\raggedleft \textbf{[SC.PHO.3]}\par}
             \vspace{0.5cm}
 
-Before the soil P pools are manipulated, they are converted into a kg ha\textsuperscript{-1} basis:
+After initialization soil P pools are converted from mg phosphorus kg\textsuperscript{-1} soil to a kg ha\textsuperscript{-1} basis.
+
 \paragraph{Soluble Phosphorus (Implemented in soluble\_phosphorus.py)}
 
-Calculates the P transferred via hydrological processes in the soil based on equations from the APLE and SurPhos models \parencite{vadas2007}. Soluble P can be lost from the soil as runoff in the first layer and leached vertically down through the soil profile.
+The SolublePhosphorus class calculates the P transferred via hydrological processes in the soil based on equations from the APLE and SurPhos models \parencite{vadas2007}. The daily\_update\_routine alters phosphorus levels in the SoilData object by tracking phosphorus in runoff (if any) from the first soil layer and phosphorus percolated downward through the soil profile.
 \vspace{0.2cm}
 
-\textit{Soluble Phosphorus Runoff}
+\paragraph{Soluble Phosphorus Runoff}
         \vspace{0.5cm}
             
     \begin{center}
-\(adjusted\ DRP_{runoff}=min(labileP,\ soilP * extraction\ coefficient * runoff * 10^{-6})\)
+\(adjusted\ DRP_{runoff}=min(labileP,\ top\_soil\_layerP * extraction\ coefficient * runoff * 10^{-6})\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2666,28 +2648,40 @@ Calculates the P transferred via hydrological processes in the soil based on equ
         \begin{itemize}
             \item adjusted DRPrunoff is the dissolved reactive phosphorus in runoff from the soil (kg ha\textsuperscript{-1}) surface expressed as the lesser of labileP or calculated dissolved P
             \item extraction coefficient is 0.005
-            \item Runoff is the amount of water lost from the surface layer (L ha\textsuperscript{-1}) soilP is:
+            \item Runoff is the amount of water lost from the surface layer (L ha\textsuperscript{-1})
+            \item top\_soil\_layerP is:
 
         \end{itemize}
         \vspace{0.5cm}
             
     \begin{center}
-\(soilP=\frac{labile\_phosphorus * 10}{bulk\ density * thickness_{cm}}\)
+\(top\_soil\_layerP=\frac{labileP * field\_size * kg-to-mg}{bulk\_density * Mg-to-kg * soil\_volume}\)
 
     \end{center}
         \vspace{0.5cm} 
     
             {\raggedleft \textbf{[SC.PSL.2]}\par}
             \vspace{0.5cm}
+            \textbf{Where:}
 
-\textit{Soluble Phosphorus Leaching}
+        \begin{itemize}
+            \item labile\_P is the labile phosphorous content of the soil (mg/kg)
+            \item field\_size is the field area (hectares)
+            \item  kg-to-mg is the constant 10\textsuperscript{6}
+            \item Mg-to-kg is the constant 10\textsuperscript{3}
+            \item soil\_volume is the volume of soil (m\textsuperscript{3})
+
+        \end{itemize}
+        \vspace{0.5cm}
+
+\paragraph{Soluble Phosphorus Leaching}
         \vspace{0.5cm}
 
 Phosphorus leaching is predicted by the clay isotherm function in the APLE documentation \parencite{vadas2007}.
         \vspace{0.5cm}
         
     \begin{center}
-\(isotherm\ slope=173.51 * clay\ fraction+8.48\)
+\(isotherm\ slope=173.51 * clay\_fraction+8.48\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2699,13 +2693,13 @@ Phosphorus leaching is predicted by the clay isotherm function in the APLE docum
             
         \begin{itemize}
             \item soilP is the concentration of P in the soil layer (mg P kg\textsuperscript{-1} soil)
-            \item Isotherm\_slope is the slope of the isotherm curve (unitless)
-            \item Clay fraction is the fractional clay content of a soil layer (unitless)
+            \item isotherm\_slope is the slope of the isotherm curve (unitless)
+            \item clay\_fraction is the fractional clay content of a soil layer (unitless)
         \end{itemize}
         \vspace{0.5cm}
         
     \begin{center}
-\(isotherm\ inter=4.726 * isotherm\ slope-8.97\)
+\(isotherm\_inter=4.726 * isotherm\_slope-8.97\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2716,14 +2710,14 @@ Phosphorus leaching is predicted by the clay isotherm function in the APLE docum
         \textbf{Where:}
             
         \begin{itemize}
-            \item Isotherm inter is the intercept of P sorption isotherm (unitless)
-            \item Isotherm slope is the slope of the P sorption isotherm (unitless) 
+            \item isotherm\_inter is the intercept of P sorption isotherm (unitless)
+            \item isotherm\_slope is the slope of the P sorption isotherm (unitless)
 
         \end{itemize}
         \vspace{0.5cm}
         
     \begin{center}
-\(DRP_{leachate}=min(20.0,\ exp(\frac{soilP * 1.5-isotherm\ inter}{isotherm\ slope}))\)
+\(DRP_{leachate}=min(20.0,\ exp(\frac{soilP * 1.5-isotherm\_inter}{isotherm\_slope}))\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2738,14 +2732,14 @@ Phosphorus leaching is predicted by the clay isotherm function in the APLE docum
         \end{itemize}
         \vspace{0.2cm}
 
-The maximum leachate amount specified in APLE is 20 (mg L\textsuperscript{-1}), specified in the paragraph beneath equation [16] and is applied here as the min term. Leached P is added to the soil layer immediately below the layer for which it is calculated.
+The maximum leachate concentration specified in APLE is 20 (mg L\textsuperscript{-1}), and is applied here as the min term. Leached P is added to the soil layer immediately below the layer for which it is calculated.
 \vspace{0.2cm}
 
 The predicted value in (mg L\textsuperscript{-1}) is then converted to kg h\textsuperscript{-1} and the actual dissolved reactive phosphorus is expressed as the minimum of the layer labile P or the calculated DRP\textsubscript{leachate} to prevent negative values.
         \vspace{0.5cm}
         
     \begin{center}
-\(DRP_{leachate},\ actual=min(labileP,\ DRP_{leachate\ in\ kg\ ha^{-1}}) \)
+\(DRP_{leachate},\ actual=min(labileP,\ DRP_{leachate}) \)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2766,7 +2760,7 @@ Summarized leachate values are the sum of values that leave the bottom layer of 
 Simulates the leaching and runoff of phosphorus from fertilizer applied to the soil surface.
 \vspace{0.2cm}
 
-\textit{Available P pool }
+\paragraph{Available Fertilizer P pool }
 \vspace{0.2cm}
 
 During rainfall events, the fraction of fertilizer P lost is greatest during the first rain event and reduced for each consecutive rainfall event. When synthetic fertilizer P is applied, 75\% of it goes into an available pool, and 25\% goes into a recalcitrant pool. The equation below determines the fraction of P remaining in the available P pool (unitless). 
@@ -2806,14 +2800,11 @@ fert\textsubscript{CNT} is then iterated to account for the logarithmic curve of
 \textit{Runoff and Leaching}
 \vspace{0.2cm}     
 
-At the first rainfall event, available P is split between runoff and leachate. Subsequent rain events target the recalcitrant pool. The partitioning of P between runoff and leachate is a function of the amount of rainfall.
+At the first rainfall event, available P is split between runoff and leachate. Subsequent rain events target the recalcitrant pool, with 40\% of released P leached, and all subsequent events leaching 7.5\% of available P. The partitioning of P between runoff and leachate is a function of the amount of rainfall.
 \vspace{0.2cm}
-
-During the first rainfall event after fertilizer application, all available fertilizer P is lost to runoff or leached to the next soil layers. For the second event, 40\% of released fertilizer P is leached, with all subsequent events leaching 7.5\% of available fertilizer P. 		
-        \vspace{0.5cm}
         
     \begin{center}
-\(sorp\ \% = rainday_{fact}\)
+\(sorp\ \% = rain\_day\_factor\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2824,7 +2815,7 @@ During the first rainfall event after fertilizer application, all available fert
         \textbf{Where:}
             
         \begin{itemize}
-            \item raindayfact is the rain day factor calibrated as described above
+            \item rain\_day\_factor is the rain day factor calibrated as described above
         \end{itemize}
         \vspace{0.2cm}
 
@@ -2868,7 +2859,7 @@ For the first layer, labileP is converted to kg to add adsorbed fertilizer P. la
         \vspace{0.5cm}
         
     \begin{center}
-\(fertP_{dissolved\ in\ runoff}=\frac{(fertP * fraction\ P\ released * PD_{fact})}{total\ rainfall}\)
+\(fertP_{dissolved\ in\ runoff}=\frac{(fertP * fraction\_P\_released * PD_{fact})}{total\ rainfall}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -2888,18 +2879,18 @@ For the first layer, labileP is converted to kg to add adsorbed fertilizer P. la
             
         \begin{itemize}
             \item fertP is the amount of fertilizer P in the pool that is going to be leached from (mg)
-            \item fraction of P released	is the fraction of P solubilized during the current rain event (unitless).
+            \item fraction of P released is the fraction of P solubilized during the current rain event. 1 for first, 0.4 for second, and 0.075 (unitless).
             \item PD\textsubscript{fact} is the P distribution factor is the value that determines P distribution between runoff and infiltration (unitless)
             \item total rainfall is rainfall on the day (L)
         \end{itemize}
         \vspace{0.5cm}
 
 \parencite{vadas2007}
-Leached fertilizer P is added to soil labileP for each layer as a function of depth:
+Leached fertilizer P is added to soil labileP for each layer to yield the updated labileP as a function of depth:
         \vspace{0.5cm}
         
     \begin{center}
-\(labileP=labileP+(fert_{leach}-fert_{runoff}) * DF\)
+\(labileP\_updated=labileP+(fert_{leach}-fert_{runoff}) * DF\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2910,13 +2901,14 @@ Leached fertilizer P is added to soil labileP for each layer as a function of de
         \textbf{Where:}
             
         \begin{itemize}
-            \item decreasing fraction of fert P to be leached from one layer to the next
+            \item fert\_{leach} is amount of fert P to be leached from one layer to the next
+            \item fert\_{runoff} is the amount of fert P lost to runoff
         \end{itemize}
         \vspace{0.5cm}
         
 Fertilizer P lost to runoff and leaching are added to their cumulative sums
 
-
+ \vspace{0.5cm}
 
 \textit{Manure Phosphorus}
 \vspace{0.2cm}
@@ -2932,7 +2924,7 @@ Manure is an important source of bioavailable P for crop uptake, runoff, and lea
 \(MIP_{leach} = max(0.0, manure_{extr}*WIP) \)
 \vspace{0.1cm}
 
-\(MIP_{leach} = max(0.0,\ \frac{manure_{extr}*WOP}{0.6})\)
+\(MOP_{leach} = max(0.0,\ \frac{manure_{extr}*WOP}{0.6})\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -2944,6 +2936,7 @@ Manure is an important source of bioavailable P for crop uptake, runoff, and lea
             
         \begin{itemize}
             \item MIP\textsubscript{leach} is the manure inorganic P leached (kg ha\textsuperscript{-1}). 
+            \item manure\_{extr} manure available for extraction
             \item MOP\textsubscript{leach} is the manure organic P leached (kg ha\textsuperscript{-1})
             \item WIP is the water extractable inorganic P	
             \item WOP is the water extractable organic P
@@ -2987,7 +2980,7 @@ The concentration of water extractable phosphorus in runoff on the current day i
             \vspace{0.5cm}
             
     \begin{center}
-\(MIP_{leach\ in\ mg}= manure\ leached*1000000\)
+\(MIP_{leach\ in\ mg}= MIP_{leach}*1000000\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -2995,7 +2988,7 @@ The concentration of water extractable phosphorus in runoff on the current day i
             \vspace{0.5cm}
 
     \begin{center}
-\(field\ size_{in\ sq\ mm}= field\ size\ *10000000000\)
+\(field\_size_{mmsq}= field\_size\ *10000000000\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -3013,7 +3006,7 @@ The concentration of water extractable phosphorus in runoff on the current day i
         \vspace{0.5cm}
         
     \begin{center}
-\(MIO = MOP_{leach\ in\ mg} *(\frac{1}{rainfall})*(\frac{1}{field\ size\ in\ mm^2})*(\frac{1}{mm^3\ to\ L})*PDfact\)
+\(MOP_{runoff} = MOP_{leach\ in\ mg} *(\frac{1}{rainfall})*(\frac{1}{field\ size\ in\ mm^2})*(\frac{1}{mm^3\ to\ L})*PDfact\)
 
     \end{center}
         \vspace{0.5cm} 
@@ -3037,10 +3030,10 @@ Leached manure P is then added to labileP for each layer as a function of depth 
         \vspace{0.5cm}
         
     \begin{center}
-\(labileP=labileP+M_{leach}*DF\)
+\(labileP\_updated=labileP+M_{leach}*DF\)
 \vspace{0.1cm}
 
-\(labileP=labileP*DF\ (used\ when\ manure\ is\ applied\ in\ the\ field)\)
+\(labileP\_updated=labileP*DF\ (used\ when\ manure\ is\ applied\ in\ the\ field)\)
 \vspace{0.1cm}
 
 \(DF=\frac{ratio}{ratio +exp(-0.867-(2.078*ratio))}\)
@@ -3065,11 +3058,11 @@ Leached manure P is then added to labileP for each layer as a function of depth 
 Manure and leachate P are then added to their respective annual sums
 \vspace{0.2cm}
 
-\textit{Manure Decomposition (implemented in manure\_pool.py)}
+\paragraph{Manure Decomposition (implemented in manure\_pool.py)}
         \vspace{0.5cm}
         
     \begin{center}
-\(wet_{rate} = -0.3 × moisture + 0.27\)
+\(wet_{rate} = -0.3 * manure\_moisture + 0.27\)
 \vspace{0.1cm}
 
 \(dry_{rate} = (-0.5 *(\frac{manure_{mass}}{mass}) + 0.075) * T_{fac}\)
@@ -3086,7 +3079,7 @@ Manure and leachate P are then added to their respective annual sums
             \item dry\textsubscript{rate}is the dry rate of manure decomposition (unitless)
             \item manure\textsubscript{mass}is the total mass of manure on the field (kg/ha)
             \item mass is the mass of applied manure (kg)
-            \item moisture is the manure water content (unitless)
+            \item manure\_moisture is the manure water content (unitless)
         \end{itemize}
         \vspace{0.5cm}
 
@@ -3185,7 +3178,7 @@ The P decomposition factor for each P pool (P\textsubscript{dcom}) is then calcu
         \textbf{Where:}
             
         \begin{itemize}
-            \item P\textsubscript{pools} represents each of the tracked P pools (SIP, SOP, WOP)
+            \item P\textsubscript{pools} represents each of the tracked P pools: stable inorganic P (SIP), stable organic P (SOP), water-extractable organic P (WOP)
         \end{itemize}
         \vspace{0.5cm}
 
@@ -3240,12 +3233,22 @@ The total decomposed P is then:
             \vspace{0.5cm}
         
     \begin{center}
-\(DP = SIP_{ASIM} + WOP_{ASIM} + SOP_{ASIM} + WIP_{ASIM}\)
+\(decomposedP = SIP_{ASIM} + WOP_{ASIM} + SOP_{ASIM} + WIP_{ASIM}\)
     \end{center}
         \vspace{0.5cm} 
     
             {\raggedleft \textbf{[SC.PSL.52]}\par}
             \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item SIP is stable inorganic P
+            \item SOP is stable organic P
+            \item WOP is water-extractable organic P
+            \item WIP is water-extractable inorganic P
+        \end{itemize}
+        \vspace{0.5cm}
 
 Manure mass and cover are updated to reflect decomposition and assimilation:
             \vspace{0.5cm}
@@ -3265,7 +3268,7 @@ Decomposed P is then added to the labile pool for each layer as a function of de
             \vspace{0.5cm}
         
     \begin{center}
-\(labileP=labileP+DP * DF\)
+\(labileP=labileP+decomposedP * depth\_factor\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -3275,28 +3278,36 @@ Decomposed P is then added to the labile pool for each layer as a function of de
         \textbf{Where:}
             
         \begin{itemize}
-            \item DF is the Depth Factor, a terminating geometric sequence modeling the decreasing 		fraction of decomposed P to be leached from one layer to the next
+            \item depth\_factor is a terminating geometric sequence modeling the decreasing fraction of decomposed P to be leached from one layer to the next
         \end{itemize}
         \vspace{0.5cm}
 
 
-\textit{Runoff (implemented in manure\_pool.py)}
+\paragraph{Manure Runoff (implemented in manure\_pool.py)}
 \vspace{0.2cm}
 
-Manure and soil P in the first layer are susceptible to runoff:
+Manure and soil P in the first layer are susceptible to runoff and the manure dissolved reactive phosphorus is 0.5\% of the top layer P concentration:
             \vspace{0.5cm}
         
     \begin{center}
-\(soilP is\ the\ labileP \div bulk\ density \div thickness_{cm} \div 0.1 \)
+\(MDRP_{runoff} = top\_layer\_manureP * 0.005\)
     \end{center}
         \vspace{0.5cm} 
     
             {\raggedleft \textbf{[SC.PSL.55]}\par}
             \vspace{0.5cm}
 
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item MDRP\textsubscript{runoff} is the manure dissolved reactive P transported in runoff (mg/L)
+            \item manureP is the amount of manure phosphorus
+        \end{itemize}
+            \vspace{0.5cm}
         
+The total inorganic phosphorus in runoff is calculated as the sum of manure inorganic, dissolved reactive, and fertilizer P:
     \begin{center}
-\(MDRP_{runoff} = soilP * 0.005\)
+\(TIP_{runoff} = MIP_{runoff} + MDRP_{runoff} + fertP_{runoff}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -3306,44 +3317,13 @@ Manure and soil P in the first layer are susceptible to runoff:
         \textbf{Where:}
             
         \begin{itemize}
-            \item MDRP\textsubscript{runoff} is the manure dissolved reactive P transported in runoff (mg/L) 
-        \end{itemize}
-            \vspace{0.5cm}
-        
-    \begin{center}
-\(soilP is\ the\ labileP \div bulk\ density \div thickness_{cm} \div 0.1 \)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.PSL.55]}\par}
-            \vspace{0.5cm}
-
-    \begin{center}
-\(TIP_{runoff} = MIP_{runoff} + MDRP_{runoff}+ fertP_{runoff}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.PSL.57]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item TIP\textsubscript{runoff} is the total Inorganic P runoff 
+            \item TIP\textsubscript{runoff} is the total inorganic P runoff
+            \item MIP\textsubscript{runoff} is the manure inorganic P runoff
+            \item MDRP\textsubscript{runoff} is the manure dissolved reactive P runoff [SC.PSL.55]
+            \item fertP\textsubscript{runoff} is the fertilizer P runoff
         \end{itemize}
         \vspace{0.5cm}
 
-
-
-
-
-
-
-
-
-
-
-        
 
 \textit{Phosphorus Mineralization (implemented in phosphorus\_mineralization.py)}
 \vspace{0.2cm}
@@ -3351,11 +3331,11 @@ Manure and soil P in the first layer are susceptible to runoff:
 Phosphorus mineralization is the transfer of P from organic to inorganic pools and between labile and active inorganic pools.
 \vspace{0.2cm}
 
-The amount of P that mineralizes into water-extractable inorganic P on the current day from the given pool.
+The amount of P that mineralizes into water-extractable inorganic P on the current day from the given pool is a function of the sorption dynamics of the type of P being mineralized, soil temperature, and soil moisture. The maximum P sorption parameter (PSP) is calculated for each layer then adjusted to be between 0.05 and 0.7 and limited based on the average value of PSP.
             \vspace{0.5cm}
 
     \begin{center}
-\(mineralization\ rate= rate*min(temp_{factor},\ moisture_{factor})\)
+\(PSP_{act}= max(0.05,\ min(0.7,( \frac{(meanPSP*364)+currentPSP)}{365}))\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -3365,34 +3345,13 @@ The amount of P that mineralizes into water-extractable inorganic P on the curre
         \textbf{Where:}
             
         \begin{itemize}
-            \item rate is the rate factor for the type of P being mineralized (unitless).
-            \item temp\textsubscript{factor} is the temperature factor on the current day (unitless).
-            \item moisture\textsubscript{factor}  is the moisture factor of the given manure pool on the current day (unitless).
-            \item P\textsubscript{amount}  is the amount of P that is mineralized from that pool that is passed (kg)
-        \end{itemize}
-        \vspace{0.5cm}
-
-The maximum P sorption parameter (PSP) is then calculated for each layer then adjusted to be between 0.05 and 0.7 and limited based on the average value of PSP.
-            \vspace{0.5cm}
-
-    \begin{center}
-\(PSP_{act}= max(0.05,\ min(0.7,( \frac{(meanPSP*364)+currentPSP)}{365}))\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.PMN.2]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item PSP\textsubscript{act}	 is the actual P sorption parameter (unitless)
+            \item PSP\textsubscript{actual} is the actual P sorption parameter (unitless)
             \item meanPSP is the mean sorption parameter (unitless)
             \item currentPSP is the current sorption parameter	(unitless)
         \end{itemize}
         \vspace{0.5cm}
 
-The following variables are used to define the sorption and desorption curves and are empirical.
+The following variables are used to define the empirical sorption and desorption curves.
 \vspace{0.2cm}
 
 The current balance of P between labile and active inorganic pools is calculated as pbal. A negative value returned indicates that there is more active phosphorus than there should be, a positive value indicates that there is more labile phosphorus than there should be, and a return value of zero indicates that the two pools are balanced
@@ -3403,7 +3362,7 @@ The current balance of P between labile and active inorganic pools is calculated
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.3]}\par}
+            {\raggedleft \textbf{[SC.PMN.2]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -3424,7 +3383,7 @@ The P desorption factor (PD\textsubscript{fac}) calculates how much P should be 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.4]}\par}
+            {\raggedleft \textbf{[SC.PMN.3]}\par}
             \vspace{0.5cm}
 
     \begin{center}
@@ -3432,7 +3391,7 @@ The P desorption factor (PD\textsubscript{fac}) calculates how much P should be 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.5]}\par}
+            {\raggedleft \textbf{[SC.PMN.4]}\par}
             \vspace{0.5cm}
 
 The amount of P that should be removed from the active inorganic P pool to put it in equilibrium with the labile inorganic P pool (kg ha\textsuperscript{-1}) is given as labile\textsubscript{pflow} 
@@ -3443,7 +3402,7 @@ The amount of P that should be removed from the active inorganic P pool to put i
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.6]}\par}
+            {\raggedleft \textbf{[SC.PMN.5]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -3461,17 +3420,12 @@ P sorption factor (PD\textsubscript{fac}) calculates how much P should be sorped
             \vspace{0.5cm}
 
     \begin{center}
-\(PS_{fac} = scalar* (day_{count}^{exponent})\)
+\(PS_{fac} = 0.918 * exp(-4.603* PSP_{act})* (day_{count}^{-0.238*log(0.918 * exp(-4.603* PSP_{act}))-1.126})\)
 \vspace{0.1cm}
-
-\(scalar = 0.918 * exp(-4.603* PSP_{act})\)
-\vspace{0.1cm}
-
-\(exponent= -0.238*log(scalar)-1.126\)
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.7]}\par}
+            {\raggedleft \textbf{[SC.PMN.6]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -3491,7 +3445,7 @@ The amount of phosphorus that should be removed from the labile inorganic phosph
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.8]}\par}
+            {\raggedleft \textbf{[SC.PMN.7]}\par}
             \vspace{0.5cm}
 
 P also transfers from stable pool to the active pool and given as stable\textsubscript{pflow} :
@@ -3501,14 +3455,14 @@ P also transfers from stable pool to the active pool and given as stable\textsub
 \(stable_{pflow} = 0.0006* (stableP - (4.0* activeP))\)
 \vspace{0.1cm}
 
-\(stable_{pflow} = min(stablePflow,amounttotransfer)\ \ \ \ \ \  if\ amounttotransfer > 0\)
+\(stable_{pflow} = min(stableP,stable_{pflow})\ \ \ \ \ \  if\ stable_{pflow} > 0\)
 \vspace{0.1cm}
 
-\(stable_{pflow} = (-1*amounttotransfer)\ \ \ \ \ \  if\ amounttotransfer > activeP\)
+\(stable_{pflow} = (-1*stable_{pflow})\ \ \ \ \ \  if\ stable_{pflow} > activeP\)
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.PMN.9]}\par}
+            {\raggedleft \textbf{[SC.PMN.8]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -3520,21 +3474,87 @@ P also transfers from stable pool to the active pool and given as stable\textsub
         \end{itemize}
         \vspace{0.5cm}
 
-\textit{Sediment P Transport in Runoff (implemented in soil\_erosion.py)}
+\subsection{Soil Carbon Cycling}
+
+The CarbonCycling class (implemented in carbon\_cycle.py) manages carbon cycling processes within the SoilData object. Carbon cycling processes include decomposition of organic matter, processing of crop residue, and partitioning of carbon between soil pools and the atmosphere and are based on the DAYCENT model. There are five carbon pools in the soil:
+\vspace{0.2cm}
+    \begin{itemize}
+        \item Plant Structural - Slowly decomposing plant mass with higher lignin content
+        \item Plant Metabolic - Rapidly decomposing plant mass with low lignin content
+        \item Active - Microbially active carbon yielded by decomposition
+        \item Slow - Soil organic matter that turns over every 20-40 years
+        \item Passive - Stable, recalcitrant soil organic matter with a turn over time between 200 and 1500 years
+    \end{itemize}
+    \vspace{0.2cm}
+Decomposition occurs within the soil C pools resulting in the transfer of C between pools. In addition, crop residues, above and below ground, decompose into the soil C pools. Each decomposition event generates some CO\textsubscript{2} that enters the atmosphere.
+\vspace{0.5cm}
+
+\paragraph{Soil Carbon Partitioning (implemented in carbon\_cycle.py)} The mass and proportion of C in the soil C pools are set by the following equations:
+        \vspace{0.5cm}
+
+    \begin{center}
+\(C_{active\ \%}=(\frac{C_{active}}{soil\ mass})\)
+\vspace{0.1cm}
+
+\(C_{slow\ \%}=(\frac{C_{slow}}{soil\ mass})\)
+\vspace{0.1cm}
+
+\(C_{passive\ \%}=(\frac{C_{passive}}{soil\ mass})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.1]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item C\textsubscript{active} \%	=	active C composition of the soil (\%)
+            \item C\textsubscript{slow}  \%	=	slow C composition of the soil (\%)
+            \item C\textsubscript{passive}  \% = 	passive C composition of the soil (\%)
+            \item soil mass = the mass of soil (kg ha\textsuperscript{-1}
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(C_\%=C_{active\%}+C_{slow\%}+C_{passive\%}	\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.2]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item C\% = carbon composition of the soil (\%)
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(C=C_{active}+C_{slow}+C_{passive}\)
+\vspace{0.1cm}
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.3]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item C = soil carbon (kg ha\textsuperscript{-1})
+
+        \end{itemize}
+        \vspace{0.5cm}
+
+\paragraph{Decomposition (implemented in decomposition.py)}
 \vspace{0.2cm}
 
-The following calculation of sediment P transport in runoff is based on SWAT \parencite{neitsch2011swat}. However, there are differences in how these equations are applied in RuFaS compared to SWAT, and it is recommended that the equations as applied in Rufas be calibrated using observational data. 
-\vspace{0.2cm}
-
-Organic and inorganic P attached to soil particles are lost to runoff during erosion. The amount of P lost with sediment is calculated with a loading function \parencite{mcelroy1977nitrogen} that was modified by \parencite{williams1978optimal}:
-
-
-\subsection{Carbon Cycling}
-
-\textit{Decomposition Factors (implemented in decomp\_factors.py)}
-\vspace{0.2cm}
-
-Carbon decomposition is affected by temperature and moisture. The following factors are parameterized and calculated in accordance with the defac spreadsheet assuming coarse soil:
+Carbon decomposition is the process of complex carbon molecules breaking down into simpler molecules and leaving behind more recalcitrant C species, represented here as a transfer of C between C pools. Decomposition is a function of temperature and moisture. The following factors are parameterized and calculated with the assumption of coarse soil:
             \vspace{0.5cm}
 
     \begin{center}
@@ -3542,7 +3562,7 @@ Carbon decomposition is affected by temperature and moisture. The following fact
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.1]}\par}
+            {\raggedleft \textbf{[SC.CAR.4]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -3563,14 +3583,14 @@ Carbon decomposition is affected by temperature and moisture. The following fact
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.2]}\par}
+            {\raggedleft \textbf{[SC.CAR.5]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
             
         \begin{itemize}
             \item M\textsubscript{d} = unitless moisture effect on decomposition factor (empirically determined based on soil water levels)
-            \item water\textsubscript{fac} = relative water saturation (\%) 
+            \item water\textsubscript{fac} = relative water saturation (\%)
             \item a = dimensionless empirical factor (0.55)
             \item b = dimensionless empirical factor (1.7)
             \item c = dimensionless empirical factor (-0.007)
@@ -3579,534 +3599,7 @@ Carbon decomposition is affected by temperature and moisture. The following fact
         \end{itemize}
         \vspace{0.5cm}
 
-\textit{Residue Partitioning (implemented in residue\_partitioning.py)}
-\vspace{0.2cm}
-
-Residue is partitioned into above ground and below ground pools representing stalks and roots left after harvest respectively. Additionally, some above ground residue is incorporated into the soil profile in the case of tillage.
-\vspace{0.2cm}
-
-\textit{Above Ground: Lignin, Metabolic C, Structural C}
-\vspace{0.2cm}
-
-Above ground residue is further partitioned into metabolic and structural components based on the lignin composition of the residue. 
-        \vspace{0.5cm}
-
-
-    \begin{center}
-\(AG_{lignin\ res\ \%}=0.12 * rainfall * 0.1\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.3]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{lignin res \%} = lignin composition of above ground plant residue
-            \item rainfall = amount of rainfall on the current day (mm)
-        \end{itemize}
-        \vspace{0.5cm}
-
-
-    \begin{center}
-\(AG_{L:N}=\frac{\frac{AG_{lignin}\ res\ \%}{100}}{fr_N}\ \ \ \ \ \ \) if fr\textsubscript{N}!=0 
-\vspace{0.3cm}
-
-
-Otherwise:
-\vspace{0.2cm}
-
-\(AG_{L:N}=0.4	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.4]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than 0 (unitless)
-            \item fr\textsubscript{N} = fraction of N in plant residue at harvest (unitless)
-        \end{itemize}
-        \vspace{0.5cm}
-
-The ratio of lignin to N in residue determines the percentage of above ground residue in the metabolic pool, with a maximum of 85\%.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{met\ \%}=0.85-0.18 * AG_{L:N}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.5]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{met \%} = above ground residue that is metabolic (\%)
-        \end{itemize}
-        \vspace{0.5cm}
-
-The component of residue dry matter at harvest consisting of above ground metabolic carbon (C) is added to the above ground metabolic C pool.
-                \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{met}+=AG_{DM\ res} * AG_{met\ \%}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.6]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{met} = above ground metabolic carbon (kg ha\textsuperscript{-1}) 
-            \item AG\textsubscript{met \%} = above ground residue that is metabolic (\%)
-            \item AG\textsubscript{DM res} = dry matter residue at harvest (kg ha\textsuperscript{-1}) 
-        \end{itemize}
-        \vspace{0.5cm}
-
-Above ground metabolic C is decomposed into active C and incorporated into the below ground pool via tillage.
-                \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{met}:C_{active}=AG_{met_{active\ decomp}} * M_d *T_d * AG_{met}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.7]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{met}:C\textsubscript{active}	=above ground metabolic C decomposed to active carbon (kg ha\textsuperscript{-1}) 
-            \item AG\textsubscript{met active decomp} = rate of decomposition from metabolic to active C (set at 0.28, \cite{parton1987analysis})
-        \end{itemize}
-        \vspace{0.5cm}               
-
-    \begin{center}
-\(AG_{met}:BG_{met}=AG_{met} * tillage_\%	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.8]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{met}:BG\textsubscript{met} = above ground metabolic C decomposed to below ground metabolic C (kg ha\textsuperscript{-1}) 
-            \item tillage = metabolic C incorporated into soil during tillage (unitless)
-        \end{itemize}
-        \vspace{0.5cm}
-
-The above ground metabolic pool is reduced by the amounts decomposed and incorporated.
-        \vspace{0.5cm}               
-
-    \begin{center}
-\(AG_{met}-=AG_{met}:C_{active}+AG_{met}:BG_{met}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.9]}\par}
-            \vspace{0.5cm}
-
-Any dry matter residue at harvest that is not added to the above ground metabolic C pool is added to the above ground structural C pool:
-        \vspace{0.5cm}               
-
-    \begin{center}
-\(AG_{struct}+=AG_{DM\ res} * (1-AG_{met_\%})	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.10]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{struct} = above ground structural C (kg ha\textsuperscript{-1}) 
-        \end{itemize}
-        \vspace{0.5cm}
-
-Above ground structural C is decomposed into active and slow C pools as well as incorporated into the underground structural C pool via tillage.
-        \vspace{0.5cm}               
-
-    \begin{center}
-\(AG_{struct\ decomp}=K1 * e^{-3} * 1-AG_{met\ \%}	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.11]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{struct\ decomp} = rate at which above ground structural C decomposes into slow or active C
-            \item K1 = structural decomposition factor, set at 0.076 (\cite{parton1987analysis})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{struct}:C_{active}=AG_{struct\ decomp} * M_d * T_d * AG_{struct}\)
-\vspace{0.1cm}
-
-\(AG_{struct}:C_{slow}=AG_{struct_{decomp}} * M_d * T_d * AG_{struct}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.12]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{struct}:C\textsubscript{active} = above ground structural C decomposed into active C (kg ha\textsuperscript{-1})
-            \item AG\textsubscript{struct}:C\textsubscript{slow} = above ground structural C decomposed into slow C (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{struct}:BG_{struct}=AG_{struct} * tillage_\%\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.13]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{struct}:BG\textsubscript{struct} = transfer of structural carbon during tillage (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{struct}-=AG_{struct}:BG_{struct}+AG_{struct}:C_{active}+AG_{struct}:C_{slow}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.14]}\par}
-            \vspace{0.5cm}
-
-\textit{Below Ground: Lignin, Metabolic C, Structural C}
-\vspace{0.2cm}
-
-Similarly, the residue below ground is partitioned into metabolic and structural C pools based on the lignin content of the residue. In the case of tillage, some residue is incorporated from the above ground pool.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{DM\ res}=AG_{DM\ res} * tillage_\%\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.15]}\par}
-            \vspace{0.5cm}
-
-In the case of tillage, below ground residue will be a combination of below ground and incorporated biomass.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(DM_{lignin\ res\ \%}=\frac{BG_{DM\ res}}{BG_{DM\ res}+BG_{bio}}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.16]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item DM\textsubscript{lignin res \%} = weighted fractional amount of lignin in residue dry matter (\%)
-            \item BG\textsubscript{bio} = below ground biomass (kg ha\textsuperscript{-1}) 
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{lignin\ res\ \%}=DM_{lignin\ res\ \%}-0.15 * rainfall * 0.01	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.17]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{lignin res}=	below ground residue comprised of lignin (\%)
-        \end{itemize}
-        \vspace{0.5cm}
-
-The below ground ratio of lignin to N will then be a weighted composition of the lignin to N ratio in the below ground and the incorporated biomass.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{L:N}=AG_{L:N} * DM_{ligning\ res\ \%}+ (\frac{\frac{BG_{lignin\ res\ \%}}{100}}{fr_N}) * (1-DM_{lignin\ res\ \%})\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.18]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{L:N}=	below ground lignin to N ratio
-        \end{itemize}
-        \vspace{0.5cm}
-
-The component of below ground residue that is metabolic is determined by the below ground lignin to N ratio, with a maximum composition of 85\%.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{met\ \%}=0.85-0.18 * BG_{L:N}	\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.19]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{met\%}=	below ground residue that is metabolic (\%)
-        \end{itemize}
-        \vspace{0.5cm}
-
-Incorporated metabolic C and the component of below ground biomass consisting of metabolic C are added to the below ground metabolic C pool.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{met}+=AG_{met}:BG_{met}+(BG_{bio} * BG_{met\ \%})\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.20]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{met}=below ground metabolic C (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-Below ground metabolic C decomposes into active C.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{met}:C_{active}=BG_{met_{active\ decomp}} * M_d * T_d * BG_{met}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.21]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{met}:C\textsubscript{active} = below ground metabolic C decomposed into active C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35, \cite{parton1987analysis})
-        \end{itemize}
-        \vspace{0.5cm}
-
-The decomposed metabolic C is removed from the below ground metabolic C pool.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{met}-=BG_{met}:C_{active}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.22]}\par}
-            \vspace{0.5cm}
-
-Incorporated structural and the component of below ground biomass consisting of structural C are added to the below ground structural C pool.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{struct}=AG_{struct}:BG_{struct}+BG_{bio} * (1-BG_{met\ \%})\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.23]}\par}
-            \vspace{0.5cm}
-
-Below ground structural C is decomposed into active and slow C.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{struct}:C_{active}=BG_{struct\ decomp} * M_d * T_d * BG_{struct}\)
-\vspace{0.1cm}
-
-\(BG_{struct}:C_{slow}=BG_{struct_{decomp}} * M_d * T_d * BG_{struct}\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.24]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{struct}:C\textsubscript{active} = below ground structural C decomposed into active C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{struct}:C\textsubscript{slow} = below ground structural C decomposed into slow C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094, \cite{parton1987analysis})
-            \item BG\textsubscript{struct} = below ground structural C (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-
-The decomposed structural C is then removed from the below ground structural pool.
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{struct}=BG_{struct}:C_{active}+BG_{struct}:C_{slow}\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.25]}\par}
-            \vspace{0.5cm}
-
-\textit{Pool and Gas Partitioning (implemented in pool\_gas\_partitioning.py)}
-\vspace{0.2cm}
-
-There is an imperfect transfer between the metabolic and structural C pools to the active and slow C pools. The amount of C lost to CO2 during the decomposition process is modeled as:
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{met}:C_{active\ loss}=AG_{met}:C_{active} * \%CO2_{met:active}\)
-\vspace{0.1cm}
-
-\(AG_{met}:C_{active\ act}=AG_{met}:C_{active} * (1-\% CO2_{met:active})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.26]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item \%CO2\textsubscript{met:active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, \cite{parton1987analysis})
-            \item AG\textsubscript{met}:C\textsubscript{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha\textsuperscript{-1})
-            \item AG\textsubscript{met}:C\textsubscript{active act} 	=above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{struct}:C_{active\ loss}=AG_{struct}:C_{active} * \%CO2_{struct:active} \)
-\vspace{0.1cm}
-
-\(AG_{struct}:C_{active\ act}=AG_{struct}:C_{active} * (1-\%CO2_{struct:active})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.27]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item \%CO2\textsubscript{struct active} = rate of CO\textsubscript{2} loss during transformation of structural to	active C (0.45, \parencite{parton1987analysis})
-
-            \item AG\textsubscript{struct}:C\textsubscript{active act} = above ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss C (kg ha\textsuperscript{-1})
-            \item AG\textsubscript{struct}:C\textsubscript{active loss} = above ground structural C being lost as CO2 during decomposition into active C (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(AG_{struct}:C_{slow\ loss}=AG_{struct}:C_{slow} * \%CO2_{struct:slow}\)
-\vspace{0.1cm}
-
-\(AG_{struct}:C_{slow\ act}=AG_{struct}:C_{slow} * (1-\%CO2_{struct:slow})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.28]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG\textsubscript{struct}:C\textsubscript{slow loss} = ecomposing above ground structural C being lost as CO2 during decomposition into slow C (kg ha\textsuperscript{-1})
-            \item AG\textsubscript{struct}:C\textsubscript{slow act}  = above ground structural C decomposed to slow C after accounting for CO2 loss (kg ha\textsuperscript{-1})
-            \item \%CO2\textsubscript{struct:slow} = rate of CO2 loss during transformation of structural to slow C (0.3, Partonet al. 1987)
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{met}:C_{active\ loss}=BG_{met}:C_{active} * \%CO2_{met:active}\)
-\vspace{0.1cm}
-
-\(BG_{met}:C_{active\ act}=BG_{met}:C_{active} * (1-\%CO2_{met:active})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.29]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{met}:C\textsubscript{active loss} = below ground metabolic C being lost as CO\textsubscript{2} during decomposition into active C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{met}:C\textsubscript{active act} = below ground metabolic C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{struct}:C_{active\ loss}=BG_{struct}:C_{active} * (\%CO2_{struct:active})\)
-\vspace{0.1cm}
-
-\(BG_{struct}:C_{active\ act}=BG_{struct}:C_{active} * (1-\%CO2_{struct:active})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.30]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{struct}:C\textsubscript{active loss} = below ground structural C being lost as CO\textsubscript{2} during  decomposition into active C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{struct}:C\textsubscript{active act} = below ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
-\(BG_{struct}:C_{slow\ loss}=BG_{struct}:C_{slow} * (\%CO2_{struct:slow})\)
-\vspace{0.1cm}
-
-\(BG_{struct}:C_{slow\ act}=BG_{struct}:C_{slow} * (1-\%CO2_{struct:slow})\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.31]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item BG\textsubscript{struct}:C\textsubscript{slow loss} = below ground structural C being lost as CO\textsubscript{2} during  decomposition into active C (kg ha\textsuperscript{-1})
-            \item BG\textsubscript{struct}:C\textsubscript{slow act} = below ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-The following equations describe the transformation of C among the active, slow, and passive pools, as well as CO2 losses from these pools.
+Decomposition proceeds at differing rates between the active, slow, and passive pools.
         \vspace{0.5cm}
 
     \begin{center}
@@ -4115,7 +3608,7 @@ The following equations describe the transformation of C among the active, slow,
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.32]}\par}
+            {\raggedleft \textbf{[SC.CAR.6]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4133,7 +3626,7 @@ The following equations describe the transformation of C among the active, slow,
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.33]}\par}
+            {\raggedleft \textbf{[SC.CAR.7]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4150,7 +3643,7 @@ The following equations describe the transformation of C among the active, slow,
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.34]}\par}
+            {\raggedleft \textbf{[SC.CAR.8]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4168,11 +3661,11 @@ The following equations describe the transformation of C among the active, slow,
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.35]}\par}
+            {\raggedleft \textbf{[SC.CAR.9]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
-            
+
         \begin{itemize}
             \item C\textsubscript{passive decomp} = passive C decomposed into active or passive carbon and CO\textsubscript{2} (kg ha\textsuperscript{-1})
             \item K7 = passive C decomposition factor (set at 0.0038, \cite{parton1987analysis})
@@ -4180,13 +3673,15 @@ The following equations describe the transformation of C among the active, slow,
         \end{itemize}
         \vspace{0.5cm}
 
+\textit{CO\textsubscript{2} produced during soil C pool decomposition}
+    \vspace{0.2cm}
     \begin{center}
 \(Es=0.85-0.68 * silt:clay_\%	\)
 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.36]}\par}
+            {\raggedleft \textbf{[SC.CAR.10]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4197,32 +3692,32 @@ The following equations describe the transformation of C among the active, slow,
         \vspace{0.5cm}
 
     \begin{center}
-\(C_{active:slow}=C_{active_{decomp}} * (1-Es-0.004)\)
+\(C_{active\_to\_slow}=C_{active_{decomp}} * (1-Es-0.004)\)
 \vspace{0.1cm}
 
-\(C_{active:loss}=C_{active_{decomp}} *Es\)
+\(C_{active\_to\_CO_2}=C_{active_{decomp}} *Es\)
 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.37]}\par}
+            {\raggedleft \textbf{[SC.CAR.11]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
             
         \begin{itemize}
-            \item C\textsubscript{active:slow} = active C decomposed into slow C (kg h\textsuperscript{-1})
+            \item C\textsubscript{active:slow} = active C decomposed into slow C (kg ha\textsuperscript{-1})
             \item C\textsubscript{active loss} = active C lost as CO\textsubscript{2} during decomposition into slow C (kg ha\textsuperscript{-1})
         \end{itemize}
         \vspace{0.5cm}
 
     \begin{center}
-\(C_{active}:C_{passive}=C_{active_{decomp}} * 0.004	\)
+\(C_{active}\_to\_C_{passive}=C_{active_{decomp}} * 0.004	\)
 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.38]}\par}
+            {\raggedleft \textbf{[SC.CAR.12]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4233,13 +3728,520 @@ The following equations describe the transformation of C among the active, slow,
         \vspace{0.5cm}
 
     \begin{center}
-\(C_{slow:active}=C_{slow_{decomp}} * (1-\%CO2 :C_{slow\ loss}-\%C_{slow:passive})\)
+\(C_{slow\_to\_active}=C_{slow_{decomp}} * (1-CO2_{slow\ loss}-C_{slow\_to\_passive})\)
 \vspace{0.1cm}
 
-\(C_{slow\ loss}=C_{slow\ decomp} * \%CO2:C_{slow\ loss}\)
+\(C_{slow\_to\_CO_2}=C_{slow\ decomp} * CO2\_to\_C_{slow\ loss}\)
 \vspace{0.1cm}
 
-\(C_{slow\ passive}=C_{slow\ decomp} * \%C_{slow\ passive}\)
+\(C_{slow\_to\_passive}=C_{slow\ decomp} * frac\_C_{slow\ passive}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.13]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item C\textsubscript{slow\_to\_active} = slow C decomposed into active C (kg ha\textsuperscript{-1})
+            \item CO\textsubscript{2}\_to\_C\textsubscript{slow loss} = slow C lost as CO\textsubscript{2} during decomposition (fraction)
+            \item frac\_C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (fraction)
+            \item C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (kg ha\textsuperscript{-1})
+            \item C\textsubscript{slow\_to\_CO_2} = slow C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(C_{passive\_to\_CO_2}=C_{passive\ decomp} * frac\_CO2_{passive\ loss}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.14]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item C\textsubscript{passive:active} = passive C decomposed into active carbon (kg ha\textsuperscript{-1})
+            \item frac\_CO\textsubscript{2}\textsubscript{passive loss} = passive C lost as CO\textsubscript{2} during decomposition (fraction)
+            \item C\textsubscript{passive loss} =passive C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
+
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(C_{CO2\ loss\ decomp}=C_{active\ loss}+C_{slow\ loss}+C_{passive\ loss}\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.15]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item C\textsubscript{CO\textsubscript{2} loss decomp} =C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+\paragraph{Residue Partitioning (implemented in residue\_partitioning.py)}
+\vspace{0.2cm}
+
+Crop residues are partitioned into above and below ground biomass representing stalks and roots left after harvest, respectively. Additionally, some above ground residue is incorporated into the soil profile in the case of tillage.
+\vspace{0.2cm}
+
+\paragraph{Above Ground: Lignin, Metabolic C, Structural C}
+\vspace{0.2cm}
+
+Above ground residue is further partitioned into metabolic and structural components based on the lignin composition of the residue.
+        \vspace{0.5cm}
+
+
+    \begin{center}
+\(AG_{lignin\ res\ frac}=0.12 * rainfall * 0.1\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.16]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{lignin res frac} = fraction of lignin composition of above ground plant residue (unitless)
+            \item rainfall = amount of rainfall on the current day (mm)
+        \end{itemize}
+        \vspace{0.5cm}
+
+
+    \begin{center}
+\(AG_{L:N}=\frac{\frac{AG_{lignin}\ res\ frac}{100}}{fr_N}\ \ \ \ \ \ \) if fr\textsubscript{N}>0
+\vspace{0.3cm}
+
+
+Otherwise:
+\vspace{0.2cm}
+
+\(AG_{L:N}=0.4	\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.17]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than 0 (unitless)
+            \item fr\textsubscript{N} = fraction of N in plant residue at harvest (unitless)
+        \end{itemize}
+        \vspace{0.5cm}
+
+The ratio of lignin to N in residue determines the percentage of above ground residue in the metabolic pool, with a maximum of 85\%.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{met\ frac}=0.85-0.18 * AG_{L:N}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.18]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{met frac} = above ground residue that is metabolic (unitless)
+        \end{itemize}
+        \vspace{0.5cm}
+
+The component of residue dry matter at harvest consisting of above ground metabolic carbon (C) is added to the above ground metabolic C pool.
+                \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{met}\_updated=AG_{met}+AG_{DM\ res} * AG_{met\ frac}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.19]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{met} = above ground metabolic carbon (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{met frac} = fraction of above ground residue that is metabolic (unitless)
+            \item AG\textsubscript{DM res} = dry matter residue at harvest (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+Above ground metabolic C follows two paths into the soil. It is either incorporated below ground pool via tillage or decomposed into the active C. The calculated values are subtracted from the above ground metabolic pool and added to the relevant pool.
+                \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{met}\_to\_C_{active}=AG_{met_{active\ decomp}} * M_d *T_d * AG_{met}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.20]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{met}\_to\_C\textsubscript{active}	= above ground metabolic C decomposed to active carbon (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{met active decomp} = rate of decomposition from metabolic to active C (set at 0.28, \cite{parton1987analysis})
+        \end{itemize}
+        \vspace{0.5cm}
+
+Below ground metabolic C decomposes into active C.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{met}\_to\_BG_{met}=AG_{met} * tillage_{frac}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.21]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{met}:BG\textsubscript{met} = above ground metabolic C decomposed to below ground metabolic C (kg ha\textsuperscript{-1})
+            \item tillage = fraction metabolic C incorporated into soil during tillage (unitless)
+        \end{itemize}
+        \vspace{0.5cm}
+
+Any dry matter residue at harvest that is not added to the above ground metabolic C pool is added to the above ground structural C pool:
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{DM\ res}\_to\_AG_{struct} =AG_{DM\ res} * (1-AG_{met frac})	\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.22]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item AG\textsubscript{struct} = above ground structural C (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+Similarly to above ground metabolic C, above ground structural C is incorporated into the belowground structural C pool via tillage or decomposed, in this case, equally into active and slow C pools. The calculated values are subtracted from the above ground structural pool and added to the relevant pool.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{struct\ decomp}=K1 * e^{-3} * 1-AG_{met\ frac}	\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.23]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item AG\textsubscript{struct\ decomp} = rate at which above ground structural C decomposes into slow or active C
+            \item K1 = structural decomposition factor, set at 0.076 (\cite{parton1987analysis})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{struct}\_to\_C_{active}=AG_{struct\ decomp} * M_d * T_d * AG_{struct}\)
+\vspace{0.1cm}
+
+\(AG_{struct}\_to\_C_{slow}=AG_{struct_{decomp}} * M_d * T_d * AG_{struct}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.24]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{struct}:C\textsubscript{active} = above ground structural C decomposed into active C (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{struct}:C\textsubscript{slow} = above ground structural C decomposed into slow C (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{struct}\_to\_BG_{struct}=AG_{struct} * tillage_{frac}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.25]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+
+        \begin{itemize}
+            \item AG\textsubscript{struct}:BG\textsubscript{struct} = transfer of structural carbon during tillage (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+\textit{Below Ground: Lignin, Metabolic C, Structural C}
+\vspace{0.2cm}
+
+As above ground, the residue below ground is partitioned into metabolic and structural C pools based on the lignin content of the residue. In the case of tillage, some residue is incorporated from the above ground pool. In the case of tillage, below ground residue will be a combination of below ground and incorporated biomass.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{DM\ res}=AG_{DM\ res} * tillage_{frac}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.26]}\par}
+            \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{lignin\ res\ frac}=(\frac{BG_{DM\ res}}{BG_{DM\ res}+BG_{bio}})-0.15 * rainfall * 0.01	\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.27]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{lignin res}=	below ground residue comprised of lignin (fraction)
+            \item BG\textsubscript{DM res} is the below ground residue mass (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{bio} = below ground biomass (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+The below ground ratio of lignin to N will then be a weighted sum of the lignin to N ratio in the below ground and the incorporated biomass.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{L:N}=AG_{L:N} * (\frac{BG_{DM\ res}}{BG_{DM\ res}+BG_{bio}}) + (\frac{BG_{lignin\ res\ =frac}}{fr_N * 100}) * (1-(\frac{BG_{DM\ res}}{BG_{DM\ res}+BG_{bio}}))\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.28]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{L:N}=	below ground lignin to N ratio
+        \end{itemize}
+        \vspace{0.5cm}
+
+The component of below ground residue that is metabolic is determined by the below ground lignin to N ratio, with a maximum composition of 85\%.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{met\ frac}=0.85-0.18 * BG_{L:N}	\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.29]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{met frac}=	below ground residue that is metabolic (fraction)
+        \end{itemize}
+        \vspace{0.5cm}
+
+Incorporated metabolic C and the component of below ground biomass consisting of metabolic C are added to the below ground metabolic C pool.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{met}\_updated=BG_{met} + AG_{met}\_to\_BG_{met}+(BG_{bio} * BG_{met\ frac})\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.30]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{met}=below ground metabolic C (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+Below ground metabolic C decomposes and the calculated mass is removed from below ground metabolic C and added to below ground active C.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{met}\_to\_C_{active}=BG_{met_{active\ decomp}} * M_d * T_d * BG_{met}\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.31]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{met}\_to\_C\textsubscript{active} = below ground metabolic C decomposed into active C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35, \cite{parton1987analysis})
+        \end{itemize}
+        \vspace{0.5cm}
+
+Incorporated structural and the component of below ground biomass consisting of structural C are added to the below ground structural C pool.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{struct}\_updated=BG_{struct} + AG_{struct}\_to\_BG_{struct}+BG_{bio} * (1-BG_{met\ frac})\)
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.32]}\par}
+            \vspace{0.5cm}
+
+Decomposition then reduces below ground structural C  by the sum of the calculated values and equal amounts of mass are added to the below ground active and slow C pools.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{struct}\_to\_C_{active}=BG_{struct\ decomp} * M_d * T_d * BG_{struct}\)
+\vspace{0.1cm}
+
+\(BG_{struct}\_to\_C_{slow}=BG_{struct_{decomp}} * M_d * T_d * BG_{struct}\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.33]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{active} = below ground structural C decomposed into active C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{slow} = below ground structural C decomposed into slow C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094, \cite{parton1987analysis})
+            \item BG\textsubscript{struct} = below ground structural C (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+\paragraph{Pool and Gas Partitioning (implemented in pool\_gas\_partition.py)}
+\vspace{0.2cm}
+
+Following the residue biomass transfers detailed above, C pools are then updated to account for the imperfect transfer of decomposition between the metabolic and structural C pools to the active and slow C pools. The amount of C lost to the atmosphere as CO2 during decomposition processes are detailed below. Calculated CO2 losses are subtracted from their source pool and added to the relevant atmospheric pool.
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{met}\_to\_C_{active\ loss}=AG_{met}\_to\_C_{active} * frac\_CO2_{met\_to\_active}\)
+\vspace{0.1cm}
+
+\(AG_{met}\_to\_C_{active\ act}=AG_{met}\_to\_C_{active} * (1-frac\_ CO2_{met\_to\_active})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.34]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item frac\_CO2\textsubscript{met_to_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, \cite{parton1987analysis})
+            \item AG\textsubscript{met}\_to\_C\textsubscript{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{met}\_to\_C\textsubscript{active act} 	=above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{struct}\_to\_C_{active\ loss}=AG_{struct}\_to\_C_{active} * frac\_CO2_{struct\_to\_active} \)
+\vspace{0.1cm}
+
+\(AG_{struct}\_to\_C_{active\ act}=AG_{struct}\_to\_C_{active} * (1-frac\_CO2_{struct\_to\_active})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.35]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item frac\_CO2\textsubscript{struct active} = rate of CO\textsubscript{2} loss during transformation of structural to	active C (0.45, \parencite{parton1987analysis})
+
+            \item AG\textsubscript{struct}\_to\_C\textsubscript{active act} = above ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss C (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{struct}\_to\_C\textsubscript{active loss} = above ground structural C being lost as CO2 during decomposition into active C (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(AG_{struct}\_to\_C_{slow\ loss}=AG_{struct}\_to\_C_{slow} * frac\_CO2_{struct\_to\_slow}\)
+\vspace{0.1cm}
+
+\(AG_{struct}\_to\_C_{slow\ act}=AG_{struct}\_to\_C_{slow} * (1-frac\_CO2_{struct\_to\_slow})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.36]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item AG\textsubscript{struct}\_to\_C\textsubscript{slow loss} = decomposing above ground structural C being lost as CO2 during decomposition into slow C (kg ha\textsuperscript{-1})
+            \item AG\textsubscript{struct}\_to\_C\textsubscript{slow act}  = above ground structural C decomposed to slow C after accounting for CO2 loss (kg ha\textsuperscript{-1})
+            \item frac\_CO2\textsubscript{struct_to_slow} = rate of CO2 loss during transformation of structural to slow C (0.3, Partonet al. 1987)
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{met}\_to\_C_{active\ loss}=BG_{met}\_to\_C_{active} * frac\_CO2_{met\_to\_active}\)
+\vspace{0.1cm}
+
+\(BG_{met}\_to\_C_{active\ act}=BG_{met}\_to\_C_{active} * (1-frac\_CO2_{met\_to\_active})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.37]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{met}\_to\_C\textsubscript{active loss} = below ground metabolic C being lost as CO\textsubscript{2} during decomposition into active C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{met}\_to\_C\textsubscript{active act} = below ground metabolic C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{struct}\_to\_C_{active\ loss}=BG_{struct}\_to\_C_{active} * (frac\_CO2_{struct\_to\_active})\)
+\vspace{0.1cm}
+
+\(BG_{struct}\_to\_C_{active\ act}=BG_{struct}\_to\_C_{active} * (1-frac\_CO2_{struct\_to\_active})\)
+
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.CAR.38]}\par}
+            \vspace{0.5cm}
+
+        \textbf{Where:}
+            
+        \begin{itemize}
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{active loss} = below ground structural C being lost as CO\textsubscript{2} during  decomposition into active C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{active act} = below ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
+        \end{itemize}
+        \vspace{0.5cm}
+
+    \begin{center}
+\(BG_{struct}\_to\_C_{slow\ loss}=BG_{struct}\_to\_C_{slow} * (frac\_CO2_{struct\_to\_slow})\)
+\vspace{0.1cm}
+
+\(BG_{struct}\_to\_C_{slow\ act}=BG_{struct}\_to\_C_{slow} * (1-frac\_CO2_{struct\_to\_slow})\)
+
     \end{center}
         \vspace{0.5cm} 
     
@@ -4249,16 +4251,20 @@ The following equations describe the transformation of C among the active, slow,
         \textbf{Where:}
             
         \begin{itemize}
-            \item C\textsubscript{slow:active} = slow C decomposed into active C (kg ha\textsuperscript{-1})
-            \item \%CO\textsubscript{2}:C\textsubscript{slow loss| = slow C lost as CO\textsubscript{2} during decomposition (\%)
-            \item \%C\textsubscript{slow:passive} = slow C decomposed into passive C (\%)
-            \item C\textsubscript{slow:passive} = slow C decomposed into passive C (kg ha\textsuperscript{-1})
-            \item C\textsubscript{slow loss} = slow C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{slow loss} = below ground structural C being lost as CO\textsubscript{2} during  decomposition into active C (kg ha\textsuperscript{-1})
+            \item BG\textsubscript{struct}\_to\_C\textsubscript{slow act} = below ground structural C decomposed to active C after accounting for CO\textsubscript{2} loss (kg ha\textsuperscript{-1})
         \end{itemize}
         \vspace{0.5cm}
 
-    \begin{center}
-\(C_{passive\ loss}=C_{passive\ decomp} * \%CO2:C_{passive\ loss}\)
+Decomposition losses, mass transfers between pools, and totals are updated following pooling and gas partitioning:
+          \begin{center}
+\(AG\_to\_C_{active}=AG_{met}\_to\_C_{active\ act} + AG_{struct}\_to\_C_{active\ act}\)
+\vspace{0.1cm}
+
+\(BG\_to\_C_{active}=BG_{met}\_to\_C_{active\ act} + BG_{struct}\_to\_C_{active\ act}\)
+\vspace{0.1cm}
+
+\(C_{active} = AG\_to\_C_{active} + BG\_to\_C_{active} + C_{passive}\_to\_C_{active}+C_{slow}\_to\_C_{active}-C_{active\ decomp}\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -4268,40 +4274,29 @@ The following equations describe the transformation of C among the active, slow,
         \textbf{Where:}
             
         \begin{itemize}
-            \item C\textsubscript{passive:active} = passive C decomposed into active carbon (kg ha\textsuperscript{-1})
-            \item \%CO\textsubscript{2}:C\textsubscript{passive loss| = passive C lost as CO\textsubscript{2} during decomposition (\%)
-            \item \%C\textsubscript{passive loss} =passive C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
-
+            \item AG\_to\_C\textsubscript{active} = above ground C decomposed into the active carbon pool (kg ha\textsuperscript{-1})
+            \item BG\_to\_C\textsubscript{active} = below ground C decomposed into the active carbon pool (kg ha\textsuperscript{-1})
         \end{itemize}
         \vspace{0.5cm}
 
     \begin{center}
-\(AG:C_{active}=AG_{met}:C_{active\ act} + AG_{struct}:C_{active\ act}\)
+\(C_{slow}=AG_{struct}\_to\_C_{slow\ act}+BG_{struct}\_to\_C_{slow\ act}+C_{active\_to\_slow}-C_{slow\ decomp}\)
 \vspace{0.1cm}
 
-\(BG:C_{active}=BG_{met}:C_{active\ act} + BG_{struct}:C_{active\ act}\)
-\vspace{0.1cm}
-
-\(C_{active} = AG:C_{active} + BG:+C_{passive}:C_{active}+C_{slow}:C_{active}-C_{active\ decomp}\)
+\(C_{passive}=C_{slow\_to\_passive}+C_{active\_to\_passive}-C_{passive\ decomp}\)
     \end{center}
         \vspace{0.5cm} 
     
             {\raggedleft \textbf{[SC.CAR.41]}\par}
             \vspace{0.5cm}
 
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item AG:C\textsubscript{active} = above ground C decomposed into the active carbon pool (kg ha\textsuperscript{-1})
-            \item BG:C\textsubscript{active} = below ground C decomposed into the active carbon pool (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
 
     \begin{center}
-\(C_{slow}=AG_{struct}:C_{slow\ act}+BG_{struct}:C_{slow\ act}+C_{active:slow}-C_{slow\ decomp}\)
+\(AG_{CO2\ loss}=AG_{met}\_to\_C_{active\ loss}+AG_{struct}\_to\_C_{active\ loss}+AG_{struct}\_to\_C_{slow\ loss}\)
 \vspace{0.1cm}
 
-\(C_{passive}=C_{slow:passive}+C_{active:passive}-C_{passive\ decomp}\)
+\(BG_{CO2\ loss}=BG_{met}\_to\_C_{active\ loss}+BG_{struct}\_to\_C_{active\ loss}+BG_{struct}\_to\_C_{slow\ loss}\)
+
     \end{center}
         \vspace{0.5cm} 
     
@@ -4408,28 +4403,12 @@ The following equations describe the transformation of C among the active, slow,
         \vspace{0.5cm}
 
     \begin{center}
-\(C_{CO2\ loss\ decomp}=C_{active\ loss}+C_{slow\ loss}+C_{passive\ loss}\)
-
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[SC.CAR.48]}\par}
-            \vspace{0.5cm}
-
-        \textbf{Where:}
-            
-        \begin{itemize}
-            \item C\textsubscript{CO\textsubscript{2} loss decomp} =C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
-        \end{itemize}
-        \vspace{0.5cm}
-
-    \begin{center}
 \(C_{CO2\ loss}=AG_{CO2\ loss}+BG_{CO2\ loss}+C_{CO2\ loss\ decomp}\)
 
     \end{center}
         \vspace{0.5cm} 
     
-            {\raggedleft \textbf{[SC.CAR.49]}\par}
+            {\raggedleft \textbf{[SC.CAR.43]}\par}
             \vspace{0.5cm}
 
         \textbf{Where:}
@@ -4438,8 +4417,6 @@ The following equations describe the transformation of C among the active, slow,
             \item C\textsubscript{CO\textsubscript{2} loss} = total C lost as CO\textsubscript{2} (kg ha\textsuperscript{-1})
         \end{itemize}
         \vspace{0.5cm}
-
-
 
 
 \section{Crop Management}
@@ -4798,7 +4775,7 @@ If it is a perennial crop, the model checks whether the perennial should be cut:
 
 \textbf{Where:}
     \begin{itemize}
-        \item fr\subscript{PHU} is the fraction of potential heat units.
+        \item fr\textsubscript{PHU} is the fraction of potential heat units.
         \item fr\textsubscript{PHU,harvest,min} is the minimum fraction of potential heat units acquired to warrant  harvest (user input).
     \end{itemize}  
 
@@ -5082,7 +5059,7 @@ where N\textsubscript{up},over is the sum of potential N uptake for each layer o
 
 where layer -1 is the soil layer above the current layer, S is the surface layer, potential\_nitrogen\_uptake\textsubscript{layer} is the potential uptake for the given soil layer (kg N ha\textsuperscript{-1}),soil\_nitrate\textsubscript{layer} is the nitrate content of the given soil layer (kg NO\textsubscript{3}-N ha\textsuperscript{-1})
 
-actual\_nitrogen\_uptake\textsubscript{total} for the entire profile on a given day is the sum of N\textsubscript{actualup for each layer.
+actual\_nitrogen\_uptake\textsubscript{total} for the entire profile on a given day is the sum of N\textsubscript{actualup} for each layer.
    \vspace{0.2cm}
 
     \begin{center}
@@ -5109,7 +5086,7 @@ After the amount of N available in the soil to meet the crop’s nitrogen demand
             {\raggedleft \textbf{[SC.CRP.40]}\par}
             \vspace{0.5cm}
 
-where unmet\_demand\is the plant N demand not met by uptake from the soil (kg N ha\textsuperscript{-1}) and is also the maximum amount of N that can be fixed by the plant on a given day, stage\_factor is the growth stage factor (0.0-1.0), \(water\_factor\) is the soil water factor (0.0-1.0), and nitrate\_factor) the soil nitrate factor (0.0-1.0).
+where unmet\_demand is the plant N demand not met by uptake from the soil (kg N ha\textsuperscript{-1}) and is also the maximum amount of N that can be fixed by the plant on a given day, stage\_factor is the growth stage factor (0.0-1.0), \(water\_factor\) is the soil water factor (0.0-1.0), and nitrate\_factor) the soil nitrate factor (0.0-1.0).
 
 The growth stage factor is dependent on the fraction of accumulated potential heat units (PHU) for the plant on a given day in the growing season and can be expressed as: 
    \vspace{0.2cm}
@@ -5828,6 +5805,7 @@ WSC & Water Soluble Carbohydrates \\
 
 \newpage
 \phantomsection
+\begin{refsection}
 \label{sec:references-crop-and-soil-module}
 \printbibliography[heading=subbibliography,title={References for Crop and Soil Module}]
 \end{refsection}
