@@ -24,7 +24,7 @@
 \usepackage{caption}
 \usepackage{multirow}
 \usepackage{tocloft}     % Customize LoT and LoF formatting
-
+\usepackage{ragged2e}
 
 % Geometry
 \usepackage[
@@ -1515,7 +1515,7 @@ evaporative demand for the layer is reduced according to the following equation
 \vspace{0.5cm}
 
     \begin{center}
- \(evap_{ly}_reduced=evap_{ly} * exp[2.5 * \frac{SW-FC}{FC-WP}]\ \ \ \ \ \ \ if\ SW<FC\)
+ \(evap_{ly}\_reduced=evap_{ly} * exp[2.5 * \frac{SW-FC}{FC-WP}]\ \ \ \ \ \ \ if\ SW<FC\)
     \end{center}
         \vspace{0.5cm} 
     
@@ -3748,7 +3748,7 @@ Decomposition proceeds at differing rates between the active, slow, and passive 
             \item CO\textsubscript{2}\_to\_C\textsubscript{slow loss} = slow C lost as CO\textsubscript{2} during decomposition (fraction)
             \item frac\_C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (fraction)
             \item C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (kg ha\textsuperscript{-1})
-            \item C\textsubscript{slow\_to\_CO_2} = slow C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
+            \item C\textsubscript{slow\_to\_CO$_2$} = slow C lost as CO\textsubscript{2} during decomposition (kg ha\textsuperscript{-1})
         \end{itemize}
         \vspace{0.5cm}
 
@@ -4147,7 +4147,7 @@ Following the residue biomass transfers detailed above, C pools are then updated
         \textbf{Where:}
             
         \begin{itemize}
-            \item frac\_CO2\textsubscript{met_to_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, \cite{parton1987analysis})
+            \item frac\_CO2\textsubscript{met\_to\_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, \cite{parton1987analysis})
             \item AG\textsubscript{met}\_to\_C\textsubscript{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha\textsuperscript{-1})
             \item AG\textsubscript{met}\_to\_C\textsubscript{active act} 	=above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha\textsuperscript{-1})
         \end{itemize}
@@ -4192,7 +4192,7 @@ Following the residue biomass transfers detailed above, C pools are then updated
         \begin{itemize}
             \item AG\textsubscript{struct}\_to\_C\textsubscript{slow loss} = decomposing above ground structural C being lost as CO2 during decomposition into slow C (kg ha\textsuperscript{-1})
             \item AG\textsubscript{struct}\_to\_C\textsubscript{slow act}  = above ground structural C decomposed to slow C after accounting for CO2 loss (kg ha\textsuperscript{-1})
-            \item frac\_CO2\textsubscript{struct_to_slow} = rate of CO2 loss during transformation of structural to slow C (0.3, Partonet al. 1987)
+            \item frac\_CO2\textsubscript{struct\_to\_slow} = rate of CO2 loss during transformation of structural to slow C (0.3, Partonet al. 1987)
         \end{itemize}
         \vspace{0.5cm}
 
@@ -5709,9 +5709,12 @@ This method relies on two crop-specific, empirically fitted parameters estimated
 \section{Abbreviations}
 
 \renewcommand{\arraystretch}{1.3}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 
-\begin{longtable}{@{} L{4cm} L{12cm} @{}} 
+% optionally tighten column padding just for this table
+\setlength{\tabcolsep}{4pt}
+
+\begin{longtable}{@{} L{0.23\textwidth} L{0.70\textwidth} @{}} % 0.93*textwidth + padding < textwidth
 \caption{Common abbreviations used throughout this document} \\
 
 \toprule
@@ -5803,7 +5806,7 @@ WSC & Water Soluble Carbohydrates \\
 \end{longtable}
 
 
-\newpage
+
 \phantomsection
 \begin{refsection}
 \label{sec:references-crop-and-soil-module}

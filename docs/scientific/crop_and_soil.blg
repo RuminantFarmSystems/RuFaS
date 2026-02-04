@@ -1,0 +1,17 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'crop_and_soil.blg'
+[97] biber-MSWIN64:342> INFO - === 
+[132] Biber.pm:421> INFO - Reading 'crop_and_soil.bcf'
+[215] Biber.pm:1002> INFO - Found 6 citekeys in bib section 0
+[216] Biber.pm:1002> INFO - Found 0 citekeys in bib section 1
+[216] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[228] Biber.pm:4487> INFO - Processing section 0
+[237] Biber.pm:4678> INFO - Looking for bibtex file 'resources/crop_and_soil.bib' for section 0
+[308] bibtex.pm:1713> INFO - LaTeX decoding ...
+[366] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/crop_and_soil.bib'
+[441] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[442] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[442] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[442] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[450] bbl.pm:676> INFO - Writing 'crop_and_soil.bbl' with encoding 'UTF-8'
+[454] bbl.pm:779> INFO - Output to crop_and_soil.bbl
