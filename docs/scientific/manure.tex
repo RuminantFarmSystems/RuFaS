@@ -5078,7 +5078,7 @@ Exchange of the information about the manure nutrient application request and th
     \begin{figure}[H] % The 'p' option places the figure on a page by itself
     \centering
     \includegraphics[width=0.9\textwidth]{resources/manurenutrreq.png} 
-    \caption{Figure 4}
+    \caption{}
     \end{figure}
 
 Each day, the SimulationEngine calls the generate\_daily\_manure\_applications() method to check with the FieldManager to see if there is a manure application scheduled and, when there is, pass the manure nutrient request created by the FieldManager to the ManureManager. The ManureManager, in turn, checks with the ManureNutrientManager to see if the manure nutrient request can be fulfilled via the request\_nutrients() in the ManureManager, which calls the evaluate\_nutrient\_request() function from the ManureNutrientManager class. The ManureNutrientManager then evaluates the nutrient request, determines the limiting nutrient to be used, and calculates the amount of each manure nutrient and the total mass that can be provided by the manure in storage using the following logic. At this time, nutrients from all storages are pooled by ManureNutrientManager to determine the total quantity of nutrients available. Once the nutrient request is returned, an identical proportion (not amount) of manure is removed from all storages. In other words, the user cannot specify at this time which storage(s) should be pulled from for a manure application.

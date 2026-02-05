@@ -1,13 +1,13 @@
 # Fdb version 4
-["biber manure"] 0 "manure.bcf" "manure.bbl" "manure" 1770220372.30103 -1
-  "manure.bcf" 1770220371 113459 276b386e0955b5c94257943fc5e8bb98 "pdflatex"
-  "resources/manure.bib" 1770079019 21237 f3d34b9d6023ce7727e49f3f116d49c9 ""
+["biber manure"] 1770232307.92829 "manure.bcf" "manure.bbl" "manure" 1770249561.58022 0
+  "manure.bcf" 1770249561 113459 276b386e0955b5c94257943fc5e8bb98 "pdflatex"
+  "resources/manure.bib" 1770231625 21237 f3d34b9d6023ce7727e49f3f116d49c9 ""
   (generated)
   "manure.bbl"
   "manure.blg"
   (rewritten before read)
-["pdflatex"] 1770220368.53932 "c:/Users/da472/RuFaS/docs/scientific/manure.tex" "manure.pdf" "manure" 1770220372.30202 0
-  "c:/Users/da472/RuFaS/docs/scientific/manure.tex" 1770220367 291469 89dcf45c821566e889ffa69a2f1e6698 ""
+["pdflatex"] 1770249557.55987 "c:/Users/da472/RuFaS/docs/scientific/manure.tex" "manure.pdf" "manure" 1770249561.5812 0
+  "c:/Users/da472/RuFaS/docs/scientific/manure.tex" 1770249550 291461 4075d55b3dfd382bf61d28fffc6e83f9 ""
   "c:/Users/da472/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1765375125 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "c:/Users/da472/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1765381166 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/Users/da472/texlive/2025/texmf-dist/fonts/tfm/adobe/helvetic/phvb7t.tfm" 1765381690 2240 eb56c13537f4d8a0bd3fafc25572b1bd ""
@@ -245,20 +245,20 @@
   "c:/Users/da472/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1765389960 5587508 5e17d873fd98f0645bf4cd091e4c30f3 ""
   "c:/Users/da472/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1765390969 3635795 926acebebf27cfb86c7cc19a9b6297be ""
   "c:/Users/da472/texlive/2025/texmf.cnf" 1765389855 713 e69b156964470283e0530f5060668171 ""
-  "manure.aux" 1770220371 26563 ffa5ee98c1aaf0729cede895e2910921 "pdflatex"
-  "manure.bbl" 1770163322 59593 a6ae77de3e02654d6dfa55e3dd85d52a "biber manure"
-  "manure.lof" 1770220371 849 d8a6951def0efe712f11b0713e970c59 "pdflatex"
-  "manure.lot" 1770220371 5469 2073c9f5b979beed214abda6033e4f35 "pdflatex"
-  "manure.out" 1770220371 8468 f19ea7fd19b8ff2b2e2287c6550e1c7d "pdflatex"
-  "manure.run.xml" 1770220371 2365 23faf0301558b4b850f39a11f644507f "pdflatex"
-  "manure.tex" 1770220367 291469 89dcf45c821566e889ffa69a2f1e6698 ""
-  "manure.toc" 1770220371 5041 c40f52c2c16c2f7fe85e2d8045e515ec "pdflatex"
-  "resources/manure.png" 1770079019 188832 2da3ad6e081c78550d6d44523bdbf05f ""
-  "resources/manuremanchain.png" 1770079019 105343 0f95ecbd6d83f1876f5f23fa7ce99a55 ""
-  "resources/manurenutrreq.png" 1770163725 81042 63589818b3c96027461c587f4828589a ""
-  "resources/manurestreams.png" 1770079019 36563 b12e60a8dd674e91552e4495f230e902 ""
-  "resources/overviewmanure.png" 1770079019 156533 7afabb7e5de5a3d11e63c292e200d962 ""
-  "resources/rufas.png" 1770079019 73887 efe95f7052122fdf4f1c6ca21cd30e7f ""
+  "manure.aux" 1770249561 26562 7276c67e33e2afe82481a76e9fda24c6 "pdflatex"
+  "manure.bbl" 1770232315 59593 a6ae77de3e02654d6dfa55e3dd85d52a "biber manure"
+  "manure.lof" 1770249561 848 39e901aa764742f45554dd382678b4dd "pdflatex"
+  "manure.lot" 1770249561 5469 2073c9f5b979beed214abda6033e4f35 "pdflatex"
+  "manure.out" 1770249561 8468 f19ea7fd19b8ff2b2e2287c6550e1c7d "pdflatex"
+  "manure.run.xml" 1770249561 2365 23faf0301558b4b850f39a11f644507f "pdflatex"
+  "manure.tex" 1770249550 291461 4075d55b3dfd382bf61d28fffc6e83f9 ""
+  "manure.toc" 1770249561 5041 c40f52c2c16c2f7fe85e2d8045e515ec "pdflatex"
+  "resources/manure.png" 1770231625 188832 2da3ad6e081c78550d6d44523bdbf05f ""
+  "resources/manuremanchain.png" 1770231625 105343 0f95ecbd6d83f1876f5f23fa7ce99a55 ""
+  "resources/manurenutrreq.png" 1770231625 81042 63589818b3c96027461c587f4828589a ""
+  "resources/manurestreams.png" 1770231625 36563 b12e60a8dd674e91552e4495f230e902 ""
+  "resources/overviewmanure.png" 1770231625 156533 7afabb7e5de5a3d11e63c292e200d962 ""
+  "resources/rufas.png" 1770231625 73887 efe95f7052122fdf4f1c6ca21cd30e7f ""
   (generated)
   "manure.aux"
   "manure.bcf"
