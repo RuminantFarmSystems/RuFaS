@@ -263,7 +263,7 @@ class SimulationEngine:
             feed_storage_instances,
         )
 
-        self.simulate_animals = self.im.get_data("config.simulate_animals")  
+        self.simulate_animals = self.im.get_data("config.simulate_animals")
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
