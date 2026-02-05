@@ -130,7 +130,7 @@ def test_project_degradations(
 ) -> None:
     """Test that project_degradations functions as expected."""
     effluent_loss_values = {
-        "fresh_mass": 800.0,
+        "dry_matter_mass": 800.0,
         "dry_matter_percentage": 14.0,
         "non_protein_nitrogen": 3.0,
         "crude_protein_percent": 5.0,
@@ -138,7 +138,7 @@ def test_project_degradations(
         "moisture_loss": 20.0,
     }
     expected_loss_values = {
-        "fresh_mass": 800.0,
+        "dry_matter_mass": 800.0,
         "dry_matter_percentage": 14.0,
         "non_protein_nitrogen": 3.0,
         "crude_protein_percent": 5.0,
@@ -155,7 +155,7 @@ def test_project_degradations(
     actual = silage.project_degradations(silage.stored, weather, time)
 
     for crop in actual:
-        assert crop.fresh_mass == expected_loss_values["fresh_mass"]
+        assert crop.dry_matter_mass == expected_loss_values["dry_matter_mass"]
         assert pytest.approx(crop.dry_matter_percentage) == expected_loss_values["dry_matter_percentage"]
         assert crop.non_protein_nitrogen == expected_loss_values["non_protein_nitrogen"]
         assert crop.crude_protein_percent == expected_loss_values["crude_protein_percent"]
