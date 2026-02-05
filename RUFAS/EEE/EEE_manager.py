@@ -1,5 +1,4 @@
 from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
 
 from .emissions import EmissionsEstimator
 from .energy import EnergyEstimator
@@ -24,5 +23,3 @@ class EEEManager:
         om.add_log("Energy Processing", "Starting processing of energy.", info_map)
         EnergyEstimator.estimate_all()
         om.add_log("Energy Processing", "Completed processing of energy.", info_map)
-
-       

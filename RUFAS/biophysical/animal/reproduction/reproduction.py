@@ -1267,7 +1267,7 @@ class Reproduction:
                     pregnancy_check_config["on_preg"],
                 )
                 if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                    (reproduction_data_stream) = (
+                    reproduction_data_stream = (
                         self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
                             reproduction_data_stream, simulation_day
                         )
@@ -1592,7 +1592,7 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Set up the presynch program for cows on the start day if applicable."""
-        (should_set_up_hormone_delivery_for_presynch, reproduction_data_stream) = (
+        should_set_up_hormone_delivery_for_presynch, reproduction_data_stream = (
             self._should_set_up_hormone_delivery_for_presynch(reproduction_data_stream, simulation_day)
         )
 
@@ -1630,7 +1630,7 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Set up an OvSynch program for cows on the OvSynch start day if applicable."""
-        (should_set_up_hormone_delivery_for_ovsynch, reproduction_data_stream) = (
+        should_set_up_hormone_delivery_for_ovsynch, reproduction_data_stream = (
             self._should_set_up_hormone_delivery_for_ovsynch(reproduction_data_stream, simulation_day)
         )
 
