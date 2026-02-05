@@ -4,7 +4,6 @@ import os
 import re
 import shutil
 from copy import deepcopy
-from datetime import timedelta
 from pathlib import Path
 from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -644,44 +643,6 @@ class Utility:
         return np.random.normal(mean, std_dev)
 
     @staticmethod
-    def generate_bivariate_random_numbers(
-        mu_x: float, mu_y: float, sigma_x: float, sigma_y: float, rho: float
-    ) -> tuple[float, float]:
-        """
-        Generates multivariate random numbers based on provided parameters.
-
-        This method generates two correlated random numbers from a bivariate
-        normal distribution, using the specified means, standard deviations,
-        and correlation coefficient.
-
-        Parameters
-        ----------
-        mu_x : float
-            Mean of the first random variable.
-        mu_y : float
-            Mean of the second random variable.
-        sigma_x : float
-            Standard deviation of the first random variable.
-        sigma_y : float
-            Standard deviation of the second random variable.
-        rho : float
-            Correlation coefficient between the two random variables.
-
-        Returns
-        -------
-        tuple[float, float]
-            A tuple containing two correlated random numbers generated
-            from the bivariate normal distribution.
-        """
-        if sigma_x <= 0 or sigma_y <= 0:
-            raise ValueError("The standard deviations for a bivariate distribution must be positive.")
-        if not (-1.0 <= rho <= 1.0):
-            raise ValueError("The correlation coefficient for a bivariate distribution must be between -1 and 1.")
-        mean = [mu_x, mu_y]
-        cov = [[sigma_x**2, rho * sigma_x * sigma_y], [rho * sigma_x * sigma_y, sigma_y**2]]
-        return tuple(np.random.multivariate_normal(mean, cov))
-
-    @staticmethod
     def flatten_dictionary(
         input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
     ) -> dict[str, Any]:
@@ -977,26 +938,6 @@ class Utility:
             return DateFormatter("%d/%m/%Y")
 
         return DateFormatter(date_format)
-
-    @staticmethod
-    def back_track_birth_date(days_born: int, current_date: datetime.datetime) -> datetime.datetime:
-        """
-        Calculates the birth date by subtracting a given number of days from the current date.
-
-        Parameters
-        ----------
-        days_born : int
-            The number of days since the animal's birth.
-        current_date : datetime.datetime
-            The current date from which the days will be subtracted.
-
-        Returns
-        -------
-        datetime.datetime
-            The calculated date of birth.
-
-        """
-        return current_date - timedelta(days_born)
 
 
 class Aggregator:

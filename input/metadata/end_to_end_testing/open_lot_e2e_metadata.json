@@ -28,12 +28,12 @@
       "type": "json",
       "properties": "animal_population_properties"
     },
-    "animal_mean_phenotype": {
-      "title": "Mean animal phenotype data by birth year",
-      "description": "The mean animal phenotype data by birth year.",
-      "path": "input/data/animal_genetics/mean_phenotype.csv",
+    "animal_net_merit": {
+      "title": "Animal Net Merit data",
+      "description": "The net merit value for cows.",
+      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
       "type": "csv",
-      "properties": "animal_mean_phenotype_properties"
+      "properties": "animal_net_merit_properties"
     },
     "animal_top_listing_semen": {
       "title": "Animal Top Listing Semen data",
