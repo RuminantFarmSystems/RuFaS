@@ -178,7 +178,7 @@ class SingleStreamHandler(Handler):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=bedding_non_degradable_solid
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_solid,
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 
@@ -239,14 +239,10 @@ class SingleStreamHandler(Handler):
         if self.manure_stream:
             degradable_to_total_manure_volatile_solid_ratio = 0.0
             if self.manure_stream.degradable_volatile_solids + self.manure_stream.non_degradable_volatile_solids != 0.0:
-                degradable_to_total_manure_volatile_solid_ratio = (
-                    self.manure_stream.degradable_volatile_solids / (
-                        self.manure_stream.degradable_volatile_solids
-                        + self.manure_stream.non_degradable_volatile_solids)
+                degradable_to_total_manure_volatile_solid_ratio = self.manure_stream.degradable_volatile_solids / (
+                    self.manure_stream.degradable_volatile_solids + self.manure_stream.non_degradable_volatile_solids
                 )
-            total_volatile_solid_loss = (
-                ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO * housing_methane_emission
-            )
+            total_volatile_solid_loss = ManureConstants.VS_TO_METHANE_LOSS_RATIO * housing_methane_emission
             degradable_volatile_solid = max(
                 0.0,
                 self.manure_stream.degradable_volatile_solids

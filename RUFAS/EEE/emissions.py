@@ -17,18 +17,21 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
         "variables": ["dry_yield", "crop", "harvest_year", "harvest_day", "field_name", "harvest_type"],
         "date_fields": ("harvest_year", "harvest_day"),
+        "use_filter_key_name": True,
     },
     "nitrous_oxide_emissions": {
         "name": "Nitrous Oxide Emissions",
         "description": "Collects the nitrous oxide emissions of all soil layers across all fields in the simulation.",
         "filters": ["FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions"],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
     "ammonia_emissions": {
         "name": "Ammonia Emissions",
         "description": "Collects the ammonia emissions of all soil layers across all fields in the simulation.",
         "filters": ["FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions"],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
     "fertilizer_applications": {
         "name": "Fertilizer Applications",
@@ -36,6 +39,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
         "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "year", "day"],
         "date_fields": ("year", "day"),
+        "use_filter_key_name": True,
     },
     "manure_applications": {
         "name": "Manure Applications",
@@ -43,6 +47,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
         "variables": ["nitrogen", "field_name", "year", "day"],
         "date_fields": ("year", "day"),
+        "use_filter_key_name": True,
     },
     "crop_received": {
         "name": "Crop Received",
@@ -53,12 +58,14 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
             "crop_name",
             "feed_id",
         ],
+        "use_filter_key_name": True,
     },
     "farmgrown_feed_deductions": {
         "name": "Farmgrown Feed Deductions",
         "description": "Collects all farmgrown feeds fed to animals in the simulation.",
         "filters": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed"],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
 }
 
@@ -283,6 +290,10 @@ class EmissionsEstimator:
         for filter_key in ["manure_applications", "fertilizer_applications"]:
             resource_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS[filter_key]
             filtered_data = self.om.filter_variables_pool(resource_filter)
+
+            if len(filtered_data) == 0:
+                continue
+
             date_field: tuple[str, str] = resource_filter["date_fields"]
             year_key, day_key = date_field[0], date_field[1]
             dates = list(
@@ -349,6 +360,8 @@ class EmissionsEstimator:
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
         filtered_data = self.om.filter_variables_pool(harvest_filter)
+        if len(filtered_data) == 0:
+            return harvest_data
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
         for i, field_name in enumerate(filtered_data["field_name"]["values"]):
@@ -386,20 +399,7 @@ class EmissionsEstimator:
             defaultdict(dict)
         )
 
-        harvest_dates_by_feed_id: dict[RUFAS_ID, list[int]] = {
-            feed_id: sorted(
-                [
-                    harvest_date
-                    for harvest_date in harvest_yield_by_field[field_name]
-                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id
-                ]
-            )
-            for field_name in harvest_yield_by_field
-            for feed_id in set(
-                harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-                for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
-            )
-        }
+        harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
 
         for field_name in harvest_yield_by_field:
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
@@ -434,38 +434,41 @@ class EmissionsEstimator:
                     ],
                     start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += sum(
-                    [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
-                        if last_harvest_date < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
-                )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += sum(
-                    [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
-                        if last_harvest_date < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
-                )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += sum(
-                    [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
-                        if last_harvest_date < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
-                )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += sum(
-                    [
-                        resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
-                        for simulation_day in resource_data["manure_applications"][field_name]
-                        if last_harvest_date < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
-                )
+                if field_name in resource_data.get("fertilizer_applications", {}):
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                if field_name in resource_data.get("manure_applications", {}):
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += sum(
+                        [
+                            resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
+                            for simulation_day in resource_data["manure_applications"][field_name]
+                            if last_harvest_date < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+
                 next_harvest_date_for_feed_id = (
                     harvest_dates_by_feed_id[feed_id][harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1]
                     if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1
@@ -513,6 +516,41 @@ class EmissionsEstimator:
                 sorted(daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items())
             )
         return daily_farmgrown_feed_emission_and_resource_by_feed_id
+
+    def _calculate_harvest_dates_by_feed_id(
+        self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+    ) -> dict[RUFAS_ID, list[int]]:
+        """
+        Generates a mapping of feed IDs to their respective harvest dates based on the
+        harvest data of multiple fields.
+
+        Parameters
+        ----------
+        harvest_yield_by_field : dict: dict[str, dict[int, dict[str, Any]]]
+            A dictionary containing harvest data organized by field name. Each field
+            name maps to another dictionary where keys represent harvest dates, and
+            values are dictionaries containing details like "feed_id".
+
+        Returns
+        -------
+        dict: dict[RUFAS_ID, list[int]]
+            A dictionary where each key is a feed ID, and the value is a sorted list
+            of harvest dates associated with that feed ID.
+        """
+        all_feed_ids = set(
+            harvest_yield_by_field[field_name][harvest_date]["feed_id"]
+            for field_name in harvest_yield_by_field
+            for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
+        )
+        harvest_dates_by_feed_id = {}
+        for feed_id in all_feed_ids:
+            harvest_dates = []
+            for field_name in harvest_yield_by_field:
+                for harvest_date in harvest_yield_by_field[field_name]:
+                    if harvest_yield_by_field[field_name][harvest_date]["feed_id"] == feed_id:
+                        harvest_dates.append(harvest_date)
+            harvest_dates_by_feed_id[feed_id] = sorted(harvest_dates)
+        return harvest_dates_by_feed_id
 
     def _calculate_daily_farmgrown_feed_fed_emissions_and_resources(
         self,

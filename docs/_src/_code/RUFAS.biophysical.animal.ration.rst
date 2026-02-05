@@ -12,7 +12,7 @@ Submodules
    RUFAS.biophysical.animal.ration.calf_ration_manager
    RUFAS.biophysical.animal.ration.ration_config
    RUFAS.biophysical.animal.ration.ration_optimizer
-   RUFAS.biophysical.animal.ration.user_defined_ration_manager
+   RUFAS.biophysical.animal.ration.ration_manager
 
 Module contents
 ---------------

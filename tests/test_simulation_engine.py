@@ -532,7 +532,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     )
     assert simulation_engine.herd_manager == mock_herd_manager
 
-    mock_manure_manager_init.assert_called_once_with()
+    mock_manure_manager_init.assert_called_once_with(
+        mock_weather.intercept_mean_temp, mock_weather.phase_shift, mock_weather.amplitude
+    )
     assert simulation_engine.manure_manager == mock_manure_manager
 
 

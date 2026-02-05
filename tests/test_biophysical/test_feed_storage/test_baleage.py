@@ -20,7 +20,7 @@ def mock_baleage_config() -> dict[str, Any]:
     return {
         "name": "baleage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 45.0,
         "post_wilting_moisture_percentage": 40.0,

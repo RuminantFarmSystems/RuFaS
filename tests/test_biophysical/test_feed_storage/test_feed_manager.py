@@ -86,10 +86,10 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     feed_manager._cumulative_purchased_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_farmgrown_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_purchased_feeds = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
-    mock_pile_config: dict[str, str | float] = {
+    mock_pile_config: dict[str, str | float | list[str]] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
@@ -122,9 +122,9 @@ def storage() -> Storage:
     Storage
         An instance of the Storage class.
     """
-    mock_storage_config: dict[str, str | float] = {
+    mock_storage_config: dict[str, str | float | list[str]] = {
         "name": "Test Storage",
-        "field_name": "Test Field",
+        "field_names": ["Test Field"],
         "crop_name": "corn_silage",
         "rufas_id": 1,
         "initial_storage_dry_matter": 50.0,
@@ -179,7 +179,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 1,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -191,7 +191,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Bag",
                         "rufas_id": 2,
                         "crop_name": "alfalfa",
-                        "field_name": "F2",
+                        "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 200.0,
@@ -212,7 +212,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 1,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -224,7 +224,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Bag",
                         "rufas_id": 2,
                         "crop_name": "alfalfa",
-                        "field_name": "F2",
+                        "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 200.0,
@@ -245,7 +245,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "storage_type": "Pile",
                         "rufas_id": 99,
                         "crop_name": "corn",
-                        "field_name": "F1",
+                        "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
                         "size": 500.0,
@@ -278,7 +278,7 @@ def test_create_all_storages(
     mock_feed_manager._available_feeds = [MagicMock(rufas_id=i) for i in available_ids]
 
     if raises_error:
-        with pytest.raises(ValueError):
+        with pytest.raises(KeyError):
             mock_feed_manager._create_all_storages(feed_storage_configs, feed_storage_instances)
         assert add_warning.call_count == 0
         return
@@ -292,6 +292,101 @@ def test_create_all_storages(
         assert hasattr(storage, "storage_name")
 
     assert add_warning.call_count == expected_warning_calls
+
+
+def test_validate_crop_field_mapping_all_unique(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """No error is raised when all feed storage config (crop_name, field_name) combos are unique."""
+    all_configs = [
+        {
+            "name": "storage_1",
+            "crop_name": "alfalfa_hay",
+            "field_names": ["field_1"],
+        },
+        {
+            "name": "storage_2",
+            "crop_name": "alfalfa_hay",
+            "field_names": ["field_2"],
+        },
+        {
+            "name": "storage_3",
+            "crop_name": "corn_silage",
+            "field_names": ["field_1"],
+        },
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+
+    feed_manager._validate_crop_field_mapping(all_configs)
+    add_error.assert_not_called()
+
+
+def test_validate_crop_field_mapping_raises_on_duplicate_combo(
+    feed_manager: FeedManager, mocker: MockerFixture
+) -> None:
+    """Raises ValueError when the same (crop_name, field_name) combo is used by multiple storage configs."""
+    all_configs = [
+        {
+            "name": "triticale_hay_storage_1",
+            "crop_name": "winter_wheat_hay",
+            "field_names": ["field_1"],
+        },
+        {
+            "name": "winter_wheat_hay_storage_1",
+            "crop_name": "winter_wheat_hay",
+            "field_names": ["field_1"],
+        },
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+    with pytest.raises(ValueError) as excinfo:
+        feed_manager._validate_crop_field_mapping(all_configs)
+
+    msg = str(excinfo.value)
+    assert "Duplicate (crop_name, field_name) combinations found" in msg
+    assert "Combination ('winter_wheat_hay', 'field_1')" in msg
+    assert "triticale_hay_storage_1" in msg
+    assert "winter_wheat_hay_storage_1" in msg
+    add_error.assert_called_once()
+
+
+def test_validate_storage_config_names_all_unique(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Should NOT raise when all storage config names are unique."""
+    configs = [
+        {"name": "S1", "other": 1},
+        {"name": "S2", "other": 2},
+        {"name": "S3", "other": 3},
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+
+    feed_manager._validate_storage_config_names(configs)
+    add_error.assert_not_called()
+
+
+def test_validate_storage_config_unique_name_duplicate_other(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Should not raise ValueError if two storage configs share a duplicate other."""
+    configs = [
+        {"name": "S1", "other": 1},
+        {"name": "S2", "other": 1},
+        {"name": "S3", "other": 2},
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+    feed_manager._validate_storage_config_names(configs)
+    add_error.assert_not_called()
+
+
+def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Should raise ValueError if two storage configs share the same name."""
+    configs = [
+        {"name": "S1"},
+        {"name": "S1"},
+        {"name": "S2"},
+    ]
+    add_error = mocker.patch.object(feed_manager._om, "add_error")
+    with pytest.raises(ValueError) as excinfo:
+        feed_manager._validate_storage_config_names(configs)
+
+    msg = str(excinfo.value)
+    assert "Duplicate storage config names found" in msg
+    assert "['S1']" in msg
+    add_error.assert_called_once()
 
 
 def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
@@ -371,12 +466,13 @@ def test_translate_crop_config_name_to_rufas_id(
     assert result == expected_next_harvest_dates_rufas_ids
 
 
-def test_receive_crop_routes_to_matching_storage(mocker: MockerFixture, feed_manager: FeedManager,
-                                                 harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_routes_to_matching_storage(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     """Tests that receive_crop routes to the correct storage, and warns if no match."""
     storage = next(iter(feed_manager.active_storages.values()))
     storage.crop_name = harvested_crop.config_name
-    storage.field_name = harvested_crop.field_name
+    storage.field_names = [harvested_crop.field_name]
 
     mocked_receive = mocker.patch.object(storage, "receive_crop")
 
@@ -388,12 +484,13 @@ def test_receive_crop_routes_to_matching_storage(mocker: MockerFixture, feed_man
     mock_add_warning.assert_not_called()
 
 
-def test_receive_crop_warns_when_no_matching_storage(mocker: MockerFixture, feed_manager: FeedManager,
-                                                     harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_warns_when_no_matching_storage(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     """Tests that receive_crop warns when no storage matches the crop."""
     for s in feed_manager.active_storages.values():
         s.crop_name = "not-" + harvested_crop.config_name
-        s.field_name = "not-" + harvested_crop.field_name
+        s.field_names = ["not-" + harvested_crop.field_name]
         mocker.patch.object(s, "receive_crop")
 
     mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
@@ -486,7 +583,7 @@ def test_report_stored_farmgrown_feeds(
 
     feed_manager.report_stored_farmgrown_feeds(mock_time, "mock_suffix")
 
-    assert mock_om_add_variable.call_count == 2 * len(mock_available_feeds)
+    assert mock_om_add_variable.call_count == 2 * len(feed_manager.active_storages)
 
 
 def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -835,10 +932,10 @@ def test_deduct_feeds_from_inventory(
     harvested_crop.config_name = "corn"
     purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, purchased_amount
     purchased_feed.storage_time = purchased_date
-    bag_config: dict[str, str | float] = {
+    bag_config: dict[str, str | float | list[str]] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
@@ -870,10 +967,10 @@ def test_deduct_feeds_from_inventory_error(
     harvested_crop.config_name = "corn"
     purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, 0.0
     purchased_feed.storage_time = date(2024, 6, 1)
-    bag_config: dict[str, str | float] = {
+    bag_config: dict[str, str | float | list[str]] = {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,

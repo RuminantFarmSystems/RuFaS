@@ -274,7 +274,9 @@ class SimulationEngine:
             available_feeds=self.feed_manager.available_feeds,
         )
 
-        self.manure_manager: ManureManager = ManureManager()
+        self.manure_manager: ManureManager = ManureManager(
+            self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
+        )
 
         self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
         feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]

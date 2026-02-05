@@ -24,7 +24,11 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.milk_production import (
+    MilkProductionInputs,
+    MilkProductionOutputs,
+    MilkProductionStatistics,
+)
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
@@ -1880,6 +1884,41 @@ def test_dead_property(dead_at_day: int | None, expected: bool, mock_lactating_c
     assert animal.dead == expected
 
 
+def test_milk_statistics_raises_for_non_cow(mock_calf: Animal) -> None:
+    """milk_statistics should raise TypeError when called on a non-cow animal."""
+    with pytest.raises(TypeError):
+        _ = mock_calf.milk_statistics
+
+
+def test_milk_statistics_returns_expected_values_for_cow(mock_lactating_cow: Animal) -> None:
+    """milk_statistics should return a correctly populated MilkProductionStatistics for cows."""
+    cow = mock_lactating_cow
+
+    cow.id = 123
+    cow.days_in_milk = 42
+    cow.calves = 3
+    cow.pen_history = [{"pen": 1, "start_date": 0, "end_date": 100, "animal_types_in_pen": [AnimalType.LAC_COW]}]
+
+    milk_prod = MagicMock()
+    milk_prod.daily_milk_produced = 35.5
+    milk_prod.true_protein_content = 3.1
+    milk_prod.fat_content = 4.0
+    milk_prod.lactose_content = 4.8
+    cow.milk_production = milk_prod
+
+    stats = cow.milk_statistics
+
+    assert isinstance(stats, MilkProductionStatistics)
+    assert stats.cow_id == 123
+    assert stats.pen_id == 1
+    assert stats.days_in_milk == 42
+    assert stats.estimated_daily_milk_produced == 35.5
+    assert stats.milk_protein == 3.1
+    assert stats.milk_fat == 4.0
+    assert stats.milk_lactose == 4.8
+    assert stats.parity == 3
+
+
 def test_daily_nutrients_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_perform_daily_phosphorus_update = mocker.patch.object(Nutrients, "perform_daily_phosphorus_update")
     mock_lactating_cow._daily_nutrients_update()
@@ -1965,6 +2004,60 @@ def test_daily_milking_update_is_cow(mock_lactating_cow: Animal, mocker: MockerF
     )
     assert mock_lactating_cow._milk_production_output_days_in_milk == 0
     assert mock_lactating_cow.events.events == {}
+
+
+def test_daily_milking_update_without_history_non_cow_does_nothing(
+    mock_calf: Animal,
+    mocker: MockerFixture,
+) -> None:
+    """Non-cow animals should return early and not call the milk_production update."""
+    calf = mock_calf
+
+    if hasattr(calf, "_milk_production_output_days_in_milk"):
+        delattr(calf, "_milk_production_output_days_in_milk")
+
+    mock_update = mocker.patch.object(
+        calf.milk_production,
+        "perform_daily_milking_update_without_history",
+    )
+
+    calf.daily_milking_update_without_history()
+
+    mock_update.assert_not_called()
+    assert not hasattr(calf, "_milk_production_output_days_in_milk")
+
+
+def test_daily_milking_update_without_history_cow_updates_output(
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
+    """For cows, daily_milking_update_without_history should call the milk_production
+    update and store the output DIM."""
+    cow = mock_lactating_cow
+    cow.days_in_milk = 12
+    cow.days_born = 34
+    cow.days_in_pregnancy = 56
+
+    fake_outputs = MilkProductionOutputs(
+        events=MagicMock(spec=AnimalEvents),
+        days_in_milk=99,
+    )
+
+    mock_update = mocker.patch.object(
+        cow.milk_production,
+        "perform_daily_milking_update_without_history",
+        return_value=fake_outputs,
+    )
+
+    cow.daily_milking_update_without_history()
+
+    mock_update.assert_called_once()
+    (inputs_arg,) = mock_update.call_args[0]
+
+    assert inputs_arg.days_in_milk == 12
+    assert inputs_arg.days_born == 34
+    assert inputs_arg.days_in_pregnancy == 56
+    assert cow._milk_production_output_days_in_milk == 99
 
 
 def test_daily_growth_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
