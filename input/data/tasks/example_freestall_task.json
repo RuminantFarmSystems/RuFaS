@@ -7,7 +7,7 @@
       "output_prefix": "freestall",
       "log_verbosity": "errors",
       "random_seed": 42,
-      "exclude_info_maps": true
+      "exclude_info_maps": false
     }
 ]
 }
