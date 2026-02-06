@@ -148,6 +148,7 @@ def test_daily_simulation(
     Unit test for function _daily_simulation in file RUFAS/simulation_engine.py
     """
     # Arrange
+    simulation_engine.simulate_animals = True
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     mock_weather_get_current_day_conditions = mocker.patch.object(
@@ -155,7 +156,6 @@ def test_daily_simulation(
         "get_current_day_conditions",
         return_value=(mock_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
     )
-
     simulation_engine.time.current_date = datetime.today()
     simulation_engine.time.simulation_day = 15
     simulation_engine.next_max_daily_feed_recalculation = (
@@ -384,6 +384,7 @@ def test_formulate_ration(
 def test_generate_daily_manure_applications(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for generate_daily_manure_applications in SimulationEngine."""
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    simulation_engine.simulate_animals = True
 
     field_1, field_2 = MagicMock(auto_spec=Field), MagicMock(auto_spec=Field)
     field_1.field_data.name, field_2.field_data.name = "Field 1", "Field 2"
@@ -449,6 +450,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_feed_storage_instances = {"dummy": "storage instances"}
     mock_ration_interval_length = 30
     mock_is_ration_defined_by_user = True
+    mock_simulate_animals = True
 
     mock_im_get_data = mocker.patch.object(
         mock_input_manager,
@@ -459,6 +461,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
             mock_feed_config,
             mock_feed_storage_configs,
             mock_feed_storage_instances,
+            mock_simulate_animals,
             mock_ration_interval_length,
             mock_is_ration_defined_by_user,
             4,
@@ -500,6 +503,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         call("feed"),
         call("feed_storage_configurations"),
         call("feed_storage_instances"),
+        call("config.simulate_animals"),
         call("animal.ration.formulation_interval"),
         call("animal.ration.user_input"),
         call("feed.max_daily_feed_recalculations_per_year"),
@@ -508,6 +512,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     assert simulation_engine.om.time == mock_time
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
     assert simulation_engine.weather == mock_weather
+    assert simulation_engine.simulate_animals == mock_simulate_animals
 
     mock_field_manager_init.assert_called_once_with()
     assert simulation_engine.field_manager == mock_field_manager
