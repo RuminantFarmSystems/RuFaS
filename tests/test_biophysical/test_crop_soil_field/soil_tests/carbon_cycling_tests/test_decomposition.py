@@ -170,7 +170,7 @@ def test_calc_moisture_factor(
         ),  # arbitrary
     ],
 )
-def test_decompose(temp_average, layers):
+def test_decompose(temp_average: int | float, layers: list[LayerData]) -> None:
     """ensures that all SoilData attributes were correctly updated"""
     data = SoilData(field_size=1.33, soil_layers=layers)
     decomp = Decomposition(data)
