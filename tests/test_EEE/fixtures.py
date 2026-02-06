@@ -8310,7 +8310,7 @@ def expected_harvest_yield_data() -> dict[str, dict[int, dict[str, int | str | f
 
 @pytest.fixture
 def raw_farmgrown_feed_deductions_data() -> dict[str, dict[str, list[Any]]]:
-    raw =  {
+    raw = {
         "FeedManager._log_feed_deductions.farmgrown_feed_44_fed": {
             "info_maps": [
                 {"simulation_day": 297},
