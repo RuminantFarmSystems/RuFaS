@@ -6,6 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.EEE.tractor_implement import TractorImplement
+from RUFAS.biophysical.feed_storage.feed_manager import FeedDeduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.input_manager import InputManager
@@ -8309,7 +8310,7 @@ def expected_harvest_yield_data() -> dict[str, dict[int, dict[str, int | str | f
 
 @pytest.fixture
 def raw_farmgrown_feed_deductions_data() -> dict[str, dict[str, list[Any]]]:
-    return {
+    raw =  {
         "FeedManager._log_feed_deductions.farmgrown_feed_44_fed": {
             "info_maps": [
                 {"simulation_day": 297},
@@ -9062,6 +9063,19 @@ def raw_farmgrown_feed_deductions_data() -> dict[str, dict[str, list[Any]]]:
                 265.2977859933837,
             ],
         },
+    }
+
+    return {
+        key: {
+            "values": [
+                FeedDeduction(
+                    simulation_day=info["simulation_day"],
+                    amount=value,
+                )
+                for info, value in zip(data["info_maps"], data["values"])
+            ]
+        }
+        for key, data in raw.items()
     }
 
 

@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict
 from datetime import datetime
-from itertools import zip_longest
 from typing import Any
 
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
@@ -274,10 +273,7 @@ class EmissionsEstimator:
                 if field_name not in all_fields_by_layer:
                     all_fields_by_layer[field_name] = {}
 
-                if len(simulation_days) != len(values["values"]):
-                    print(f"Warning: Length mismatch.")
                 all_fields_by_layer[field_name][layer_number] = dict(zip(simulation_days, values["values"]))
-
             for field_name in all_fields_by_layer:
                 emission_data[filter_key][field_name] = {
                     simulation_day: sum(
@@ -334,13 +330,13 @@ class EmissionsEstimator:
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_deductions"]
         )
         feed_deduction_by_feed_id: dict[RUFAS_ID, dict[int, float]] = defaultdict(dict)
-        for variable, values in filtered_data.items():
-            match = re.search(r"farmgrown_feed_(\d+)_fed", variable)
+        for variable_name, variable_contents in filtered_data.items():
+            match = re.search(r"farmgrown_feed_(\d+)_fed", variable_name)
             if match:
                 feed_id = int(match.group(1))
             else:
-                raise ValueError(f"No feed_id match found for {variable}.")
-            values_list: list[tuple] = values.get("values", [])
+                raise ValueError(f"No feed_id match found for {variable_name}.")
+            values_list = variable_contents.get("values", [])
 
             matched = {values_list[i][0]: values_list[i][1] for i in range(len(values_list))}
 
