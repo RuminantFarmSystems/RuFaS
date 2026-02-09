@@ -40,8 +40,7 @@ def reproduction_inputs() -> ReproductionInputs:
         days_born=1000,
         days_in_pregnancy=150,
         days_in_milk=200,
-        dam_tbv_fat=10.0,
-        dam_tbv_protein=10.0,
+        net_merit=5.0,
         phosphorus_for_gestation_required_for_calf=0.8,
     )
 
@@ -128,8 +127,7 @@ def reproduction_data_stream(
         days_in_pregnancy=170,
         days_in_milk=230,
         events=sample_animal_events,
-        dam_tbv_fat=10.0,
-        dam_tbv_protein=10.0,
+        net_merit=6.5,
         phosphorus_for_gestation_required_for_calf=1.2,
         herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,
@@ -144,8 +142,7 @@ def test_reproduction_inputs_initialization(reproduction_inputs: ReproductionInp
     assert reproduction_inputs.days_born == 1000
     assert reproduction_inputs.days_in_pregnancy == 150
     assert reproduction_inputs.days_in_milk == 200
-    assert reproduction_inputs.dam_tbv_fat == 10.0
-    assert reproduction_inputs.dam_tbv_protein == 10.0
+    assert reproduction_inputs.net_merit == 5.0
     assert reproduction_inputs.phosphorus_for_gestation_required_for_calf == 0.8
 
 
@@ -362,8 +359,7 @@ def test_reproduction_data_stream_initialization(reproduction_data_stream: Repro
     assert reproduction_data_stream.days_in_pregnancy == 170
     assert reproduction_data_stream.days_in_milk == 230
     assert isinstance(reproduction_data_stream.events, AnimalEvents)
-    assert reproduction_data_stream.dam_tbv_fat == 10.0
-    assert reproduction_data_stream.dam_tbv_protein == 10.0
+    assert reproduction_data_stream.net_merit == 6.5
     assert reproduction_data_stream.phosphorus_for_gestation_required_for_calf == 1.2
     assert reproduction_data_stream.newborn_calf_config is None
 

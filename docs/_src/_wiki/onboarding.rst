@@ -643,16 +643,41 @@ Git Desktop.
          scenario, this file will indicate the exact path that the
          program takes to find the correct ’config’ file.
 
+         The metadata lives in ``input/metadata``. Each file in that
+         folder represents a scenario (for example
+         ``example_open_lot_metadata.json`` or
+         ``example_no_animal_metadata.json``). Inside each metadata file
+         is a ``properties`` entry that points to the validation rules
+         the Input Manager should use. Those properties files are kept
+         beside the metadata under ``input/metadata/properties`` and can
+         be loaded one at a time (``path``) or combined by listing
+         multiple documents under ``paths``. When multiple files are
+         listed, Input Manager loads them in order and later entries
+         override earlier definitions.
+
+         **Picking properties for a scenario.** Start with
+         ``default.json`` for the core validation rules, then layer on a
+         domain-specific extension such as
+         ``commodity_properties.json`` if your scenario needs those
+         checks. Update the metadata’s ``properties`` block to reference
+         the files you need, keeping the base file first and the
+         overrides later.
+
          Make sure that you have the correct "address" indicated in your
          metadata file for the simulation that you are running.
 
          If you aren’t sure, go back to your input data folders, select
          your module of interest and the file you wish to use. This is
          your "address". You may also see the term "multi-run-counts"
-         followed by a numeral. This indicates that the simulation will
-         run the number indicated in the numeral. You can replace this
-         number if you wish to run fewer or more simulations through the
-         same metadata file.
+         followed by a numeral. This appears in task files under
+         ``input/data/tasks`` and controls how many times a single task
+         entry runs. If you supply more than one metadata/properties
+         combination in the ``tasks`` list, RuFaS will repeat each
+         combination the specified number of times, so total runs equal
+         ``multi_run_counts`` multiplied by the number of task entries.
+         Adjust this value if you want to repeat the same scenario (with
+         the same merged properties files) multiple times or reduce it to
+         speed up quick checks.
 
       -  Tasks - under your ’inputs’ and ’data’, there is a ’tasks’
          file. Select one of the available tasks. You will see that the
