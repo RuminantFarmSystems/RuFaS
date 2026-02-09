@@ -80,7 +80,7 @@ class SlurryStorageOutdoor(Storage):
         units = MeasurementUnits.KILOGRAMS
         self._report_processor_output(
             "outdoor_storage_manure_temperature",
-            str(manure_temperature),
+            manure_temperature,
             data_origin_name,
             MeasurementUnits.DEGREES_CELSIUS,
             time.simulation_day,
