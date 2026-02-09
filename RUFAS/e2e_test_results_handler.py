@@ -75,6 +75,26 @@ class E2ETestResultsHandler:
                         expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
                     )
 
+            def tryafloat(x):
+                if isinstance(x, str):
+                    try:
+                        return float(x)
+                    except ValueError:
+                        return x
+                return x
+
+
+            def makeitflo(obj):
+                if isinstance(obj, dict):
+                    return {k: makeitflo(x) for k, x in obj.items()}
+                elif isinstance(obj, list):
+                    return [makeitflo(thing) for thing in obj]
+                else:
+                    return tryafloat(obj)
+
+            expected_results = makeitflo(expected_results)
+            actual_results = makeitflo(actual_results)
+
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
