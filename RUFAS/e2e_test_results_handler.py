@@ -124,8 +124,14 @@ class E2ETestResultsHandler:
             # expected_results = E2ETestResultsHandler.makeitflo(expected_results)
             # actual_results = E2ETestResultsHandler.makeitflo(actual_results)
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2,
-                            significant_digits=3, ignore_numeric_type_changes=True)
+            diff = DeepDiff(
+                expected_results,
+                actual_results,
+                ignore_order=True,
+                verbose_level=2,
+                significant_digits=3,
+                ignore_numeric_type_changes=True,
+            )
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
 
