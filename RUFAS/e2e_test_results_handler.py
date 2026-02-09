@@ -22,12 +22,12 @@ class E2ETestResultsHandler:
     Handles generating and comparing actual and expected results for end-to-end testing of various
     RuFaS modules.
     """
-    
+
     @staticmethod
     def tryafloat(x: Any) -> float | Any:
         """
         Tries to turn strings to floats.
-    
+
         Parameters
         ----------
         x : Any
