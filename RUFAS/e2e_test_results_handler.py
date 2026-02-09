@@ -24,6 +24,52 @@ class E2ETestResultsHandler:
     """
 
     @staticmethod
+    def tryafloat(x: Any) -> float | Any:
+        """
+        Tries to turn strings to floats.
+
+        Parameters
+        ----------
+        x : Any
+            The value to attempt to convert to a float.
+
+        Returns
+        -------
+        float | Any
+            If `x` is a string that can be converted to a float, returns the float value.
+            Otherwise, returns `x` unchanged.
+        """
+        if isinstance(x, str):
+            try:
+                return float(x)
+            except ValueError:
+                return x
+        return x
+
+    @staticmethod
+    def makeitflo(obj: Any) -> Any:
+        """
+        Recursively traverses a nested structure (dicts and lists) and attempts to convert string values to floats.
+
+        Parameters
+        ----------
+        obj : Any
+            The object to process, which can be a dictionary, list, or any other type.
+
+        Returns
+        -------
+        Any
+            The processed object with string values converted to floats where possible,
+            returned in the same structure as the input.
+        """
+        if isinstance(obj, dict):
+            return {k: E2ETestResultsHandler.makeitflo(x) for k, x in obj.items()}
+        elif isinstance(obj, list):
+            return [E2ETestResultsHandler.makeitflo(thing) for thing in obj]
+        else:
+            return E2ETestResultsHandler.tryafloat(obj)
+
+    @staticmethod
     def compare_actual_and_expected_test_results(
         json_output_path: Path, convert_variable_table_path: str | None, output_prefix: str
     ) -> None:
@@ -75,7 +121,16 @@ class E2ETestResultsHandler:
                         expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
                     )
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
+            expected_results = E2ETestResultsHandler.makeitflo(expected_results)
+            actual_results = E2ETestResultsHandler.makeitflo(actual_results)
+
+            diff = DeepDiff(
+                expected_results,
+                actual_results,
+                ignore_order=True,
+                verbose_level=2,
+                significant_digits=3
+            )
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
 
