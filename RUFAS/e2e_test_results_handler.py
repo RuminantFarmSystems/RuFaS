@@ -22,12 +22,12 @@ class E2ETestResultsHandler:
     Handles generating and comparing actual and expected results for end-to-end testing of various
     RuFaS modules.
     """
-    
+
     @staticmethod
     def tryafloat(x: Any) -> float | Any:
         """
         Tries to turn strings to floats.
-    
+
         Parameters
         ----------
         x : Any
@@ -36,7 +36,8 @@ class E2ETestResultsHandler:
         Returns
         -------
         float | Any
-            If `x` is a string that can be converted to a float, returns the float value. Otherwise, returns `x` unchanged.
+            If `x` is a string that can be converted to a float, returns the float value.
+            Otherwise, returns `x` unchanged.
         """
         if isinstance(x, str):
             try:
@@ -58,7 +59,8 @@ class E2ETestResultsHandler:
         Returns
         -------
         Any
-            The processed object with string values converted to floats where possible, returned in the same structure as the input.
+            The processed object with string values converted to floats where possible,
+            returned in the same structure as the input.
         """
         if isinstance(obj, dict):
             return {k: E2ETestResultsHandler.makeitflo(x) for k, x in obj.items()}
@@ -119,10 +121,11 @@ class E2ETestResultsHandler:
                         expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
                     )
 
-            expected_results = E2ETestResultsHandler.makeitflo(expected_results)
-            actual_results = E2ETestResultsHandler.makeitflo(actual_results)
+            # expected_results = E2ETestResultsHandler.makeitflo(expected_results)
+            # actual_results = E2ETestResultsHandler.makeitflo(actual_results)
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
+            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2,
+                            significant_digits=3, ignore_numeric_type_changes=True)
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
 
