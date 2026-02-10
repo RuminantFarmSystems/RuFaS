@@ -57,7 +57,7 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
         if calving_to_pregnancy_time > 0
     ]
     expected_average_calving_to_pregnancy_time = (
-        sum(calving_to_pregnancy_times) / number_of_cows if number_of_cows > 0 else 0
+        sum(calving_to_pregnancy_times) / len(calving_to_pregnancy_times) if len(calving_to_pregnancy_times) > 0 else 0
     )
 
     return cows, {
@@ -598,6 +598,7 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_and_died_cows
     ]
@@ -647,6 +648,7 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_cows
     ]
@@ -721,6 +723,7 @@ def test_update_sold_heiferII_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(heiferII.genetic_history),
         )
         for heiferII in sold_heiferIIs
     ]
@@ -764,6 +767,7 @@ def test_update_sold_newborn_calf_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(calf.genetic_history),
         )
         for calf in sold_calves
     ]

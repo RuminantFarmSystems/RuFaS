@@ -288,14 +288,12 @@ v0.9.2
 - [2674](https://github.com/RuminantFarmSystems/MASM/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
 - [2676](https://github.com/RuminantFarmSystems/MASM/pull/2676) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2688](https://github.com/RuminantFarmSystems/MASM/pull/2688) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Hot fix to correct the missing part of 2640.
-- [2701](https://github.com/RuminantFarmSystems/MASM/pull/2701) - [minor change] [EEEManager] [NoInputChange] [NoOutputChange] Hot fix to correct the failure in EEEManager..
 - [2672](https://github.com/RuminantFarmSystems/MASM/pull/2672) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Allow multiple crop-field combos to map to the same feed storage.
 - [2677](https://github.com/RuminantFarmSystems/RuFaS/pull/2677) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Removes possibility of infinite loop in ration formulation.
 - [2708](https://github.com/RuminantFarmSystems/RuFaS/pull/2708) - [minor change] [FeedStorage] [NoInputChange] [NoOutputChange] Eases restriction on type for feed storage config inputs.
 - [2709](https://github.com/RuminantFarmSystems/RuFaS/pull/2709) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Updates use-name to allow for exact regex match var name use in outputs.
 - [2710](https://github.com/RuminantFarmSystems/RuFaS/pull/2710) - [minor change] [Pilot testing] [NoInputChange] [NoOutputChange] Quick fix for farm 4 failure in pilot testing.
 - [2711](https://github.com/RuminantFarmSystems/MASM/pull/2711) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Updates damping factor and Arrhenius constant values
-- [2721](https://github.com/RuminantFarmSystems/MASM/pull/2721) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds error for instances of negative liquid manure water, and adds protection against division by 0 errors in digesters.
 - [2726](https://github.com/RuminantFarmSystems/MASM/pull/2726) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Report the Farm Grown Feed Emissions on a daily basis.
 - [2734](https://github.com/RuminantFarmSystems/MASM/pull/2734) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
 

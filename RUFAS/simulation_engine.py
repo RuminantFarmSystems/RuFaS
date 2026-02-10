@@ -74,6 +74,7 @@ class SimulationEngine:
             self.time,
             self.herd_manager.heiferII_events_by_id,
             self.herd_manager.cow_events_by_id,
+            self.herd_manager.animal_genetic_history_by_id,
         )
         EEEManager.estimate_all()
         t_end_sim = timer.time()
