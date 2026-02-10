@@ -478,42 +478,132 @@ def test_perform_aggregations(
 @pytest.mark.parametrize(
     "report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs",
     [
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {"ver_hor_agg": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {"hor_agg_(km)": [1, 2, 3]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data_(km)'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {"ver_agg": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg_(kg)": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data_(kg)'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {"ver_agg": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"ver_agg": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
-        ({"data": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg": [6]},
-         [{'log': "Report 'Unnamed Report' aggregation variables.",
-           'message': "Variables/constants aggregated: ['data'].",
-           'info_map': {'class': 'ReportGenerator', 'function': '_route_aggregator_functions'}}]),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            "sum",
+            "sum",
+            {"ver_hor_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data_(km)": [1, 2, 3]},
+            {"display_units": True},
+            "sum",
+            None,
+            {"hor_agg_(km)": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data_(km)'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            "sum",
+            None,
+            {"hor_agg": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            None,
+            {"data": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True, "variables": "data"},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data_(kg)": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            "sum",
+            {"ver_agg_(kg)": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data_(kg)'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False, "variables": "data"},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
     ],
 )
 def test_route_aggregator_functions(
