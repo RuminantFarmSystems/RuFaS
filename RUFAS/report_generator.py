@@ -102,7 +102,6 @@ class ReportGenerator:
                     filtered_pool, filter_content
                 )
             event_logs.extend(aggregation_logs)
-            # print("generation logs:", aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
             if "data_significant_digits" in filter_content:
@@ -148,7 +147,7 @@ class ReportGenerator:
                     "info_map": info_map,
                 }
             )
-        # print("final event logs:", event_logs)
+
         return event_logs
 
     def _get_horizontal_first_value(
@@ -371,7 +370,6 @@ class ReportGenerator:
         )
 
         event_logs = event_logs + aggregation_logs
-        # print("AGGREGATION LOGS:", event_logs)
 
         return aggregate_report, event_logs, True
 
