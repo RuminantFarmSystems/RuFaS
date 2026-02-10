@@ -22,14 +22,20 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
     "nitrous_oxide_emissions": {
         "name": "Nitrous Oxide Emissions",
         "description": "Collects the nitrous oxide emissions of all soil layers across all fields in the simulation.",
-        "filters": ["FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions"],
+        "filters": [
+            "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions",
+            ".*RufasTime.simulation_day.*",
+        ],
         "date_fields": "simulation_day",
         "use_filter_key_name": True,
     },
     "ammonia_emissions": {
         "name": "Ammonia Emissions",
         "description": "Collects the ammonia emissions of all soil layers across all fields in the simulation.",
-        "filters": ["FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions"],
+        "filters": [
+            "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions",
+            ".*RufasTime.simulation_day.*",
+        ],
         "date_fields": "simulation_day",
         "use_filter_key_name": True,
     },
@@ -255,7 +261,10 @@ class EmissionsEstimator:
         for filter_key in ["nitrous_oxide_emissions", "ammonia_emissions"]:
             filtered_data = self.om.filter_variables_pool(FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS[filter_key])
             all_fields_by_layer: dict[str, dict[int, dict[int, float]]] = defaultdict(dict)
+            simulation_days: list[int] = filtered_data["RufasTime.simulation_day"]["values"]
             for variable, values in filtered_data.items():
+                if variable == "RufasTime.simulation_day":
+                    continue
                 match = re.search(r"field='([^']+)',layer='(\d+)'", variable)
                 if match:
                     field_name, layer_number = match.group(1), int(match.group(2))
@@ -263,13 +272,9 @@ class EmissionsEstimator:
                     raise ValueError(f"No field name and layer match found for {variable}.")
                 if field_name not in all_fields_by_layer:
                     all_fields_by_layer[field_name] = {}
-                all_fields_by_layer[field_name][layer_number] = {
-                    info_map["simulation_day"]: values["values"][i] for i, info_map in enumerate(values["info_maps"])
-                }
 
+                all_fields_by_layer[field_name][layer_number] = dict(zip(simulation_days, values["values"]))
             for field_name in all_fields_by_layer:
-                simulation_days = {day for layer_data in all_fields_by_layer[field_name].values() for day in layer_data}
-
                 emission_data[filter_key][field_name] = {
                     simulation_day: sum(
                         layer_data.get(simulation_day, 0) for layer_data in all_fields_by_layer[field_name].values()
@@ -325,19 +330,20 @@ class EmissionsEstimator:
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_deductions"]
         )
         feed_deduction_by_feed_id: dict[RUFAS_ID, dict[int, float]] = defaultdict(dict)
-        for variable, values in filtered_data.items():
-            match = re.search(r"farmgrown_feed_(\d+)_fed", variable)
+        for variable_name, variable_contents in filtered_data.items():
+            match = re.search(r"farmgrown_feed_(\d+)_fed", variable_name)
             if match:
                 feed_id = int(match.group(1))
             else:
-                raise ValueError(f"No feed_id match found for {variable}.")
-            feed_deduction_by_feed_id[feed_id] = {
-                info_map["simulation_day"]: values["values"][i] for i, info_map in enumerate(values["info_maps"])
-            }
-            for simulation_day in all_simulation_days:
-                if simulation_day not in feed_deduction_by_feed_id[feed_id]:
-                    feed_deduction_by_feed_id[feed_id][simulation_day] = 0.0
+                raise ValueError(f"No feed_id match found for {variable_name}.")
+            values_list = variable_contents.get("values", [])
+
+            matched = {values_list[i][0]: values_list[i][1] for i in range(len(values_list))}
+
+            feed_deduction_by_feed_id[feed_id] = {day: matched.get(day, 0.0) for day in all_simulation_days}
+
             feed_deduction_by_feed_id[feed_id] = dict(sorted(feed_deduction_by_feed_id[feed_id].items()))
+
         return feed_deduction_by_feed_id
 
     def _parse_crop_to_feed_id_mapping(self) -> dict[tuple[str, str], RUFAS_ID]:
