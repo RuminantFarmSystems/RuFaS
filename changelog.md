@@ -307,6 +307,8 @@ v0.9.2
 - [2667](https://github.com/RuminantFarmSystems/MASM/pull/2667) - [minor change] [NoInputChange][OutputChange][Feed Storage] Refactor Harvested crop class to store mass on a dry matter basis.
 
 - [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
+- [2742](https://github.com/RuminantFarmSystems/RuFaS/pull/2742) - [minor change] [NoInputChange] [NoOutputChange] Add logs for variables contributing to aggregated reports.
+
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
