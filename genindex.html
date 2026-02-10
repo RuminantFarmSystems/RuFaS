@@ -1,47 +1,49 @@
 <!DOCTYPE html>
-<html lang="en"
-      data-content_root="./"
-      x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }"
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
-      class="scroll-smooth"
-      :class="{'dark': darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)}"
->
+<html lang="en" data-content_root="./"
+  x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}"
+  :class="{ 'dark' : darkMode === true }">
+
 <head>
+  <script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="utf-8" />
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-    <title>Index | Ruminant Farm Simulation (RuFaS)  documentation</title>
-    <meta property="og:title" content="Index | Ruminant Farm Simulation (RuFaS)  documentation" />
-    <meta name="twitter:title" content="Index | Ruminant Farm Simulation (RuFaS)  documentation" />
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
-      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=42baaae4" />
-      <link rel="icon" href="_static/rufas.png" />
-        <link rel="search" title="Search" href="search.html" />
-        <link rel="index" title="Index" href="#" />
-
-    <script>
-    <!-- Prevent Flash of wrong theme -->
-      const userPreference = localStorage.getItem('darkMode');
-      let mode;
-      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        mode = 'dark';
-        document.documentElement.classList.add('dark');
-      } else {
-        mode = 'light';
-      }
-      if (!userPreference) {localStorage.setItem('darkMode', mode)}
-    </script>
+  <title>Index | Ruminant Farm Simulation (RuFaS)  documentation</title>
+  <meta property="og:title" content="Index | Ruminant Farm Simulation (RuFaS)  documentation" />
+  <meta name="twitter:title" content="Index | Ruminant Farm Simulation (RuFaS)  documentation" />
+  <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
+  <link rel="stylesheet" type="text/css" href="_static/theme.css?v=73505e79" />
+  <link rel="icon" href="_static/rufas.png" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="index" title="Index" href="#" />
 </head>
-  <body x-data="{ showSidebar: false, showScrollTop: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
-    <div x-cloak x-show="showSidebar" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content" class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
+
+<body x-data="{ showSidebar: false, showScrollTop: false }"
+  class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+  <div x-cloak x-show="showSidebar"
+    class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden"
+    @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content"
+      class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
       Skip to content
-    </a><header
-  class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
       <a href="index.html" class="flex items-center mr-6">
-          <img height="24" width="24" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+        <img height="24" width="24" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -52,7 +54,7 @@
       </svg>
       <span class="sr-only">Toggle navigation menu</span>
     </button>
-    <div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+    <div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
       <div class="flex-1 w-full md:w-auto md:flex-none"><form id="searchbox"
       action="search.html"
       method="get"
@@ -71,17 +73,17 @@
   </kbd>
 </form>
       </div>
-      <nav class="flex items-center space-x-1">
-        <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
+      <nav class="flex items-center gap-1">
+        <button @click="darkMode = !darkMode"
           class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
           type="button"
-          aria-label="Color theme switcher">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+          title="Toggle color scheme">
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
             class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
             <path
               d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
           </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
             class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
             <path
               d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
@@ -92,15 +94,16 @@
   </div>
 </header>
 
-    <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
-  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
+    <div class="flex-1"><div
+        class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
+  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="index.html" class="!justify-start text-sm md:!hidden bg-background">
-        <img height="16" width="16" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+    <a href="index.html" class="justify-start text-sm md:!hidden bg-background">
+      <img height="16" width="16" class="mr-2 dark:invert" src="_static/RuFaS Logo Vector.svg" alt="Logo" /><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
     </a>
 
-    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
       <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
   <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul>
@@ -158,7 +161,7 @@
       </svg>
     </button>
   </aside>
-        <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+          <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
 <div class="w-full min-w-0 mx-auto">
 <nav aria-label="breadcrumbs"
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
@@ -187,7 +190,13 @@
   <h2 id="_">_</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__delete_data_logs_pool">__delete_data_logs_pool (RUFAS.input_manager.InputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__delete_input_and_metadata">__delete_input_and_metadata() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.__end_to_end_testing_filter_prefixes">__end_to_end_testing_filter_prefixes (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__get_data_logs_pool">__get_data_logs_pool (RUFAS.input_manager.InputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal.__init__">__init__() (RUFAS.biophysical.animal.animal.Animal method)</a>
 
@@ -454,6 +463,10 @@
 </li>
         <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator.__init__">(RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
+        <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.__init__">(RUFAS.EEE.tractor.Tractor method)</a>
+</li>
+        <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.__init__">(RUFAS.EEE.tractor_implement.TractorImplement method)</a>
+</li>
         <li><a href="_code/RUFAS.graph_generator.html#RUFAS.graph_generator.GraphGenerator.__init__">(RUFAS.graph_generator.GraphGenerator method)</a>
 </li>
         <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__init__">(RUFAS.input_manager.InputManager method)</a>
@@ -477,6 +490,16 @@
         <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.__instance">(RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.__log_verbose">__log_verbose (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__metadata">__metadata (RUFAS.input_manager.InputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.__metadata_prefix">__metadata_prefix (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.__pool">__pool (RUFAS.input_manager.InputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.__supported_filter_types_prefixes">__supported_filter_types_prefixes (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_health.disease.html#RUFAS.biophysical.animal.animal_health.disease.Disease._abc_impl">_abc_impl (RUFAS.biophysical.animal.animal_health.disease.Disease attribute)</a>
 
       <ul style="list-style-type:none">
@@ -575,9 +598,9 @@
 </li>
       <li><a href="_code/RUFAS.simulation_engine.html#RUFAS.simulation_engine.SimulationEngine._advance_time">_advance_time() (RUFAS.simulation_engine.SimulationEngine method)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._aggregate_data">_aggregate_data() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._aggregate_units">_aggregate_units() (RUFAS.report_generator.ReportGenerator method)</a>
+</li>
+      <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator._alias_pool">_alias_pool (RUFAS.data_validator.CrossValidator attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._allocate_animals_to_pens_helper">_allocate_animals_to_pens_helper() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
 </li>
@@ -603,8 +626,6 @@
         <li><a href="_code/RUFAS.biophysical.manure.storage.open_lot.html#RUFAS.biophysical.manure.storage.open_lot.OpenLot._apply_dry_matter_loss">(RUFAS.biophysical.manure.storage.open_lot.OpenLot method)</a>
 </li>
       </ul></li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._apply_fertilizer_to_next_crop">_apply_fertilizer_to_next_crop() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._apply_horizontal_aggregation">_apply_horizontal_aggregation() (RUFAS.report_generator.ReportGenerator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.anaerobic_lagoon.html#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._apply_methane_emissions">_apply_methane_emissions() (RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon method)</a>
@@ -643,9 +664,11 @@
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.DataValidator._array_type_validator">_array_type_validator() (RUFAS.data_validator.DataValidator method)</a>
 </li>
-      <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._asdict">_asdict() (RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest method)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction._asdict">_asdict() (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction method)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._asdict">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest method)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults._asdict">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults method)</a>
 </li>
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType._asdict">(RUFAS.e2e_test_results_handler.ResultPathType method)</a>
@@ -656,6 +679,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal._assign_sex_to_newborn_calf">_assign_sex_to_newborn_calf() (RUFAS.biophysical.animal.animal.Animal method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen._attempt_formulation">_attempt_formulation() (RUFAS.biophysical.animal.pen.Pen method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._available_feeds">_available_feeds (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_factory.html#RUFAS.biophysical.animal.herd_factory.HerdFactory._backtrack_animal_birth_date">_backtrack_animal_birth_date() (RUFAS.biophysical.animal.herd_factory.HerdFactory method)</a>
 </li>
@@ -702,6 +727,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.html#RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_loss_fraction">_calculate_ammonium_loss_fraction() (RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.html#RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_lost_to_process">_calculate_ammonium_lost_to_process() (RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization static method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_and_report_lca_emissions">_calculate_and_report_lca_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrients.html#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_animal_phosphorus_requirement">_calculate_animal_phosphorus_requirement() (RUFAS.biophysical.animal.nutrients.nutrients.Nutrients method)</a>
 </li>
@@ -753,6 +780,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_cull_reason_percentages">_calculate_cull_reason_percentages() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources">_calculate_daily_farmgrown_feed_emissions_and_resources() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources">_calculate_daily_farmgrown_feed_fed_emissions_and_resources() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.nitrogen_cycling.mineralization_decomp.html#RUFAS.biophysical.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_decay_rate_constant">_calculate_decay_rate_constant() (RUFAS.biophysical.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._calculate_degradation_values">_calculate_degradation_values() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
@@ -776,8 +807,6 @@
 </li>
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.silage.html#RUFAS.biophysical.feed_storage.silage.Silage._calculate_effluent_loss">_calculate_effluent_loss() (RUFAS.biophysical.feed_storage.silage.Silage method)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_emissions_by_field">_calculate_emissions_by_field() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidCalculator._calculate_endogenous_urinary_excretion">_calculate_endogenous_urinary_excretion() (RUFAS.biophysical.animal.ration.amino_acid.AminoAcidCalculator method)</a>
 </li>
@@ -805,11 +834,11 @@
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_evaluator.html#RUFAS.biophysical.animal.nutrients.nutrition_evaluator.NutritionEvaluator._calculate_growth_energy_supplied">_calculate_growth_energy_supplied() (RUFAS.biophysical.animal.nutrients.nutrition_evaluator.NutritionEvaluator class method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id">_calculate_harvest_dates_by_feed_id() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.processor.html#RUFAS.biophysical.manure.processor.Processor._calculate_henry_law_coefficient_of_ammonia">_calculate_henry_law_coefficient_of_ammonia() (RUFAS.biophysical.manure.processor.Processor static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_herd_percentages">_calculate_herd_percentages() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_homegrown_feed_emissions">_calculate_homegrown_feed_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.hay.html#RUFAS.biophysical.feed_storage.hay.Hay._calculate_initial_dry_matter_loss_to_gas">_calculate_initial_dry_matter_loss_to_gas() (RUFAS.biophysical.feed_storage.hay.Hay method)</a>
 </li>
@@ -953,7 +982,7 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_evaluator.html#RUFAS.biophysical.animal.nutrients.nutrition_evaluator.NutritionEvaluator._calculate_total_energy_supplied">_calculate_total_energy_supplied() (RUFAS.biophysical.animal.nutrients.nutrition_evaluator.NutritionEvaluator class method)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._calculate_total_homegrown_feed_amounts_by_crop_type">_calculate_total_homegrown_feed_amounts_by_crop_type() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+      <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed">_calculate_total_power_needed() (RUFAS.EEE.energy.EnergyEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop._calculate_total_sensible_heat_generated">_calculate_total_sensible_heat_generated() (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop method)</a>
 </li>
@@ -976,8 +1005,6 @@
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._check_crop_planting_schedule">_check_crop_planting_schedule() (RUFAS.biophysical.field.field.field.Field method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._check_do_not_breed_flag">_check_do_not_breed_flag() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
-</li>
-      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._check_feed_availability">_check_feed_availability() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._check_fertilizer_application_schedule">_check_fertilizer_application_schedule() (RUFAS.biophysical.field.field.field.Field method)</a>
 </li>
@@ -1002,8 +1029,6 @@
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._check_tillage_schedule">_check_tillage_schedule() (RUFAS.biophysical.field.field.field.Field method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_genetics.animal_genetics.html#RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics._clamp_birth_year_month_in_data_range">_clamp_birth_year_month_in_data_range() (RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics static method)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._collect_target_soil_characteristics">_collect_target_soil_characteristics() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._combine_units">_combine_units() (RUFAS.report_generator.ReportGenerator static method)</a>
 </li>
@@ -1047,6 +1072,14 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropDataFactory._crop_configurations">_crop_configurations (RUFAS.biophysical.field.crop.crop_data_factory.CropDataFactory attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._cumulative_farmgrown_feeds_fed">_cumulative_farmgrown_feeds_fed (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._cumulative_feed_requests">_cumulative_feed_requests (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._cumulative_purchased_feeds">_cumulative_purchased_feeds (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._cumulative_purchased_feeds_fed">_cumulative_purchased_feeds_fed (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.graph_generator.html#RUFAS.graph_generator.GraphGenerator._customize_graph">_customize_graph() (RUFAS.graph_generator.GraphGenerator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._cycle_water">_cycle_water() (RUFAS.biophysical.field.field.field.Field method)</a>
@@ -1060,6 +1093,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._decrease_conception_rate_by_parity">_decrease_conception_rate_by_parity() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_feeds_from_inventory">_deduct_feeds_from_inventory() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._deduct_from_storage">_deduct_from_storage() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._deliver_hormones">_deliver_hormones() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
 </li>
@@ -1197,8 +1232,6 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._determine_maximum_soil_evaporation">_determine_maximum_soil_evaporation() (RUFAS.biophysical.field.field.field.Field static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.field.crop.water_dynamics.html#RUFAS.biophysical.field.crop.water_dynamics.WaterDynamics._determine_maximum_transpiration">_determine_maximum_transpiration() (RUFAS.biophysical.field.crop.water_dynamics.WaterDynamics static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.heat_units.html#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature">_determine_minimum_heat_unit_temperature() (RUFAS.biophysical.field.crop.heat_units.HeatUnits static method)</a>
@@ -1213,6 +1246,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_manager.html#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_non_limiting_nutrient_removal_amount">_determine_non_limiting_nutrient_removal_amount() (RUFAS.biophysical.manure.manure_manager.ManureManager static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.manure.manure_manager.html#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_nutrient_proportion_to_be_removed">_determine_nutrient_proportion_to_be_removed() (RUFAS.biophysical.manure.manure_manager.ManureManager static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.growth_constraints.html#RUFAS.biophysical.field.crop.growth_constraints.GrowthConstraints._determine_nutrient_stress">_determine_nutrient_stress() (RUFAS.biophysical.field.crop.growth_constraints.GrowthConstraints static method)</a>
@@ -1225,7 +1260,7 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.nitrogen_cycling.humus_mineralization.html#RUFAS.biophysical.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization._determine_organic_to_nitrate_mineralization">_determine_organic_to_nitrate_mineralization() (RUFAS.biophysical.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization static method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.manure.processor.html#RUFAS.biophysical.manure.processor.Processor._determine_outdoor_storage_temperature">_determine_outdoor_storage_temperature() (RUFAS.biophysical.manure.processor.Processor static method)</a>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage._determine_outdoor_storage_temperature">_determine_outdoor_storage_temperature() (RUFAS.biophysical.manure.storage.storage.Storage method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.html#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_passive_carbon_co2_lost_amount">_determine_passive_carbon_co2_lost_amount() (RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition static method)</a>
 </li>
@@ -1435,6 +1470,12 @@
 </li>
       <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist">_duplicate_mappings_exist() (RUFAS.e2e_test_results_handler.E2ETestResultsHandler static method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.anaerobic_lagoon.html#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._emptying_fraction">_emptying_fraction (RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon property)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage._emptying_fraction">(RUFAS.biophysical.manure.storage.storage.Storage property)</a>
+</li>
+      </ul></li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._ensure_unique_report_name_with_timestamp">_ensure_unique_report_name_with_timestamp() (RUFAS.report_generator.ReportGenerator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._enter_fresh_state_if_in_empty_state">_enter_fresh_state_if_in_empty_state() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
@@ -1473,7 +1514,11 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._evaporate_from_crop_canopies">_evaporate_from_crop_canopies() (RUFAS.biophysical.field.field.field.Field method)</a>
 </li>
+      <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator._event_logs">_event_logs (RUFAS.data_validator.CrossValidator attribute)</a>
+</li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._exclude_info_maps">_exclude_info_maps() (RUFAS.output_manager.OutputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._exclude_info_maps_flag">_exclude_info_maps_flag (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._execute_allocation_plan">_execute_allocation_plan() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
 </li>
@@ -1501,21 +1546,27 @@
 </li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._extract_aggregation_keys">_extract_aggregation_keys() (RUFAS.report_generator.ReportGenerator method)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._extract_applied_crops">_extract_applied_crops() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.DataValidator._extract_data_by_key_list">_extract_data_by_key_list() (RUFAS.data_validator.DataValidator method)</a>
 </li>
-      <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._field_defaults">_field_defaults (RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest attribute)</a>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._extract_runtime_files">_extract_runtime_files() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._extract_target_and_save_block">_extract_target_and_save_block() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction._field_defaults">_field_defaults (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._field_defaults">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest attribute)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults._field_defaults">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults attribute)</a>
 </li>
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults">(RUFAS.e2e_test_results_handler.ResultPathType attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._fields">_fields (RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest attribute)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction._fields">_fields (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._fields">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest attribute)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults._fields">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults attribute)</a>
 </li>
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType._fields">(RUFAS.e2e_test_results_handler.ResultPathType attribute)</a>
@@ -1524,8 +1575,6 @@
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._filter_events">_filter_events() (RUFAS.biophysical.field.field.field.Field static method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._filter_prefixes">_filter_prefixes (RUFAS.output_manager.OutputManager property)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._filter_results">_filter_results() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_manager.html#RUFAS.biophysical.manure.manure_manager.ManureManager._find_all_processor_names_in_connection_map">_find_all_processor_names_in_connection_map() (RUFAS.biophysical.manure.manure_manager.ManureManager method)</a>
 </li>
@@ -1545,11 +1594,11 @@
 </li>
       <li><a href="_code/RUFAS.simulation_engine.html#RUFAS.simulation_engine.SimulationEngine._formulate_ration">_formulate_ration() (RUFAS.simulation_engine.SimulationEngine method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._gather_available_feeds">_gather_available_feeds() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._gather_homegrown_feeds_and_fertilizer_apps">_gather_homegrown_feeds_and_fertilizer_apps() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._gather_available_feeds_by_id">_gather_available_feeds_by_id() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._gather_pen_history">_gather_pen_history() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._gather_valid_farmgrown_feed_ids">_gather_valid_farmgrown_feed_ids() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_manager.html#RUFAS.biophysical.manure.manure_manager.ManureManager._generate_adjacency_matrix_keys">_generate_adjacency_matrix_keys() (RUFAS.biophysical.manure.manure_manager.ManureManager method)</a>
 </li>
@@ -1616,6 +1665,12 @@
       <li><a href="_code/RUFAS.biophysical.animal.milk.lactation_curve.html#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._get_region_adjustments">_get_region_adjustments() (RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve class method)</a>
 </li>
       <li><a href="_code/RUFAS.report_generator.html#RUFAS.report_generator.ReportGenerator._get_reports_by_regex">_get_reports_by_regex() (RUFAS.report_generator.ReportGenerator method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._get_runtime_metadata_map">_get_runtime_metadata_map() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._get_runtime_metadata_path">_get_runtime_metadata_path() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._get_runtime_metadata_reference">_get_runtime_metadata_reference() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility._get_str">_get_str() (RUFAS.util.Utility class method)</a>
 </li>
@@ -1753,6 +1808,8 @@
 </li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._is_input_required_upon_initialization">_is_input_required_upon_initialization() (RUFAS.input_manager.InputManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._is_metadata_loaded">_is_metadata_loaded() (RUFAS.input_manager.InputManager method)</a>
+</li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._is_modifiable_during_runtime">_is_modifiable_during_runtime() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.phosphorus_cycling.manure.html#RUFAS.biophysical.field.soil.phosphorus_cycling.manure.Manure._leach_and_update_phosphorus_pools">_leach_and_update_phosphorus_pools() (RUFAS.biophysical.field.soil.phosphorus_cycling.manure.Manure method)</a>
@@ -1773,6 +1830,12 @@
 </li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._load_properties">_load_properties() (RUFAS.input_manager.InputManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._load_runtime_metadata_contents">_load_runtime_metadata_contents() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._load_runtime_metadata_document">_load_runtime_metadata_document() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._log_feed_deductions">_log_feed_deductions() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
+</li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator._log_missing_condition_clause_field">_log_missing_condition_clause_field() (RUFAS.data_validator.CrossValidator method)</a>
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.DataValidator._log_missing_data">_log_missing_data() (RUFAS.data_validator.DataValidator method)</a>
@@ -1785,9 +1848,11 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._lookup_storage_rufas_id">_lookup_storage_rufas_id() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
-      <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._make">_make() (RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest class method)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction._make">_make() (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction class method)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._make">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest class method)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults._make">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults class method)</a>
 </li>
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType._make">(RUFAS.e2e_test_results_handler.ResultPathType class method)</a>
@@ -1832,7 +1897,7 @@
       <li><a href="_code/RUFAS.biophysical.animal.milk.lactation_curve.html#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._om">_om (RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve attribute)</a>
 
       <ul style="list-style-type:none">
-        <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager._om">(RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager attribute)</a>
+        <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager._om">(RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
 </li>
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropDataFactory._om">(RUFAS.biophysical.field.crop.crop_data_factory.CropDataFactory attribute)</a>
 </li>
@@ -1841,17 +1906,25 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.lactation_curve.html#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._parity_to_std_dev_mapping">_parity_to_std_dev_mapping (RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping">_parse_crop_to_feed_id_mapping() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data">_parse_farmgrown_feed_deductions_data() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data">_parse_farmgrown_feeds_emission_data() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._parse_filtered_variables">_parse_filtered_variables() (RUFAS.output_manager.OutputManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data">_parse_harvest_data() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+</li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskManager._parse_input_tasks">_parse_input_tasks() (RUFAS.task_manager.TaskManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data">_parse_manure_and_fertilizer_application_data() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._parse_metadata_properties">_parse_metadata_properties() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits._parse_unit">_parse_unit() (RUFAS.units.MeasurementUnits static method)</a>
 </li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater._parse_variable_name_into_title">_parse_variable_name_into_title() (RUFAS.data_collection_app_updater.DataCollectionAppUpdater method)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._partition_applied_crop_fertilizer_emissions">_partition_applied_crop_fertilizer_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.percolation.html#RUFAS.biophysical.field.soil.percolation.Percolation._percolate_between_layers">_percolate_between_layers() (RUFAS.biophysical.field.soil.percolation.Percolation static method)</a>
 </li>
@@ -1886,6 +1959,8 @@
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._process_feed_library">_process_feed_library() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._process_moisture_loss">_process_moisture_loss() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._process_runtime_file">_process_runtime_file() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._project_moisture_loss">_project_moisture_loss() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
 </li>
@@ -1931,6 +2006,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field.html#RUFAS.biophysical.field.field.field.Field._record_planting">_record_planting() (RUFAS.biophysical.field.field.field.Field method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._record_received_crop">_record_received_crop() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._record_storage_totals">_record_storage_totals() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage._record_stored_crops">_record_stored_crops() (RUFAS.biophysical.feed_storage.storage.Storage method)</a>
@@ -1959,15 +2036,19 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._repeat_estrus_simulation_before_vwp">_repeat_estrus_simulation_before_vwp() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
 </li>
-      <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._replace">_replace() (RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest method)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction._replace">_replace() (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction method)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest._replace">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequest method)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults._replace">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults method)</a>
 </li>
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType._replace">(RUFAS.e2e_test_results_handler.ResultPathType method)</a>
 </li>
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.manure.digester.continuous_mix.html#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._report_continuous_mix_outputs">_report_continuous_mix_outputs() (RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources">_report_daily_farmgrown_feed_fed_emissions_and_resources() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.handler.single_stream_handler.html#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions">_report_gas_emissions() (RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler method)</a>
 </li>
@@ -1983,6 +2064,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._reset_daily_statistics">_reset_daily_statistics() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._resolve_runtime_metadata_files">_resolve_runtime_metadata_files() (RUFAS.input_manager.InputManager method)</a>
+</li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater._rewrite_index_page">_rewrite_index_page() (RUFAS.data_collection_app_updater.DataCollectionAppUpdater method)</a>
 </li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater._rewrite_schemas">_rewrite_schemas() (RUFAS.data_collection_app_updater.DataCollectionAppUpdater method)</a>
@@ -1996,6 +2079,10 @@
       <li><a href="_code/RUFAS.simulation_engine.html#RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop">_run_simulation_main_loop() (RUFAS.simulation_engine.SimulationEngine method)</a>
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskManager._run_tasks">_run_tasks() (RUFAS.task_manager.TaskManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._runtime_data_loader_map">_runtime_data_loader_map() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._runtime_metadata_guard_failure">_runtime_metadata_guard_failure() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._save_current_variable_pool">_save_current_variable_pool() (RUFAS.output_manager.OutputManager method)</a>
 </li>
@@ -2067,8 +2154,6 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle.html#RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle.CarbonCycling._soil_carbon_aggregation">_soil_carbon_aggregation() (RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle.CarbonCycling method)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._soil_data_update">_soil_data_update() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager._sort_cows_before_allocation">_sort_cows_before_allocation() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._sort_saved_chunk_files">_sort_saved_chunk_files() (RUFAS.output_manager.OutputManager method)</a>
@@ -2089,8 +2174,6 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_management.html#RUFAS.biophysical.field.crop.crop_management.CropManagement._transfer_residue">_transfer_residue() (RUFAS.biophysical.field.crop.crop_management.CropManagement method)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator._transform_outputs_to_list_of_dicts">_transform_outputs_to_list_of_dicts() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal._transition_calf_to_heiferI">_transition_calf_to_heiferI() (RUFAS.biophysical.animal.animal.Animal method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal._transition_heiferI_to_heiferII">_transition_heiferI_to_heiferII() (RUFAS.biophysical.animal.animal.Animal method)</a>
@@ -2098,6 +2181,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal._transition_heiferII_to_heiferIII">_transition_heiferII_to_heiferIII() (RUFAS.biophysical.animal.animal.Animal method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_manager.html#RUFAS.biophysical.manure.manure_manager.ManureManager._traverse_adjacency_matrix">_traverse_adjacency_matrix() (RUFAS.biophysical.manure.manure_manager.ManureManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater._type_to_schema_map">_type_to_schema_map (RUFAS.data_collection_app_updater.DataCollectionAppUpdater attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer.html#RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer.Fertilizer._update_after_first_rain">_update_after_first_rain() (RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer.Fertilizer method)</a>
 </li>
@@ -2159,9 +2244,13 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._validate_cow_reproduction_program">_validate_cow_reproduction_program() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._validate_crop_field_mapping">_validate_crop_field_mapping() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
+</li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._validate_data">_validate_data() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.manager.schedule.html#RUFAS.biophysical.field.manager.schedule.Schedule._validate_days">_validate_days() (RUFAS.biophysical.field.manager.schedule.Schedule static method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage._validate_emptying_fraction">_validate_emptying_fraction() (RUFAS.biophysical.manure.storage.storage.Storage method)</a>
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator._validate_expression_block_with_complex_variable_values">_validate_expression_block_with_complex_variable_values() (RUFAS.data_validator.CrossValidator method)</a>
 </li>
@@ -2181,9 +2270,15 @@
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator._validate_relationship">_validate_relationship() (RUFAS.data_validator.CrossValidator method)</a>
 </li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager._validate_runtime_metadata">_validate_runtime_metadata() (RUFAS.input_manager.InputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager._validate_storage_config_names">_validate_storage_config_names() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.manager.tillage_schedule.html#RUFAS.biophysical.field.manager.tillage_schedule.TillageSchedule._validate_tillage_parameters">_validate_tillage_parameters() (RUFAS.biophysical.field.manager.tillage_schedule.TillageSchedule method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.manager.schedule.html#RUFAS.biophysical.field.manager.schedule.Schedule._validate_years">_validate_years() (RUFAS.biophysical.field.manager.schedule.Schedule static method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._variables_usage_counter">_variables_usage_counter (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager._write_disclaimer">_write_disclaimer() (RUFAS.output_manager.OutputManager method)</a>
 </li>
@@ -2254,6 +2349,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.active_organic_nitrogen_content">active_organic_nitrogen_content (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.active_storages">active_storages (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType.actual_results_path">actual_results_path (RUFAS.e2e_test_results_handler.ResultPathType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.add_error">add_error() (RUFAS.output_manager.OutputManager method)</a>
@@ -2282,6 +2379,8 @@
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.add_warning">add_warning() (RUFAS.output_manager.OutputManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.hay.html#RUFAS.biophysical.feed_storage.hay.Hay.additional_dry_matter_loss_coefficient">additional_dry_matter_loss_coefficient (RUFAS.biophysical.feed_storage.hay.Hay attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.adf">adf (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.ADF">ADF (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
@@ -2292,6 +2391,8 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.adf_at_harvest">(RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.adf_loss_coefficient">adf_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.ADICP">ADICP (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.manure_pool.html#RUFAS.biophysical.field.soil.manure_pool.ManurePool.adjust_manure_moisture_factor">adjust_manure_moisture_factor() (RUFAS.biophysical.field.soil.manure_pool.ManurePool method)</a>
@@ -2339,8 +2440,18 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.ammonium_volatilization_cation_exchange_factor">ammonium_volatilization_cation_exchange_factor (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.amount">amount (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction.amount">(RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction attribute)</a>
 </li>
+      </ul></li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.amount_available">amount_available (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage.amplitude">amplitude (RUFAS.biophysical.manure.storage.storage.Storage attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.ANAEROBIC_LAGOON_MANURE_RETENTION">ANAEROBIC_LAGOON_MANURE_RETENTION (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE">ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.anaerobic_lagoon.html#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon">AnaerobicLagoon (class in RUFAS.biophysical.manure.storage.anaerobic_lagoon)</a>
 
@@ -2448,6 +2559,8 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.ash_at_harvest">(RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.ash_loss_coefficient">ash_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_health.disease.html#RUFAS.biophysical.animal.animal_health.disease.Disease.assess_disease_risk">assess_disease_risk() (RUFAS.biophysical.animal.animal_health.disease.Disease method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.assess_dormancy">assess_dormancy() (RUFAS.biophysical.field.crop.crop.Crop method)</a>
@@ -2463,9 +2576,13 @@
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.available_feeds">available_feeds (RUFAS.biophysical.feed_storage.feed_manager.FeedManager property)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeedStorage.available_feeds">(RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeedStorage attribute)</a>
+</li>
         <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory.available_feeds">(RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.available_memory">available_memory (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.available_phosphorus_pool">available_phosphorus_pool (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.AVAILABLE_SCHEMAS_LIST_PLACEHOLDER">AVAILABLE_SCHEMAS_LIST_PLACEHOLDER (in module RUFAS.data_collection_app_updater)</a>
@@ -2473,6 +2590,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.available_water_capacity">available_water_capacity (RUFAS.biophysical.field.soil.layer_data.LayerData property)</a>
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Aggregator.average">average() (RUFAS.util.Aggregator static method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.average_add_variable_call_addition">average_add_variable_call_addition (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.average_body_weight">average_body_weight (RUFAS.biophysical.animal.pen.Pen property)</a>
 </li>
@@ -2523,6 +2642,8 @@
       </ul></li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.bale_density">bale_density (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.hay.html#RUFAS.biophysical.feed_storage.hay.Hay.bale_size">bale_size (RUFAS.biophysical.feed_storage.hay.Hay attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.baleage.html#RUFAS.biophysical.feed_storage.baleage.Baleage">Baleage (class in RUFAS.biophysical.feed_storage.baleage)</a>
 
       <ul style="list-style-type:none">
@@ -2541,14 +2662,16 @@
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.animal.bedding.bedding.html#RUFAS.biophysical.animal.bedding.bedding.Bedding">Bedding (class in RUFAS.biophysical.animal.bedding.bedding)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.bedding_non_degradable_volatile_solids">bedding_non_degradable_volatile_solids (RUFAS.data_structures.animal_to_manure_connection.ManureStream attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.biomass">biomass (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.biomass_allocation">biomass_allocation (RUFAS.biophysical.field.crop.crop.Crop property)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.biomass_growth_max">biomass_growth_max (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.biomass_growth_max">biomass_growth_max (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.biomass_allocation.html#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation">BiomassAllocation (class in RUFAS.biophysical.field.crop.biomass_allocation)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.biotin">biotin (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
@@ -2632,6 +2755,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.solids_storage_calculator.html#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_anaerobic_coefficient">calculate_anaerobic_coefficient() (RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator static method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.calculate_axel_power">calculate_axel_power() (RUFAS.EEE.tractor.Tractor method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.bedded_pack.html#RUFAS.biophysical.manure.storage.bedded_pack.BeddedPack.calculate_bedded_pack_methane_conversion_factor">calculate_bedded_pack_methane_conversion_factor() (RUFAS.biophysical.manure.storage.bedded_pack.BeddedPack static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.bedded_pack.html#RUFAS.biophysical.manure.storage.bedded_pack.BeddedPack.calculate_bedded_pack_methane_emission">calculate_bedded_pack_methane_emission() (RUFAS.biophysical.manure.storage.bedded_pack.BeddedPack static method)</a>
@@ -2664,6 +2789,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.solids_storage_calculator.html#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction">calculate_degradable_volatile_solids_fraction() (RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator static method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator.calculate_diesel_consumption">calculate_diesel_consumption() (RUFAS.EEE.energy.EnergyEstimator method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.calculate_drawbar_power">calculate_drawbar_power() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.solids_storage_calculator.html#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_dry_matter_loss">calculate_dry_matter_loss() (RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.silage.html#RUFAS.biophysical.feed_storage.silage.Silage.calculate_dry_matter_loss_to_effluent">calculate_dry_matter_loss_to_effluent() (RUFAS.biophysical.feed_storage.silage.Silage method)</a>
@@ -2674,11 +2803,11 @@
         <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas">(RUFAS.biophysical.feed_storage.storage.Storage method)</a>
 </li>
       </ul></li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator.calculate_emissions">calculate_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
-</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidCalculator.calculate_essential_amino_acid_requirements">calculate_essential_amino_acid_requirements() (RUFAS.biophysical.animal.ration.amino_acid.AminoAcidCalculator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_forage_neutral_detergent_fiber_content">calculate_forage_neutral_detergent_fiber_content() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.calculate_functional_draft">calculate_functional_draft() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.html#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_heifer_manure">calculate_heifer_manure() (RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator static method)</a>
 </li>
@@ -2698,7 +2827,13 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_calcium_requirements">calculate_NASEM_calcium_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_NASEM_digestible_energy">calculate_NASEM_digestible_energy() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_DMI">calculate_NASEM_DMI() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_NASEM_dNDF">calculate_NASEM_dNDF() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_NASEM_dstarch">calculate_NASEM_dstarch() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_energy_growth_requirements">calculate_NASEM_energy_growth_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
 </li>
@@ -2708,9 +2843,15 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_energy_pregnancy_requirements">calculate_NASEM_energy_pregnancy_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_NASEM_metabolizable_energy">calculate_NASEM_metabolizable_energy() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_NASEM_net_energy">calculate_NASEM_net_energy() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_phosphorus_requirements">calculate_NASEM_phosphorus_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.calculate_NASEM_protein_requirements">calculate_NASEM_protein_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.calculate_needed_PTO">calculate_needed_PTO() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.solids_storage_calculator.html#RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching">calculate_nitrogen_loss_to_leaching() (RUFAS.biophysical.manure.storage.solids_storage_calculator.SolidsStorageCalculator static method)</a>
 </li>
@@ -2740,6 +2881,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal.calculate_nutrition_requirements">calculate_nutrition_requirements() (RUFAS.biophysical.animal.animal.Animal method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.calculate_operation_time_hr">calculate_operation_time_hr() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter">calculate_phosphorus_sorption_parameter() (RUFAS.biophysical.field.soil.layer_data.LayerData static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_phosphorus_supply">calculate_phosphorus_supply() (RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator class method)</a>
@@ -2749,6 +2892,8 @@
       <li><a href="_code/RUFAS.biophysical.manure.manure_nutrient_manager.html#RUFAS.biophysical.manure.manure_nutrient_manager.ManureNutrientManager.calculate_projected_manure_mass">calculate_projected_manure_mass() (RUFAS.biophysical.manure.manure_nutrient_manager.ManureNutrientManager static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.baleage.html#RUFAS.biophysical.feed_storage.baleage.Baleage.calculate_protein_loss">calculate_protein_loss() (RUFAS.biophysical.feed_storage.baleage.Baleage method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator.calculate_purchased_feed_emissions">calculate_purchased_feed_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.html#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator.calculate_requirements">calculate_requirements() (RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator class method)</a>
 
@@ -2774,7 +2919,7 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal.calf_birth_weight">calf_birth_weight (RUFAS.biophysical.animal.animal.Animal property)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.CALF_DRY_MATTER_INTAKE">CALF_DRY_MATTER_INTAKE (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager attribute)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.CALF_DRY_MATTER_INTAKE">CALF_DRY_MATTER_INTAKE (RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.CALF_LIQUID_FEED">CALF_LIQUID_FEED (RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization attribute)</a>
 </li>
@@ -2795,6 +2940,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal.calving_interval_history">calving_interval_history (RUFAS.biophysical.animal.animal.Animal property)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.canopy_water">canopy_water (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.capacity">capacity (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.CARBON_DIOXIDE_MOLAR_MASS">CARBON_DIOXIDE_MOLAR_MASS (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
@@ -2842,12 +2989,14 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.chlorine">chlorine (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.choline">choline (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.chromium">chromium (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.chunkification">chunkification (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.clay_fraction">clay_fraction (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.clear">clear() (RUFAS.biophysical.animal.pen.Pen method)</a>
@@ -2867,6 +3016,8 @@
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.cobalt">cobalt (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager.collect_daily_feed_request">collect_daily_feed_request() (RUFAS.biophysical.animal.herd_manager.HerdManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.COLLECTION">COLLECTION (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.combine_saved_input_csv">combine_saved_input_csv() (RUFAS.util.Utility static method)</a>
 </li>
@@ -2919,6 +3070,8 @@
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.convert_dict_of_lists_to_list_of_dicts">convert_dict_of_lists_to_list_of_dicts() (RUFAS.util.Utility static method)</a>
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists">convert_list_of_dicts_to_dict_of_lists() (RUFAS.util.Utility static method)</a>
+</li>
+      <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.convert_list_to_dict_by_key">convert_list_to_dict_by_key() (RUFAS.util.Utility static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData.convert_liters_to_millimeters">convert_liters_to_millimeters() (RUFAS.biophysical.field.field.field_data.FieldData static method)</a>
 </li>
@@ -3010,6 +3163,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.crop_management">crop_management (RUFAS.biophysical.field.crop.crop.Crop property)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.crop_name">crop_name (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.crop_to_rufas_id">crop_to_rufas_id (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.crop_yield_nitrogen">crop_yield_nitrogen (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration">CropConfiguration (class in RUFAS.biophysical.field.crop.crop_data_factory)</a>
@@ -3028,6 +3185,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#RUFAS.biophysical.animal.milk.milk_production.MilkProduction.crude_protein_content">crude_protein_content (RUFAS.biophysical.animal.milk.milk_production.MilkProduction attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.crude_protein_loss_coefficient">crude_protein_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#RUFAS.biophysical.animal.milk.milk_production.MilkProduction.crude_protein_percent">crude_protein_percent (RUFAS.biophysical.animal.milk.milk_production.MilkProduction attribute)</a>
 
       <ul style="list-style-type:none">
@@ -3041,6 +3200,8 @@
 </li>
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover.CRUST">CRUST (RUFAS.biophysical.manure.storage.storage_cover.StorageCover attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.csv_report_generation_list">csv_report_generation_list (RUFAS.input_manager.InputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.CUBIC_METERS">CUBIC_METERS (RUFAS.units.MeasurementUnits attribute)</a>
 </li>
@@ -3091,6 +3252,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#RUFAS.biophysical.animal.milk.milk_production.MilkProduction.current_lactation_305_day_milk_produced">current_lactation_305_day_milk_produced (RUFAS.biophysical.animal.milk.milk_production.MilkProduction attribute)</a>
 </li>
       <li><a href="_code/RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime.current_month">current_month (RUFAS.rufas_time.RufasTime property)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.current_pool_size">current_pool_size (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData.current_residue">current_residue (RUFAS.biophysical.field.field.field_data.FieldData attribute)</a>
 </li>
@@ -3305,10 +3468,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.depth_of_layer_center">depth_of_layer_center (RUFAS.biophysical.field.soil.layer_data.LayerData property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.manure.handler.handler.html#RUFAS.biophysical.manure.handler.handler.Handler.determine_ammonia_resistance">determine_ammonia_resistance() (RUFAS.biophysical.manure.handler.handler.Handler static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.field.soil.manure_pool.html#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_phosphorus_amount">determine_assimilated_phosphorus_amount() (RUFAS.biophysical.field.soil.manure_pool.ManurePool static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.manure_pool.html#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_surface_manure">determine_assimilated_surface_manure() (RUFAS.biophysical.field.soil.manure_pool.ManurePool method)</a>
@@ -3343,6 +3506,8 @@
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.determine_if_all_non_negative_values">determine_if_all_non_negative_values() (RUFAS.util.Utility static method)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.determine_implement_parameters">determine_implement_parameters() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake.determine_layer_extracted_resource">determine_layer_extracted_resource() (RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake class method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.nutrient_uptake.html#RUFAS.biophysical.field.crop.nutrient_uptake.NutrientUptake.determine_layer_nutrient_demands">determine_layer_nutrient_demands() (RUFAS.biophysical.field.crop.nutrient_uptake.NutrientUptake static method)</a>
@@ -3358,6 +3523,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.manure_pool.html#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_mineralized_surface_phosphorus">determine_mineralized_surface_phosphorus() (RUFAS.biophysical.field.soil.manure_pool.ManurePool static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake.determine_nutrient_shape_parameters">determine_nutrient_shape_parameters() (RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake class method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.determine_operation_type">determine_operation_type() (RUFAS.EEE.tractor.Tractor method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake.determine_optimal_nutrient">determine_optimal_nutrient() (RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake static method)</a>
 </li>
@@ -3514,6 +3681,8 @@
 </li>
       <li><a href="_code/RUFAS.EEE.EEE_manager.html#RUFAS.EEE.EEE_manager.EEEManager">EEEManager (class in RUFAS.EEE.EEE_manager)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.EFF_OF_ME_USE">EFF_OF_ME_USE (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE">EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.ElementsCounter">ElementsCounter (class in RUFAS.data_validator)</a>
@@ -3546,6 +3715,8 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.ENERGY_SOURCE">ENERGY_SOURCE (RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator">EnergyEstimator (class in RUFAS.EEE.energy)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.repro_state_manager.html#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.enter">enter() (RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.enter_dormancy">enter_dormancy() (RUFAS.biophysical.field.crop.crop.Crop method)</a>
@@ -3557,6 +3728,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.digestive_system.digestive_system.html#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission">enteric_methane_emission (RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.html#RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.EntericMethaneCalculator">EntericMethaneCalculator (class in RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.EnumWithStrOverride">EnumWithStrOverride (class in RUFAS.data_structures.tillage_implements)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_erosion.html#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion.erode">erode() (RUFAS.biophysical.field.soil.soil_erosion.SoilErosion method)</a>
 </li>
@@ -3570,13 +3743,19 @@
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.LogVerbosity.ERRORS">ERRORS (RUFAS.output_manager.LogVerbosity attribute)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements">EssentialAminoAcidRequirements (class in RUFAS.biophysical.animal.ration.amino_acid)</a>
-</li>
-      <li><a href="_code/RUFAS.EEE.EEE_manager.html#RUFAS.EEE.EEE_manager.EEEManager.estimate_all">estimate_all() (RUFAS.EEE.EEE_manager.EEEManager static method)</a>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.errors_pool">errors_pool (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator.estimate_emissions">estimate_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements">EssentialAminoAcidRequirements (class in RUFAS.biophysical.animal.ration.amino_acid)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.EEE_manager.html#RUFAS.EEE.EEE_manager.EEEManager.estimate_all">estimate_all() (RUFAS.EEE.EEE_manager.EEEManager static method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator.estimate_all">(RUFAS.EEE.energy.EnergyEstimator static method)</a>
+</li>
+      </ul></li>
+      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.EmissionsEstimator.estimate_farmgrown_feed_emissions">estimate_farmgrown_feed_emissions() (RUFAS.EEE.emissions.EmissionsEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.estimate_maximum_effluent">estimate_maximum_effluent() (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop method)</a>
 </li>
@@ -3606,6 +3785,8 @@
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults.event">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.DataValidator.event_logs">event_logs (RUFAS.data_validator.DataValidator attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.excess_water_available">excess_water_available (RUFAS.biophysical.field.soil.layer_data.LayerData property)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.reproduction.html#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol">execute_cow_ed_protocol() (RUFAS.biophysical.animal.reproduction.reproduction.Reproduction method)</a>
@@ -3633,8 +3814,6 @@
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake.extend_nutrient_uptakes_to_full_profile">extend_nutrient_uptakes_to_full_profile() (RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake.extract_nutrient_from_soil_layers">extract_nutrient_from_soil_layers() (RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake static method)</a>
-</li>
-      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.extract_target_and_save_block">extract_target_and_save_block() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.extract_units">extract_units() (RUFAS.units.MeasurementUnits static method)</a>
 </li>
@@ -3675,6 +3854,8 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.FeedComponentType">FeedComponentType (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction">FeedDeduction (class in RUFAS.biophysical.feed_storage.feed_manager)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation">FeedInRation (class in RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager">FeedManager (class in RUFAS.biophysical.feed_storage.feed_manager)</a>
@@ -3684,6 +3865,12 @@
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.feet_leg_cull_probability">feet_leg_cull_probability (RUFAS.biophysical.animal.animal_config.AnimalConfig attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer.html#RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer.Fertilizer">Fertilizer (class in RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent.FERTILIZER_APPLICATION">FERTILIZER_APPLICATION (RUFAS.data_structures.tillage_implements.FieldOperationEvent attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE">FERTILIZER_APPLICATION_BELOW_SURFACE (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.FERTILIZER_APPLICATION_SURFACE">FERTILIZER_APPLICATION_SURFACE (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.fertilizer_application.html#RUFAS.biophysical.field.field.fertilizer_application.FertilizerApplication">FertilizerApplication (class in RUFAS.biophysical.field.field.fertilizer_application)</a>
 </li>
@@ -3695,6 +3882,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.field_capacity_content">field_capacity_content (RUFAS.biophysical.field.soil.layer_data.LayerData property)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement.field_capacity_ha_per_hr">field_capacity_ha_per_hr() (RUFAS.EEE.tractor_implement.TractorImplement method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.field_capacity_water_concentration">field_capacity_water_concentration (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.field_name">field_name (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop attribute)</a>
@@ -3705,6 +3894,8 @@
         <li><a href="_code/RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults.field_name">(RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.field_names">field_names (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.field_proportion">field_proportion (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData.field_size">field_size (RUFAS.biophysical.field.field.field_data.FieldData attribute)</a>
@@ -3723,16 +3914,18 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.field_manure_supplier.html#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier">FieldManureSupplier (class in RUFAS.biophysical.manure.field_manure_supplier)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent">FieldOperationEvent (class in RUFAS.data_structures.tillage_implements)</a>
+</li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.filter_dictionary">filter_dictionary() (RUFAS.util.Utility static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes">filter_insignificant_changes() (RUFAS.e2e_test_results_handler.E2ETestResultsHandler static method)</a>
 </li>
       <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested">filter_nested() (RUFAS.e2e_test_results_handler.E2ETestResultsHandler static method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.filter_variables_pool">filter_variables_pool() (RUFAS.output_manager.OutputManager method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.field.crop.harvest_operations.html#RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS">FINAL_HARVEST_OPERATIONS (in module RUFAS.biophysical.field.crop.harvest_operations)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.hay.html#RUFAS.biophysical.feed_storage.hay.FINAL_MOISTURE_PERCENTAGE">FINAL_MOISTURE_PERCENTAGE (in module RUFAS.biophysical.feed_storage.hay)</a>
@@ -3744,6 +3937,8 @@
       <li><a href="_code/RUFAS.biophysical.field.crop.dormancy.html#RUFAS.biophysical.field.crop.dormancy.Dormancy.find_dormancy_threshold">find_dormancy_threshold() (RUFAS.biophysical.field.crop.dormancy.Dormancy static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints">find_failed_constraints() (RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer static method)</a>
+</li>
+      <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility.find_max_index_from_keys">find_max_index_from_keys() (RUFAS.util.Utility static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.dormancy.html#RUFAS.biophysical.field.crop.dormancy.Dormancy.find_threshold_daylength">find_threshold_daylength() (RUFAS.biophysical.field.crop.dormancy.Dormancy static method)</a>
 </li>
@@ -3898,6 +4093,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.processor_enum.html#RUFAS.biophysical.manure.processor_enum.ProcessorType.get_processor_class">get_processor_class() (RUFAS.biophysical.manure.processor_enum.ProcessorType class method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.get_ration_feeds">get_ration_feeds() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.get_requested_feed">get_requested_feed() (RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.Modifiability.get_required_during_initialization">get_required_during_initialization() (RUFAS.data_validator.Modifiability class method)</a>
@@ -3912,9 +4109,9 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.get_total_projected_inventory">get_total_projected_inventory() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.get_user_defined_ration">get_user_defined_ration() (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager class method)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.get_user_defined_ration">get_user_defined_ration() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.get_user_defined_ration_feeds">get_user_defined_ration_feeds() (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager class method)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.get_user_defined_ration_feeds">get_user_defined_ration_feeds() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.get_vectorized_layer_attribute">get_vectorized_layer_attribute() (RUFAS.biophysical.field.soil.soil_data.SoilData method)</a>
 </li>
@@ -3988,6 +4185,8 @@
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.handle_water_in_canopy">handle_water_in_canopy() (RUFAS.biophysical.field.crop.crop.Crop method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.handler.handler.html#RUFAS.biophysical.manure.handler.handler.Handler">Handler (class in RUFAS.biophysical.manure.handler.handler)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent.HARVEST">HARVEST (RUFAS.data_structures.tillage_implements.FieldOperationEvent attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.harvest_heat_fraction">harvest_heat_fraction (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
@@ -4077,6 +4276,8 @@
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskType.HERD_INITIALIZATION">HERD_INITIALIZATION (RUFAS.task_manager.TaskType attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.herd_size_to_tractor_size">herd_size_to_tractor_size() (RUFAS.EEE.tractor.Tractor method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_factory.html#RUFAS.biophysical.animal.herd_factory.HerdFactory">HerdFactory (class in RUFAS.biophysical.animal.herd_factory)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager">HerdManager (class in RUFAS.biophysical.animal.herd_manager)</a>
@@ -4093,8 +4294,6 @@
         <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.histidine">(RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS">HOMEGROWN_FEEDS_AND_FERTILIZERS_FILTERS (in module RUFAS.EEE.emissions)</a>
-</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR">HORIZONTAL_DIST_TO_MILKING_PARLOR (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.html#RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.HormoneDeliverySchedule">HormoneDeliverySchedule (class in RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule)</a>
@@ -4164,6 +4363,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.initial_soil_nitrate_concentration">initial_soil_nitrate_concentration (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.initial_storage_dry_matter">initial_storage_dry_matter (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.initial_water_content">initial_water_content (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config">initialize_animal_config() (RUFAS.biophysical.animal.animal_config.AnimalConfig class method)</a>
@@ -4194,13 +4395,19 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.insert_animals_into_animals_in_pen_map">insert_animals_into_animals_in_pen_map() (RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.insert_single_animal_into_animals_in_pen_map">insert_single_animal_into_animals_in_pen_map() (RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
-      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.instance">instance (RUFAS.output_manager.OutputManager attribute)</a>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.instance">instance (RUFAS.input_manager.InputManager attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.instance">(RUFAS.output_manager.OutputManager attribute)</a>
 </li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.biophysical.manure.storage.composting_type.html#RUFAS.biophysical.manure.storage.composting_type.CompostingType.INTENSIVE_WINDROW">INTENSIVE_WINDROW (RUFAS.biophysical.manure.storage.composting_type.CompostingType attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage.intercept_mean_temp">intercept_mean_temp (RUFAS.biophysical.manure.storage.storage.Storage attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_health.disease.html#RUFAS.biophysical.animal.animal_health.disease.Disease.intermediate_effect">intermediate_effect() (RUFAS.biophysical.animal.animal_health.disease.Disease method)</a>
 </li>
@@ -4228,9 +4435,13 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.is_empty">is_empty (RUFAS.data_structures.animal_to_manure_connection.ManureStream property)</a>
 </li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.is_end_to_end_testing_run">is_end_to_end_testing_run (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.is_fat">is_fat (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.is_file_in_dir">is_file_in_dir() (RUFAS.output_manager.OutputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.is_first_post_processing">is_first_post_processing (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#RUFAS.biophysical.animal.ration.ration_config.RationConfig.is_forage_list">is_forage_list (RUFAS.biophysical.animal.ration.ration_config.RationConfig attribute)</a>
 </li>
@@ -4365,6 +4576,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#RUFAS.biophysical.animal.milk.milk_production.MilkProduction.lactose_percent">lactose_percent (RUFAS.biophysical.animal.milk.milk_production.MilkProduction attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize.LARGE">LARGE (RUFAS.data_structures.tillage_implements.TractorSize attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.last_time_degraded">last_time_degraded (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_health.disease.html#RUFAS.biophysical.animal.animal_health.disease.Disease.lasting_effect">lasting_effect() (RUFAS.biophysical.animal.animal_health.disease.Disease method)</a>
@@ -4403,8 +4616,6 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.light_use_efficiency">(RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.lignin">lignin (RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop attribute)</a>
 
       <ul style="list-style-type:none">
@@ -4417,9 +4628,17 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.lignin_dry_matter_percentage">(RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.lignin_loss_coefficient">lignin_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.limit">limit (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType.LIQUID">LIQUID (RUFAS.data_structures.manure_types.ManureType attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE">LIQUID_MANURE_APPLICATION_BELOW_SURFACE (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.LIQUID_MANURE_APPLICATION_SURFACE">LIQUID_MANURE_APPLICATION_SURFACE (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.LIQUID_MANURE_DENSITY">LIQUID_MANURE_DENSITY (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
@@ -4431,17 +4650,27 @@
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.LITERS_PER_CUBIC_MILLIMETER">LITERS_PER_CUBIC_MILLIMETER (RUFAS.units.MeasurementUnits attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.LITERS_PER_HA">LITERS_PER_HA (RUFAS.units.MeasurementUnits attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.LITERS_PER_KILOWATTS_PER_HOUR">LITERS_PER_KILOWATTS_PER_HOUR (RUFAS.units.MeasurementUnits attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.LITERS_PER_TON">LITERS_PER_TON (RUFAS.units.MeasurementUnits attribute)</a>
+</li>
       <li><a href="_code/RUFAS.general_constants.html#RUFAS.general_constants.GeneralConstants.LITERS_TO_CUBIC_METERS">LITERS_TO_CUBIC_METERS (RUFAS.general_constants.GeneralConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.general_constants.html#RUFAS.general_constants.GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS">LITERS_TO_CUBIC_MILLIMETERS (RUFAS.general_constants.GeneralConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.load_multiple_variables_pools_from_files">load_multiple_variables_pools_from_files() (RUFAS.output_manager.OutputManager method)</a>
 </li>
+      <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.load_runtime_metadata">load_runtime_metadata() (RUFAS.input_manager.InputManager method)</a>
+</li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.load_saved_pools">load_saved_pools() (RUFAS.output_manager.OutputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.load_variables_pool_from_file">load_variables_pool_from_file() (RUFAS.output_manager.OutputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.LogVerbosity.LOGS">LOGS (RUFAS.output_manager.LogVerbosity attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.logs_pool">logs_pool (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.LogVerbosity">LogVerbosity (class in RUFAS.output_manager)</a>
 </li>
@@ -4511,13 +4740,19 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.manure_supplement_methods.html#RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod.MANURE">MANURE (RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent.MANURE_APPLICATION">MANURE_APPLICATION (RUFAS.data_structures.tillage_implements.FieldOperationEvent attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.MANURE_CONVERSION_CONSTANT">MANURE_CONVERSION_CONSTANT (in module RUFAS.biophysical.manure.storage.storage)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.MANURE_DAMPING_FACTOR">MANURE_DAMPING_FACTOR (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.PenManureData.manure_deposition_surface_area">manure_deposition_surface_area (RUFAS.data_structures.animal_to_manure_connection.PenManureData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.digestive_system.digestive_system.html#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion">manure_excretion (RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.MANURE_STREAM_UNITS">MANURE_STREAM_UNITS (RUFAS.data_structures.animal_to_manure_connection.ManureStream attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.MANURE_TEMPERATURE_LAG">MANURE_TEMPERATURE_LAG (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.manure_nutrients.html#RUFAS.data_structures.manure_nutrients.ManureNutrients.manure_type">manure_type (RUFAS.data_structures.manure_nutrients.ManureNutrients attribute)</a>
 
@@ -4563,6 +4798,8 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.mass">mass (RUFAS.data_structures.animal_to_manure_connection.ManureStream property)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.mass_kg">mass_kg (RUFAS.EEE.tractor.Tractor property)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_day_probability">mastitis_cull_day_probability (RUFAS.biophysical.animal.animal_config.AnimalConfig attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_probability">mastitis_cull_probability (RUFAS.biophysical.animal.animal_config.AnimalConfig attribute)</a>
@@ -4607,9 +4844,13 @@
         <li><a href="_code/RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData.max_transpiration">(RUFAS.biophysical.field.field.field_data.FieldData attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.maximum_pool_size">maximum_pool_size (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MAXIMUM_RATION_FAT">MAXIMUM_RATION_FAT (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MAXIMUM_RATION_NDF">MAXIMUM_RATION_NDF (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.maximum_ration_reformulation_attempts">maximum_ration_reformulation_attempts (RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MAXMIMUM_MANURE_DRY_MATTER_CONTENT">MAXMIMUM_MANURE_DRY_MATTER_CONTENT (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
 </li>
@@ -4638,6 +4879,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.mean_phosphorus_sorption_parameter">mean_phosphorus_sorption_parameter (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits">MeasurementUnits (class in RUFAS.units)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize.MEDIUM">MEDIUM (RUFAS.data_structures.tillage_implements.TractorSize attribute)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.MEGACALORIES">MEGACALORIES (RUFAS.units.MeasurementUnits attribute)</a>
 </li>
@@ -4678,8 +4921,6 @@
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_MOLAR_MASS">METHANE_MOLAR_MASS (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.methane_production_potential">methane_production_potential (RUFAS.data_structures.animal_to_manure_connection.ManureStream attribute)</a>
-</li>
-      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO">METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator.html#RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator.MethaneMitigationCalculator">MethaneMitigationCalculator (class in RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator)</a>
 </li>
@@ -4897,9 +5138,9 @@
 </li>
         <li><a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#module-RUFAS.biophysical.animal.ration.ration_config">RUFAS.biophysical.animal.ration.ration_config</a>
 </li>
-        <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#module-RUFAS.biophysical.animal.ration.ration_optimizer">RUFAS.biophysical.animal.ration.ration_optimizer</a>
+        <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#module-RUFAS.biophysical.animal.ration.ration_manager">RUFAS.biophysical.animal.ration.ration_manager</a>
 </li>
-        <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#module-RUFAS.biophysical.animal.ration.user_defined_ration_manager">RUFAS.biophysical.animal.ration.user_defined_ration_manager</a>
+        <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#module-RUFAS.biophysical.animal.ration.ration_optimizer">RUFAS.biophysical.animal.ration.ration_optimizer</a>
 </li>
         <li><a href="_code/RUFAS.biophysical.animal.reproduction.html#module-RUFAS.biophysical.animal.reproduction">RUFAS.biophysical.animal.reproduction</a>
 </li>
@@ -5145,6 +5386,12 @@
 </li>
         <li><a href="_code/RUFAS.EEE.emissions.html#module-RUFAS.EEE.emissions">RUFAS.EEE.emissions</a>
 </li>
+        <li><a href="_code/RUFAS.EEE.energy.html#module-RUFAS.EEE.energy">RUFAS.EEE.energy</a>
+</li>
+        <li><a href="_code/RUFAS.EEE.tractor.html#module-RUFAS.EEE.tractor">RUFAS.EEE.tractor</a>
+</li>
+        <li><a href="_code/RUFAS.EEE.tractor_implement.html#module-RUFAS.EEE.tractor_implement">RUFAS.EEE.tractor_implement</a>
+</li>
         <li><a href="_code/RUFAS.general_constants.html#module-RUFAS.general_constants">RUFAS.general_constants</a>
 </li>
         <li><a href="_code/RUFAS.graph_generator.html#module-RUFAS.graph_generator">RUFAS.graph_generator</a>
@@ -5177,6 +5424,8 @@
       <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TillageImplement.MOLDBOARD_PLOW">MOLDBOARD_PLOW (RUFAS.data_structures.tillage_implements.TillageImplement attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.molibdenum">molibdenum (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.MOWING">MOWING (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#RUFAS.biophysical.animal.ration.ration_config.RationConfig.MP_supply">MP_supply (RUFAS.biophysical.animal.ration.ration_config.RationConfig attribute)</a>
 </li>
@@ -5211,6 +5460,8 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard.NASEM">NASEM (RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NASEM_net_energy_constraint">NASEM_net_energy_constraint() (RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer static method)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed">NASEMFeed (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.html#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator">NASEMRequirementsCalculator (class in RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator)</a>
@@ -5232,6 +5483,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_lower">NDF_constraint_lower() (RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer static method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer.NDF_constraint_upper">NDF_constraint_upper() (RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer static method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.ndf_loss_coefficient">ndf_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.NDICP">NDICP (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
@@ -5281,10 +5534,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.field_manure_supplier.html#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS">NITROGEN_TO_LIQUID_MANURE_DRY_MASS (in module RUFAS.biophysical.manure.field_manure_supplier)</a>
 </li>
-      <li><a href="_code/RUFAS.user_constants.html#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN">NITROGEN_TO_PROTEIN (RUFAS.user_constants.UserConstants attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.user_constants.html#RUFAS.user_constants.UserConstants.NITROGEN_TO_PROTEIN">NITROGEN_TO_PROTEIN (RUFAS.user_constants.UserConstants attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.field_manure_supplier.html#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS">NITROGEN_TO_SOLID_MANURE_DRY_MASS (in module RUFAS.biophysical.manure.field_manure_supplier)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.manure_nutrients.html#RUFAS.data_structures.manure_nutrients.ManureNutrients.nitrogen_unit">nitrogen_unit (RUFAS.data_structures.manure_nutrients.ManureNutrients attribute)</a>
@@ -5336,6 +5589,8 @@
       <li><a href="_code/RUFAS.biophysical.field.crop.non_water_uptake.html#RUFAS.biophysical.field.crop.non_water_uptake.NonWaterUptake">NonWaterUptake (class in RUFAS.biophysical.field.crop.non_water_uptake)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.NPN_source">NPN_source (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.NPN_SUPPLEMENT">NPN_SUPPLEMENT (RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard.NRC">NRC (RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard attribute)</a>
 </li>
@@ -5390,6 +5645,8 @@
 </li>
       <li><a href="_code/RUFAS.data_structures.events.html#RUFAS.data_structures.events.BaseFieldManagementEvent.occurs_today">occurs_today() (RUFAS.data_structures.events.BaseFieldManagementEvent method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.om">om (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.on_farm_cost">on_farm_cost (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.ON_FARM_TO_PURCHASED_PRICE_RATION">ON_FARM_TO_PURCHASED_PRICE_RATION (in module RUFAS.biophysical.feed_storage.feed_manager)</a>
@@ -5404,6 +5661,8 @@
         <li><a href="_code/RUFAS.biophysical.manure.processor_enum.html#RUFAS.biophysical.manure.processor_enum.ProcessorType.OpenLot">(RUFAS.biophysical.manure.processor_enum.ProcessorType attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType">OperationType (class in RUFAS.data_structures.tillage_implements)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_harvest_index">optimal_harvest_index (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 
       <ul style="list-style-type:none">
@@ -5414,10 +5673,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_nitrogen_fraction">optimal_nitrogen_fraction (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_phosphorus">optimal_phosphorus (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_phosphorus">optimal_phosphorus (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_phosphorus_fraction">optimal_phosphorus_fraction (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.optimal_temperature">optimal_temperature (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
@@ -5474,6 +5733,8 @@
 </li>
       </ul></li>
       <li><a href="_code/main.html#main.parse_gnu_args">parse_gnu_args() (in module main)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator.parse_inputs_for_diesel_consumption_calculation">parse_inputs_for_diesel_consumption_calculation() (RUFAS.EEE.energy.EnergyEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.biomass_allocation.html#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation.partition_biomass">partition_biomass() (RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation method)</a>
 </li>
@@ -5547,6 +5808,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.pH">pH (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage.phase_shift">phase_shift (RUFAS.biophysical.manure.storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.amino_acid.html#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements.phenylalanine">phenylalanine (RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements attribute)</a>
 
       <ul style="list-style-type:none">
@@ -5613,6 +5876,8 @@
         <li><a href="_code/RUFAS.biophysical.feed_storage.feed_storage_enum.html#RUFAS.biophysical.feed_storage.feed_storage_enum.StorageType.Pile">(RUFAS.biophysical.feed_storage.feed_storage_enum.StorageType attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.planning_cycle_allowance">planning_cycle_allowance (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.PlanningCycleAllowance">PlanningCycleAllowance (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.plant_active_decompose_carbon">plant_active_decompose_carbon (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
@@ -5665,6 +5930,12 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.PlantCategory">PlantCategory (class in RUFAS.biophysical.field.crop.crop_data)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent.PLANTING">PLANTING (RUFAS.data_structures.tillage_implements.FieldOperationEvent attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.PLANTING">(RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
+</li>
+      </ul></li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.planting_day">planting_day (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.planting_year">planting_year (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
@@ -5697,6 +5968,8 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.potential_heat_units">(RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.power_available_kW">power_available_kW (RUFAS.EEE.tractor.Tractor property)</a>
+</li>
       <li><a href="_code/RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions.precipitation">precipitation (RUFAS.current_day_conditions.CurrentDayConditions attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.PRECIPITATION_CONSTANT">PRECIPITATION_CONSTANT (in module RUFAS.biophysical.manure.storage.storage)</a>
@@ -5833,13 +6106,15 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR">PROTEIN_UPPER_LIMIT_FACTOR (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.PTO_kW">PTO_kW (RUFAS.EEE.tractor.Tractor property)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed.purchase_cost">purchase_cost (RUFAS.data_structures.feed_storage_to_animal_connection.Feed attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchase_feed">purchase_feed() (RUFAS.biophysical.feed_storage.feed_manager.FeedManager method)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance">PurchaseAllowance (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
 </li>
-      <li><a href="_code/RUFAS.EEE.emissions.html#RUFAS.EEE.emissions.PURCHASED_FEED_PATTERN">PURCHASED_FEED_PATTERN (in module RUFAS.EEE.emissions)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.purchased_feed_storage">purchased_feed_storage (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed">PurchasedFeed (class in RUFAS.biophysical.feed_storage.purchased_feed_storage)</a>
 </li>
@@ -5864,6 +6139,8 @@
         <li><a href="_code/RUFAS.util.html#RUFAS.util.random">(in module RUFAS.util)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.ration_feeds">ration_feeds (RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.nutrients.nutrients.html#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.ration_phosphorus_concentration">ration_phosphorus_concentration (RUFAS.biophysical.animal.nutrients.nutrients.Nutrients attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#RUFAS.biophysical.animal.ration.ration_config.RationConfig">RationConfig (class in RUFAS.biophysical.animal.ration.ration_config)</a>
@@ -5872,6 +6149,8 @@
         <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationConfig">(class in RUFAS.biophysical.animal.ration.ration_optimizer)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager">RationManager (class in RUFAS.biophysical.animal.ration.ration_manager)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#RUFAS.biophysical.animal.ration.ration_optimizer.RationOptimizer">RationOptimizer (class in RUFAS.biophysical.animal.ration.ration_optimizer)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.ration_config.html#RUFAS.biophysical.animal.ration.ration_config.RationConfig.RDP_diet">RDP_diet (RUFAS.biophysical.animal.ration.ration_config.RationConfig attribute)</a>
@@ -5924,6 +6203,8 @@
         <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.reduce_milk_production">(RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.CrossValidator.relation_mapping">relation_mapping (RUFAS.data_validator.CrossValidator attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.remove_animals_by_ids">remove_animals_by_ids() (RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed.remove_dry_matter_mass">remove_dry_matter_mass() (RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed method)</a>
@@ -5967,6 +6248,8 @@
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_reporter.html#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total">report_daily_pen_total() (RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter class method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_reporter.html#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_ration_per_pen">report_daily_ration_per_pen() (RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter class method)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.energy.html#RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption">report_diesel_consumption() (RUFAS.EEE.energy.EnergyEstimator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_reporter.html#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_disease_incidence">report_disease_incidence() (RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter class method)</a>
 </li>
@@ -6392,17 +6675,17 @@
 </li>
       </ul></li>
       <li>
+    RUFAS.biophysical.animal.ration.ration_manager
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#module-RUFAS.biophysical.animal.ration.ration_manager">module</a>
+</li>
+      </ul></li>
+      <li>
     RUFAS.biophysical.animal.ration.ration_optimizer
 
       <ul style="list-style-type:none">
         <li><a href="_code/RUFAS.biophysical.animal.ration.ration_optimizer.html#module-RUFAS.biophysical.animal.ration.ration_optimizer">module</a>
-</li>
-      </ul></li>
-      <li>
-    RUFAS.biophysical.animal.ration.user_defined_ration_manager
-
-      <ul style="list-style-type:none">
-        <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#module-RUFAS.biophysical.animal.ration.user_defined_ration_manager">module</a>
 </li>
       </ul></li>
       <li>
@@ -6545,8 +6828,6 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_data_factory.html#module-RUFAS.biophysical.field.crop.crop_data_factory">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     RUFAS.biophysical.field.crop.crop_management
 
@@ -6554,6 +6835,8 @@
         <li><a href="_code/RUFAS.biophysical.field.crop.crop_management.html#module-RUFAS.biophysical.field.crop.crop_management">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     RUFAS.biophysical.field.crop.dormancy
 
@@ -7262,6 +7545,27 @@
 </li>
       </ul></li>
       <li>
+    RUFAS.EEE.energy
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.EEE.energy.html#module-RUFAS.EEE.energy">module</a>
+</li>
+      </ul></li>
+      <li>
+    RUFAS.EEE.tractor
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.EEE.tractor.html#module-RUFAS.EEE.tractor">module</a>
+</li>
+      </ul></li>
+      <li>
+    RUFAS.EEE.tractor_implement
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.EEE.tractor_implement.html#module-RUFAS.EEE.tractor_implement">module</a>
+</li>
+      </ul></li>
+      <li>
     RUFAS.general_constants
 
       <ul style="list-style-type:none">
@@ -7345,6 +7649,8 @@
         <li><a href="_code/RUFAS.weather.html#module-RUFAS.weather">module</a>
 </li>
       </ul></li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.rufas_feed_id">rufas_feed_id (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed.rufas_id">rufas_id (RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed attribute)</a>
 
       <ul style="list-style-type:none">
@@ -7360,6 +7666,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.runoff_fertilizer_phosphorus">runoff_fertilizer_phosphorus (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.manure_pool.html#RUFAS.biophysical.field.soil.manure_pool.ManurePool.runoff_reset">runoff_reset() (RUFAS.biophysical.field.soil.manure_pool.ManurePool method)</a>
+</li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedManager.runtime_purchase_allowance">runtime_purchase_allowance (RUFAS.biophysical.feed_storage.feed_manager.FeedManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.RuntimePurchaseAllowance">RuntimePurchaseAllowance (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
 </li>
@@ -7384,9 +7692,15 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.saturation_point_water_concentration">saturation_point_water_concentration (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.save_chunk_threshold_call_count">save_chunk_threshold_call_count (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.save_metadata_properties">save_metadata_properties() (RUFAS.input_manager.InputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.save_results">save_results() (RUFAS.output_manager.OutputManager method)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.saved_pool_chunks_num">saved_pool_chunks_num (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.saved_pool_chunks_path">saved_pool_chunks_path (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.manager.schedule.html#RUFAS.biophysical.field.manager.schedule.Schedule">Schedule (class in RUFAS.biophysical.field.manager.schedule)</a>
 </li>
@@ -7484,6 +7798,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.lactation_curve.html#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.set_lactation_parameters">set_lactation_parameters() (RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve class method)</a>
 </li>
+      <li><a href="_code/RUFAS.weather.html#RUFAS.weather.Weather.set_linest_temperature_factors">set_linest_temperature_factors() (RUFAS.weather.Weather method)</a>
+</li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.set_log_verbose">set_log_verbose() (RUFAS.output_manager.OutputManager method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop.html#RUFAS.biophysical.field.crop.crop.Crop.set_maximum_transpiration">set_maximum_transpiration() (RUFAS.biophysical.field.crop.crop.Crop method)</a>
@@ -7510,11 +7826,13 @@
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskManager.set_random_seed">set_random_seed() (RUFAS.task_manager.TaskManager static method)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds">set_ration_feeds() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.ration.animal_requirements.html#RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements.set_requirements">set_requirements() (RUFAS.biophysical.animal.ration.animal_requirements.AnimalRequirements method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.set_user_defined_ration_tolerance">set_user_defined_ration_tolerance() (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager class method)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance">set_user_defined_ration_tolerance() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.set_user_defined_rations">set_user_defined_rations() (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager class method)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations">set_user_defined_rations() (RUFAS.biophysical.animal.ration.ration_manager.RationManager class method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.set_vectorized_layer_attribute">set_vectorized_layer_attribute() (RUFAS.biophysical.field.soil.soil_data.SoilData method)</a>
 </li>
@@ -7554,8 +7872,12 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData.simulate_water_stress">simulate_water_stress (RUFAS.biophysical.field.field.field_data.FieldData attribute)</a>
 </li>
-      <li><a href="_code/RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime.simulation_day">simulation_day (RUFAS.rufas_time.RufasTime property)</a>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.feed_manager.html#RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction.simulation_day">simulation_day (RUFAS.biophysical.feed_storage.feed_manager.FeedDeduction attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime.simulation_day">(RUFAS.rufas_time.RufasTime property)</a>
 </li>
+      </ul></li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.SIMULATION_DAY">SIMULATION_DAY (RUFAS.units.MeasurementUnits attribute)</a>
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN">SIMULATION_MULTI_RUN (RUFAS.task_manager.TaskType attribute)</a>
@@ -7582,6 +7904,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.SLURRY_MANURE_DENSITY">SLURRY_MANURE_DENSITY (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.SLURRY_OUTDOOR_MINIMUM_TEMPERATURE">SLURRY_OUTDOOR_MINIMUM_TEMPERATURE (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.storage.slurry_storage_outdoor.html#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor">SlurryStorageOutdoor (class in RUFAS.biophysical.manure.storage.slurry_storage_outdoor)</a>
 
       <ul style="list-style-type:none">
@@ -7594,10 +7918,12 @@
         <li><a href="_code/RUFAS.biophysical.manure.processor_enum.html#RUFAS.biophysical.manure.processor_enum.ProcessorType.SlurryStorageUnderfloor">(RUFAS.biophysical.manure.processor_enum.ProcessorType attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_code/RUFAS.biophysical.field.soil.snow.html#RUFAS.biophysical.field.soil.snow.Snow">Snow (class in RUFAS.biophysical.field.soil.snow)</a>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize.SMALL">SMALL (RUFAS.data_structures.tillage_implements.TractorSize attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.biophysical.field.soil.snow.html#RUFAS.biophysical.field.soil.snow.Snow">Snow (class in RUFAS.biophysical.field.soil.snow)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.snow_content">snow_content (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.snow_coverage_fraction">snow_coverage_fraction (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
@@ -7694,6 +8020,10 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.phosphorus_cycling.soluble_phosphorus.html#RUFAS.biophysical.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus">SolublePhosphorus (class in RUFAS.biophysical.field.soil.phosphorus_cycling.soluble_phosphorus)</a>
 </li>
+      <li><a href="_code/RUFAS.user_constants.html#RUFAS.user_constants.UserConstants.SPECIFIC_FUEL_CONSUMPTION">SPECIFIC_FUEL_CONSUMPTION (RUFAS.user_constants.UserConstants attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor.speed_km_hr">speed_km_hr (RUFAS.EEE.tractor.Tractor property)</a>
+</li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.split_stream">split_stream() (RUFAS.data_structures.animal_to_manure_connection.ManureStream method)</a>
 </li>
       <li><a href="_code/RUFAS.units.html#RUFAS.units.MeasurementUnits.SQUARE_CENTIMETERS_PER_HECTARE">SQUARE_CENTIMETERS_PER_HECTARE (RUFAS.units.MeasurementUnits attribute)</a>
@@ -7734,6 +8064,8 @@
       </ul></li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.starch_digested">starch_digested (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.starch_loss_coefficient">starch_loss_coefficient (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskManager.start">start() (RUFAS.task_manager.TaskManager method)</a>
 </li>
       <li><a href="_code/RUFAS.input_manager.html#RUFAS.input_manager.InputManager.start_data_processing">start_data_processing() (RUFAS.input_manager.InputManager method)</a>
@@ -7766,6 +8098,8 @@
       </ul></li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING">STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.storage_name">storage_name (RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_RESISTANCE">STORAGE_RESISTANCE (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed.storage_time">storage_time (RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeed attribute)</a>
@@ -7778,6 +8112,12 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.feed_storage_enum.html#RUFAS.biophysical.feed_storage.feed_storage_enum.StorageType">StorageType (class in RUFAS.biophysical.feed_storage.feed_storage_enum)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.purchased_feed_storage.html#RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeedStorage.stored">stored (RUFAS.biophysical.feed_storage.purchased_feed_storage.PurchasedFeedStorage attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.stored">(RUFAS.biophysical.feed_storage.storage.Storage attribute)</a>
+</li>
+      </ul></li>
       <li><a href="_code/RUFAS.biophysical.feed_storage.storage.html#RUFAS.biophysical.feed_storage.storage.Storage.stored_mass">stored_mass (RUFAS.biophysical.feed_storage.storage.Storage property)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.PenManureData.stream_type">stream_type (RUFAS.data_structures.animal_to_manure_connection.PenManureData attribute)</a>
@@ -7825,6 +8165,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.TAN_INCREASE_FACTOR">TAN_INCREASE_FACTOR (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.feed_storage.hay.html#RUFAS.biophysical.feed_storage.hay.Hay.target_dry_matter">target_dry_matter (RUFAS.biophysical.feed_storage.hay.Hay attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.target_heifer_pregnant_day">target_heifer_pregnant_day (RUFAS.biophysical.animal.animal_config.AnimalConfig attribute)</a>
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskManager.task">task() (RUFAS.task_manager.TaskManager static method)</a>
@@ -7867,11 +8209,17 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.field.manager.tillage_schedule.html#RUFAS.biophysical.field.manager.tillage_schedule.TillageSchedule">TillageSchedule (class in RUFAS.biophysical.field.manager.tillage_schedule)</a>
 </li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.FieldOperationEvent.TILLING">TILLING (RUFAS.data_structures.tillage_implements.FieldOperationEvent attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.TILLING">(RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
+</li>
+      </ul></li>
       <li><a href="_code/RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData.time_step">time_step (RUFAS.biophysical.field.soil.soil_data.SoilData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.growth.growth.html#RUFAS.biophysical.animal.growth.growth.Growth.tissue_changed">tissue_changed (RUFAS.biophysical.animal.growth.growth.Growth attribute)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.tolerance">tolerance (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager attribute)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.tolerance">tolerance (RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
 
       <ul style="list-style-type:none">
         <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.ResultPathType.tolerance">(RUFAS.e2e_test_results_handler.ResultPathType attribute)</a>
@@ -7918,6 +8266,12 @@
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.total_volatile_solids">total_volatile_solids (RUFAS.data_structures.animal_to_manure_connection.ManureStream property)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory">TotalInventory (class in RUFAS.data_structures.feed_storage_to_animal_connection)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor">Tractor (class in RUFAS.EEE.tractor)</a>
+</li>
+      <li><a href="_code/RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement">TractorImplement (class in RUFAS.EEE.tractor_implement)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize">TractorSize (class in RUFAS.data_structures.tillage_implements)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal.transition_heiferIII_to_cow">transition_heiferIII_to_cow() (RUFAS.biophysical.animal.animal.Animal method)</a>
 </li>
@@ -7994,10 +8348,10 @@
 </li>
       <li><a href="_code/RUFAS.task_manager.html#RUFAS.task_manager.TaskType.UPDATE_E2E_TEST_RESULTS">UPDATE_E2E_TEST_RESULTS (RUFAS.task_manager.TaskType attribute)</a>
 </li>
-      <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results">update_expected_test_results() (RUFAS.e2e_test_results_handler.E2ETestResultsHandler static method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_code/RUFAS.e2e_test_results_handler.html#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results">update_expected_test_results() (RUFAS.e2e_test_results_handler.E2ETestResultsHandler static method)</a>
+</li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater.update_feed_schema">update_feed_schema() (RUFAS.data_collection_app_updater.DataCollectionAppUpdater method)</a>
 </li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.DataCollectionAppUpdater.update_first_property_with_enum">update_first_property_with_enum() (RUFAS.data_collection_app_updater.DataCollectionAppUpdater static method)</a>
@@ -8032,15 +8386,13 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen.use_user_defined_ration">use_user_defined_ration() (RUFAS.biophysical.animal.pen.Pen method)</a>
 </li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.user_defined_rations">user_defined_rations (RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager attribute)</a>
+      <li><a href="_code/RUFAS.biophysical.animal.ration.ration_manager.html#RUFAS.biophysical.animal.ration.ration_manager.RationManager.user_defined_rations">user_defined_rations (RUFAS.biophysical.animal.ration.ration_manager.RationManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_collection_app_updater.html#RUFAS.data_collection_app_updater.USER_FEED_PATH">USER_FEED_PATH (in module RUFAS.data_collection_app_updater)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData.user_harvest_index">user_harvest_index (RUFAS.biophysical.field.crop.crop_data.CropData attribute)</a>
 </li>
       <li><a href="_code/RUFAS.user_constants.html#RUFAS.user_constants.UserConstants">UserConstants (class in RUFAS.user_constants)</a>
-</li>
-      <li><a href="_code/RUFAS.biophysical.animal.ration.user_defined_ration_manager.html#RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager">UserDefinedRationManager (class in RUFAS.biophysical.animal.ration.user_defined_ration_manager)</a>
 </li>
       <li><a href="_code/RUFAS.util.html#RUFAS.util.Utility">Utility (class in RUFAS.util)</a>
 </li>
@@ -8083,10 +8435,10 @@
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.validate_json_filters">validate_json_filters() (RUFAS.output_manager.OutputManager method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.validate_list_of_strings">validate_list_of_strings() (RUFAS.output_manager.OutputManager method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.DataValidator.validate_metadata">validate_metadata() (RUFAS.data_validator.DataValidator method)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.manager.schedule.html#RUFAS.biophysical.field.manager.schedule.Schedule.validate_positive_values">validate_positive_values() (RUFAS.biophysical.field.manager.schedule.Schedule static method)</a>
@@ -8105,6 +8457,8 @@
       </ul></li>
       <li><a href="_code/RUFAS.data_validator.html#RUFAS.data_validator.Modifiability.values">values() (RUFAS.data_validator.Modifiability class method)</a>
 </li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.variables_pool">variables_pool (RUFAS.output_manager.OutputManager attribute)</a>
+</li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_module_constants.html#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR">VERTICAL_DIST_TO_MILKING_PARLOR (RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.Vit_A">Vit_A (RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed attribute)</a>
@@ -8121,6 +8475,8 @@
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.animal_config.html#RUFAS.biophysical.animal.animal_config.AnimalConfig.voluntary_waiting_period">voluntary_waiting_period (RUFAS.biophysical.animal.animal_config.AnimalConfig attribute)</a>
 </li>
+      <li><a href="_code/RUFAS.biophysical.manure.manure_constants.html#RUFAS.biophysical.manure.manure_constants.ManureConstants.VS_TO_METHANE_LOSS_RATIO">VS_TO_METHANE_LOSS_RATIO (RUFAS.biophysical.manure.manure_constants.ManureConstants attribute)</a>
+</li>
   </ul></td>
   </tr>
       </table>
@@ -8133,6 +8489,8 @@
       <li><a href="_code/RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.PlantCategory.WARM_ANNUAL_LEGUME">WARM_ANNUAL_LEGUME (RUFAS.biophysical.field.crop.crop_data.PlantCategory attribute)</a>
 </li>
       <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.LogVerbosity.WARNINGS">WARNINGS (RUFAS.output_manager.LogVerbosity attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.output_manager.html#RUFAS.output_manager.OutputManager.warnings_pool">warnings_pool (RUFAS.output_manager.OutputManager attribute)</a>
 </li>
       <li><a href="_code/RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream.water">water (RUFAS.data_structures.animal_to_manure_connection.ManureStream attribute)</a>
 </li>
@@ -8191,6 +8549,8 @@
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.wilting_point_content">wilting_point_content (RUFAS.biophysical.field.soil.layer_data.LayerData property)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData.wilting_point_water_concentration">wilting_point_water_concentration (RUFAS.biophysical.field.soil.layer_data.LayerData attribute)</a>
+</li>
+      <li><a href="_code/RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType.WINDROWING">WINDROWING (RUFAS.data_structures.tillage_implements.OperationType attribute)</a>
 </li>
       <li><a href="_code/RUFAS.biophysical.animal.milk.milk_production.html#RUFAS.biophysical.animal.milk.milk_production.MilkProduction.wood_l">wood_l (RUFAS.biophysical.animal.milk.milk_production.MilkProduction attribute)</a>
 </li>
@@ -8255,23 +8615,24 @@
 <a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#_">_</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#A">A</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#B">B</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#C">C</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#D">D</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#E">E</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#F">F</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#G">G</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#H">H</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#I">I</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#J">J</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#K">K</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#L">L</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#M">M</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#N">N</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#O">O</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#P">P</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#R">R</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#S">S</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#T">T</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#U">U</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#V">V</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#W">W</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Y">Y</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Z">Z</a>
 </div>
 </aside>
-        </main>
-      </div>
-    </div><footer class="py-6 border-t border-border md:py-0">
+          </main>
+        </div>
+      </div><footer class="py-6 border-t border-border md:py-0">
     <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
       <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
         <p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team&nbsp;Built with <a class="font-medium underline underline-offset-4"
     href="https://www.sphinx-doc.org"
-    rel="noreferrer">Sphinx 8.2.3</a></p>
+    rel="noreferrer">Sphinx 9.1.0</a></p>
 </div>
 </div>
 </footer>
-  </div>
-  
+    </div>
+    
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="defer" src="_static/theme.js?v=073f68d9"></script>
-  
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="_static/theme.js?v=582b20c5"></script>
+    
 </body>
+
 </html>

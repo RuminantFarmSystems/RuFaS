@@ -9,6 +9,7 @@ Subpackages
 
    RUFAS.biophysical.animal.animal_genetics
    RUFAS.biophysical.animal.animal_health
+   RUFAS.biophysical.animal.bedding
    RUFAS.biophysical.animal.digestive_system
    RUFAS.biophysical.animal.growth
    RUFAS.biophysical.animal.milk

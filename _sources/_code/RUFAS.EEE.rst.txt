@@ -9,6 +9,9 @@ Submodules
 
    RUFAS.EEE.EEE_manager
    RUFAS.EEE.emissions
+   RUFAS.EEE.energy
+   RUFAS.EEE.tractor
+   RUFAS.EEE.tractor_implement
 
 Module contents
 ---------------
