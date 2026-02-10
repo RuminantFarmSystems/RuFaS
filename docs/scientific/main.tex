@@ -1,0 +1,131 @@
+\documentclass{article}
+
+% Language setting
+\usepackage[english]{babel}
+\setlength{\parindent}{0pt}
+
+% Useful packages
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage[most]{tcolorbox}
+\usepackage{ragged2e}
+
+% Fonts
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{pdflscape}
+\usepackage{lipsum}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{tocloft}
+\usepackage{mhchem}
+\usepackage{etoc}
+\usepackage{docmute}
+
+% Geometry
+\usepackage[
+  a4paper,
+  top=1.5in,
+  bottom=1in,
+  left=1in,
+  right=1in,
+  headheight=60pt,
+  headsep=20pt
+]{geometry}
+
+% Define header and footer styles
+\usepackage{fancyhdr}
+\usepackage{rotating}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[C]{%
+    \vspace{25pt}%
+  \raisebox{15pt}[0pt][0pt]{%
+    \makebox[\textwidth]{%
+      \includegraphics[height=40pt]{resources/rufas.png}\hfill
+      \textbf{\today}%
+    }%
+  }\\[-25pt]
+  \centering\textbf{Scientific Documentation of RuFaS Model} \\
+  \rule{\textwidth}{1pt}
+}
+
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{%
+  \begin{tabular}[t]{@{}l@{}}
+    Ruminant Farm System\\
+    Sci Doc v.1
+  \end{tabular}%
+}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{%
+  \begin{tabular}[t]{@{}r@{}}
+    \nouppercase{\leftmark}\\
+  \end{tabular}%
+}
+\fancypagestyle{landscapeplain}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% Bibliography setup
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  natbib=true
+]{biblatex}
+
+\addbibresource{rufas.bib}
+
+\usepackage{titlesec}
+\usepackage{etoolbox}
+
+% Reset subsection counter at each new section
+\pretocmd{\section}{\setcounter{subsection}{0}}{}{}
+
+% Roman for \section, Alpha for \subsection, alpha for \subsubsection
+\renewcommand{\thesection}{\Roman{section}.}
+\renewcommand{\thesubsection}{\Alph{subsection}.}
+\renewcommand{\thesubsubsection}{\alph{subsubsection}.}
+
+% --- Title Formats (in size order) ---
+\titleformat{\section}
+  {\Large\bfseries}
+  {\thesection}
+  {1em}
+  {}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries}
+  {\thesubsubsection}
+  {1em}
+  {}
+
+% --- Spacing for each level ---
+\titlespacing*{\section}{0pt}{1.5\baselineskip}{1\baselineskip}
+\titlespacing*{\subsection}{0pt}{1\baselineskip}{0.5\baselineskip}
+\titlespacing*{\subsubsection}{0pt}{0.75\baselineskip}{0.35\baselineskip}
+
+\begin{document}
+
+\include{animal}
+\include{manure}
+\include{crop_and_soil}
+\include{feed_storage}
+
+\end{document}

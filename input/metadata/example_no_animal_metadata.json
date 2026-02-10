@@ -118,7 +118,7 @@
       "path": "input/data/field/example_small_field_corn_alf_silage.json",
       "type": "json",
       "properties": "field_properties"
-    }, 
+    },
     "soil_1": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
@@ -227,7 +227,10 @@
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
-      "path": "input/metadata/properties/default.json",
+      "paths": [
+        "input/metadata/properties/default.json",
+        "input/metadata/properties/commodity_properties.json"
+      ],
       "type": "json",
       "properties": "NA"
     },
