@@ -18,7 +18,8 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RuntimePurchaseAllowance,
     RequestedFeed,
     TotalInventory,
-    IdealFeeds, AdvancePurchaseAllowance,
+    IdealFeeds,
+    AdvancePurchaseAllowance,
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
@@ -488,8 +489,8 @@ class FeedManager:
             amount_to_purchase = max(amount_requested - available_amount, 0.0) * (1 + feed_info.buffer)
             tolerance = 1e-6
             is_fulfillable_with_purchase = (
-                                               amount_requested - available_amount
-                                           ) <= self.advanced_purchase_allowance.allowances.get(feed_id) + tolerance
+                amount_requested - available_amount
+            ) <= self.advanced_purchase_allowance.allowances.get(feed_id) + tolerance
             if not is_fulfillable_with_purchase:
                 self._om.add_warning(
                     "Ration Interval Purchase Warning",
@@ -502,10 +503,12 @@ class FeedManager:
                         "function": self.manage_ration_interval_purchases.__name__,
                     },
                 )
-                print(f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
-                      f"Requested: {amount_requested}, Available: {available_amount}, "
-                      f"Allowance: {self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
-                      f"Still making full purchase.")
+                print(
+                    f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
+                    f"Requested: {amount_requested}, Available: {available_amount}, "
+                    f"Allowance: {self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
+                    f"Still making full purchase."
+                )
             feeds_to_purchase[feed_id] = amount_to_purchase
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
