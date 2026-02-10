@@ -106,6 +106,8 @@ specific purposes:
    schema using the metadata properties held in the Input Manager, and
    updates the Data Collection App files in the ``DataCollectionApp``
    directory to use the new input schema.
+10. **UPDATE_E2E_TEST_RESULTS**: Updates the expected end to end testing
+    results with the new actual results.
 
 Detailed Sensitivity Analysis Settings
 --------------------------------------
