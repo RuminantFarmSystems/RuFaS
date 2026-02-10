@@ -102,6 +102,7 @@ class ReportGenerator:
                     filtered_pool, filter_content
                 )
             event_logs.extend(aggregation_logs)
+            # print("generation logs:", aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
             if "data_significant_digits" in filter_content:
@@ -147,7 +148,7 @@ class ReportGenerator:
                     "info_map": info_map,
                 }
             )
-
+        # print("final event logs:", event_logs)
         return event_logs
 
     def _get_horizontal_first_value(
@@ -370,6 +371,7 @@ class ReportGenerator:
         )
 
         event_logs = event_logs + aggregation_logs
+        # print("AGGREGATION LOGS:", event_logs)
 
         return aggregate_report, event_logs, True
 
@@ -447,6 +449,16 @@ class ReportGenerator:
                         else "ver_agg"
                     )
                     aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
+
+        aggregate_keys_log: dict[str, str | dict[str, str]] = {
+            "log": f"Report '{filter_content.get('name', 'Unnamed Report')}' aggregation variables.",
+            "message": f"Variables/constants aggregated: {list(report_data.keys())}.",
+            "info_map": {
+                "class": self.__class__.__name__,
+                "function": self._route_aggregator_functions.__name__,
+            },
+        }
+        event_logs.append(aggregate_keys_log)
 
         return aggregate_report, event_logs
 
