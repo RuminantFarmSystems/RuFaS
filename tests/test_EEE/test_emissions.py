@@ -536,3 +536,71 @@ def test_calculate_and_report_lca_and_luc_emissions(
         expected_farmgrown_feed_deductions_data,
     )
     assert mock_add_variable_bulk.call_count == 2 * 2
+
+
+def test_gather_farmgrown_feed_inventory_data_success(
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Tests successful parsing of farmgrown feed inventory data from output manager.
+    """
+    fake_filtered = {
+        "stored_feed_12_dm.daily_storage_levels": {
+            "values": [1.25, 2.5, 0.0],
+            "info_maps": [{"simulation_day": 0}, {"simulation_day": 1}, {"simulation_day": 10}],
+        },
+        "stored_feed_7_dm.daily_storage_levels": {
+            "values": [9.0, 8.0],
+            "info_maps": [{"simulation_day": 5}, {"simulation_day": 6}],
+        },
+    }
+
+    filter_spy = mocker.patch.object(em.om, "filter_variables_pool", return_value=fake_filtered)
+    add_error_spy = mocker.patch.object(em.om, "add_error")
+
+    result = em._gather_farmgrown_feed_inventory_data()
+
+    filter_spy.assert_called_once()
+    assert result == {
+        12: {0: 1.25, 1: 2.5, 10: 0.0},
+        7: {5: 9.0, 6: 8.0},
+    }
+
+    add_error_spy.assert_not_called()
+
+
+def test_gather_farmgrown_feed_inventory_data_raises_and_logs_on_bad_key(
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Tests that a non-matching variable name logs an error via om.add_error
+    and then raises ValueError with helpful text.
+    """
+    bad_key = "stored_feed_X_dm.daily_storage_levels"
+    fake_filtered = {
+        bad_key: {
+            "values": [1.0],
+            "info_maps": [{"simulation_day": 0}],
+        }
+    }
+
+    mocker.patch.object(em.om, "filter_variables_pool", return_value=fake_filtered)
+    add_error_spy = mocker.patch.object(em.om, "add_error")
+
+    with pytest.raises(ValueError) as excinfo:
+        em._gather_farmgrown_feed_inventory_data()
+
+    msg = str(excinfo.value)
+    assert bad_key in msg
+    assert "Needed to parse farmgrown feed inventory data." in msg
+    assert "Check emissions.py filters." in msg
+
+    add_error_spy.assert_called_once()
+    title, message, info_map = add_error_spy.call_args.args
+
+    assert title == "Farmgrown Feed Data Parsing Error"
+    assert message == f"No feed_id match found for {bad_key}."
+    assert info_map["class"] == em.__class__.__name__
+    assert info_map["function"] == "_gather_farmgrown_feed_inventory_data"
