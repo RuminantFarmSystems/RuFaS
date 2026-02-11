@@ -641,7 +641,7 @@ class DataValidator:
             return valid, message
         return True, ""
 
-    def validate_metadata(
+    def validate_metadata(  # noqa: C901
         self,
         metadata: dict[str, Any],
         valid_data_types: set[str],
