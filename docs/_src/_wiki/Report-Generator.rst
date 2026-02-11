@@ -44,7 +44,7 @@ Each filter file contains several key components:
 - **filters**: (Optional if cross validation is present) The list of
   Regex filters to select variables from the OutputManager's variables
   pool.
-- **variables**: (Optional) When the data is stored in dictionaries
+- **variables**: (Optional) Required when the data is stored in dictionaries
   (i.e., when reporting the variable to the output manager using
   ``OutputManager.add_variable()``, a dict was passed), the
   ``variables`` entry is used to select which variables from the
@@ -127,6 +127,12 @@ Each filter file contains several key components:
   variations in aggregation results. This occurs because mixing rounded
   and non-rounded data in aggregation functions may produce results that
   differ slightly from those obtained using only non-rounded data.
+- **direction**: (Optional) The output CSV orientation. Either ``“portrait”``
+  or ``“landscape”``. If no value is provided or providing an unexpected
+  value, the default ``“portrait”`` direction will be used.
+- **use_name**: (Optional) Whether to use the filter name when constructing
+  the key name for data pulled from a dictionary.
+- **use_verbose_report_name**: ?
 
 Columns are the variables and rows are datapoints, i.e., each row
 corresponds to a ``OM.add_variable`` call and each column corresponds to
