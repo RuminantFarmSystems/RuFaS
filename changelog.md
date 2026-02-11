@@ -304,6 +304,7 @@ v0.9.2
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
 - [2742](https://github.com/RuminantFarmSystems/RuFaS/pull/2742) - [minor change] [NoInputChange] [NoOutputChange] Add logs for variables contributing to aggregated reports.
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
+- [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 
 ### v0.9.2
 
