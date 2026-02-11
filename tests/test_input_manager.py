@@ -3339,10 +3339,9 @@ def test_export_pool_to_csv_errors(
     )
 
 
-def x_test_load_runtime_metadata_success(
+def test_load_runtime_metadata_success(
     mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path
 ) -> None:
-    # TODO issue #2691
     runtime_metadata = {
         "files": {
             "commodity_prices.calves_all.dollar_per_kilogram": {
@@ -3372,7 +3371,12 @@ def x_test_load_runtime_metadata_success(
 
     assert mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
 
-    mocked_validate.assert_called_once_with(runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+    mocked_validate.assert_called_once_with(
+        runtime_metadata,
+        VALID_INPUT_TYPES,
+        ADDRESS_TO_INPUTS,
+        mock_input_manager.input_root
+    )
     mocked_loader.assert_called_once_with(tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv")
     mocked_add.assert_called_once_with(
         variable_name="commodity_prices.calves_all.dollar_per_kilogram",
