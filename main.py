@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
 
 """
 This file serves as a main entry point to RuFaS.
@@ -10,26 +10,51 @@ import argparse
 import sys
 import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.task_manager import TaskManager
 
 
 def main() -> None:
+    """run RuFaS from the command line"""
     cmd_arguments = parse_gnu_args(sys.argv[1:])
+    run_rufas(
+        metapath = Path(cmd_arguments.path_to_metadata),
+        verbosity = LogVerbosity(cmd_arguments.verbose),
+        keep_infos = not cmd_arguments.exclude_info_maps,
+        out_dir = Path(cmd_arguments.output_dir),
+        log_dir = Path(cmd_arguments.logs_dir),
+        preclean = cmd_arguments.clear_output,
+        graphics = cmd_arguments.no_graphics,
+        log = not cmd_arguments.suppress_log_files,
+        metadepth = cmd_arguments.metadata_depth_limit
+    )
+
+
+def run_rufas(
+        metapath: Path, verbosity: LogVerbosity,
+        out_dir: Path,
+        log_dir: Path,
+        keep_infos: bool = True,
+        preclean: bool = False,
+        graphics: bool = False,
+        log: bool = True,
+        metadepth: Optional[int] = None,
+) -> None:
+    """function to run RuFaS"""
     try:
         task_manager = TaskManager()
         task_manager.start(
-            metadata_path=Path(cmd_arguments.path_to_metadata),
-            verbosity=LogVerbosity(cmd_arguments.verbose),
-            exclude_info_maps=cmd_arguments.exclude_info_maps,
-            output_directory=Path(cmd_arguments.output_dir),
-            logs_directory=Path(cmd_arguments.logs_dir),
-            clear_output_directory=cmd_arguments.clear_output,
-            produce_graphics=not cmd_arguments.no_graphics,
-            suppress_log_files=cmd_arguments.suppress_log_files,
-            metadata_depth_limit=cmd_arguments.metadata_depth_limit,
+            metadata_path = metapath,
+            verbosity = verbosity,
+            exclude_info_maps = not keep_infos,
+            output_directory = out_dir,
+            logs_directory = log_dir,
+            clear_output_directory = preclean,
+            produce_graphics = graphics,
+            suppress_log_files = not log,
+            metadata_depth_limit = metadepth,
         )
     except Exception as e:
         info_map = {"class": "No caller class", "function": main.__name__}
@@ -41,10 +66,10 @@ def main() -> None:
             error_message,
             info_map,
         )
-        output_manager.create_directory(Path(cmd_arguments.logs_dir))
+        output_manager.create_directory(log_dir)
         output_manager.dump_all_nondata_pools(
-            Path(cmd_arguments.logs_dir),
-            cmd_arguments.exclude_info_maps,
+            log_dir,
+            not keep_infos,
             "block",
         )
         output_manager.add_error(
@@ -54,7 +79,7 @@ def main() -> None:
         )
         raise RuntimeError(
             f"An error occurred during simulation: {e} - check error logs in"
-            f" '{cmd_arguments.output_dir}' directory for further details."
+            f" '{out_dir}' directory for further details."
         )
 
 
