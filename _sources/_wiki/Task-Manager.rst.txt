@@ -95,8 +95,8 @@ specific purposes:
    by changes in input parameters.
 5. **INPUT_DATA_AUDIT**: Performs validation on input data and generates
    a CSV file for them.
-6. **END_TO_END_TESTING**: Ensures all components of a system work
-   together correctly from start to finish.
+6. **END_TO_END_TESTING**: Runs RuFaS's end-to-end testing routine.
+   Ensures all components of RuFaS work together correctly from start to finish.
 7. **POST_PROCESSING**: Handles data processing after initial output,
    such as data aggregation or visualization.
 8. **COMPARE_METADATA_PROPERTIES**: Compares and saves the differences
