@@ -1,0 +1,280 @@
+{
+  "tasks_properties": {
+    "data_collection_app_compatible": true,
+    "parallel_workers": {
+      "type": "number",
+      "description": "How many parallel workers should Task Manager use",
+      "default": 1,
+      "minimum": 1
+    },
+    "export_input_data_to_csv": {
+      "type": "bool",
+      "description": "Select this flag to export the input data pool into a CSV file for all tasks.",
+      "default": false
+    },
+    "input_data_csv_export_path": {
+      "type": "string",
+      "description": "The path to save the exported input data CSV file.",
+      "default": "output/saved_input_data/"
+    },
+    "input_data_csv_import_path": {
+      "type": "string",
+      "description": "If user wish to compare the input data with previous runs, the user can pass in the previously saved input data CSV path. The result will be combined together for a side-by-side comparison.",
+      "default": ""
+    },
+    "tasks": {
+      "type": "array",
+      "description": "The list of things that Task Manager should do in an unordered manner",
+      "properties": {
+        "type": "object",
+        "task_type": {
+          "type": "string",
+          "pattern": "^(HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE|UPDATE_E2E_TEST_RESULTS)$",
+          "description": "What kind of task is this?"
+        },
+        "metadata_file_path": {
+          "type": "string",
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
+          "description": "The path to the metadata JSON files to load and use in the Input Manager of this task"
+        },
+        "input_root": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "Root directory for all input files.",
+          "default": ""
+        },
+        "properties_file_path": {
+          "type": "string",
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
+          "description": "The path to the first metadata properties JSON file to load and compare to the other metadata file loaded",
+          "default": "input/metadata/properties/default.json"
+        },
+        "comparison_properties_file_path": {
+          "type": "string",
+          "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
+          "description": "The path to the second metadata properties JSON file to load and compare to the other metadata file loaded",
+          "default": "input/metadata/properties/default.json"
+        },
+        "convert_variable_table_path": {
+          "type": "string",
+          "pattern": "^.*.csv$",
+          "description": "The path to the CSV file that contains the previous and the new name of variables.",
+          "default": null,
+          "nullable": true
+        },
+        "output_prefix": {
+          "type": "string",
+          "description": "Will be used to generate a name for each of the output files for this task.",
+          "default": "default_scenario"
+        },
+        "log_verbosity": {
+          "type": "string",
+          "pattern": "^(errors|warnings|logs|credits|none)$",
+          "default": "errors",
+          "description": "Specifies the level of log type to be printed on console."
+        },
+        "variable_name_style": {
+          "type": "string",
+          "pattern": "^(block|inline|verbose|basic)$",
+          "description": "The formatting option for variable_names.txt file",
+          "default": "basic"
+        },
+        "exclude_info_maps": {
+          "type": "bool",
+          "description": "Exclude info_maps from the output",
+          "default": false
+        },
+        "init_herd": {
+          "type": "bool",
+          "description": "Select this flag if you want to initialize the herd by generating a herd population through simulation.",
+          "default": false
+        },
+        "save_animals": {
+          "type": "bool",
+          "description": "Choose this flag if you want to save the generated herd data into a JSON file.",
+          "default": false
+        },
+        "save_animals_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The saving directory for animals if save_animals is set to true",
+          "default": "output/"
+        },
+        "filters_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory for the files containing the output filters",
+          "default": "output/output_filters/"
+        },
+        "csv_output_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory for the csv output files to be saved",
+          "default": "output/CSVs/"
+        },
+        "json_output_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory for the JSON output files to be saved.",
+          "default": "output/JSONs/"
+        },
+        "report_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory for reports to be saved to.",
+          "default": "output/reports/"
+        },
+        "graphics_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The saving directory for graphics",
+          "default": "output/graphics/"
+        },
+        "logs_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory for saving log message files, variable names, and other simulation outputs to.",
+          "default": "output/logs/"
+        },
+        "suppress_log_files": {
+          "type": "bool",
+          "description": "If true, logs will not be written as output files.",
+          "default": false
+        },
+        "run_eee": {
+          "type": "bool",
+          "description": "Run the emissions, energy, and economics estimators prior to post-processing.",
+          "default": false
+        },
+        "load_saved_output_pools": {
+          "type": "bool",
+          "description": "Load previously saved output pools prior to post-processing.",
+          "default": false
+        },
+        "saved_output_pools": {
+          "type": "array",
+          "description": "Collection of saved output pools to reload before post-processing.",
+          "properties": {
+            "type": "object",
+            "name": {
+                "type": "string",
+                "description": "Identifier applied to variables loaded from this pool.",
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "path": {
+                "type": "string",
+                "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+                "description": "File path to the saved output pool JSON file."
+              }
+            },
+          "nullable": true
+        },
+        "output_pool_path": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9._-]+[\\\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+          "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
+          "default": ""
+        },
+        "random_seed": {
+          "type": "number",
+          "description": "The random seed, set it to 0 to auto-generate it",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "default": 0
+        },
+        "chunkification": {
+          "type": "bool",
+          "description": "Whether to periodically save the output variable pool to a file.",
+          "default": false
+        },
+        "save_chunk_threshold_call_count": {
+          "type": "number",
+          "description": "The threshold add variable call count for saving the output variable pool chunk.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage": {
+          "type": "number",
+          "description": "The maximum memory usage in Bytes.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage_percent": {
+          "type": "number",
+          "description": "The maximum percentage of memory use. If save_chunk_threshold_call_count is provided, then that is what is used to determine when to chunk, otherwise it is maximum memory usage, otherwise it is max memory usage percent.",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
+        },
+        "multi_run_counts": {
+          "type": "number",
+          "description": "If task type is multi_run, indicates how many single simulations should run.",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 4
+        },
+        "sampler": {
+          "type": "string",
+          "description": "The sampler for Sensitivity Analysis",
+          "pattern": "^(fractional_factorial|sobol|morris)$",
+          "default": "sobol"
+        },
+        "skip_values": {
+          "type": "number",
+          "description": "The number of points in the sampling sequence to skip for Sensitivity Analysis",
+          "minimum": 0,
+          "default": 0
+        },
+        "sampler_n": {
+          "type": "number",
+          "description": "The number of samples to generate for Sensitivity Analysis. Ideally a power of 2 and >= 'skip_values'",
+          "minimum": 2,
+          "default": 2
+        },
+        "SA_input_variables": {
+          "type": "array",
+          "description": "The input variables to perform Sensitivity Analysis on",
+          "nullable": true,
+          "properties": {
+            "type": "object",
+            "variable_name": {
+              "type": "string",
+              "default": "no_name",
+              "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
+            },
+            "lower_bound": {
+              "type": "number",
+              "default": 0,
+              "description": "The lower bound for sampling"
+            },
+            "upper_bound": {
+              "type": "number",
+              "default": 1,
+              "description": "The upper bound for sampling"
+            },
+            "data_type": {
+              "type": "string",
+              "description": "Specifies the data type of this variable",
+              "default": "float",
+              "pattern": "^(float|int)$"
+            }
+          }
+        },
+        "SA_load_balancing_start": {
+          "type": "number",
+          "description": "The lower bound value for sensitivity analysis load balancing",
+          "minimum": 0,
+          "maximum": 0.99,
+          "default": 0
+        },
+        "SA_load_balancing_stop": {
+          "type": "number",
+          "description": "The upper bound value for sensitivity analysis load balancing",
+          "minimum": 0.01,
+          "maximum": 1,
+          "default": 1
+        }
+      }
+    }
+  }
+}
