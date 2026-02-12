@@ -50,7 +50,6 @@ def main(**man_args) -> None:
     :param man_args: (optional) manually-specified named arguments to rufas. Values of provided will supersede
     those specified in config files and model defaults and are superseded by gnu arguments, which have the
     highest priority (see parse_gnu_args below).
-    :param single_run: should this be a single run?
     """
 
     # check for single run (or other task manager stuff)
@@ -91,9 +90,9 @@ def run_model(**kwargs) -> None:
     perform a **single** run of the rufas model
     :param kwargs: all input parameters for RUFAS
 
-    Note: I think it is important that there is a function for running RUFAS in the simplest way (only oncce) to
+    Note: I think it is important that there is a function for running RUFAS in the simplest way (only once) to
     facilitate shell scripting, distributed computing, etc. Other functions (and the task manager) can then determine
-    how many times to
+    how many times and under what additional contexts the model should run.
     """
     pass
 
@@ -164,8 +163,8 @@ def merge_arg_dicts(d1, d2) -> dict:
 
 def parse_inputs(**kwargs) -> dict:
     """
-    parse keyword arguments and convert them into an appropriate dictionary of RUFAS arguments
-    this function may not be needed, but I wanted to allow for preprocessing/reformatting inputs
+    parse keyword arguments and convert them into an appropriate dictionary of RUFAS arguments.
+    This function may not be needed, but I wanted to allow for preprocessing/reformatting inputs
     :param kwargs: arguments to be parsed
     :return: a conformant dictionary of RUFAS arguments
     """
