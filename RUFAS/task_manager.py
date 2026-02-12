@@ -36,12 +36,18 @@ NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 class TaskType(Enum):
     """Enum for different task types handled by TaskManager."""
 
-    HERD_INITIALIZATION = "Herd Initialization"
+    HERD_INITIALIZATION = "Initializes simulation to generate a stable herd"
     SIMULATION_SINGLE_RUN = "A single simulation run"
-    SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
+    SIMULATION_MULTI_RUN = (
+        "Runs multiple simulations to generate statistically significant results. "
+        "Automatically changes the random seed."
+    )
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
     INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
-    END_TO_END_TESTING = "Run e2e testing"
+    END_TO_END_TESTING = (
+        "Runs RuFaS's end-to-end testing routine. Ensures all components of RuFaS work together "
+        "correctly from start to finish."
+    )
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
     DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
@@ -130,7 +136,7 @@ class TaskManager:
             "function": TaskManager.start.__name__,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""))
+        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""), task_id="TASK MANAGER")
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         for task in task_config.get("tasks", []):
             filters_path = Path(task["filters_directory"])
@@ -745,7 +751,7 @@ class TaskManager:
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
         is_data_valid = input_manager.start_data_processing(
-            Path(args["metadata_file_path"]), Path(args["input_root"]), eager_termination
+            Path(args["metadata_file_path"]), Path(args["input_root"]), args["task_id"], eager_termination
         )
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map

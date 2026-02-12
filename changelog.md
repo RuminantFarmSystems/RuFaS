@@ -270,7 +270,6 @@ v0.9.2
 - [2639](https://github.com/RuminantFarmSystems/MASM/pull/2639) - [minor change] [InputChange][NoOutputChange][EEE] Add Economics prices dataset.
 - [2640](https://github.com/RuminantFarmSystems/MASM/pull/2640) - [minor change] [InputChange][NoOutputChange][Input Manager] Add functionality to load data anad metadata lazily.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
-- [2638](https://github.com/RuminantFarmSystems/MASM/pull/2638) - [minor change] [NoInputChange][OutputChange] Institutes 25% manure retention for anaerobic lagoon.
 - [2641](https://github.com/RuminantFarmSystems/MASM/pull/2641) - [minor change] [NoInputChange][NoOutputChange][ReadMe] Fix Readme badges.
 - [2644](https://github.com/RuminantFarmSystems/MASM/pull/2644) - [minor change] [NoInputChange][NoOutputChange] Ensures a particular crop-field pair can only match one particular storage.
 - [2643](https://github.com/RuminantFarmSystems/MASM/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
@@ -279,6 +278,7 @@ v0.9.2
 - [2636](https://github.com/RuminantFarmSystems/MASM/pull/2636) - [minor change] [Manure] [NoInputChange] [OutputChange] Improve temperature estimation of slurry of liquid manure in storage.
 - [2660](https://github.com/RuminantFarmSystems/MASM/pull/2660) - [minor change] [InputChange][NoOutputChange][Input][Properties] Adds task property to allow running simulations using inputs from external repos.
 - [2653](https://github.com/RuminantFarmSystems/MASM/pull/2653) - [minor change] [NoInputChange][NoOutputChange][Unit Test] Separate Unit Tests for `photosynthesize()` and `partition_biomass()` in `allocate_biomass()`.
+- [2667](https://github.com/RuminantFarmSystems/MASM/pull/2667) - [minor change] [NoInputChange][OutputChange][Feed Storage] Refactor Harvested crop class to store mass on a dry matter basis.
 - [2655](https://github.com/RuminantFarmSystems/MASM/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 - [2670](https://github.com/RuminantFarmSystems/MASM/pull/2670) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated Animal module unit testing to 100% coverage.
 - [2673](https://github.com/RuminantFarmSystems/MASM/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
@@ -302,6 +302,12 @@ v0.9.2
 - [2608](https://github.com/RuminantFarmSystems/MASM/pull/2608) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
 - [2705](https://github.com/RuminantFarmSystems/MASM/pull/2705) - [minor change] [InputChange][OutputChange][e2e-testing] Fix end to end testing for the new emission files.
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
+- [2742](https://github.com/RuminantFarmSystems/RuFaS/pull/2742) - [minor change] [NoInputChange] [NoOutputChange] Add logs for variables contributing to aggregated reports.
+- [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
+- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
+- [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
+- [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
+
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
