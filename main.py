@@ -21,10 +21,10 @@ def main() -> None:
     cmd_arguments = parse_gnu_args(sys.argv[1:])
     run_rufas(
         metapath = Path(cmd_arguments.path_to_metadata),
-        verbosity = LogVerbosity(cmd_arguments.verbose),
-        keep_infos = not cmd_arguments.exclude_info_maps,
         out_dir = Path(cmd_arguments.output_dir),
         log_dir = Path(cmd_arguments.logs_dir),
+        verbosity = LogVerbosity(cmd_arguments.verbose),
+        keep_infos = not cmd_arguments.exclude_info_maps,
         preclean = cmd_arguments.clear_output,
         graphics = cmd_arguments.no_graphics,
         log = not cmd_arguments.suppress_log_files,
@@ -33,16 +33,17 @@ def main() -> None:
 
 
 def run_rufas(
-        metapath: Path, verbosity: LogVerbosity,
+        metapath: Path,
         out_dir: Path,
         log_dir: Path,
+        verbosity: LogVerbosity = LogVerbosity("credits"),
         keep_infos: bool = True,
         preclean: bool = False,
         graphics: bool = False,
         log: bool = True,
         metadepth: Optional[int] = None,
 ) -> None:
-    """function to run RuFaS"""
+    """function to run RuFaS model"""
     try:
         task_manager = TaskManager()
         task_manager.start(
