@@ -1,0 +1,2 @@
+diesel_cost_gal,electricity_cost_kwh,natural_gas_cost_kwh,water_cost_gal
+5.00,0.15,0.053,0.008
