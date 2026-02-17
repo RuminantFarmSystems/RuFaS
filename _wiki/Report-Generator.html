@@ -177,7 +177,7 @@ CSV file. If missing, it defaults to <code class="docutils literal notranslate">
 <li><p><strong>filters</strong>: (Optional if cross validation is present) The list of
 Regex filters to select variables from the OutputManager’s variables
 pool.</p></li>
-<li><p><strong>variables</strong>: (Optional) When the data is stored in dictionaries
+<li><p><strong>variables</strong>: (Optional) Required when the data is stored in dictionaries
 (i.e., when reporting the variable to the output manager using
 <code class="docutils literal notranslate"><span class="pre">OutputManager.add_variable()</span></code>, a dict was passed), the
 <code class="docutils literal notranslate"><span class="pre">variables</span></code> entry is used to select which variables from the
@@ -260,6 +260,18 @@ when used alongside cross_references, rounding can lead to slight
 variations in aggregation results. This occurs because mixing rounded
 and non-rounded data in aggregation functions may produce results that
 differ slightly from those obtained using only non-rounded data.</p></li>
+<li><p><strong>direction</strong>: (Optional) The output CSV orientation. Either <code class="docutils literal notranslate"><span class="pre">“portrait”</span></code>
+or <code class="docutils literal notranslate"><span class="pre">“landscape”</span></code>. If no value is provided or providing an unexpected
+value, the default <code class="docutils literal notranslate"><span class="pre">“portrait”</span></code> direction will be used.</p></li>
+<li><p><strong>use_name</strong>: (Optional) Whether to use the filter name when constructing
+the key name for data pulled from a dictionary.</p></li>
+<li><p><strong>use_verbose_report_name</strong>: (Optional) When true, forces verbose report
+names (report_name.full_variable_address) for single-column reports.
+By default, single-column reports use compact names while multi-column
+reports use verbose names to ensure distinct column headers.
+This flag only affects vertically aggregated single-column reports
+and unaggregated single-column reports; it has no effect on horizontally
+aggregated reports or multi-column reports (which already use verbose names).</p></li>
 </ul>
 <p>Columns are the variables and rows are datapoints, i.e., each row
 corresponds to a <code class="docutils literal notranslate"><span class="pre">OM.add_variable</span></code> call and each column corresponds to

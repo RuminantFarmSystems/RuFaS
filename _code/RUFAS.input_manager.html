@@ -191,7 +191,7 @@
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.start_data_processing">
-<span class="sig-name descname"><span class="pre">start_data_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.start_data_processing" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.start_data_processing'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">start_data_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.start_data_processing" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager.start_data_processing'"><span>#</span></a></dt>
 <dd><p>Starts the pipeline for organizing metadata and input data processing.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
@@ -199,6 +199,8 @@
 <dt>metadata_path<span class="classifier">Path</span></dt><dd><p>File path to the metadata.</p>
 </dd>
 <dt>input_root<span class="classifier">Path</span></dt><dd><p>Root directory for all input files.</p>
+</dd>
+<dt>task_id<span class="classifier">Any</span></dt><dd><p>Task ID for the current process.</p>
 </dd>
 <dt>eager_termination<span class="classifier">bool, default=True</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.
 If False, the process will be terminated after going through and validating the entire data.</p>
@@ -212,6 +214,11 @@ If False, the process will be terminated after going through and validating the 
 </dd>
 </dl>
 </section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._validate_required_file_blobs">
+<span class="sig-name descname"><span class="pre">_validate_required_file_blobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_file_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._validate_required_file_blobs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.input_manager.InputManager._validate_required_file_blobs'"><span>#</span></a></dt>
+<dd><p>Validates that all required file blobs are present in the metadata.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.load_runtime_metadata">
@@ -1118,6 +1125,7 @@ encountered.</p>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.meta_data'" class="reference internal" href="#RUFAS.input_manager.InputManager.meta_data"><code class="docutils literal notranslate"><span class="pre">InputManager.meta_data</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.pool'" class="reference internal" href="#RUFAS.input_manager.InputManager.pool"><code class="docutils literal notranslate"><span class="pre">InputManager.pool</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.start_data_processing'" class="reference internal" href="#RUFAS.input_manager.InputManager.start_data_processing"><code class="docutils literal notranslate"><span class="pre">InputManager.start_data_processing()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._validate_required_file_blobs'" class="reference internal" href="#RUFAS.input_manager.InputManager._validate_required_file_blobs"><code class="docutils literal notranslate"><span class="pre">InputManager._validate_required_file_blobs()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager.load_runtime_metadata'" class="reference internal" href="#RUFAS.input_manager.InputManager.load_runtime_metadata"><code class="docutils literal notranslate"><span class="pre">InputManager.load_runtime_metadata()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._runtime_metadata_guard_failure'" class="reference internal" href="#RUFAS.input_manager.InputManager._runtime_metadata_guard_failure"><code class="docutils literal notranslate"><span class="pre">InputManager._runtime_metadata_guard_failure()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.input_manager.InputManager._resolve_runtime_metadata_files'" class="reference internal" href="#RUFAS.input_manager.InputManager._resolve_runtime_metadata_files"><code class="docutils literal notranslate"><span class="pre">InputManager._resolve_runtime_metadata_files()</span></code></a></li>

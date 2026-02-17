@@ -256,7 +256,7 @@ that have any effect are ``”name”``, ``”filters”``, ``”variables”``,
 <tr class="row-even"><td><p>name</p></td>
 <td><p>str</p></td>
 <td><p>N/A</p></td>
-<td><p>n/a</p></td>
+<td><p>N/A</p></td>
 <td><p>The name of the report to appear in the column header of report CSV.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">"Average</span> <span class="pre">Herd</span> <span class="pre">Milk</span> <span class="pre">Fat"</span></code></p></td>
 <td><p>OPTIONAL</p></td>
@@ -265,7 +265,7 @@ that have any effect are ``”name”``, ``”filters”``, ``”variables”``,
 <td><p>str</p></td>
 <td><p>N/A</p></td>
 <td><p>The title of the graph.</p></td>
-<td><p>n/a</p></td>
+<td><p>N/A</p></td>
 <td><p>“Gallons Milk Per Cow”</p></td>
 <td><p>No</p></td>
 </tr>
@@ -274,7 +274,7 @@ that have any effect are ``”name”``, ``”filters”``, ``”variables”``,
 <td><p>N/A</p></td>
 <td><p>The type of graph you want
 plotted.</p></td>
-<td><p>n/a</p></td>
+<td><p>N/A</p></td>
 <td><p>“stackplot”</p></td>
 <td><p>GG</p></td>
 </tr>
@@ -359,7 +359,7 @@ plotted.</p></td>
 <td><p>If true use dates/time as
 measurement on graph’s
 x-axis</p></td>
-<td><p>n/a</p></td>
+<td><p>N/A</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>No</p></td>
 </tr>
@@ -369,7 +369,7 @@ x-axis</p></td>
 <td><p>Specifies format of
 date/time along x-axis of
 graph</p></td>
-<td><p>n/a</p></td>
+<td><p>N/A</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">day_of_year</span></code></p></td>
 <td><p>No</p></td>
 </tr>
@@ -416,7 +416,54 @@ NaNs.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>constants</p></td>
+<tr class="row-even"><td><p>fill_value</p></td>
+<td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.nan</span></code></p></td>
+<td><p>Value that is used to pad
+the front of the data
+values, and optionally the
+values in between original
+values and after the last
+original value.</p></td>
+<td><p>Value that is used to pad the front of the data values, and optionally the values in
+between original values and after the last original value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>use_fill_value_in_gaps</p></td>
+<td><p>bool</p></td>
+<td><p>true</p></td>
+<td><p>If false, values between
+known data points are
+expanded with the last
+known value from the data
+set. If true, values
+between known data points
+are filled with
+<code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+<td><p>If false, values between known data points are expanded with the last known value from
+the data set. If true, values between known data points are filled with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>use_fill_value_at_end</p></td>
+<td><p>bool</p></td>
+<td><p>true</p></td>
+<td><p>If false, values after last
+known data point are
+padded with the last
+known value from the data
+set. If true, values
+after the known data point
+are filled with
+<code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+<td><p>If false, values after last known data point are padded with the last known value from
+the data set. If true, values after the last known data point are filled
+with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>constants</p></td>
 <td><p>dict[str, float]</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -425,7 +472,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{"Liters</span> <span class="pre">to</span> <span class="pre">Gallons":</span> <span class="pre">0.264172}</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>cross_references</p></td>
+<tr class="row-even"><td><p>cross_references</p></td>
 <td><p>list[str]</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -433,7 +480,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">["Milk</span> <span class="pre">protein,</span> <span class="pre">kg_ver_agg_.*"]</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>vertical_aggregation</p></td>
+<tr class="row-odd"><td><p>vertical_aggregation</p></td>
 <td><p>str</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -441,7 +488,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">"sum"</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>horizontal_aggregation</p></td>
+<tr class="row-even"><td><p>horizontal_aggregation</p></td>
 <td><p>str</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -449,7 +496,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">"product"</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>horizontal_first</p></td>
+<tr class="row-odd"><td><p>horizontal_first</p></td>
 <td><p>bool</p></td>
 <td><p>false</p></td>
 <td><p>N/A</p></td>
@@ -457,7 +504,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>horizontal_order</p></td>
+<tr class="row-even"><td><p>horizontal_order</p></td>
 <td><p>list[str]</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -465,7 +512,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">["Herd</span> <span class="pre">FPCM,</span> <span class="pre">kg_hor_agg",</span> <span class="pre">"Milking</span> <span class="pre">cows_ver_agg",</span> <span class="pre">"Days</span> <span class="pre">per</span> <span class="pre">year"]</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>slice_start</p></td>
+<tr class="row-odd"><td><p>slice_start</p></td>
 <td><p>int</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -473,7 +520,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-730</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>slice_end</p></td>
+<tr class="row-even"><td><p>slice_end</p></td>
 <td><p>int</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -481,7 +528,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">365</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>graph_details</p></td>
+<tr class="row-odd"><td><p>graph_details</p></td>
 <td><p>dict[str, str]</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
@@ -490,7 +537,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{"type":</span> <span class="pre">"plot"}</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>graph_and_report</p></td>
+<tr class="row-even"><td><p>graph_and_report</p></td>
 <td><p>bool</p></td>
 <td><p>false</p></td>
 <td><p>N/A</p></td>
@@ -498,7 +545,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>simplify_units</p></td>
+<tr class="row-odd"><td><p>simplify_units</p></td>
 <td><p>bool</p></td>
 <td><p>true</p></td>
 <td><p>N/A</p></td>
@@ -506,7 +553,7 @@ aggregation.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>data_significant_digits</p></td>
+<tr class="row-even"><td><p>data_significant_digits</p></td>
 <td><p>int</p></td>
 <td><p>N/A</p></td>
 <td><p># significant digits for
@@ -523,13 +570,26 @@ be rounded
 during
 simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p>direction</p></td>
+<tr class="row-odd"><td><p>direction</p></td>
 <td><p>str</p></td>
 <td><p>“portrait”</p></td>
 <td><p>N/A</p></td>
 <td><p>The output CSV orientation. Either “portrait” or “landscape”. If no value is provided or
 providing an unexpected value, the default “portrait” direction will be used.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">"portrait"</span></code></p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>use_verbose_report_name</p></td>
+<td><p>bool</p></td>
+<td><p>false</p></td>
+<td><p>N/A</p></td>
+<td><p>When set to true, forces verbose report names (report_name.full_variable_address) for
+single-column reports. By default, single-column reports use compact names while
+multi-column reports use verbose names to ensure distinct column headers.
+This flag only affects vertically aggregated single-column reports and unaggregated
+single-column reports; it has no effect on horizontally aggregated reports or multi-column
+reports (which already use verbose names).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
 <td><p>No</p></td>
 </tr>
 </tbody>
