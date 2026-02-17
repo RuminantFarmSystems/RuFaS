@@ -15,7 +15,7 @@ def test_estimate_all(mocker: MockerFixture) -> None:
     om = OutputManager()
     mock_om_add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.EEE.emissions.EmissionsEstimator.__init__", return_value=None)
-    mock_estimate_emissions = mocker.patch("RUFAS.EEE.emissions.EmissionsEstimator.estimate_emissions")
+    mock_estimate_emissions = mocker.patch("RUFAS.EEE.emissions.EmissionsEstimator.estimate_farmgrown_feed_emissions")
     mock_estimate_energy = mocker.patch.object(EnergyEstimator, "estimate_all")
 
     EEEManager.estimate_all()

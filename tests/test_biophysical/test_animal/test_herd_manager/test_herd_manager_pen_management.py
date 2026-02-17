@@ -9,11 +9,11 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, TotalInventory, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
@@ -299,7 +299,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
 
         mock_udr_key = mocker.MagicMock()
-        mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
+        mocker.patch.object(RationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
 
         mock_pen_avail_feeds = mocker.MagicMock()
         mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds)
@@ -319,6 +319,59 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         )
         assert animal.id in herd_manager.animal_to_pen_id_map
         assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
+
+
+def test_add_animal_to_pen_and_id_map_uses_default_ration_feeds_when_not_user_defined(
+    herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
+) -> None:
+    """When ration is not user-defined, _add_animal_to_pen_and_id_map should use RationManager.ration_feeds."""
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
+    animal = mock_herd["calves"][0]
+
+    herd_manager.animal_to_pen_id_map = {}
+    herd_manager.is_ration_defined_by_user = False
+    mock_feed = MagicMock(auto_spec=Feed)
+    available_feeds: list[Feed] = [mock_feed]
+    total_inventory = TotalInventory({}, datetime.today().date())
+
+    animal_combination = herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+    pen_with_min_stocking_density: Pen = min(
+        herd_manager.pens_by_animal_combination[animal_combination],
+        key=lambda p: p.current_stocking_density,
+    )
+    pen_with_min_stocking_density.clear()
+
+    mocker.patch.object(pen_with_min_stocking_density, "insert_single_animal_into_animals_in_pen_map")
+    mocker.patch.object(pen_with_min_stocking_density, "set_animal_nutritional_requirements")
+    mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+
+    mock_ration_feeds = mocker.MagicMock(name="ration_feeds")
+    mocker.patch.object(RationManager, "ration_feeds", mock_ration_feeds, create=True)
+
+    mock_pen_avail_feeds = mocker.MagicMock()
+    mock_find_pen_available_feeds = mocker.patch.object(
+        herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds
+    )
+
+    herd_manager._add_animal_to_pen_and_id_map(
+        animal=animal,
+        available_feeds=available_feeds,
+        current_day_conditions=mock_current_day_conditions,
+        total_inventory=total_inventory,
+        simulation_day=15,
+    )
+
+    mock_find_pen_available_feeds.assert_called_once_with(available_feeds, mock_ration_feeds)
+
+    mock_reformulate_ration_single_pen.assert_called_once_with(
+        pen=pen_with_min_stocking_density,
+        pen_available_feeds=mock_pen_avail_feeds,
+        current_temperature=mock_current_day_conditions.mean_air_temperature,
+        total_inventory=total_inventory,
+        simulation_day=15,
+    )
+
+    assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
 
 
 @pytest.mark.parametrize(
@@ -470,6 +523,45 @@ def test_fully_update_animal_to_pen_id_map_warns_if_pen_is_overstocked(
     assert "Pen 99" in args[1]
     assert kwargs["info_map"]["function"] == "fully_update_animal_to_pen_id_map"
     assert kwargs["info_map"]["simulation_day"] == 15
+
+
+@pytest.mark.parametrize(
+    "all_feed_ids, user_defined_ids, expected_ids",
+    [
+        # 1. Single match
+        ([1, 2], [1], [1]),
+        # 2. No matches
+        ([1, 2], [3], []),
+        # 3. Multiple matches (order should be preserved from all_available_feeds)
+        ([1, 2, 3], [3, 1], [1, 3]),
+        # 4. Both lists empty
+        ([], [], []),
+        # 5. user_defined_ids empty → always returns []
+        ([1], [], []),
+    ],
+)
+def test_find_pen_available_feeds(
+    all_feed_ids: list[int],
+    user_defined_ids: list[int],
+    expected_ids: list[int],
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Tests for _find_pen_available_feeds filtering behavior."""
+    all_available_feeds = []
+    for feed_id in all_feed_ids:
+        feed = mocker.MagicMock(spec=Feed)
+        feed.rufas_id = RUFAS_ID(feed_id)
+        all_available_feeds.append(feed)
+
+    user_defined_ration_feed_ids = [RUFAS_ID(feed_id) for feed_id in user_defined_ids]
+
+    result = herd_manager._find_pen_available_feeds(
+        all_available_feeds=all_available_feeds,
+        user_defined_ration_feed_ids=user_defined_ration_feed_ids,
+    )
+
+    assert [feed.rufas_id for feed in result] == expected_ids
 
 
 def test_gather_pen_history(

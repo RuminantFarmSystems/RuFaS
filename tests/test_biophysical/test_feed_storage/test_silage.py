@@ -17,11 +17,11 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def mock_silage_config() -> dict[str, str | float]:
+def mock_silage_config() -> dict[str, str | float | list[str]]:
     return {
         "name": "silage",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
         "size": 1000.0,
@@ -30,7 +30,7 @@ def mock_silage_config() -> dict[str, str | float]:
 
 
 @pytest.fixture
-def silage(mock_silage_config: dict[str, str | float]) -> Silage:
+def silage(mock_silage_config: dict[str, str | float | list[str]]) -> Silage:
     return Silage(config=mock_silage_config)
 
 
@@ -130,7 +130,7 @@ def test_project_degradations(
 ) -> None:
     """Test that project_degradations functions as expected."""
     effluent_loss_values = {
-        "fresh_mass": 800.0,
+        "dry_matter_mass": 800.0,
         "dry_matter_percentage": 14.0,
         "non_protein_nitrogen": 3.0,
         "crude_protein_percent": 5.0,
@@ -138,7 +138,7 @@ def test_project_degradations(
         "moisture_loss": 20.0,
     }
     expected_loss_values = {
-        "fresh_mass": 800.0,
+        "dry_matter_mass": 800.0,
         "dry_matter_percentage": 14.0,
         "non_protein_nitrogen": 3.0,
         "crude_protein_percent": 5.0,
@@ -155,7 +155,7 @@ def test_project_degradations(
     actual = silage.project_degradations(silage.stored, weather, time)
 
     for crop in actual:
-        assert crop.fresh_mass == expected_loss_values["fresh_mass"]
+        assert crop.dry_matter_mass == expected_loss_values["dry_matter_mass"]
         assert pytest.approx(crop.dry_matter_percentage) == expected_loss_values["dry_matter_percentage"]
         assert crop.non_protein_nitrogen == expected_loss_values["non_protein_nitrogen"]
         assert crop.crude_protein_percent == expected_loss_values["crude_protein_percent"]
@@ -238,17 +238,17 @@ def test_calculate_crude_protein_after_effluent_loss(
 
 
 @pytest.fixture
-def bunker(mock_silage_config: dict[str, str | float]) -> Bunker:
+def bunker(mock_silage_config: dict[str, str | float | list[str]]) -> Bunker:
     return Bunker(config=mock_silage_config)
 
 
 @pytest.fixture
-def pile(mock_silage_config: dict[str, str | float]) -> Pile:
+def pile(mock_silage_config: dict[str, str | float | list[str]]) -> Pile:
     return Pile(config=mock_silage_config)
 
 
 @pytest.fixture
-def bag(mock_silage_config: dict[str, str | float]) -> Bag:
+def bag(mock_silage_config: dict[str, str | float | list[str]]) -> Bag:
     return Bag(config=mock_silage_config)
 
 

@@ -26,6 +26,32 @@ ADDRESS_TO_INPUTS = "files"
 
 VARIABLE_PROPERTIES_TO_IGNORE = ["type", "description", "modifiability", "data_collection_app_compatible"]
 
+REQUIRED_FILE_BLOBS: set[str] = {
+    "config",
+    "animal",
+    "animal_population",
+    "animal_net_merit",
+    "animal_top_listing_semen",
+    "lactation",
+    "economy",
+    "emission",
+    "purchased_feeds_emissions",
+    "purchased_feed_land_use_change_emissions",
+    "feed",
+    "NRC_Comp",
+    "NASEM_Comp",
+    "manure_management",
+    "manure_processor_connection",
+    "crop_configurations",
+    "weather",
+    "user_feeds",
+    "tractor_dataset",
+    "EEE_constants",
+    "properties",
+    "feed_storage_configurations",
+    "feed_storage_instances",
+}
+
 
 class InputManager:
     """
@@ -73,7 +99,9 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
+    def start_data_processing(
+        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+    ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
@@ -81,6 +109,10 @@ class InputManager:
         ----------
         metadata_path : Path
             File path to the metadata.
+        input_root : Path
+            Root directory for all input files.
+        task_id : Any
+            Task ID for the current process.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
@@ -90,8 +122,13 @@ class InputManager:
         bool
             True if data is valid, otherwise False.
         """
-        self._load_metadata(metadata_path)
-        valid, message = self.data_validator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        full_metadata_path = Path(input_root) / metadata_path
+        self._load_metadata(full_metadata_path)
+        if task_id != "TASK MANAGER":
+            self._validate_required_file_blobs(set(self.__metadata[ADDRESS_TO_INPUTS].keys()))
+        valid, message = self.data_validator.validate_metadata(
+            self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, input_root
+        )
         if not valid:
             raise ValueError(message)
         self._load_properties()
@@ -99,9 +136,354 @@ class InputManager:
         if not valid:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
-        is_input_data_valid = self._populate_pool(eager_termination)
+        is_input_data_valid = self._populate_pool(input_root, eager_termination)
+        failing_cross_validation_blocks: list[str] = []
+        cross_validation_blocks = self.__metadata.get("cross-validation", [])
+        if cross_validation_blocks:
+            for block in cross_validation_blocks:
+                target_and_save_block = block.get("target_and_save", {})
+                target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
+                is_cross_validation_successful = self.cross_validator.cross_validate_data(
+                    target_and_save_result,
+                    block,
+                    eager_termination,
+                )
+                if not is_cross_validation_successful:
+                    failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
+                    if eager_termination:
+                        break
+        if len(failing_cross_validation_blocks) > 0:
+            self.om.add_error(
+                "Cross Validation Failure",
+                "One or more cross-validation rules failed: " f"{', '.join(failing_cross_validation_blocks)}",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self.start_data_processing.__name__,
+                },
+            )
+            is_input_data_valid = False
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
+
+    def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
+        """Validates that all required file blobs are present in the metadata."""
+        info_map = {
+            "class": InputManager.__name__,
+            "function": InputManager._validate_required_file_blobs.__name__,
+        }
+        if not REQUIRED_FILE_BLOBS.issubset(metadata_file_names):
+            missing_blobs = REQUIRED_FILE_BLOBS - metadata_file_names
+            self.om.add_error(
+                "Metadata blobs error",
+                f"Missing required file blobs: {list(missing_blobs)}. "
+                f"Please add all missing file blobs to metadata.",
+                info_map,
+            )
+            raise ValueError(f"Missing required file blobs: {list(missing_blobs)}")
+        else:
+            self.om.add_log(
+                "Required Metadata File Blob Validation",
+                "All required file blobs are present in the metadata.",
+                info_map,
+            )
+
+    def load_runtime_metadata(self, metadata_key: str, eager_termination: bool) -> bool:
+        """Load and validate a runtime metadata document before ingesting the referenced data.
+
+        Parameters
+        ----------
+        metadata_key : str
+            Identifier declared in the primary metadata document's ``runtime_metadata`` section.
+        eager_termination : bool
+            Flag forwarded to :py:meth:`add_runtime_variable_to_pool` determining whether validation
+            failures should prevent additional fixes before continuing execution.
+
+        Returns
+        -------
+        bool
+            ``True`` when all referenced datasets are validated and added to the pool, otherwise
+            ``False`` when any failure is encountered.
+        """
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.load_runtime_metadata.__name__,
+        }
+
+        if not self._is_metadata_loaded(info_map):
+            return self._runtime_metadata_guard_failure(
+                "Active metadata must be loaded before runtime metadata can be processed.",
+                info_map,
+            )
+
+        runtime_metadata_map = self._get_runtime_metadata_map(info_map)
+        if runtime_metadata_map is None:
+            return self._runtime_metadata_guard_failure(
+                "Runtime metadata configuration could not be resolved from the active metadata document.",
+                info_map,
+            )
+
+        runtime_files = self._resolve_runtime_metadata_files(runtime_metadata_map, metadata_key, info_map)
+        if runtime_files is None:
+            return False
+
+        data_type_to_loader_map = self._runtime_data_loader_map()
+
+        results: list[bool] = []
+        for variable_name, file_details in runtime_files.items():
+            result = self._process_runtime_file(
+                variable_name,
+                file_details,
+                data_type_to_loader_map,
+                eager_termination,
+                info_map,
+            )
+            results.append(result)
+            if eager_termination and not result:
+                break
+
+        self.om.route_logs(self.data_validator.event_logs)
+        if results == []:
+            self.om.add_warning(
+                "No runtime metadata files processed",
+                f"No runtime metadata files were processed for key '{metadata_key}'. "
+                "Check if the configuration is correct or if this key is expected to have no runtime files.",
+                info_map,
+            )
+
+        return all(results) if results else True
+
+    def _runtime_metadata_guard_failure(self, reason: str, info_map: Dict[str, Any]) -> bool:
+        self.om.add_error("Runtime metadata load failure", reason, info_map)
+        return False
+
+    def _resolve_runtime_metadata_files(
+        self, runtime_metadata_map: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
+    ) -> Dict[str, Any] | None:
+        metadata_reference = self._get_runtime_metadata_reference(runtime_metadata_map, metadata_key, info_map)
+        if metadata_reference is None:
+            self._runtime_metadata_guard_failure(
+                f"Runtime metadata entry '{metadata_key}' is unavailable for loading.",
+                info_map,
+            )
+            return None
+
+        metadata_path = self._get_runtime_metadata_path(metadata_reference, metadata_key, info_map)
+        if metadata_path is None:
+            self._runtime_metadata_guard_failure(
+                f"Runtime metadata entry '{metadata_key}' does not define a loadable path.",
+                info_map,
+            )
+            return None
+
+        runtime_metadata = self._load_runtime_metadata_contents(metadata_path, info_map)
+        if runtime_metadata is None:
+            self._runtime_metadata_guard_failure(
+                f"Runtime metadata document at '{metadata_path}' could not be loaded.",
+                info_map,
+            )
+            return None
+
+        if not self._validate_runtime_metadata(runtime_metadata, info_map):
+            self._runtime_metadata_guard_failure(
+                f"Runtime metadata document at '{metadata_path}' failed validation.",
+                info_map,
+            )
+            return None
+
+        runtime_files = self._extract_runtime_files(runtime_metadata, metadata_path, info_map)
+        if runtime_files is None:
+            self._runtime_metadata_guard_failure(
+                f"Runtime metadata document at '{metadata_path}' is missing a valid '{ADDRESS_TO_INPUTS}' section.",
+                info_map,
+            )
+            return None
+
+        return runtime_files
+
+    def _is_metadata_loaded(self, info_map: Dict[str, Any]) -> bool:
+        if self.__metadata:
+            return True
+        self.om.add_error(
+            "Runtime metadata load failure",
+            "No metadata is currently loaded into the InputManager.",
+            info_map,
+        )
+        return False
+
+    def _get_runtime_metadata_map(self, info_map: Dict[str, Any]) -> Dict[str, Any] | None:
+        try:
+            return self.get_metadata("runtime_metadata")
+        except KeyError:
+            self.om.add_error(
+                "Runtime metadata not configured",
+                "No runtime metadata configuration found in the active metadata document.",
+                info_map,
+            )
+            return None
+
+    def _get_runtime_metadata_reference(
+        self, runtime_metadata_map: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
+    ) -> Dict[str, Any] | None:
+        metadata_reference = runtime_metadata_map.get(metadata_key)
+        if metadata_reference is None:
+            self.om.add_error(
+                "Runtime metadata key missing",
+                f"Runtime metadata key '{metadata_key}' not found in configuration.",
+                info_map,
+            )
+            return None
+        return metadata_reference
+
+    def _get_runtime_metadata_path(
+        self, metadata_reference: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
+    ) -> Path | None:
+        metadata_path_value = metadata_reference.get("path")
+        if metadata_path_value is None:
+            self.om.add_error(
+                "Runtime metadata path missing",
+                f"Runtime metadata entry '{metadata_key}' is missing a path attribute.",
+                info_map,
+            )
+            return None
+        return Path(metadata_path_value)
+
+    def _load_runtime_metadata_contents(self, metadata_path: Path, info_map: Dict[str, Any]) -> Dict[str, Any] | None:
+        try:
+            return self._load_runtime_metadata_document(metadata_path)
+        except Exception as exc:
+            self.om.add_error(
+                "Runtime metadata load failure",
+                f"Failed to load runtime metadata from {metadata_path}: {exc}",
+                info_map,
+            )
+            return None
+
+    def _validate_runtime_metadata(self, runtime_metadata: Dict[str, Any], info_map: Dict[str, Any]) -> bool:
+        is_valid, message = self.data_validator.validate_metadata(
+            runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, self.input_root
+        )
+        if is_valid:
+            return True
+        self.om.add_error("Runtime metadata validation failed", message, info_map)
+        self.om.route_logs(self.data_validator.event_logs)
+        return False
+
+    def _extract_runtime_files(
+        self, runtime_metadata: Dict[str, Any], metadata_path: Path, info_map: Dict[str, Any]
+    ) -> Dict[str, Any] | None:
+        runtime_files = runtime_metadata.get(ADDRESS_TO_INPUTS, {})
+        if isinstance(runtime_files, dict):
+            return runtime_files
+        self.om.add_error(
+            "Runtime metadata files invalid",
+            f"Runtime metadata document {metadata_path} does not contain a valid '{ADDRESS_TO_INPUTS}' section.",
+            info_map,
+        )
+        self.om.route_logs(self.data_validator.event_logs)
+        return None
+
+    def _runtime_data_loader_map(self) -> Dict[str, Callable[[Path], Dict[str, Any]]]:
+        return {
+            "json": self._load_data_from_json,
+            "csv": self._load_data_from_csv,
+        }
+
+    def _process_runtime_file(
+        self,
+        variable_name: str,
+        file_details: Dict[str, Any],
+        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]],
+        eager_termination: bool,
+        info_map: Dict[str, Any],
+    ) -> bool:
+        properties_blob_key = file_details.get("properties")
+        if not properties_blob_key:
+            self.om.add_error(
+                "Runtime metadata properties missing",
+                f"Runtime metadata for '{variable_name}' is missing a properties reference.",
+                info_map,
+            )
+            return False
+
+        try:
+            self._metadata_properties_exist(variable_name, properties_blob_key)
+        except (ValueError, KeyError):
+            return False
+
+        data_type = file_details.get("type")
+        data_loader = data_type_to_loader_map.get(data_type)
+        if data_loader is None:
+            supported_types = ", ".join(sorted(data_type_to_loader_map.keys()))
+            self.om.add_error(
+                "Unsupported runtime metadata type",
+                f"Faulty data type in {variable_name}, supported types are: {supported_types}",
+                info_map,
+            )
+            return False
+
+        file_path_value = file_details.get("path")
+        if not file_path_value:
+            self.om.add_error(
+                "Runtime metadata path missing",
+                f"Runtime metadata for '{variable_name}' is missing a path attribute.",
+                info_map,
+            )
+            return False
+        try:
+            input_data = data_loader(Path(file_path_value))
+        except Exception as exc:
+            self.om.add_error(
+                "Runtime metadata load failure",
+                f"Failed to load data for '{variable_name}' from {file_details.get('path')}: {exc}",
+                info_map,
+            )
+            return False
+
+        try:
+            is_runtime_data_added = self.add_runtime_variable_to_pool(
+                variable_name=variable_name,
+                data=input_data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+            )
+        except (TypeError, ValueError, PermissionError) as exc:
+            self.om.add_error(
+                "Runtime metadata variable addition failed",
+                f"Failed to add runtime metadata variable '{variable_name}' to pool: {exc}",
+                info_map,
+            )
+            return False
+
+        return is_runtime_data_added
+
+    def _load_runtime_metadata_document(self, metadata_path: Path) -> Dict[str, Any]:
+        """Load a runtime metadata document without disturbing the active metadata state.
+
+        Parameters
+        ----------
+        metadata_path : Path
+            Location of the metadata document that should be loaded for runtime processing.
+
+        Returns
+        -------
+        Dict[str, Any]
+            Parsed metadata content from ``metadata_path``.
+
+        Notes
+        -----
+        The active metadata is restored after loading so callers retain their previously parsed
+        metadata tree.
+        """
+
+        original_metadata = deepcopy(self.__metadata)
+        try:
+            self._load_metadata(metadata_path)
+            runtime_metadata = deepcopy(self.__metadata)
+        finally:
+            self.__metadata = original_metadata
+
+        return runtime_metadata
 
     def _load_metadata(self, metadata_path: Path) -> None:
         """
@@ -160,21 +542,37 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_path = Path(self.__metadata["files"]["properties"]["path"])
+            properties_metadata = self.__metadata["files"]["properties"]
+            properties_paths = properties_metadata.get("paths") or properties_metadata.get("path")
+
+            if isinstance(properties_paths, str):
+                properties_paths = [properties_paths]
+            if not isinstance(properties_paths, list) or len(properties_paths) == 0:
+                raise ValueError("Properties paths must be a non-empty string or list of strings")
+
+            if not all(isinstance(path, str) and path for path in properties_paths):
+                raise ValueError("Each properties path must be a non-empty string")
+
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {properties_path}",
+                f"Attempting to load properties from {properties_paths}",
                 info_map,
             )
-            if not properties_path.exists():
-                raise FileNotFoundError(f"Properties file not found at {properties_path}")
+
+            combined_properties: dict[str, Any] = {}
+            for properties_path_str in properties_paths:
+                properties_path = Path(properties_path_str)
+                if not properties_path.exists():
+                    raise FileNotFoundError(f"Properties file not found at {properties_path}")
+                loaded_properties = self._load_data_from_json(properties_path)
+                combined_properties.update(loaded_properties)
 
             del self.__metadata["files"]["properties"]
 
-            self.__metadata["properties"] = self._load_data_from_json(properties_path)
+            self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {properties_path}",
+                f"Successfully loaded properties from {properties_paths}",
                 info_map,
             )
 
@@ -266,17 +664,19 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _populate_pool(self, eager_termination: bool) -> bool:
+    def _populate_pool(self, input_root: Path, eager_termination: bool) -> bool:
         """
         Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
         then adds data to the pool.
 
         Parameters
         ----------
+        input_root : Path
+            The root directory for all input files.
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data,
-            If invalid data is found.
+            If False, the process will be terminated after going through and validating the entire data
+            if invalid data is found.
 
         Returns
         -------
@@ -289,14 +689,14 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
-
-        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]] = {
+        self.input_root = input_root
+        data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
-            file_path = file_details["path"]
+            file_path = Path(self.input_root) / file_details["path"]
             if file_details["type"] == "json":
                 self.csv_report_generation_list.append(file_blob_key)
 
@@ -946,16 +1346,34 @@ class InputManager:
 
         """
         element_hierarchy = variable_name.split(".")
+        metadata_root = self.__metadata["properties"][properties_blob_key]
         if len(element_hierarchy) > 1:
             flat_key_data = {variable_name.split(".", 1)[1]: input_data}
-            data = Utility.flatten_keys_to_nested_structure(flat_key_data)
-            element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
-            metadata_properties = reduce(
-                lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
-            )
+            metadata_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
+            nested_data = Utility.flatten_keys_to_nested_structure(flat_key_data)
+
+            metadata_properties = metadata_root
+            data = input_data
+            current_metadata = metadata_root
+            current_nested_data = nested_data
+            consumed_all_keys = True
+            for key in metadata_hierarchy[1:]:
+                if isinstance(current_metadata, dict) and key in current_metadata:
+                    current_metadata = current_metadata[key]
+                    metadata_properties = current_metadata
+                else:
+                    consumed_all_keys = False
+                    break
+
+                if isinstance(current_nested_data, dict) and key in current_nested_data:
+                    current_nested_data = current_nested_data[key]
+                    data = current_nested_data
+
+            if consumed_all_keys and metadata_hierarchy[1:]:
+                data = nested_data
         else:
             data = input_data
-            metadata_properties = self.__metadata["properties"][properties_blob_key]
+            metadata_properties = metadata_root
 
         return data, metadata_properties
 
@@ -1415,7 +1833,7 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def extract_target_and_save_block(
+    def _extract_target_and_save_block(
         self, target_and_save_block: dict[str, dict[str, Any]], eager_termination: bool
     ) -> dict[str, Any]:
         """
@@ -1439,10 +1857,10 @@ class InputManager:
         self.cross_validator.check_target_and_save_block(target_and_save_block, eager_termination)
         sections = ["variables", "constants"]
         for section in sections:
-            if section == "variables":
+            if section == "variables" and target_and_save_block.get(section) is not None:
                 for key, address in target_and_save_block[section].items():
                     target_and_save_results[key] = self.get_data(address)
-            else:
+            elif section == "constants" and target_and_save_block.get(section) is not None:
                 for constant_name, value in target_and_save_block[section].items():
                     target_and_save_results[constant_name] = value
         return target_and_save_results
