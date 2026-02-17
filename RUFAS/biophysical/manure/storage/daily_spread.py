@@ -52,4 +52,11 @@ class DailySpread(Storage):
 
         """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
-        return super().process_manure(current_day_conditions, time)
+        manure_held_before_processing = self.stored_manure + self._received_manure
+        output_streams = super().process_manure(current_day_conditions, time)
+        emptied_manure_stream = output_streams.get("manure")
+        if emptied_manure_stream is not None and not emptied_manure_stream.is_empty:
+            self._report_manure_stream(emptied_manure_stream, "exported_excess", time.simulation_day)
+        elif manure_held_before_processing.is_empty:
+            self._report_manure_stream(ManureStream.make_empty_manure_stream(), "exported_excess", time.simulation_day)
+        return output_streams
