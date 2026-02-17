@@ -21,9 +21,17 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 ### Current version
 
-v0.9.2
+v1.0.0
 
 ### Next Version Updates
+
+- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
+- [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
+- [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
+- [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
+
+### v1.0.0
+
 - [2081](https://github.com/RuminantFarmSystems/MASM/pull/2081) - [minor change] [Crop & Soil] Break down the `_setup_field()` function in `FieldManager`.
 - [2011](https://github.com/RuminantFarmSystems/MASM/pull/2011) - [minor change] [Animal] Implements the Animal Growth submodule logic and tests.
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
@@ -304,9 +312,6 @@ v0.9.2
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
 - [2742](https://github.com/RuminantFarmSystems/RuFaS/pull/2742) - [minor change] [NoInputChange] [NoOutputChange] Add logs for variables contributing to aggregated reports.
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
-- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
-- [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
-- [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 
 ### v0.9.2
 
