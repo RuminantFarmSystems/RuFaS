@@ -95,8 +95,8 @@ specific purposes:
    by changes in input parameters.
 5. **INPUT_DATA_AUDIT**: Performs validation on input data and generates
    a CSV file for them.
-6. **END_TO_END_TESTING**: Ensures all components of a system work
-   together correctly from start to finish.
+6. **END_TO_END_TESTING**: Runs RuFaS's end-to-end testing routine.
+   Ensures all components of RuFaS work together correctly from start to finish.
 7. **POST_PROCESSING**: Handles data processing after initial output,
    such as data aggregation or visualization.
 8. **COMPARE_METADATA_PROPERTIES**: Compares and saves the differences
@@ -106,6 +106,8 @@ specific purposes:
    schema using the metadata properties held in the Input Manager, and
    updates the Data Collection App files in the ``DataCollectionApp``
    directory to use the new input schema.
+10. **UPDATE_E2E_TEST_RESULTS**: Updates the expected end to end testing
+    results with the new actual results.
 
 Detailed Sensitivity Analysis Settings
 --------------------------------------
