@@ -1032,9 +1032,8 @@ class ManureManager:
         """Return True if requested nutrients are met by the supplied result."""
         if result is None:
             return False
-        return (
-            math.isclose(result.nitrogen, request.nitrogen, abs_tol=1e-5)
-            and math.isclose(result.phosphorus, request.phosphorus, abs_tol=1e-5)
+        return math.isclose(result.nitrogen, request.nitrogen, abs_tol=1e-5) and math.isclose(
+            result.phosphorus, request.phosphorus, abs_tol=1e-5
         )
 
     @staticmethod
