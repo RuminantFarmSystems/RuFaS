@@ -683,7 +683,7 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
         }
-        feed_deduction: dict[str, float|int] = {}
+        feed_deduction: dict[str, float | int] = {}
         for feed_id, amount in total_purchased.items():
             feed_deduction["simulation_day"] = simulation_day
             feed_deduction["amount"] = amount
