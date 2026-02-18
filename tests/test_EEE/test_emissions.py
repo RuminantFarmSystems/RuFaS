@@ -543,11 +543,16 @@ def test_gather_farmgrown_feed_inventory_data_success(
     mocker: MockerFixture,
 ) -> None:
     fake_filtered = {
-        "stored_feed_12_dm.daily_storage_levels": {"values": [{"simulation_day": 0, "amount": 1.25},
-                                                              {"simulation_day": 1, "amount": 2.5},
-                                                              {"simulation_day": 10, "amount": 0.0}]},
-        "stored_feed_7_dm.daily_storage_levels": {"values": [{"simulation_day": 5, "amount": 9.0},
-                                                             {"simulation_day": 6, "amount": 8.0}]},
+        "stored_feed_12_dm.daily_storage_levels": {
+            "values": [
+                {"simulation_day": 0, "amount": 1.25},
+                {"simulation_day": 1, "amount": 2.5},
+                {"simulation_day": 10, "amount": 0.0},
+            ]
+        },
+        "stored_feed_7_dm.daily_storage_levels": {
+            "values": [{"simulation_day": 5, "amount": 9.0}, {"simulation_day": 6, "amount": 8.0}]
+        },
     }
 
     filter_spy = mocker.patch.object(em.om, "filter_variables_pool", return_value=fake_filtered)

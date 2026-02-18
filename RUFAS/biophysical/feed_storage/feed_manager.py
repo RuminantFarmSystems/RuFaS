@@ -342,18 +342,20 @@ class FeedManager:
         }
         for rufas_id, mass in feed_report.items():
             self._om.add_variable(
-                f"stored_feed_{rufas_id}_dm", {
+                f"stored_feed_{rufas_id}_dm",
+                {
                     "simulation_day": simulation_day,
                     "amount": mass["dry_matter_mass"],
                 },
-                info_map
+                info_map,
             )
             self._om.add_variable(
-                f"stored_feed_{rufas_id}_wet", {
+                f"stored_feed_{rufas_id}_wet",
+                {
                     "simulation_day": simulation_day,
                     "amount": mass["fresh_mass"],
                 },
-                info_map
+                info_map,
             )
 
     def manage_daily_feed_request(
@@ -695,11 +697,13 @@ class FeedManager:
             "simulation_day": simulation_day,
         }
         for feed_id, amount in total_purchased.items():
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed",
-                                  {"simulation_day": simulation_day, "amount": amount}, info_map)
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_fed", {"simulation_day": simulation_day, "amount": amount}, info_map
+            )
         for feed_id, amount in total_farmgrown.items():
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed",
-                                  {"simulation_day": simulation_day, "amount": amount}, info_map)
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_fed", {"simulation_day": simulation_day, "amount": amount}, info_map
+            )
 
     def _deduct_from_storage(
         self,
