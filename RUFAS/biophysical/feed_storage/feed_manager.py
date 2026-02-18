@@ -1,4 +1,4 @@
-from collections import Counter, defaultdict, namedtuple
+from collections import Counter, defaultdict
 from datetime import date
 from typing import Any, DefaultDict, Literal, Sequence
 
