@@ -683,15 +683,24 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
         }
-        feed_deduction: dict[str, float | int] = {}
         for feed_id, amount in total_purchased.items():
-            feed_deduction["simulation_day"] = simulation_day
-            feed_deduction["amount"] = amount
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed", feed_deduction, info_map)
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
         for feed_id, amount in total_farmgrown.items():
-            feed_deduction["simulation_day"] = simulation_day
-            feed_deduction["amount"] = amount
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", feed_deduction, info_map)
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
 
     def _deduct_from_storage(
         self,
