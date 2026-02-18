@@ -36,8 +36,6 @@ ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 """A type alias representing the context in which a feed purchase was initiated."""
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
 
-FeedDeduction = namedtuple("FeedDeduction", ["simulation_day", "amount"])
-
 
 class FeedManager:
     """
@@ -686,9 +684,23 @@ class FeedManager:
             "simulation_day": simulation_day,
         }
         for feed_id, amount in total_purchased.items():
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed", FeedDeduction(simulation_day, amount), info_map)
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
         for feed_id, amount in total_farmgrown.items():
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", FeedDeduction(simulation_day, amount), info_map)
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
 
     def _deduct_from_storage(
         self,
