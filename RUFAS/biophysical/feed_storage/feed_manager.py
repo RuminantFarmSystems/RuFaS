@@ -689,6 +689,8 @@ class FeedManager:
             feed_deduction["amount"] = amount
             self._om.add_variable(f"purchased_feed_{feed_id}_fed", feed_deduction, info_map)
         for feed_id, amount in total_farmgrown.items():
+            feed_deduction["simulation_day"] = simulation_day
+            feed_deduction["amount"] = amount
             self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", feed_deduction, info_map)
 
     def _deduct_from_storage(
