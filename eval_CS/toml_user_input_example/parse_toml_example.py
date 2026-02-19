@@ -1,3 +1,4 @@
+# from https://stackoverflow.com/questions/70310388/how-to-merge-nested-dictionaries/70310511#70310511
 def _combine_into(d: dict, combined: dict) -> None:
     """recursively join d (dict) into combined (dict)"""
     for k, v in d.items():
@@ -18,6 +19,8 @@ def nested_merge_dicts(*dicts: dict) -> dict:
         _combine_into(d, combined)
 
     return combined
+
+# might be worth trying the naapc library instead (https://github.com/eiphy/naapc)
 
 if __name__ == '__main__':
     # Example usage:
