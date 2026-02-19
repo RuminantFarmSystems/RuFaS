@@ -527,7 +527,7 @@ class TaskManager:
         produce_graphics: bool,
         workers: int,
         metadata_depth_limit: int | None,
-        metadata_path: Path,
+        metadata_path: Path, # TODO: variable not used?
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {

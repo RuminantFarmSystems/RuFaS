@@ -21,6 +21,7 @@ FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
 Set enumerating the input data formats the Input Manager can accept.
 """
 VALID_INPUT_TYPES: set[str] = {"json", "csv"}
+# TODO: add support for TOML files.
 
 ADDRESS_TO_INPUTS = "files"
 
@@ -57,6 +58,7 @@ class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
     """
+    # TODO: add attribute docstrings describing (at least) the main components (i.e., meta_data and pool)
 
     __instance = None
 
