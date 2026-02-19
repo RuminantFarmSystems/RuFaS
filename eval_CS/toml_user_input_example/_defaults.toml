@@ -1,0 +1,46 @@
+string = "string"
+escape_quotes = "\"literal\" string"
+flag = false
+integer = 1
+decimal = 1.5
+sci_note = 1e05
+today = 2026-01-01
+now = 12:00:00
+now_today = 2026-01-01 12:00:00
+array = [1, 2, 3, 4, 5,]
+regex = "pattern.*"
+meaning = "understanding"
+
+# only included in the default file
+## everything else will be overwritten, since they are included in the configs
+[default_values]
+pi = 3.14159
+planck = 6.626e-34
+avagadro = 6.022e23
+
+[inline_table]
+hydrogen = 1
+deuterium = 2
+
+[table]
+a = 1
+b = 2
+c = 3
+d = [5, 7, 11, 13,]
+
+[table.nested]
+apples = "crisp."
+bananas = "soft."
+
+[table.nested.deeper]
+call = "hello?"
+response = "hello."
+question = "who are you?"
+
+[table.new_nest]
+x = "birds"
+y = "herpetiles"
+z = "platypuses (or is it platypi?)"
+
+[new_table]
+only_one_value = "this value"

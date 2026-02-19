@@ -1,0 +1,24 @@
+# new top-level value
+meaning = 42
+
+# new value for existing table
+[inline_table]
+helium = 18
+
+# new sub-table
+[table.new_nest]
+x = "birds"
+y = "herpetiles"
+z = "platypuses (or is it platypi?)"
+
+[table.nested.deeper]
+question = "is there anything down here?"
+
+[new_table]
+only_one_value = "sad"
+
+# values with the same name will be overwritten during
+## the dictionary merge (via nested_merge_dicts)
+[table.nested]
+bananas = "I changed my mind, they're gross!"
+

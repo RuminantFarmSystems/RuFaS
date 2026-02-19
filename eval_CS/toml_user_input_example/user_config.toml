@@ -1,0 +1,34 @@
+string = "hello, World!"
+escape_quotes = "there is no \"escape.\""
+flag = true
+integer = 5
+decimal = 8.359
+sci_note = 3e-7
+today = 2026-02-19
+now = 11:28:00
+now_today = 2026-02-19 11:28:00
+array = [1, 2, 3, 4, 5]
+regex = '^\d{2}\s*(.*)'
+inline_table = {hydrogen = 1, deuterium = 2}
+
+[table]
+a = 1
+b = 2
+c = 3
+d = [5, 7, 11, 13]
+
+[table.nested]
+apples = "Meh."
+bananas = "Yum!"
+
+[table.nested.deeper]
+call = "anyone home?"
+response = "nope."
+
+
+# paths to sub-config files, this allows the option to split a configuration
+## file into multiple files if desired (but not required).
+[sub_configs]
+one = "subconfig-01.toml"
+two = "subconfig-02.toml"
+
