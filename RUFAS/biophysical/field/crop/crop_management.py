@@ -170,11 +170,7 @@ class CropManagement:
             self.kill()
 
         self._record_yield(
-            harvest_operaion,
-            field_name,
-            field_size,
-            time.current_calendar_year,
-            time.current_julian_day
+            harvest_operaion, field_name, field_size, time.current_calendar_year, time.current_julian_day
         )
         self._transfer_residue(soil_data, not self.data.is_alive)
 
@@ -378,7 +374,7 @@ class CropManagement:
         return harvested_crop
 
     def _record_yield(
-            self, harvest_op : HarvestOperation, field_name: str, field_size: float, year: int, day: int
+        self, harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int
     ) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
