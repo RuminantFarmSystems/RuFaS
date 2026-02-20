@@ -303,7 +303,7 @@ v0.9.2
 - [2705](https://github.com/RuminantFarmSystems/MASM/pull/2705) - [minor change] [InputChange][OutputChange][e2e-testing] Fix end to end testing for the new emission files.
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
-- [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
+- [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
