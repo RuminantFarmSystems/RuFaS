@@ -8,6 +8,8 @@ from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
@@ -92,54 +94,70 @@ class SimulationEngine:
         for simulation_year in range(self.time.simulation_length_years):
             self._annual_simulation()
 
-    def _daily_simulation(self) -> None:
-        """Executes the daily simulation routines."""
-        manure_applications = self.generate_daily_manure_applications()
-        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
-        next_harvest_dates: dict[str, date | None] = {}
-        for harvested_crop in harvested_crops:
-            self.feed_manager.receive_crop(harvested_crop, self.time.simulation_day)
-            if harvested_crop.config_name not in next_harvest_dates:
-                crop_config_name = harvested_crop.config_name
-                next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
-                next_harvest_dates[harvested_crop.config_name] = next_harvest_date.get(crop_config_name)
+    def _execute_daily_simulation(self) -> None:
+        """
+        Executes the daily simulation routines.
 
-        is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
-        if is_time_to_recalculate_max_daily_feeds:
-            crops_to_get_next_harvest_dates = [
-                crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in next_harvest_dates.keys()
-            ]
-            next_harvest_dates = self.field_manager.get_next_harvest_dates(crops_to_get_next_harvest_dates)
-            self.next_max_daily_feed_recalculation: date = self.time.current_date
-            +self.max_daily_feed_recalculation_interval
+        Daily Full Farm Simulation Process:
+        1. Field operations (manure applications, harvesting)
+        2. Feed planning (recalculate feed availability, update purchase plans)
+        3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
+        update purchase plans)
+        4. Animal operations (distribute feed to herd)
+        5. Manure operations (collect and manage manure)
+        6. Record keeping (time, weather, purchased feeds fed emissions)
+        7. Advance simulation date
 
-        if next_harvest_dates != {}:
-            total_projected_inventory = self.feed_manager.get_total_projected_inventory(
-                self.time.current_date.date(), self.weather, self.time
-            )
+        """
+        daily_harvested_crops = self._execute_daily_field_operations()
 
-            next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
-                next_harvest_dates
-            )
-            ideal_feeds_to_purchase = self.herd_manager.update_all_max_daily_feeds(
-                total_projected_inventory, next_harvest_dates_with_rufas_ids, self.time
-            )
-            self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
+        harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
+        self._execute_feed_planning(harvest_schedule)
 
-        is_time_to_reformulate_ration = self.time.current_date.date() == self.next_ration_reformulation
-        if is_time_to_reformulate_ration:
-            self._formulate_ration()
+        self._execute_ration_planning()
 
+        daily_manure_data, daily_purchased_feeds_fed = self._execute_daily_animal_operations()
+
+        self._execute_daily_manure_operations(daily_manure_data)
+
+        self._record_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _record_daily_records(self, daily_purchased_feeds_fed: dict[str, float]) -> None:
+        """
+        Records the daily records for the simulation.
+
+        Parameters
+        ----------
+        daily_purchased_feeds_fed : dict[str, float]
+            A dictionary mapping feed types to the amount of purchased feed fed to the herd on the current day.
+        """
+        self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
+        self.time.record_time()
+        self.weather.record_weather(self.time)
+
+    def _execute_daily_animal_operations(self) -> tuple[dict[str, ManureStream] | None, dict[str, float]]:
+        """
+        Executes the daily animal routines.
+
+        Returns
+        -------
+        tuple[dict[str, ManureStream] | None, dict[str, float]]
+            A tuple containing:
+            - A dictionary mapping pens to their corresponding ManureStream objects generated
+              from the daily routines. If animals are not being simulated, this will be None.
+            - A dictionary mapping feed types to the amount of purchased feed fed to the herd.
+        """
         requested_feed = self.herd_manager.collect_daily_feed_request()
         self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")
         self.feed_manager.report_cumulative_purchased_feeds(self.time.simulation_day)
         is_ok_to_feed_animals, daily_feeds_fed = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
 
         daily_purchased_feeds_fed = daily_feeds_fed.get("purchased", {})
-        self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
 
         if not is_ok_to_feed_animals:
-            info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
+            info_map = {"class": self.__class__.__name__, "function": self._execute_daily_simulation.__name__}
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
@@ -147,20 +165,111 @@ class SimulationEngine:
             self.time.current_date.date(), self.weather, self.time
         )
 
+        all_manure_data: dict[str, ManureStream] | None = None
+
         if self.simulate_animals:
 
             all_manure_data = self.herd_manager.daily_routines(
                 self.feed_manager.available_feeds, self.time, self.weather, total_inventory
             )
 
+        return all_manure_data, daily_purchased_feeds_fed
+
+    def _execute_daily_manure_operations(self, daily_manure_data: dict[str, ManureStream] | None) -> None:
+        """
+        Executes the daily manure operations routine.
+
+        Parameters
+        ----------
+        daily_manure_data : dict[str, ManureStream] | None
+            A list of dictionaries containing manure data for each pen in the herd.
+            If animals are not being simulated, this will be None.
+        """
+        if daily_manure_data is not None:
             self.manure_manager.run_daily_update(
-                all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
+                daily_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
             )
 
-        self.time.record_time()
-        self.weather.record_weather(self.time)
+    def _execute_daily_field_operations(self) -> list[HarvestedCrop]:
+        """Handles daily field operations including manure applications and crop harvesting/receiving."""
+        manure_applications: list[ManureEventNutrientRequestResults] = self.generate_daily_manure_applications()
+        harvested_crops: list[HarvestedCrop] = self.field_manager.daily_update_routine(
+            self.weather, self.time, manure_applications
+        )
 
-        self._advance_time()
+        for crop in harvested_crops:
+            self.feed_manager.receive_crop(crop, self.time.simulation_day)
+
+        return harvested_crops
+
+    def _should_recalculate_feed_planning(self) -> bool:
+        """Check if it's time to recalculate maximum daily feed allocations."""
+        return self.next_max_daily_feed_recalculation == self.time.current_date
+
+    def _build_harvest_schedule(self, harvested_crops: list[HarvestedCrop]) -> dict[str, date | None]:
+        """
+        Builds a schedule of next harvest dates for all crop types.
+
+        Parameters
+        ----------
+        harvested_crops : list[HarvestedCrop]
+            A list of crops that were harvested on the current day.
+
+
+        Returns
+        -------
+        dict[str, date | None]
+            A dictionary mapping crops to their next harvest dates.
+            If a crop does not have a scheduled next harvest, the value will be None.
+
+        Notes
+        -----
+        - The method checks if it's time to recalculate feed planning, which is done at a user-specified interval.
+        If it is time, it will include all crops that are relevant for feed planning in the harvest schedule,
+        even if they were not harvested today.
+        """
+        harvest_schedule_crops = set(crop.config_name for crop in harvested_crops)
+
+        if self._should_recalculate_feed_planning():
+            crops_to_get_next_harvest_dates = [
+                crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in harvest_schedule_crops
+            ]
+            harvest_schedule_crops = harvest_schedule_crops.union(crops_to_get_next_harvest_dates)
+            self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
+
+        harvest_schedule = self.field_manager.get_next_harvest_dates(list(harvest_schedule_crops))
+
+        return harvest_schedule
+
+    def _execute_feed_planning(self, harvest_schedule: dict[str, date | None]) -> None:
+        """
+        Recalculates maximum daily feed allocations if it's time.
+
+        Parameters
+        ----------
+        harvest_schedule : dict[str, date | None]
+            A dictionary mapping crop config names to their next harvest dates, used to inform feed planning.
+        """
+        if harvest_schedule == {}:
+            return
+
+        total_projected_inventory = self.feed_manager.get_total_projected_inventory(
+            self.time.current_date.date(), self.weather, self.time
+        )
+        next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
+            harvest_schedule
+        )
+
+        ideal_feeds_to_purchase = self.herd_manager.update_all_max_daily_feeds(
+            total_projected_inventory, next_harvest_dates_with_rufas_ids, self.time
+        )
+        self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
+
+    def _execute_ration_planning(self) -> None:
+        """Checks if it's time to reformulate the ration and executes ration formulation if needed."""
+        is_time_to_reformulate_ration = self.time.current_date.date() == self.next_ration_reformulation
+        if is_time_to_reformulate_ration:
+            self._formulate_ration()
 
     def _formulate_ration(self) -> None:
         """Formulates the ration for the animals."""
@@ -229,7 +338,7 @@ class SimulationEngine:
         Executes the annual simulation routines.
         """
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
-            self._daily_simulation()
+            self._execute_daily_simulation()
 
         self._run_post_annual_routines()
 
