@@ -84,7 +84,7 @@ class ManureConstants:
      minimum energy that must be available to microbes for methanogenesis to occur.
     """
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 30.7
     """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
      manure (g methane / kg manure Volatile Solids / hour)."""
 
@@ -207,7 +207,7 @@ class ManureConstants:
     ANAEROBIC_LAGOON_MANURE_RETENTION: float = 0.1
     """The manure retention proportion in the anaerobic lagoon (fraction)."""
 
-    MANURE_DAMPING_FACTOR: float = 0.5
+    MANURE_DAMPING_FACTOR: float = 0.65
     """Unitless factor representing the reduction of the amplitude of manure temperature in the sin/cosin equation
      compared to air temperature amplitude (unitless)."""
 

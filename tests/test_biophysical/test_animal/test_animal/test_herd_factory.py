@@ -1171,9 +1171,7 @@ def test_random_sample_with_replacement_by_type_parity_branches(
     expected_k: int,
 ) -> None:
     """Covers the parity/milking branch, including inversion of milking fraction for non-milking cows."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     pre_animals = [MagicMock() for _ in range(5)]
@@ -1218,9 +1216,7 @@ def test_random_sample_with_replacement_by_type_exception_zero_animals_logs_miss
     mocker: MockerFixture,
 ) -> None:
     """Covers except-block branch where animal_num == 0."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     herd_factory.pre_animal_population = MagicMock()
@@ -1250,9 +1246,7 @@ def test_random_sample_with_replacement_by_type_exception_nonzero_animals_logs_p
     mocker: MockerFixture,
 ) -> None:
     """Covers except-block branch where animal_num > 0."""
-    mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None)
     herd_factory = HerdFactory()
 
     herd_factory.pre_animal_population = MagicMock()

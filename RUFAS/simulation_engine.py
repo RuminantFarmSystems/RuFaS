@@ -39,6 +39,8 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    simulate_animals: bool
+        A boolean indicating whether user has chosen to simulate animals in config.
 
     Methods
     -------
@@ -145,13 +147,15 @@ class SimulationEngine:
             self.time.current_date.date(), self.weather, self.time
         )
 
-        all_manure_data = self.herd_manager.daily_routines(
-            self.feed_manager.available_feeds, self.time, self.weather, total_inventory
-        )
+        if self.simulate_animals:
 
-        self.manure_manager.run_daily_update(
-            all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
-        )
+            all_manure_data = self.herd_manager.daily_routines(
+                self.feed_manager.available_feeds, self.time, self.weather, total_inventory
+            )
+
+            self.manure_manager.run_daily_update(
+                all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
+            )
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -196,7 +200,7 @@ class SimulationEngine:
                 manure_request = manure_event_request.nutrient_request
                 manure_request_results = None
                 if manure_request is not None:
-                    simulate_animals: bool = self.im.get_data("config.simulate_animals")
+                    simulate_animals: bool = self.simulate_animals
                     manure_request_results = self.manure_manager.request_nutrients(
                         manure_request, simulate_animals, self.time
                     )
@@ -259,6 +263,7 @@ class SimulationEngine:
             feed_storage_instances,
         )
 
+        self.simulate_animals = self.im.get_data("config.simulate_animals")
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()

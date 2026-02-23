@@ -7,7 +7,6 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-
 """
 The base change time and value in the net merit value.
 
