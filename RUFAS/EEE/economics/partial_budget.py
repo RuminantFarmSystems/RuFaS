@@ -208,13 +208,13 @@ class PartialBudget:
                 }
             )
 
-            self.om.add_variable("pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-            self.om.add_variable("pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-            self.om.add_variable("pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-            self.om.add_variable("pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-            self.om.add_variable("pba_net_change", net_change.tolist(), info_map)
-            self.om.add_variable("pba_cumulative_net_change", cumulative_change.tolist(), info_map)
-            self.om.add_variable("pba_summary", result_df.to_dict(orient="list"), info_map)
+            self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+            self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+            self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+            self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+            self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
+            self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
+            self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
             self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
             return
 
@@ -237,14 +237,14 @@ class PartialBudget:
                     "NetAnnualCashFlow": net_annual_cash_flow,
                 }
             )
-            self.om.add_variable("pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-            self.om.add_variable("pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-            self.om.add_variable("pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-            self.om.add_variable("pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-            self.om.add_variable("pba_revenue_total", revenue_total.tolist(), info_map)
-            self.om.add_variable("pba_cost_total", cost_total.tolist(), info_map)
-            self.om.add_variable("pba_net_annual_cash_flow", net_annual_cash_flow.tolist(), info_map)
-            self.om.add_variable("pba_summary", result_df.to_dict(orient="list"), info_map)
+            self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+            self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+            self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+            self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+            self.om.add_variable("econ_pba_revenue_total", revenue_total.tolist(), info_map)
+            self.om.add_variable("econ_pba_cost_total", cost_total.tolist(), info_map)
+            self.om.add_variable("econ_pba_net_annual_cash_flow", net_annual_cash_flow.tolist(), info_map)
+            self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
             self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
             return
 
@@ -273,13 +273,13 @@ class PartialBudget:
             }
         )
 
-        self.om.add_variable("pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-        self.om.add_variable("pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-        self.om.add_variable("pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-        self.om.add_variable("pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-        self.om.add_variable("pba_net_change", net_change.tolist(), info_map)
-        self.om.add_variable("pba_cumulative_net_change", cumulative_change.tolist(), info_map)
-        self.om.add_variable("pba_summary", result_df.to_dict(orient="list"), info_map)
+        self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
     def has_partial_budget_activity(

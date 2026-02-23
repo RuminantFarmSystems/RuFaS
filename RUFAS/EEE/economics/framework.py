@@ -8,7 +8,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from .dcfror import DCFRORCalculator
-from .fallback_values import capital_cost_breakdown_fallback
 from .partial_budget import PartialBudget
 from .preprocessing import EconomicPreprocessor
 
@@ -30,20 +29,7 @@ class EconomicFramework:
 
         info_map = {"class": __name__, "function": self._capital_cost_present.__name__}
 
-        cost_key = "capital_costs.capital_cost_breakdown"
-        if hasattr(self.im, "check_property_exists_in_pool"):
-            try:
-                if not self.im.check_property_exists_in_pool(cost_key):
-                    cost_data = capital_cost_breakdown_fallback()
-                else:
-                    cost_data = self.im.get_data(cost_key)
-            except Exception:
-                cost_data = capital_cost_breakdown_fallback()
-        else:
-            try:
-                cost_data = self.im.get_data(cost_key)
-            except Exception:
-                cost_data = capital_cost_breakdown_fallback()
+        cost_data = self.im.get_data("economic_inputs.capital_costs.capital_cost_breakdown")
         is_dataframe = isinstance(cost_data, pd.DataFrame)
 
         if is_dataframe:
@@ -116,7 +102,7 @@ class EconomicFramework:
 
         preprocessed_results = self.preprocessor.preprocess()
         self.om.add_variable(
-            "preprocessed_economic_inputs",
+            "econ_preprocessed_economic_inputs",
             preprocessed_results,
             info_map={
                 "class": __name__,
@@ -129,7 +115,7 @@ class EconomicFramework:
 
         if capital_present:
             calculator = DCFRORCalculator()
-            calculator.calculate(preprocessed_results)
+            calculator.calculate()
             if partial_budget_requested:
                 self.partial_budget.calculate_partial_budget(preprocessed_results)
         else:

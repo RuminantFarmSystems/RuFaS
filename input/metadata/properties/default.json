@@ -3310,6 +3310,156 @@
         "minimum": 0,
         "default": 0
       }
+    },
+    "cashflow_inputs": {
+      "type": "object",
+      "description": "Inputs for discounted cash-flow rate-of-return analysis.",
+      "loan_term": {
+        "type": "number",
+        "description": "Loan term in years.",
+        "minimum": 0,
+        "default": 10
+      },
+      "project_term": {
+        "type": "number",
+        "description": "Project evaluation horizon in years.",
+        "minimum": 0,
+        "default": 20
+      },
+      "operating_units": {
+        "type": "array",
+        "description": "Operating units by category and year.",
+        "properties": {
+          "type": "array",
+          "properties": {
+            "type": "number"
+          }
+        }
+      },
+      "operating_unit_costs": {
+        "type": "array",
+        "description": "Operating cost per unit by category and year.",
+        "properties": {
+          "type": "array",
+          "properties": {
+            "type": "number"
+          }
+        }
+      },
+      "units_produced": {
+        "type": "array",
+        "description": "Revenue units produced by category and year.",
+        "properties": {
+          "type": "array",
+          "properties": {
+            "type": "number"
+          }
+        }
+      },
+      "unit_price": {
+        "type": "array",
+        "description": "Revenue price per unit by category and year.",
+        "properties": {
+          "type": "array",
+          "properties": {
+            "type": "number"
+          }
+        }
+      },
+      "loan_interest_rate": {
+        "type": "number",
+        "description": "Loan interest rate (fraction).",
+        "minimum": 0,
+        "default": 0.05
+      },
+      "loan_fraction": {
+        "type": "number",
+        "description": "Fraction of capital financed by debt.",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.5
+      },
+      "equity": {
+        "type": "number",
+        "description": "Fraction of capital financed by equity.",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.5
+      },
+      "const_int": {
+        "type": "number",
+        "description": "Construction-period interest rate (fraction).",
+        "minimum": 0,
+        "default": 0.04
+      },
+      "const_term": {
+        "type": "number",
+        "description": "Construction term in years.",
+        "minimum": 0,
+        "default": 1
+      },
+      "const_rate_i": {
+        "type": "array",
+        "description": "Fractional completion per construction year.",
+        "properties": {
+          "type": "number"
+        }
+      },
+      "tax_rate": {
+        "type": "number",
+        "description": "Tax rate applied to taxable income (fraction).",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.21
+      },
+      "target_internal_rate_of_return": {
+        "type": "number",
+        "description": "Target internal rate of return (fraction).",
+        "minimum": 0,
+        "default": 0.08
+      },
+      "depreciation_i": {
+        "type": "array",
+        "description": "Depreciation schedule fractions by year.",
+        "properties": {
+          "type": "number"
+        }
+      },
+      "enable_dcfror": {
+        "type": "bool",
+        "description": "Whether to execute DCFROR calculations.",
+        "default": true
+      },
+      "tax_credit_used": {
+        "type": "number",
+        "description": "Tax credit amount used in the project model.",
+        "default": 0.0
+      },
+      "tax_credit_revenue": {
+        "type": "number",
+        "description": "Tax credit revenue recognized in the project model.",
+        "default": 0.0
+      }
+    },
+    "capital_costs": {
+      "type": "object",
+      "description": "Capital cost definitions for economic analysis.",
+      "capital_cost_breakdown": {
+        "type": "array",
+        "description": "Capital cost breakdown table with line item names and costs.",
+        "properties": {
+          "type": "object",
+          "Item": {
+            "type": "string",
+            "description": "Capital cost line-item name."
+          },
+          "Cost": {
+            "type": "number",
+            "description": "Capital cost amount for the line item.",
+            "minimum": 0
+          }
+        }
+      }
     }
   },
   "emissions_properties": {
@@ -6478,7 +6628,6 @@
       }
     }
   },
-
   "economics_map_properties": {
     "data_collection_app_compatible": false,
     "Animal": {

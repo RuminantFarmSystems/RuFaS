@@ -25,25 +25,25 @@ class DCFRORCalculator:
         info_map = {"class": self.__class__.__name__, "function": self._load_inputs.__name__}
         try:
             inputs: Dict[str, Any] = {
-                "cost_capital_multiple": self.im.get_data("capital_costs.capital_cost_breakdown"),
-                "cost_operational_units": self.im.get_data("cashflow_inputs.operating_units"),
-                "cost_operational_unit_cost": self.im.get_data("cashflow_inputs.operating_unit_costs"),
-                "units_produced": self.im.get_data("cashflow_inputs.units_produced"),
-                "unit_cost": self.im.get_data("cashflow_inputs.unit_price"),
-                "loan_interest_rate": self.im.get_data("cashflow_inputs.loan_interest_rate"),
-                "loan_term": self.im.get_data("cashflow_inputs.loan_term"),
-                "loan_amount": self.im.get_data("cashflow_inputs.loan_fraction"),
-                "equity_amount": self.im.get_data("cashflow_inputs.equity"),
-                "interest_rate_construction": self.im.get_data("cashflow_inputs.const_int"),
-                "construction_term": self.im.get_data("cashflow_inputs.const_term"),
-                "construction_finish_pcts": self.im.get_data("cashflow_inputs.const_rate_i"),
-                "tax_rate": self.im.get_data("cashflow_inputs.tax_rate"),
-                "internal_rate_of_return": self.im.get_data("cashflow_inputs.target_internal_rate_of_return"),
-                "project_term": self.im.get_data("cashflow_inputs.project_term"),
-                "depreciation_rate": np.array(self.im.get_data("cashflow_inputs.depreciation_i")),
-                "enable": self.im.get_data("cashflow_inputs.enable_dcfror"),
-                "tax_credit_used": self.im.get_data("cashflow_inputs.tax_credit_used"),
-                "tax_credit_revenue": self.im.get_data("cashflow_inputs.tax_credit_revenue"),
+                "cost_capital_multiple": self.im.get_data("economic_inputs.capital_costs.capital_cost_breakdown"),
+                "cost_operational_units": self.im.get_data("economic_inputs.cashflow_inputs.operating_units"),
+                "cost_operational_unit_cost": self.im.get_data("economic_inputs.cashflow_inputs.operating_unit_costs"),
+                "units_produced": self.im.get_data("economic_inputs.cashflow_inputs.units_produced"),
+                "unit_cost": self.im.get_data("economic_inputs.cashflow_inputs.unit_price"),
+                "loan_interest_rate": self.im.get_data("economic_inputs.cashflow_inputs.loan_interest_rate"),
+                "loan_term": self.im.get_data("economic_inputs.cashflow_inputs.loan_term"),
+                "loan_amount": self.im.get_data("economic_inputs.cashflow_inputs.loan_fraction"),
+                "equity_amount": self.im.get_data("economic_inputs.cashflow_inputs.equity"),
+                "interest_rate_construction": self.im.get_data("economic_inputs.cashflow_inputs.const_int"),
+                "construction_term": self.im.get_data("economic_inputs.cashflow_inputs.const_term"),
+                "construction_finish_pcts": self.im.get_data("economic_inputs.cashflow_inputs.const_rate_i"),
+                "tax_rate": self.im.get_data("economic_inputs.cashflow_inputs.tax_rate"),
+                "internal_rate_of_return": self.im.get_data("economic_inputs.cashflow_inputs.target_internal_rate_of_return"),
+                "project_term": self.im.get_data("economic_inputs.cashflow_inputs.project_term"),
+                "depreciation_rate": np.array(self.im.get_data("economic_inputs.cashflow_inputs.depreciation_i")),
+                "enable": self.im.get_data("economic_inputs.cashflow_inputs.enable_dcfror"),
+                "tax_credit_used": self.im.get_data("economic_inputs.cashflow_inputs.tax_credit_used"),
+                "tax_credit_revenue": self.im.get_data("economic_inputs.cashflow_inputs.tax_credit_revenue"),
             }
             inputs["cost_capital_multiple"].set_index("Item", inplace=True)
             return inputs
@@ -239,8 +239,8 @@ class DCFRORCalculator:
         """
         info_map = {"class": self.__class__.__name__, "function": self.calculate.__name__}
         npv = np.npv(internal_rate_of_return, CF)
-        self.om.add_variable("dcfror_npv", npv, info_map)
-        self.om.add_variable("dcfror_cash_flow_summary", cash_flow_df.to_dict(orient="list"), info_map)
+        self.om.add_variable("econ_dcfror_npv", npv, info_map)
+        self.om.add_variable("econ_dcfror_cash_flow_summary", cash_flow_df.to_dict(orient="list"), info_map)
         self.om.add_log("DCFROR calculation completed successfully.", info_map)
 
     def goal_seek(
@@ -283,11 +283,11 @@ class DCFRORCalculator:
                 {
                     "name": "NPV Retrieval",
                     "description": "Retrieve the latest DCFROR NPV for goal seek.",
-                    "filters": [f"{self.__class__.__name__}.{self.calculate.__name__}.dcfror_npv"],
+                    "filters": [f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv"],
                 }
             )
             npv = npv_result.get(
-                f"{self.__class__.__name__}.{self.calculate.__name__}.dcfror_npv",
+                f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv",
                 None,
             )
 

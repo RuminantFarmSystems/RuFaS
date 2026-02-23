@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-import pandas as pd
-
 # Fallback values for InputManager lookups (pricing + selectors).
 INPUT_MANAGER_FALLBACKS: Dict[str, Any] = {
     "animal.pen_information.*.manure_streams.0.bedding_name": "manure_solids",
@@ -16,24 +14,6 @@ INPUT_MANAGER_FALLBACKS: Dict[str, Any] = {
     "commodity_prices.bedding_straw.dollar_per_head": 3.0,
     "commodity_prices.digester_carbon_credits_dollar_per_tonne_CO2e": 15.0,
     "commodity_prices.*.dollar_per_square_meter": 0.25,
-    "cashflow_inputs.loan_term": 10,
-    "cashflow_inputs.project_term": 20,
-    "cashflow_inputs.operating_units": [[1.0]],
-    "cashflow_inputs.operating_unit_costs": [[100.0]],
-    "cashflow_inputs.units_produced": [[1.0]],
-    "cashflow_inputs.unit_price": [[50.0]],
-    "cashflow_inputs.loan_interest_rate": 0.05,
-    "cashflow_inputs.loan_fraction": 0.5,
-    "cashflow_inputs.equity": 0.5,
-    "cashflow_inputs.const_int": 0.04,
-    "cashflow_inputs.const_term": 1,
-    "cashflow_inputs.const_rate_i": [1.0],
-    "cashflow_inputs.tax_rate": 0.21,
-    "cashflow_inputs.target_internal_rate_of_return": 0.08,
-    "cashflow_inputs.depreciation_i": [0.2, 0.2, 0.2, 0.2, 0.2],
-    "cashflow_inputs.enable_dcfror": True,
-    "cashflow_inputs.tax_credit_used": 0.0,
-    "cashflow_inputs.tax_credit_revenue": 0.0,
 }
 
 # Fallback values for biophysical simulation patterns.
@@ -58,9 +38,3 @@ ECONOMIC_QUANTITY_FALLBACK: float = 1.0
 
 # Default price used when no commodity pricing is available.
 ECONOMIC_PRICE_FALLBACK: Dict[str, float] = {"revenue": 2.0, "cost": 1.0}
-
-
-def capital_cost_breakdown_fallback() -> pd.DataFrame:
-    """Return a minimal capital cost breakdown for DCFROR fallback."""
-
-    return pd.DataFrame([{"Item": "Fallback capital cost", "Cost": 10000.0}])

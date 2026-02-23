@@ -16,14 +16,11 @@ class DummyOutputManager:
 
 class MissingInputManager:
     def __init__(self):
-        self.checked = []
+        self.requested = []
 
-    def check_property_exists_in_pool(self, key):
-        self.checked.append(key)
-        return False
-
-    def get_data(self, key):  # pragma: no cover - guarded by pool check
-        raise AssertionError("get_data should not be called when pool check fails")
+    def get_data(self, key):
+        self.requested.append(key)
+        return None
 
 
 def test_partial_budget_ignores_missing_inputs(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -36,7 +33,7 @@ def test_partial_budget_ignores_missing_inputs(monkeypatch: pytest.MonkeyPatch) 
     pb = partial_budget.PartialBudget()
 
     assert pb.has_partial_budget_activity() is False
-    assert dummy_im.checked == []
+    assert dummy_im.requested == []
     assert dummy_om.warnings == []
 
 
@@ -63,6 +60,5 @@ def test_capital_cost_present_handles_missing_table(monkeypatch: pytest.MonkeyPa
     ef = framework.EconomicFramework()
 
     assert ef._capital_cost_present() is False
-    assert dummy_im.checked == ["capital_costs.capital_cost_breakdown"]
-    warning_codes = [code for code, _, _ in dummy_om.warnings]
-    assert warning_codes == ["MissingCapitalCostData"]
+    assert dummy_im.requested == ["economic_inputs.capital_costs.capital_cost_breakdown"]
+    assert dummy_om.warnings == []

@@ -55,13 +55,13 @@ def test_partial_budget_exports_all_series(monkeypatch: pytest.MonkeyPatch) -> N
 
     exported = {name: value for name, value, _ in dummy_om.variables}
 
-    assert exported["pba_additional_revenue"] == [10.0]
-    assert exported["pba_reduced_costs"] == [2.0]
-    assert exported["pba_additional_costs"] == [2.0]
-    assert exported["pba_reduced_revenue"] == [3.0]
-    assert exported["pba_net_change"] == pytest.approx([7.0])
-    assert exported["pba_cumulative_net_change"] == pytest.approx([7.0])
-    assert "pba_summary" in exported
+    assert exported["econ_pba_additional_revenue"] == [10.0]
+    assert exported["econ_pba_reduced_costs"] == [2.0]
+    assert exported["econ_pba_additional_costs"] == [2.0]
+    assert exported["econ_pba_reduced_revenue"] == [3.0]
+    assert exported["econ_pba_net_change"] == pytest.approx([7.0])
+    assert exported["econ_pba_cumulative_net_change"] == pytest.approx([7.0])
+    assert "econ_pba_summary" in exported
 
 
 def test_partial_budget_exports_net_annual_cash_flow_for_single_scenario(
@@ -95,11 +95,11 @@ def test_partial_budget_exports_net_annual_cash_flow_for_single_scenario(
 
     exported = {name: value for name, value, _ in dummy_om.variables}
 
-    assert exported["pba_net_annual_cash_flow"] == [40.0]
-    assert exported["pba_revenue_total"] == [120.0]
-    assert exported["pba_cost_total"] == [80.0]
-    assert exported["pba_additional_revenue"] == [0.0]
-    assert exported["pba_reduced_costs"] == [0.0]
-    assert exported["pba_additional_costs"] == [0.0]
-    assert exported["pba_reduced_revenue"] == [0.0]
-    assert "pba_summary" in exported
+    assert exported["econ_pba_net_annual_cash_flow"] == [40.0]
+    assert exported["econ_pba_revenue_total"] == [120.0]
+    assert exported["econ_pba_cost_total"] == [80.0]
+    assert exported["econ_pba_additional_revenue"] == [0.0]
+    assert exported["econ_pba_reduced_costs"] == [0.0]
+    assert exported["econ_pba_additional_costs"] == [0.0]
+    assert exported["econ_pba_reduced_revenue"] == [0.0]
+    assert "econ_pba_summary" in exported
