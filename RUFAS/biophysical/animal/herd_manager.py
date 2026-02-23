@@ -139,6 +139,9 @@ class HerdManager:
             RationManager.set_user_defined_ration_tolerance(ration_feed_config)
         else:
             RationManager.set_ration_feeds(ration_feed_config)
+        RationManager.maximum_ration_reformulation_attempts = animal_config_data["ration"][
+            "maximum_ration_reformulation_attempts"
+        ]
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
@@ -154,7 +157,7 @@ class HerdManager:
 
         if self.simulate_animals:
             herd_population = HerdFactory.post_animal_population
-            (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
+            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
                 herd_population.calves,
                 herd_population.heiferIs,
                 herd_population.heiferIIs,

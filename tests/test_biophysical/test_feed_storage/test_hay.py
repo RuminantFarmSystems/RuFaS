@@ -26,12 +26,12 @@ from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def mock_storage_config() -> dict[str, str | float]:
+def mock_storage_config() -> dict[str, str | float | list[str]]:
     """Fixture to provide a mock storage configuration dictionary."""
     return {
         "name": "hay",
         "rufas_id": 1,
-        "field_name": "field_1",
+        "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 300.0,
         "bale_size": 1.2,
@@ -41,7 +41,7 @@ def mock_storage_config() -> dict[str, str | float]:
 
 
 @pytest.fixture
-def hay(mock_storage_config: dict[str, str | float]) -> Hay:
+def hay(mock_storage_config: dict[str, str | float | list[str]]) -> Hay:
     """
     Pytest fixture to create a Hay instance for testing.
 
@@ -124,9 +124,9 @@ def test_project_degradations(
     mocker: MockerFixture,
 ) -> None:
     """Tests project_degradations in Hay."""
-    hay.stored = [replace(harvested_crop, fresh_mass=1000.0) for _ in range(3)]
-    crops_with_moisture_loss = [replace(crop, fresh_mass=900.0) for crop in hay.stored]
-    crops_with_all_loss = [replace(crop, fresh_mass=800.0) for crop in hay.stored]
+    hay.stored = [replace(harvested_crop, dry_matter_mass=1000.0) for _ in range(3)]
+    crops_with_moisture_loss = [replace(crop, dry_matter_mass=900.0) for crop in hay.stored]
+    crops_with_all_loss = [replace(crop, dry_matter_mass=800.0) for crop in hay.stored]
     project_moisture_loss = mocker.patch.object(hay, "_project_moisture_loss", return_value=crops_with_moisture_loss)
     project_degradations = mocker.patch(
         "RUFAS.biophysical.feed_storage.storage.Storage.project_degradations", return_value=crops_with_all_loss
@@ -246,21 +246,21 @@ def test_calculate_additional_dry_matter_loss(
     assert pytest.approx(actual) == expected
 
 
-def test_protected_wrapped_init(mock_storage_config: dict[str, str | float]) -> None:
+def test_protected_wrapped_init(mock_storage_config: dict[str, str | float | list[str]]) -> None:
     """Tests that ProtectedWrapped hay instances are initialized correctly."""
     mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     protected_wrapped = ProtectedWrapped(config=mock_storage_config)
     assert protected_wrapped.additional_dry_matter_loss_coefficient == PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
-def test_protected_tarped_init(mock_storage_config: dict[str, str | float]) -> None:
+def test_protected_tarped_init(mock_storage_config: dict[str, str | float | list[str]]) -> None:
     """Tests that ProtectedTarped hay instances are initialized correctly."""
     mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     protected_tarped = ProtectedTarped(config=mock_storage_config)
     assert protected_tarped.additional_dry_matter_loss_coefficient == PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
-def test_outdoor_unprotected_init(mock_storage_config: dict[str, str | float]) -> None:
+def test_outdoor_unprotected_init(mock_storage_config: dict[str, str | float | list[str]]) -> None:
     """Tests that Unprotected hay instances are initialized correctly."""
     mock_storage_config["additional_dry_matter_loss_coefficient"] = 0.0
     unprotected = Unprotected(config=mock_storage_config)

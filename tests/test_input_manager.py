@@ -383,6 +383,7 @@ def test_start_data_processing(
     eager short-circuit vs collect)."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
     mocker.patch.object(mock_input_manager, "_load_properties")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
     mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
     mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
     mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
@@ -417,12 +418,14 @@ def test_start_data_processing(
     else:
         raise AssertionError("Unknown test setup")
 
-    setattr(mock_input_manager, "_InputManager__metadata", {"cross-validation": cv_blocks})
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": cv_blocks})
     cv_mock = mock_input_manager.cross_validator
     cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
     mock_input_manager.data_validator.event_logs.clear()
 
-    result = mock_input_manager.start_data_processing(Path("mock/metadata/path"), Path(""), eager_termination)
+    result = mock_input_manager.start_data_processing(
+        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
+    )
 
     assert result is expected_return
 
@@ -451,12 +454,15 @@ def test_start_data_processing(
 def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """If validate_metadata returns (False, msg), it should raise ValueError with that message."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
     mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(False, "bad meta"))
     mock_load_props = mocker.patch.object(mock_input_manager, "_load_properties")
     mock_validate_props = mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties")
 
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
+
     with pytest.raises(ValueError, match="bad meta"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=True)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=True)
 
     mock_load_props.assert_not_called()
     mock_validate_props.assert_not_called()
@@ -467,6 +473,7 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
 ) -> None:
     """If validate_properties returns (False, msg), it should route logs and then raise ValueError."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
     mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
     mocker.patch.object(mock_input_manager, "_load_properties")
     mock_input_manager.data_validator.event_logs[:] = [{"level": "error", "msg": "prop fail"}]
@@ -474,12 +481,115 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
         type(mock_input_manager.data_validator), "validate_properties", return_value=(False, "bad props")
     )
 
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
+
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     with pytest.raises(ValueError, match="bad props"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), eager_termination=False)
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=False)
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+
+
+@pytest.mark.parametrize(
+    "input_file_blobs, expected_missing_blobs",
+    [
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            [],
+        ),
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            ["user_feeds"],
+        ),
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_instances",
+            },
+            [
+                "NASEM_Comp",
+                "feed_storage_configurations",
+                "lactation",
+            ],
+        ),
+    ],
+)
+def test_validate_required_file_blobs(
+    input_file_blobs: set[str], expected_missing_blobs: list[str], mock_input_manager: InputManager
+) -> None:
+    """Unit test for function _validate_required_file_blobs in file input_manager.py"""
+    if expected_missing_blobs:
+        with pytest.raises(ValueError) as exc_info:
+            mock_input_manager._validate_required_file_blobs(input_file_blobs)
+            assert exc_info.value.args[0] == f"Missing required file blobs: {expected_missing_blobs}"
+    else:
+        mock_input_manager._validate_required_file_blobs(input_file_blobs)
 
 
 @pytest.fixture
@@ -3339,10 +3449,7 @@ def test_export_pool_to_csv_errors(
     )
 
 
-def x_test_load_runtime_metadata_success(
-    mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path
-) -> None:
-    # TODO issue #2691
+def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path) -> None:
     runtime_metadata = {
         "files": {
             "commodity_prices.calves_all.dollar_per_kilogram": {
@@ -3372,7 +3479,9 @@ def x_test_load_runtime_metadata_success(
 
     assert mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
 
-    mocked_validate.assert_called_once_with(runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+    mocked_validate.assert_called_once_with(
+        runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, mock_input_manager.input_root
+    )
     mocked_loader.assert_called_once_with(tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv")
     mocked_add.assert_called_once_with(
         variable_name="commodity_prices.calves_all.dollar_per_kilogram",
