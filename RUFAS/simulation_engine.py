@@ -256,9 +256,7 @@ class SimulationEngine:
         total_projected_inventory = self.feed_manager.get_total_projected_inventory(
             self.time.current_date.date(), self.weather, self.time
         )
-        next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
-            harvest_schedule
-        )
+        next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(harvest_schedule)
 
         ideal_feeds_to_purchase = self.herd_manager.update_all_max_daily_feeds(
             total_projected_inventory, next_harvest_dates_with_rufas_ids, self.time
