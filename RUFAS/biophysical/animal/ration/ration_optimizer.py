@@ -874,23 +874,28 @@ class RationOptimizer:
         [AN.RAT.1]
 
         """
+        sorted_pen_available_feeds = sorted(pen_available_feeds, key=lambda feed: feed.rufas_id)
         ration_config = RationConfig(
             nutrient_standard,
             requirements,
-            pen_available_feeds,
+            sorted_pen_available_feeds,
             initial_dry_matter_requirement,
             initial_protein_requirement,
             pen_average_body_weight,
             pen_average_enteric_methane,
             pen_average_urine_nitrogen,
         )
-
-        initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
+        sorted_previous_ration = dict(sorted(previous_ration.items())) if previous_ration else None
+        initial_decision_vector = np.array(self._build_initial_value(sorted_previous_ration, ration_config),
+                                           dtype=float)
 
         if user_defined_ration_dictionary:
+            sorted_user_defined_ration_dictionary = dict(
+                sorted(user_defined_ration_dictionary.items())
+            )
             bounds = self._build_bounds_user_defined_ration(
                 ration_config=ration_config,
-                user_defined_ration_dictionary=user_defined_ration_dictionary,
+                user_defined_ration_dictionary=sorted_user_defined_ration_dictionary,
                 user_defined_ration_tolerance=user_defined_ration_tolerance,
             )
         else:

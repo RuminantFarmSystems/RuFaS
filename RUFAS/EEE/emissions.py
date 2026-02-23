@@ -338,7 +338,7 @@ class EmissionsEstimator:
                 raise ValueError(f"No feed_id match found for {variable_name}.")
             values_list = variable_contents.get("values", [])
 
-            matched = {values_list[i][0]: values_list[i][1] for i in range(len(values_list))}
+            matched = {values_list[i]["simulation_day"]: values_list[i]["amount"] for i in range(len(values_list))}
 
             feed_deduction_by_feed_id[feed_id] = {day: matched.get(day, 0.0) for day in all_simulation_days}
 
