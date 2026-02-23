@@ -2,6 +2,7 @@ from RUFAS.output_manager import OutputManager
 
 from .emissions import EmissionsEstimator
 from .energy import EnergyEstimator
+from .economics.framework import EconomicFramework
 
 
 class EEEManager:
