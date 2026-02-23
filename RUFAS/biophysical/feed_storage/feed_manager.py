@@ -98,8 +98,11 @@ class FeedManager:
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
-        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(sorted_purchased_allowances)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
+            sorted_purchased_allowances
+        )
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -868,7 +871,8 @@ class FeedManager:
             )
             available_feeds.append(new_feed)
 
-        return available_feeds
+        sorted_available_feeds = sorted(available_feeds, key=lambda feed: feed.rufas_id)
+        return sorted_available_feeds
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
         """

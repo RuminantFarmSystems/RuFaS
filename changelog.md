@@ -312,6 +312,7 @@ v1.0.0
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
 - [2742](https://github.com/RuminantFarmSystems/RuFaS/pull/2742) - [minor change] [NoInputChange] [NoOutputChange] Add logs for variables contributing to aggregated reports.
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
+- [2763](https://github.com/RuminantFarmSystems/RuFaS/pull/2763) - [minor change] [NoInputChange] [NoOutputChange] Fixes feed order issue by sorting user feed inputs.
 - [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
 ### v0.9.2
 
