@@ -24,6 +24,7 @@ class DCFRORCalculator:
     def _load_inputs(self) -> Dict[str, Any]:
         info_map = {"class": self.__class__.__name__, "function": self._load_inputs.__name__}
         try:
+
             def _get_input(path: str) -> Any:
                 if hasattr(self.im, "check_property_exists_in_pool"):
                     if not self.im.check_property_exists_in_pool(path):

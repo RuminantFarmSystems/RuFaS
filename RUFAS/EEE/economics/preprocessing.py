@@ -77,9 +77,7 @@ class EconomicPreprocessor:
         if candidate in self.available_input_keys:
             return candidate
 
-        prefix_matches = sorted(
-            key for key in self.available_input_keys if key.startswith(f"{candidate}.")
-        )
+        prefix_matches = sorted(key for key in self.available_input_keys if key.startswith(f"{candidate}."))
         if prefix_matches:
             return prefix_matches[0]
 
@@ -239,9 +237,7 @@ class EconomicPreprocessor:
                     )
         return values
 
-    def _fetch_values_by_scenario(
-        self, sim_paths: Iterable[str]
-    ) -> Dict[str, List[float]]:
+    def _fetch_values_by_scenario(self, sim_paths: Iterable[str]) -> Dict[str, List[float]]:
         """Collect values per scenario from the OutputManager."""
 
         flat_pool = self.om._get_flat_variables_pool()
@@ -255,9 +251,7 @@ class EconomicPreprocessor:
             if all(isinstance(value, dict) and "values" in value for value in pool.values()):
                 scenario_names = ["baseline"]
             else:
-                scenario_names = [
-                    name for name, data in pool.items() if isinstance(data, dict) and data
-                ]
+                scenario_names = [name for name, data in pool.items() if isinstance(data, dict) and data]
         if not scenario_names:
             scenario_names = ["baseline"]
 
@@ -293,9 +287,7 @@ class EconomicPreprocessor:
                     )
         return values_by_scenario
 
-    def _fallback_values_by_scenario(
-        self, sim_paths: Iterable[str]
-    ) -> Dict[str, List[float]]:
+    def _fallback_values_by_scenario(self, sim_paths: Iterable[str]) -> Dict[str, List[float]]:
         """Build fallback values when no OutputManager data is available."""
 
         values_by_scenario: Dict[str, List[float]] = {"baseline": []}

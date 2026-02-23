@@ -77,7 +77,7 @@ class PartialBudget:
                     items.append((item.get("flow_type"), item, line_items))
 
         if len(scenario_names) == 1:
-            scenario = next(iter(scenario_names))            
+            scenario = next(iter(scenario_names))
 
             revenue_total = 0.0
             cost_total = 0.0
@@ -174,9 +174,7 @@ class PartialBudget:
             "reduced_costs": reduced_costs,
         }
 
-    def calculate_partial_budget(
-        self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None
-    ) -> None:
+    def calculate_partial_budget(self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None) -> None:
         """Perform a partial budget analysis and export multi-year net changes."""
 
         info_map = {

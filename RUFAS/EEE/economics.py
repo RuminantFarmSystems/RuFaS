@@ -4,7 +4,6 @@ import numpy as np
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
-
 # NOTE: ``dcfror.py`` is the maintained implementation described in
 # `RuFaS_Economics_Module_Overview_Slides.pdf`. This duplicate remains for
 # legacy compatibility and will be removed once users migrate to the dedicated
@@ -38,7 +37,9 @@ class DCFRORCalculator:
                 "construction_term": self.im.get_data("economic_inputs.cashflow_inputs.const_term"),
                 "construction_finish_pcts": self.im.get_data("economic_inputs.cashflow_inputs.const_rate_i"),
                 "tax_rate": self.im.get_data("economic_inputs.cashflow_inputs.tax_rate"),
-                "internal_rate_of_return": self.im.get_data("economic_inputs.cashflow_inputs.target_internal_rate_of_return"),
+                "internal_rate_of_return": self.im.get_data(
+                    "economic_inputs.cashflow_inputs.target_internal_rate_of_return"
+                ),
                 "project_term": self.im.get_data("economic_inputs.cashflow_inputs.project_term"),
                 "depreciation_rate": np.array(self.im.get_data("economic_inputs.cashflow_inputs.depreciation_i")),
                 "enable": self.im.get_data("economic_inputs.cashflow_inputs.enable_dcfror"),
