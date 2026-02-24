@@ -39,6 +39,8 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    simulate_animals: bool
+        A boolean indicating whether user has chosen to simulate animals in config.
 
     Methods
     -------
@@ -109,7 +111,7 @@ class SimulationEngine:
             ]
             next_harvest_dates = self.field_manager.get_next_harvest_dates(crops_to_get_next_harvest_dates)
             self.next_max_daily_feed_recalculation: date = self.time.current_date
-            + self.max_daily_feed_recalculation_interval
+            +self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
             total_projected_inventory = self.feed_manager.get_total_projected_inventory(
@@ -134,7 +136,7 @@ class SimulationEngine:
         is_ok_to_feed_animals, daily_feeds_fed = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
 
         daily_purchased_feeds_fed = daily_feeds_fed.get("purchased", {})
-        self.emissions_estimator.calculate_emissions(daily_purchased_feeds_fed)
+        self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
 
         if not is_ok_to_feed_animals:
             info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
@@ -145,13 +147,15 @@ class SimulationEngine:
             self.time.current_date.date(), self.weather, self.time
         )
 
-        all_manure_data = self.herd_manager.daily_routines(
-            self.feed_manager.available_feeds, self.time, self.weather, total_inventory
-        )
+        if self.simulate_animals:
 
-        self.manure_manager.run_daily_update(
-            all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
-        )
+            all_manure_data = self.herd_manager.daily_routines(
+                self.feed_manager.available_feeds, self.time, self.weather, total_inventory
+            )
+
+            self.manure_manager.run_daily_update(
+                all_manure_data, self.time, self.weather.get_current_day_conditions(self.time)
+            )
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -188,6 +192,7 @@ class SimulationEngine:
             A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.
         """
         manure_applications: list[ManureEventNutrientRequestResults] = []
+        is_daily_spread = self.im.get_data("manure")
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
             for manure_event_request in manure_events_requests:
@@ -196,7 +201,7 @@ class SimulationEngine:
                 manure_request = manure_event_request.nutrient_request
                 manure_request_results = None
                 if manure_request is not None:
-                    simulate_animals: bool = self.im.get_data("config.simulate_animals")
+                    simulate_animals: bool = self.simulate_animals
                     manure_request_results = self.manure_manager.request_nutrients(
                         manure_request, simulate_animals, self.time
                     )
@@ -259,6 +264,7 @@ class SimulationEngine:
             feed_storage_instances,
         )
 
+        self.simulate_animals = self.im.get_data("config.simulate_animals")
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
@@ -274,7 +280,9 @@ class SimulationEngine:
             available_feeds=self.feed_manager.available_feeds,
         )
 
-        self.manure_manager: ManureManager = ManureManager()
+        self.manure_manager: ManureManager = ManureManager(
+            self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
+        )
 
         self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
         feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]

@@ -3,6 +3,7 @@ import enum
 import os
 import re
 import shutil
+from copy import deepcopy
 from pathlib import Path
 from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -108,6 +109,34 @@ class Utility:
                 current[last_key] = value
 
         return nested_structure
+
+    @staticmethod
+    def find_max_index_from_keys(data: dict[str, Any]) -> int | None:
+        """
+        Extracts and returns the maximum index (n) from the keys of the given dictionary.
+        Assumes keys follow the format `<prefix>_<number>.<suffix>` and number >= 0.
+
+        Parameters
+        ----------
+        data: Dict[str, Any]
+            The dictionary whose keys will be analyzed.
+
+        Returns
+        -------
+        int | None
+            The maximum index found among the keys, or None if no numeric index is found.
+        """
+        pattern = re.compile(r"_([0-9]+)\.")
+        max_number = -1
+
+        for key in data.keys():
+            match = pattern.search(key)
+            if match:
+                number = int(match.group(1))
+                if number > max_number:
+                    max_number = number
+
+        return max_number if max_number != -1 else None
 
     @staticmethod
     def expand_data_temporally(
@@ -669,6 +698,57 @@ class Utility:
         result_df.to_csv(output_csv_path, index=False)
 
         shutil.rmtree(saved_csv_working_folder)
+
+    @staticmethod
+    def convert_list_to_dict_by_key(list_of_dicts: List[Dict[str, Any]], id_key: str) -> Dict[Any, Dict[str, Any]]:
+        """
+        Convert a list of dictionaries into a dictionary keyed by a specified identifier,
+        where each value is the original dictionary minus the identifier key.
+
+        Parameters
+        ----------
+        list_of_dicts : List[Dict[str, Any]]
+            A list of dictionaries, each containing a unique identifier and other data.
+        id_key : str
+            The key in each dictionary to use as the unique identifier.
+
+        Returns
+        -------
+        Dict[Any, Dict[str, Any]]
+            A dictionary where each key is the unique identifier from the list and each
+            value is the corresponding dictionary minus the identifier key.
+
+        Notes
+        -----
+        The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
+        If you need to keep the original list and dictionaries intact, make a copy before calling this function.
+
+        Example
+        -------
+        Given a list of dictionaries like this:
+        [
+            {"ID": 1, "value": 2, "other_keys": "other values"},
+            {"ID": 3, "value": 4, "other_keys": "other values"}
+        ]
+        And using 'ID' as the id_key:
+
+        convert_list_to_dict_by_key(list_of_dicts, 'ID')
+
+        Would return:
+        {
+            1: {"value": 2, "other_keys": "other values"},
+            3: {"value": 4, "other_keys": "other values"}
+        }
+        """
+        result = {}
+        for dict_ in deepcopy(list_of_dicts):
+            if id_key in dict_:
+                id_value = dict_.pop(id_key)
+                result[id_value] = dict_
+            else:
+                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+
+        return result
 
     @staticmethod
     def elongate_list(list_to_elongate: list[Any], reference_list_length: int) -> list[Any]:

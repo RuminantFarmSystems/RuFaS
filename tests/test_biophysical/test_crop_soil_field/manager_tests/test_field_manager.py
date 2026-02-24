@@ -154,7 +154,7 @@ def test_daily_update_routine(
                         field_name="test_field",
                         harvest_time=mocked_time,
                         storage_time=mocked_time,
-                        fresh_mass=10.0,
+                        dry_matter_mass=10.0,
                         dry_matter_percentage=0.85,
                         dry_matter_digestibility=0.65,
                         crude_protein_percent=0.12,
@@ -172,7 +172,7 @@ def test_daily_update_routine(
                         field_name="test_field",
                         harvest_time=mocked_time,
                         storage_time=mocked_time,
-                        fresh_mass=10.0,
+                        dry_matter_mass=10.0,
                         dry_matter_percentage=0.85,
                         dry_matter_digestibility=0.65,
                         crude_protein_percent=0.12,
@@ -393,6 +393,14 @@ def test_setup_fertilizer_schedule(
     mock_input_manager.get_data.assert_called_once_with("test_fert_schedule")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+
+
+def test_setup_fertilizer_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test when no fertilizer schedule input."""
+    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_fertilizer_events("test_fert_schedule")
 
 
 @pytest.mark.parametrize(
@@ -831,6 +839,14 @@ def test_setup_manure_schedule(
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
+def test_setup_manure_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test when no manure schedule input."""
+    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_manure_events("test_manure_schedule")
+
+
 @pytest.mark.parametrize(
     "tillage_schedule_data,expected_tillage_schedule",
     [
@@ -1247,6 +1263,14 @@ def test_setup_tillage_schedule(
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
+def test_setup_tillage_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test when no tillage input data available."""
+    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_tillage_events("test_tillage_schedule")
+
+
 @pytest.mark.parametrize(
     "crop_schedule_config,expected",
     [
@@ -1405,6 +1429,15 @@ def test_crop_schedule_setup(
     mock_input_manager.get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+
+
+def test_setup_crop_schedule_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test when no crop schedule input data available."""
+    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+    crop_configs = ["alfalfa", "corn", "oats"]
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_crop_schedules("test_crop_schedule", crop_configs)
 
 
 def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: InputManager) -> None:
@@ -1849,7 +1882,7 @@ def test_setup_soil_error(
     soil_configuration: dict[str, float | int] | dict[str, float | int | None],
     error_message: str,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Any],
 ) -> None:
     """Tests that errors are raised correctly when invalid soil configurations are passed."""
     mock_input_manager.get_data = mock.MagicMock(return_value=soil_configuration)

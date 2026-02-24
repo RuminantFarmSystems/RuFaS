@@ -13,7 +13,7 @@ def grain() -> Grain:
     Grain
         An instance of the Grain class.
     """
-    mock_grain_config: dict[str, str | float] = {
+    mock_grain_config: dict[str, str | float | list[str]] = {
         "name": "corn_grain",
         "rufas_id": 1,
         "field_name": "field_1",

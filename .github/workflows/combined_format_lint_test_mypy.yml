@@ -138,7 +138,7 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
@@ -155,14 +155,14 @@ jobs:
           echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
         
       - name: Capture the commit hash
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         id: capture_commit_sha
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
 
       - name: Format code with Black for forked branches
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url != 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository != 'RuminantFarmSystems/RuFaS' }}
         run: |
           echo $(black ${{ env.FILES }})
 
@@ -246,7 +246,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: ${{ github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -285,7 +285,7 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
-        if: ${{ github.ref != 'refs/heads/dev' && steps.get_current_repo_url.outputs.current_repo_url == 'https://github.com/RuminantFarmSystems/RuFaS.git' }}
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"

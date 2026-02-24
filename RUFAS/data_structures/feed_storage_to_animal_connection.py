@@ -27,6 +27,7 @@ class FeedCategorization(Enum):
     PASTURE = "Pasture"
     PLANT_PROTEIN = "Plant Protein"
     VITAMIN_MINERAL = "Vitamin/Mineral"
+    NPN_SUPPLEMENT = "NPN Supplement"
 
 
 class FeedComponentType(Enum):
@@ -163,7 +164,6 @@ class Feed:
     lower_limit: float
     TDN: float
     DE: float
-
     amount_available: float
     on_farm_cost: float
     purchase_cost: float
@@ -221,7 +221,9 @@ class NASEMFeed(Feed):
     C183_FA : float
     otherFA_FA : float
     NPN_source : float
+        Non-protein nitrogen fraction (%).
     starch_digested : float
+        Base starch digestibility (%).
     FA_dig : float
     P_inorg : float
     P_org : float

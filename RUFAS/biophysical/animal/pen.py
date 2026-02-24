@@ -21,11 +21,12 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
     TotalInventory,
+    NutrientStandard,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
@@ -511,7 +512,11 @@ class Pen:
             self.insert_single_animal_into_animals_in_pen_map(animal)
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
             nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
+                feeds_used=available_feeds,
+                ration_formulation=self.ration,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrition_supply = nutrient_supply
             animal.nutrients.set_dry_matter_intake(nutrient_supply.dry_matter)
@@ -696,6 +701,7 @@ class Pen:
             volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
             methane_production_potential=methane_production_potential,
             pen_manure_data=total_pen_manure_data,
+            bedding_non_degradable_volatile_solids=0.0,
         )
 
         parlor_stream_proportion = None
@@ -775,16 +781,15 @@ class Pen:
                 if bedding.bedding_type != BeddingType.SAND
                 else manure_stream.ash + total_bedding_dry_solids
             ),
-            non_degradable_volatile_solids=(
-                manure_stream.non_degradable_volatile_solids
-                if bedding.bedding_type == BeddingType.SAND
-                else manure_stream.non_degradable_volatile_solids + total_bedding_dry_solids
-            ),
+            non_degradable_volatile_solids=manure_stream.non_degradable_volatile_solids,
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
             total_solids=manure_stream.total_solids + total_bedding_dry_solids,
             volume=manure_stream.volume + total_bedding_volume,
             methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
+            bedding_non_degradable_volatile_solids=(
+                0 if bedding.bedding_type == BeddingType.SAND else total_bedding_dry_solids
+            ),
         )
 
     def _calculate_manure_surface_area(self) -> float:
@@ -907,7 +912,11 @@ class Pen:
         for animal in self.animals_in_pen.values():
             animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
+                feeds_used=feeds_used,
+                ration_formulation=ration_formulation,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
             animal.nutrients.set_phosphorus_intake(animal.nutrition_supply.phosphorus)
@@ -988,12 +997,18 @@ class Pen:
             # Lac cow success exit and non lac cow one time run only exit
             if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
-
+            if num_attempts > RationManager.maximum_ration_reformulation_attempts:
+                om.add_log(
+                    "Maximum ration reformulation attempts exceeded.",
+                    f"See output variable failed_constraint_summary_for_pen_{self.id} for more information.",
+                    info_map,
+                )
+                break
             adjusted_dry_matter_lower = initial_dry_matter_requirement_fixed * (
-                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + UserDefinedRationManager.tolerance
+                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
             )
             adjusted_dry_matter_upper = initial_dry_matter_requirement_fixed * (
-                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - UserDefinedRationManager.tolerance
+                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
             )
             need_dry_matter_increase = bool(
                 set(
@@ -1001,16 +1016,14 @@ class Pen:
                         "NE_total_constraint",
                         "NE_maintenance_and_activity_constraint",
                         "NE_lactation_constraint",
-                        "NE_growth_constraint" "calcium_constraint",
+                        "NE_growth_constraint",
+                        "calcium_constraint",
                         "phosphorus_constraint",
                         "protein_constraint_lower",
                         "DMI_constraint_lower",
                     ]
                 )
                 & set(constraints_failed_list)
-            )
-            need_dry_matter_decrease = bool(
-                set(["protein_constraint_upper", "DMI_constraint_upper"]) & set(constraints_failed_list)
             )
 
             if is_ration_defined_by_user and (
@@ -1019,11 +1032,7 @@ class Pen:
                 if need_dry_matter_increase:
                     initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
                     continue
-                elif need_dry_matter_decrease:
-                    initial_dry_matter_requirement = initial_dry_matter_requirement * 0.9
-                    continue
 
-            # For lac cow
             if is_ration_defined_by_user:
                 if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
                     break
@@ -1069,14 +1078,30 @@ class Pen:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
         if is_ration_defined_by_user:
-            user_defined_ration_dictionary = UserDefinedRationManager.user_defined_rations[self.animal_combination]
-            tolerance = UserDefinedRationManager.tolerance
+            user_defined_ration_dictionary = RationManager.user_defined_rations[self.animal_combination]
+            tolerance = RationManager.tolerance
         else:
             user_defined_ration_dictionary = None
             tolerance = None
+        nutrient_standard = list(self.animals_in_pen.values())[0].nutrient_standard
+
+        if nutrient_standard is NutrientStandard.NASEM:
+            enteric_methane_list = []
+            urine_nitrogen_list = []
+            for animal in self.animals_in_pen.values():
+                enteric_methane_list.append(animal.digestive_system.enteric_methane_emission)
+                urine_nitrogen_list.append(animal.digestive_system.manure_excretion.urine_nitrogen)
+            pen_average_enteric_methane = sum(enteric_methane_list) / len(enteric_methane_list)
+            pen_average_urine_nitrogen = sum(urine_nitrogen_list) / len(urine_nitrogen_list)
+        else:
+            pen_average_enteric_methane = None
+            pen_average_urine_nitrogen = None
 
         return self.ration_optimizer.attempt_optimization(
+            nutrient_standard=nutrient_standard,
             pen_average_body_weight=self.average_body_weight,
+            pen_average_enteric_methane=pen_average_enteric_methane,
+            pen_average_urine_nitrogen=pen_average_urine_nitrogen,
             requirements=self.average_nutrition_requirements,
             initial_dry_matter_requirement=initial_dry_matter_requirement,
             initial_protein_requirement=initial_protein_requirement,
@@ -1109,7 +1134,7 @@ class Pen:
         pen_feeds : list[Feed]
             Feeds available in a given pen.
         """
-        self.ration = UserDefinedRationManager.get_user_defined_ration(
+        self.ration = RationManager.get_user_defined_ration(
             self.animal_combination, self.average_nutrition_requirements
         )
         self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
@@ -1206,9 +1231,7 @@ class Pen:
         if animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements
-        )
+        ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1226,9 +1249,7 @@ class Pen:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-                ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements
-                )
+                ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     self.average_nutrition_requirements,

@@ -81,7 +81,8 @@ class BeddedPack(Storage):
         if manure_annual_temperature:
             storage_methane = BeddedPack.calculate_bedded_pack_methane_emission(
                 self.is_mixed,
-                self._manure_to_process.total_volatile_solids,
+                self._manure_to_process.degradable_volatile_solids
+                + self._manure_to_process.non_degradable_volatile_solids,
                 self._determine_barn_temperature(manure_annual_temperature),
                 self._manure_to_process.methane_production_potential
             )
@@ -180,13 +181,14 @@ class BeddedPack(Storage):
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
             self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
         )
-        non_degradable_volatile_solids_after_losses = (
+        non_degradable_volatile_solids_after_losses = max(0, (
             self._manure_to_process.non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
-        )
-        degradable_volatile_solids_after_losses = (
-            self._manure_to_process.degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
-        )
+        ))
+        degradable_volatile_solids_after_losses = max(0, (
+            self._manure_to_process.degradable_volatile_solids
+            - dry_matter_loss * degradable_volatile_solids_fraction
+        ))
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
         errors = []

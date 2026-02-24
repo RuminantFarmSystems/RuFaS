@@ -8,7 +8,7 @@ import pytest
 from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
+from RUFAS.input_manager import ADDRESS_TO_INPUTS, VALID_INPUT_TYPES, InputManager
 from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState, CrossValidator
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
@@ -99,7 +99,7 @@ def test_load_properties_success(mock_input_manager: InputManager, mocker: Mocke
 
 def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling FileNotFoundError in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=False)
+    mocker.patch.object(Path, "exists", return_value=False)
     mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/missing_properties.json"}}}
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
@@ -110,7 +110,6 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
 
 def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling JSONDecodeError in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
     mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
 
@@ -124,7 +123,6 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
 
 def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling unexpected errors in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
     mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="valid_json"))
     mocker.patch(
@@ -138,6 +136,113 @@ def test_load_properties_unexpected_error(mock_input_manager: InputManager, mock
         with pytest.raises(Exception, match="Unexpected error"):
             mock_input_manager._load_properties()
         assert add_error.call_count == 1
+
+
+def test_load_properties_combines_multiple_files(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """_load_properties should merge properties documents when multiple paths are provided."""
+
+    mocker.patch.object(Path, "exists", return_value=True)
+    first_properties = {"key1": "value1"}
+    second_properties = {"key2": "value2"}
+    mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        side_effect=[first_properties, second_properties],
+    )
+
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": [
+                    "path/to/properties.json",
+                    "path/to/commodity_properties.json",
+                ]
+            }
+        }
+    }
+
+    mock_input_manager._load_properties()
+
+    assert mock_input_manager._InputManager__metadata["properties"] == {
+        "key1": "value1",
+        "key2": "value2",
+    }
+
+
+def test_load_properties_overlapping_keys_last_file_wins(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    """_load_properties should allow later files to override earlier keys and remove properties pointer."""
+
+    mocker.patch.object(Path, "exists", return_value=True)
+    first_properties = {"key1": "value1", "shared": "original"}
+    second_properties = {"shared": "updated"}
+    load_json = mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        side_effect=[first_properties, second_properties],
+    )
+
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": ["path/to/properties.json", "path/to/commodity_properties.json"],
+            }
+        }
+    }
+
+    mock_input_manager._load_properties()
+
+    assert mock_input_manager._InputManager__metadata["properties"] == {
+        "key1": "value1",
+        "shared": "updated",
+    }
+    assert "properties" not in mock_input_manager._InputManager__metadata["files"]
+    assert load_json.call_count == 2
+
+
+def test_load_properties_empty_paths_list_raises_value_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    mocker.patch.object(Path, "exists", return_value=True)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"paths": []}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(ValueError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
+
+
+def test_load_properties_rejects_non_string_paths(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    mocker.patch.object(Path, "exists", return_value=True)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"paths": ["valid/path.json", 123]}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(ValueError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
+
+
+def test_load_properties_missing_second_file_triggers_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    """When any properties path is missing the loader should raise FileNotFoundError."""
+
+    mocker.patch.object(Path, "exists", side_effect=[True, False])
+    mocker.patch(
+        "RUFAS.input_manager.InputManager._load_data_from_json",
+        return_value={"key1": "value1"},
+    )
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "properties": {
+                "paths": ["path/to/properties.json", "path/to/missing_properties.json"],
+            }
+        }
+    }
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(FileNotFoundError):
+            mock_input_manager._load_properties()
+        add_error.assert_called_once()
 
 
 def test_load_metadata(mock_input_manager: InputManager) -> None:
@@ -243,27 +348,248 @@ def test_load_data_from_csv_invalid_data_raises_error(
                 assert add_log.call_count == 1
 
 
+@pytest.mark.parametrize(
+    "cv_scenario, eager_termination, populate_ok, expected_return, expected_cv_calls, expected_fail_blocks",
+    [
+        ("none", True, True, True, 0, []),
+        ("none", False, True, True, 0, []),
+        ("all_pass", True, True, True, 2, []),
+        ("all_pass", False, True, True, 2, []),
+        ("first_fail_eager_true", True, True, False, 1, ["cv1"]),
+        ("two_fail_eager_false", False, True, False, 3, ["cv1", "cv2"]),
+        ("all_pass", True, False, False, 2, []),
+    ],
+    ids=[
+        "no-cv_eager-true",
+        "no-cv_eager-false",
+        "cv-pass_eager-true",
+        "cv-pass_eager-false",
+        "cv-first-fail_eager-true",
+        "cv-two-fail_eager-false",
+        "populate-false_cv-pass",
+    ],
+)
 def test_start_data_processing(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
+    cv_scenario: str,
+    eager_termination: bool,
+    populate_ok: bool,
+    expected_return: bool,
+    expected_cv_calls: int,
+    expected_fail_blocks: list[str],
 ) -> None:
-    """Unit test for function start_data_processing in file input_manager.py"""
-    patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
-    patch_for_populate_pool = mocker.patch.object(InputManager, "_populate_pool", return_value=True)
-    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata", return_value=(True, ""))
-    patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
-    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties", return_value=(True, ""))
+    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
+    eager short-circuit vs collect)."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_load_properties")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
 
-    eager_termination = True
-    mock_metadata_path = "mock/metadata/path"
+    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
-    mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
+    mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={"dummy": True})
 
-    patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
-    patch_for_populate_pool.assert_called_once_with(eager_termination)
-    patch_for_load_properties.assert_called_once()
-    patch_for_validate_metadata.assert_called_once()
-    patch_for_validate_properties.assert_called_once()
+    if cv_scenario == "none":
+        cv_blocks = []
+        side_effect = []
+    elif cv_scenario == "all_pass":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+        ]
+        side_effect = [True, True]
+    elif cv_scenario == "first_fail_eager_true":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+        ]
+        side_effect = [False, True]
+    elif cv_scenario == "two_fail_eager_false":
+        cv_blocks = [
+            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+            {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+        ]
+        side_effect = [False, False, True]
+    else:
+        raise AssertionError("Unknown test setup")
+
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": cv_blocks})
+    cv_mock = mock_input_manager.cross_validator
+    cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
+    mock_input_manager.data_validator.event_logs.clear()
+
+    result = mock_input_manager.start_data_processing(
+        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
+    )
+
+    assert result is expected_return
+
+    assert cv_call.call_count == expected_cv_calls
+    for idx, cv_call in enumerate(cv_call.call_args_list[:expected_cv_calls]):
+        _, kwargs = cv_call
+        target_and_save_result, block, eager = cv_call.args
+        assert "target_and_save" in block
+        assert eager is eager_termination
+        assert isinstance(target_and_save_result, dict)
+
+    if expected_fail_blocks:
+        add_error.assert_called_once()
+        err, msg, info = add_error.call_args.args
+        assert err == "Cross Validation Failure"
+        for name in expected_fail_blocks:
+            assert name in msg
+        assert info.get("class") == mock_input_manager.__class__.__name__
+        assert info.get("function") == mock_input_manager.start_data_processing.__name__
+    else:
+        add_error.assert_not_called()
+
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+
+
+def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """If validate_metadata returns (False, msg), it should raise ValueError with that message."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(False, "bad meta"))
+    mock_load_props = mocker.patch.object(mock_input_manager, "_load_properties")
+    mock_validate_props = mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties")
+
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
+
+    with pytest.raises(ValueError, match="bad meta"):
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=True)
+
+    mock_load_props.assert_not_called()
+    mock_validate_props.assert_not_called()
+
+
+def test_start_data_processing_invalid_properties_routes_logs_and_raises(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    """If validate_properties returns (False, msg), it should route logs and then raise ValueError."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
+    mocker.patch.object(mock_input_manager, "_load_properties")
+    mock_input_manager.data_validator.event_logs[:] = [{"level": "error", "msg": "prop fail"}]
+    mocker.patch.object(
+        type(mock_input_manager.data_validator), "validate_properties", return_value=(False, "bad props")
+    )
+
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
+
+    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+
+    with pytest.raises(ValueError, match="bad props"):
+        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=False)
+
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+
+
+@pytest.mark.parametrize(
+    "input_file_blobs, expected_missing_blobs",
+    [
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            [],
+        ),
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "lactation",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "NASEM_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_configurations",
+                "feed_storage_instances",
+            },
+            ["user_feeds"],
+        ),
+        (
+            {
+                "config",
+                "animal",
+                "animal_population",
+                "animal_net_merit",
+                "animal_top_listing_semen",
+                "economy",
+                "emission",
+                "purchased_feeds_emissions",
+                "purchased_feed_land_use_change_emissions",
+                "feed",
+                "NRC_Comp",
+                "manure_management",
+                "manure_processor_connection",
+                "crop_configurations",
+                "weather",
+                "user_feeds",
+                "tractor_dataset",
+                "EEE_constants",
+                "properties",
+                "feed_storage_instances",
+            },
+            [
+                "NASEM_Comp",
+                "feed_storage_configurations",
+                "lactation",
+            ],
+        ),
+    ],
+)
+def test_validate_required_file_blobs(
+    input_file_blobs: set[str], expected_missing_blobs: list[str], mock_input_manager: InputManager
+) -> None:
+    """Unit test for function _validate_required_file_blobs in file input_manager.py"""
+    if expected_missing_blobs:
+        with pytest.raises(ValueError) as exc_info:
+            mock_input_manager._validate_required_file_blobs(input_file_blobs)
+            assert exc_info.value.args[0] == f"Missing required file blobs: {expected_missing_blobs}"
+    else:
+        mock_input_manager._validate_required_file_blobs(input_file_blobs)
 
 
 @pytest.fixture
@@ -308,7 +634,7 @@ def test_populate_pool_valid(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=True)
+    result = input_manager._populate_pool(Path(""), eager_termination=True)
 
     # Assert
     assert result
@@ -341,7 +667,7 @@ def test_populate_pool_invalid(
     mocker.patch.object(input_manager, "elements_counter", elements_counter)
 
     # Act
-    result = input_manager._populate_pool(eager_termination=False)
+    result = input_manager._populate_pool(Path(""), eager_termination=False)
 
     # Assert
     assert not result
@@ -369,7 +695,7 @@ def test_populate_pool_partial_invalid(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=False)
+    result = input_manager._populate_pool(Path(""), eager_termination=False)
 
     # Assert
     assert result is False
@@ -404,7 +730,7 @@ def test_populate_pool_eager_termination(
     mocker.patch.object(OutputManager, "add_warning")
 
     # Act
-    result = input_manager._populate_pool(eager_termination=True)
+    result = input_manager._populate_pool(Path(""), eager_termination=True)
 
     # Assert
     assert result is False
@@ -430,7 +756,7 @@ def test_populate_pool_raises_keyerror(
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
             with pytest.raises(KeyError):
-                mock_input_manager._populate_pool(eager_termination=True)
+                mock_input_manager._populate_pool(Path(""), eager_termination=True)
 
             assert add_log.call_count == 0
             assert add_warning.call_count == 0
@@ -2790,7 +3116,14 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key": {
                 "object_property": {"nested_property": {"type": "string", "description": "An example property"}},
                 "example_property": {"type": "string", "description": "An example property"},
-            }
+            },
+            "commodity_prices_blob_key": {
+                "fips": {"type": "array", "properties": {"type": "number"}},
+                "2003": {"type": "array", "properties": {"type": "number"}},
+            },
+            "commodity_prices_with_parent_blob_key": {
+                "calves_all": {"modifiability": "REQUIRED_AND_LOCKED"},
+            },
         }
     }
 
@@ -2815,6 +3148,25 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key",
             {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
+            True,
+        ),
+        (
+            "commodity_prices.calves_all.dollar_per_kilogram",
+            {"fips": [1], "2003": [2]},
+            "commodity_prices_blob_key",
+            {"fips": [1], "2003": [2]},
+            {
+                "fips": {"properties": {"type": "number"}, "type": "array"},
+                "2003": {"properties": {"type": "number"}, "type": "array"},
+            },
+            False,
+        ),
+        (
+            "commodity_prices.calves_all.dollar_per_kilogram",
+            {"fips": [1], "2003": [2]},
+            "commodity_prices_with_parent_blob_key",
+            {"dollar_per_kilogram": {"fips": [1], "2003": [2]}},
+            {"modifiability": "REQUIRED_AND_LOCKED"},
             True,
         ),
     ],
@@ -3097,6 +3449,176 @@ def test_export_pool_to_csv_errors(
     )
 
 
+def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path) -> None:
+    runtime_metadata = {
+        "files": {
+            "commodity_prices.calves_all.dollar_per_kilogram": {
+                "path": str(tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv"),
+                "type": "csv",
+                "properties": "commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
+            }
+        }
+    }
+    runtime_metadata_path = tmp_path / "econ_metadata.json"
+    runtime_metadata_path.write_text(json.dumps(runtime_metadata))
+    (tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv").write_text("value\n1\n")
+
+    mock_input_manager._InputManager__metadata = {
+        "properties": {
+            "commodity_prices_calves_all_dollar_per_kilogram_csv_properties": {},
+        },
+        "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
+    }
+
+    mocked_validate = mocker.patch.object(
+        mock_input_manager.data_validator, "validate_metadata", return_value=(True, "")
+    )
+    mocked_loader = mocker.patch.object(mock_input_manager, "_load_data_from_csv", return_value={"value": [1]})
+    mocked_add = mocker.patch.object(mock_input_manager, "add_runtime_variable_to_pool", return_value=True)
+    metadata_exists_spy = mocker.spy(mock_input_manager, "_metadata_properties_exist")
+
+    assert mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+
+    mocked_validate.assert_called_once_with(
+        runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, mock_input_manager.input_root
+    )
+    mocked_loader.assert_called_once_with(tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv")
+    mocked_add.assert_called_once_with(
+        variable_name="commodity_prices.calves_all.dollar_per_kilogram",
+        data={"value": [1]},
+        properties_blob_key="commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
+        eager_termination=True,
+    )
+    metadata_exists_spy.assert_called_once_with(
+        "commodity_prices.calves_all.dollar_per_kilogram",
+        "commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
+    )
+    assert mock_input_manager._InputManager__metadata["runtime_metadata"] == {
+        "EEE_econ": {"path": str(runtime_metadata_path)}
+    }
+
+
+def test_load_runtime_metadata_invalid_key(mock_input_manager: InputManager) -> None:
+    mock_input_manager._InputManager__metadata = {
+        "properties": {},
+        "runtime_metadata": {},
+    }
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+
+    add_error.assert_called()
+
+
+def test_load_runtime_metadata_missing_configuration(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    mock_input_manager._InputManager__metadata = {
+        "properties": {},
+    }
+
+    get_metadata_spy = mocker.spy(mock_input_manager, "get_metadata")
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+
+    get_metadata_spy.assert_called_once_with("runtime_metadata")
+    assert add_error.call_args_list[-1] == call(
+        "Runtime metadata load failure",
+        "Runtime metadata configuration could not be resolved from the active metadata document.",
+        {"class": "InputManager", "function": "load_runtime_metadata"},
+    )
+
+
+def test_load_runtime_metadata_missing_path(mock_input_manager: InputManager) -> None:
+    mock_input_manager._InputManager__metadata = {
+        "properties": {},
+        "runtime_metadata": {"EEE_econ": {}},
+    }
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+
+    assert add_error.call_count >= 1
+
+
+def test_load_runtime_metadata_invalid_metadata(
+    mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path
+) -> None:
+    runtime_metadata = {
+        "files": {
+            "commodity_prices.calves_all.dollar_per_kilogram": {
+                "path": str(tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv"),
+                "type": "csv",
+                "properties": "commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
+            }
+        }
+    }
+    runtime_metadata_path = tmp_path / "econ_metadata.json"
+    runtime_metadata_path.write_text(json.dumps(runtime_metadata))
+    (tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv").write_text("value\n1\n")
+
+    mock_input_manager._InputManager__metadata = {
+        "properties": {},
+        "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
+    }
+
+    mocker.patch.object(mock_input_manager.data_validator, "validate_metadata", return_value=(False, "boom"))
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+
+    add_error.assert_called_with(
+        "Runtime metadata load failure",
+        f"Runtime metadata document at '{runtime_metadata_path}' failed validation.",
+        {"class": "InputManager", "function": "load_runtime_metadata"},
+    )
+
+
+def test_load_runtime_metadata_eager_termination_stops_processing(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
+    mocker.patch.object(mock_input_manager, "_is_metadata_loaded", return_value=True)
+    mocker.patch.object(mock_input_manager, "_get_runtime_metadata_map", return_value={})
+    mocker.patch.object(
+        mock_input_manager,
+        "_resolve_runtime_metadata_files",
+        return_value={"var_a": {}, "var_b": {}},
+    )
+    mocker.patch.object(mock_input_manager, "_runtime_data_loader_map", return_value={})
+    process_runtime_file = mocker.patch.object(
+        mock_input_manager,
+        "_process_runtime_file",
+        side_effect=[False, True],
+    )
+
+    assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
+    process_runtime_file.assert_called_once_with(
+        "var_a", {}, {}, True, {"class": "InputManager", "function": "load_runtime_metadata"}
+    )
+
+
+def test_load_runtime_metadata_non_eager_processes_all(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    mocker.patch.object(mock_input_manager, "_is_metadata_loaded", return_value=True)
+    mocker.patch.object(mock_input_manager, "_get_runtime_metadata_map", return_value={})
+    runtime_files = {"var_a": {}, "var_b": {}}
+    mocker.patch.object(
+        mock_input_manager,
+        "_resolve_runtime_metadata_files",
+        return_value=runtime_files,
+    )
+    mocker.patch.object(mock_input_manager, "_runtime_data_loader_map", return_value={})
+    process_runtime_file = mocker.patch.object(
+        mock_input_manager,
+        "_process_runtime_file",
+        side_effect=[False, True],
+    )
+
+    assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=False)
+    assert process_runtime_file.call_args_list == [
+        call("var_a", {}, {}, False, {"class": "InputManager", "function": "load_runtime_metadata"}),
+        call("var_b", {}, {}, False, {"class": "InputManager", "function": "load_runtime_metadata"}),
+    ]
+
+
 @pytest.fixture
 def simple_pool_and_meta() -> tuple[dict[Any, Any], dict[Any, Any]]:
     pool = {"a": 1, "b": 2, "c": {"nested": {"level1": 3, "another": 4}}}
@@ -3203,7 +3725,7 @@ def test_extract_target_and_save_block(mocker: MockerFixture) -> None:
     im = InputManager()
     mock_check = mocker.patch.object(CrossValidator, "check_target_and_save_block")
     mock_get_data = mocker.patch.object(im, "get_data", return_value=1)
-    result = im.extract_target_and_save_block(
+    result = im._extract_target_and_save_block(
         {"variables": {"a": "test.address.1", "b": "test.address.2"}, "constants": {"c": "value"}}, True
     )
 

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import asdict
-
 from numpy import clip
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -294,36 +293,6 @@ class Processor(ABC):
 
         """
         return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
-
-    @staticmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
-        """
-        Determines the temperature of the manure in outdoor liquid and slurry storages.
-
-        Parameters
-        ----------
-        air_temperature : float
-            The current day's ambient air temperature (°C).
-
-        Returns
-        -------
-        float
-            The estimated temperature of the manure storage (°C).
-
-        References
-        ----------
-        The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
-        (april.leytem@usda.gov) and A. VanderZaag (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work
-        from Genedy and Ogejo, 2021 (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and
-        maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.
-
-        Notes
-        -----
-        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
-        liquid manure temperature is assumed to be equal to ambient air temperature.
-
-        """
-        return float(clip(air_temperature, 0.0, 35.0))
 
     @staticmethod
     def _determine_barn_temperature(air_temperature: float) -> float:

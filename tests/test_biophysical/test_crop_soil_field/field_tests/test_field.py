@@ -589,7 +589,7 @@ def test_check_crop_harvest_schedule(
         field_name="test_field",
         harvest_time=mocked_time,
         storage_time=mocked_time,
-        fresh_mass=10.0,
+        dry_matter_mass=10.0,
         dry_matter_percentage=0.85,
         dry_matter_digestibility=0.65,
         crude_protein_percent=0.12,
@@ -803,6 +803,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -812,6 +813,7 @@ def test_plant_crop(
                 "day": 100,
                 "field_size": 1.3,
                 "average_clay_percent": 40.0,
+                "field_name": "name_1",
             },
         ),
         (
@@ -829,6 +831,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -838,6 +841,7 @@ def test_plant_crop(
                 "day": 120,
                 "field_size": 2.55,
                 "average_clay_percent": 40.0,
+                "field_name": "name_2",
             },
         ),
         (
@@ -855,6 +859,7 @@ def test_plant_crop(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                 },
             },
             {
@@ -864,6 +869,7 @@ def test_plant_crop(
                 "day": 122,
                 "field_size": 0.95,
                 "average_clay_percent": 40.0,
+                "field_name": "name_3",
             },
         ),
     ],

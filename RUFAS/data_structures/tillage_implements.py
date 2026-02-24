@@ -1,26 +1,12 @@
 from enum import Enum
 
 
-class TillageImplement(Enum):
-    """
-    Defines the supported tillage implements for RuFaS.
+class EnumWithStrOverride(Enum):
+    def __str__(self):
+        return self.value
 
-    Attributes
-    ----------
-    SUBSOILER : str
-        Subsoiler.
-    MOLDBOARD_PLOW : str
-        Moldboard plow.
-    COULTER_CHISEL_PLOW : str
-        Coulter-chisel plow.
-    DISK_HARROW : str
-        Disk harrow.
-    CULTIVATOR : str
-        Cultivator.
-    SEEDBED_CONDITIONER : str
-        Seedbed conditioner.
-    """
 
+class TillageImplement(EnumWithStrOverride):
     SUBSOILER = "subsoiler"
     MOLDBOARD_PLOW = "moldboard-plow"
     COULTER_CHISEL_PLOW = "coulter-chisel-plow"
@@ -28,5 +14,28 @@ class TillageImplement(Enum):
     CULTIVATOR = "cultivator"
     SEEDBED_CONDITIONER = "seedbed-conditioner"
 
-    def __str__(self):
-        return self.value
+
+class TractorSize(EnumWithStrOverride):
+    SMALL = "Small"
+    MEDIUM = "Medium"
+    LARGE = "Large"
+
+
+class OperationType(EnumWithStrOverride):
+    PLANTING = "Planting"
+    TILLING = "Tilling"
+    LIQUID_MANURE_APPLICATION_SURFACE = "Liquid Manure Application - Surface"
+    LIQUID_MANURE_APPLICATION_BELOW_SURFACE = "Liquid Manure Application - Below Surface"
+    FERTILIZER_APPLICATION_SURFACE = "Fertilizer Application - Surface"
+    FERTILIZER_APPLICATION_BELOW_SURFACE = "Fertilizer Application - Below Surface"
+    MOWING = "Mowing"
+    COLLECTION = "Collection"
+    WINDROWING = "Windrowing"
+
+
+class FieldOperationEvent(EnumWithStrOverride):
+    HARVEST = "Harvest"
+    FERTILIZER_APPLICATION = "Fertilizer Application"
+    MANURE_APPLICATION = "Manure Application"
+    PLANTING = "Planting"
+    TILLING = "Tilling"

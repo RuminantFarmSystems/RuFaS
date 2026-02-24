@@ -1,0 +1,41 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'main.blg'
+[139] biber-MSWIN64:342> INFO - === 
+[188] Biber.pm:421> INFO - Reading 'main.bcf'
+[292] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[293] Biber.pm:1002> INFO - Found 29 citekeys in bib section 1
+[294] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[296] Biber.pm:1002> INFO - Found 28 citekeys in bib section 2
+[296] Biber.pm:1002> INFO - Found 6 citekeys in bib section 0
+[296] Biber.pm:1002> INFO - Found 0 citekeys in bib section 3
+[296] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[296] Biber.pm:1002> INFO - Found 2 citekeys in bib section 4
+[296] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[319] Biber.pm:4487> INFO - Processing section 0
+[327] Biber.pm:4678> INFO - Looking for bibtex file 'rufas.bib' for section 0
+[425] bibtex.pm:1713> INFO - LaTeX decoding ...
+[509] bibtex.pm:1519> INFO - Found BibTeX data source 'rufas.bib'
+[583] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[583] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[583] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[583] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[591] Biber.pm:4487> INFO - Processing section 1
+[592] Biber.pm:4678> INFO - Looking for bibtex file 'rufas.bib' for section 1
+[756] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[756] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[756] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[756] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[780] Biber.pm:4487> INFO - Processing section 2
+[781] Biber.pm:4678> INFO - Looking for bibtex file 'rufas.bib' for section 2
+[926] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[926] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[926] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[926] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[949] Biber.pm:4487> INFO - Processing section 4
+[949] Biber.pm:4678> INFO - Looking for bibtex file 'rufas.bib' for section 4
+[988] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[988] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[988] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[988] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[990] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[1033] bbl.pm:779> INFO - Output to main.bbl

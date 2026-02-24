@@ -32,10 +32,7 @@ def main() -> None:
             metadata_depth_limit=cmd_arguments.metadata_depth_limit,
         )
     except Exception as e:
-        info_map = {
-            "class": "No caller class",
-            "function": main.__name__,
-        }
+        info_map = {"class": "No caller class", "function": main.__name__}
         output_manager = OutputManager()
         error_message = "This terminal error occurred during runtime. "
         error_message += traceback.format_exc()
