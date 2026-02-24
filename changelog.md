@@ -301,6 +301,7 @@ v1.0.0
 - [2701](https://github.com/RuminantFarmSystems/MASM/pull/2701) - [minor change] [EEEManager] [NoInputChange] [NoOutputChange] Hot fix to correct the failure in EEEManager..
 - [2672](https://github.com/RuminantFarmSystems/MASM/pull/2672) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Allow multiple crop-field combos to map to the same feed storage.
 - [2677](https://github.com/RuminantFarmSystems/RuFaS/pull/2677) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Removes possibility of infinite loop in ration formulation.
+- [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
 - [2708](https://github.com/RuminantFarmSystems/RuFaS/pull/2708) - [minor change] [FeedStorage] [NoInputChange] [NoOutputChange] Eases restriction on type for feed storage config inputs.
 - [2709](https://github.com/RuminantFarmSystems/RuFaS/pull/2709) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Updates use-name to allow for exact regex match var name use in outputs.
 - [2710](https://github.com/RuminantFarmSystems/RuFaS/pull/2710) - [minor change] [Pilot testing] [NoInputChange] [NoOutputChange] Quick fix for farm 4 failure in pilot testing.
@@ -315,6 +316,7 @@ v1.0.0
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
 - [2763](https://github.com/RuminantFarmSystems/RuFaS/pull/2763) - [minor change] [NoInputChange] [NoOutputChange] Fixes feed order issue by sorting user feed inputs.
 - [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
+
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
