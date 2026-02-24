@@ -26,8 +26,6 @@ class HarvestedCrop:
     last_time_degraded : date
         The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
         storage time of the crop.
-    fresh_mass : float
-        The fresh mass of the crop in kg.
     dry_matter_percentage : float
         Percent of mass that is not water.
     initial_dry_matter_percentage : float
@@ -80,7 +78,7 @@ class HarvestedCrop:
     harvest_time: date
     storage_time: date
     last_time_degraded: date = field(init=False)
-    fresh_mass: float
+    dry_matter_mass: float
     dry_matter_percentage: float
     initial_dry_matter_percentage: float = field(init=False)
     initial_dry_matter_mass: float = field(init=False)
@@ -121,12 +119,15 @@ class HarvestedCrop:
             self.storage_time = self.storage_time.current_date.date()
 
     @property
-    def dry_matter_mass(self) -> float:
+    def fresh_mass(self) -> float:
         """
-        Calculates the dry matter mass of this crop in kg.
+        Calculates the fresh matter mass of this crop in kg.
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        return dry_matter_fraction * self.fresh_mass
+        if dry_matter_fraction == 0:
+            return 0.0
+        else:
+            return self.dry_matter_mass / dry_matter_fraction
 
     @property
     def is_alfalfa(self) -> bool:
@@ -141,13 +142,25 @@ class HarvestedCrop:
         return "alfalfa" in self.config_name.lower()
 
     def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
-        """Removes the specified amount of dry matter mass from the crop."""
-        new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
-        self.fresh_mass -= mass_to_remove
-        if self.fresh_mass == 0.0:
+        """
+        Removes the specified dry mass of feed from the crop and keeps the dry matter percentage unchanged.
+
+        Parameters
+        ----------
+        mass_to_remove : float
+            Dry-matter to remove. (kg).
+        """
+        current_fresh_mass = self.fresh_mass
+
+        self.dry_matter_mass -= mass_to_remove
+
+        new_fresh_mass = current_fresh_mass - mass_to_remove
+
+        if self.dry_matter_mass <= 0.0:
+            self.dry_matter_mass = 0.0
             self.dry_matter_percentage = 0.0
             return
-        self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
+        self.dry_matter_percentage = (self.dry_matter_mass / new_fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def remove_feed_mass(self, dm_to_remove: float) -> None:
         """
@@ -156,18 +169,18 @@ class HarvestedCrop:
         Parameters
         ----------
         dm_to_remove : float
-            Dry-matter to remove. (kg).
+            Dry-matter to remove (kg).
         """
-        dm_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        fresh_to_remove = dm_to_remove / dm_fraction
+        if dm_to_remove > self.dry_matter_mass + 1e-6:
+            dm_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            fresh_required = dm_to_remove / dm_fraction if dm_fraction > 0 else 0
 
-        if fresh_to_remove > self.fresh_mass + 1e-6:
             raise ValueError(
                 f"Cannot remove {dm_to_remove:.3f} kg DM "
-                f"({fresh_to_remove:.3f} kg fresh) - only {self.fresh_mass:.3f} kg fresh available."
+                f"({fresh_required:.3f} kg fresh) - only {self.dry_matter_mass:.3f} kg dry matter available."
             )
 
-        self.fresh_mass -= fresh_to_remove
+        self.dry_matter_mass -= dm_to_remove
 
     def estimate_maximum_effluent(self) -> float:
         """

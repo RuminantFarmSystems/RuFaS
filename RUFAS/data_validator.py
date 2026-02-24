@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import re
 from enum import Enum
-from typing import Any, Callable, Union, Sequence
+from typing import Any, Callable, Sequence
 
 from RUFAS.util import Aggregator
 
@@ -641,7 +641,7 @@ class DataValidator:
             return valid, message
         return True, ""
 
-    def validate_metadata(
+    def validate_metadata(  # noqa: C901
         self,
         metadata: dict[str, Any],
         valid_data_types: set[str],
@@ -654,8 +654,8 @@ class DataValidator:
             "function": DataValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[address_to_data]
-        required_keys = {"path", "type", "properties"}
-        optional_keys = {"title", "description"}
+        required_keys = {"type", "properties"}
+        optional_keys = {"title", "description", "path", "paths"}
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
@@ -677,6 +677,17 @@ class DataValidator:
                 )
                 return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
 
+            if "path" not in data and "paths" not in data:
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "message": f"'{key}' must define at least one of the keys "
+                        "'path' or 'paths', but neither was found.",
+                        "info_map": info_map,
+                    }
+                )
+                return False, f"Missing required key 'path' or 'paths' in '{key}'"
+
             if data["type"] not in valid_data_types:
                 self.event_logs.append(
                     {
@@ -687,16 +698,65 @@ class DataValidator:
                     }
                 )
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
-            full_path = os.path.join(input_root, data["path"])
-            if not os.path.isfile(full_path):
-                self.event_logs.append(
-                    {
-                        "error": "Metadata Validation",
-                        "message": f"Invalid path '{data['path']}' in '{key}'",
-                        "info_map": info_map,
-                    }
-                )
-                return False, f"Invalid path '{data['path']}' in '{key}'"
+            paths_to_check: list[str] = []
+            if "path" in data:
+                path_value = data.get("path")
+                if not isinstance(path_value, str) or not path_value:
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid path value '{path_value}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid path value '{path_value}' in '{key}'"
+                paths_to_check.append(path_value)
+            if "paths" in data:
+                paths_value = data.get("paths")
+                if isinstance(paths_value, list):
+                    if not paths_value:
+                        self.event_logs.append(
+                            {
+                                "error": "Metadata Validation",
+                                "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                                "info_map": info_map,
+                            }
+                        )
+                        return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+                    invalid_path_entries = [path for path in paths_value if not isinstance(path, str) or not path]
+                    if invalid_path_entries:
+                        self.event_logs.append(
+                            {
+                                "error": "Metadata Validation",
+                                "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                                "info_map": info_map,
+                            }
+                        )
+                        return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+                    paths_to_check.extend(paths_value)
+                else:
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid paths value '{paths_value}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid paths value '{paths_value}' in '{key}'"
+
+            for path in paths_to_check:
+                full_path = os.path.join(input_root, path)
+                if not os.path.isfile(full_path):
+                    self.event_logs.append(
+                        {
+                            "error": "Metadata Validation",
+                            "message": f"Invalid path '{path}' in '{key}'",
+                            "info_map": info_map,
+                        }
+                    )
+                    return False, f"Invalid path '{path}' in '{key}'"
 
             if data["properties"] is None or data["properties"] == "":
                 self.event_logs.append(
@@ -717,7 +777,7 @@ class DataValidator:
         self,
         variable_properties: dict[str, Any],
         variable_path: list[str | int],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -729,11 +789,11 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing properties relevant to the validation.
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             The path to the variable being validated.
-        data : Dict[str, Any]
+        data : dict[str | int, Any] | list[Any]
             The data to be validated.
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
@@ -773,7 +833,17 @@ class DataValidator:
         type_to_validator_map: dict[
             str,
             Callable[
-                [list[int | str], dict[str, Any], dict[str, Any], bool, str, ElementsCounter, bool, set[str]], bool
+                [
+                    list[int | str],
+                    dict[str, Any],
+                    dict[str | int, Any] | list[Any],
+                    bool,
+                    str,
+                    ElementsCounter,
+                    bool,
+                    set[str],
+                ],
+                bool,
             ],
         ] = {
             "array": self._array_type_validator,
@@ -804,12 +874,12 @@ class DataValidator:
         if data_type not in fixable_data_types:
             if not is_valid:
                 error_message = (
-                    f"Variable: '{path}' has invalid or missing values and its data type is not fixable."
+                    f"Variable: '{path}' data type '{data_type}' is not fixable by Input Manager."
                     f" Please check the inputs."
                 )
                 self.event_logs.append(
                     {
-                        "error": "Validation: invalid input data not able to be fixed",
+                        "error": "Validation: data type is not fixable by Input Manager",
                         "message": error_message,
                         "info_map": info_map,
                     }
@@ -826,16 +896,6 @@ class DataValidator:
             elements_counter.increment(ElementState.FIXED)
             return True
         else:
-            error_message = (
-                f"Variable: '{path}' has invalid or missing values and failed to fix. Please check the inputs."
-            )
-            self.event_logs.append(
-                {
-                    "error": "Validation: invalid input data not able to be fixed",
-                    "message": error_message,
-                    "info_map": info_map,
-                }
-            )
             elements_counter.increment(ElementState.INVALID)
             return False
 
@@ -920,7 +980,7 @@ class DataValidator:
         self,
         variable_path: list[str | int],
         variable_properties: dict[str, Any],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -932,11 +992,11 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             The path to the variable being validated.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             The metadata properties for the variable being validated.
-        data : Dict[str, Any]
+        data : data: dict[str | Any] | list[Any]
             The data to be validated.
         eager_termination : bool
             If True, the process will be terminated upon finding invalid data.
@@ -988,7 +1048,7 @@ class DataValidator:
         self,
         variable_path: list[str | int],
         variable_properties: dict[str, Any],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: ElementsCounter,
@@ -1000,11 +1060,11 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             The path to the variable being validated.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             The metadata properties for the variable being validated.
-        data : Dict[str, Any]
+        data : dict[str | int, Any] | list[Any]
             The data to be validated.
         eager_termination : bool
             If True, the process will be terminated upon finding invalid data.
@@ -1088,7 +1148,7 @@ class DataValidator:
         self,
         variable_path: list[str | int],
         variable_properties: dict[str, Any],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1150,7 +1210,7 @@ class DataValidator:
         self,
         variable_path: list[str | int],
         variable_properties: dict[str, Any],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1224,7 +1284,7 @@ class DataValidator:
         self,
         variable_path: list[str | int],
         variable_properties: dict[str, Any],
-        data: dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1264,8 +1324,8 @@ class DataValidator:
     def _fix_data(
         self,
         variable_properties: dict[str, Any],
-        element_hierarchy: list[Union[str, int]],
-        data: dict[str, Any],
+        element_hierarchy: list[str | int],
+        data: dict[str | int, Any] | list[Any],
         properties_blob_key: str,
     ) -> bool:
         """
@@ -1276,10 +1336,10 @@ class DataValidator:
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
 
-        element_hierarchy: list
+        element_hierarchy: list[str | int]
             A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
-        data: dict[str, Any]
+        data: dict[str | int, Any] | list[Any]
             A buffer dictionary that holds the data for validation and fixing.
 
         properties_blob_key : str
@@ -1295,17 +1355,22 @@ class DataValidator:
             "function": DataValidator._fix_data.__name__,
         }
 
-        variable_parent = data
+        variable_parent: dict[str | int, Any] | list[Any] = data
         for key in element_hierarchy[:-1]:
-            variable_parent = variable_parent[key]
+            variable_parent = variable_parent[key] if isinstance(variable_parent, dict) else variable_parent[int(key)]
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
             f"Violates properties defined in metadata properties section '{properties_blob_key}'."
         )
         if "default" not in variable_properties.keys():
+            invalid_value = (
+                variable_parent.get(element_hierarchy[-1], "missing required value")
+                if isinstance(variable_parent, dict)
+                else variable_parent[int(element_hierarchy[-1])]
+            )
             error_message = (
-                f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
+                f"Variable: '{element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
             self.event_logs.append(
@@ -1318,9 +1383,10 @@ class DataValidator:
             return False
 
         if type(variable_parent) is list:
-            original_invalid_value = variable_parent[element_hierarchy[-1]]
+            original_invalid_value = variable_parent[int(element_hierarchy[-1])]
         else:
-            original_invalid_value = variable_parent.get(element_hierarchy[-1])
+            assert type(variable_parent) is dict
+            original_invalid_value = variable_parent.get(str(element_hierarchy[-1]))
 
         warning_message = (
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
@@ -1328,8 +1394,11 @@ class DataValidator:
         self.event_logs.append(
             {"warning": "Validation: invalid data found", "message": warning_message, "info_map": info_map}
         )
-
-        variable_parent[element_hierarchy[-1]] = variable_properties["default"]
+        if type(variable_parent) is list:
+            variable_parent[int(element_hierarchy[-1])] = variable_properties["default"]
+        else:
+            assert type(variable_parent) is dict
+            variable_parent[str(element_hierarchy[-1])] = variable_properties["default"]
 
         warning_message = (
             f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
@@ -1341,7 +1410,7 @@ class DataValidator:
 
     def _extract_data_by_key_list(
         self,
-        data: list[Any] | dict[str, Any],
+        data: dict[str | int, Any] | list[Any],
         variable_path: Sequence[str | int],
         variable_properties: dict[str, Any],
         called_during_initialization: bool,
@@ -1561,7 +1630,9 @@ class DataValidator:
                 formatted_path_elems.append(f"{raw_path_elem}")
         return ".".join(formatted_path_elems)
 
-    def extract_value_by_key_list(self, data: list[Any] | dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    def extract_value_by_key_list(
+        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int]
+    ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
