@@ -220,7 +220,7 @@ class SimulationEngine:
         Flushes the data in the output object
         Resets the state for the following year
         """
-
+        ## TODO: this method appears only to be required for the C&S module. Why?
         self.annual_mass_balance(self.time)
         self.annual_reset()
 
@@ -240,6 +240,7 @@ class SimulationEngine:
         self.field_manager.annual_update_routine()
 
     def annual_mass_balance(self, time: RufasTime) -> None:
+        # TODO: remove?
         pass
 
     def _initialize_simulation(self) -> None:

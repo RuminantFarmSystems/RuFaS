@@ -1,4 +1,7 @@
+from datetime import date
 from pathlib import Path
+
+import requests.models
 
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
@@ -15,10 +18,11 @@ class FieldSimulation(SimulationEngine):
     """
     def __init__(self):
         """Initializes the agronomy simulation"""
+        # TODO: this is redundant with SimulationEngine.__init__() but I can't figure out how to exclude
+        ## this function definition without errors.
         self.om = OutputManager()
         self.im = InputManager()
-        self.time = RufasTime() # requires
-        # this call to _initialize_simulation makes this method redundant with super().__init__().
+        self.time = RufasTime()
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -32,17 +36,24 @@ class FieldSimulation(SimulationEngine):
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.field_manager: FieldManager = FieldManager()
-
-        self.manure_manager: ManureManager = ManureManager(
-            self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
-        )
-
+        self.simulate_animals = False
 
     def _daily_simulation(self) -> None:
         """Overloads the daily simulation function, specific to agronomy simulations."""
-        pass
+        # TODO: Niko is working on a refactor that will make implementing this
+        ## much easier, so I'm going to wait on that.
+        manure_applications = self.generate_daily_manure_applications()
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
 
-    def _formulate_ration(self) -> None:
+        self.time.record_time()
+        self.weather.record_weather(self.time)
+
+        self._advance_time()
+
+        return harvested_crops
+
+
+def _formulate_ration(self) -> None:
         """Overloads ration formulation: No rations need formulating in the isolated agronomy simulation"""
         pass
 
@@ -59,5 +70,18 @@ if __name__ == '__main__':
         task_id = "random task name" # TODO: why is this required? Should be some default.
     )
 
+    # get a reference to the output manager
+    om = OutputManager()
+
     # Initialize the field simulation engine
     fs = FieldSimulation()
+
+    # # run a day's simulation
+    # fs._daily_simulation()
+
+    # run a year's simulation
+    fs._run_simulation_main_loop()
+
+    # TODO - currently this is failing, because FieldSimulation does not have a
+    ## manure manager even though the parent function generate_daily_manure_application
+    ## depends upon it.
