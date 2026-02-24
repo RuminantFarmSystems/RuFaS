@@ -174,7 +174,7 @@ def test_task_manager_start(
     ]
     mock_add_log.assert_has_calls(expected_add_log_calls)
 
-    mock_start_data.assert_called_once_with(Path("metadata/path"), Path(""))
+    mock_start_data.assert_called_once_with(Path("metadata/path"), Path(""), task_id="TASK MANAGER")
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
@@ -620,6 +620,7 @@ def test_input_data_audit(
         "export_input_data_to_csv": export_input_data_to_csv,
         "input_data_csv_export_path": Path("/fake/output/saved_input"),
         "input_root": "",
+        "task_id": "1",
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)

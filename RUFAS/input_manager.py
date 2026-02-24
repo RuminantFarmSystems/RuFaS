@@ -26,6 +26,32 @@ ADDRESS_TO_INPUTS = "files"
 
 VARIABLE_PROPERTIES_TO_IGNORE = ["type", "description", "modifiability", "data_collection_app_compatible"]
 
+REQUIRED_FILE_BLOBS: set[str] = {
+    "config",
+    "animal",
+    "animal_population",
+    "animal_net_merit",
+    "animal_top_listing_semen",
+    "lactation",
+    "economy",
+    "emission",
+    "purchased_feeds_emissions",
+    "purchased_feed_land_use_change_emissions",
+    "feed",
+    "NRC_Comp",
+    "NASEM_Comp",
+    "manure_management",
+    "manure_processor_connection",
+    "crop_configurations",
+    "weather",
+    "user_feeds",
+    "tractor_dataset",
+    "EEE_constants",
+    "properties",
+    "feed_storage_configurations",
+    "feed_storage_instances",
+}
+
 
 class InputManager:
     """
@@ -73,7 +99,9 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(self, metadata_path: Path, input_root: Path, eager_termination: bool = True) -> bool:
+    def start_data_processing(
+        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+    ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
@@ -83,6 +111,8 @@ class InputManager:
             File path to the metadata.
         input_root : Path
             Root directory for all input files.
+        task_id : Any
+            Task ID for the current process.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
@@ -94,6 +124,8 @@ class InputManager:
         """
         full_metadata_path = Path(input_root) / metadata_path
         self._load_metadata(full_metadata_path)
+        if task_id != "TASK MANAGER":
+            self._validate_required_file_blobs(set(self.__metadata[ADDRESS_TO_INPUTS].keys()))
         valid, message = self.data_validator.validate_metadata(
             self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, input_root
         )
@@ -132,6 +164,28 @@ class InputManager:
             is_input_data_valid = False
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
+
+    def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
+        """Validates that all required file blobs are present in the metadata."""
+        info_map = {
+            "class": InputManager.__name__,
+            "function": InputManager._validate_required_file_blobs.__name__,
+        }
+        if not REQUIRED_FILE_BLOBS.issubset(metadata_file_names):
+            missing_blobs = REQUIRED_FILE_BLOBS - metadata_file_names
+            self.om.add_error(
+                "Metadata blobs error",
+                f"Missing required file blobs: {list(missing_blobs)}. "
+                f"Please add all missing file blobs to metadata.",
+                info_map,
+            )
+            raise ValueError(f"Missing required file blobs: {list(missing_blobs)}")
+        else:
+            self.om.add_log(
+                "Required Metadata File Blob Validation",
+                "All required file blobs are present in the metadata.",
+                info_map,
+            )
 
     def load_runtime_metadata(self, metadata_key: str, eager_termination: bool) -> bool:
         """Load and validate a runtime metadata document before ingesting the referenced data.
