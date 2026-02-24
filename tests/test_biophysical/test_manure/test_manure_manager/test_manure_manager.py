@@ -12,6 +12,7 @@ from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManag
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.daily_spread import DailySpread
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -919,6 +920,7 @@ def test_request_nutrients(
 
     mock_nutrient_request.use_supplemental_manure = use_supplemental_manure
     mock_nutrient_request.manure_type = ManureType.LIQUID
+    mock_nutrient_request.use_daily_spread_source = False
 
     request_result = (
         None
@@ -975,11 +977,30 @@ def test_remove_nutrients_from_storage(
     mock_compute = mocker.patch.object(
         ManureManager, "_compute_stream_after_removal", return_value=(MagicMock(ManureStream), {"nitrogen": 50})
     )
+    mock_split = mocker.patch.object(manure_manager, "_split_storages_by_daily_spread")
     composting = MagicMock(Composting)
-    composting.stored_manure = MagicMock(ManureStream)
-    manure_manager.all_processors = {"non_storage": MagicMock(Digester), "storage": composting}
+    composting.stored_manure = ManureStream(
+        water=100.0,
+        ammoniacal_nitrogen=10.0,
+        nitrogen=100.0,
+        phosphorus=200.0,
+        potassium=20.0,
+        ash=5.0,
+        non_degradable_volatile_solids=1.0,
+        degradable_volatile_solids=2.0,
+        total_solids=120.0,
+        volume=1.0,
+        methane_production_potential=0.24,
+        pen_manure_data=None,
+    )
+    STORAGE_CLASS_TO_TYPE[type(composting)] = ManureType.LIQUID
+    mock_split.return_value = ([], [composting])
 
-    manure_manager._remove_nutrients_from_storage(NutrientRequestResults(nitrogen=10, phosphorus=20), ManureType.LIQUID)
+    manure_manager._remove_nutrients_from_storage(
+        NutrientRequestResults(nitrogen=10, phosphorus=20),
+        ManureType.LIQUID,
+        include_daily_spread=False,
+    )
 
     mock_determine_limiting_nutrient.assert_called_once()
     if is_nitrogen_limiting_nutrient:
@@ -987,7 +1008,45 @@ def test_remove_nutrients_from_storage(
     else:
         mock_proportion.assert_called_once_with(20, 200)
     mock_compute.assert_called_once()
-    mock_remove.assert_called_once_with({"nitrogen": 50, "manure_type": None})
+    mock_remove.assert_called_once_with({"nitrogen": 50, "manure_type": ManureType.LIQUID})
+
+
+def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -> None:
+    """Daily spread requests should pull DailySpread first, then use shared supplemental shortfall logic."""
+    mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
+    manure_manager = ManureManager()
+    manure_manager._manure_nutrient_manager = ManureNutrientManager()
+    manure_manager._om = OutputManager()
+
+    request = NutrientRequest(
+        nitrogen=10.0,
+        phosphorus=5.0,
+        manure_type=ManureType.SOLID,
+        use_supplemental_manure=True,
+        use_daily_spread_source=True,
+    )
+    daily_result = NutrientRequestResults(nitrogen=3.0, phosphorus=2.0, total_manure_mass=10.0)
+    off_farm_result = NutrientRequestResults(nitrogen=7.0, phosphorus=3.0, total_manure_mass=20.0)
+
+    mock_split = mocker.patch.object(manure_manager, "_split_storages_by_daily_spread", return_value=([MagicMock(DailySpread)], []))
+    mock_daily_request = mocker.patch.object(
+        manure_manager, "_handle_nutrient_request_for_storages", return_value=(daily_result, False)
+    )
+    mock_remove = mocker.patch.object(manure_manager, "_remove_nutrients_from_storage")
+    mock_record = mocker.patch.object(manure_manager, "_record_manure_request_results")
+    mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value="daily_shortfall")
+    mock_off_farm = mocker.patch.object(FieldManureSupplier, "request_nutrients", return_value=off_farm_result)
+
+    actual = manure_manager.request_nutrients(request, True, MagicMock(spec=RufasTime))
+
+    assert actual == daily_result + off_farm_result
+    mock_split.assert_called_once_with()
+    mock_daily_request.assert_called_once()
+    assert mock_remove.call_args_list == [
+        call(daily_result, ManureType.SOLID, include_daily_spread=True, update_nutrient_manager_pool=False),
+    ]
+    mock_record.assert_called_once()
+    mock_off_farm.assert_called_once_with("daily_shortfall")
 
 
 @pytest.mark.parametrize(

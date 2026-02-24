@@ -21,6 +21,9 @@ class NutrientRequest:
     use_supplemental_manure: bool
     """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
 
+    use_daily_spread_source: bool = False
+    """Whether this request should first use DailySpread processors."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.

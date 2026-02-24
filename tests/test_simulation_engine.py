@@ -233,6 +233,9 @@ def test_daily_simulation(
     )
 
     mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "run_daily_update")
+    mock_finalize_daily_spread_exports = mocker.patch.object(
+        simulation_engine.manure_manager, "finalize_daily_spread_exports"
+    )
 
     mock_om_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     mock_record_time = mocker.patch.object(mock_time, "record_time")
@@ -295,6 +298,7 @@ def test_daily_simulation(
         simulation_engine.feed_manager.available_feeds, mock_time, mock_weather, mock_total_inventory
     )
     mock_manure_daily_update.assert_called_once_with(mock_manure_streams, mock_time, mock_current_day_conditions)
+    mock_finalize_daily_spread_exports.assert_called_once_with(mock_time)
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
     mock_advance_time.assert_called_once_with()
