@@ -179,7 +179,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -488,6 +488,7 @@ class TaskManager:
         metadata_depth_limit: int,
         workers: int,
         metadata_path: Path,
+        output_directory: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -496,6 +497,7 @@ class TaskManager:
             metadata_depth_limit=metadata_depth_limit,
             workers=workers,
             metadata_path=metadata_path,
+            output_directory=output_directory,
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -528,6 +530,7 @@ class TaskManager:
         workers: int,
         metadata_depth_limit: int | None,
         metadata_path: Path,
+        output_directory: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -561,7 +564,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
-                output_directory=Path("output/"),
+                output_directory=output_directory,
                 clear_output_directory=False,
                 chunkification=args["chunkification"],
                 max_memory_usage_percent=int(args["maximum_memory_usage_percent"] / workers),
