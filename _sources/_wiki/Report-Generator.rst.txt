@@ -44,7 +44,7 @@ Each filter file contains several key components:
 - **filters**: (Optional if cross validation is present) The list of
   Regex filters to select variables from the OutputManager's variables
   pool.
-- **variables**: (Optional) Required when the data is stored in dictionaries
+- **variables**: (Optional) When the data is stored in dictionaries
   (i.e., when reporting the variable to the output manager using
   ``OutputManager.add_variable()``, a dict was passed), the
   ``variables`` entry is used to select which variables from the
