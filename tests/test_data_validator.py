@@ -1493,12 +1493,83 @@ def test_validate_input_by_type_key_error() -> None:
             {
                 "files": {
                     "file1": {
+                        "paths": ["valid/path/to/file1.json", "valid/path/to/file2.json"],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            False,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "paths": [],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {"paths": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "paths": ["valid/path/to/file1.json", None],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            False,
+            {
+                "files": {
+                    "file1": {
+                        "paths": ["valid/path/to/file1.json", "valid/path/to/file2.json"],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
                         "path": "valid/path/to/file1.json",
                         "type": "json",
                         "properties": "",
                     }
                 }
             },
+            True,
+        ),
+        (
+            True,
+            {"files": {"file1": {"path": "", "type": "json", "properties": "some properties"}}},
+            True,
+        ),
+        (
+            True,
+            {"files": {"file1": {"path": 123, "type": "json", "properties": "some properties"}}},
             True,
         ),
     ],
