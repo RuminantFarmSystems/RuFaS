@@ -376,7 +376,7 @@ class SimulationEngine:
             The type of simulation to run. Determines which daily simulation function to execute.
         """
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
-            self._simulation_type_to_daily_simulation_function[simulation_type]
+            self._simulation_type_to_daily_simulation_function[simulation_type]()
 
         self._run_post_annual_routines()
 

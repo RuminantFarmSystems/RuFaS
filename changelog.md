@@ -31,6 +31,7 @@ v1.0.0
 - [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
 - [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
 - [2720](https://github.com/RuminantFarmSystems/MASM/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
+- [2772](https://github.com/RuminantFarmSystems/MASM/pull/2772) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Refactors `SimulationEngine`.`_daily_simulation()` to accommodate isolating modules.
 
 ### v1.0.0
 
