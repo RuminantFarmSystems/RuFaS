@@ -43,11 +43,6 @@ class SimulationEngine:
         The FieldManager object that manages all fields in the simulation.
     simulate_animals: bool
         A boolean indicating whether user has chosen to simulate animals in config.
-
-    Methods
-    -------
-    simulate()
-        Execute the simulation process.
     """
 
     def __init__(self) -> None:
@@ -58,11 +53,21 @@ class SimulationEngine:
         self.im = InputManager()
         self.time = RufasTime()
 
+        self._simulation_type_to_daily_simulation_function = {
+            "full_farm": self._execute_full_farm_daily_simulation,
+            "no_animals": self._execute_no_animals_daily_simulation,
+        }
+
         self._initialize_simulation()
 
-    def simulate(self) -> None:
+    def simulate(self, simulation_type: str) -> None:
         """
         Executes the simulation.
+
+        Parameters
+        ----------
+        simulation_type : str
+            The type of simulation to run. Determines which daily simulation function to execute.
         """
 
         info_map = {
@@ -70,7 +75,8 @@ class SimulationEngine:
             "function": self.simulate.__name__,
         }
         t_start_sim = timer.time()
-        self._run_simulation_main_loop()
+
+        self._run_simulation_main_loop(simulation_type)
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics,
@@ -87,16 +93,22 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
-    def _run_simulation_main_loop(self) -> None:
+    def _run_simulation_main_loop(self, simulation_type: str) -> None:
         """
         The main loop for simulation.
+
+        Parameters
+        ----------
+        simulation_type : str
+            The type of simulation to run. Determines which daily simulation function to execute.
+
         """
         for simulation_year in range(self.time.simulation_length_years):
-            self._annual_simulation()
+            self._annual_simulation(simulation_type)
 
-    def _execute_daily_simulation(self) -> None:
+    def _execute_full_farm_daily_simulation(self) -> None:
         """
-        Executes the daily simulation routines.
+        Executes the daily simulation routines for a full farm with all sub-modules.
 
         Daily Full Farm Simulation Process:
         1. Field operations (manure applications, harvesting)
@@ -121,6 +133,30 @@ class SimulationEngine:
         self._execute_daily_manure_operations(daily_manure_data)
 
         self._report_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _execute_no_animals_daily_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a farm with no animals.
+
+        Daily No Animals Simulation Process:
+        1. Field operations (manure applications, harvesting)
+        2. Feed planning (recalculate feed availability, update purchase plans)
+        3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
+        update purchase plans)
+        4. Record keeping (time, weather, purchased feeds fed emissions)
+        5. Advance simulation date
+
+        """
+        daily_harvested_crops = self._execute_daily_field_operations()
+
+        harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
+        self._execute_feed_planning(harvest_schedule)
+
+        self._execute_ration_planning()
+
+        self._report_daily_records(daily_purchased_feeds_fed={})
 
         self._advance_time()
 
@@ -230,7 +266,7 @@ class SimulationEngine:
         """Checks if it's time to reformulate the ration based on the user-defined interval."""
         return self.time.current_date.date() >= self.next_ration_reformulation
 
-    def _execute_daily_animal_operations(self) -> tuple[dict[str, ManureStream] | None, dict[str, float]]:
+    def _execute_daily_animal_operations(self) -> tuple[dict[str, ManureStream], dict[str, float]]:
         """
         Executes the daily animal routines.
 
@@ -250,7 +286,7 @@ class SimulationEngine:
         daily_purchased_feeds_fed = daily_feeds_fed.get("purchased", {})
 
         if not is_ok_to_feed_animals:
-            info_map = {"class": self.__class__.__name__, "function": self._execute_daily_simulation.__name__}
+            info_map = {"class": self.__class__.__name__, "function": self._execute_daily_animal_operations.__name__}
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
@@ -258,13 +294,9 @@ class SimulationEngine:
             self.time.current_date.date(), self.weather, self.time
         )
 
-        all_manure_data: dict[str, ManureStream] | None = None
-
-        if self.simulate_animals:
-
-            all_manure_data = self.herd_manager.daily_routines(
-                self.feed_manager.available_feeds, self.time, self.weather, total_inventory
-            )
+        all_manure_data = self.herd_manager.daily_routines(
+            self.feed_manager.available_feeds, self.time, self.weather, total_inventory
+        )
 
         return all_manure_data, daily_purchased_feeds_fed
 
@@ -334,12 +366,17 @@ class SimulationEngine:
         self.annual_mass_balance(self.time)
         self.annual_reset()
 
-    def _annual_simulation(self) -> None:
+    def _annual_simulation(self, simulation_type: str) -> None:
         """
         Executes the annual simulation routines.
+
+        Parameters
+        ----------
+        simulation_type : str
+            The type of simulation to run. Determines which daily simulation function to execute.
         """
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
-            self._execute_daily_simulation()
+            self._simulation_type_to_daily_simulation_function[simulation_type]
 
         self._run_post_annual_routines()
 
@@ -373,7 +410,7 @@ class SimulationEngine:
             feed_storage_instances,
         )
 
-        self.simulate_animals = self.im.get_data("config.simulate_animals")
+        self.simulate_animals = self.im.get_data("config.simulation_type") != "no_animals"
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()

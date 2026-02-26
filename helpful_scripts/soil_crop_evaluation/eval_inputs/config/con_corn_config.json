@@ -3,7 +3,7 @@
     "end_date": "2004:365",
     "random_seed": 0,
     "set_seed": false,
-    "simulate_animals": false,
+    "simulation_type": "no_animals",
     "nutrient_standard": "NASEM",
     "FIPS_county_code": 55021
 }

@@ -108,7 +108,7 @@ class HerdManager:
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
 
-        self.simulate_animals = config_data.get("simulate_animals", True)
+        self.simulate_animals = config_data.get("simulation_type") != "no_animals"
 
         self.calves: list[Animal] = []
         self.heiferIs: list[Animal] = []

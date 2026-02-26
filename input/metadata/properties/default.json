@@ -13,10 +13,11 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
-    "simulate_animals": {
-      "type": "bool",
-      "description": "Whether or not to simulate animals during the simulation",
-      "default": true
+    "simulation_type": {
+      "type": "string",
+      "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
+      "default": "full_farm",
+      "pattern": "^(full_farm|no_animals)$"
     },
     "nutrient_standard": {
       "type": "string",
