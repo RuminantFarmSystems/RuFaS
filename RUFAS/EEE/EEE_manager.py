@@ -1,3 +1,4 @@
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 from .emissions import EmissionsEstimator
@@ -24,3 +25,15 @@ class EEEManager:
         om.add_log("Energy Processing", "Starting processing of energy.", info_map)
         EnergyEstimator.estimate_all()
         om.add_log("Energy Processing", "Completed processing of energy.", info_map)
+
+        metadata_loaded = InputManager().load_runtime_metadata("EEE_econ", eager_termination=True)
+        if metadata_loaded is False:
+            om.add_error(
+                "Emissions metadata load failure",
+                "Failed to load runtime metadata for 'EEE_econ'. Aborting emissions estimation.",
+                info_map,
+            )
+            return
+        om.add_log("Economics Processing", "Starting processing of economics.", info_map)
+        EconomicFramework().run_economic_analysis()
+        om.add_log("Economics Processing", "Completed processing of economics.", info_map)
