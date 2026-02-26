@@ -126,8 +126,8 @@ class HerdManager:
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
-        self.selling_threshold = animal_config_data["herd_information"]["herd_selling_threshold"]
-        self.buying_threshold = animal_config_data["herd_information"]["herd_buying_threshold"]
+        self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"] / 100
+        self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"] / 100
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
