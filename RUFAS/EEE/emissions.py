@@ -176,8 +176,11 @@ class EmissionsEstimator:
         self,
         purchased_feeds: dict[int, float],
     ) -> None:
-        """Calculates the emissions from purchased feeds and land use changes. If there are feed IDs with missing
-        emissions factor data, they will be omitted from the calculations and not reported."""
+        """
+        Calculates the emissions from purchased feeds and land use changes and reports them to OutputManager.
+        If there are feed IDs with missing emissions factor data, they will be omitted from the calculations
+        and not reported.
+        """
         purchased_feed_emissions: dict[str, float] = {}
         land_use_change_emissions: dict[str, float] = {}
 
