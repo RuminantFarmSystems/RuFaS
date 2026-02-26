@@ -343,10 +343,23 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
-
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(f"stored_feed_{rufas_id}_dm", mass["dry_matter_mass"], info_map)
-            self._om.add_variable(f"stored_feed_{rufas_id}_wet", mass["fresh_mass"], info_map)
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_dm",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["dry_matter_mass"],
+                },
+                info_map,
+            )
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_wet",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["fresh_mass"],
+                },
+                info_map,
+            )
 
     def manage_daily_feed_request(
         self, requested_feed: RequestedFeed, time: RufasTime
