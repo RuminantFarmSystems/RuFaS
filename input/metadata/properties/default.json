@@ -184,6 +184,29 @@
           "default": "conventional",
           "pattern": "^(sexed|conventional)$"
         },
+        "semen_allocation": {
+          "type": "array",
+          "description": "",
+          "properties": {
+            "type": "object",
+            "lower_percentage": {
+              "type": "number",
+              "description": "",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "upper_percentage": {
+              "type": "number",
+              "description": "",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "semen_type": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        },
         "days_in_preg_when_dry": {
           "type": "number",
           "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
@@ -233,20 +256,6 @@
         "calf": {
           "type": "object",
           "description": "Calf Management",
-          "male_calf_rate_sexed_semen": {
-            "type": "number",
-            "description": "Male Calf Rate, Sexed Semen (percent) -- The rate of male calves when using sexed semen",
-            "default": 0.1,
-            "minimum": 0,
-            "maximum": 1
-          },
-          "male_calf_rate_conventional_semen": {
-            "type": "number",
-            "description": "Male Calf Rate, Conventional Semen (percent) -- The rate of male calves when using conventional semen",
-            "default": 0.53,
-            "minimum": 0,
-            "maximum": 1
-          },
           "keep_female_calf_rate": {
             "type": "number",
             "description": "Female Calf Retention Rate (percent) -- The percentage of female calves kept and raised on-farm",

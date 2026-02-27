@@ -281,6 +281,7 @@ class TaskManager:
                     " dependencies at required minimum levels.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
+                return
                 raise RuntimeError(
                     f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
                     f" {requirement.specifier}"

@@ -28,18 +28,38 @@
       "heifer_repro_method": "SynchED",
       "cow_repro_method": "TAI",
       "semen_type": "conventional",
+      "semen_allocation": [
+        {
+          "lower_percentage": 0,
+          "upper_percentage": 25,
+          "semen_type": "conventional_beef"
+        },
+        {
+          "lower_percentage": 25,
+          "upper_percentage": 50,
+          "semen_type": "sexed_beef"
+        },
+        {
+          "lower_percentage": 50,
+          "upper_percentage": 75,
+          "semen_type": "conventional_dairy"
+        },
+        {
+          "lower_percentage": 75,
+          "upper_percentage": 100,
+          "semen_type": "sexed_dairy"
+        }
+      ],
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,
       "do_not_breed_time": 185,
       "cull_milk_production": 30,
       "cow_times_milked_per_day": 3,
-	    "milk_fat_percent": 4,
-	    "milk_protein_percent": 3.2
+      "milk_fat_percent": 4,
+      "milk_protein_percent": 3.2
     },
     "farm_level": {
       "calf": {
-        "male_calf_rate_sexed_semen": 0.1,
-        "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
         "wean_day": 60,
         "wean_length": 7,

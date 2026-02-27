@@ -198,6 +198,28 @@ class AnimalConfig:
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
     male_calf_rate_sexed_semen: float = 0.10
+    semen_allocation: list[dict[str, float | str]] = [
+        {
+            "lower_percentage": 0,
+            "upper_percentage": 25,
+            "semen_type": "conventional_beef",
+        },
+        {
+            "lower_percentage": 25,
+            "upper_percentage": 50,
+            "semen_type": "sexed_beef",
+        },
+        {
+            "lower_percentage": 50,
+            "upper_percentage": 75,
+            "semen_type": "conventional_dairy",
+        },
+        {
+            "lower_percentage": 75,
+            "upper_percentage": 100,
+            "semen_type": "sexed_dairy",
+        },
+    ]
     keep_female_calf_rate: float = 1
     still_birth_rate: float = 0.065
     average_gestation_length: int = 276
@@ -398,10 +420,7 @@ class AnimalConfig:
         cls.cull_milk_production = animal_config_data["management_decisions"]["cull_milk_production"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
-        cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
-            "male_calf_rate_conventional_semen"
-        ]
-        cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
+        cls.semen_allocation = animal_config_data["management_decisions"]["semen_allocation"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
         cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
