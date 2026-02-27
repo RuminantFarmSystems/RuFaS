@@ -320,8 +320,27 @@ class EconomicPreprocessor:
     def _extract_price_values(self, price_data: Any) -> List[float]:
         """Extract numeric price values from pricing payloads."""
 
+        start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
+        end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
+        fips_code: int = self.im.get_data("config.FIPS_county_code")
         values: List[float] = []
-        self._append_from_payload(values, price_data)
+        for key, value in price_data.items():
+            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
+                print(f"Warning: Price data for '{key}' is not in expected format; skipping price extraction.")
+                continue
+                #TODO: We are hitting this condition because some of the commodity prices for certain years are not available in the csv files.
+            fips_idx = value["fips"].index(fips_code)
+            for year in range(start_year, end_year + 1):
+                try:
+                    price = value[f"{year}"][fips_idx]
+                    values.append(price)
+                except (KeyError, IndexError):
+                    self.om.add_warning(
+                        "MissingPriceData",
+                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'",
+                        {"class": self.__class__.__name__, "function": self._extract_price_values.__name__},
+                    )
+                    continue
         return values
 
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
@@ -493,22 +512,22 @@ class EconomicPreprocessor:
             input_values = self._fetch_input_values(item.input_manager)
 
             if values_by_scenario:
-                for scenario, values in values_by_scenario.items():
-                    if not values and input_values:
+                for scenario, biophysical_values in values_by_scenario.items():
+                    if not biophysical_values and input_values:
                         values_by_scenario[scenario] = list(input_values)
             elif input_values:
                 values_by_scenario = {"baseline": list(input_values)}
             else:
                 values_by_scenario = {"baseline": [ECONOMIC_QUANTITY_FALLBACK]}
 
-            values: List[float] = []
+            biophysical_values: List[float] = []
             for scenario_values in values_by_scenario.values():
-                values.extend(scenario_values)
+                biophysical_values.extend(scenario_values)
 
-            aggregated_value = self._aggregate(values, item.preprocessing or "")
-            if aggregated_value is None and values:
-                aggregated_value = Aggregator.sum(values)
-            if not values and not input_values:
+            aggregated_value = self._aggregate(biophysical_values, item.preprocessing or "")
+            if aggregated_value is None and biophysical_values:
+                aggregated_value = Aggregator.sum(biophysical_values)
+            if not biophysical_values and not input_values:
                 self.om.add_warning(
                     "MissingBiophysicalData",
                     "No values found for "
@@ -561,7 +580,7 @@ class EconomicPreprocessor:
 
             flow_type = self._infer_flow_type(item) or "cost"
             category_data[item.name] = {
-                "biophysical_values": values,
+                "biophysical_values": biophysical_values,
                 "biophysical_aggregate": aggregated_value,
                 "biophysical_values_by_scenario": values_by_scenario,
                 "biophysical_aggregate_by_scenario": aggregates_by_scenario,
