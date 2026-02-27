@@ -103,8 +103,8 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
         "herd_information": {
             "herd_num": 123,
             "herd_size_adjustment_period": 30,
-            "herd_selling_threshold": 1.01,
-            "herd_buying_threshold": 1.06,
+            "herd_size_sell_threshold": 101,
+            "herd_size_buy_threshold": 106,
         },
         "housing": "barn",
         "pasture_concentrate": 0,

@@ -694,28 +694,21 @@ class HerdManager:
         return newborn_calf
 
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
-        """Finds the index of the best candidate cow to sell based on priority rules."""
+        """Finds the index of the eligible cow with the lowest daily milk production."""
         MIN_DIM_FOR_REMOVAL = 60
-        dnb_indices = []
-        non_dnb_indices = []
+        MAX_DAYS_IN_PREG_FOR_REMOVAL = 180
+        eligible_indices = []
 
         for index, cow in enumerate(self.cows):
             if cow in removed_animal:
                 continue
-            if cow.reproduction.do_not_breed:
-                dnb_indices.append(index)
-            elif cow.days_in_milk > MIN_DIM_FOR_REMOVAL:
-                non_dnb_indices.append(index)
+            if cow.days_in_milk > MIN_DIM_FOR_REMOVAL and cow.days_in_pregnancy < MAX_DAYS_IN_PREG_FOR_REMOVAL:
+                eligible_indices.append(index)
 
-        if not dnb_indices and not non_dnb_indices:
+        if not eligible_indices:
             return None
 
-        # Priority 1: DNB cows by lowest daily milk
-        if dnb_indices:
-            return min(dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
-
-        # Priority 2: Non-DNB cows by lowest daily milk (qualified by DIM)
-        return min(non_dnb_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
 
     def _record_sold_cow_stats(self, removed_cow: Animal, simulation_day: int) -> None:
         """Updates herd statistics and metadata for a sold cow."""

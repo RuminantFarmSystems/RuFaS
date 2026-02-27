@@ -488,7 +488,9 @@ def test_create_newborn_calf(
         animal.events.add_event.assert_called_once()
 
 
-def _create_sortable_mock_cow(id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int) -> MagicMock:
+def _create_sortable_mock_cow(
+    id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int, days_in_pregnancy: int
+) -> MagicMock:
     """Helper to create a mock cow with specific sorting attributes."""
     cow = MagicMock(spec=Animal)
     cow.id = id_val
@@ -504,6 +506,7 @@ def _create_sortable_mock_cow(id_val: int, is_dnb: bool, daily_milk: float, days
     cow.milk_production.daily_milk_produced = daily_milk
 
     cow.days_in_milk = days_in_milk
+    cow.days_in_pregnancy = days_in_pregnancy
     return cow
 
 
@@ -512,9 +515,9 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
     Unit test for _check_if_cows_need_to_be_sold().
 
     Verifies:
-    1. Cows marked 'do_not_breed' (DNB) are removed first.
-    2. Within priority groups, cows are removed by lowest milk production.
-    3. Non-DNB cows with DIM < 60 are protected (skipped).
+    1. All eligible cows are ranked only by lowest milk production.
+    2. Cows with DIM <= 60 are protected (skipped).
+    3. Cows with days in pregnancy >= 180 are protected (skipped).
     4. Error is logged if herd is too large but no cows are eligible.
     5. Statistics are updated correctly based on source code logic.
     """
@@ -529,15 +532,16 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
     herd_manager.herd_statistics.sold_cow_num = 0
     herd_manager.herd_statistics.cow_herd_exit_num = 10
 
-    cow_dnb_low_milk = _create_sortable_mock_cow(1, True, 10.0, 100)
-    cow_dnb_high_milk = _create_sortable_mock_cow(2, True, 50.0, 100)
-    cow_normal_low_milk = _create_sortable_mock_cow(3, False, 20.0, 100)
-    cow_normal_high_milk = _create_sortable_mock_cow(4, False, 40.0, 100)
-    cow_protected_low_dim = _create_sortable_mock_cow(5, False, 5.0, 10)
+    cow_dnb_low_milk = _create_sortable_mock_cow(1, True, 10.0, 100, 50)
+    cow_dnb_high_milk = _create_sortable_mock_cow(2, True, 50.0, 100, 60)
+    cow_normal_low_milk = _create_sortable_mock_cow(3, False, 20.0, 100, 70)
+    cow_normal_high_milk = _create_sortable_mock_cow(4, False, 40.0, 100, 80)
+    cow_protected_low_dim = _create_sortable_mock_cow(5, False, 5.0, 10, 0)
+    cow_protected_high_preg = _create_sortable_mock_cow(6, False, 1.0, 200, 180)
 
     fillers = []
     for i in range(10):
-        fillers.append(_create_sortable_mock_cow(10 + i, False, 100.0, 200))
+        fillers.append(_create_sortable_mock_cow(10 + i, False, 100.0, 200, 20))
 
     fillers[0].milk_production.daily_milk_produced = 90.0
 
@@ -547,6 +551,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
         cow_normal_low_milk,
         cow_normal_high_milk,
         cow_protected_low_dim,
+        cow_protected_high_preg,
     ] + fillers
 
     herd_manager.cows = all_cows
@@ -555,30 +560,31 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
 
     removed_cows = herd_manager._check_if_cows_need_to_be_sold(SIMULATION_DAY, [])
 
-    assert len(removed_cows) == 5
+    assert len(removed_cows) == 6
     assert len(herd_manager.cows) == 10
 
     assert removed_cows[0] == cow_dnb_low_milk
-    assert removed_cows[1] == cow_dnb_high_milk
-    assert removed_cows[2] == cow_normal_low_milk
-    assert removed_cows[3] == cow_normal_high_milk
+    assert removed_cows[1] == cow_normal_low_milk
+    assert removed_cows[2] == cow_normal_high_milk
+    assert removed_cows[3] == cow_dnb_high_milk
     assert removed_cows[4] == fillers[0]
 
     assert cow_protected_low_dim in herd_manager.cows
+    assert cow_protected_high_preg in herd_manager.cows
 
-    assert herd_manager.herd_statistics.sold_cow_oversupply_num == 5
-    assert herd_manager.herd_statistics.sold_cow_num == 5
-    assert herd_manager.herd_statistics.cow_herd_exit_num == 15
+    assert herd_manager.herd_statistics.sold_cow_oversupply_num == 6
+    assert herd_manager.herd_statistics.sold_cow_num == 6
+    assert herd_manager.herd_statistics.cow_herd_exit_num == 16
 
-    assert len(herd_manager.herd_statistics.sold_cows_info) == 5
+    assert len(herd_manager.herd_statistics.sold_cows_info) == 6
     assert herd_manager.herd_statistics.sold_cows_info[0]["id"] == cow_dnb_low_milk.id
     assert herd_manager.herd_statistics.sold_cows_info[0]["sold_at_day"] == SIMULATION_DAY
 
     herd_manager.herd_statistics.herd_num = 1
     herd_manager.selling_threshold = 1.0
 
-    cow_prot_1 = _create_sortable_mock_cow(99, False, 100.0, 10)
-    cow_prot_2 = _create_sortable_mock_cow(98, False, 100.0, 10)
+    cow_prot_1 = _create_sortable_mock_cow(99, False, 100.0, 10, 0)
+    cow_prot_2 = _create_sortable_mock_cow(98, False, 100.0, 10, 0)
     herd_manager.cows = [cow_prot_1, cow_prot_2]
 
     stuck_result = herd_manager._check_if_cows_need_to_be_sold(SIMULATION_DAY, [])
