@@ -852,7 +852,7 @@ def test_single_simulation_run(
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
-    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN}
+    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN, "simulation_type": "full_farm"}
 
     mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
     mock_simulation_engine_init = mocker.patch(
