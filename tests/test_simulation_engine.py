@@ -11,11 +11,9 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
-    IdealFeeds,
     RequestedFeed,
     NutrientStandard,
 )
@@ -25,13 +23,9 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     NutrientRequestResults,
     ManureEventNutrientRequest,
 )
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
-    HarvestedCrop,
-)
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.field.field import Field
-from RUFAS.biophysical.field.field.manure_application import ManureApplication
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.simulation_engine import SimulationEngine
