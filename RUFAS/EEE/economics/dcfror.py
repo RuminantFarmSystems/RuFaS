@@ -247,7 +247,7 @@ class DCFRORCalculator:
             )
             capital_interest_pv = np.zeros(n_years, dtype=float)
             capital_interest_pv[construction_mask] = EconomicEquations.npv_capital_plus_interest(
-                capital_schedule,
+                equity_schedule,
                 EconomicEquations.construction_interest_cost,
                 internal_rate_of_return,
                 years[construction_mask],
