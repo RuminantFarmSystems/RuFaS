@@ -98,7 +98,7 @@ def test_determine_isotherm_intercept(slope: float) -> None:
 )
 def test_determine_dissolved_reactive_phosphorus_leachate(
     phosphorus: float, slope: float, intercept: float, overflow: bool
-) -> float:
+) -> None:
     """Tests that the amount of phosphorus calculated to leach out of the layer is correct."""
     observed = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(phosphorus, slope, intercept)
     if overflow:

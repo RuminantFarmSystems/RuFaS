@@ -36,12 +36,18 @@ NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 class TaskType(Enum):
     """Enum for different task types handled by TaskManager."""
 
-    HERD_INITIALIZATION = "Herd Initialization"
+    HERD_INITIALIZATION = "Initializes simulation to generate a stable herd"
     SIMULATION_SINGLE_RUN = "A single simulation run"
-    SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
+    SIMULATION_MULTI_RUN = (
+        "Runs multiple simulations to generate statistically significant results. "
+        "Automatically changes the random seed."
+    )
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
     INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
-    END_TO_END_TESTING = "Run e2e testing"
+    END_TO_END_TESTING = (
+        "Runs RuFaS's end-to-end testing routine. Ensures all components of RuFaS work together "
+        "correctly from start to finish."
+    )
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
     DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
@@ -130,7 +136,7 @@ class TaskManager:
             "function": TaskManager.start.__name__,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""))
+        is_data_valid = self.input_manager.start_data_processing(metadata_path, Path(""), task_id="TASK MANAGER")
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         for task in task_config.get("tasks", []):
             filters_path = Path(task["filters_directory"])
@@ -173,7 +179,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -482,6 +488,7 @@ class TaskManager:
         metadata_depth_limit: int,
         workers: int,
         metadata_path: Path,
+        output_directory: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -490,6 +497,7 @@ class TaskManager:
             metadata_depth_limit=metadata_depth_limit,
             workers=workers,
             metadata_path=metadata_path,
+            output_directory=output_directory,
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -522,6 +530,7 @@ class TaskManager:
         workers: int,
         metadata_depth_limit: int | None,
         metadata_path: Path,
+        output_directory: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -555,7 +564,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
-                output_directory=Path("output/"),
+                output_directory=output_directory,
                 clear_output_directory=False,
                 chunkification=args["chunkification"],
                 max_memory_usage_percent=int(args["maximum_memory_usage_percent"] / workers),
@@ -745,7 +754,7 @@ class TaskManager:
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
         is_data_valid = input_manager.start_data_processing(
-            Path(args["metadata_file_path"]), Path(args["input_root"]), eager_termination
+            Path(args["metadata_file_path"]), Path(args["input_root"]), args["task_id"], eager_termination
         )
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map

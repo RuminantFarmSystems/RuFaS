@@ -1,0 +1,245 @@
+\contentsline {section}{\numberline {I.}Preface: A Day in the Life on a RuFaS Farm}{8}{section.1}%
+\contentsline {paragraph}{Feeding the Animals}{8}{section.1}%
+\contentsline {paragraph}{Taking Care of the Animals}{8}{section.1}%
+\contentsline {paragraph}{Dealing with the Manure}{9}{section.1}%
+\contentsline {paragraph}{Managing the Fields}{9}{section.1}%
+\contentsline {paragraph}{Storing the Feeds}{9}{section.1}%
+\contentsline {section}{\numberline {II.}Module Introduction}{9}{section.2}%
+\contentsline {subsection}{\numberline {A.}Animal Life Cycle}{10}{subsection.2.1}%
+\contentsline {section}{\numberline {III.}Herd-level Processes and Management}{11}{section.3}%
+\contentsline {subsection}{\numberline {A.}Herd Initialization}{11}{subsection.3.1}%
+\contentsline {paragraph}{Introduction}{11}{subsection.3.1}%
+\contentsline {paragraph}{Methodology}{14}{table.3}%
+\contentsline {subsection}{\numberline {B.}Pens and Animal Grouping}{15}{subsection.3.2}%
+\contentsline {paragraph}{Introduction}{15}{subsection.3.2}%
+\contentsline {paragraph}{Methodology}{17}{table.5}%
+\contentsline {paragraph}{Remove\_animals\_by\_ids}{17}{table.caption.2}%
+\contentsline {paragraph}{\_add\_new\_animals}{18}{table.caption.2}%
+\contentsline {paragraph}{Set\_animal\_nutritional\_requirements}{18}{table.caption.2}%
+\contentsline {subsection}{\numberline {C.}Ration Formulation}{18}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {a.}Energy and Nutrition Requirements}{18}{subsubsection.3.3.1}%
+\contentsline {paragraph}{NRC: Calculating Nutrient Requirements of Dairy Cattle}{18}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {b.}Nutrient Requirements of Dairy Cattle (NRC)}{19}{subsubsection.3.3.2}%
+\contentsline {paragraph}{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}{28}{table.9}%
+\contentsline {paragraph}{NASEM: Calculating Amino Acid Requirements}{39}{table.12}%
+\contentsline {subsubsection}{\numberline {c.}Energy and Nutrition Supply }{43}{subsubsection.3.3.3}%
+\contentsline {paragraph}{Nutrient Supply}{43}{subsubsection.3.3.3}%
+\contentsline {paragraph}{Energy Supply - NRC 2001}{43}{subsubsection.3.3.3}%
+\contentsline {paragraph}{Energy Supply - NASEM 2021}{45}{table.15}%
+\contentsline {paragraph}{AA Nutrient Supply}{50}{table.18}%
+\contentsline {subsubsection}{\numberline {d.}Automated Ration Formulation}{53}{subsubsection.3.3.4}%
+\contentsline {paragraph}{Introduction}{53}{subsubsection.3.3.4}%
+\contentsline {paragraph}{Methodology}{55}{table.20}%
+\contentsline {subsubsection}{\numberline {e.}User-defined ration formulation}{56}{subsubsection.3.3.5}%
+\contentsline {paragraph}{Introduction}{56}{subsubsection.3.3.5}%
+\contentsline {paragraph}{Methodology}{56}{table.22}%
+\contentsline {subsection}{\numberline {D.}Herd Size Management}{57}{subsection.3.4}%
+\contentsline {section}{\numberline {IV.}Animal-level Processes and Management}{59}{section.4}%
+\contentsline {paragraph}{Flow of information}{59}{section.4}%
+\contentsline {subsection}{\numberline {A.}RuFaS Bodyweight and Growth}{60}{subsection.4.1}%
+\contentsline {paragraph}{Introduction}{60}{subsection.4.1}%
+\contentsline {paragraph}{Methodology}{61}{table.23}%
+\contentsline {paragraph}{Parity 1 Animals:}{63}{table.23}%
+\contentsline {paragraph}{Parity 2 Animals}{63}{table.23}%
+\contentsline {subsection}{\numberline {B.}Animal Reproduction}{65}{subsection.4.2}%
+\contentsline {paragraph}{Introduction}{65}{subsection.4.2}%
+\contentsline {paragraph}{Methodology}{69}{table.caption.6}%
+\contentsline {subsection}{\numberline {C.}Milk Production}{76}{subsection.4.3}%
+\contentsline {paragraph}{Introduction}{76}{subsection.4.3}%
+\contentsline {paragraph}{Methodology}{80}{table.30}%
+\contentsline {subsection}{\numberline {D.}Lactation Curve: Parameters and Definitions}{84}{subsection.4.4}%
+\contentsline {paragraph}{Introduction}{84}{subsection.4.4}%
+\contentsline {paragraph}{Methodology}{88}{table.36}%
+\contentsline {subsection}{\numberline {E.}Culling}{90}{subsection.4.5}%
+\contentsline {paragraph}{Introduction}{90}{subsection.4.5}%
+\contentsline {paragraph}{Methodology}{93}{table.37}%
+\contentsline {section}{\numberline {V.}Methane Emission and Manure Excretion}{98}{section.5}%
+\contentsline {subsection}{\numberline {A.}Manure Excretion}{98}{subsection.5.1}%
+\contentsline {paragraph}{Introduction}{98}{subsection.5.1}%
+\contentsline {paragraph}{Methodology}{101}{table.42}%
+\contentsline {paragraph}{Manure excretions}{101}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{102}{table.42}%
+\contentsline {paragraph}{Manure excretions}{103}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{104}{table.42}%
+\contentsline {paragraph}{Manure excretions}{105}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{106}{table.42}%
+\contentsline {paragraph}{Manure excretions}{107}{table.42}%
+\contentsline {subsection}{\numberline {B.}Enteric Methane Emission}{110}{subsection.5.2}%
+\contentsline {paragraph}{Introduction}{110}{subsection.5.2}%
+\contentsline {paragraph}{Methodology}{111}{table.46}%
+\contentsline {paragraph}{Mutian Model}{112}{table.46}%
+\contentsline {paragraph}{Mills Model}{112}{table.46}%
+\contentsline {paragraph}{IPCC Model}{113}{table.46}%
+\contentsline {paragraph}{Mills Model}{113}{table.46}%
+\contentsline {paragraph}{IPCC Model}{113}{table.46}%
+\contentsline {subsection}{\numberline {C.}Enteric Methane Mitigation}{113}{subsection.5.3}%
+\contentsline {paragraph}{Introduction}{113}{subsection.5.3}%
+\contentsline {paragraph}{Methodology}{114}{table.50}%
+\contentsline {section}{\numberline {VI.}Abbreviations}{116}{section.6}%
+\contentsline {section}{\numberline {VII.}References}{118}{section.7}%
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {VIII.}Preface: A Day in the Life on a RuFaS Farm}{6}{section.8}%
+\contentsline {paragraph}{Feeding the Animals}{6}{section.8}%
+\contentsline {paragraph}{Taking Care of the Animals}{6}{section.8}%
+\contentsline {paragraph}{Dealing with the Manure}{7}{section.8}%
+\contentsline {paragraph}{Managing the Fields}{7}{section.8}%
+\contentsline {paragraph}{Storing the Feeds}{7}{section.8}%
+\contentsline {section}{\numberline {IX.}Module Introduction}{7}{section.9}%
+\contentsline {subsection}{\numberline {A.}Structural setup of the Manure Module}{8}{subsection.9.1}%
+\contentsline {subsection}{\numberline {B.}Overview of Required Inputs}{9}{subsection.9.2}%
+\contentsline {subsection}{\numberline {C.}General Assumptions of the Manure Module}{10}{subsection.9.3}%
+\contentsline {section}{\numberline {X.}Animal and Manure Module Connection}{11}{section.10}%
+\contentsline {subsection}{\numberline {A.}Introduction}{11}{subsection.10.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{14}{subsection.10.2}%
+\contentsline {section}{\numberline {XI.}Manure Handler}{19}{section.11}%
+\contentsline {subsection}{\numberline {A.}Introduction}{19}{subsection.11.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{22}{subsection.11.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{28}{subsection.11.3}%
+\contentsline {section}{\numberline {XII.}Solid Liquid Separators}{28}{section.12}%
+\contentsline {subsection}{\numberline {A.}Introduction}{28}{subsection.12.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{31}{subsection.12.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{33}{subsection.12.3}%
+\contentsline {section}{\numberline {XIII.}Anaerobic Digestion}{35}{section.13}%
+\contentsline {subsection}{\numberline {A.}Introduction}{35}{subsection.13.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{37}{subsection.13.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{41}{subsection.13.3}%
+\contentsline {section}{\numberline {XIV.}Slurry Storage}{43}{section.14}%
+\contentsline {subsection}{\numberline {A.}Introduction}{43}{subsection.14.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{45}{subsection.14.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{51}{subsection.14.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{52}{subsection.14.4}%
+\contentsline {section}{\numberline {XV.}Anaerobic Lagoon}{53}{section.15}%
+\contentsline {subsection}{\numberline {A.}Introduction}{53}{subsection.15.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{55}{subsection.15.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{62}{subsection.15.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{62}{subsection.15.4}%
+\contentsline {section}{\numberline {XVI.}Bedded Pack}{64}{section.16}%
+\contentsline {subsection}{\numberline {A.}Introduction}{64}{subsection.16.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{66}{subsection.16.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{71}{subsection.16.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{72}{subsection.16.4}%
+\contentsline {section}{\numberline {XVII.}Open Lot}{74}{section.17}%
+\contentsline {subsection}{\numberline {A.}Introduction}{74}{subsection.17.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{76}{subsection.17.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{81}{subsection.17.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{82}{subsection.17.4}%
+\contentsline {section}{\numberline {XVIII.}Composting}{84}{section.18}%
+\contentsline {subsection}{\numberline {A.}Introduction}{84}{subsection.18.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{86}{subsection.18.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{91}{subsection.18.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{92}{subsection.18.4}%
+\contentsline {section}{\numberline {XIX.}Daily spread}{93}{section.19}%
+\contentsline {subsection}{\numberline {A.}Introduction}{93}{subsection.19.1}%
+\contentsline {section}{\numberline {XX.}Manure to Soil and Crop Module Connection}{95}{section.20}%
+\contentsline {subsection}{\numberline {A.}Introduction}{95}{subsection.20.1}%
+\contentsline {subsection}{\numberline {B.}Implementation in RuFaS}{95}{subsection.20.2}%
+\contentsline {subsection}{\numberline {C.}Methodology}{96}{subsection.20.3}%
+\contentsline {section}{\numberline {XXI.}Key Constants}{98}{section.21}%
+\contentsline {section}{\numberline {XXII.}Abbreviations}{100}{section.22}%
+\contentsline {section}{\numberline {XXIII.}References}{102}{section.23}%
+\contentsline {section}{\numberline {XXIV.}Preface: A Day in the Life on a RuFaS Farm}{6}{section.24}%
+\contentsline {paragraph}{Feeding the Animals}{6}{section.24}%
+\contentsline {paragraph}{Taking Care of the Animals}{6}{section.24}%
+\contentsline {paragraph}{Dealing with the Manure}{7}{section.24}%
+\contentsline {paragraph}{Managing the Fields}{7}{section.24}%
+\contentsline {paragraph}{Storing the Feeds}{7}{section.24}%
+\contentsline {section}{\numberline {XXV.}Module Introduction}{8}{section.25}%
+\contentsline {section}{\numberline {XXVI.}Field Management}{8}{section.26}%
+\contentsline {subsection}{\numberline {A.}Introduction}{8}{subsection.26.1}%
+\contentsline {paragraph}{Setting up Field Management}{8}{subsection.26.1}%
+\contentsline {paragraph}{Field Management Initialization}{8}{subsection.26.1}%
+\contentsline {paragraph}{Field Setup and Initialization}{9}{figure.caption.46}%
+\contentsline {paragraph}{Required Inputs}{10}{figure.caption.46}%
+\contentsline {subsection}{\numberline {B.}Methodology}{16}{subsection.26.2}%
+\contentsline {paragraph}{Daily Field Management}{17}{subsection.26.2}%
+\contentsline {paragraph}{Fertilizer Application}{17}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{18}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{18}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{19}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{19}{subsection.26.2}%
+\contentsline {paragraph}{Manure Application}{20}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{20}{subsection.26.2}%
+\contentsline {paragraph}{Surface Manure Application}{20}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{21}{subsection.26.2}%
+\contentsline {paragraph}{Surface Phosphorus Application}{21}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{22}{subsection.26.2}%
+\contentsline {paragraph}{Surface Nitrogen Application}{22}{subsection.26.2}%
+\contentsline {paragraph}{Where:}{22}{subsection.26.2}%
+\contentsline {paragraph}{Subsurface Manure Application}{23}{subsection.26.2}%
+\contentsline {paragraph}{Tillage Application}{23}{subsection.26.2}%
+\contentsline {paragraph}{Initiate Daily Biophysical Processes}{24}{subsection.26.2}%
+\contentsline {paragraph}{Crop Management}{24}{subsection.26.2}%
+\contentsline {section}{\numberline {XXVII.}Soil Management}{24}{section.27}%
+\contentsline {subsection}{\numberline {A.}Introduction}{24}{subsection.27.1}%
+\contentsline {paragraph}{Soil Initialization}{24}{subsection.27.1}%
+\contentsline {paragraph}{Required Inputs}{25}{subsection.27.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{28}{subsection.27.2}%
+\contentsline {paragraph}{Soil Temperature}{28}{subsection.27.2}%
+\contentsline {paragraph}{Infiltration (implemented in infiltration.py)}{30}{subsection.27.2}%
+\contentsline {paragraph}{Evapotranspiration}{32}{subsection.27.2}%
+\contentsline {paragraph}{Potential Evapotranspiration (Implemented in field.py)}{33}{subsection.27.2}%
+\contentsline {paragraph}{Percolation (implemented in percolation.py)}{35}{subsection.27.2}%
+\contentsline {subsection}{\numberline {C.}Soil Erosion (Implemented as soil\_erosion.py)}{36}{subsection.27.3}%
+\contentsline {paragraph}{Base Equation, Rainfall Intensity, and Peak Runoff}{36}{subsection.27.3}%
+\contentsline {subsection}{\numberline {D.}Soil Nitrogen Cycling}{40}{subsection.27.4}%
+\contentsline {paragraph}{Nitrification and Volatilization (Implemented in nitirification\_volatilization.py)}{42}{subsection.27.4}%
+\contentsline {paragraph}{N loss in leaching and runoff (Implemented in leaching\_runoff\_erosion.py)}{44}{subsection.27.4}%
+\contentsline {paragraph}{N erosion (Implemented in leaching\_runoff\_erosion.py)}{45}{subsection.27.4}%
+\contentsline {paragraph}{Denitrification (Implemented in denitrification.py)}{46}{subsection.27.4}%
+\contentsline {subsection}{\numberline {E.}Soil Phosphorus Cycling}{50}{subsection.27.5}%
+\contentsline {paragraph}{Phosphorus Initialization (Implemented in layer\_data.py)}{50}{subsection.27.5}%
+\contentsline {paragraph}{Soluble Phosphorus (Implemented in soluble\_phosphorus.py)}{51}{subsection.27.5}%
+\contentsline {paragraph}{Soluble Phosphorus Runoff}{51}{subsection.27.5}%
+\contentsline {paragraph}{Soluble Phosphorus Leaching}{52}{subsection.27.5}%
+\contentsline {paragraph}{Fertilizer Leaching and Runoff (Implemented in fertilizer.py)}{53}{subsection.27.5}%
+\contentsline {paragraph}{Available Fertilizer P pool }{53}{subsection.27.5}%
+\contentsline {paragraph}{Manure Decomposition (implemented in manure\_pool.py)}{57}{subsection.27.5}%
+\contentsline {paragraph}{Manure Runoff (implemented in manure\_pool.py)}{60}{subsection.27.5}%
+\contentsline {subsection}{\numberline {F.}Soil Carbon Cycling}{63}{subsection.27.6}%
+\contentsline {paragraph}{Soil Carbon Partitioning (implemented in carbon\_cycle.py)}{63}{subsection.27.6}%
+\contentsline {paragraph}{Decomposition (implemented in decomposition.py)}{64}{subsection.27.6}%
+\contentsline {paragraph}{Residue Partitioning (implemented in residue\_partitioning.py)}{67}{subsection.27.6}%
+\contentsline {paragraph}{Above Ground: Lignin, Metabolic C, Structural C}{67}{subsection.27.6}%
+\contentsline {paragraph}{Pool and Gas Partitioning (implemented in pool\_gas\_partition.py)}{72}{subsection.27.6}%
+\contentsline {section}{\numberline {XXVIII.}Crop Management}{76}{section.28}%
+\contentsline {subsection}{\numberline {A.}Introduction}{76}{subsection.28.1}%
+\contentsline {paragraph}{Planting and Initialization}{76}{subsection.28.1}%
+\contentsline {paragraph}{Daily Biophysical Processes}{76}{subsection.28.1}%
+\contentsline {paragraph}{Harvest}{76}{subsection.28.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{76}{subsection.28.2}%
+\contentsline {paragraph}{Crop Water Cycle Daily Updates}{76}{subsection.28.2}%
+\contentsline {paragraph}{Crop Evaporation}{76}{subsection.28.2}%
+\contentsline {paragraph}{Crop Canopy Water}{77}{subsection.28.2}%
+\contentsline {paragraph}{Crop Potential Transpiration}{77}{subsection.28.2}%
+\contentsline {paragraph}{Potential Water Uptake}{78}{subsection.28.2}%
+\contentsline {paragraph}{Actual water uptake}{79}{subsection.28.2}%
+\contentsline {paragraph}{Maturity}{80}{subsection.28.2}%
+\contentsline {paragraph}{Dormancy}{80}{subsection.28.2}%
+\contentsline {paragraph}{Accumulation of Heat Units}{81}{subsection.28.2}%
+\contentsline {paragraph}{Root Development}{82}{Item.55}%
+\contentsline {paragraph}{Potential Nitrogen Uptake}{83}{Item.55}%
+\contentsline {paragraph}{Actual Nitrogen Uptake}{84}{Item.55}%
+\contentsline {paragraph}{Nitrogen Fixation}{86}{Item.55}%
+\contentsline {paragraph}{Store Nitrogen in Plant}{87}{Item.55}%
+\contentsline {paragraph}{Water stress}{88}{Item.55}%
+\contentsline {paragraph}{Temperature stress}{88}{Item.55}%
+\contentsline {paragraph}{Nitrogen and Phosphorus Stress}{89}{Item.55}%
+\contentsline {section}{\numberline {XXIX.}Abbreviations}{96}{section.29}%
+\contentsline {section}{\numberline {XXX.}Preface: A Day in the Life on a RuFaS Farm}{6}{section.30}%
+\contentsline {paragraph}{Feeding the Animals}{6}{section.30}%
+\contentsline {paragraph}{Taking Care of the Animals}{6}{section.30}%
+\contentsline {paragraph}{Dealing with the Manure}{7}{section.30}%
+\contentsline {paragraph}{Managing the Fields}{7}{section.30}%
+\contentsline {paragraph}{Storing the Feeds}{7}{section.30}%
+\contentsline {section}{\numberline {XXXI.}Module Introduction}{8}{section.31}%
+\contentsline {subsection}{\numberline {A.}Feed Quality Assessment}{8}{subsection.31.1}%
+\contentsline {section}{\numberline {XXXII.}Feed Storage Inputs}{9}{section.32}%
+\contentsline {section}{\numberline {XXXIII.}Storage Classifications}{9}{section.33}%
+\contentsline {subsection}{\numberline {A.}Grain}{9}{subsection.33.1}%
+\contentsline {subsection}{\numberline {B.}Hay}{10}{subsection.33.2}%
+\contentsline {subsection}{\numberline {C.}Silage}{12}{subsection.33.3}%
+\contentsline {subsection}{\numberline {D.}Baleage}{15}{subsection.33.4}%
+\contentsline {subsection}{\numberline {E.}Nutrient Composition}{15}{subsection.33.5}%
+\contentsline {section}{\numberline {XXXIV.}Abbreviations}{16}{section.34}%
+\contentsline {section}{\numberline {XXXV.}References}{18}{section.35}%

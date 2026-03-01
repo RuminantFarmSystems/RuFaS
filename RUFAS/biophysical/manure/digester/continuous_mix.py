@@ -183,9 +183,8 @@ class ContinuousMix(Digester):
                 "date": time.current_date.date(),
                 "simulation_day": time.simulation_day,
                 "degradable_volatile_solids": self._manure_in_digester.degradable_volatile_solids,
-                "total_non_degradable_volatile_solids":
-                    self._manure_in_digester.non_degradable_volatile_solids
-                    + self._manure_in_digester.bedding_non_degradable_volatile_solids,
+                "total_non_degradable_volatile_solids": self._manure_in_digester.non_degradable_volatile_solids
+                + self._manure_in_digester.bedding_non_degradable_volatile_solids,
                 "total_volatile_solids": self._manure_in_digester.total_volatile_solids,
                 "total_volatile_solids_destruction": total_volatile_solids_destruction,
             }
@@ -197,14 +196,36 @@ class ContinuousMix(Digester):
             non_degradable_volatile_solids = 0.0
             bedding_non_degradable_volatile_solids = 0.0
         else:
+            if self._manure_in_digester.total_volatile_solids <= 0.0:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self._destroy_volatile_solids.__name__,
+                    "name": self.name,
+                    "date": time.current_date.date(),
+                    "simulation_day": time.simulation_day,
+                    "total_volatile_solids": self._manure_in_digester.total_volatile_solids,
+                    "total_manure_mass": self._manure_in_digester.mass,
+                }
+                self._om.add_warning(
+                    f"Anaerobic digester '{self.name}' receieved manure containing 0 total volatile solids."
+                    "Moving manure to next processor unchanged.",
+                    f"Digester has {self._manure_in_digester.mass} kg manure"
+                    f"and {self._manure_in_digester.total_volatile_solids} kg volatile solids.",
+                    info_map,
+                )
             manure_degradable_volatile_solids_frac = (
-                self._manure_in_digester.degradable_volatile_solids
-                / self._manure_in_digester.total_volatile_solids
+                (self._manure_in_digester.degradable_volatile_solids / self._manure_in_digester.total_volatile_solids)
+                if self._manure_in_digester.total_volatile_solids > 0.0
+                else 0.0
             )
 
             manure_non_degradable_volatile_solids_fraction = (
-                self._manure_in_digester.non_degradable_volatile_solids
-                / self._manure_in_digester.total_volatile_solids
+                (
+                    self._manure_in_digester.non_degradable_volatile_solids
+                    / self._manure_in_digester.total_volatile_solids
+                )
+                if self._manure_in_digester.total_volatile_solids > 0.0
+                else 0.0
             )
 
             degradable_volatile_solids = self._manure_in_digester.degradable_volatile_solids - (
@@ -213,10 +234,10 @@ class ContinuousMix(Digester):
             non_degradable_volatile_solids = self._manure_in_digester.non_degradable_volatile_solids - (
                 total_volatile_solids_destruction * manure_non_degradable_volatile_solids_fraction
             )
-            bedding_non_degradable_volatile_solids = (
-                self._manure_in_digester.bedding_non_degradable_volatile_solids - (
-                    total_volatile_solids_destruction * (
-                        1 - manure_degradable_volatile_solids_frac - manure_non_degradable_volatile_solids_fraction)))
+            bedding_non_degradable_volatile_solids = self._manure_in_digester.bedding_non_degradable_volatile_solids - (
+                total_volatile_solids_destruction
+                * (1 - manure_degradable_volatile_solids_frac - manure_non_degradable_volatile_solids_fraction)
+            )
 
         return replace(
             self._manure_in_digester,

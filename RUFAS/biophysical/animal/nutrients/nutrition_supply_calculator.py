@@ -148,7 +148,7 @@ class NutritionSupplyCalculator:
 
         Notes
         -------
-        [AN.SUP.1], [AN.SUP.2], [AN.SUP.3, [AN.SUP.4]
+        [AN.SUP.1.1], [AN.SUP.2.1], [AN.SUP.3.1], [AN.SUP.4.1]
 
         References
         ----------
@@ -198,7 +198,7 @@ class NutritionSupplyCalculator:
 
         Notes
         -------
-        [AN.SUP.5]
+        [AN.SUP.5.1]
         References
         ----------
          [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -240,7 +240,7 @@ class NutritionSupplyCalculator:
 
         Notes
         -------
-        [AN.SUP.7]
+        [AN.SUP.7.1]
         References
         ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -288,7 +288,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.2
+        AN.SUP.2.2
         """
 
         dNDFbase: float = (
@@ -322,7 +322,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.3
+        AN.SUP.3.2
         """
         dstarch: float = feed.info.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION - 1.0 * (
             (dry_matter_intake / body_weight) - 0.035
@@ -355,7 +355,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.1, AN.SUP.4, AN.SUP.5, and AN.SUP.6
+        AN.SUP.1.2, AN.SUP.4.2, AN.SUP.5.2, and AN.SUP.6.2
         """
 
         digestible_energy_NASEM_dict: dict[RUFAS_ID, float] = {}
@@ -440,7 +440,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.7, AN.SUP.8, and AN.SUP.9
+        AN.SUP.7.2, AN.SUP.8.2, and AN.SUP.9.2
         """
 
         NASEM_digestible_energy: float = cls.calculate_NASEM_digestible_energy(
@@ -471,7 +471,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.10
+        AN.SUP.10.2
         """
         net_energy: float = AnimalModuleConstants.EFF_OF_ME_USE * total_metabolizable_energy
         return net_energy
@@ -502,7 +502,7 @@ class NutritionSupplyCalculator:
 
         Notes
         -------
-        [AN.SUP.6]
+        [AN.SUP.6.1]
 
         References
         ----------
@@ -550,7 +550,7 @@ class NutritionSupplyCalculator:
 
         Notes
         -------
-        [AN.SUP.8]
+        [AN.SUP.8.1]
 
         References
         ----------

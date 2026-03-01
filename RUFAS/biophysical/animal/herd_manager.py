@@ -146,7 +146,8 @@ class HerdManager:
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
         allowances = self.im.get_data("feed.allowances")
-        self.advance_purchase_allowance = AdvancePurchaseAllowance(allowances)
+        sorted_allowances = sorted(allowances, key=lambda x: x["purchased_feed"])
+        self.advance_purchase_allowance = AdvancePurchaseAllowance(sorted_allowances)
 
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
         nutrient_standard = NutrientStandard(config_data["nutrient_standard"])
@@ -157,7 +158,7 @@ class HerdManager:
 
         if self.simulate_animals:
             herd_population = HerdFactory.post_animal_population
-            (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
+            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
                 herd_population.calves,
                 herd_population.heiferIs,
                 herd_population.heiferIIs,

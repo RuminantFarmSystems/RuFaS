@@ -1,0 +1,37 @@
+name: Build scientific PDF
+
+on:
+  push:
+    branches:
+      - test
+    paths:
+      - 'docs/scientific/**'
+
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to build from (dev or test)"
+        required: false
+        default: "dev"
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out selected branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch || github.ref_name }}
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          working_directory: docs/scientific
+          root_file: main.tex
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scientific-pdf
+          path: docs/scientific/main.pdf
