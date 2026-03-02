@@ -256,5 +256,5 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": {}
+  "cross-validation": null
 }

@@ -138,8 +138,10 @@ class InputManager:
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
         failing_cross_validation_blocks: list[str] = []
-        cross_validation_blocks = self.__metadata.get("cross-validation", [])
-        if cross_validation_blocks:
+        cross_validation_file_path: str | None = self.__metadata.get("cross-validation", None)
+        cross_validation_rules = self._load_cross_validation(cross_validation_file_path)
+        if cross_validation_rules is not None:
+            cross_validation_blocks = cross_validation_rules.get("cross-validation", [])
             for block in cross_validation_blocks:
                 target_and_save_block = block.get("target_and_save", {})
                 target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
@@ -517,6 +519,43 @@ class InputManager:
                     f"Successfully loaded metadata from {metadata_path}",
                     info_map,
                 )
+        except Exception as e:
+            raise e
+
+    def _load_cross_validation(self, cross_validation_path: str | None) -> dict[str, list[dict[str, Any]]] | None:
+        """
+        Loads cross-validation data from the specified file path.
+
+        Parameters
+        ----------
+        cross_validation_path : str
+            The file path where the cross-validation data is stored.
+
+        Returns
+        -------
+        dict[str, list[dict[str, Any]]]
+            A dictionary containing the parsed cross-validation data.
+        """
+        if cross_validation_path is None:
+            return None
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_cross_validation.__name__,
+        }
+        self.om.add_log(
+            "load_cross_validation_attempt",
+            f"Attempting to load cross validation data from {cross_validation_path}.",
+            info_map,
+        )
+        try:
+            with open(Path(cross_validation_path)) as cross_validation_file:
+                self.om.add_log(
+                    "load_metadata_success",
+                    f"Successfully loaded metadata from {cross_validation_path}",
+                    info_map,
+                )
+                return json.load(cross_validation_file)
         except Exception as e:
             raise e
 
