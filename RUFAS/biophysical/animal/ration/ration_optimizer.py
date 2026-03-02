@@ -702,8 +702,15 @@ class RationOptimizer:
             Non-negative value indicates that supply is greater than the minimum ration percent value for forage NDF.
 
         """
-        
-        return 2.0
+        dry_matter_intake = sum(decision_vector)
+        if dry_matter_intake != 0:
+            feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
+            forage_NDF_supply = NutritionSupplyCalculator.calculate_forage_neutral_detergent_fiber_content(feeds)
+            return (
+                forage_NDF_supply / dry_matter_intake
+            ) * GeneralConstants.FRACTION_TO_PERCENTAGE - AnimalModuleConstants.MINIMUM_RATION_FORAGE_NDF
+        else:
+            return -1.0
 
     @staticmethod
     def fat_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
