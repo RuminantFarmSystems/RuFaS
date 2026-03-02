@@ -634,7 +634,9 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {}
+        total_purchased_deducted: dict[RUFAS_ID, float] = {
+            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
+        }
         total_farmgrown_deducted: dict[RUFAS_ID, float] = {
             farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
         }
