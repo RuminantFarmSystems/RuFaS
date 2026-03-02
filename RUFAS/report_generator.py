@@ -448,6 +448,16 @@ class ReportGenerator:
                     )
                     aggregate_report = {column_name: list(vertically_aggregated.values())[0]}
 
+        aggregate_keys_log: dict[str, str | dict[str, str]] = {
+            "log": f"Report '{filter_content.get('name', 'Unnamed Report')}' aggregation variables.",
+            "message": f"Variables/constants aggregated: {list(report_data.keys())}.",
+            "info_map": {
+                "class": self.__class__.__name__,
+                "function": self._route_aggregator_functions.__name__,
+            },
+        }
+        event_logs.append(aggregate_keys_log)
+
         return aggregate_report, event_logs
 
     @staticmethod

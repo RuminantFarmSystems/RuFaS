@@ -54,9 +54,7 @@ class HerdFactory:
         after random sampling with replacement.
     """
 
-    post_animal_population: AnimalPopulation = AnimalPopulation(
-        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[]
-    )
+    post_animal_population: AnimalPopulation = None
 
     def __init__(
         self,
