@@ -16,7 +16,7 @@
 		"5": 0.09
     },
 	"milking_cow_fraction": 0.81,
-    "annual_milk_yield": 11472240
+    "annual_milk_yield": 10472240
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -196,14 +196,8 @@
 				{
 					"stream_name": "grow_lot",
 					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.24,
+					"stream_proportion": 1.0,
 					"first_processor": "growing_feed_alley_scraper"
-				},
-				{
-					"stream_name": "grow_feed_alley",
-					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.76,
-					"first_processor": "growing_open_lot"
 				}
 			]
 		},
@@ -221,14 +215,8 @@
 				{
 					"stream_name": "closeup_feed_alley",
 					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.796,
+					"stream_proportion": 1.0,
 					"first_processor": "closeup_feed_alley_scraper"
-				},
-				{
-					"stream_name": "closeup_lot",
-					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.204,
-					"first_processor": "closeup_open_lot"
 				}
 			]
 		},
@@ -242,22 +230,16 @@
 			"housing_type": "open air barn",
 			"pen_type": "open lot",
 			"max_stocking_density": 1.2,
-			"minutes_away_for_milking": 300,
+			"minutes_away_for_milking": 216,
 			"first_parlor_processor": "parlor_cleaning_handler",
 			"parlor_stream_name": "lac_parlor",
 			"manure_streams": [
 				{
 					"stream_name": "lac_lot",
 					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.796,
+					"stream_proportion": 1.0,
 					"first_processor": "lac_open_lot"
-				},
-				{
-					"stream_name": "lac_feed_alley",
-					"bedding_name": "none (no bedding)",
-					"stream_proportion": 0.204,
-					"first_processor": "lac_feed_alley_scraper"
-				}			
+				}		
 			]
 		}
 	],

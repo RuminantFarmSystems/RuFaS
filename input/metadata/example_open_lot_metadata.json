@@ -143,7 +143,7 @@
     "manure_schedule_1": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/example_corn_silage_cover_crop_manure_app.json",
+      "path": "input/data/manure_schedule/no_manure.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
@@ -185,7 +185,7 @@
     "manure_schedule_2": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/example_corn_alf_manure_schedule.json",
+      "path": "input/data/manure_schedule/no_manure.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },

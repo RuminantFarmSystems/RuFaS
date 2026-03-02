@@ -98,7 +98,7 @@
       "processor_type": "AnaerobicLagoon",
       "capacity": 1e10,
       "cover": "no_crust_or_cover",
-      "storage_time_period": 365,
+      "storage_time_period": 183,
       "surface_area": 8000
     },
     {
