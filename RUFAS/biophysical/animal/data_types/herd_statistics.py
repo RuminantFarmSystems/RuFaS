@@ -172,7 +172,6 @@ class HerdStatistics:
     sold_and_died_cows_info: list[SoldAnimalTypedDict]
     total_enteric_methane: dict[AnimalType, dict[str, float]]
 
-    # TODO: Maybe break this list down into smaller lists GitHub Issue #1215
     herd_num = 0
     calf_num = 0
     heiferI_num = 0
@@ -331,7 +330,6 @@ class HerdStatistics:
         self.heiferIII_percent = 0.0
         self.cow_percent = 0.0
 
-        # TODO: Check if all the following variables need to reset daily GitHub Issue #1215
         self.CIDR_count = 0
         self.preg_check_num_h = 0
         self.preg_check_num = 0
