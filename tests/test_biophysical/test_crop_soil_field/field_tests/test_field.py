@@ -2039,6 +2039,7 @@ def test_execute_manure_application_with_invalid_args(
         dry_matter_fraction=0.66,
     )
     field = Field(field_data=FieldData(name="test", field_size=1.89))
+    assert field.soil.data.soil_layers is not None
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15
     expected_total_organic_fraction = 0.35
@@ -2438,6 +2439,7 @@ def test_execute_daily_processes(
     annual_mean_temp: float,
     transpiration: float,
     stressors: bool,
+    mocker: MockerFixture
 ) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
     with patch.multiple(
@@ -2468,19 +2470,21 @@ def test_execute_daily_processes(
             annual_mean_air_temperature=annual_mean_temp,
         )
 
-        incorp.soil.snow.update_snow = MagicMock()
-        incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
-        incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
-        incorp._cycle_water = MagicMock()
+        mocker.patch.object(incorp.soil.snow, "update_snow")
+        mock_determine_total_above_ground_biomass = mocker.patch.object(incorp, "_determine_total_above_ground_biomass",
+                                                                        return_value=89)
+        mocker.patch.object(incorp.soil.soil_temp, "daily_soil_temperature_update")
+        mock_cycle_water = mocker.patch.object(incorp, "_cycle_water")
         for crop in incorp.crops:
-            crop._heat_units.absorb_heat_units = MagicMock()
-            crop._root_development = MagicMock()
-            crop._nitrogen_uptake.uptake = MagicMock()
-            crop._phosphorus_uptake.uptake = MagicMock()
-            crop._growth_constraints.constrain_growth = MagicMock()
-            crop._leaf_area_index.grow_canopy = MagicMock()
-            crop._biomass_allocation.allocate_biomass = MagicMock()
-        mocked_time = MagicMock(RufasTime)
+            mock_absorb_heat_units = mocker.patch.object(crop._heat_units, "absorb_heat_units")
+            mock_root_development = mocker.patch.object(crop._root_development, "develop_roots")
+
+            mock_nitrogen_update = mocker.patch.object(crop._nitrogen_uptake, "uptake")
+            mock_phosphorus_uptake = mocker.patch.object(crop._phosphorus_uptake, "uptake")
+            mock_constrain_growth = mocker.patch.object(crop._growth_constraints, "constrain_growth")
+            mock_grown_canopy = mocker.patch.object(crop._leaf_area_index, "grow_canopy")
+            mock_allocate_biomass = mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
+        mocked_time = mocker.MagicMock(RufasTime)
         setattr(mocked_time, "current_calendar_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
 
@@ -2489,32 +2493,32 @@ def test_execute_daily_processes(
         incorp.soil.snow.update_snow.assert_called_once_with(
             current_day_conditions=current_conditions, day=mocked_time.current_julian_day
         )
-        incorp._determine_total_above_ground_biomass.assert_called_once()
+        mock_determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(
             light, mean_temp, min_temp, max_temp, 89 + residue, 0, annual_mean_temp
         )
-        incorp._cycle_water.assert_called_once_with(current_conditions, mocked_time)
+        mock_cycle_water.assert_called_once_with(current_conditions, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
-                crop._heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
-                crop._root_development.develop_roots.assert_called_once()
-                crop._nitrogen_uptake.uptake.assert_called_once_with(incorp.soil.data)
-                crop._phosphorus_uptake.uptake.assert_called_once_with(incorp.soil.data)
-                crop._growth_constraints.constrain_growth.assert_called_once_with(
+                mock_absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
+                mock_root_development.assert_called_once()
+                mock_nitrogen_update.assert_called_once_with(incorp.soil.data)
+                mock_phosphorus_uptake.assert_called_once_with(incorp.soil.data)
+                mock_constrain_growth.assert_called_once_with(
                     transpiration,
                     mean_temp,
                     *[stressors] * 4,
                 )
-                crop._leaf_area_index.grow_canopy.assert_called_once()
-                crop._biomass_allocation.allocate_biomass.assert_called_once_with(light)
+                mock_grown_canopy.assert_called_once()
+                mock_allocate_biomass.assert_called_once_with(light)
             else:
-                crop._heat_units.absorb_heat_units.assert_not_called()
-                crop._root_development.develop_roots.assert_not_called()
-                crop._nitrogen_uptake.uptake.assert_not_called()
-                crop._phosphorus_uptake.uptake.assert_not_called()
-                crop._growth_constraints.constrain_growth.assert_not_called()
-                crop._leaf_area_index.grow_canopy.assert_not_called()
-                crop._biomass_allocation.allocate_biomass.assert_not_called()
+                mock_absorb_heat_units.assert_not_called()
+                mock_root_development.assert_not_called()
+                mock_nitrogen_update.assert_not_called()
+                mock_phosphorus_uptake.assert_not_called()
+                mock_constrain_growth.assert_not_called()
+                mock_grown_canopy.assert_not_called()
+                mock_allocate_biomass.assert_not_called()
 
 
 @pytest.mark.parametrize(
