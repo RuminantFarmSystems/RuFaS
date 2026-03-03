@@ -6,9 +6,77 @@ from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalM
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.user_constants import UserConstants
+from RUFAS.output_manager import OutputManager
 
 
 class ManureExcretionCalculator:
+    """Calculates manure excretion values for animals.
+
+    Notes
+    -----
+    This class includes a simple DMI-clip tracker for manure excretion calculations.
+    When predicted DMI falls below the literature-based minimum, we log a warning
+    and clip to that minimum.
+
+    The tracker is intentionally lightweight: it logs at most one warning per animal class
+    (lactating vs dry), while keeping running counters in-memory.
+    """
+
+    _dmi_clip_stats = {
+        "lact": {"n_total": 0, "n_clipped": 0},
+        "dry": {"n_total": 0, "n_clipped": 0},
+    }
+    _dmi_clip_warned = {"lact": False, "dry": False}
+
+    @staticmethod
+    def _track_and_warn_dmi_clip(*, kind: str, dmi_original: float, dmi_used: float, context: dict) -> None:
+        """Track DMI clipping and warn once per kind.
+
+        Parameters
+        ----------
+        kind : {"lact", "dry"}
+            Which DMI floor is being applied.
+        dmi_original : float
+            DMI before clipping (kg/day).
+        dmi_used : float
+            DMI after clipping (kg/day).
+        context : dict
+            info_map-like context for OutputManager warnings.
+        """
+        stats = ManureExcretionCalculator._dmi_clip_stats[kind]
+        stats["n_total"] += 1
+
+        if kind == "lact":
+            floor = AnimalModuleConstants.MINIMUM_DMI_LACT
+        elif kind == "dry":
+            floor = AnimalModuleConstants.MINIMUM_DMI_DRY
+        else:
+            raise ValueError(f"Unexpected DMI clip kind: {kind}")
+
+        clipped = dmi_original < floor
+
+        if clipped:
+            stats["n_clipped"] += 1
+
+        # Warn at most once per kind (to avoid log spam) when clipping is applied.
+        if clipped and not ManureExcretionCalculator._dmi_clip_warned[kind]:
+            ManureExcretionCalculator._dmi_clip_warned[kind] = True
+
+            pct = lambda a, b: (100.0 * a / b) if b else 0.0
+            msg = (
+                f"Predicted DMI for manure excretion is below the literature minimum for {kind} cows "
+                f"(DMI={dmi_original:.3f} kg/d < {floor:.3f} kg/d). "
+                + f"Clipping applied to {floor:.3f} kg/d. "
+                + f"Cumulative so far: clipped {stats['n_clipped']}/{stats['n_total']} "
+                f"({pct(stats['n_clipped'], stats['n_total']):.1f}%)."
+            )
+
+            OutputManager().add_warning(
+                "DMI minimum warning (manure excretion)",
+                msg,
+                context,
+            )
+
     @staticmethod
     def calculate_calf_manure(
         body_weight: float,
@@ -383,7 +451,8 @@ class ManureExcretionCalculator:
         (Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Appuhamy et al., 2018)
 
         """
-        dry_matter_intake = nutrient_amounts.dry_matter
+        dry_matter_intake_original = nutrient_amounts.dry_matter
+        dry_matter_intake = dry_matter_intake_original
         ash_diet_content = nutrient_amounts.ash_supply
         dry_matter_concentration = nutrient_amounts.dry_matter_percentage
         acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
@@ -419,6 +488,12 @@ class ManureExcretionCalculator:
         ) * GeneralConstants.GRAMS_TO_KG
 
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
+        ManureExcretionCalculator._track_and_warn_dmi_clip(
+            kind="lact",
+            dmi_original=dry_matter_intake_original,
+            dmi_used=dry_matter_intake,
+            context={"class": ManureExcretionCalculator.__name__, "function": "calculate_lactating_cow_manure"},
+        )
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -547,7 +622,8 @@ class ManureExcretionCalculator:
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-        dry_matter_intake = nutrient_amounts.dry_matter
+        dry_matter_intake_original = nutrient_amounts.dry_matter
+        dry_matter_intake = dry_matter_intake_original
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         potassium_concentration = nutrient_amounts.potassium_percentage
         ash_concentration = nutrient_amounts.ash_percentage
@@ -570,6 +646,12 @@ class ManureExcretionCalculator:
         )
 
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
+        ManureExcretionCalculator._track_and_warn_dmi_clip(
+            kind="dry",
+            dmi_original=dry_matter_intake_original,
+            dmi_used=dry_matter_intake,
+            context={"class": ManureExcretionCalculator.__name__, "function": "calculate_dry_cow_manure"},
+        )
         organic_matter_intake = (
             dry_matter_intake
             * (GeneralConstants.FRACTION_TO_PERCENTAGE - ash_concentration)
