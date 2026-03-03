@@ -451,8 +451,8 @@ class ManureExcretionCalculator:
         (Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Appuhamy et al., 2018)
 
         """
-        dry_matter_intake_original = nutrient_amounts.dry_matter
-        dry_matter_intake = dry_matter_intake_original
+        dry_matter_intake = nutrient_amounts.dry_matter * 0.2
+        dry_matter_intake_original = dry_matter_intake 
         ash_diet_content = nutrient_amounts.ash_supply
         dry_matter_concentration = nutrient_amounts.dry_matter_percentage
         acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
