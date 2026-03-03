@@ -107,6 +107,8 @@ class HerdStatistics:
         Number of cows actively milking in the herd, (unitless).
     dry_cow_num : int
         Number of dry cows (non-milking) in the herd, (unitless).
+    animals_deaths_by_stage : dict[AnimalType, int]
+        Count of animal deaths categorized by their stages.
     dry_cow_percent : float
         Percentage of dry cows in the herd, (unitless).
     milking_cow_percent : float
@@ -115,16 +117,6 @@ class HerdStatistics:
         Percentage of pregnant cows in the herd, (unitless).
     non_preg_cow_percent : float
         Percentage of non-pregnant cows in the herd, (unitless).
-    daily_milk_production : float
-        Average daily milk production, (kg).
-    herd_milk_fat_kg : float
-        Total quantity of milk fat in the herd's milk production, (kg).
-    herd_milk_fat_percent : float
-        Percentage of milk fat in the herd's milk production, (unitless).
-    herd_milk_protein_kg : float
-        Total quantity of milk protein in the herd's milk production, (kg).
-    herd_milk_protein_percent : float
-        Percentage of milk protein in the herd's milk production, (unitless).
     avg_days_in_milk : float
         Average number of days in milk, (simulation days).
     avg_days_in_preg : float
@@ -154,8 +146,16 @@ class HerdStatistics:
         Percentage statistics of culled animals, categorized by culling reasons, (unitless).
     percent_cow_for_parity : dict[str, float]
         Percentage of cows available for each parity class, calculated based on total counts, (unitless).
-    animals_deaths_by_stage : dict[AnimalType, int]
-        Count of animal deaths categorized by their stages.
+    daily_milk_production : float
+        Average daily milk production, (kg).
+    herd_milk_fat_kg : float
+        Total quantity of milk fat in the herd's milk production, (kg).
+    herd_milk_fat_percent : float
+        Percentage of milk fat in the herd's milk production, (unitless).
+    herd_milk_protein_kg : float
+        Total quantity of milk protein in the herd's milk production, (kg).
+    herd_milk_protein_percent : float
+        Percentage of milk protein in the herd's milk production, (unitless).
 
     """
 
@@ -195,9 +195,9 @@ class HerdStatistics:
     heiferIII_percent = 0.0
     cow_percent = 0.0
 
+    CIDR_count = 0
     preg_check_num_h = 0
     preg_check_num = 0
-    CIDR_count = 0
     GnRH_injection_num_h = 0
     GnRH_injection_num = 0
     PGF_injection_num_h = 0
@@ -216,16 +216,13 @@ class HerdStatistics:
     milking_cow_num = 0
     dry_cow_num = 0
 
+    animals_deaths_by_stage: dict[AnimalType, int]
+
     dry_cow_percent = 0.0
     milking_cow_percent = 0.0
     preg_cow_percent = 0.0
     non_preg_cow_percent = 0.0
 
-    daily_milk_production = 0.0
-    herd_milk_fat_kg = 0.0
-    herd_milk_fat_percent = 0.0
-    herd_milk_protein_kg = 0.0
-    herd_milk_protein_percent = 0.0
     avg_days_in_milk = 0.0
     avg_days_in_preg = 0.0
     avg_cow_body_weight = 0.0
@@ -244,7 +241,11 @@ class HerdStatistics:
     cull_reason_stats_percent: dict[str, float]
     percent_cow_for_parity: dict[str, float]
 
-    animals_deaths_by_stage: dict[AnimalType, int]
+    daily_milk_production = 0.0
+    herd_milk_fat_kg = 0.0
+    herd_milk_fat_percent = 0.0
+    herd_milk_protein_kg = 0.0
+    herd_milk_protein_percent = 0.0
 
     def __init__(self) -> None:
         """
@@ -338,6 +339,7 @@ class HerdStatistics:
         self.GnRH_injection_num = 0
         self.PGF_injection_num_h = 0
         self.PGF_injection_num = 0
+
         self.ai_num_h = 0
         self.ai_num = 0
         self.semen_num_h = 0
