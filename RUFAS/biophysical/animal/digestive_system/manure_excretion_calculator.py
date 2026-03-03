@@ -451,8 +451,8 @@ class ManureExcretionCalculator:
         (Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Appuhamy et al., 2018)
 
         """
-        dry_matter_intake = nutrient_amounts.dry_matter * 0.2
-        dry_matter_intake_original = dry_matter_intake
+        dry_matter_intake_original = nutrient_amounts.dry_matter
+        dry_matter_intake = dry_matter_intake_original
         ash_diet_content = nutrient_amounts.ash_supply
         dry_matter_concentration = nutrient_amounts.dry_matter_percentage
         acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
@@ -622,8 +622,8 @@ class ManureExcretionCalculator:
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-        dry_matter_intake = nutrient_amounts.dry_matter * 0.2
-        dry_matter_intake_original = dry_matter_intake
+        dry_matter_intake_original = nutrient_amounts.dry_matter
+        dry_matter_intake = dry_matter_intake_original
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         potassium_concentration = nutrient_amounts.potassium_percentage
         ash_concentration = nutrient_amounts.ash_percentage
