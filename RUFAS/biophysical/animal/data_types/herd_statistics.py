@@ -32,7 +32,7 @@ class HerdStatistics:
     sold_and_died_cows_info : list[SoldAnimalTypedDict]
         Information concerning cows that were either sold or died.
      total_enteric_methane : dict[AnimalType, dict[str, float]]
-        Total amount of enteric methane, grouped by animal types and methods (g/day).   
+        Total amount of enteric methane, grouped by animal types and methods (g/day).
     herd_num : int
         Total number of animals in the herd, (unitless).
     calf_num : int
