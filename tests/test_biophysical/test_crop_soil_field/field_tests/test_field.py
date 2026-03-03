@@ -200,7 +200,7 @@ def test_check_crop_planting_schedule(
     all_events: List[PlantingEvent],
     events_remaining: List[PlantingEvent],
     events_occurring_today: List[PlantingEvent],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """
     Tests that the planting schedule is updated correctly and that planting events are executed correctly. This test
@@ -267,7 +267,7 @@ def test_check_fertilizer_application_schedule(
     events: List[FertilizerEvent],
     remaining_events: List[FertilizerEvent],
     current_events: List[FertilizerEvent],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that fertilizer events that occur on the current day are properly selected and executed."""
     field = Field(fertilizer_events=events)
@@ -563,7 +563,7 @@ def test_harvest_heat_scheduled_crops(
     crop_num: int,
     should_harvest_results: List[bool],
     expected_harvest_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
     crops = []
@@ -857,15 +857,15 @@ def test_harvest_crop(
     field = Field(field_data=mock_field_data)
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
 
-    manage_crop_harvest_mocks = [
-        mocker.patch.object(crop, "manage_crop_harvest")
-        for crop in field.crops
-    ]
+    manage_crop_harvest_mocks = [mocker.patch.object(crop, "manage_crop_harvest") for crop in field.crops]
 
     mock_conditions = mocker.MagicMock(spec=CurrentDayConditions)
     mock_conditions.rainfall = rainfall
 
-    add_residue = mocker.patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", )
+    add_residue = mocker.patch.object(
+        field.soil.carbon_cycling.residue_partition,
+        "add_residue_to_pools",
+    )
 
     field._harvest_crop(crop_reference, harvest_op, mock_time, mock_conditions)
 
@@ -897,7 +897,7 @@ def test_harvest_crop_warnings(
     mock_field_data: FieldData,
     crop_count: int,
     expected_message: str,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that warnings are raised correctly to the OutputManager."""
     crops = [Crop(crop_data=mock_crop_data) for _ in range(crop_count)]
@@ -1640,7 +1640,7 @@ def test_execute_manure_application(
     supplied_manure: NutrientRequestResults,
     expected_request: NutrientRequest,
     expected_unmet_nitrogen: float,
-    expected_unmet_phosphorus: float
+    expected_unmet_phosphorus: float,
 ) -> None:
     """Tests that manure is applied to the soil correctly."""
     field = Field(field_data=FieldData(name="test", field_size=1.4))
@@ -1651,8 +1651,9 @@ def test_execute_manure_application(
     )
     mock_apply = mocker.patch.object(field.manure_applicator, "apply_machine_manure")
     mock_record = mocker.patch.object(field, "_record_manure_application")
-    mock_determine_optimal_fertilizer_mix = mocker.patch.object(field, "_determine_optimal_fertilizer_mix",
-                                                                return_value="expected_optimal_mix")
+    mock_determine_optimal_fertilizer_mix = mocker.patch.object(
+        field, "_determine_optimal_fertilizer_mix", return_value="expected_optimal_mix"
+    )
     mock_execute = mocker.patch.object(field, "_execute_fertilizer_application")
 
     warn = mocker.patch.object(field.om, "add_warning")
@@ -2441,7 +2442,7 @@ def test_execute_daily_processes(
     annual_mean_temp: float,
     transpiration: float,
     stressors: bool,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
     with patch.multiple(
@@ -2473,8 +2474,9 @@ def test_execute_daily_processes(
         )
 
         mock_update_snow = mocker.patch.object(incorp.soil.snow, "update_snow")
-        mock_determine_total_above_ground_biomass = mocker.patch.object(incorp, "_determine_total_above_ground_biomass",
-                                                                        return_value=89)
+        mock_determine_total_above_ground_biomass = mocker.patch.object(
+            incorp, "_determine_total_above_ground_biomass", return_value=89
+        )
         mock_daily_soil_temp_update = mocker.patch.object(incorp.soil.soil_temp, "daily_soil_temperature_update")
         mock_cycle_water = mocker.patch.object(incorp, "_cycle_water")
         for crop in incorp.crops:
@@ -2547,7 +2549,7 @@ def test_cycle_water(
     crop_1_proportion: float,
     crop_2_proportion: float,
     crops_growing: bool,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
     with patch(
@@ -2610,9 +2612,7 @@ def test_cycle_water(
         mock_sublimate = mocker.patch.object(incorp.soil.snow, "sublimate")
         mock_evaporate = mocker.patch.object(incorp.soil.evaporation, "evaporate")
 
-        mock_determine_watering_amount = mocker.patch.object(
-            incorp, "_determine_watering_amount", return_value=0
-        )
+        mock_determine_watering_amount = mocker.patch.object(incorp, "_determine_watering_amount", return_value=0)
         mock_handle_water_in_crop_canopies = mocker.patch.object(
             incorp, "_handle_water_in_crop_canopies", return_value=2.0
         )
@@ -2622,37 +2622,21 @@ def test_cycle_water(
         mock_evaporate_from_crop_canopies = mocker.patch.object(
             incorp, "_evaporate_from_crop_canopies", return_value=30.5
         )
-        mocker.patch.object(
-            incorp, "_determine_total_above_ground_biomass", return_value=40.0
-        )
+        mocker.patch.object(incorp, "_determine_total_above_ground_biomass", return_value=40.0)
         mock_determine_soil_evaporation_and_sublimation_adjusted = mocker.patch.object(
             incorp, "_determine_soil_evaporation_and_sublimation_adjusted", return_value=10.5
         )
         mock_determine_maximum_soil_evaporation = mocker.patch.object(
             incorp, "_determine_maximum_soil_evaporation", return_value=5.0
         )
-        mocker.patch.object(
-            incorp, "_get_manure_water", return_value=manure_water
-        )
+        mocker.patch.object(incorp, "_get_manure_water", return_value=manure_water)
 
-        mock_crop1_set_max_transpiration = mocker.patch.object(
-            crop_1._water_dynamics, "set_maximum_transpiration"
-        )
-        mock_crop1_cycle_water = mocker.patch.object(
-            crop_1._water_dynamics, "cycle_water"
-        )
-        mock_crop1_uptake = mocker.patch.object(
-            crop_1._water_uptake, "uptake"
-        )
-        mock_crop2_set_max_transpiration = mocker.patch.object(
-            crop_2._water_dynamics, "set_maximum_transpiration"
-        )
-        mock_crop2_cycle_water = mocker.patch.object(
-            crop_2._water_dynamics, "cycle_water"
-        )
-        mock_crop2_uptake = mocker.patch.object(
-            crop_2._water_uptake, "uptake"
-        )
+        mock_crop1_set_max_transpiration = mocker.patch.object(crop_1._water_dynamics, "set_maximum_transpiration")
+        mock_crop1_cycle_water = mocker.patch.object(crop_1._water_dynamics, "cycle_water")
+        mock_crop1_uptake = mocker.patch.object(crop_1._water_uptake, "uptake")
+        mock_crop2_set_max_transpiration = mocker.patch.object(crop_2._water_dynamics, "set_maximum_transpiration")
+        mock_crop2_cycle_water = mocker.patch.object(crop_2._water_dynamics, "cycle_water")
+        mock_crop2_uptake = mocker.patch.object(crop_2._water_uptake, "uptake")
         mocked_time = mocker.MagicMock(RufasTime)
         setattr(mocked_time, "current_simulation_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -3165,7 +3149,7 @@ def test_check_tillage_schedule(
     year: int,
     not_today: List[TillageEvent],
     is_today: List[TillageEvent],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     mocked_time = mocker.MagicMock(RufasTime)
     setattr(mocked_time, "current_calendar_year", year)
@@ -3202,17 +3186,14 @@ def test_liters_to_millimeters(liters: float, area: float, expected: float) -> N
     ],
 )
 def test_field_data_initialization(
-    latitude: float,
-    min_daylength: float,
-    watering_amount: float,
-    watering_interval: int,
-    mocker: MockerFixture
+    latitude: float, min_daylength: float, watering_amount: float, watering_interval: int, mocker: MockerFixture
 ) -> None:
     """Tests that FieldData objects are initialized correctly."""
     mock_find_dormancy_threshold = mocker.patch.object(Dormancy, "find_dormancy_threshold", return_value=14.5)
     mock_find_threshold_daylength = mocker.patch.object(Dormancy, "find_threshold_daylength", return_value=10.22)
-    mock_convert_liters_to_millimeters = mocker.patch.object(FieldData, "convert_liters_to_millimeters",
-                                                             return_value=0.8)
+    mock_convert_liters_to_millimeters = mocker.patch.object(
+        FieldData, "convert_liters_to_millimeters", return_value=0.8
+    )
 
     data = FieldData(
         field_size=3,
