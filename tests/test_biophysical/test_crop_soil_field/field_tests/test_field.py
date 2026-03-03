@@ -1,7 +1,7 @@
 from dataclasses import replace
 import datetime
 from math import exp
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
 import pytest
@@ -115,10 +115,10 @@ def test_manage_field(mocker: MockerFixture) -> None:
     setattr(manure_event_mock, "day", 120)
     setattr(manure_event_mock, "manure_supplement_method", ManureSupplementMethod.NONE)
 
-    manure_application_mock = MagicMock(spec=ManureEventNutrientRequestResults)
+    manure_application_mock = mocker.MagicMock(spec=ManureEventNutrientRequestResults)
     manure_application_mock.event = manure_event_mock
     manure_application_mock.nutrient_request_results = "MockResults"
-    manure_application_mock.manure_supplement_method = ManureSupplementMethod.NONE
+    manure_application_mock.supplement_metjkod = ManureSupplementMethod.NONE
 
     mock_manure_applications = [manure_application_mock]
 
@@ -153,43 +153,43 @@ def test_manage_field(mocker: MockerFixture) -> None:
     [
         (
             [
-                PlantingEvent("test_1", 1996, 120, False),
-                PlantingEvent("test_2", 1996, 120, False),
-                PlantingEvent("test_3", 1996, 240, False),
-                PlantingEvent("test_4", 1997, 125, False),
+                PlantingEvent("test_1", False, 120, False),
+                PlantingEvent("test_2", False, 120, False),
+                PlantingEvent("test_3", False, 240, False),
+                PlantingEvent("test_4", False, 125, False),
             ],
             [
-                PlantingEvent("test_3", 1996, 240, False),
-                PlantingEvent("test_4", 1997, 125, False),
+                PlantingEvent("test_3", False, 240, False),
+                PlantingEvent("test_4", False, 125, False),
             ],
             [
-                PlantingEvent("test_1", 1996, 120, False),
-                PlantingEvent("test_2", 1996, 120, False),
+                PlantingEvent("test_1", False, 120, False),
+                PlantingEvent("test_2", False, 120, False),
             ],
         ),
         (
             [
-                PlantingEvent("crop_1", 1995, 100, True),
-                PlantingEvent("crop_2", 1995, 100, False),
-                PlantingEvent("crop_3", 1995, 100, False),
+                PlantingEvent("crop_1", False, 100, True),
+                PlantingEvent("crop_2", False, 100, False),
+                PlantingEvent("crop_3", False, 100, False),
             ],
             [],
             [
-                PlantingEvent("crop_1", 1995, 100, True),
-                PlantingEvent("crop_2", 1995, 100, False),
-                PlantingEvent("crop_3", 1995, 100, False),
+                PlantingEvent("crop_1", False, 100, True),
+                PlantingEvent("crop_2", False, 100, False),
+                PlantingEvent("crop_3", False, 100, False),
             ],
         ),
         (
             [
-                PlantingEvent("not_today_1", 2000, 100, False),
-                PlantingEvent("not_today_2", 2000, 250, True),
-                PlantingEvent("not_today_3", 2001, 200, True),
+                PlantingEvent("not_today_1", False, 100, False),
+                PlantingEvent("not_today_2", False, 250, True),
+                PlantingEvent("not_today_3", False, 200, True),
             ],
             [
-                PlantingEvent("not_today_1", 2000, 100, False),
-                PlantingEvent("not_today_2", 2000, 250, True),
-                PlantingEvent("not_today_3", 2001, 200, True),
+                PlantingEvent("not_today_1", False, 100, False),
+                PlantingEvent("not_today_2", False, 250, True),
+                PlantingEvent("not_today_3", False, 200, True),
             ],
             [],
         ),
@@ -200,6 +200,7 @@ def test_check_crop_planting_schedule(
     all_events: List[PlantingEvent],
     events_remaining: List[PlantingEvent],
     events_occurring_today: List[PlantingEvent],
+    mocker: MockerFixture
 ) -> None:
     """
     Tests that the planting schedule is updated correctly and that planting events are executed correctly. This test
@@ -207,16 +208,15 @@ def test_check_crop_planting_schedule(
     no planting events occur on the current day, and no planting events left.
     """
     field = Field(plantings=all_events)
-    field._filter_events = MagicMock(return_value=(events_remaining, events_occurring_today))
-
-    field._plant_crop = MagicMock()
+    mock_filter = mocker.patch.object(field, "_filter_events", return_value=(events_remaining, events_occurring_today))
+    mock_plant = mocker.patch.object(field, "_plant_crop")
     time = MagicMock(RufasTime)
     expected_create_and_update_events_calls = [call(all_events, time)]
 
     field._check_crop_planting_schedule(time)
 
-    field._filter_events.assert_has_calls(expected_create_and_update_events_calls)
-    assert field._plant_crop.call_count == len(events_occurring_today)
+    mock_filter.assert_has_calls(expected_create_and_update_events_calls)
+    assert mock_plant.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
 
 
@@ -225,39 +225,39 @@ def test_check_crop_planting_schedule(
     [
         (
             [
-                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
-                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
-                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent("mix_1",  20, 100, 1993, 75, 15, 0, 1),
+                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1),
+                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1),
             ],
             [],
             [
-                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
-                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
-                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent("mix_1",  20, 100, 1993, 75, 15, 0, 1),
+                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1),
+                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1),
             ],
         ),
         (
             [
-                FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0),
-                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
-                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
+                FertilizerEvent("mix_1", 20, 150, 1992, 80, 15, 0, 1),
+                FertilizerEvent("mix_1", 5, 25, 1992, 250, 15, 0, 1),
+                FertilizerEvent("mix 1",100, 50,1993, 80, 15, 0, 1),
             ],
             [
-                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
-                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
+                FertilizerEvent("mix_1", 5, 25, 1992, 250, 15, 0, 1),
+                FertilizerEvent("mix_1", 50, 100, 1993, 80, 15, 0, 1),
             ],
-            [FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0)],
+            [FertilizerEvent("mix_1", 20, 150, 1992, 80, 15, 0, 1)],
         ),
         (
             [
-                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
-                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
-                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
+                FertilizerEvent("mix 1", 10, 50, 1998, 90, 15, 0, 1),
+                FertilizerEvent("mix 1", 10, 50, 1999, 90, 15, 0, 1),
+                FertilizerEvent("mix 1", 10, 50, 2000, 90, 15, 0, 1),
             ],
             [
-                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
-                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
-                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
+                FertilizerEvent("mix 1", 10, 50, 1998, 90, 15, 0, 1),
+                FertilizerEvent("mix 1", 10, 50, 1999, 90, 15, 0, 1),
+                FertilizerEvent("mix 1", 10, 50, 2000, 90, 15, 0, 1),
             ],
             [],
         ),
@@ -267,11 +267,12 @@ def test_check_fertilizer_application_schedule(
     events: List[FertilizerEvent],
     remaining_events: List[FertilizerEvent],
     current_events: List[FertilizerEvent],
+    mocker: MockerFixture
 ) -> None:
     """Tests that fertilizer events that occur on the current day are properly selected and executed."""
     field = Field(fertilizer_events=events)
-    field._filter_events = MagicMock(return_value=(remaining_events, current_events))
-    field._execute_fertilizer_application = MagicMock()
+    mock_filter = mocker.patch.object(field, "_filter_events", return_value=(remaining_events, current_events))
+    mock_execute = mocker.patch.object(field, "_execute_fertilizer_application")
     mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "calendar_year", 2000)
     setattr(mocked_time, "day", 100)
@@ -292,8 +293,8 @@ def test_check_fertilizer_application_schedule(
                 event.day,
             )
         )
-    field._filter_events.assert_called_once_with(events, mocked_time)
-    field._execute_fertilizer_application.assert_has_calls(expected_execution_calls)
+    mock_filter.assert_called_once_with(events, mocked_time)
+    mock_execute.assert_has_calls(expected_execution_calls)
 
 
 def test_check_manure_application_schedule() -> None:
