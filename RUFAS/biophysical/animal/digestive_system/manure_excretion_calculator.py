@@ -623,7 +623,7 @@ class ManureExcretionCalculator:
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
         dry_matter_intake = nutrient_amounts.dry_matter * 0.2
-        dry_matter_intake_original = dry_matter_intake 
+        dry_matter_intake_original = dry_matter_intake
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         potassium_concentration = nutrient_amounts.potassium_percentage
         ash_concentration = nutrient_amounts.ash_percentage
