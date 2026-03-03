@@ -21,6 +21,8 @@ class HerdStatistics:
         Count of cows for each parity class, (unitless).
     avg_daily_cow_milking : float
         Average number of milking cows per day, (unitless).
+    stillborn_calf_info : list[SoldAnimalTypedDict]
+        Details about stillborn calves including relevant attributes.
     sold_calves_info : list[SoldAnimalTypedDict]
         Details about sold calves including relevant attributes.
     sold_heiferIIIs_info : list[SoldAnimalTypedDict]
@@ -347,16 +349,20 @@ class HerdStatistics:
         self.milking_cow_num = 0
         self.dry_cow_num = 0
 
+        self.animals_deaths_by_stage: dict[AnimalType, int] = {
+            AnimalType.CALF: 0,
+            AnimalType.HEIFER_I: 0,
+            AnimalType.HEIFER_II: 0,
+            AnimalType.HEIFER_III: 0,
+            AnimalType.LAC_COW: 0,
+            AnimalType.DRY_COW: 0,
+        }
+
         self.preg_cow_percent = 0.0
         self.dry_cow_percent = 0.0
         self.milking_cow_percent = 0.0
         self.non_preg_cow_percent = 0.0
 
-        self.daily_milk_production = 0.0
-        self.herd_milk_fat_kg = 0.0
-        self.herd_milk_fat_percent = 0.0
-        self.herd_milk_protein_kg = 0.0
-        self.herd_milk_protein_percent = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -368,14 +374,11 @@ class HerdStatistics:
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
 
-        self.animals_deaths_by_stage: dict[AnimalType, int] = {
-            AnimalType.CALF: 0,
-            AnimalType.HEIFER_I: 0,
-            AnimalType.HEIFER_II: 0,
-            AnimalType.HEIFER_III: 0,
-            AnimalType.LAC_COW: 0,
-            AnimalType.DRY_COW: 0,
-        }
+        self.daily_milk_production = 0.0
+        self.herd_milk_fat_kg = 0.0
+        self.herd_milk_fat_percent = 0.0
+        self.herd_milk_protein_kg = 0.0
+        self.herd_milk_protein_percent = 0.0
 
     def reset_parity(self) -> None:
         """Resets parity-based attributes."""
