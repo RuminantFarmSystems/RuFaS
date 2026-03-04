@@ -2733,7 +2733,7 @@ def test_save_metadata_properties_errors(
 
     mock_parse.assert_called_once_with("test_properties")
     mock_add_error.assert_called_once_with(
-        "Save CSV failure.", f"Unable to save to {expected_path} because of {error_message}.", ANY
+        "Metadata Properties Save CSV failure.", f"Unable to save to {expected_path} because of {error_message}.", ANY
     )
 
 

@@ -58,10 +58,10 @@ class ManureNutrients:
                 pass
             elif field.name == "manure_type":
                 if not isinstance(value, ManureType):
-                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+                    raise ValueError(f"ManureNutrients Error: field {field.name} must be an instance of ManureType.")
             else:
                 if value < 0:
-                    raise ValueError(f"Field {field.name} must be non-negative.")
+                    raise ValueError(f"ManureNutrients Error: field {field.name} must be non-negative.")
 
     @property
     def units_dict(self) -> dict[str, MeasurementUnits]:
@@ -162,10 +162,11 @@ class ManureNutrients:
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f"Cannot add {type(self)} to {type(other)}.")
+            raise TypeError(f"ManureNutrients Error: Cannot add {type(self)} to {type(other)}.")
 
         if self.manure_type != other.manure_type:
-            raise TypeError(f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients.")
+            raise TypeError(f"ManureNutrients Error: Cannot add {self.manure_type} nutrients to {other.manure_type} "
+                            "nutrients.")
 
         summed_attributes = {
             field.name: getattr(self, field.name) + getattr(other, field.name)
@@ -200,10 +201,10 @@ class ManureNutrients:
 
         """
         if not isinstance(scalar, (int, float)):
-            raise TypeError(f"Cannot multiply {type(self)} by {type(scalar)}.")
+            raise TypeError(f"ManureNutrients Error: Cannot multiply {type(self)} by {type(scalar)}.")
 
         if scalar < 0.0:
-            raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
+            raise ValueError(f"ManureNutrients Error: Cannot multiply {type(self)} by a negative scalar.")
 
         multiplied_attributes = {
             field.name: getattr(self, field.name) * scalar
@@ -239,10 +240,11 @@ class ManureNutrients:
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f"Cannot subtract {type(other)} from {type(self)}.")
+            raise TypeError(f"ManureNutrients Error: Cannot subtract {type(other)} from {type(self)}.")
 
         if self.manure_type != other.manure_type:
-            raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
+            raise TypeError(f"ManureNutrients Error: Cannot subtract {other.manure_type} nutrients from"
+                            f" {self.manure_type} nutrients.")
 
         subtracted_attributes = {}
         for field in fields(self):
@@ -250,7 +252,8 @@ class ManureNutrients:
                 self_value = getattr(self, field.name)
                 other_value = getattr(other, field.name)
                 if other_value > self_value:
-                    raise ValueError(f"The amount of {field.name} in other object is greater than what is available.")
+                    raise ValueError(f"ManureNutrients Error: The amount of {field.name} in other object is greater"
+                                     " than what is available.")
                 subtracted_attributes[field.name] = self_value - other_value
         subtracted_attributes["manure_type"] = self.manure_type
         subtracted_attributes.update(self.units_dict)

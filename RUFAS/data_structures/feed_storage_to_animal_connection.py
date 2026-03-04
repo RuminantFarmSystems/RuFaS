@@ -376,7 +376,7 @@ class RequestedFeed:
 
     def __add__(self, other: "RequestedFeed") -> "RequestedFeed":
         if not isinstance(other, RequestedFeed):
-            raise NotImplementedError
+            return NotImplemented
 
         combined_feed = defaultdict(float, self.requested_feed)
         for feed_id, amount in other.requested_feed.items():

@@ -329,7 +329,7 @@ class ManureStream:
 
         Raises
         ------
-        ValueErrorcov
+        ValueError
             If split_ratio is not between 0 and 1.
         """
         if not (0 < split_ratio <= 1):
@@ -341,7 +341,7 @@ class ManureStream:
                     "function": self.split_stream.__name__,
                 },
             )
-            raise ValueError("Split ratio must be greater than 0 and less than 1.")
+            raise ValueError("ManureStream split error: Split ratio must be greater than 0 and less than 1.")
 
         split_pen_manure_data = None
         if self.pen_manure_data is not None and stream_type is not None:

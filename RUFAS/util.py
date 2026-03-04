@@ -185,17 +185,19 @@ class Utility:
 
         """
         if not data_to_expand:
-            raise ValueError("Cannot fill empty dataset.")
+            raise ValueError("Data Expansion error: Cannot fill empty dataset.")
 
         all_simulation_days = []
         for key, value in data_to_expand.items():
             info_maps = value.get("info_maps")
             if info_maps is None:
-                raise TypeError(f"Variable '{key}' has no info maps.")
+                raise TypeError(f"Data Expansion error: Variable '{key}' has no info maps.")
             if len(info_maps) != len(value["values"]):
-                raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
+                raise ValueError(f"Data Expansion error: Variable '{key}' does not have matching number of values and "
+                                 "info maps.")
             if not all("simulation_day" in info_map.keys() for info_map in info_maps):
-                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
+                raise ValueError(f"Data Expansion error: Variable '{key}' does not have simulation day value in every "
+                                 "info map.")
             all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
 
         filtered_simulation_days = sorted(set(all_simulation_days))
@@ -616,7 +618,8 @@ class Utility:
 
         """
         if starting_offset > ending_offset:
-            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+            raise ValueError("Time Series Generation error: "
+                             f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
 
         time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
 
@@ -634,7 +637,8 @@ class Utility:
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
         if not 1 <= day <= maximum_day:
-            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+            raise ValueError("Error converting ordinal date: "
+                             f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
 
     @staticmethod
@@ -746,7 +750,7 @@ class Utility:
                 id_value = dict_.pop(id_key)
                 result[id_value] = dict_
             else:
-                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+                raise KeyError(f"List to dict conversion error: Key '{id_key}' not found in dictionary.")
 
         return result
 
