@@ -27,7 +27,13 @@ $$CBW = MW \times 0.06275$$
 
 # Use alphanumeric equation labels
 
-Through quarto does not allow custom labels, you can include your own using
-the \\tag latex command:
+Though quarto does not allow custom cross-reference labels, you can
+include your own non-CR label with the \\tag latex command. *And* the
+equation can still be cross-referenceable (and assigned a dynamic 
+equation number) by using a custom cross-reference class (defined in _quarto.yml):
 
+:::{#eqn-an-nrc-2}
 $$CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
+:::
+
+see @eqn-an-nrc-2

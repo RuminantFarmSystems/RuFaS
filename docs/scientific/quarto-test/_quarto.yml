@@ -1,10 +1,10 @@
 # project specifications
-project: 
+project:
   type: book
   output-dir: output
 
 # Book project specifications
-book: 
+book:
   title: "Ruminant Farm System Model"
   subtitle: "Scientific Documentation"
   version: 1.0
@@ -20,13 +20,13 @@ book:
 title-block-banner: true
 
 # define the formats to be rendered and format-specific settings
-format: 
-  html: 
+format:
+  html:
     theme:
       - cosmo
       # - custom.scss # option for extended CSS file for specifying HTML formating, etc.
     html-math-method: katex
-  pdf: 
+  pdf:
     toc: true
     number-sections: true
     # keep-tex: true # keep the intermediate LaTeX files
@@ -34,8 +34,15 @@ format:
     colorlinks: true
 #    include-in-header:
 #     - preamble-latex.tex # file(s) with LaTeX for document formatting, etc.
-  epub: 
+  epub:
     cover-image: resources/rufas.png
+
+crossref:
+  custom:
+    - kind: float
+      reference-prefix: Equation
+      caption-location: margin
+      key: eqn
 
 # list of .bib files
 bibliography: ../resources/animal.bib
