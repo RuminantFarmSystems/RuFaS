@@ -218,7 +218,7 @@ v0.9.2
 - [2500](https://github.com/RuminantFarmSystems/RuFaS/pull/2500) - [minor change] Moves `AnimalCombination`, `AnimalManureExcretions`, and removes the old `PenManureData`.
 - [2518](https://github.com/RuminantFarmSystems/RuFaS/pull/2518) - [minor change] Cleanup all TODOs in the codebase.
 - [2502](https://github.com/RuminantFarmSystems/RuFaS/pull/2502) - [minor change] [Manure] Implement Manure Methane Potential Tracking.
-- [2524](https://github.com/RuminantFarmSystems/RuFaS/pull/2502) - [minor change] [EEE][FeedManager] Updates calculation method for purchased feed emissions.
+- [2524](https://github.com/RuminantFarmSystems/RuFaS/pull/2524) - [minor change] [EEE][FeedManager] Updates calculation method for purchased feed emissions.
 - [2513](https://github.com/RuminantFarmSystems/RuFaS/pull/2502) - [minor change] [Manure] Add type to separator.
 - [2491](https://github.com/RuminantFarmSystems/RuFaS/pull/2491) - [minor change] [Manure] Fixes a bug in manure request management when trying to supplement a request from a farm that has no on-farm manure.
 - [2461](https://github.com/RuminantFarmSystems/RuFaS/pull/2461) [Input] Create Example Input files.
@@ -231,7 +231,7 @@ v0.9.2
 - [2551](https://github.com/RuminantFarmSystems/RuFaS/pull/2551) - [minor change] Raises error in main.py to direct user to errors file for debugging.
 - [2547](https://github.com/RuminantFarmSystems/RuFaS/pull/2547) - [minor change] [Input Manager] 1/5 Cross Validation basic setup.
 - [2559](https://github.com/RuminantFarmSystems/RuFaS/pull/2559) - [minor change] [Manure] Implement daily spread processor.
-- [2482](https://github.com/RuminantFarmSystems/RuFaS/pull/2554) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
+- [2482](https://github.com/RuminantFarmSystems/RuFaS/pull/2482) - [minor change] [Animal] Restructure newborn calf status categorization and reporting.
 - [2550](https://github.com/RuminantFarmSystems/RuFaS/pull/2550) - [minor change] Create metadata for no animal scenario.
 - [2553](https://github.com/RuminantFarmSystems/RuFaS/pull/2553) - [minor change] [Input Manager] 3/5 Cross Validation: implement expression block.
 - [2567](https://github.com/RuminantFarmSystems/RuFaS/pull/2567) - [minor change] Creates and prints e2e testing results summary for all metadata e2e testing runs.
@@ -248,7 +248,7 @@ v0.9.2
 - [2598](https://github.com/RuminantFarmSystems/RuFaS/pull/2598) - [minor change] [FeedManager][Feed Storage] Adjust feed deduction logic to gather and remove available feeds by storage rather than crop.
 - [2587](https://github.com/RuminantFarmSystems/RuFaS/pull/2587) - [major change] [Output Manager] Add cross-scenario aggregation and running EEE to post processing task.
 - [2583](https://github.com/RuminantFarmSystems/RuFaS/pull/2583) - [minor change] [Github Action] Fix the GitHub Action for forked branches.
-- [2579](https://github.com/RuminantFarmSystems/RuFaS/pull/2563) - [minor change] [Animal] Changed location of milking cow fraction to main animal input file.
+- [2579](https://github.com/RuminantFarmSystems/RuFaS/pull/2579) - [minor change] [Animal] Changed location of milking cow fraction to main animal input file.
 - [2594](https://github.com/RuminantFarmSystems/RuFaS/pull/2594) - [minor change] [Manure] Fixed splitting-logic for manure_deposition_surface_area based on stream type.
 - [2586](https://github.com/RuminantFarmSystems/RuFaS/pull/2586) - [minor change] Make `max_daily_feed_recalculations_per_year` an User Input
 - [2584](https://github.com/RuminantFarmSystems/RuFaS/pull/2584) - [minor change] [Manure] Implement unit test for Processor.check_manure_stream_compatibility().
@@ -286,7 +286,7 @@ v0.9.2
 - [2675](https://github.com/RuminantFarmSystems/RuFaS/pull/2675) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Fixes and clarifies data fixing error messaging for IM.
 - [2674](https://github.com/RuminantFarmSystems/RuFaS/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
 - [2678](https://github.com/RuminantFarmSystems/RuFaS/pull/2678) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
-- [2679](https://github.com/RuminantFarmSystems/RuFaS/pull/2678) - [minor change] [Feed] [NoInputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation
+- [2679](https://github.com/RuminantFarmSystems/RuFaS/pull/2679) - [minor change] [Feed] [NoInputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation
 - [2688](https://github.com/RuminantFarmSystems/RuFaS/pull/2688) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Hot fix to correct the missing part of 2640.
 - [2689](https://github.com/RuminantFarmSystems/RuFaS/pull/2689) - [minor change] [InputManager] [InputChange] [NoOutputChange] Add support for multiple properties files.
 - [2701](https://github.com/RuminantFarmSystems/RuFaS/pull/2701) - [minor change] [EEEManager] [NoInputChange] [NoOutputChange] Hot fix to correct the failure in EEEManager..
