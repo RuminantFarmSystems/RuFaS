@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.7.33">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,15 +34,14 @@ ul.task-list li input[type="checkbox"] {
 <link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-73925ddb4c75e6a4ab52b689fcc811f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d52876e851f4fc3720e5a45040007cd6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -99,7 +98,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+      if (mathElements[i].tagName == "SPAN") {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -216,6 +215,7 @@ window.Quarto = {
   <ul>
   <li><a href="#sec-nrc" id="toc-sec-nrc" class="nav-link active" data-scroll-target="#sec-nrc"><span class="header-section-number">2.1</span> Nutrient Requirements of Dairy Cattle (NRC)</a></li>
   <li><a href="#reformatted-equations" id="toc-reformatted-equations" class="nav-link" data-scroll-target="#reformatted-equations"><span class="header-section-number">2.2</span> Reformatted equations</a></li>
+  <li><a href="#use-alphanumeric-equation-labels" id="toc-use-alphanumeric-equation-labels" class="nav-link" data-scroll-target="#use-alphanumeric-equation-labels"><span class="header-section-number">3</span> Use alphanumeric equation labels</a></li>
   </ul>
 </nav>
     </div>
@@ -242,6 +242,11 @@ window.Quarto = {
 <h2 data-number="2.2" class="anchored" data-anchor-id="reformatted-equations"><span class="header-section-number">2.2</span> Reformatted equations</h2>
 <p><a href="#eq-nrc-cbw" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> may be visually improved by using the <code>\times</code> LaTeX command:</p>
 <p><span class="math display">CBW = MW \times 0.06275</span></p>
+</section>
+<section id="use-alphanumeric-equation-labels" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Use alphanumeric equation labels</h1>
+<p>Through quarto does not allow custom labels, you can include your own using the \tag latex command:</p>
+<p><span class="math display">CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}</span></p>
 
 
 </section>
@@ -298,14 +303,13 @@ window.Quarto = {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
         }
-      }
-      return codeEl.innerText;
+        return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

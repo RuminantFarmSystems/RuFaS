@@ -24,3 +24,10 @@ calculation, please refer to the [energykey](energy requirements key).
 command: 
 
 $$CBW = MW \times 0.06275$$
+
+# Use alphanumeric equation labels
+
+Through quarto does not allow custom labels, you can include your own using
+the \\tag latex command:
+
+$$CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
