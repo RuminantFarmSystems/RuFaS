@@ -1,0 +1,11 @@
+PWD c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific
+INPUT C:\Users\gmg228\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
+INPUT c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific\manure.tex
+OUTPUT manure.log
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
+OUTPUT manure.pdf
+INPUT C:\Users\gmg228\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbxti10.tfm
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti10.tfm
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx7.tfm
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\tcrm1000.tfm

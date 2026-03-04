@@ -1,0 +1,17 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'feed_storage copy.blg'
+[150] biber-MSWIN64:340> INFO - === 
+[204] Biber.pm:419> INFO - Reading 'feed_storage copy.bcf'
+[360] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[361] Biber.pm:979> INFO - Found 2 citekeys in bib section 1
+[361] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[388] Biber.pm:4419> INFO - Processing section 1
+[404] Biber.pm:4610> INFO - Looking for bibtex file 'resources/feed_storage.bib' for section 1
+[463] bibtex.pm:1713> INFO - LaTeX decoding ...
+[556] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/feed_storage.bib'
+[620] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[620] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[620] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[620] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[624] bbl.pm:660> INFO - Writing 'feed_storage copy.bbl' with encoding 'UTF-8'
+[627] bbl.pm:763> INFO - Output to feed_storage copy.bbl

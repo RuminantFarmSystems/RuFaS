@@ -1,0 +1,76 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {part}{I\hspace {1em}Animal Module}{1}{part.1}%
+\etoc@startlocaltoc {1}
+\contentsline {section}{\numberline {I.}Module Introduction}{3}{section.1}%
+\contentsline {subsection}{\numberline {A.}Animal Life Cycle}{3}{subsection.1.1}%
+\contentsline {section}{\numberline {II.}Herd-level Processes and Management}{4}{section.2}%
+\contentsline {subsection}{\numberline {A.}Herd Initialization}{4}{subsection.2.1}%
+\contentsline {paragraph}{Introduction}{4}{subsection.2.1}%
+\contentsline {paragraph}{Methodology}{8}{table.3}%
+\contentsline {subsection}{\numberline {B.}Pens and Animal Grouping}{9}{subsection.2.2}%
+\contentsline {paragraph}{Introduction}{9}{subsection.2.2}%
+\contentsline {paragraph}{Methodology}{11}{table.5}%
+\contentsline {paragraph}{Remove\_animals\_by\_ids}{11}{table.caption.2}%
+\contentsline {paragraph}{\_add\_new\_animals}{12}{table.caption.2}%
+\contentsline {paragraph}{Set\_animal\_nutritional\_requirements}{12}{table.caption.2}%
+\contentsline {subsection}{\numberline {C.}Ration Formulation}{12}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {a.}Energy and Nutrition Requirements}{12}{subsubsection.2.3.1}%
+\contentsline {paragraph}{NRC: Calculating Nutrient Requirements of Dairy Cattle}{12}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {b.}Nutrient Requirements of Dairy Cattle (NRC)}{13}{subsubsection.2.3.2}%
+\contentsline {paragraph}{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}{22}{table.9}%
+\contentsline {paragraph}{NASEM: Calculating Amino Acid Requirements}{33}{table.12}%
+\contentsline {subsubsection}{\numberline {c.}Energy and Nutrition Supply }{37}{subsubsection.2.3.3}%
+\contentsline {paragraph}{Nutrient Supply}{37}{subsubsection.2.3.3}%
+\contentsline {paragraph}{Energy Supply - NRC 2001}{37}{subsubsection.2.3.3}%
+\contentsline {paragraph}{Energy Supply - NASEM 2021}{39}{table.15}%
+\contentsline {paragraph}{AA Nutrient Supply}{45}{table.18}%
+\contentsline {subsubsection}{\numberline {d.}Automated Ration Formulation}{47}{subsubsection.2.3.4}%
+\contentsline {paragraph}{Introduction}{47}{subsubsection.2.3.4}%
+\contentsline {paragraph}{Methodology}{49}{table.20}%
+\contentsline {subsubsection}{\numberline {e.}User-defined ration formulation}{50}{subsubsection.2.3.5}%
+\contentsline {paragraph}{Introduction}{50}{subsubsection.2.3.5}%
+\contentsline {paragraph}{Methodology}{50}{table.22}%
+\contentsline {subsection}{\numberline {D.}Herd Size Management}{51}{subsection.2.4}%
+\contentsline {section}{\numberline {III.}Animal-level Processes and Management}{53}{section.3}%
+\contentsline {paragraph}{Flow of information}{53}{section.3}%
+\contentsline {subsection}{\numberline {A.}RuFaS Bodyweight and Growth}{54}{subsection.3.1}%
+\contentsline {paragraph}{Introduction}{54}{subsection.3.1}%
+\contentsline {paragraph}{Methodology}{55}{table.23}%
+\contentsline {paragraph}{Parity 1 Animals:}{57}{table.23}%
+\contentsline {paragraph}{Parity 2 Animals}{57}{table.23}%
+\contentsline {subsection}{\numberline {B.}Animal Reproduction}{59}{subsection.3.2}%
+\contentsline {paragraph}{Introduction}{59}{subsection.3.2}%
+\contentsline {paragraph}{Methodology}{64}{table.caption.6}%
+\contentsline {subsection}{\numberline {C.}Milk Production}{71}{subsection.3.3}%
+\contentsline {paragraph}{Introduction}{71}{subsection.3.3}%
+\contentsline {paragraph}{Methodology}{75}{table.30}%
+\contentsline {subsection}{\numberline {D.}Lactation Curve: Parameters and Definitions}{79}{subsection.3.4}%
+\contentsline {paragraph}{Introduction}{79}{subsection.3.4}%
+\contentsline {paragraph}{Methodology}{84}{table.36}%
+\contentsline {subsection}{\numberline {E.}Culling}{86}{subsection.3.5}%
+\contentsline {paragraph}{Introduction}{86}{subsection.3.5}%
+\contentsline {paragraph}{Methodology}{90}{table.37}%
+\contentsline {section}{\numberline {IV.}Methane Emission and Manure Excretion}{95}{section.4}%
+\contentsline {subsection}{\numberline {A.}Manure Excretion}{95}{subsection.4.1}%
+\contentsline {paragraph}{Introduction}{95}{subsection.4.1}%
+\contentsline {paragraph}{Methodology}{98}{table.42}%
+\contentsline {paragraph}{Manure excretions}{98}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{99}{table.42}%
+\contentsline {paragraph}{Manure excretions}{100}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{101}{table.42}%
+\contentsline {paragraph}{Manure excretions}{102}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{103}{table.42}%
+\contentsline {paragraph}{Manure excretions}{104}{table.42}%
+\contentsline {subsection}{\numberline {B.}Enteric Methane Emission}{107}{subsection.4.2}%
+\contentsline {paragraph}{Introduction}{107}{subsection.4.2}%
+\contentsline {paragraph}{Methodology}{108}{table.46}%
+\contentsline {paragraph}{Mutian Model}{109}{table.46}%
+\contentsline {paragraph}{Mills Model}{109}{table.46}%
+\contentsline {paragraph}{IPCC Model}{110}{table.46}%
+\contentsline {paragraph}{Mills Model}{110}{table.46}%
+\contentsline {paragraph}{IPCC Model}{110}{table.46}%
+\contentsline {subsection}{\numberline {C.}Enteric Methane Mitigation}{110}{subsection.4.3}%
+\contentsline {paragraph}{Introduction}{110}{subsection.4.3}%
+\contentsline {paragraph}{Methodology}{111}{table.50}%
+\contentsline {section}{\numberline {V.}References}{113}{section.5}%

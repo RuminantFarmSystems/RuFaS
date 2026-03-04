@@ -1,0 +1,134 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{1}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{muck2013recent}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9e97a7f449e0e5f7a53683f931d75eaa}{%
+           family={Muck},
+           familyi={M\bibinitperiod},
+           given={R.\bibnamedelimi E.},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \strng{fullhash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \strng{bibnamehash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \strng{authorbibnamehash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \strng{authornamehash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \strng{authorfullhash}{9e97a7f449e0e5f7a53683f931d75eaa}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Agricultural and Food Science}
+      \field{number}{1}
+      \field{title}{Recent advances in silage microbiology}
+      \field{volume}{22}
+      \field{year}{2013}
+      \field{pages}{3\bibrangedash 15}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.23986/afsci.6718
+      \endverb
+    \endentry
+    \entry{pahlow2003microbiology}{incollection}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=55ccb6b3d25b0dc8a39facddef733aa2}{%
+           family={Pahlow},
+           familyi={P\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9e97a7f449e0e5f7a53683f931d75eaa}{%
+           family={Muck},
+           familyi={M\bibinitperiod},
+           given={R.\bibnamedelimi E.},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8a2b5f8eb8a04b72d936b6df23f58640}{%
+           family={Driehuis},
+           familyi={D\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d219836673a2a246507dc98b306fbafe}{%
+           family={Elferink},
+           familyi={E\bibinitperiod},
+           given={S.\bibnamedelimi J.\bibnamedelimi W.\bibnamedelimi H.\bibnamedelimi O.},
+           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim W\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim O\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=2691120a7fa7c9f82d90514c43becc80}{%
+           family={Spoelstra},
+           familyi={S\bibinitperiod},
+           given={S.\bibnamedelimi F.},
+           giveni={S\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{3}{}{%
+        {{hash=930dba14b4ea9e4b417625e32e85f253}{%
+           family={Buxton},
+           familyi={B\bibinitperiod},
+           given={D.\bibnamedelimi R.},
+           giveni={D\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=9e97a7f449e0e5f7a53683f931d75eaa}{%
+           family={Muck},
+           familyi={M\bibinitperiod},
+           given={R.\bibnamedelimi E.},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=3652238b76c188a78672234a35db998e}{%
+           family={Harrison},
+           familyi={H\bibinitperiod},
+           given={J.\bibnamedelimi H.},
+           giveni={J\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Madison}%
+      }
+      \list{publisher}{1}{%
+        {American Society of Agronomy, Inc.}%
+      }
+      \strng{namehash}{88fe406b9e717229845ca2c859347726}
+      \strng{fullhash}{02f4f473c812bbcbbc837bd1e5535856}
+      \strng{bibnamehash}{88fe406b9e717229845ca2c859347726}
+      \strng{authorbibnamehash}{88fe406b9e717229845ca2c859347726}
+      \strng{authornamehash}{88fe406b9e717229845ca2c859347726}
+      \strng{authorfullhash}{02f4f473c812bbcbbc837bd1e5535856}
+      \strng{editorbibnamehash}{fe29230a50af8000d70e73de0812edbc}
+      \strng{editornamehash}{fe29230a50af8000d70e73de0812edbc}
+      \strng{editorfullhash}{fe29230a50af8000d70e73de0812edbc}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Silage Science and Technology}
+      \field{title}{Microbiology of ensiling}
+      \field{year}{2003}
+      \field{pages}{31\bibrangedash 93}
+      \range{pages}{63}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
