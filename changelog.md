@@ -282,7 +282,6 @@ v0.9.2
 - [2655](https://github.com/RuminantFarmSystems/RuFaS/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 - [2670](https://github.com/RuminantFarmSystems/RuFaS/pull/2670) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated Animal module unit testing to 100% coverage.
 - [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
-
 - [2675](https://github.com/RuminantFarmSystems/RuFaS/pull/2675) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Fixes and clarifies data fixing error messaging for IM.
 - [2674](https://github.com/RuminantFarmSystems/RuFaS/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
 - [2678](https://github.com/RuminantFarmSystems/RuFaS/pull/2678) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
@@ -304,10 +303,8 @@ v0.9.2
 - [2732](https://github.com/RuminantFarmSystems/RuFaS/pull/2732) - [minor change] [NoInputChange] [NoOutputChange] Skip Animal module and Manure module if no animals are present in simulation.
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
 - [2763](https://github.com/RuminantFarmSystems/RuFaS/pull/2763) - [minor change] [NoInputChange] [NoOutputChange] Fixes feed order issue by sorting user feed inputs.
-
 - [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
 ### v0.9.2
-
 - [1968](https://github.com/RuminantFarmSystems/RuFaS/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
 - [1976](https://github.com/RuminantFarmSystems/RuFaS/pull/1976) - [minor change] [EEE] Add unit tests for the Emission module.
 - [1977](https://github.com/RuminantFarmSystems/RuFaS/pull/1977) - [minor change] [EEE] Improve emission.py codebase and clarity.
