@@ -152,7 +152,7 @@ class AnimalRequirements:
             List of essential amino acid requirements (g).
         """
 
-        attr_names_to_args_map: Dict[str, List[float | EssentialAminoAcidRequirements]] = {
+        attr_names_to_args_map: Dict[str, list[float] | list[EssentialAminoAcidRequirements]] = {
             "NEmaint_requirement": NEmaint_requirement_list,
             "NEa_requirement": NEa_requirement_list,
             "NEg_requirement": NEg_requirement_list,
@@ -186,7 +186,8 @@ class AnimalRequirements:
                     attribute_name,
                     EssentialAminoAcidRequirements(
                         histidine=calc_method_to_function_map[calc_method](
-                            [eaa_req.histidine for eaa_req in arg], *stats_args
+                            [eaa_req.histidine for eaa_req in arg if isinstance(
+                                eaa_req, EssentialAminoAcidRequirements)], *stats_args
                         ),
                         isoleucine=calc_method_to_function_map[calc_method](
                             [eaa_req.isoleucine for eaa_req in arg], *stats_args
