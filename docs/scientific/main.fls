@@ -469,13 +469,6 @@ OUTPUT animal.aux
 INPUT .\animal.tex
 INPUT .\animal.tex
 INPUT animal.tex
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
-INPUT .\resources\animal1.png
 INPUT .\resources\rufas.png
 INPUT .\resources\rufas.png
 INPUT .\resources\rufas.png
@@ -493,6 +486,9 @@ INPUT .\resources\rufas.png
 INPUT .\resources\rufas.png
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0700.tfm
 OUTPUT main.lot
+INPUT .\resources\animal1.png
+INPUT .\resources\animal1.png
+INPUT .\resources\animal1.png
 INPUT .\resources\animal1.png
 INPUT .\resources\animal1.png
 INPUT .\resources\animal1.png
