@@ -640,7 +640,7 @@ class HerdManager:
                 str(pen.id),
                 pen.animal_combination.name,
                 len(pen.animals_in_pen),
-                simulation_day,
+                simulation_day
             )
 
             current_pen_ration = pen.total_pen_ration
