@@ -1,28 +1,3 @@
-
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Crop and Soil Module\par}
-  \vspace{1cm}
-
-  {\Large RuFaS Scientific Documentation\par}
-  \vspace{1cm}
-
-  \includegraphics[width=0.5\textwidth]{resources/crop.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1\par}
-  \vspace*{1cm}
-
-\newpage
-
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
-
 \part{Soil and Crop Module}
 
 % Global Table of Contents
@@ -43,8 +18,11 @@
 
 
 \section{Module Introduction}
+\par\noindent\justifying
+
 The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability, weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily biogeochemical processes and direct simulation of the user-provided management practices including application of manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed Storage Module.
 \vspace{0.2cm}
+
 
 \section{Field Management}
 \subsection{Introduction}
@@ -4262,7 +4240,7 @@ The maximum potential water evaporation and transpiration from the crop, however
 \paragraph{Crop Evaporation}
 \vspace{-0.25cm}
 
-The maximum potential crop canopy evaporation and transpiration are calculated as a function of the total potential evapotranspiration for the field on that day (see the \colorbox{red}{Soil documentation}). 
+The maximum potential crop canopy evaporation and transpiration are calculated as a function of the total potential evapotranspiration for the field on that day (see the Soil documentation). 
 
 After the total potential evapotranspiration (mm H\textsubscript{2}O) is calculated in the Field class, evaporation from the crop canopy is estimated as: 
 

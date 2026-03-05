@@ -1,3 +1,4 @@
+\babel@toc {english}{}\relax 
 \contentsline {table}{\numberline {1}{\ignorespaces Overview of the distinct phases by which animals are created and introduced to the herd.}}{7}{table.1}%
 \contentsline {table}{\numberline {2}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section}}{8}{table.2}%
 \contentsline {table}{\numberline {3}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.}}{8}{table.3}%
@@ -17,7 +18,7 @@
 \contentsline {table}{\numberline {18}{\ignorespaces Key variables used in calculation of AA.}}{46}{table.18}%
 \contentsline {table}{\numberline {19}{\ignorespaces Key inputs found in the animal input file.}}{50}{table.19}%
 \contentsline {table}{\numberline {20}{\ignorespaces Key inputs found in the feed input file.}}{50}{table.20}%
-\contentsline {table}{\numberline {21}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{52}{table.21}%
+\contentsline {table}{\numberline {21}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{51}{table.21}%
 \contentsline {table}{\numberline {22}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{52}{table.22}%
 \contentsline {table}{\numberline {23}{\ignorespaces Below is a summary of the user inputs that are available and their definitions.}}{57}{table.23}%
 \contentsline {table}{\numberline {24}{\ignorespaces Below are the key user inputs that determine the \textbf {heifer reproductive breeding program} and impact reproductive efficiency and age at first calving.}}{63}{table.caption.5}%
@@ -45,4 +46,3 @@
 \contentsline {table}{\numberline {48}{\ignorespaces Feed-based methane mitigation strategies.}}{113}{table.48}%
 \contentsline {table}{\numberline {49}{\ignorespaces Dosage of methane mitigation additives.}}{114}{table.49}%
 \contentsline {table}{\numberline {50}{\ignorespaces Expected outputs from this section.}}{114}{table.50}%
-\babel@toc {english}{}\relax 

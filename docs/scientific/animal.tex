@@ -1,34 +1,3 @@
-
-
-
-% Custom Title Page
-
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Animal Module\par}
-  \vspace{1cm}
-
-  {\Large RuFaS Scientific Documentation\par}
-  \vspace{1cm}
-
-  \includegraphics[width=0.5\textwidth]{resources/animal1.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1\par}
-  \vspace*{1cm}
-\newpage
-
-
-\newpage
-
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
-
 \part{Animal Module}
 
 \etocsettocstyle{\subsection*{Contents}}{} % title of the module ToC
@@ -45,6 +14,7 @@
 
 \section{Module Introduction}
 \begin{refsection}
+    \par\noindent\justifying
   The Animal Module simulates individual animals on a daily basis throughout each stage of life from birth until removal from the herd. In addition to the dynamic Monte-Carlo models that determine the occurrence of events throughout each animal’s life, the Animal Module uses process-based, dynamic models to simulate the following processes:
 
 \begin{figure}[H]
@@ -66,9 +36,11 @@
   \end{itemize}
 \end{minipage}
 \end{figure}
+\par\noindent\justifying
+
 Animals in the RuFaS model are divided into 5 life stages and a culling stage that were established based on the different management and physiological processes that need to be simulated for each class. The 5 classes and culling stage are described in more detail later in this document, but include: calves, heifers I, heifers II, heifers III, cow, and culled. 
 
-The attributes that define the animal characteristics and management are provided by the user and are comprehensively described in \colorbox{red}{inputs section} of this module. When a simulation begins, the herd is populated by a semi-random draw of animals from a large, existing set of animal objects. This process and the process for regenerating the population of animals used to initialize the herd are described in detail in the \colorbox{red}{Herd Initialization Section}. The initially selected animal objects are then grouped into pens based on their life stage and the user-provided pen information. Once the herd has been set up, a regular progression of functions is called each day to simulate and report outputs of the processes required to manage the herd and the processes that define each animal’s development and production. These daily updates are grouped into two classes in the RuFaS model: herd level daily routines (HerdManager) and animal level daily routines (AnimalManager). At the start of each day, the Herd-level daily update cycles through all the animals to call their daily update functions. Then based on the changes for each animal that resulted from the animal level daily updates, the HerdManager changes the animal life-stages, moves them to new pens, and removes them from the herd. If the herd size has decreased too much, the HerdManager will purchase new Heifer III animals to maintain the adult herd size. The HerdManager then checks if it is time to formulate a new diet (at a user-specified interval), summarizes and reports the herd statistics, and gathers and reports all of the manure excreted by the animals to pass to the Manure Module. 
+The attributes that define the animal characteristics and management are provided by the user and are comprehensively described in the inputs section of this module. When a simulation begins, the herd is populated by a semi-random draw of animals from a large, existing set of animal objects. This process and the process for regenerating the population of animals used to initialize the herd are described in detail in the \hyperref{herdinit}{Herd Initialization Section}. The initially selected animal objects are then grouped into pens based on their life stage and the user-provided pen information. Once the herd has been set up, a regular progression of functions is called each day to simulate and report outputs of the processes required to manage the herd and the processes that define each animal’s development and production. These daily updates are grouped into two classes in the RuFaS model: herd level daily routines (HerdManager) and animal level daily routines (AnimalManager). At the start of each day, the Herd-level daily update cycles through all the animals to call their daily update functions. Then based on the changes for each animal that resulted from the animal level daily updates, the HerdManager changes the animal life-stages, moves them to new pens, and removes them from the herd. If the herd size has decreased too much, the HerdManager will purchase new Heifer III animals to maintain the adult herd size. The HerdManager then checks if it is time to formulate a new diet (at a user-specified interval), summarizes and reports the herd statistics, and gathers and reports all of the manure excreted by the animals to pass to the Manure Module. 
 
 Daily outputs from the Animal module are provided at a variety of scales and time steps that range from reports at the individual animal level (e.g. animal event histories), animal class level (e.g. average dry-matter intake for Heifer II’s), at the pen level (e.g. average net energy requirement or intake for Pen 3), and at the herd level (i.e. number of animals sold each day). A complete list of potential outputs from the Animal Module is provided in this document.
 \vspace{1cm}
@@ -100,8 +72,10 @@ When a HeiferIII or Cow reaches full gestation length, they start lactating and 
 
 
 \section{Herd-level Processes and Management}
-     
-\subsection{Herd Initialization} 
+\vspace{0.5cm}
+
+\subsection{Herd Initialization} \label{herdinit}
+\vspace{0.5cm}
 
 \begin{tcolorbox}[colback=white, colframe=black, title=Important Note]
 \textit{In RuFaS code, the term “herd initialization” is used to refer to both the process of generating an animal population file and of selecting from that population to create a specific herd at the start of a simulation. In this doc, those two processes will be differentiated by calling them “Generation” and “Selection”, respectively. }
@@ -493,7 +467,7 @@ Where appropriate, requirement calculations are differentiated by animal age and
 
 \subsubsection{Nutrient Requirements of Dairy Cattle (NRC)} 
 
-    \textbf{ Energy Requirements} For details about the variables included in each calculation, please refer to the \colorbox{red}{energy requirements key.}
+    \textbf{ Energy Requirements} For details about the variables included in each calculation, please refer to the energy requirements key.
     \vspace{0.2cm}
     
     \begin{itemize}
@@ -780,7 +754,7 @@ Where appropriate, requirement calculations are differentiated by animal age and
     \end{itemize}
 
     
-    \textbf{ Protein Requirements} Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the \colorbox{red}{protein requirements key}.
+    \textbf{ Protein Requirements} Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
     \vspace{0.2cm}
 
     \begin{itemize}
@@ -934,7 +908,7 @@ NPg & Net protein requirement for growth  & g \\
 
     \textbf{ Mineral Requirements} 
     \begin{tcolorbox}[colback=white, colframe=black, title=Important Note]
-        Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the \colorbox{red}{mineral requirements key}.
+        Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the mineral requirements key.
     \end{tcolorbox}
 
     \begin{itemize}
@@ -1223,7 +1197,7 @@ WOL        & Week of lactation & Units are the integer part of days \(\frac{DIM}
 \paragraph{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition} 
 
     \textbf{ Energy Requirements} 
-    The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the \colorbox{red}{energy requirements key}.
+    The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the energy requirements key.
     \vspace{0.2cm}
 
 \begin{itemize}
@@ -1461,7 +1435,7 @@ If true protein, (TP\_Milk) is measured, its energy content is adjusted to accou
     Each physiological function is quantified in terms of TP (true protein), instead of CP (crude protein).
     \vspace{0.2cm}
     
-    To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the \colorbox{red}{protein requirements key}.
+    To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the protein requirements key.
     \vspace{0.5cm}
 
 \begin{itemize}
@@ -1688,7 +1662,7 @@ TargetEffMP and TargetEffAA &  Proposed target efficiencies of converting metabo
 \vspace{0.5cm}
 
 
-\textbf{ Mineral Requirements} Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the \colorbox{red}{mineral requirements key}.
+\textbf{ Mineral Requirements} Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the mineral requirements key.
     \vspace{0.5cm}
 
 \begin{itemize}
@@ -1864,7 +1838,7 @@ P\_preg & Phosphorus requirement for pregnancy & g \\
     \end{longtable}
 \vspace{0.5cm}
 
-\textbf{ Dry Matter Intake Estimation} Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the \colorbox{red}{DMI estimation key}.
+\textbf{ Dry Matter Intake Estimation} Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the DMI estimation key.
     \vspace{0.5cm}
                 
 \begin{center}
@@ -3166,7 +3140,7 @@ milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary 
 \paragraph{Methodology}
 The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the user\_defined\_ration\_percentage values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
 
-The ration formulation will proceed as described in the \colorbox{red}{Automated Methodology} above, but when formulation fails, different outcomes will occur.
+The ration formulation will proceed as described in the Automated Methodology above, but when formulation fails, different outcomes will occur.
 
 
 \textit{For lactating cow pens}
@@ -3335,21 +3309,6 @@ Details of this method are described in the Culling section of Animal-level proc
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \section{Animal-level Processes and Management}
 The methods in the RuFaS model that simulate individual animals’ life events and the effects of herd management on individual animals are referred to as the Animal Life Cycle Sub-module. This part of the model is driven by a Monte Carlo stochastic process that simulates the growth, production, reproduction, and culling of individual dairy cattle animals and shares aggregated outcomes with the Herd Management Sub-Module to manage herd dynamics on a daily basis.
 
@@ -3365,7 +3324,7 @@ The life cycle module represents the variation in animal performance through the
 
 \paragraph{Flow of information}
 
-For each animal object, the daily updates are called according to the order described in the \colorbox{red}{Day in the Life for Animal} on a RuFaS Farm. This is:
+For each animal object, the daily updates are called according to the order described in the \hyperref{rufasday}{Day in the Life for Animal} on a RuFaS Farm. This is:
 \setlength{\parskip}{1em}
 
 \setlength{\parindent}{0pt} DigestiveSystem $\rightarrow$ NutrientInputs $\rightarrow$ MilkProduction $\rightarrow$ BodyweightChange $\rightarrow$ Reproduction $\rightarrow$ LifeStage Change $\rightarrow$ Parturition
@@ -3954,7 +3913,7 @@ open\_cow &  Handles open status updates for cows, reassigning protocols or mark
     \paragraph{Introduction} This section describes how RuFaS determines the amount of milk and milk components produced by a particular cow on a particular day. 
     \vspace{0.25cm}
     
-    Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the \colorbox{red}{Lactation Curve } section). At the beginning of each new lactation, each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
+    Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the Lactation Curve section). At the beginning of each new lactation, each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     \vspace{0.25cm}
     
     When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. Each day, each cow’s milk production is calculated and recorded. Milk production is calculated from the Wood’s curve equation using the given lactation curve parameters and days in milk, and then adjusted by applying random variation and any milk reduction required by other parts of the model. Milk components (protein, fat, and lactose) are calculated based on milk production and percent of each component for each cow. 
@@ -4184,7 +4143,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
          \textit{Parameters and Equations}
          \vspace{0.1cm}
 
-         These are comprehensively outlines in the \colorbox{red}{Lactation Curve Parameters Determination} Section.
+         These are comprehensively outlines in the Lactation Curve Parameters Determination Section.
         \vspace{0.1cm}
         
          LactationCurve.set\_lactation\_parameters() is called by:
@@ -4387,7 +4346,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
 
 
         \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-            For more information, refer to the \colorbox{red}{Reproduction} section of this document.
+            For more information, refer to the Reproduction section of this document.
         \end{tcolorbox}
         \vspace{0.2cm}
     
@@ -4395,7 +4354,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
     \vspace{0.2cm}
             
         \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-            For more details on milk changes and reductions, go to the \colorbox{red}{Milk Production and Reduction} portion of this section. . 
+            For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section. . 
         \end{tcolorbox}
     
    
@@ -4406,7 +4365,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
  
     \paragraph{Introduction} The Lactation Curve Parameter Determination module calculates and adjusts Wood’s lactation curve parameters (l, m, n) based on farm-specific attributes such as geographic location, management practices, and production levels. These parameters shape the milk production curve for cows across different parities (1st, 2nd, 3rd + lactations).
     
-    This module is part of the Animal Module and integrates with the \colorbox{red}{Milk Production} calculations. The outputs influence various downstream models, including nutrient requirements, manure excretion, and greenhouse gas emission calculations.
+    This module is part of the Animal Module and integrates with the Milk Production calculations. The outputs influence various downstream models, including nutrient requirements, manure excretion, and greenhouse gas emission calculations.
     
     The primary class in this module is:
     
@@ -4749,7 +4708,7 @@ n & Unitless & Farm-specific rate of milk yield decline after peak lactation by 
     \end{enumerate}
 
         
-    Equations below are not in the LactationCurve class, but they are useful to understanding the bigger picture of how lactation curve parameter estimates are generated in RuFaS. Please see the \colorbox{red}{Milk Production} section for more details on these equations \parencite{Wood1967}.
+    Equations below are not in the LactationCurve class, but they are useful to understanding the bigger picture of how lactation curve parameter estimates are generated in RuFaS. Please see the Milk Production section for more details on these equations \parencite{Wood1967}.
     \vspace{0.5cm}
 
     \textbf{Wood's Lactation Curve}
@@ -5148,9 +5107,9 @@ If a cow is not pregnant when she reaches the days in milk cutoff specified by t
 
     The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are drawn from pen ration files and animal module constants. They are organized into the following groups:
     \begin{enumerate}
-        \item  \colorbox{red}{General Animal Inputs}
-        \item \colorbox{red}{Cow Specific Inputs} 
-        \item \colorbox{red}{Phosphorus Specific Inputs}
+        \item  General Animal Inputs
+        \item Cow Specific Inputs
+        \item Phosphorus Specific Inputs
     \end{enumerate}
 
 

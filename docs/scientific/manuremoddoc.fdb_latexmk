@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber manuremoddoc"] 1772660324.47158 "manuremoddoc.bcf" "manuremoddoc.bbl" "manuremoddoc" 1772660346.69822 0
-  "manuremoddoc.bcf" 1772660345 112612 b8a1d99bc249c8ada58fb65f4341bbe0 "pdflatex"
+["biber manuremoddoc"] 1772660324.47158 "manuremoddoc.bcf" "manuremoddoc.bbl" "manuremoddoc" 1772717093.40978 0
+  "manuremoddoc.bcf" 1772717092 112612 b8a1d99bc249c8ada58fb65f4341bbe0 "pdflatex"
   "resources/animal.bib" 1772218264 19843 003ce6dc3163a9c1fd885dbc082d404e ""
   (generated)
   "manuremoddoc.bbl"
   "manuremoddoc.blg"
   (rewritten before read)
-["pdflatex"] 1772660340.63603 "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/manuremoddoc.tex" "manuremoddoc.pdf" "manuremoddoc" 1772660346.6995 0
+["pdflatex"] 1772717087.05468 "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/manuremoddoc.tex" "manuremoddoc.pdf" "manuremoddoc" 1772717093.4111 0
   "C:/Program Files/MiKTeX/tex/latex/listings/lstpatch.sty" 1763898348 353 9024412f43e92cd5b21fe9ded82d0610 ""
   "C:/Users/gmg228/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1772637374 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/gmg228/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbi1000.pk" 1772637453 34112 54862e108df8d433db242fb093842b53 ""
@@ -261,18 +261,18 @@
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/xurl/xurl.sty" 1641733940 4675 e4b8c405820368c2dfb03526e16d725a ""
-  "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/manuremoddoc.tex" 1772660316 101 b7964501d428b9cc65974e02cd4074ed ""
-  "manure.aux" 1772660345 20179 2d2125282b3faffca602803e24be780a "pdflatex"
-  "manure.tex" 1772660288 276934 9ffc42932df53b9029b72b9e6026085d ""
-  "manuremoddoc.aux" 1772660345 8232 e6bc39d7e369526adaa9cf9cb0cb05fd "pdflatex"
+  "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/manuremoddoc.tex" 1772717065 573 418c4ca91994a644ca01548d139c151b ""
+  "manure.aux" 1772717092 20179 308d0ff93e11ac823e193a06399e7408 "pdflatex"
+  "manure.tex" 1772716700 276431 c248edd306a109824903b0feb1790817 ""
+  "manuremoddoc.aux" 1772717092 8232 4c39b535e3e92440a0f2153bc3ed1335 "pdflatex"
   "manuremoddoc.bbl" 1772660327 45213 de37dd2190e53ac708d9b71c9ed40334 "biber manuremoddoc"
-  "manuremoddoc.lof" 1772660345 848 3ad039590130d659932593c56ab8ecef "pdflatex"
-  "manuremoddoc.lot" 1772660345 5347 ee1561cbf6e8aca2be7d13084c8d5cdd "pdflatex"
-  "manuremoddoc.out" 1772660345 8274 e7781f20c96eeed11e9048d0a742ce57 "pdflatex"
-  "manuremoddoc.run.xml" 1772660345 2407 23920ab80983b02da4c4c9e771b584a4 "pdflatex"
-  "manuremoddoc.tex" 1772660316 101 b7964501d428b9cc65974e02cd4074ed ""
-  "manuremoddoc.toc" 1772660345 4627 bd7f13da8c90011e9bbed914b211b335 "pdflatex"
-  "preamble.tex" 1772659241 4366 f8a3a7fb9fd9f2834522a97f2f489a0d ""
+  "manuremoddoc.lof" 1772717092 848 573ff34be1f8de7ef2f79d7658eed343 "pdflatex"
+  "manuremoddoc.lot" 1772717092 5347 8d6e9b62919d9b496e9598cf10823df5 "pdflatex"
+  "manuremoddoc.out" 1772717092 8274 e7781f20c96eeed11e9048d0a742ce57 "pdflatex"
+  "manuremoddoc.run.xml" 1772717092 2407 23920ab80983b02da4c4c9e771b584a4 "pdflatex"
+  "manuremoddoc.tex" 1772717065 573 418c4ca91994a644ca01548d139c151b ""
+  "manuremoddoc.toc" 1772717092 4627 acc81305b2ef1b207fb99dfd2f0276f5 "pdflatex"
+  "preamble.tex" 1772715085 4441 832c8b27715f30da4b08e57d0d5858fb ""
   "resources/manure.png" 1772562329 161792 278319aec5a23015e09842644617994b ""
   "resources/manuremanchain.png" 1772218264 105343 0f95ecbd6d83f1876f5f23fa7ce99a55 ""
   "resources/manurenutrreq.png" 1772460659 81042 63589818b3c96027461c587f4828589a ""

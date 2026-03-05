@@ -1,9 +1,11 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
 \contentsline {part}{I\hspace {1em}Animal Module}{2}{part.1}%
 \etoc@startlocaltoc {1}
 \contentsline {section}{\numberline {I.}Module Introduction}{5}{section.1}%
 \contentsline {subsection}{\numberline {A.}Animal Life Cycle}{6}{subsection.1.1}%
-\contentsline {section}{\numberline {II.}Herd-level Processes and Management}{6}{section.2}%
-\contentsline {subsection}{\numberline {A.}Herd Initialization}{6}{subsection.2.1}%
+\contentsline {section}{\numberline {II.}Herd-level Processes and Management}{7}{section.2}%
+\contentsline {subsection}{\numberline {A.}Herd Initialization}{7}{subsection.2.1}%
 \contentsline {paragraph}{Introduction}{7}{subsection.2.1}%
 \contentsline {paragraph}{Methodology}{10}{table.3}%
 \contentsline {subsection}{\numberline {B.}Pens and Animal Grouping}{11}{subsection.2.2}%
@@ -28,7 +30,7 @@
 \contentsline {paragraph}{Methodology}{51}{table.20}%
 \contentsline {subsubsection}{\numberline {e.}User-defined ration formulation}{52}{subsubsection.2.3.5}%
 \contentsline {paragraph}{Introduction}{52}{subsubsection.2.3.5}%
-\contentsline {paragraph}{Methodology}{53}{table.22}%
+\contentsline {paragraph}{Methodology}{52}{table.22}%
 \contentsline {subsection}{\numberline {D.}Herd Size Management}{53}{subsection.2.4}%
 \contentsline {section}{\numberline {III.}Animal-level Processes and Management}{55}{section.3}%
 \contentsline {paragraph}{Flow of information}{55}{section.3}%
@@ -72,5 +74,3 @@
 \contentsline {paragraph}{Introduction}{113}{subsection.4.3}%
 \contentsline {paragraph}{Methodology}{114}{table.50}%
 \contentsline {section}{\numberline {V.}References}{116}{section.5}%
-\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
-\babel@toc {english}{}\relax 

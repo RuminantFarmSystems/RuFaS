@@ -402,12 +402,6 @@ INPUT manuremoddoc.bbl
 INPUT .\manuremoddoc.toc
 INPUT .\manuremoddoc.toc
 INPUT manuremoddoc.toc
-INPUT .\manure.tex
-INPUT .\manure.tex
-OUTPUT manure.aux
-INPUT .\manure.tex
-INPUT .\manure.tex
-INPUT manure.tex
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm2488.tfm
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx2488.tfm
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1440.tfm
@@ -420,6 +414,12 @@ INPUT .\resources\manure.png
 INPUT .\resources\manure.png
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0900.tfm
 INPUT C:\Users\gmg228\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
+INPUT .\manure.tex
+INPUT .\manure.tex
+OUTPUT manure.aux
+INPUT .\manure.tex
+INPUT .\manure.tex
+INPUT manure.tex
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx1440.tfm
 INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx2074.tfm
 OUTPUT manuremoddoc.toc

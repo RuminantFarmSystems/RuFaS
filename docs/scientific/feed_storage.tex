@@ -1,29 +1,3 @@
-
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Feed Storage Module\par}
-  \vspace{1cm}
-
-  {\Large RuFaS Scientific Documentation\par}
-  \vspace{1cm}
-
-  {\large \today\par}
-  \vspace{1.5cm} % Add space before the image
-
-  \includegraphics[width=0.5\textwidth]{resources/feed.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1\par}
-  \vspace*{1cm}
-\newpage
-
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
 \part{Feed Storage Module}
 
 % Global Table of Contents
@@ -43,7 +17,7 @@
 
 \section{Module Introduction}
 \begin{refsection}
-The Feed Module’s primary purpose is to serve as an inventory of purchased and farm-grown feed. Feed is added via purchase (Animal Module) and from on-farm harvest (Crop and Soil Module). Feed is removed when it is fed out in the Animal Module. In addition, stored feed quantity and quality changes are simulated over the duration of storage depending on crop type, crop quality, user-specified storage conditions, and ambient climate conditions. The feed storage module currently accepts Corn (silage, dry/high-moisture grain), Alfalfa, Grass, Triticale/Cereal, and Soybean. Forage and/or feed quality can also be user-specified, offering flexibility and modularity of user needs. Feed component values, proportions, digestibility, and availability subject to change during storage are: mass, DM content, CP, NPN, nNDF, ADF,  starch, and WSC. These changes must be tracked to accurately reflect the remaining feed and its qualities. Overall stored feed quality is \colorbox{red}{assessed} prior to consumption in the \colorbox{red}{Animal Module}.
+The Feed Module’s primary purpose is to serve as an inventory of purchased and farm-grown feed. Feed is added via purchase (Animal Module) and from on-farm harvest (Crop and Soil Module). Feed is removed when it is fed out in the Animal Module. In addition, stored feed quantity and quality changes are simulated over the duration of storage depending on crop type, crop quality, user-specified storage conditions, and ambient climate conditions. The feed storage module currently accepts Corn (silage, dry/high-moisture grain), Alfalfa, Grass, Triticale/Cereal, and Soybean. Forage and/or feed quality can also be user-specified, offering flexibility and modularity of user needs. Feed component values, proportions, digestibility, and availability subject to change during storage are: mass, DM content, CP, NPN, nNDF, ADF,  starch, and WSC. These changes must be tracked to accurately reflect the remaining feed and its qualities. Overall stored feed quality is assessed prior to consumption in the Animal Module.
 
 \subsection{Feed Quality Assessment} colorbox
 This section allocates farm grown feeds to be used for single or multiple animal classes and is illustrated in Figure 1. Priority is to reserve high-quality forage for lactating cows. Feeds are generally categorized into grains or forages. If the feed is a grain then it is available to all animal classes. The model assumes that grains can be purchased to supplement farm grown grain inventory. 

@@ -2368,12 +2368,11 @@
     <bcf:datasource type="file" datatype="bibtex" glob="false">resources/animal.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="1">
-    <bcf:citekey order="1" intorder="1">reuven2017</bcf:citekey>
-    <bcf:citekey order="2" intorder="1">Li2022</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">nrc2021</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">nrc2001</bcf:citekey>
-    <bcf:citekey order="4" intorder="2">nrc2021</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">nrc2021</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">reuven2017</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">Li2022</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">nrc2021</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">nrc2001</bcf:citekey>
+    <bcf:citekey order="5" intorder="2">nrc2021</bcf:citekey>
     <bcf:citekey order="6" intorder="1">nrc2021</bcf:citekey>
     <bcf:citekey order="7" intorder="1">nrc2021</bcf:citekey>
     <bcf:citekey order="8" intorder="1">nrc2021</bcf:citekey>
@@ -2382,55 +2381,181 @@
     <bcf:citekey order="11" intorder="1">nrc2021</bcf:citekey>
     <bcf:citekey order="12" intorder="1">nrc2021</bcf:citekey>
     <bcf:citekey order="13" intorder="1">nrc2021</bcf:citekey>
-    <bcf:citekey order="14" intorder="1">nrc2001</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">nrc2021</bcf:citekey>
     <bcf:citekey order="15" intorder="1">nrc2001</bcf:citekey>
-    <bcf:citekey order="16" intorder="1">nrc2021</bcf:citekey>
-    <bcf:citekey order="17" intorder="1">nrc2001</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">nrc2021</bcf:citekey>
-    <bcf:citekey order="19" intorder="1">nrc2001</bcf:citekey>
-    <bcf:citekey order="20" intorder="1">Li2022</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">nrc2001</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">nrc2021</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">nrc2001</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">nrc2021</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">nrc2001</bcf:citekey>
     <bcf:citekey order="21" intorder="1">Li2022</bcf:citekey>
-    <bcf:citekey order="22" intorder="1">reuven2017</bcf:citekey>
-    <bcf:citekey order="23" intorder="1">Li2023</bcf:citekey>
-    <bcf:citekey order="24" intorder="1">nrc2001</bcf:citekey>
-    <bcf:citekey order="25" intorder="1">Korver1985</bcf:citekey>
-    <bcf:citekey order="26" intorder="1">Galvao2013</bcf:citekey>
-    <bcf:citekey order="27" intorder="1">dcrc_protocols</bcf:citekey>
-    <bcf:citekey order="28" intorder="1">devries2006</bcf:citekey>
-    <bcf:citekey order="29" intorder="1">kalantari2015using</bcf:citekey>
-    <bcf:citekey order="30" intorder="1">wiltbank2016</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">Li2022</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">reuven2017</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">Li2023</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">nrc2001</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">Korver1985</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">Galvao2013</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">dcrc_protocols</bcf:citekey>
+    <bcf:citekey order="29" intorder="1">devries2006</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">kalantari2015using</bcf:citekey>
     <bcf:citekey order="31" intorder="1">wiltbank2016</bcf:citekey>
-    <bcf:citekey order="32" intorder="1">Li2022</bcf:citekey>
+    <bcf:citekey order="32" intorder="1">wiltbank2016</bcf:citekey>
     <bcf:citekey order="33" intorder="1">Li2022</bcf:citekey>
     <bcf:citekey order="34" intorder="1">Li2022</bcf:citekey>
     <bcf:citekey order="35" intorder="1">Li2022</bcf:citekey>
-    <bcf:citekey order="36" intorder="1">Wood1967</bcf:citekey>
-    <bcf:citekey order="37" intorder="1">Hanson2024</bcf:citekey>
-    <bcf:citekey order="38" intorder="1" nocite="1">reed2015</bcf:citekey>
-    <bcf:citekey order="39" intorder="2" nocite="1">nennich2005</bcf:citekey>
-    <bcf:citekey order="40" intorder="3" nocite="1">asabe2005</bcf:citekey>
-    <bcf:citekey order="41" intorder="4" nocite="1">johnson2016</bcf:citekey>
-    <bcf:citekey order="42" intorder="5" nocite="1">appuhamy2014</bcf:citekey>
-    <bcf:citekey order="43" intorder="6" nocite="1">appuhamy2018</bcf:citekey>
-    <bcf:citekey order="44" intorder="7" nocite="1">vadas2007</bcf:citekey>
-    <bcf:citekey order="45" intorder="8">nrc2001</bcf:citekey>
-    <bcf:citekey order="46" intorder="9">nrc2021</bcf:citekey>
-    <bcf:citekey order="47" intorder="10" nocite="1">wilkerson1997prediction</bcf:citekey>
-    <bcf:citekey order="48" intorder="11" nocite="1">boadi2004</bcf:citekey>
-    <bcf:citekey order="49" intorder="12" nocite="1">deboer2002a</bcf:citekey>
-    <bcf:citekey order="50" intorder="13" nocite="1">monteny2002b</bcf:citekey>
-    <bcf:citekey order="51" intorder="1">IPCC2006</bcf:citekey>
-    <bcf:citekey order="52" intorder="1">Mills2003</bcf:citekey>
-    <bcf:citekey order="53" intorder="1">Niu2018</bcf:citekey>
-    <bcf:citekey order="54" intorder="1">Pattanaik2003</bcf:citekey>
+    <bcf:citekey order="36" intorder="1">Li2022</bcf:citekey>
+    <bcf:citekey order="37" intorder="1">Wood1967</bcf:citekey>
+    <bcf:citekey order="38" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="39" intorder="1" nocite="1">reed2015</bcf:citekey>
+    <bcf:citekey order="40" intorder="2" nocite="1">nennich2005</bcf:citekey>
+    <bcf:citekey order="41" intorder="3" nocite="1">asabe2005</bcf:citekey>
+    <bcf:citekey order="42" intorder="4" nocite="1">johnson2016</bcf:citekey>
+    <bcf:citekey order="43" intorder="5" nocite="1">appuhamy2014</bcf:citekey>
+    <bcf:citekey order="44" intorder="6" nocite="1">appuhamy2018</bcf:citekey>
+    <bcf:citekey order="45" intorder="7" nocite="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="46" intorder="8">nrc2001</bcf:citekey>
+    <bcf:citekey order="47" intorder="9">nrc2021</bcf:citekey>
+    <bcf:citekey order="48" intorder="10" nocite="1">wilkerson1997prediction</bcf:citekey>
+    <bcf:citekey order="49" intorder="11" nocite="1">boadi2004</bcf:citekey>
+    <bcf:citekey order="50" intorder="12" nocite="1">deboer2002a</bcf:citekey>
+    <bcf:citekey order="51" intorder="13" nocite="1">monteny2002b</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">IPCC2006</bcf:citekey>
+    <bcf:citekey order="53" intorder="1">Mills2003</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">Niu2018</bcf:citekey>
     <bcf:citekey order="55" intorder="1">Pattanaik2003</bcf:citekey>
-    <bcf:citekey order="56" intorder="14">Niu2018</bcf:citekey>
-    <bcf:citekey order="57" intorder="15">Niu2018</bcf:citekey>
-    <bcf:citekey order="58" intorder="1">Mills2003</bcf:citekey>
-    <bcf:citekey order="59" intorder="16">Niu2018</bcf:citekey>
-    <bcf:citekey order="60" intorder="1">Mills2003</bcf:citekey>
-    <bcf:citekey order="61" intorder="17">Niu2018</bcf:citekey>
-    <bcf:citekey order="62" intorder="14" nocite="1">Kebreab2023</bcf:citekey>
+    <bcf:citekey order="56" intorder="1">Pattanaik2003</bcf:citekey>
+    <bcf:citekey order="57" intorder="14">Niu2018</bcf:citekey>
+    <bcf:citekey order="58" intorder="15">Niu2018</bcf:citekey>
+    <bcf:citekey order="59" intorder="1">Mills2003</bcf:citekey>
+    <bcf:citekey order="60" intorder="16">Niu2018</bcf:citekey>
+    <bcf:citekey order="61" intorder="1">Mills2003</bcf:citekey>
+    <bcf:citekey order="62" intorder="17">Niu2018</bcf:citekey>
+    <bcf:citekey order="63" intorder="14" nocite="1">Kebreab2023</bcf:citekey>
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+  </bcf:section>
+  <!-- SECTION 2 -->
+  <bcf:bibdata section="2">
+    <bcf:datasource type="file" datatype="bibtex" glob="false">resources/animal.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="2">
+    <bcf:citekey order="1" intorder="1">gomez2010time</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">espejo2007herd</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">jewell2019prevalence</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">meyer2019contract</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">meyer2019contract</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">endres2007behavior</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">gomez2010time</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">Bucklin2009</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">Rotz2023</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">Chianese2009a</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">Rotz2006</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">Rotz2006</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">Hegg1981</bcf:citekey>
+    <bcf:citekey order="13" intorder="2">Mukhtar1999</bcf:citekey>
+    <bcf:citekey order="13" intorder="3">Varma2021</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">Jorgensen2009</bcf:citekey>
+    <bcf:citekey order="14" intorder="2">Fournel2019</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">Fernandez2015</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">AguirreVillegas2019</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">Sommer2004</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">Sommer2004</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">Elsgaard2016</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">Elsgaard2016</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">wallaceDMI</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">Rotz2006</bcf:citekey>
+    <bcf:citekey order="29" intorder="1">Rotz2023</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">IPCC2019</bcf:citekey>
+    <bcf:citekey order="31" intorder="1">IPCC2006</bcf:citekey>
+    <bcf:citekey order="32" intorder="1">NRCS2017</bcf:citekey>
+    <bcf:citekey order="33" intorder="1">Sommer2004</bcf:citekey>
+    <bcf:citekey order="34" intorder="1">Sommer2022</bcf:citekey>
+    <bcf:citekey order="35" intorder="1">Elsgaard2016</bcf:citekey>
+    <bcf:citekey order="36" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="37" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="38" intorder="1">Elsgaard2016</bcf:citekey>
+    <bcf:citekey order="39" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="40" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="41" intorder="1">Petersen2024</bcf:citekey>
+    <bcf:citekey order="42" intorder="1">Rotz2006</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">Rotz2023</bcf:citekey>
+    <bcf:citekey order="44" intorder="1">IPCC2019</bcf:citekey>
+    <bcf:citekey order="45" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">bonifacio2017a</bcf:citekey>
+    <bcf:citekey order="46" intorder="2">bonifacio2017b</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">larney2011</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="49" intorder="1">Rotz2023</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">IPCC2006</bcf:citekey>
+    <bcf:citekey order="51" intorder="1">bonifacio2017a</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">bonifacio2017b</bcf:citekey>
+    <bcf:citekey order="53" intorder="1">larney2011</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="55" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="56" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="57" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="58" intorder="1">bonifacio2017a</bcf:citekey>
+    <bcf:citekey order="59" intorder="1">bonifacio2017b</bcf:citekey>
+    <bcf:citekey order="60" intorder="1">larney2011</bcf:citekey>
+    <bcf:citekey order="61" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="62" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="63" intorder="1">Hanson2024</bcf:citekey>
+    <bcf:citekey order="64" intorder="1">Petersen2024</bcf:citekey>
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+    <bcf:citekey order="1" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">hargreaves1985</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">mu-extsoil</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">hayes2020vindication</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">vadas2007</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">parton1987analysis</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">fan2016root</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">fan2016root</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">fan2016root</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">fan2016root</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">fan2016root</bcf:citekey>
+  </bcf:section>
+  <!-- SECTION 3 -->
+  <bcf:bibdata section="3">
+    <bcf:datasource type="file" datatype="bibtex" glob="false">resources/animal.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="3">
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+  </bcf:section>
+  <!-- SECTION 4 -->
+  <bcf:bibdata section="4">
+    <bcf:datasource type="file" datatype="bibtex" glob="false">resources/animal.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="4">
+    <bcf:citekey order="1" intorder="1">pahlow2003microbiology</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">pahlow2003microbiology</bcf:citekey>
+    <bcf:citekey order="2" intorder="2">muck2013recent</bcf:citekey>
   </bcf:section>
   <!-- SECTION 0 (cont.) -->
   <bcf:section number="0">
@@ -2466,6 +2591,33 @@
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
   <bcf:datalist section="1"
+                name="nyt/global//global/global"
+                type="entry"
+                sortingtemplatename="nyt"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global">
+  </bcf:datalist>
+  <bcf:datalist section="2"
+                name="nyt/global//global/global"
+                type="entry"
+                sortingtemplatename="nyt"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global">
+  </bcf:datalist>
+  <bcf:datalist section="3"
+                name="nyt/global//global/global"
+                type="entry"
+                sortingtemplatename="nyt"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global">
+  </bcf:datalist>
+  <bcf:datalist section="4"
                 name="nyt/global//global/global"
                 type="entry"
                 sortingtemplatename="nyt"

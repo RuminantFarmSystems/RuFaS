@@ -113,23 +113,23 @@
 \renewcommand{\thesubsubsection}{\alph{subsubsection}.} % a, b, c...
 
 % --- Title Formats (in size order) ---
-\titleformat{\section}
-  {\Large\bfseries}   % Section: largest
-  {\thesection}       % Label
-  {1em}               % Spacing between label and title
-  {}                  % Before-code
+\titleformat{\section}[block]
+  {\Large\bfseries}
+  {\thesection}
+  {1em}
+  {\raggedright} % <- key: prevents justification/stretching
 
-\titleformat{\subsection}
+\titleformat{\subsection}[block]
   {\normalsize\bfseries}   % Subsection: medium
   {\thesubsection}
   {1em}
-  {}
+  {\raggedright} % <- key: prevents justification/stretching
 
-\titleformat{\subsubsection}
+\titleformat{\subsubsection}[block]
   {\normalsize\bfseries}  % Subsubsection: smallest
   {\thesubsubsection}
   {1em}
-  {}
+  {\raggedright} % <- key: prevents justification/stretching
 
 % --- Spacing for each level ---
 \titlespacing{\section}{0pt}{10pt plus 2pt minus 1pt}{5pt}

@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber animalmoddoc"] 1772660424.74475 "animalmoddoc.bcf" "animalmoddoc.bbl" "animalmoddoc" 1772660442.59513 0
-  "animalmoddoc.bcf" 1772660441 112259 a9526a3fa13d06622e8c4a1f0455c20c "pdflatex"
+["biber animalmoddoc"] 1772717054.0505 "animalmoddoc.bcf" "animalmoddoc.bbl" "animalmoddoc" 1772717406.16375 0
+  "animalmoddoc.bcf" 1772717404 112259 a9526a3fa13d06622e8c4a1f0455c20c "pdflatex"
   "resources/animal.bib" 1772218264 19843 003ce6dc3163a9c1fd885dbc082d404e ""
   (generated)
   "animalmoddoc.bbl"
   "animalmoddoc.blg"
   (rewritten before read)
-["pdflatex"] 1772660434.6769 "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/animalmoddoc.tex" "animalmoddoc.pdf" "animalmoddoc" 1772660442.59634 0
+["pdflatex"] 1772717399.12643 "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/animalmoddoc.tex" "animalmoddoc.pdf" "animalmoddoc" 1772717406.16528 0
   "C:/Program Files/MiKTeX/tex/latex/listings/lstpatch.sty" 1763898348 353 9024412f43e92cd5b21fe9ded82d0610 ""
   "C:/Users/gmg228/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1772637374 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/gmg228/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbi1000.pk" 1772637453 34112 54862e108df8d433db242fb093842b53 ""
@@ -270,18 +270,18 @@
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
   "C:/Users/gmg228/AppData/Local/Programs/MiKTeX/tex/latex/xurl/xurl.sty" 1641733940 4675 e4b8c405820368c2dfb03526e16d725a ""
-  "animal.aux" 1772660441 29563 c79600c5b83734598463e556cdb81908 "pdflatex"
-  "animal.tex" 1772660412 268282 c5eea39d0006ee759a5554d45e28e9e8 ""
-  "animalmoddoc.aux" 1772660441 7936 74297c04119b016c71129d848d6e8aa3 "pdflatex"
-  "animalmoddoc.bbl" 1772660428 58386 3dfad22d6024395a171e9fb63bf83d65 "biber animalmoddoc"
-  "animalmoddoc.lof" 1772660441 762 d05d64490a9ddee11e1530a701c845dc "pdflatex"
-  "animalmoddoc.lot" 1772660441 7971 62bd35ef92db1949b60a06e49d4d6ca3 "pdflatex"
-  "animalmoddoc.out" 1772660441 4493 549ea7cd37b333b963d30b88592a3938 "pdflatex"
-  "animalmoddoc.run.xml" 1772660441 2407 5735db26526a7c8c171c357b53dd5a9b "pdflatex"
-  "animalmoddoc.tex" 1772659740 101 640127b96da8e2fd6d328f0884a7804c ""
-  "animalmoddoc.toc" 1772660441 5508 18d69895034c09ec8ceea17e73fc107d "pdflatex"
-  "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/animalmoddoc.tex" 1772659740 101 640127b96da8e2fd6d328f0884a7804c ""
-  "preamble.tex" 1772659241 4366 f8a3a7fb9fd9f2834522a97f2f489a0d ""
+  "animal.aux" 1772717404 29631 32339cf1544816598f0c6e30c0905738 "pdflatex"
+  "animal.tex" 1772717382 267563 a961e722614fd72ee10ba738129a93f1 ""
+  "animalmoddoc.aux" 1772717404 7936 39d82fce85390a0d97505ebdeec80bf0 "pdflatex"
+  "animalmoddoc.bbl" 1772717058 58386 3dfad22d6024395a171e9fb63bf83d65 "biber animalmoddoc"
+  "animalmoddoc.lof" 1772717404 762 70e3e8189aea1fd46d0ecd29ce27154f "pdflatex"
+  "animalmoddoc.lot" 1772717404 7971 d931f40bdf84c5379303ae1f906272ca "pdflatex"
+  "animalmoddoc.out" 1772717404 4493 549ea7cd37b333b963d30b88592a3938 "pdflatex"
+  "animalmoddoc.run.xml" 1772717404 2407 5735db26526a7c8c171c357b53dd5a9b "pdflatex"
+  "animalmoddoc.tex" 1772717039 574 086e450d70a56906aa4eeebcce58437f ""
+  "animalmoddoc.toc" 1772717404 5508 cf9a760d04d3494c7d0dbffb80709f83 "pdflatex"
+  "c:/Users/gmg228/Documents/RuFaS/RuFaS/docs/scientific/animalmoddoc.tex" 1772717039 574 086e450d70a56906aa4eeebcce58437f ""
+  "preamble.tex" 1772715085 4441 832c8b27715f30da4b08e57d0d5858fb ""
   "resources/animal1.png" 1772562329 204760 63ad4e90063ffaed258c1eb7fc2a7889 ""
   "resources/animalgroups.png" 1772218264 99003 12ad61c91b0f8e47e62249e2fdb458b9 ""
   "resources/cowbreedmethod.png" 1772218264 249475 26a2153096ad61f7889191c615bffca3 ""

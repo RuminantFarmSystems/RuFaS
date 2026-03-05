@@ -1,27 +1,3 @@
-
-% Custom Title Page
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Manure Module\par}
-  \vspace{1cm}
-
-  {\Large RuFaS Scientific Documentation\par}
-  \vspace{1cm}
-
-  \includegraphics[width=0.5\textwidth]{resources/manure.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1\par}
-  \vspace*{1cm}
-
-\newpage
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
 \part{Manure Module}
 
 % Global Table of Contents
@@ -43,7 +19,7 @@
 
 \section{Module Introduction}
 \begin{refsection}
-    
+\par\noindent\justifying
 The responsibility of the manure module in RuFaS is to simulate the loss and/or gain of manure mass and nutrients on a daily timestep at each step of the manure management chain on a dairy farm. On the majority of farms, manure represents an important link in the cycling of nutrients through animals, land, crops, and back to animals. Therefore, modeling both greenhouse gas (GHG) emissions as well as non-GHG nutrient and losses is crucial in capturing nutrient flows through the whole-farm system. 
     
 The manure module accomplishes its responsibilities by tracking a critical, core set of variables called “ManureStream” variables, which include key agronomic nutrients (N, P, K), carbon (e.g. total and volatile solids), water, ash, mass, and volume. The Manure Module receives manure excretion and bedding information from the animal module, then passes manure through the manure management chain, until manure is either applied to fields or exported. The specific steps of the manure management chain are user-defined, and the individual steps/options in manure management chains are referred to as “processors”. The exact chemical, physical, or other processes that occur at each step along the management chain depend on what type of processor the manure is being held in. For example, parlor cleaning processors, which represent removing manure from the milking parlor and holding areas, principally add water to manure but do not estimate GH emissions or other nutrient losses. A slurry storage outdoor processor (a type of manure storage), however, estimates daily methane (CH\textsubscript{4}) and ammonia (NH\textsubscript{3}-N) losses, which are then reflected by reducing the quantity of nutrients remaining in the stored manure at the end of the day. 
@@ -111,7 +87,7 @@ For defining destinations and proportions, there are very few rules and restrict
 \vspace{0.2cm}
 
 \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-The assignment of manure generated in the Animal Module (which also reflects the quantity of bedding used) to its destination in the Manure Module occurs in the Animal Module. See the \colorbox{red}{Animal to Manure Connection} section for more information. 
+The assignment of manure generated in the Animal Module (which also reflects the quantity of bedding used) to its destination in the Manure Module occurs in the Animal Module. See the Animal to Manure Connection section for more information. 
 
 \end{tcolorbox}
 \vspace{0.2cm}
@@ -2786,7 +2762,7 @@ The use of covers has implications for inclusion or exclusion of precipitation v
         \item No cover
     \end{itemize}
 
-Detailed descriptions are outlined in the \colorbox{red}{Slurry Storage} section of this module. Precipitation volume for anaerobic lagoons that are uncovered or have a crust is calculated as follows:\\
+Detailed descriptions are outlined in the Slurry Storage section of this module. Precipitation volume for anaerobic lagoons that are uncovered or have a crust is calculated as follows:\\
         \vspace{0.5cm}
 
     \begin{center}

@@ -41,13 +41,13 @@
   >
 ]>
 <requests version="1.0">
-  <internal package="biblatex" priority="9" active="1">
+  <internal package="biblatex" priority="9" active="0">
     <generic>latex</generic>
     <provides type="dynamic">
-      <file>"feed_storage copy".bcf</file>
+      <file>cropandsoilmoddoc.bcf</file>
     </provides>
     <requires type="dynamic">
-      <file>"feed_storage copy".bbl</file>
+      <file>cropandsoilmoddoc.bbl</file>
     </requires>
     <requires type="static">
       <file>blx-dm.def</file>
@@ -61,26 +61,26 @@
       <file>english.lbx</file>
     </requires>
   </internal>
-  <external package="biblatex" priority="5" active="1">
+  <external package="biblatex" priority="5" active="0">
     <generic>biber</generic>
     <cmdline>
       <binary>biber</binary>
-      <infile>"feed_storage copy"</infile>
+      <infile>cropandsoilmoddoc</infile>
     </cmdline>
     <input>
-      <file>"feed_storage copy".bcf</file>
+      <file>cropandsoilmoddoc.bcf</file>
     </input>
     <output>
-      <file>"feed_storage copy".bbl</file>
+      <file>cropandsoilmoddoc.bbl</file>
     </output>
     <provides type="dynamic">
-      <file>"feed_storage copy".bbl</file>
+      <file>cropandsoilmoddoc.bbl</file>
     </provides>
     <requires type="dynamic">
-      <file>"feed_storage copy".bcf</file>
+      <file>cropandsoilmoddoc.bcf</file>
     </requires>
     <requires type="editable">
-      <file>resources/feed_storage.bib</file>
+      <file>resources/animal.bib</file>
     </requires>
   </external>
 </requests>
