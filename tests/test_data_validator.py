@@ -2514,7 +2514,9 @@ def test_validate_relationship_non_string(eager_termination: bool) -> None:
     cv = CrossValidator()
 
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Relationship must be a string\."):
+        with pytest.raises(
+            ValueError, match=r"Cross-validation error: Conditional clause relationship " r"must be a string\."
+        ):
             cv._validate_relationship(123, eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
@@ -2531,7 +2533,9 @@ def test_validate_relationship_invalid_value(eager_termination: bool) -> None:
     cv = CrossValidator()
 
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Invalid relationship provided\."):
+        with pytest.raises(
+            ValueError, match=r"Cross-validation error: Invalid conditional clause relationship " r"provided\."
+        ):
             cv._validate_relationship("something_else", eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
@@ -2620,7 +2624,7 @@ def test_evaluate_is_type_data_type_not_str(eager_termination: bool) -> None:
     """Non-string data_type logs and optionally raises."""
     cv = CrossValidator()
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Invalid type comparison in cross validation\."):
+        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
             cv._evaluate_is_type(["x"], [123], eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
@@ -2634,7 +2638,7 @@ def test_evaluate_is_type_unsupported_type_string(eager_termination: bool) -> No
     """Unsupported type string logs and optionally raises."""
     cv = CrossValidator()
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Unsupported data type weird\. Supported types:"):
+        with pytest.raises(ValueError, match=r"Cross-validation error: Unsupported data type: weird. Supported types:"):
             cv._evaluate_is_type(["x"], ["weird"], eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
