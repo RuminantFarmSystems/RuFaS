@@ -121,18 +121,18 @@ Steps
 
 1. **Determine Version Increment**
 
-   - Review all changes introduced since the previous release.
-   - Decide whether the release should increment **MAJOR**, **MINOR**, or
+   - PML reviews all changes introduced since the previous release.
+   - PML decides whether the release should increment **MAJOR**, **MINOR**, or
      **PATCH** according to Semantic Versioning.
 
 2. **Update Version in ``dev``**
 
-   - Update the ``version`` field in ``pyproject.toml`` on the ``dev``
+   - Repo Admin updates the ``version`` field in ``pyproject.toml`` on the ``dev``
      branch.
 
 3. **Create Release Candidate**
 
-   - Merge ``dev`` into ``test`` to create a release candidate.
+   - Repo Admin merges ``dev`` into ``test`` to create a release candidate.
 
 4. **Stabilization Testing**
 
@@ -150,11 +150,11 @@ Steps
 
 6. **Merge into Main**
 
-   - Merge ``test`` into ``main`` once stabilization testing is complete.
+   - Repo Admin merges ``test`` into ``main`` once stabilization testing is complete.
 
 7. **Tag the Release**
 
-   - Create a Git tag corresponding to the version number, for example:
+   - Repo Admin creates a Git tag corresponding to the version number, for example:
 
    ::
 

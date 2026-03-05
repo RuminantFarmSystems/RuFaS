@@ -272,6 +272,45 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
             assert add_log.call_count == 1
 
 
+def test_load_cross_validation(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_cross_validation in file input_manager.py"""
+    with patch(
+        "builtins.open",
+        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+    ):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_cross_validation(["path/dummy_cv.json"])
+            assert add_log.call_count == 2
+
+
+def test_load_multiple_cross_validation(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_cross_validation in file input_manager.py when multiple files are provided."""
+    with patch(
+        "builtins.open",
+        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+    ):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_cross_validation(["path/dummy_cv.json", "path/dummy_cv2.json"])
+            assert add_log.call_count == 4
+
+
+def test_load_cross_validation_raises_exception(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_cross_validation raising an exception in file input_manager.py"""
+    mock_open_func = Mock()
+    mock_open_func.side_effect = Exception("Error opening file")
+
+    with patch("builtins.open", mock_open_func):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(Exception):
+                mock_input_manager._load_cross_validation("path/dummy_metadata.json")
+            assert add_log.call_count == 1
+
+
+def test_load_cross_validation_none(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_cross_validation in file input_manager.py"""
+    assert mock_input_manager._load_cross_validation(None) is None
+
+
 def test_load_data_from_json(
     mock_input_manager: InputManager,
 ) -> None:
@@ -349,15 +388,60 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 
 @pytest.mark.parametrize(
-    "cv_scenario, eager_termination, populate_ok, expected_return, expected_cv_calls, expected_fail_blocks",
+    "eager_termination, populate_ok, cv_ok, expected_return",
     [
-        ("none", True, True, True, 0, []),
-        ("none", False, True, True, 0, []),
-        ("all_pass", True, True, True, 2, []),
-        ("all_pass", False, True, True, 2, []),
-        ("first_fail_eager_true", True, True, False, 1, ["cv1"]),
-        ("two_fail_eager_false", False, True, False, 3, ["cv1", "cv2"]),
-        ("all_pass", True, False, False, 2, []),
+        (True, True, True, True),
+        (True, False, True, False),
+        (True, True, False, False),
+        (True, False, False, False),
+        (False, True, True, True),
+        (False, False, True, False),
+        (False, True, False, False),
+        (False, False, False, False),
+    ],
+)
+def test_start_data_processing(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    eager_termination: bool,
+    populate_ok: bool,
+    cv_ok: bool,
+    expected_return: bool,
+) -> None:
+    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
+    eager short-circuit vs collect)."""
+    mocker.patch.object(mock_input_manager, "_load_metadata")
+    mocker.patch.object(mock_input_manager, "_load_properties")
+    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
+    mocker.patch.object(mock_input_manager, "_cross_validate_data", return_value=cv_ok)
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
+    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
+
+    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}})
+    mock_input_manager.data_validator.event_logs.clear()
+
+    result = mock_input_manager.start_data_processing(
+        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
+    )
+
+    assert result is expected_return
+
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+
+
+@pytest.mark.parametrize(
+    "cv_scenario, eager_termination, expected_return, expected_cv_calls, expected_fail_blocks",
+    [
+        ("none", True, True, 0, []),
+        ("none", False, True, 0, []),
+        ("all_pass", True, True, 2, []),
+        ("all_pass", False, True, 2, []),
+        ("first_fail_eager_true", True, False, 1, ["cv1"]),
+        ("two_fail_eager_false", False, False, 3, ["cv1", "cv2"]),
+        ("multiple_pass", True, True, 3, []),
     ],
     ids=[
         "no-cv_eager-true",
@@ -366,66 +450,86 @@ def test_load_data_from_csv_invalid_data_raises_error(
         "cv-pass_eager-false",
         "cv-first-fail_eager-true",
         "cv-two-fail_eager-false",
-        "populate-false_cv-pass",
+        "multiple_cv-pass",
     ],
 )
-def test_start_data_processing(
+def test_cross_validate_data(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
     cv_scenario: str,
     eager_termination: bool,
-    populate_ok: bool,
     expected_return: bool,
     expected_cv_calls: int,
     expected_fail_blocks: list[str],
 ) -> None:
-    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
-    eager short-circuit vs collect)."""
-    mocker.patch.object(mock_input_manager, "_load_metadata")
-    mocker.patch.object(mock_input_manager, "_load_properties")
-    mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
-
-    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
+    """Unit test for function _cross_validate_data in file input_manager.py"""
     add_error = mocker.patch.object(mock_input_manager.om, "add_error")
-
     mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={"dummy": True})
 
     if cv_scenario == "none":
-        cv_blocks = []
+        cv_path = None
+        cv_blocks = None
         side_effect = []
     elif cv_scenario == "all_pass":
+        cv_path = ["mock/cv/path"]
         cv_blocks = [
-            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                ]
+            }
         ]
         side_effect = [True, True]
     elif cv_scenario == "first_fail_eager_true":
+        cv_path = ["mock/cv/path"]
         cv_blocks = [
-            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                ]
+            }
         ]
         side_effect = [False, True]
     elif cv_scenario == "two_fail_eager_false":
+        cv_path = ["mock/cv/path"]
         cv_blocks = [
-            {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-            {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
-            {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+                ]
+            }
         ]
         side_effect = [False, False, True]
+    elif cv_scenario == "multiple_pass":
+        cv_path = ["mock/cv/path1", "mock/cv/path2"]
+        cv_blocks = [
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                ]
+            },
+            {
+                "cross-validation": [
+                    {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+                ]
+            },
+        ]
+        side_effect = [True, True, True]
     else:
         raise AssertionError("Unknown test setup")
 
-    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": cv_blocks})
+    setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": cv_path})
+    mocker.patch.object(mock_input_manager, "_load_cross_validation", return_value=cv_blocks)
     cv_mock = mock_input_manager.cross_validator
     cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
     mock_input_manager.data_validator.event_logs.clear()
 
-    result = mock_input_manager.start_data_processing(
-        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
-    )
+    result = mock_input_manager._cross_validate_data(eager_termination=eager_termination)
 
     assert result is expected_return
 
@@ -444,11 +548,9 @@ def test_start_data_processing(
         for name in expected_fail_blocks:
             assert name in msg
         assert info.get("class") == mock_input_manager.__class__.__name__
-        assert info.get("function") == mock_input_manager.start_data_processing.__name__
+        assert info.get("function") == mock_input_manager._cross_validate_data.__name__
     else:
         add_error.assert_not_called()
-
-    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
 def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:

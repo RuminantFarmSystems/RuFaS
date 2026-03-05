@@ -13,7 +13,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 ### Example Entry
 
-- [123](https://github.com/RuminantFarmSystems/MASM/pull/123) - [Major change/ minor change] [Impact Area] Short description of the change or feature.
+- [123](https://github.com/RuminantFarmSystems/RuFaS/pull/123) - [Major change/ minor change] [Impact Area] [No/InputChange] [No/OutputChange] Short description of the change or feature.
 
 ---
 
@@ -33,6 +33,7 @@ v1.0.0
 - [2720](https://github.com/RuminantFarmSystems/MASM/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
 - [2791](https://github.com/RuminantFarmSystems/MASM/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
 - [2813](https://github.com/RuminantFarmSystems/RuFaS/pull/2813) - [minor change] [Docs] [NoInputChange] [NoOutputChange] Updates branching and versioning policy docs.
+- [2804](https://github.com/RuminantFarmSystems/MASM/pull/2804) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field.py.
 
 ### v1.0.0
 
@@ -323,6 +324,7 @@ v1.0.0
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2790](https://github.com/RuminantFarmSystems/RuFaS/pull/2790) - [minor change] [NoInputChange] [NoOutputChange] This PR updates dev to be in sync with test regarding changes in [#2785](https://github.com/RuminantFarmSystems/RuFaS/pull/2785).
+- [2795](https://github.com/RuminantFarmSystems/RuFaS/pull/2795) - [minor change] [InputManager] [InputChange] [NoOutputChange] Extract Cross Validation Rules.
 
 ### v0.9.2
 
