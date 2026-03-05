@@ -2790,16 +2790,14 @@ class OutputManager(object):
             "subtraction",
         }
         if value not in supported:
+            error_msg = f"ReportGenerator Aggregator error: '{content_name}' in {filter_name} must be one of " \
+                f"{sorted(supported)}, but got '{value}'."
             self.add_error(
                 "Unsupported aggregator in report filter content",
-                f"ReportGenerator Aggregator error: '{content_name}' in {filter_name} must be one of "
-                f"{sorted(supported)}, but got '{value}'.",
+                error_msg,
                 info_map,
             )
-            raise ValueError(
-                f"ReportGenerator Aggregator error: '{content_name}' in {filter_name} must be one of "
-                f"{sorted(supported)}, but got '{value}'."
-            )
+            raise ValueError(error_msg)
 
     def validate_list_of_strings(self, value: Any, content_name: str, filter_name: str) -> None:
         """
