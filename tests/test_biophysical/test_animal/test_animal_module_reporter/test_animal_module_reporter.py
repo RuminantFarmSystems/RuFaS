@@ -755,11 +755,11 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_daily_pen_total("1", "GROWING", 8, 10)
     info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
-            "units": MeasurementUnits.ANIMALS,
-            "simulation_day": 10
-        }
+        "class": AnimalModuleReporter.__name__,
+        "function": AnimalModuleReporter.report_daily_pen_total.__name__,
+        "units": MeasurementUnits.ANIMALS,
+        "simulation_day": 10
+    }
     mock_om_add_variable.assert_called_once_with("number_of_animals_in_pen_1_GROWING", 8, info_map)
 
 
