@@ -81,7 +81,7 @@ class ElementsCounter:
         elif state == ElementState.FIXED:
             self.fixed_elements += value
         else:
-            raise ValueError(f"Invalid state: {state}")
+            raise ValueError(f"Input element has an invalid state: {state}")
 
     def increment(self, state: ElementState) -> None:
         """
@@ -815,6 +815,8 @@ class DataValidator:
         ------
         KeyError
             If the variable's properties does not specify a "type".
+        ValueError
+            If the variable's properties specifies a "type" that is not supported.
 
         Notes
         -----
@@ -826,7 +828,7 @@ class DataValidator:
             "function": DataValidator.validate_data_by_type.__name__,
         }
         if "type" not in variable_properties:
-            raise KeyError(f"Missing 'type' key in {variable_properties}")
+            raise KeyError(f"Input property missing 'type' key in {variable_properties}")
 
         data_type = variable_properties["type"]
 
@@ -1500,12 +1502,12 @@ class DataValidator:
                 }
             )
             raise KeyError(
-                f"Key {var_name} not found in data. Data value is required for this "
+                f"Key {var_name} not found in input data. Data value is required for this "
                 "variable upon program initialization."
             )
         self.event_logs.append(
             {
-                "warning": "Validation: key not found in data -- data not required upon initialization",
+                "warning": "Validation: key not found in input data -- data not required upon initialization",
                 "message": f"Key {var_name} not found in data. Data value is not required for "
                 f"this "
                 "variable upon program initialization, setting the variable value "
@@ -1551,14 +1553,14 @@ class DataValidator:
         -----
         This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
         empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
-        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
-        its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
+        correspond to any enum members, a KeyError is raised after logging the error downstream. If 'modifiability'
+        is absent or its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
 
         Parameters
         ----------
         variable_name : str
             The name of the variable for which the modifiability status is being determined. Used for error logging.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing the properties of the variable, containing the desired 'modifiability' property.
 
         Returns
@@ -1566,11 +1568,6 @@ class DataValidator:
         Modifiability
             An enum member representing the variable's modifiability status.
 
-        Raises
-        ------
-        KeyError
-            If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
-            message includes the invalid modifiability value and suggests valid values.
         """
         info_map = {
             "class": DataValidator.__name__,
@@ -1694,7 +1691,7 @@ class DataValidator:
             elif isinstance(data, dict) and isinstance(key, str) and key in data:
                 data = data[key]
             else:
-                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}. Data cannot be extracted.")
         return data
 
 
@@ -1813,7 +1810,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError(f"Unknown alias name: {alias_name}")
+                raise ValueError(f"Cross-validation error: Unknown alias name: {alias_name}")
 
         return value
 
@@ -1852,7 +1849,7 @@ class CrossValidator:
                 )
                 if eager_termination:
                     raise ValueError(
-                        f"Unknown block: {section}. "
+                        f"Cross-validation error: Unknown target and save block: {section}. "
                         "target_and_save_block should only have variables and constants blocks."
                     )
 
@@ -1877,6 +1874,11 @@ class CrossValidator:
         tuple[Any, bool]
             The result of the expression evaluation and a boolean indicating whether the expression was
             successfully evaluated.
+
+        Raises
+        ------
+        ValueError
+            Raises the error when the expression block contains unknown operation or missing ordered variables.
 
         Notes
         -----
@@ -1903,7 +1905,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError(f"Unknown operation: {operation}")
+                raise ValueError(f"Cross-validation error: Unknown operation in expression block: {operation}")
             else:
                 return None, False
 
@@ -1919,7 +1921,9 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError("Ordered variables list is empty or missing in cross validation rule.")
+                raise ValueError(
+                    "Cross-validation error: " "Ordered variables list is empty or missing in cross validation rule."
+                )
             else:
                 return None, False
         ordered_values: list[Any] = []
@@ -1966,6 +1970,13 @@ class CrossValidator:
             Specifies whether to immediately terminate the process when a validation error is
             encountered.
 
+        Raises
+        ------
+        ValueError
+            -If multiple complex variables are selected for cross-validation in a single expression block.
+            -If the 'apply_to' key is missing in the expression block when a complex variable is selected.
+            -If the 'apply_to' value is not one of the expected options ('individual' or 'group').
+
         Returns
         -------
         bool
@@ -1986,7 +1997,7 @@ class CrossValidator:
             )
             if eager_termination:
                 raise ValueError(
-                    "Only one list or dict variable can be selected for cross validation in "
+                    "Cross-validation error: Only one list or dict variable can be selected for cross validation in "
                     "a single expression block."
                 )
             else:
@@ -2005,7 +2016,10 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError("Missing 'apply_to' key in expression block for selected complex data structure.")
+                raise ValueError(
+                    "Cross-validation error: Missing 'apply_to' key in expression block for "
+                    "selected complex data structure."
+                )
             else:
                 return False
         if apply_to := expression_block["apply_to"] not in ["individual", "group"]:
@@ -2020,7 +2034,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError(f"Unknown apply_to value: {apply_to}")
+                raise ValueError(f"Cross-validation error: Unknown apply_to value in expression block: {apply_to}")
             else:
                 return False
         return True
@@ -2075,7 +2089,7 @@ class CrossValidator:
             for name in missing:
                 self._log_missing_condition_clause_field(name)
             if missing and eager_termination:
-                raise KeyError("Missing required field in conditional clause.")
+                raise KeyError("Cross-validation error: Missing required field in conditional clause.")
             elif missing:
                 valid = False
 
@@ -2112,7 +2126,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError("Relationship must be a string.")
+                raise ValueError("Cross-validation error: Conditional clause relationship must be a string.")
             return False
         elif relationship not in available_relationship:
             self._event_logs.append(
@@ -2126,7 +2140,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError("Invalid relationship provided.")
+                raise ValueError("Cross-validation error: Invalid conditional clause relationship provided.")
             return False
         else:
             return True
@@ -2158,7 +2172,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError("Invalid type comparison in cross validation.")
+                raise ValueError("Cross-validation error: Invalid type comparison.")
             return False
         data_type = data_type[0].strip().lower()
         checkers: dict[str, Callable[[Any], bool]] = {
@@ -2182,7 +2196,9 @@ class CrossValidator:
                 }
             )
             if eager_termination:
-                raise ValueError(f"Unsupported data type {data_type}. Supported types: {supported}.")
+                raise ValueError(
+                    f"Cross-validation error: Unsupported data type: {data_type}. " f"Supported types: {supported}."
+                )
             return False
 
         return bool(all(checker(value) for value in left_hand_value))

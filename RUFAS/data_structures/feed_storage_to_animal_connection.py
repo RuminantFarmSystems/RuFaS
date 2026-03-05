@@ -5,7 +5,6 @@ from enum import Enum
 
 from RUFAS.units import MeasurementUnits
 
-
 """
 Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
 other input files and the RuFaS codebase.
@@ -376,7 +375,7 @@ class RequestedFeed:
 
     def __add__(self, other: "RequestedFeed") -> "RequestedFeed":
         if not isinstance(other, RequestedFeed):
-            raise NotImplementedError
+            return NotImplemented
 
         combined_feed = defaultdict(float, self.requested_feed)
         for feed_id, amount in other.requested_feed.items():
