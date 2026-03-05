@@ -682,7 +682,7 @@ class DataValidator:
             if not has_path_or_paths:
                 return False, msg
 
-            is_type_valid, msg = self._validate_type(key, data, valid_data_types, info_map)
+            is_type_valid, msg = self._validate_metadata_type(key, data, valid_data_types, info_map)
             if not is_type_valid:
                 return False, msg
 
@@ -694,7 +694,7 @@ class DataValidator:
             if not are_paths_valid:
                 return False, msg
 
-            are_properties_valid, msg = self._validate_properties(key, data, info_map)
+            are_properties_valid, msg = self._validate_metadata_properties(key, data, info_map)
             if not are_properties_valid:
                 return False, msg
 
@@ -734,7 +734,7 @@ class DataValidator:
             )
         return True, ""
 
-    def _validate_type(
+    def _validate_metadata_type(
         self,
         key: str,
         data: dict[str, Any],
@@ -792,7 +792,7 @@ class DataValidator:
                 return self._generate_fail_message(f"Invalid path '{rel_path}' in '{key}'", info_map)
         return True, ""
 
-    def _validate_properties(
+    def _validate_metadata_properties(
         self, key: str, data: dict[str, Any], info_map: dict[str, Any]
     ) -> tuple[bool, str]:
         """Helper function to validate the 'properties' section in metadata."""
