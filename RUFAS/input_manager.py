@@ -630,7 +630,7 @@ class InputManager:
                     info_map,
                 )
                 return data
-        except Exception as e:
+        except Exception:
             raise
 
     def _load_data_from_csv(self, file_path: Path) -> dict[str, Any]:
