@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Type, cast
 from unittest.mock import ANY, call
 
 import pandas as pd
@@ -2009,8 +2009,17 @@ def test_add_runtime_variable_to_pool(
         properties_blob_key=properties_blob_key,
         eager_termination=False,
     )
-    mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+
+    mocker.patch.object(
+        InputManager,
+        "_metadata_properties_exist",
+        wraps=input_manager_original_method_states["_metadata_properties_exist"],
+    )
+    mocker.patch.object(
+        InputManager,
+        "_add_variable_to_pool",
+        wraps=input_manager_original_method_states["_add_variable_to_pool"],
+    )
 
 
 @pytest.mark.parametrize(
@@ -2026,10 +2035,11 @@ def test_add_runtime_variable_to_pool_type_error(
     data: Dict[str, Any],
     properties_blob_key: str,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Callable[..., Any]],
+    mocker: MockerFixture
 ) -> None:
-    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
+    mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=True)
+    mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         with pytest.raises(TypeError):
@@ -2041,14 +2051,19 @@ def test_add_runtime_variable_to_pool_type_error(
             )
 
         assert mock_om_add_error.call_count == 1
-        mock_input_manager._metadata_properties_exist.assert_not_called()
-        mock_input_manager._add_variable_to_pool.assert_not_called()
+        mock_check.assert_not_called()
+        mock_add.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_runtime_variable_to_pool"]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
-        ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+        mocker.patch.object(
+            InputManager,
+            "_metadata_properties_exist",
+            wraps=input_manager_original_method_states["_metadata_properties_exist"],
+        )
+        mocker.patch.object(
+            InputManager,
+            "_add_variable_to_pool",
+            wraps=input_manager_original_method_states["_add_variable_to_pool"],
+        )
 
 
 @pytest.mark.parametrize(
@@ -2064,10 +2079,11 @@ def test_add_runtime_variable_to_pool_invalid_data(
     data: Dict[str, Any],
     properties_blob_key: str,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Callable[..., Any]],
+    mocker: MockerFixture
 ) -> None:
-    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
+    mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=True)
+    mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_runtime_variable_to_pool(
@@ -2079,29 +2095,35 @@ def test_add_runtime_variable_to_pool_invalid_data(
 
         assert result is False
         assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exist.assert_called_once_with(
+        mock_check.assert_called_once_with(
             variable_name=variable_name, properties_blob_key=properties_blob_key
         )
-        mock_input_manager._add_variable_to_pool.assert_called_once_with(
+        mock_add.assert_called_once_with(
             variable_name=variable_name,
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
         )
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_runtime_variable_to_pool"]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
-        ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+        mocker.patch.object(
+            InputManager,
+            "_metadata_properties_exist",
+            wraps=input_manager_original_method_states["_metadata_properties_exist"],
+        )
+        mocker.patch.object(
+            InputManager,
+            "_add_variable_to_pool",
+            wraps=input_manager_original_method_states["_add_variable_to_pool"],
+        )
 
 
 def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: Dict[str, Callable[..., Any]],
+    mocker: MockerFixture
 ) -> None:
-    mock_input_manager._metadata_properties_exist = MagicMock(return_value=False)
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
+    mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=False)
+    mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_runtime_variable_to_pool(
@@ -2113,16 +2135,21 @@ def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
 
         assert result is False
         assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exist.assert_called_once_with(
+        mock_check.assert_called_once_with(
             variable_name="var1", properties_blob_key="key2"
         )
-        mock_input_manager._add_variable_to_pool.assert_not_called()
+        mock_add.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_runtime_variable_to_pool"]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
-        ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+        mocker.patch.object(
+            InputManager,
+            "_metadata_properties_exist",
+            wraps=input_manager_original_method_states["_metadata_properties_exist"],
+        )
+        mocker.patch.object(
+            InputManager,
+            "_add_variable_to_pool",
+            wraps=input_manager_original_method_states["_add_variable_to_pool"],
+        )
 
 
 @pytest.mark.parametrize(
@@ -2675,11 +2702,16 @@ def test_dump_get_data_logs(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__get_data_logs_pool = {
-        "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
-        "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
-        "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
-    }
+    setattr(
+        mock_input_manager,
+        "_InputManager__get_data_logs_pool",
+        {
+            "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
+            "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
+            "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
+        },
+    )
+
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
     patch_for_generate_file_name = mocker.patch.object(
@@ -2693,8 +2725,9 @@ def test_dump_get_data_logs(
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     patch_create_dir.assert_called_once_with(mock_dir_path)
+    get_logs = getattr(mock_input_manager, "_InputManager__get_data_logs_pool")
     mock_dict_to_file_json.assert_called_once_with(
-        mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+        get_logs, Path("dummy_path", mock_generated_file_name)
     )
 
 
@@ -2702,11 +2735,15 @@ def test_dump_delete_data_logs(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__delete_data_logs_pool = {
-        "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
-        "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
-        "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
-    }
+    setattr(
+        mock_input_manager,
+        "_InputManager__delete_data_logs_pool",
+        {
+            "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
+            "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
+            "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
+        },
+    )
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
     patch_for_generate_file_name = mocker.patch.object(
@@ -2720,8 +2757,9 @@ def test_dump_delete_data_logs(
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_delete_data_log", extension="json")
     patch_create_dir.assert_called_once_with(mock_dir_path)
+    delete_logs = getattr(mock_input_manager, "_InputManager__delete_data_logs_pool")
     mock_dict_to_file_json.assert_called_once_with(
-        mock_input_manager._InputManager__delete_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+        delete_logs, Path("dummy_path", mock_generated_file_name)
     )
 
 
@@ -3083,7 +3121,7 @@ def test_update_value_error() -> None:
 
     # Act
     with pytest.raises(ValueError):
-        counter.update("not valid", 2)
+        counter.update(cast(ElementState, "not valid"), 2)
 
 
 def test_reset_method_in_elements_counter() -> None:
@@ -3536,12 +3574,16 @@ def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker:
     runtime_metadata_path.write_text(json.dumps(runtime_metadata))
     (tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv").write_text("value\n1\n")
 
-    mock_input_manager._InputManager__metadata = {
-        "properties": {
-            "commodity_prices_calves_all_dollar_per_kilogram_csv_properties": {},
+    setattr(
+        mock_input_manager,
+        "_InputManager__metadata",
+        {
+            "properties": {
+                "commodity_prices_calves_all_dollar_per_kilogram_csv_properties": {},
+            },
+            "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
         },
-        "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
-    }
+    )
 
     mocked_validate = mocker.patch.object(
         mock_input_manager.data_validator, "validate_metadata", return_value=(True, "")
@@ -3566,16 +3608,22 @@ def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker:
         "commodity_prices.calves_all.dollar_per_kilogram",
         "commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
     )
-    assert mock_input_manager._InputManager__metadata["runtime_metadata"] == {
+    metadata = getattr(mock_input_manager, "_InputManager__metadata")
+    assert metadata["runtime_metadata"] == {
         "EEE_econ": {"path": str(runtime_metadata_path)}
     }
 
 
 def test_load_runtime_metadata_invalid_key(mock_input_manager: InputManager) -> None:
-    mock_input_manager._InputManager__metadata = {
-        "properties": {},
-        "runtime_metadata": {},
-    }
+    """Tests _load_runtime_metadata() with invalid key."""
+    setattr(
+        mock_input_manager,
+        "_InputManager__metadata",
+        {
+            "properties": {},
+            "runtime_metadata": {},
+        },
+    )
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
@@ -3584,9 +3632,14 @@ def test_load_runtime_metadata_invalid_key(mock_input_manager: InputManager) -> 
 
 
 def test_load_runtime_metadata_missing_configuration(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    mock_input_manager._InputManager__metadata = {
-        "properties": {},
-    }
+    """Test load_runtime_metadata() with missing configs."""
+    setattr(
+        mock_input_manager,
+        "_InputManager__metadata",
+        {
+            "properties": {},
+        },
+    )
 
     get_metadata_spy = mocker.spy(mock_input_manager, "get_metadata")
 
@@ -3602,10 +3655,15 @@ def test_load_runtime_metadata_missing_configuration(mock_input_manager: InputMa
 
 
 def test_load_runtime_metadata_missing_path(mock_input_manager: InputManager) -> None:
-    mock_input_manager._InputManager__metadata = {
-        "properties": {},
-        "runtime_metadata": {"EEE_econ": {}},
-    }
+    """Test load_runtime_metadata() with missing path."""
+    setattr(
+        mock_input_manager,
+        "_InputManager__metadata",
+        {
+            "properties": {},
+            "runtime_metadata": {"EEE_econ": {}},
+        },
+    )
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         assert not mock_input_manager.load_runtime_metadata("EEE_econ", eager_termination=True)
@@ -3616,6 +3674,7 @@ def test_load_runtime_metadata_missing_path(mock_input_manager: InputManager) ->
 def test_load_runtime_metadata_invalid_metadata(
     mock_input_manager: InputManager, mocker: MockerFixture, tmp_path: Path
 ) -> None:
+    """Test load_runtime_metadata() with missing path."""
     runtime_metadata = {
         "files": {
             "commodity_prices.calves_all.dollar_per_kilogram": {
@@ -3629,10 +3688,14 @@ def test_load_runtime_metadata_invalid_metadata(
     runtime_metadata_path.write_text(json.dumps(runtime_metadata))
     (tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv").write_text("value\n1\n")
 
-    mock_input_manager._InputManager__metadata = {
-        "properties": {},
-        "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
-    }
+    setattr(
+        mock_input_manager,
+        "_InputManager__metadata",
+        {
+            "properties": {},
+            "runtime_metadata": {"EEE_econ": {"path": str(runtime_metadata_path)}},
+        },
+    )
 
     mocker.patch.object(mock_input_manager.data_validator, "validate_metadata", return_value=(False, "boom"))
 
@@ -3672,7 +3735,7 @@ def test_load_runtime_metadata_eager_termination_stops_processing(
 def test_load_runtime_metadata_non_eager_processes_all(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     mocker.patch.object(mock_input_manager, "_is_metadata_loaded", return_value=True)
     mocker.patch.object(mock_input_manager, "_get_runtime_metadata_map", return_value={})
-    runtime_files = {"var_a": {}, "var_b": {}}
+    runtime_files: dict[str, dict[Any, Any]] = {"var_a": {}, "var_b": {}}
     mocker.patch.object(
         mock_input_manager,
         "_resolve_runtime_metadata_files",
@@ -3735,7 +3798,9 @@ def test_delete_data_with_valid_key(
     im.meta_data = metadata
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
 
-    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.level1")
+    data_delete, metadata_delete = getattr(
+        im, "_InputManager__delete_input_and_metadata"
+    )("c.nested.level1")
 
     assert data_delete
     assert metadata_delete
@@ -3755,8 +3820,9 @@ def test_delete_data_with_invalid_data_address(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", side_effect=KeyError("missing"))
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.unknown")
-
+    data_delete, metadata_delete = getattr(
+        im, "_InputManager__delete_input_and_metadata"
+    )("c.nested.unknown")
     assert not data_delete
     assert metadata_delete
     assert pool["c"]["nested"]["level1"] == 3
@@ -3783,7 +3849,9 @@ def test_delete_data_metadata_not_found(
     mocker.patch.object(im.data_validator, "extract_value_by_key_list", return_value=pool["c"]["nested"])
     mock_add_error = mocker.patch.object(im.om, "add_error", autospec=True)
 
-    data_delete, metadata_delete = im._InputManager__delete_input_and_metadata("c.nested.another")
+    data_delete, metadata_delete = getattr(
+        im, "_InputManager__delete_input_and_metadata"
+    )("c.nested.another")
 
     assert data_delete
     assert not metadata_delete
