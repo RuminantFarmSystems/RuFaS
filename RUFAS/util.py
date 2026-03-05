@@ -829,7 +829,7 @@ class Utility:
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
     @staticmethod
-    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+    def round_numeric_values_in_dict(data: dict[str, Any], significant_digits: int) -> dict[str, Any]:
         """
         Rounds all numeric values in a dictionary to the specified number of significant digits.
 
