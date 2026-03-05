@@ -1,0 +1,48 @@
+\babel@toc {english}{}\relax 
+\contentsline {table}{\numberline {1}{\ignorespaces Overview of the distinct phases by which animals are created and introduced to the herd.}}{7}{table.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section}}{8}{table.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.}}{8}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces The user must define at least 3 pens and for each pen, key inputs are:}}{12}{table.4}%
+\contentsline {table}{\numberline {6}{\ignorespaces A summary of animal types}}{13}{table.caption.2}%
+\contentsline {table}{\numberline {7}{\ignorespaces Key variables used in protein requirement calculations.}}{20}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces Key variables used in mineral requirement calculations.}}{23}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces Key variables used in DMI requirement calculations.}}{24}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Key variables used in protein requirement calculations.}}{30}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Key variables used in mineral requirement calculations.}}{33}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Key variables used in DMI estimation calculations.}}{35}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces Essential and non-essential amino acids}}{35}{table.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces Key variables used in calculation of AA.}}{37}{table.14}%
+\contentsline {table}{\numberline {15}{\ignorespaces Key variables used in calculation of net energy in NRC 2001.}}{41}{table.15}%
+\contentsline {table}{\numberline {16}{\ignorespaces Key variables used in calculation of net energy supply from NASEM 2021.}}{43}{table.16}%
+\contentsline {table}{\numberline {17}{\ignorespaces Key variables used in calculation of AA.}}{46}{table.17}%
+\contentsline {table}{\numberline {18}{\ignorespaces Key variables used in calculation of AA.}}{46}{table.18}%
+\contentsline {table}{\numberline {19}{\ignorespaces Key inputs found in the animal input file.}}{50}{table.19}%
+\contentsline {table}{\numberline {20}{\ignorespaces Key inputs found in the feed input file.}}{50}{table.20}%
+\contentsline {table}{\numberline {21}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{51}{table.21}%
+\contentsline {table}{\numberline {22}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{52}{table.22}%
+\contentsline {table}{\numberline {23}{\ignorespaces Below is a summary of the user inputs that are available and their definitions.}}{57}{table.23}%
+\contentsline {table}{\numberline {24}{\ignorespaces Below are the key user inputs that determine the \textbf {heifer reproductive breeding program} and impact reproductive efficiency and age at first calving.}}{63}{table.caption.5}%
+\contentsline {table}{\numberline {25}{\ignorespaces The following inputs determine reproductive efficiency of cows and influence culling, calving interval, and calf output.}}{64}{table.25}%
+\contentsline {table}{\numberline {26}{\ignorespaces The following inputs can be used to determine if there is a \textbf {decrease in the conception rate} with parity and rebreeding attempts.}}{65}{table.caption.6}%
+\contentsline {table}{\numberline {27}{\ignorespaces Important functions for the reproduction section.}}{71}{table.27}%
+\contentsline {table}{\numberline {28}{\ignorespaces The following user inputs are used to estimate customized herd-level lactation curve parameters. See the Methodology section of this document and the Lactation Curve Scientific Documentation for more detail about how these inputs are used with relation to daily milk production.}}{74}{table.28}%
+\contentsline {table}{\numberline {29}{\ignorespaces The following inputs are used to determine the milk fat and milk protein percentages for each lactating cow}}{75}{table.29}%
+\contentsline {table}{\numberline {30}{\ignorespaces The following inputs are used to constrain how much an average cow’s daily milk production will be reduced due to an inadequate ration. See the Methodology section of this document and the Ration Formulation scientific documentation for more detail about how these inputs are used with relation to daily milk production.}}{76}{table.30}%
+\contentsline {table}{\numberline {31}{\ignorespaces Wood's Lactation Curve Base Parameters – These inputs provide the baseline values and variability for Wood’s lactation curve parameters as derived from \blx@tocontentsinit {1}\textcite {Li2022}.}}{83}{table.31}%
+\contentsline {table}{\numberline {33}{\ignorespaces Adjustment Factors – These factors adjust the base parameters based on geographical, temporal, management, and parity considerations.}}{84}{table.33}%
+\contentsline {table}{\numberline {35}{\ignorespaces Farm Specific 305-Day Milk Production — These inputs help tailor the lactation curve to the farm’s production targets and herd composition.}}{85}{table.35}%
+\contentsline {table}{\numberline {36}{\ignorespaces Summary of important functions for the reproduction section. }}{86}{table.36}%
+\contentsline {table}{\numberline {37}{\ignorespaces The following inputs are used to determine the probability and timing of cow death and sales events.}}{90}{table.37}%
+\contentsline {table}{\numberline {38}{\ignorespaces Cumulative distribution function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time. Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}}{96}{table.caption.10}%
+\contentsline {table}{\numberline {39}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{98}{table.39}%
+\contentsline {table}{\numberline {40}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{98}{table.40}%
+\contentsline {table}{\numberline {41}{\ignorespaces These inputs define phosphorus-related outputs relevant to lactating cows.}}{99}{table.41}%
+\contentsline {table}{\numberline {42}{\ignorespaces Expected outputs from this section.}}{99}{table.42}%
+\contentsline {table}{\numberline {43}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{109}{table.43}%
+\contentsline {table}{\numberline {44}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{109}{table.44}%
+\contentsline {table}{\numberline {45}{\ignorespaces Inputs specific to the methane emissions model and selected mitigation strategies.}}{110}{table.45}%
+\contentsline {table}{\numberline {46}{\ignorespaces Expected outputs from this section.}}{110}{table.46}%
+\contentsline {table}{\numberline {47}{\ignorespaces General dietary fiber and fat concentration inputs.}}{113}{table.47}%
+\contentsline {table}{\numberline {48}{\ignorespaces Feed-based methane mitigation strategies.}}{113}{table.48}%
+\contentsline {table}{\numberline {49}{\ignorespaces Dosage of methane mitigation additives.}}{114}{table.49}%
+\contentsline {table}{\numberline {50}{\ignorespaces Expected outputs from this section.}}{114}{table.50}%
