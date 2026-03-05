@@ -2007,7 +2007,8 @@ def test_get_paths_to_check_success_single_path(mocker: MockerFixture) -> None:
 
 
 def test_get_paths_to_check_success_multiple_paths(mocker: MockerFixture) -> None:
-    """Tests that when 'paths' contains multiple valid entries, _get_paths_to_check() returns the correct list of paths."""
+    """Tests that when 'paths' contains multiple valid entries, _get_paths_to_check() returns the correct
+    list of paths."""
     validator = DataValidator()
     key = "test_entry"
     info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
@@ -2028,7 +2029,8 @@ def test_get_paths_to_check_success_multiple_paths(mocker: MockerFixture) -> Non
 
 
 def test_get_paths_to_check_success_path_and_paths(mocker: MockerFixture) -> None:
-    """Tests that when both 'path' and 'paths' are present and valid, _get_paths_to_check() returns a combined list of paths."""
+    """Tests that when both 'path' and 'paths' are present and valid, _get_paths_to_check() returns a combined list
+    of paths."""
     validator = DataValidator()
     key = "test_entry"
     info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
