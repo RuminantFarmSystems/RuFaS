@@ -18,6 +18,11 @@ Branches Overview
 
 - **Approval**: Merging to ``dev`` requires **2 approvals**.
 
+- **Note**: All the changes on ``dev`` are considered for the next release.
+ If something is **NOT** intended to be included in the next release,
+ it should be merged into a separate parking branch and not merged into ``dev``
+ until it is ready for release.
+
 ``test``
 ~~~~~~~~
 
@@ -32,7 +37,7 @@ Branches Overview
   no new development work should be introduced into ``test``. Only bug
   fixes discovered during testing should be applied.
 
-- **Approval**: Merging to ``test`` requires **at least 1 approval**.
+- **Approval**: ``test`` is locked and only admins can merge into it.
 
 ``main``
 ~~~~~~~~
@@ -44,9 +49,7 @@ Branches Overview
   version number has been updated, updates are pulled into ``main``.
 
 - **Permissions**: The ``main`` branch is locked, and only
-  `Pooya Hekmati <https://github.com/PooyaHekmati>`__ and
-  `Kristan Reed <https://github.com/KFosterReed>`__ have permission to
-  merge pull requests into it.
+  repo admins have permission to merge pull requests into it.
 
 ``scientific_documentation_updates``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,7 +98,8 @@ Merging to ``test``
 1. **Prepare a Release Candidate**
 
    - When the development team decides to prepare a release,
-     merge ``dev`` into ``test``.
+     update the version number in ``pyproject.toml`` on the ``dev``
+     branch and merge ``dev`` into ``test``.
 
 2. **Testing Phase**
 
@@ -120,31 +124,26 @@ Merging to ``test``
 Merging to ``main``
 ~~~~~~~~~~~~~~~~~~~
 
-1. **Version Update**
-
-   - Update the version number in ``pyproject.toml`` on the ``dev``
-     branch.
-
-2. **Merge Version Update into Test**
+1. **Merge Version Update into Test**
 
    - Merge the updated ``dev`` branch into ``test`` as part of the
      release preparation.
 
-3. **Stability Confirmation**
+2. **Stability Confirmation**
 
    - Confirm that the ``test`` branch has passed validation and
      stabilization testing.
 
-4. **PML Approval**
+3. **PML Approval**
 
    - The **Project Management Lead (PML)** must approve the release and
      the release notes before the merge to ``main`` is performed.
 
-5. **Merge to Main**
+4. **Merge to Main**
 
    - Pull the stable updates from ``test`` into ``main``.
 
-6. **Tag the Release**
+5. **Tag the Release**
 
    - Create a Git tag corresponding to the version number
      (for example ``v1.2.0``).
