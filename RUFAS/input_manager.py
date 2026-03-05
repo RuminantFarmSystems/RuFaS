@@ -165,8 +165,9 @@ class InputManager:
                 cross_validation_blocks = cross_validation_ruleset.get("cross-validation", [])
                 for block in cross_validation_blocks:
                     target_and_save_block = block.get("target_and_save", {})
-                    target_and_save_result = self._extract_target_and_save_block(target_and_save_block,
-                                                                                 eager_termination)
+                    target_and_save_result = self._extract_target_and_save_block(
+                        target_and_save_block, eager_termination
+                    )
                     is_cross_validation_successful = self.cross_validator.cross_validate_data(
                         target_and_save_result,
                         block,
@@ -543,7 +544,9 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_cross_validation(self, cross_validation_paths: list[str] | None) -> list[dict[str, list[dict[str, Any]]]] | None:
+    def _load_cross_validation(
+        self, cross_validation_paths: list[str] | None
+    ) -> list[dict[str, list[dict[str, Any]]]] | None:
         """
         Loads cross-validation rules from a list of file paths. Each file is expected to contain
         JSON-encoded data representing cross-validation configurations. If no paths are provided,

@@ -472,31 +472,37 @@ def test_cross_validate_data(
         side_effect = []
     elif cv_scenario == "all_pass":
         cv_path = ["mock/cv/path"]
-        cv_blocks = [{
-            "cross-validation": [
-                {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
-            ]
-        }]
+        cv_blocks = [
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                ]
+            }
+        ]
         side_effect = [True, True]
     elif cv_scenario == "first_fail_eager_true":
         cv_path = ["mock/cv/path"]
-        cv_blocks = [{
-            "cross-validation": [
-                {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
-            ]
-        }]
+        cv_blocks = [
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                ]
+            }
+        ]
         side_effect = [False, True]
     elif cv_scenario == "two_fail_eager_false":
         cv_path = ["mock/cv/path"]
-        cv_blocks = [{
-            "cross-validation": [
-                {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
-                {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
-            ]
-        }]
+        cv_blocks = [
+            {
+                "cross-validation": [
+                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+                ]
+            }
+        ]
         side_effect = [False, False, True]
     elif cv_scenario == "multiple_pass":
         cv_path = ["mock/cv/path1", "mock/cv/path2"]
@@ -511,7 +517,7 @@ def test_cross_validate_data(
                 "cross-validation": [
                     {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
                 ]
-            }
+            },
         ]
         side_effect = [True, True, True]
     else:
