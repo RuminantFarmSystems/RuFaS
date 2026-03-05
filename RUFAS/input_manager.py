@@ -137,33 +137,57 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
+        is_input_data_valid = self._cross_validate_data(eager_termination) and is_input_data_valid
+        self.om.route_logs(self.data_validator.event_logs)
+        return is_input_data_valid
+
+    def _cross_validate_data(self, eager_termination: bool) -> bool:
+        """
+        Validates data against cross-validation rules and reports any failures.
+
+        Parameters
+        ----------
+        eager_termination : bool
+            If True, the validation process stops after the first cross-validation
+            failure. Otherwise, it continues validating all the rules.
+
+        Returns
+        -------
+        bool
+            Returns True if all cross-validation rules pass. Returns False if one
+            or more rules fail.
+        """
         failing_cross_validation_blocks: list[str] = []
-        cross_validation_blocks = self.__metadata.get("cross-validation", [])
-        if cross_validation_blocks:
-            for block in cross_validation_blocks:
-                target_and_save_block = block.get("target_and_save", {})
-                target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
-                is_cross_validation_successful = self.cross_validator.cross_validate_data(
-                    target_and_save_result,
-                    block,
-                    eager_termination,
-                )
-                if not is_cross_validation_successful:
-                    failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
-                    if eager_termination:
-                        break
+        cross_validation_file_paths: list[str] | None = self.__metadata.get("cross-validation", None)
+        cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
+        if cross_validation_rules is not None and len(cross_validation_rules) > 0:
+            for cross_validation_ruleset in cross_validation_rules:
+                cross_validation_blocks = cross_validation_ruleset.get("cross-validation", [])
+                for block in cross_validation_blocks:
+                    target_and_save_block = block.get("target_and_save", {})
+                    target_and_save_result = self._extract_target_and_save_block(
+                        target_and_save_block, eager_termination
+                    )
+                    is_cross_validation_successful = self.cross_validator.cross_validate_data(
+                        target_and_save_result,
+                        block,
+                        eager_termination,
+                    )
+                    if not is_cross_validation_successful:
+                        failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
+                        if eager_termination:
+                            break
         if len(failing_cross_validation_blocks) > 0:
             self.om.add_error(
                 "Cross Validation Failure",
                 "One or more cross-validation rules failed: " f"{', '.join(failing_cross_validation_blocks)}",
                 {
                     "class": self.__class__.__name__,
-                    "function": self.start_data_processing.__name__,
+                    "function": self._cross_validate_data.__name__,
                 },
             )
-            is_input_data_valid = False
-        self.om.route_logs(self.data_validator.event_logs)
-        return is_input_data_valid
+            return False
+        return True
 
     def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
         """Validates that all required file blobs are present in the metadata."""
@@ -519,6 +543,70 @@ class InputManager:
                 )
         except Exception as e:
             raise e
+
+    def _load_cross_validation(
+        self, cross_validation_paths: list[str] | None
+    ) -> list[dict[str, list[dict[str, Any]]]] | None:
+        """
+        Loads cross-validation rules from a list of file paths. Each file is expected to contain
+        JSON-encoded data representing cross-validation configurations. If no paths are provided,
+        the method returns `None`.
+
+        Parameters
+        ----------
+        cross_validation_paths : list of str or None
+            A list of file paths to JSON-formatted cross-validation files. If `None` is provided,
+            the method returns `None`.
+
+        Returns
+        -------
+        list of dict or None
+            A list of dictionaries containing the loaded cross-validation configuration data from
+            the JSON files. Returns `None` if `cross_validation_paths` is `None`.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a specified file cannot be found at the provided path.
+
+        json.JSONDecodeError
+            If a file is not properly formatted as JSON.
+
+        Exception
+            If an unexpected error occurs during the file loading process.
+        """
+        if cross_validation_paths is None:
+            return None
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_cross_validation.__name__,
+        }
+        cross_validation_rules: list[dict[str, list[dict[str, Any]]]] = []
+        for cross_validation_path in cross_validation_paths:
+            self.om.add_log(
+                "load_cross_validation_attempt",
+                f"Attempting to load cross validation data from {cross_validation_path}.",
+                info_map,
+            )
+            try:
+                with open(Path(cross_validation_path)) as cross_validation_file:
+                    self.om.add_log(
+                        "load_metadata_success",
+                        f"Successfully loaded metadata from {cross_validation_path}",
+                        info_map,
+                    )
+                    cross_validation_rules.append(json.load(cross_validation_file))
+            except FileNotFoundError as fnfe:
+                self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+                raise
+            except json.JSONDecodeError as jde:
+                self.om.add_error("load_properties_json_error", str(jde), info_map)
+                raise
+            except Exception as e:
+                self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+                raise
+        return cross_validation_rules
 
     def _load_properties(self) -> None:
         """

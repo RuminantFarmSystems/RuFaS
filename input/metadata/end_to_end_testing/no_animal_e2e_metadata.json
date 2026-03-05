@@ -256,5 +256,5 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": {}
+  "cross-validation": ["input/metadata/cross_validation/example_cross_validation.json"]
 }
