@@ -46,7 +46,7 @@ To set up Output Manager to capture data from a RuFaS simulation:
 - To capture all variables, you would enter ``.*``. For more details on
   how to write RegEx patterns to help capture the specific data you
   need, `see the pattern matching
-  section. <https://github.com/RuminantFarmSystems/RuFaS/wiki/Output-Manager#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file>`__
+  section. <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Output-Manager#here-are-some-base-example-patterns-that-can-be-used-as-templates-for-making-your-own-filter-pattern-file>`__
 
 3. Run a simulation!
 
@@ -236,7 +236,7 @@ that have any effect are ``"name"``, ``"filters"``, ``"variables"``, and
 | simplify_units            | bool                                                                       | true               | N/A                        | If false, complex units from aggregation won't be simplified.                               | ``false``                                                                   | No               |
 +---------------------------+----------------------------------------------------------------------------+--------------------+----------------------------+---------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------+------------------+
 | data_significant_digits   | int                                                                        | N/A                | # significant digits for   | # significant digits for reported data. `See further details in RG                          | ``2``                                                                       | No - only occurs |
-|                           |                                                                            |                    | graphed data.              | wiki. <https://github.com/RuminantFarmSystems/RuFaS/wiki/Report-Generator#filter-content>`__ |                                                                             | at               |
+|                           |                                                                            |                    | graphed data.              | wiki. <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Report-Generator.html#filter-content>`__ |                                                                             | at               |
 |                           |                                                                            |                    |                            |                                                                                             |                                                                             | post-processing  |
 |                           |                                                                            |                    |                            |                                                                                             |                                                                             | stage. Will not  |
 |                           |                                                                            |                    |                            |                                                                                             |                                                                             | cause values to  |
