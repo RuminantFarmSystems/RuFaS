@@ -207,7 +207,7 @@ class EmissionsEstimator:
         county_codes = feed_emissions_data["county_code"]
         try:
             emissions_index = county_codes.index(county_code)
-        except ValueError as e:
+        except ValueError:
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._get_feed_emissions_data.__name__,
@@ -217,7 +217,7 @@ class EmissionsEstimator:
                 f"Emission data have county codes {county_codes}," f"Tried to get data with county code: {county_code}",
                 info_map,
             )
-            raise e
+            raise
 
         feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
