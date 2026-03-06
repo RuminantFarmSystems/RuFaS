@@ -211,7 +211,7 @@ class InputManager:
                 f"Please add all missing file blobs to metadata.",
                 info_map,
             )
-            raise ValueError(f"Input Validation Error: Missing required file blobs: {list(missing_blobs)}")
+            raise ValueError(f"Input Manager Error: Missing required file blobs: {list(missing_blobs)}")
         else:
             self.om.add_log(
                 "Required Metadata File Blob Validation",
@@ -550,7 +550,7 @@ class InputManager:
                     info_map,
                 )
         except Exception as e:
-            raise type(e)(f"Input Validation Error: {e}") from e
+            raise type(e)(f"Input Manager Error: {e}") from e
 
     def _load_cross_validation(
         self, cross_validation_paths: list[str] | None
@@ -645,11 +645,11 @@ class InputManager:
                 properties_paths = [properties_paths]
             if not isinstance(properties_paths, list) or len(properties_paths) == 0:
                 raise ValueError(
-                    "Input Validation Error: Properties paths must be a non-empty string or list of " "strings"
+                    "Input Manager Error: Properties paths must be a non-empty string or list of strings"
                 )
 
             if not all(isinstance(path, str) and path for path in properties_paths):
-                raise ValueError("Input Validation Error: Each properties path must be a non-empty string")
+                raise ValueError("Input Manager Error: Each properties path must be a non-empty string")
 
             self.om.add_log(
                 "load_properties_attempt",
@@ -661,7 +661,7 @@ class InputManager:
             for properties_path_str in properties_paths:
                 properties_path = Path(properties_path_str)
                 if not properties_path.exists():
-                    raise FileNotFoundError(f"Input Validation Error: Properties file not found at {properties_path}")
+                    raise FileNotFoundError(f"Input Manager Error: Properties file not found at {properties_path}")
                 loaded_properties = self._load_data_from_json(properties_path)
                 combined_properties.update(loaded_properties)
 
@@ -675,13 +675,13 @@ class InputManager:
             )
 
         except FileNotFoundError as fnfe:
-            self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            self.om.add_error("File at path not found", str(fnfe), info_map)
             raise
         except json.JSONDecodeError as jde:
-            self.om.add_error("load_properties_json_error", str(jde), info_map)
+            self.om.add_error("JSON decode error in file at path", str(jde), info_map)
             raise
         except Exception as e:
-            self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            self.om.add_error("Unexpected error when loading file at path: {e}", str(e), info_map)
             raise
 
     def _load_data_from_json(self, file_path: Path) -> dict[str, Any]:
@@ -718,7 +718,14 @@ class InputManager:
                     info_map,
                 )
                 return data
-        except Exception:
+        except FileNotFoundError as fnfe:
+            self.om.add_error(f"File at path {file_path} not found", str(fnfe), info_map)
+            raise
+        except json.JSONDecodeError as jde:
+            self.om.add_error(f"JSON decode error in file at path {file_path}", str(jde), info_map)
+            raise
+        except Exception as e:
+            self.om.add_error(f"Unexpected error when loading file at path {file_path}: {e}", str(e), info_map)
             raise
 
     def _load_data_from_csv(self, file_path: Path) -> dict[str, Any]:
@@ -739,6 +746,10 @@ class InputManager:
         ------
         FileNotFoundError
             If the CSV file does not exist at the specified path.
+        pd.errors.EmptyDataError
+            If the CSV file is empty.
+        pd.errors.ParserError
+            If there is a parse error in the CSV file.
         Exception
             For any other unexpected errors during CSV file loading.
 
@@ -759,8 +770,18 @@ class InputManager:
                         info_map,
                     )
                 return data_dict
+        except FileNotFoundError as fnfe:
+            self.om.add_error(f"File at path {file_path} not found", str(fnfe), info_map)
+            raise
+        except pd.errors.EmptyDataError as ede:
+            self.om.add_error(f"CSV file at path {file_path} is empty", str(ede), info_map)
+            raise
+        except pd.errors.ParserError as pe:
+            self.om.add_error(f"CSV parse error in file at path {file_path}", str(pe), info_map)
+            raise
         except Exception as e:
-            raise type(e)(f"Input Validation Error when trying to load {file_path}: {e}") from e
+            self.om.add_error(f"Unexpected error when loading file at path {file_path}: {e}", str(e), info_map)
+            raise
 
     def _populate_pool(self, input_root: Path, eager_termination: bool) -> bool:
         """
@@ -803,7 +824,7 @@ class InputManager:
                 input_data = data_loader(file_path)
             except KeyError:
                 raise KeyError(
-                    f"Input Validation Error: Faulty data type in {file_blob_key},"
+                    f"Input Manager Error: Faulty data type in {file_blob_key},"
                     f"supported types are: {data_type_to_loader_map.keys()}"
                 )
 
@@ -1732,17 +1753,17 @@ class InputManager:
                 f"Unable to save to {path_to_save} because of {fnfe}.",
                 info_map,
             )
-            raise fnfe
+            raise FileNotFoundError(f"Metadata Properties Save CSV failure: {fnfe}") from fnfe
         except PermissionError as pe:
             self.om.add_error(
                 "Metadata Properties Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map
             )
-            raise pe
+            raise PermissionError(f"Metadata Properties Save CSV failure: {pe}") from pe
         except OSError as e:
             self.om.add_error(
                 "Metadata Properties Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map
             )
-            raise e
+            raise OSError(f"Metadata Properties Save CSV failure: {e}") from e
 
     def _parse_metadata_properties(
         self, data: dict[str, Any], prefix: str = "", sep: str = "_"
