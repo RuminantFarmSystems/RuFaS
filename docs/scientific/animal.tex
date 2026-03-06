@@ -1,15 +1,20 @@
 \part{Animal Module}
+% Global Table of Contents
+\thispagestyle{fancy}
 
-\etocsettocstyle{\subsection*{Contents}}{} % title of the module ToC
-\etocsetnexttocdepth{subsubsection}        % choose depth: section/subsection/subsubsection
+% Local TOC that includes only what’s inside THIS section
+\etocsettocstyle{\subsection*{Contents}}{} % heading for the local toc
+\etocsetnexttocdepth{subsection}           % or subsubsection
 \localtableofcontents
 \newpage
 
-\listoffigures
+\section*{List of Figures}
+\locallistoffigures
 \newpage
 
-\listoftables
-
+\section*{List of Tables}
+\locallistoftables
+\newpage
 
 
 \section{Module Introduction}

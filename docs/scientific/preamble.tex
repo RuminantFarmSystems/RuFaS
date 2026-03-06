@@ -106,11 +106,11 @@
 
 % Reset subsection counter at each new section
 \pretocmd{\section}{\setcounter{subsection}{0}}{}{}
+\pretocmd{\subsection}{\setcounter{subsubsection}{0}}{}{}
 
-% Roman for \section, Alpha for \subsection, alpha for \subsubsection
-\renewcommand{\thesection}{\Roman{section}.}           % I, II, III...
-\renewcommand{\thesubsection}{\Alph{subsection}.}       % A, B, C...
-\renewcommand{\thesubsubsection}{\alph{subsubsection}.} % a, b, c...
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\roman{subsubsection}}
 
 % --- Title Formats (in size order) ---
 \titleformat{\section}[block]
@@ -137,8 +137,8 @@
 \titlespacing{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt}
 
 % Optional: Keep your TOC control if needed
-\usepackage{etoc}
-
+\usepackage[lof,lot]{etoc}
+\etocsetlocaltop{part}
 % Optional: If using headers/footers
 \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
 
