@@ -92,16 +92,7 @@ RuFaS adopted the [![Contributor Covenant](https://img.shields.io/badge/Contribu
 
 ## Forking Guidelines
 
-We fully support private forks for your own internal use, experimentation, or customization. However, **if you wish to contribute back to this project via pull request**, your fork must be public. This requirement exists because:
-
-- Our CI/CD workflows need access to run automated GitHub Action tests and checks.
-- GitHub merge conflict resolution depends on fork access.
-
-If you're working in a private fork and want to contribute, you can either:
-- Make your fork public before opening the PR, or
-- Create a new public fork specifically for contributions.
-
-We understand privacy is important and respect your need for private implementations. This requirement only applies when contributing back to the main RuFaS project.
+We support both public and private forks. See detailed guidelines for forking from the RuFaS repository in the [FORKING.MD page](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/FORKING.md)
 
 ---
 
