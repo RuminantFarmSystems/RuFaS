@@ -12,11 +12,11 @@ calculation, please refer to the [energykey](energy requirements key).
   
   $$CBW = MW * 0.06275$$ {#eq-nrc-cbw}
   
-  $$CW = {(18 + (DOP - 190) * 0.665) * ( \frac{CBW}{45}),~\text{if}~DOP > 190.0}$$ {#eq-nrc-cw}
+  $$ CW = {(18 + (DOP - 190) * 0.665) * (\frac{CBW}{45}),\text{if}DOP > 190.0} $$ {#eq-nrc-cw}
   
   *Otherwise*
   
-  $$NEmaint = 0.08 \times (BW - CW)^{0.75}$$ {#eq-nrc-ne-maint}
+  $$ NEmaint = 0.08 \times (BW - CW)^{0.75} $$ {#eq-nrc-ne-maint}
 
 ## Reformatted equations
 
@@ -33,7 +33,7 @@ equation can still be cross-referenceable (and assigned a dynamic
 equation number) by using a custom cross-reference class (defined in _quarto.yml):
 
 :::{#eqn-an-nrc-2}
-$$CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
 :::
 
 see @eqn-an-nrc-2

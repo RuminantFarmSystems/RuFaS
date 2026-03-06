@@ -9,7 +9,7 @@ book:
   subtitle: "Scientific Documentation"
   version: 1.0
   ## specify downloadable formats
-  downloads: [pdf, epub]
+  downloads: [pdf]
   date: today
   ## list of quarto documents to render the book (in order)
   chapters:
@@ -32,17 +32,21 @@ format:
     # keep-tex: true # keep the intermediate LaTeX files
     number-depth: 2
     colorlinks: true
-#    include-in-header:
-#     - preamble-latex.tex # file(s) with LaTeX for document formatting, etc.
-  epub:
-    cover-image: resources/rufas.png
+    papersize: A4
+    pagestyle: empty
+    geometry: # PDF geometry
+      - right = 1in
+      - left = 1in
+    #include-in-header:
+    # - preamble-latex.tex # file(s) with LaTeX for document formatting, etc.
 
 crossref:
-  custom:
+    custom:
     - kind: float
       reference-prefix: Equation
       caption-location: margin
       key: eqn
+      latex-env: Equation
 
 # list of .bib files
 bibliography: ../resources/animal.bib

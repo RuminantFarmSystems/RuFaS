@@ -116,7 +116,7 @@ window.Quarto = {
 
 </head>
 
-<body class="nav-sidebar floating quarto-light">
+<body class="nav-sidebar floating slimcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -158,23 +158,7 @@ window.Quarto = {
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Ruminant Farm System Model</a> 
         <div class="sidebar-tools-main">
-    <div class="dropdown">
-      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="./Ruminant-Farm-System-Model.pdf">
-              <i class="bi bi-file-pdf pe-1"></i>
-            Download PDF
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="./Ruminant-Farm-System-Model.epub">
-              <i class="bi bi-journal pe-1"></i>
-            Download ePub
-            </a>
-          </li>
-      </ul>
-    </div>
+    <a href="./Ruminant-Farm-System-Model.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
 </div>
     </div>
       </div>
@@ -220,7 +204,7 @@ window.Quarto = {
 </nav>
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
@@ -233,9 +217,9 @@ window.Quarto = {
 <li><p><strong><em>Maintenance</em></strong> - The maintenance requirement is calculated based on metabolic body weight (body weight<span class="math inline">^{0.75}</span>).</p>
 <p><u>Lactating and Dry Cows</u></p>
 <p><span id="eq-nrc-cbw"><span class="math display">CBW = MW * 0.06275 \tag{2.1}</span></span></p>
-<p><span id="eq-nrc-cw"><span class="math display">CW = {(18 + (DOP - 190) * 0.665) * ( \frac{CBW}{45}),~\text{if}~DOP &gt; 190.0} \tag{2.2}</span></span></p>
+<p><span id="eq-nrc-cw"><span class="math display"> CW = {(18 + (DOP - 190) * 0.665) * (\frac{CBW}{45}),\text{if}DOP &gt; 190.0}  \tag{2.2}</span></span></p>
 <p><em>Otherwise</em></p>
-<p><span id="eq-nrc-ne-maint"><span class="math display">NEmaint = 0.08 \times (BW - CW)^{0.75} \tag{2.3}</span></span></p></li>
+<p><span id="eq-nrc-ne-maint"><span class="math display"> NEmaint = 0.08 \times (BW - CW)^{0.75}  \tag{2.3}</span></span></p></li>
 </ul>
 </section>
 <section id="reformatted-equations" class="level2" data-number="2.2">
@@ -243,10 +227,20 @@ window.Quarto = {
 <p><a href="#eq-nrc-cbw" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> may be visually improved by using the <code>\times</code> LaTeX command:</p>
 <p><span class="math display">CBW = MW \times 0.06275</span></p>
 </section>
-<section id="use-alphanumeric-equation-labels" class="level1" data-number="3">
+<section id="use-alphanumeric-equation-labels" class="level1 page-columns page-full" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Use alphanumeric equation labels</h1>
-<p>Through quarto does not allow custom labels, you can include your own using the \tag latex command:</p>
-<p><span class="math display">CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}</span></p>
+<p>Though quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \tag latex command. <em>And</em> the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):</p>
+<div id="eqn-an-nrc-2" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-eqn figure page-columns page-full">
+<div aria-describedby="eqn-an-nrc-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p><span class="math display"> CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}</span></p>
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-eqn quarto-uncaptioned margin-caption" id="eqn-an-nrc-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Equation&nbsp;3.1
+</figcaption>
+</figure>
+</div>
+<p>see <a href="#eqn-an-nrc-2" class="quarto-xref">Equation&nbsp;<span>3.1</span></a></p>
 
 
 </section>
