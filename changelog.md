@@ -25,6 +25,7 @@ v1.0.0
 
 ### Next Version Updates
 
+- [2793](https://github.com/RuminantFarmSystems/RuFaS/pull/2793) - [minor change] [Animal] [NoInputChange] [OutputManager] Use manure VS DMI minima for lactating and dry cows; emit an end-of-simulation summary warning with below-minimum frequency counts.
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
 - [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
