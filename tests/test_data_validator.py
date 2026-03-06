@@ -757,7 +757,7 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
 def test_fix_number_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str | int],
-    expected_value: str,
+    expected_value: int | float | str | bool | None,
     expected_result: bool,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
@@ -791,7 +791,7 @@ def test_fix_number_type_fixable_data(
         dummy_properties_key,
     )
 
-    variable_to_check = dummy_input_data
+    variable_to_check: Any = dummy_input_data
     for key in dummy_element_hierarchy:
         if isinstance(variable_to_check, list):
             variable_to_check = variable_to_check[int(key)]
