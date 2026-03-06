@@ -25,6 +25,7 @@ v1.0.0
 
 ### Next Version Updates
 
+- [2835](https://github.com/RuminantFarmSystems/RuFaS/pull/2835) - [minor change] [Documentation] [Animal Module] [NoInputChange] [NoOutputChange] Document the minimum DMI (7.1 kg/d per cow) used for manure volatile solids excretion per Appuhamy et al. 2018.
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
 - [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
