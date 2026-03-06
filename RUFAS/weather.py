@@ -317,10 +317,10 @@ class Weather:
         time: RufasTime
             The RufasTime instance containing time configuration information of the simulation.
 
-        Returns
-        -------
-        None
-
+        Raises
+        ------
+        ValueError
+            If there is not enough weather data to cover the simulation period.
         """
         om = OutputManager()
         years_list = weather_file["year"]

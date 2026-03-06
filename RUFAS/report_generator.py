@@ -155,8 +155,7 @@ class ReportGenerator:
         filter_content: dict[str, Any],
     ) -> bool:
         """
-        Check if the 'horizontal_first' property (when present) in the report filter is a boolean.
-        If not, raise an error. Return the value of 'horizontal_first' or False as the default value.
+        Return the value of 'horizontal_first' or False as the default value.
 
         Parameters
         ----------
@@ -168,23 +167,11 @@ class ReportGenerator:
         -------
         bool
             The value of 'horizontal_first' in the report filter, or False if it is not present.
-
-        Raises
-        ------
-        ValueError
-            If the value of 'horizontal_first' in the report filter is not a boolean.
         """
 
-        horizontal_first = filter_content.get("horizontal_first", False)
+        horizontal_first: bool = filter_content.get("horizontal_first", False)
         if not horizontal_first:
             return False
-
-        if not isinstance(horizontal_first, bool):
-            raise ValueError(
-                f"The value of 'horizontal_first' in the report filter should be a boolean. "
-                f"Value provided: {repr(filter_content['horizontal_first'])} "
-                f"(type {type(filter_content['horizontal_first'])})"
-            )
 
         return horizontal_first
 
@@ -277,7 +264,8 @@ class ReportGenerator:
 
         if missing_references:
             raise KeyError(
-                f"Missing referenced reports matching the following pattern(s): {', '.join(missing_references)}"
+                "Report Generator error: Missing referenced reports matching the following pattern(s): "
+                f"{', '.join(missing_references)}"
             )
 
     def _get_reports_by_regex(self, regex_patterns: list[str]) -> dict[str, dict[str, list[Any]]]:
@@ -352,14 +340,18 @@ class ReportGenerator:
                 report_data = self._add_var_units(report_data)
             report_data = {key: report_data[key]["values"] for key in report_data}
             if not all(report_data[key] for key in report_data):
-                raise ValueError
+                raise ValueError(
+                    "Report Generator error: One or more columns in the report data are empty, "
+                    "cannot perform aggregations."
+                )
             event_logs = self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise
 
         if not report_data:
             raise ValueError(
-                f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
+                f"Report Generator error: filter {filter_content.get('filters')} in {filter_content.get('name')} "
+                "led to empty report data."
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
@@ -500,6 +492,11 @@ class ReportGenerator:
         simplify_units : bool
             Whether to simplify and reduce the units.
 
+        Raises
+        ------
+        ValueError
+            If there is an error extracting units from the report data.
+
         Returns
         -------
         tuple[str | Any, dict[str, str | dict[str, str]]]
@@ -508,7 +505,7 @@ class ReportGenerator:
         """
         event_log: dict[str, str | dict[str, str]] = {}
         if len(report_data) == 0:
-            raise ValueError("No report data available to aggregate units from.")
+            raise ValueError("Report Generator error: No report data available to aggregate units from.")
         elif len(report_data) == 1 or len(report_data) > 2:
             var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
             if var_units_match:
@@ -568,11 +565,6 @@ class ReportGenerator:
         -------
         tuple[dict[str, int], dict[str, int], dict[str, str | dict[str, str]]]
             Two dictionaries representing the combined numerator and denominator units along with the event logs.
-
-        Raises
-        ------
-        ValueError
-            If the operation is addition or subtraction and the units are not the same.
         """
         info_map: dict[str, str] = {
             "class": ReportGenerator.__class__.__name__,
@@ -688,12 +680,6 @@ class ReportGenerator:
         tuple[str | None, str | None]
             A tuple containing the horizontal and vertical aggregation keys, respectively.
             Returns None for each key if it is not specified or if it is not among the supported types.
-
-        Raises
-        ------
-        ValueError
-            Raised if the specified horizontal or vertical aggregation type is not supported.
-            Supported types are defined in the AGGREGATION_FUNCTIONS dictionary.
         """
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
@@ -736,7 +722,7 @@ class ReportGenerator:
 
         lengths = [len(report_data[key]) for key in report_data if any(loop_key in key for loop_key in loop_list)]
         if len(set(lengths)) != 1:
-            raise ValueError("Can't aggregate data with different lengths")
+            raise ValueError("Report Generator error: Can't aggregate data with different lengths")
         max_length = max(lengths)
         aggregated_data: list[float] = []
         event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -965,22 +951,22 @@ class ReportGenerator:
 
         for name, value in constants_config.items():
             if name in existing_reports:
-                raise ValueError(f"Constant name {name} already exists in report data.")
+                raise ValueError(f"Report Generator error: Constant name {name} already exists in report data.")
 
             if name is None:
-                raise ValueError("Constant name cannot be None.")
+                raise ValueError("Report Generator error: Constant name cannot be None.")
 
             if value is None:
-                raise ValueError("Constant value cannot be None.")
+                raise ValueError("Report Generator error: Constant value cannot be None.")
 
             if not isinstance(name, str):
-                raise ValueError(f"Constant name {name} must be a string and cannot be empty.")
+                raise ValueError(f"Report Generator error: Constant name {name} must be a string and cannot be empty.")
 
             if len(name) == 0:
-                raise ValueError(f"Constant name {name} cannot be empty.")
+                raise ValueError(f"Report Generator error: Constant name {name} cannot be empty.")
 
             if not isinstance(value, (int, float)):
-                raise ValueError(f"Constant value {value} must be a number.")
+                raise ValueError(f"Report Generator error: Constant value {value} must be a number.")
 
     @staticmethod
     def _normalize_constant_name(name: str) -> str:
