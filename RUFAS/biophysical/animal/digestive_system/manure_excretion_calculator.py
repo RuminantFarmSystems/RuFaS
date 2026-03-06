@@ -11,9 +11,9 @@ from RUFAS.user_constants import UserConstants
 from RUFAS.output_manager import OutputManager
 
 
-class _DMIClipStats(TypedDict):
+class _DMIBelowMinStats(TypedDict):
     n_total: int
-    n_clipped: int
+    n_below_min: int
 
 
 class ManureExcretionCalculator:
@@ -21,11 +21,10 @@ class ManureExcretionCalculator:
 
     _DMI_KIND: Final = Literal["lact", "dry"]
 
-    _dmi_clip_stats: dict[_DMI_KIND, _DMIClipStats] = {
-        "lact": {"n_total": 0, "n_clipped": 0},
-        "dry": {"n_total": 0, "n_clipped": 0},
+    _dmi_below_min_stats: dict[_DMI_KIND, _DMIBelowMinStats] = {
+        "lact": {"n_total": 0, "n_below_min": 0},
+        "dry": {"n_total": 0, "n_below_min": 0},
     }
-    _dmi_clip_warned: dict[_DMI_KIND, bool] = {"lact": False, "dry": False}
 
     @staticmethod
     def _safe_pct(n: int, d: int) -> float:
@@ -39,7 +38,7 @@ class ManureExcretionCalculator:
         dmi_effective: float,
         context: dict[str, Any],
     ) -> None:
-        """Track DMI clipping and warn once per kind.
+        """Track DMI below-minimum counts for end-of-simulation summary.
 
         Parameters
         ----------
@@ -52,31 +51,38 @@ class ManureExcretionCalculator:
         context : dict[str, Any]
             info_map-like context for OutputManager warnings.
         """
-        stats = ManureExcretionCalculator._dmi_clip_stats[kind]
+        stats = ManureExcretionCalculator._dmi_below_min_stats[kind]
         stats["n_total"] += 1
 
         if kind == "lact":
-            floor = AnimalModuleConstants.MINIMUM_DMI_LACT
+            floor = AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS
         else:
-            floor = AnimalModuleConstants.MINIMUM_DMI_DRY
+            floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
 
-        clipped = dmi_predicted < floor
-        if clipped:
-            stats["n_clipped"] += 1
+        if dmi_effective < floor:
+            stats["n_below_min"] += 1
 
-        if clipped and not ManureExcretionCalculator._dmi_clip_warned[kind]:
-            ManureExcretionCalculator._dmi_clip_warned[kind] = True
+    @staticmethod
+    def emit_dmi_below_min_summary(context: dict[str, Any]) -> None:
+        """Emit a summary warning for DMI below-minimum frequency."""
+        for kind in ("lact", "dry"):
+            stats = ManureExcretionCalculator._dmi_below_min_stats[kind]
+            if stats["n_below_min"] == 0:
+                continue
+
+            if kind == "lact":
+                floor = AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS
+            else:
+                floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
 
             msg = (
-                f"Predicted DMI for manure excretion is below the literature minimum for {kind} cows "
-                f"(DMI={dmi_predicted:.3f} kg/d < {floor:.3f} kg/d). "
-                f"Clipping applied to {floor:.3f} kg/d. "
-                f"Cumulative so far: clipped {stats['n_clipped']}/{stats['n_total']} "
-                f"({ManureExcretionCalculator._safe_pct(stats['n_clipped'], stats['n_total']):.1f}%)."
+                f"Final counts for effective DMI below the literature minimum for {kind} cows "
+                f"({floor:.3f} kg/d): {stats['n_below_min']}/{stats['n_total']} "
+                f"({ManureExcretionCalculator._safe_pct(stats['n_below_min'], stats['n_total']):.1f}%)."
             )
 
             OutputManager().add_warning(
-                "DMI minimum warning (manure excretion)",
+                "DMI minimum summary (manure excretion)",
                 msg,
                 context,
             )
