@@ -1,17 +1,17 @@
-[0] Config.pm:328> INFO - This is Biber 2.21
-[0] Config.pm:331> INFO - Logfile is 'animalmoddoc.blg'
-[37] biber-darwin:342> INFO - === Fri Mar  6, 2026, 12:26:43
-[47] Biber.pm:421> INFO - Reading 'animalmoddoc.bcf'
-[96] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
-[97] Biber.pm:1002> INFO - Found 29 citekeys in bib section 1
-[97] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
-[112] Biber.pm:4487> INFO - Processing section 1
-[119] Biber.pm:4678> INFO - Looking for bibtex file 'resources/animal.bib' for section 1
-[121] bibtex.pm:1713> INFO - LaTeX decoding ...
-[150] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/animal.bib'
-[295] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[295] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[295] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
-[295] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[319] bbl.pm:676> INFO - Writing 'animalmoddoc.bbl' with encoding 'UTF-8'
-[331] bbl.pm:779> INFO - Output to animalmoddoc.bbl
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'animalmoddoc.blg'
+[213] biber-MSWIN64:340> INFO - === 
+[287] Biber.pm:419> INFO - Reading 'animalmoddoc.bcf'
+[471] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[474] Biber.pm:979> INFO - Found 29 citekeys in bib section 1
+[475] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[505] Biber.pm:4419> INFO - Processing section 1
+[525] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 1
+[623] bibtex.pm:1713> INFO - LaTeX decoding ...
+[851] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/animal.bib'
+[1322] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1322] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1322] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[1323] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[1422] bbl.pm:660> INFO - Writing 'animalmoddoc.bbl' with encoding 'UTF-8'
+[1472] bbl.pm:763> INFO - Output to animalmoddoc.bbl
