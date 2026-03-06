@@ -53,28 +53,16 @@
   ],
   "separator": [
     {
-      "name": "rotary_screen_1",
-      "processor_type": "RotaryScreen",
-      "separated_solids_dry_matter": 0.20,
-      "total_solids_efficiency": 0.35,
-      "volatile_solids_efficiency": 0.40,
-      "nitrogen_efficiency": 0.30,
-      "ammoniacal_nitrogen_efficiency": 0.15,
-      "phosphorus_efficiency": 0.40,
-      "potassium_efficiency": 0.15,
-      "ash_efficiency": 0.20
-    },
-    {
-      "name": "screw_press_1",
+      "name": "sand-lane",
       "processor_type": "ScrewPress",
-      "separated_solids_dry_matter": 0.35,
-      "total_solids_efficiency": 0.25,
-      "volatile_solids_efficiency": 0.30,
-      "nitrogen_efficiency": 0.30,
-      "ammoniacal_nitrogen_efficiency": 0.10,
-      "phosphorus_efficiency": 0.20,
-      "potassium_efficiency": 0.23,
-      "ash_efficiency": 0.20
+      "separated_solids_dry_matter": 0.50,
+      "total_solids_efficiency": 0.066,
+      "volatile_solids_efficiency": 0.046,
+      "nitrogen_efficiency": 0.0,
+      "ammoniacal_nitrogen_efficiency": 0.0,
+      "phosphorus_efficiency": 0.0,
+      "potassium_efficiency": 0.0,
+      "ash_efficiency": 0.40
     }
   ],
   "storage": [

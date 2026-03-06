@@ -31,7 +31,7 @@
       "processor_name": "parlor_cleaning_handler",
       "destinations": [
         {
-          "receiving_processor_name": "anaerobic_lagoon",
+          "receiving_processor_name": "sand-lane",
           "proportion": 1.0
         }
       ]
@@ -49,5 +49,17 @@
       "destinations": []
     }
   ],
-  "separator_connections": []
+  "separator_connections": [
+    {
+      "processor_name": "sand-lane",
+      "liquid_output_destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon",
+          "proportion": 1.0
+        }
+      ],
+      "solid_output_destinations": [
+      ]
+    }
+  ]
 }
