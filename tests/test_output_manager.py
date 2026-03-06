@@ -2787,8 +2787,8 @@ def test_route_save_functions_csv_with_rounding(
         "RUFAS.util.Utility.round_numeric_values_in_dict", side_effect=lambda x, y: x
     )
 
-    filtered_pool = {"key": {"var": 123.456789}}
-    filter_content = {
+    filtered_pool = {"key": {"var": [123.456789]}}
+    filter_content: dict[str, str | int] = {
         "filters": "regex",
         "data_significant_digits": 3,
     }
@@ -2806,10 +2806,10 @@ def test_route_save_functions_csv_with_rounding(
     )
 
     # Assert
-    round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
+    round_numeric_values_in_dict.assert_called_once_with({"var": [123.456789]}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path), direction
+        {"key": {"var": [123.456789]}}, Path("output", "CSVs", variable_csv_file_path), direction
     )
     mock_add_log.assert_called_once_with(
         "Rounding Values",
@@ -2829,9 +2829,9 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "json_file"
     jsons_dir = Path("json_dir")
-    filtered_pool = {"key": {"var": "value"}}
+    filtered_pool = {"key": {"var": ["value"]}}
     produce_graphics = True
-    filter_content = {"filters": "regex"}
+    filter_content: dict[str, str | int] = {"filters": "regex"}
     graphics_dir = Path("graphics_dir")
     csvs_dir = Path("csvs_dir")
 
@@ -2858,9 +2858,9 @@ def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "comparison_file"
     json_dir = Path("json_dir")
-    filtered_pool = {"key": {"var": "value"}}
+    filtered_pool = {"key": {"var": ["value"]}}
     produce_graphics = True
-    filter_content = {"filters": "regex"}
+    filter_content: dict[str, str | int] = {"filters": "regex"}
     graphics_dir = Path("graphics_dir")
     csv_dir = Path("csvs_dir")
 
@@ -2907,7 +2907,7 @@ def test_save_to_json(
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
     filter_file = f"{filter_file_prefix}_filter_file{filter_file_extension}"
     save_path = tmp_path  # Using pytest's tmp_path fixture
-    filtered_pool = {"key": "value"}
+    filtered_pool = {"key": {"value": ["value"]}}
 
     # Act
     output_manager._save_to_json(filter_file, save_path, filtered_pool, filter_content)
@@ -2939,11 +2939,11 @@ def test_route_save_functions_graph(
     add_warning = mocker.patch.object(mock_output_manager, "add_warning")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
     mocker.patch.object(mock_output_manager, "route_logs", return_value=True)
-    graph_data = {"filters": ".*", "other keys": "other values"}
+    graph_data: dict[str, str | int] = {"filters": ".*", "other keys": "other values"}
 
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         False,
         graph_data,
         Path("jsons_dir"),
@@ -2962,7 +2962,7 @@ def test_route_save_functions_graph(
 
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         True,
         graph_data,
         Path("jsons_dir"),
@@ -2977,13 +2977,13 @@ def test_route_save_functions_graph(
     )
 
     mock_generate_graph.assert_called_once_with(
-        {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
+        {"key": {"value": [1, 2, 3, 4]}}, graph_data, "graph_file", Path("graphics_dir"), True
     )
 
     mock_generate_graph.side_effect = Exception("test exception")
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         True,
         graph_data,
         Path("jsons_dir"),
@@ -3130,7 +3130,7 @@ def test_route_logs(
     ],
 )
 def test_route_logs_mismatch(
-    log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+    log_pool: list[dict[str, str | dict[str, str]]], expected_calls: dict[str, int], mocker: MockerFixture
 ) -> None:
     output_manager = OutputManager()
 
@@ -3336,7 +3336,7 @@ def test_get_error_and_warning_counts(
     errors_pool: dict[str, dict[str, list[Any]]],
     warnings_pool: dict[str, dict[str, list[Any]]],
     logs_pool: dict[str, dict[str, list[Any]]],
-    expected: tuple[int, int],
+    expected: tuple[int, int, int],
 ) -> None:
     """
     Unit test for the _get_errors_warnings_logs_counts() method in OutputManager class.
@@ -3380,7 +3380,11 @@ def test_print_credits(
     """
     Unit test for the print_credits() method in OutputManager class.
     """
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     version = "v"
     mock_output_manager.print_credits(version)
 
@@ -3408,7 +3412,11 @@ def test_print_task_id(
     """
     Unit test for the print_task_id() method in OutputManager class.
     """
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     mock_output_manager.print_task_id(task_id)
     captured = capfd.readouterr()
     assert captured.out == expected_output
@@ -3427,7 +3435,11 @@ def test_print_task_id(
 def test_print_errors_warnings_logs(
     mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd: CaptureFixture[str]
 ) -> None:
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     task_id = "id"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
         mock_output_manager.print_errors_warnings_logs_counts(task_id)
@@ -3487,7 +3499,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
 
     mock_add_error.assert_any_call(
         "Invalid e2e output prefix",
-        pytest.helpers.contains("NoMatch_comparison.json") if hasattr(pytest, "helpers") else ANY,
+        ANY,
         ANY,
     )
 
@@ -3523,7 +3535,7 @@ def test__print_e2e_results_summary_formats_output(
     capsys: CaptureFixture[str], mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     """Unit test for the _print_e2e_results_summary() method in OutputManager class."""
-    summary = {
+    summary: dict[str, dict[str, bool | str]] = {
         "E2E_Animal": {
             "Animal": True,
             "CropAndSoil": False,
@@ -3847,7 +3859,11 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
 
     dummy_saved_pool_chunks_num = 0
-    dummy_variable_pool = {"a": 1, "b": "B", "c": True}
+    dummy_variable_pool: dict[str, dict[str, list[Any]]] = {
+       "a": {"values": [1]},
+        "b": {"values": ["B"]},
+        "c": {"values": [True]}
+    }
 
     output_manager.saved_pool_chunks_path = Path("dummy_path")
     output_manager.saved_pool_chunks_num = dummy_saved_pool_chunks_num
@@ -3875,7 +3891,7 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     assert output_manager.saved_pool_chunks_num == 1
 
 
-def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> None:
+def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir: py.path.local) -> None:
     tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content")
     tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content")
     tmpdir.join("saved_pool_3_dummy_timestamp.json").write("File 3 content")
@@ -4093,7 +4109,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.save_chunk_threshold_call_count = 0
     mock_output_manager.maximum_pool_size = 0
     mock_output_manager.set_metadata_prefix("test_prefix")
 
