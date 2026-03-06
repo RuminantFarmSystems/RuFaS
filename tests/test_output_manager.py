@@ -3860,9 +3860,9 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
 
     dummy_saved_pool_chunks_num = 0
     dummy_variable_pool: dict[str, dict[str, list[Any]]] = {
-       "a": {"values": [1]},
+        "a": {"values": [1]},
         "b": {"values": ["B"]},
-        "c": {"values": [True]}
+        "c": {"values": [True]},
     }
 
     output_manager.saved_pool_chunks_path = Path("dummy_path")
