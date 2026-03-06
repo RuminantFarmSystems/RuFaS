@@ -19,7 +19,7 @@ class HerdStatistics:
         Count statistics of culled animals, categorized by specified culling reasons, (unitless).
     num_cow_for_parity : dict[str, int]
         Count of cows for each parity class, (unitless).
-    stillborn_calf_info : list[SoldAnimalTypedDict]
+    stillborn_calf_info : list[StillbornCalfTypedDict]
         Details about stillborn calves including relevant attributes.
     sold_calves_info : list[SoldAnimalTypedDict]
         Details about sold calves including relevant attributes.
