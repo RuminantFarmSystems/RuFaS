@@ -14,7 +14,7 @@ Forking is encouraged when you need to:
 - **Maintain a long-lived variant** with clearly different assumptions, scope, or roadmap.
 
 Forking is discouraged when the goal is to:
-- Create confusion about the main RuFaS repository.
+- Create confusion about the primary RuFaS repository.
 - Avoid transparency while still benefiting from RuFaS community standards and credibility.
 - Make only minor, configuration-level changes that could be achieved with a plugin, adapter, parameterization, or feature flag.
 
