@@ -1909,7 +1909,7 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
             {"numpy": "1.24.0"},
             None,
             RuntimeError,
-            "does not satisfy required version",
+            "Required package 'numpy' version does not match. Installed: 1.24.0, Required: >=2.0.0",
         ),
     ],
 )

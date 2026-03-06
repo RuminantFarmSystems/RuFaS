@@ -132,7 +132,7 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         with pytest.raises(json.JSONDecodeError):
             mock_input_manager._load_properties()
-        assert add_error.call_count == 1
+        assert add_error.call_count == 2
 
 
 def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
@@ -2908,12 +2908,16 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
 
 @pytest.mark.parametrize(
     "exception, error_message",
-    [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
+    [
+        (FileNotFoundError, "No such file or directory"),
+        (PermissionError, "Permission denied"),
+        (OSError, "OS error"),
+    ],
 )
 def test_save_metadata_properties_errors(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
-    exception: Type[FileNotFoundError | PermissionError | OSError],
+    exception: type[FileNotFoundError | PermissionError | OSError],
     error_message: str,
 ) -> None:
     output_dir = Path("/example/dir")
@@ -2923,20 +2927,30 @@ def test_save_metadata_properties_errors(
     mock_input_manager.meta_data = metadata
     mock_records = [{"key": "value"}]
 
-    mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
+    mock_parse = mocker.patch.object(
+        mock_input_manager,
+        "_parse_metadata_properties",
+        return_value=mock_records,
+    )
     mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
-    mocker.patch.object(mock_input_manager.om, "generate_file_name", return_value=generated_filename)
+    mocker.patch.object(
+        mock_input_manager.om,
+        "generate_file_name",
+        return_value=generated_filename,
+    )
     mock_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
     with pytest.raises(exception) as exc_info:
         mock_input_manager.save_metadata_properties(output_dir)
 
-    assert str(exc_info.value) == error_message
+    assert str(exc_info.value) == f"Metadata Properties Save CSV failure: {error_message}"
 
     mock_parse.assert_called_once_with("test_properties")
     mock_add_error.assert_called_once_with(
-        "Save CSV failure.", f"Unable to save to {expected_path} because of {error_message}.", ANY
+        "Metadata Properties Save CSV failure.",
+        f"Unable to save to {expected_path} because of {error_message}.",
+        ANY,
     )
 
 
