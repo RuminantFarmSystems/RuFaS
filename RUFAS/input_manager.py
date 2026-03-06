@@ -644,9 +644,7 @@ class InputManager:
             if isinstance(properties_paths, str):
                 properties_paths = [properties_paths]
             if not isinstance(properties_paths, list) or len(properties_paths) == 0:
-                raise ValueError(
-                    "Input Manager Error: Properties paths must be a non-empty string or list of strings"
-                )
+                raise ValueError("Input Manager Error: Properties paths must be a non-empty string or list of strings")
 
             if not all(isinstance(path, str) and path for path in properties_paths):
                 raise ValueError("Input Manager Error: Each properties path must be a non-empty string")
