@@ -34,6 +34,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: dict[str, Any],
+        first_info_map_only: bool,
         units: dict[str, MeasurementUnits] | MeasurementUnits,
     ) -> None:
         """
@@ -62,6 +63,8 @@ class AnimalModuleReporter:
             The day of the simulation.
         info_map: Dict[str, Any]
             The info_map to use when padding.
+        first_info_map_only: bool
+            Whether to only add the info_map for the first padding entry, or to add it for all entries.
         units: Dict[str, str] | str
             Units for the variable being added, in the format provided in the main call to add_variable,
             (e.g., the one following the call of data_padder).
@@ -80,6 +83,7 @@ class AnimalModuleReporter:
                         short_variable_to_add,
                         thing_to_add,
                         info_map=dict(info_map, **{"units": units}),
+                        first_info_map_only=first_info_map_only,
                     )
 
     @classmethod
@@ -555,15 +559,17 @@ class AnimalModuleReporter:
         }
         for base_name, manure_excretion in manure_excretions.items():
             for manure_property, manure_value in asdict(manure_excretion).items():
-                reference_variable = f"{class_name}.{function_name}.CALF_PEN_0_{str(manure_property)}"
+                reference_base = list(manure_excretions.keys())[0]
+                reference_variable = f"{class_name}.{function_name}.{reference_base}_{str(manure_property)}"
                 variable_to_add = f"{class_name}.{function_name}.{base_name}_{str(manure_property)}"
                 AnimalModuleReporter.data_padder(
                     reference_variable,
                     variable_to_add,
                     0,
                     simulation_day,
-                    info_map,
-                    pen_manure_data_units[manure_property],
+                    info_map=info_map,
+                    first_info_map_only=True,
+                    units=pen_manure_data_units[manure_property],
                 )
                 om.add_variable(
                     f"{base_name}_{str(manure_property)}",
@@ -867,16 +873,11 @@ class AnimalModuleReporter:
             The current simulation day.
         """
         info_map = {
-            "class": (class_name := AnimalModuleReporter.__name__),
-            "function": (function_name := AnimalModuleReporter.report_daily_pen_total.__name__),
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
             "units": MeasurementUnits.ANIMALS,
             "simulation_day": simulation_day,
         }
-        variable_to_add = f"{class_name}.{function_name}.number_of_animals_in_pen_{pen_id}_{pen_animal_name}"
-        reference_variable = f"{class_name}.{function_name}.number_of_animals_in_pen_0_CALF"
-        AnimalModuleReporter.data_padder(
-            reference_variable, variable_to_add, 0, simulation_day, info_map, MeasurementUnits.ANIMALS
-        )
         om.add_variable(
             f"number_of_animals_in_pen_{pen_id}_{pen_animal_name}",
             number_of_animals_in_pen,
