@@ -757,7 +757,7 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
 def test_fix_number_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str | int],
-    expected_value: str,
+    expected_value: int | float | str | bool | None,
     expected_result: bool,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
@@ -791,7 +791,7 @@ def test_fix_number_type_fixable_data(
         dummy_properties_key,
     )
 
-    variable_to_check = dummy_input_data
+    variable_to_check: Any = dummy_input_data
     for key in dummy_element_hierarchy:
         if isinstance(variable_to_check, list):
             variable_to_check = variable_to_check[int(key)]
@@ -1580,6 +1580,7 @@ def test_validate_metadata(
     metadata: dict[str, Any],
     expected_exception: bool,
 ) -> None:
+    """Tests validate_metadata() function in InputManager. Helpful for testing integration of helper functions."""
     mocker.patch("os.path.isfile", return_value=does_file_exist)
     info_map = {
         "class": DataValidator.__name__,
@@ -1596,6 +1597,464 @@ def test_validate_metadata(
         assert dv.event_logs == [
             {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         ]
+
+
+def test_generate_fail_message() -> None:
+    """Tests the _generate_fail_message() function in InputManager."""
+    dv = DataValidator()
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator.validate_metadata.__name__,
+    }
+    status, message = dv._generate_fail_message(
+        message="test error",
+        info_map=info_map,
+    )
+    assert message == "test error"
+    assert not status
+    assert dv.event_logs == [
+        {
+            "error": "Metadata Validation",
+            "message": "test error",
+            "info_map": {"class": "DataValidator", "function": "validate_metadata"},
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "data, required_keys, valid_keys, expected_message_substr",
+    [
+        # Missing required keys
+        (
+            {"type": "json"},  # missing "properties"
+            {"type", "properties"},
+            {"type", "properties", "title"},
+            "Missing required keys",
+        ),
+        # Invalid keys present
+        (
+            {"type": "json", "properties": {}, "bogus": 123},
+            {"type", "properties"},
+            {"type", "properties", "title"},
+            "Invalid keys",
+        ),
+    ],
+)
+def test_validate_metadata_keys_failure_calls_generate_fail_message(
+    data: dict[str, Any],
+    required_keys: set[str],
+    valid_keys: set[str],
+    expected_message_substr: str,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that _validate_metadata_keys() returns False and calls _generate_fail_message()
+    with the expected message when given invalid data."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_keys"}
+    key = "my_entry"
+
+    fail_msg = f"{expected_message_substr} in '{key}'"
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message", return_value=(False, fail_msg))
+
+    ok, msg = validator._validate_metadata_keys(
+        key=key,
+        data=data,
+        required_keys=required_keys,
+        valid_keys=valid_keys,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert expected_message_substr in msg
+    generate_fail_spy.assert_called_once()
+    called_message, called_info_map = generate_fail_spy.call_args.args
+    assert expected_message_substr in called_message
+    assert f"'{key}'" in called_message
+    assert called_info_map is info_map
+
+
+def test_validate_metadata_keys_success_does_not_call_generate_fail_message(mocker: MockerFixture) -> None:
+    """Tests that _validate_metadata_keys() returns True and does not call _generate_fail_message()
+    when given valid data."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_keys"}
+    key = "my_entry"
+
+    required_keys = {"type", "properties"}
+    valid_keys = {"type", "properties", "title", "description", "path", "paths"}
+
+    data = {"type": "json", "properties": {}, "title": "Hello"}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_keys(
+        key=key,
+        data=data,
+        required_keys=required_keys,
+        valid_keys=valid_keys,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_validate_has_path_or_paths_fails_when_neither_key_present(mocker: MockerFixture) -> None:
+    """Tests that _validate_has_path_or_paths() returns False and calls _generate_fail_message()
+    with the expected message when neither 'path' nor 'paths' keys are present."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_has_path_or_paths"}
+    key = "my_entry"
+    data: dict[str, Any] = {"type": "json", "properties": {}}
+
+    expected_msg = f"'{key}' must define at least one of the keys 'path' or 'paths', but neither was found."
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_msg),
+    )
+
+    ok, msg = validator._validate_has_path_or_paths(key=key, data=data, info_map=info_map)
+
+    assert ok is False
+    assert msg == expected_msg
+    generate_fail_spy.assert_called_once_with(expected_msg, info_map)
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        ({"path": "a/b/c.json"}),
+        ({"paths": ["a/b/c.json", "d/e/f.json"]}),
+        ({"path": "a/b/c.json", "paths": ["d/e/f.json"]}),
+    ],
+)
+def test_validate_has_path_or_paths_success_when_either_key_present(
+    data: dict[str, Any], mocker: MockerFixture
+) -> None:
+    """Tests that _validate_has_path_or_paths() returns True and does not call _generate_fail_message()
+    when either 'path' or 'paths' key is present."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_has_path_or_paths"}
+    key = "my_entry"
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_has_path_or_paths(key=key, data=data, info_map=info_map)
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "properties_value",
+    [
+        None,
+        "",
+    ],
+)
+def test_validate_metadata_properties_failure(
+    properties_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid properties values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_properties"}
+
+    data: dict[str, Any] = {"properties": properties_value}
+
+    expected_message = f"Properties section empty or None in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    ok, msg = validator._validate_metadata_properties(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+def test_validate_metadata_properties_success(mocker: MockerFixture) -> None:
+    """Tests valid properties section passes validation."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_properties"}
+
+    data: dict[str, Any] = {"properties": {"a": 1}}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_properties(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "type_value, valid_data_types",
+    [
+        ("csv", {"json", "yaml"}),
+        ("xml", {"csv", "json"}),
+    ],
+)
+def test_validate_metadata_type_failure(
+    type_value: str,
+    valid_data_types: set[str],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid type values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_type"}
+
+    data: dict[str, Any] = {"type": type_value}
+
+    expected_message = f"Invalid type '{type_value}' in '{key}'. Expected one option from {valid_data_types}"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    ok, msg = validator._validate_metadata_type(
+        key=key,
+        data=data,
+        valid_data_types=valid_data_types,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "type_value, valid_data_types",
+    [
+        ("json", {"json", "yaml"}),
+        ("csv", {"csv", "json"}),
+    ],
+)
+def test_validate_metadata_type_success(
+    type_value: str,
+    valid_data_types: set[str],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that valid type value passes validation."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_type"}
+
+    data: dict[str, Any] = {"type": type_value}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_type(
+        key=key,
+        data=data,
+        valid_data_types=valid_data_types,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "path_value",
+    [
+        None,
+        "",
+        123,
+    ],
+)
+def test_get_paths_to_check_invalid_path(
+    path_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid 'path' value in metadata triggers a failure in _get_paths_to_check()."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": path_value}
+
+    expected_message = f"Invalid path value '{path_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "paths_value",
+    [
+        None,
+        [],
+        "not-a-list",
+    ],
+)
+def test_get_paths_to_check_invalid_paths_container(
+    paths_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid 'paths' values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": paths_value}
+
+    expected_message = f"Invalid paths value '{paths_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "paths_value",
+    [
+        [None],
+        [""],
+        ["valid", None],
+    ],
+)
+def test_get_paths_to_check_invalid_paths_entries(
+    paths_value: list[Any],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid entries within the 'paths' list trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": paths_value}
+
+    expected_message = f"Invalid paths value '{paths_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+def test_get_paths_to_check_success_single_path(mocker: MockerFixture) -> None:
+    """Tests that when 'path' contains a single valid entry, _get_paths_to_check() returns the correct list of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": "file.json"}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["file.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_get_paths_to_check_success_multiple_paths(mocker: MockerFixture) -> None:
+    """Tests that when 'paths' contains multiple valid entries, _get_paths_to_check() returns the correct
+    list of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": ["a.json", "b.json"]}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["a.json", "b.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_get_paths_to_check_success_path_and_paths(mocker: MockerFixture) -> None:
+    """Tests that when both 'path' and 'paths' are present and valid, _get_paths_to_check() returns a combined list
+    of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": "a.json", "paths": ["b.json", "c.json"]}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["a.json", "b.json", "c.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -1652,7 +2111,6 @@ def test_validate_properties(
     expected_err_msg: str,
 ) -> None:
     """Tests _validate_properties() function in InputManager."""
-    # Initiated to avoid the call of add_log in __init__ to be recorded
     dv = DataValidator()
 
     info_map = {
