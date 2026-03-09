@@ -2,6 +2,7 @@
 
 import time as timer
 from datetime import date, timedelta
+from enum import Enum
 
 from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
@@ -56,11 +57,13 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             "full_farm": self._execute_full_farm_daily_simulation,
             "no_animals": self._execute_no_animals_daily_simulation,
+            # "field_only": self._execute_field_only_simulation, #TODO
+            # "field_and_storage": self._execute_field_and_storage_simulation, #TODO
         }
 
         self._initialize_simulation()
 
-    def simulate(self, simulation_type: str) -> None:
+    def simulate(self, simulation_type: str = "full_farm") -> None:
         """
         Executes the simulation.
 
@@ -78,14 +81,16 @@ class SimulationEngine:
 
         self._run_simulation_main_loop(simulation_type)
 
-        AnimalModuleReporter.report_end_of_simulation(
-            self.herd_manager.herd_statistics,
-            self.herd_manager.herd_reproduction_statistics,
-            self.time,
-            self.herd_manager.heiferII_events_by_id,
-            self.herd_manager.cow_events_by_id,
-        )
-        EEEManager.estimate_all()
+        if simulation_type in ["full_farm", ]:
+            AnimalModuleReporter.report_end_of_simulation(
+                self.herd_manager.herd_statistics,
+                self.herd_manager.herd_reproduction_statistics,
+                self.time,
+                self.herd_manager.heiferII_events_by_id,
+                self.herd_manager.cow_events_by_id,
+            )
+            EEEManager.estimate_all()
+
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -93,7 +98,7 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
-    def _run_simulation_main_loop(self, simulation_type: str) -> None:
+    def _run_simulation_main_loop(self, simulation_type: str = "full_farm") -> None:
         """
         The main loop for simulation.
 
@@ -105,6 +110,18 @@ class SimulationEngine:
         """
         for simulation_year in range(self.time.simulation_length_years):
             self._annual_simulation(simulation_type)
+
+    def _execute_field_only_simulation(self, feed_planning: bool = False) -> None:
+        daily_harvested_crops = self._execute_daily_field_operations()
+        harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
+
+        if feed_planning:
+            self._execute_feed_planning(harvest_schedule)
+
+        self._report_daily_records({})
+
+
+        pass
 
     def _execute_full_farm_daily_simulation(self) -> None:
         """
@@ -161,6 +178,8 @@ class SimulationEngine:
         self._advance_time()
 
     def _execute_daily_field_operations(self) -> list[HarvestedCrop]:
+        # TODO: refactor. This executes AND outputs - dual functionality.
+        ## field_manager.daily_update_routine() is the culprit...
         """Handles daily field operations including manure applications and crop harvesting/receiving."""
         manure_applications: list[ManureEventNutrientRequestResults] = self.generate_daily_manure_applications()
         harvested_crops: list[HarvestedCrop] = self.field_manager.daily_update_routine(
@@ -363,7 +382,7 @@ class SimulationEngine:
         Resets the state for the following year
         """
 
-        self.annual_mass_balance(self.time)
+        self.annual_mass_balance(self.time) # TODO: remove? Does nothing.
         self.annual_reset()
 
     def _annual_simulation(self, simulation_type: str) -> None:
@@ -378,12 +397,14 @@ class SimulationEngine:
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
             self._simulation_type_to_daily_simulation_function[simulation_type]()
 
+        # NOTE: this is only needed for simulations that include fields
         self._run_post_annual_routines()
 
     def annual_reset(self) -> None:
         """
         Resets all annual variables that require reset.
         """
+        # TODO: rename to reset_fields? only used by field manager
         self.field_manager.annual_update_routine()
 
     def annual_mass_balance(self, time: RufasTime) -> None:
