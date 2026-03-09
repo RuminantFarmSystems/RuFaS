@@ -83,6 +83,24 @@
         "default": 100,
         "minimum": 6
       },
+      "herd_size_adjustment_period": {
+        "type": "number",
+        "description": "The period between each check to adjust the her's size.",
+        "default": 30,
+        "minimum": 1
+      },
+      "herd_size_sell_threshold": {
+        "type": "number",
+        "description": "The threshold that should sell animals to maintain herd size.",
+        "default": 101,
+        "minimum": 1
+      },
+      "herd_size_buy_threshold": {
+        "type": "number",
+        "description": "The threshold that should buy animals to maintain herd size.",
+        "default": 95,
+        "minimum": 0
+      },
       "breed": {
         "type": "string",
         "default": "HO",
@@ -200,12 +218,6 @@
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
           "default": 185,
-          "minimum": 0
-        },
-        "cull_milk_production": {
-          "type": "number",
-          "description": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below",
-          "default": 30,
           "minimum": 0
         },
         "cow_times_milked_per_day": {
