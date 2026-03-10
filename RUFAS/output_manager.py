@@ -309,6 +309,11 @@ class OutputManager(object):
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        Notes
+        -----
+        The use of `deepcopy` is necessary here because `value` may be a mutable object,
+        and storing a reference would allow external modifications to corrupt the data
+        held in the pool.
 
         """
         discard_info_map = first_info_map_only
@@ -354,6 +359,12 @@ class OutputManager(object):
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
 
+        Raises
+        ------
+        KeyError
+            - If either info_map["class"] or info_map["function"] are not present
+            - If 'units' is not found in info_map
+            - If 'units' is a dict and is missing entries for the variable's values.
         """
         self.add_variable_call += 1
         units = info_map.get("units")
@@ -722,7 +733,7 @@ class OutputManager(object):
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
-            raise e
+            raise type(e)(f"An error occurred while saving to {path}: {str(e)}") from e
 
     def _add_detailed_values(self, data_dict: dict[str, Any], origin_label: OriginLabel) -> dict[str, Any]:
         """
@@ -831,7 +842,7 @@ class OutputManager(object):
             if len(data_origins) != len(sub_data_dict["values"]) or len(units) != len(sub_data_dict["values"]):
                 continue
 
-            detailed_values: list[list[str]] = []
+            detailed_values: list[str] = []
             for index, value in enumerate(sub_data_dict["values"]):
                 for origin in data_origins[index]:
                     detailed_origin_data = {
@@ -1133,7 +1144,7 @@ class OutputManager(object):
                 var_names_file.writelines(data_list)
                 self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
-            raise e
+            raise type(e)(f"An error occurred while saving to {path}: {str(e)}") from e
 
     def generate_file_name(self, base_name: str, extension: str, include_millis: bool = False) -> str:
         """Returns a file name using the given base_name and timestamp."""
@@ -1190,7 +1201,7 @@ class OutputManager(object):
             )
             return filter_files
         else:
-            raise NotADirectoryError("The specified path must be a directory")
+            raise NotADirectoryError(f"The specified path {dir_path} must be a valid directory")
 
     def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
         """
@@ -1257,7 +1268,7 @@ class OutputManager(object):
                         list_of_elements.pop(0)
                     result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
                 else:
-                    raise Exception("Unsupported file format; only json and txt are supported.")
+                    raise Exception(f"Unsupported file format {path.suffix}; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
             return result, direction
         except FileNotFoundError:
@@ -1293,6 +1304,7 @@ class OutputManager(object):
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
+        use_filter_key_name: bool = filter_content.get("use_filter_key_name", False)
         info_map = {
             "class": self.__class__.__name__,
             "function": self.filter_variables_pool.__name__,
@@ -1320,7 +1332,7 @@ class OutputManager(object):
         selected_variables: list[str] | None = filter_content.get("variables")
 
         results = self._parse_filtered_variables(
-            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
+            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion, use_filter_key_name
         )
 
         if filter_content.get("expand_data", False):
@@ -1355,6 +1367,7 @@ class OutputManager(object):
         filter_name: str,
         use_filter_name: bool,
         filter_by_exclusion: bool,
+        use_filter_key_name: bool,
     ) -> dict[str, OutputManager.pool_element_type]:
         """
         Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
@@ -1368,9 +1381,11 @@ class OutputManager(object):
         filter_name : str
             Name of the filter used to collect variables for the filtered pool.
         use_filter_name : bool
-            Whether to use the filter name when constructing the key name for data pulled from a dictionary.
+            Whether to use the filter name when constructing the key name for data pulled from the filtered pool.
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
+        use_filter_key_name : bool
+            Whether to use the filtered key name when constructing the key name for data pulled from a dictionary.
 
         Returns
         -------
@@ -1409,7 +1424,14 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
+                    if use_filter_key_name:
+                        # TODO DEPRECATED behavior, kept for backward compatibility
+                        # should be removed when closing #2718
+                        combined_key = filtered_key
+                    else:
+                        combined_key = (
+                            f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else f"{key}.{filtered_key}"
+                        )
                     if combined_key in results.keys():
                         results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
@@ -2024,14 +2046,6 @@ class OutputManager(object):
         ----------
         file_path : Path
             The path to the file to be loaded to the variables pool.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the variables pool file does not exist at the specified path.
-        json.JSONDecodeError
-            If there is an error in decoding the JSON file.
-
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -2566,6 +2580,9 @@ class OutputManager(object):
             "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
             "direction": self.validate_direction,
+            "use_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_filter_key_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():
@@ -2778,14 +2795,16 @@ class OutputManager(object):
             "subtraction",
         }
         if value not in supported:
+            error_msg = (
+                f"ReportGenerator Aggregator error: '{content_name}' in {filter_name} must be one of "
+                f"{sorted(supported)}, but got '{value}'."
+            )
             self.add_error(
                 "Unsupported aggregator in report filter content",
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'.",
+                error_msg,
                 info_map,
             )
-            raise ValueError(
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'."
-            )
+            raise ValueError(error_msg)
 
     def validate_list_of_strings(self, value: Any, content_name: str, filter_name: str) -> None:
         """

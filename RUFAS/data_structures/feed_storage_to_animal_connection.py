@@ -5,7 +5,6 @@ from enum import Enum
 
 from RUFAS.units import MeasurementUnits
 
-
 """
 Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
 other input files and the RuFaS codebase.
@@ -27,6 +26,7 @@ class FeedCategorization(Enum):
     PASTURE = "Pasture"
     PLANT_PROTEIN = "Plant Protein"
     VITAMIN_MINERAL = "Vitamin/Mineral"
+    NPN_SUPPLEMENT = "NPN Supplement"
 
 
 class FeedComponentType(Enum):
@@ -163,7 +163,6 @@ class Feed:
     lower_limit: float
     TDN: float
     DE: float
-
     amount_available: float
     on_farm_cost: float
     purchase_cost: float
@@ -221,7 +220,9 @@ class NASEMFeed(Feed):
     C183_FA : float
     otherFA_FA : float
     NPN_source : float
+        Non-protein nitrogen fraction (%).
     starch_digested : float
+        Base starch digestibility (%).
     FA_dig : float
     P_inorg : float
     P_org : float
@@ -374,7 +375,7 @@ class RequestedFeed:
 
     def __add__(self, other: "RequestedFeed") -> "RequestedFeed":
         if not isinstance(other, RequestedFeed):
-            raise NotImplementedError
+            return NotImplemented
 
         combined_feed = defaultdict(float, self.requested_feed)
         for feed_id, amount in other.requested_feed.items():
@@ -411,7 +412,7 @@ class PurchaseAllowance:
     def __init__(self, feed_config_data: list[dict[str, int | float]]) -> None:
         self.allowances = self._setup_purchase_allowance(feed_config_data)
 
-    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int | float]]) -> dict[int, float]:
+    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int | float]]) -> dict[int | float, float]:
         return {
             feed_config["purchased_feed"]: feed_config[self._purchase_allowance_key] for feed_config in feed_config_data
         }

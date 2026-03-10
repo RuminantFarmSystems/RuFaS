@@ -393,7 +393,7 @@ def test_add_units_to_constants(
             {"display_units": False, "filters": [], "name": "test1"},
             (None, None),
             None,
-            ({"col1": [1, 2, 3], "col2": [4, 5, 6]}, []),
+            ({"col1": [1, 2, 3], "col2": [4, 5, 6]}, [], False),
         ),
         (
             # Test case 2: Horizontal aggregation only
@@ -401,7 +401,7 @@ def test_add_units_to_constants(
             {"display_units": False, "horizontal_agg": "sum", "filters": [], "name": "test2"},
             ("sum", None),
             ({"hor_agg": [6, 15]}, []),
-            ({"hor_agg": [6, 15]}, []),
+            ({"hor_agg": [6, 15]}, [], True),
         ),
         (
             # Test case 3: Vertical aggregation only
@@ -409,7 +409,7 @@ def test_add_units_to_constants(
             {"display_units": False, "vertical_agg": "sum", "filters": [], "name": "test3"},
             (None, "sum"),
             ({"ver_agg": [5, 7, 9]}, []),
-            ({"ver_agg": [5, 7, 9]}, []),
+            ({"ver_agg": [5, 7, 9]}, [], True),
         ),
         (
             # Test case 4: Both horizontal and vertical aggregations, horizontal first
@@ -424,7 +424,7 @@ def test_add_units_to_constants(
             },
             ("sum", "sum"),
             ({"hor_ver_agg": [21]}, []),
-            ({"hor_ver_agg": [21]}, []),
+            ({"hor_ver_agg": [21]}, [], True),
         ),
         (
             # Test case 5: Both horizontal and vertical aggregations, vertical first
@@ -439,7 +439,7 @@ def test_add_units_to_constants(
             },
             ("sum", "sum"),
             ({"ver_hor_agg": [21]}, []),
-            ({"ver_hor_agg": [21]}, []),
+            ({"ver_hor_agg": [21]}, [], True),
         ),
         (
             # Test case 6: No aggregation specified
@@ -450,7 +450,7 @@ def test_add_units_to_constants(
             {"display_units": True, "filters": [], "name": "test1"},
             (None, None),
             None,
-            ({"col1 (dummy_units)": [1, 2, 3], "col2 (dummy_units2)": [4, 5, 6]}, []),
+            ({"col1 (dummy_units)": [1, 2, 3], "col2 (dummy_units2)": [4, 5, 6]}, [], False),
         ),
     ],
 )
@@ -478,15 +478,132 @@ def test_perform_aggregations(
 @pytest.mark.parametrize(
     "report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs",
     [
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {"ver_hor_agg": [6]}, []),
-        ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {"hor_agg_(km)": [1, 2, 3]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
-        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg_(kg)": [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"ver_agg": [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg": [6]}, []),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            "sum",
+            "sum",
+            {"ver_hor_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data_(km)": [1, 2, 3]},
+            {"display_units": True},
+            "sum",
+            None,
+            {"hor_agg_(km)": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data_(km)'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            "sum",
+            None,
+            {"hor_agg": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            None,
+            {"data": [1, 2, 3]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True, "variables": "data"},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data_(kg)": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            "sum",
+            {"ver_agg_(kg)": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data_(kg)'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False, "variables": "data"},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": False},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
+        (
+            {"data": [1, 2, 3]},
+            {"display_units": True},
+            None,
+            "sum",
+            {"ver_agg": [6]},
+            [
+                {
+                    "log": "Report 'Unnamed Report' aggregation variables.",
+                    "message": "Variables/constants aggregated: ['data'].",
+                    "info_map": {"class": "ReportGenerator", "function": "_route_aggregator_functions"},
+                }
+            ],
+        ),
     ],
 )
 def test_route_aggregator_functions(
@@ -907,7 +1024,7 @@ def test_ensure_unique_report_name_with_timestamp(
             {},
             None,
             None,
-            {"standard_report_some_filter": {"values": [1, 2, 3]}},
+            {"standard_report": {"values": [1, 2, 3]}},
             ["Start generating individual report: standard_report"],
             0,
         ),
@@ -993,7 +1110,7 @@ def test_ensure_unique_report_name_with_timestamp(
             {},
             None,
             None,
-            {"full_feature_report_full_feature_filter": {"values": [10, 11, 12]}},
+            {"full_feature_report": {"values": [10, 11, 12]}},
             [
                 "Start generating individual report: full_feature_report",
                 "Prepared graph data for report: full_feature_report",
@@ -1012,7 +1129,7 @@ def test_ensure_unique_report_name_with_timestamp(
             {},
             None,
             None,
-            {"graph_report_missing_details_missing_graph_filter": {"values": [13, 14, 15]}},
+            {"graph_report_missing_details": {"values": [13, 14, 15]}},
             [
                 "Start generating individual report: graph_report_missing_details",
                 "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
@@ -1042,20 +1159,20 @@ def test_ensure_unique_report_name_with_timestamp(
             {},
             None,
             None,
-            {"test_report_filter1": {"values": [1.23, 2.35, 3.46]}},
+            {"test_report": {"values": [1.23, 2.35, 3.46]}},
             ["Start generating individual report: test_report"],
             0,
         ),
     ],
 )
 def test_generate_report(
-    filter_content: Dict[str, Any],
-    filtered_pool: Dict[str, Any],
-    reports: Dict[str, Dict[str, List[Any]]],
+    filter_content: dict[str, Any],
+    filtered_pool: dict[str, Any],
+    reports: dict[str, dict[str, list[Any]]],
     reference_exception: Optional[Type[BaseException]],
     perform_aggregations_exception: Optional[Type[BaseException]],
     expected_report_columns: dict[str, dict[str, list[Any]]],
-    expected_log_messages: List[str],
+    expected_log_messages: list[str],
     expected_get_reports_by_regex_calls: int,
     mocker: MockerFixture,
 ) -> None:
@@ -1099,6 +1216,7 @@ def test_generate_report(
                 {fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
                 | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
                 [],
+                False,
             ),
         )
 
@@ -1204,21 +1322,17 @@ def test_clear_reports(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "filter_content, expected_result, expected_exception",
+    "filter_content, expected_result",
     [
-        ({"horizontal_first": True}, True, None),
-        ({"horizontal_first": False}, False, None),
-        ({}, False, None),
-        ({"horizontal_first": "true"}, None, ValueError),
-        ({"horizontal_first": "false"}, None, ValueError),
-        ({"horizontal_first": 1}, None, ValueError),
-        ({"horizontal_first": None}, False, None),
+        ({"horizontal_first": True}, True),
+        ({"horizontal_first": False}, False),
+        ({}, False),
+        ({"horizontal_first": None}, False),
     ],
 )
 def test_get_horizontal_first_value(
     filter_content: Dict[str, Any],
     expected_result: bool,
-    expected_exception: Exception | None,
 ) -> None:
     """
     Unit test for the _get_horizontal_first_value method of ReportGenerator class in report_generator.py file.
@@ -1228,17 +1342,8 @@ def test_get_horizontal_first_value(
     report_generator = ReportGenerator()
 
     # Act & Assert
-    if expected_exception:
-        with pytest.raises(ValueError) as exc_info:
-            report_generator._get_horizontal_first_value(filter_content)
-        assert str(exc_info.value) == (
-            f"The value of 'horizontal_first' in the report filter should be a boolean. "
-            f"Value provided: {repr(filter_content['horizontal_first'])} "
-            f"(type {type(filter_content['horizontal_first'])})"
-        )
-    else:
-        result = report_generator._get_horizontal_first_value(filter_content)
-        assert result == expected_result
+    result = report_generator._get_horizontal_first_value(filter_content)
+    assert result == expected_result
 
 
 @pytest.mark.parametrize(

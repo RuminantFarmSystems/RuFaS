@@ -1573,8 +1573,8 @@ class Animal:
 
         newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
 
-        (daily_routines_output.animal_status, daily_routines_output.newborn_calf_config) = (
-            self.animal_life_stage_update(time)
+        daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
+            time
         )
 
         if self.animal_type.is_cow and newborn_calf_config is not None:

@@ -30,7 +30,6 @@ from RUFAS.output_manager import OutputManager
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
-
 """Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
 ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
@@ -99,8 +98,11 @@ class FeedManager:
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
-        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(sorted_purchased_allowances)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
+            sorted_purchased_allowances
+        )
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -134,23 +136,23 @@ class FeedManager:
         feed_storage_instances : dict[str, list[str]]
             A dictionary that contains feed storage instance names.
         """
-        all_configs: list[dict[str, Any]] = [
-            storage_config
+        all_configs_by_name: dict[str, dict[str, Any]] = {
+            storage_config["name"]: storage_config
             for storage_config_list in feed_storage_configs.values()
             for storage_config in storage_config_list
-        ]
-        self._validate_storage_config_names(all_configs)
-        self._validate_crop_field_mapping(all_configs)
-
-        configs_by_name: dict[str, dict[str, Any]] = {
-            config["name"]: config for config in all_configs if "name" in config
+            if "name" in storage_config
         }
 
         instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+        instance_configs_by_name: dict[str, dict[str, Any]] = {
+            name: all_configs_by_name[name] for name in instance_names
+        }
+
+        self._validate_storage_config_names(list(instance_configs_by_name.values()))
+        self._validate_crop_field_mapping(list(instance_configs_by_name.values()))
 
         available_rufas_ids: list[int] = [feed.rufas_id for feed in self.available_feeds]
-        for instance_name in instance_names:
-            storage_config = configs_by_name[instance_name]
+        for instance_name, storage_config in instance_configs_by_name.items():
             storage_type_str = storage_config["storage_type"]
             storage_class = StorageType.get_storage_class(storage_type_str)
             storage = storage_class(storage_config)
@@ -162,7 +164,7 @@ class FeedManager:
                     "to any feed listed in the available feeds. This storage will not be used for feeding.",
                     {
                         "class": self.__class__.__name__,
-                        "function": self.receive_crop.__name__,
+                        "function": self._create_all_storages.__name__,
                     },
                 )
 
@@ -191,10 +193,11 @@ class FeedManager:
         combo_to_names: dict[tuple[str | None, str | None], list[str]] = defaultdict(list)
 
         for config in all_configs:
-            crop_name = config.get("crop_name")
-            field_name = config.get("field_name")
+            crop_name = config["crop_name"]
+            field_names = config["field_names"]
             name = config.get("name", "<unnamed_storage>")
-            combo_to_names[(crop_name, field_name)].append(name)
+            for field_name in field_names:
+                combo_to_names[(crop_name, field_name)].append(name)
 
         duplicate_details = {
             combo: names for combo, names in combo_to_names.items() if len(names) > 1 and None not in combo
@@ -279,7 +282,7 @@ class FeedManager:
         crop_name = harvested_crop.config_name
         field_name = harvested_crop.field_name
         for storage in self.active_storages.values():
-            if storage.crop_name == crop_name and storage.field_name == field_name:
+            if storage.crop_name == crop_name and field_name in storage.field_names:
                 storage.receive_crop(harvested_crop, simulation_day)
                 return
         else:
@@ -321,17 +324,18 @@ class FeedManager:
 
     def report_stored_farmgrown_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
         """Outputs total amounts of farmgrown feeds currently stored by the FeedManager."""
-        feed_report: dict[RUFAS_ID, dict[str, float]] = {
-            feed.rufas_id: {"dry_matter_mass": 0.0, "fresh_mass": 0.0} for feed in self._available_feeds
-        }
+        feed_report: dict[RUFAS_ID, dict[str, float]] = {}
 
         for storage in self.active_storages.values():
             for crop in storage.stored:
                 rufas_id = storage.rufas_feed_id
                 if rufas_id not in feed_report:
-                    continue
-                feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
-                feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
+                    feed_report[rufas_id] = {}
+                    feed_report[rufas_id]["dry_matter_mass"] = crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] = crop.fresh_mass
+                else:
+                    feed_report[rufas_id]["dry_matter_mass"] += crop.dry_matter_mass
+                    feed_report[rufas_id]["fresh_mass"] += crop.fresh_mass
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,
@@ -339,10 +343,23 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
-
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(f"stored_feed_{rufas_id}_dm", mass["dry_matter_mass"], info_map)
-            self._om.add_variable(f"stored_feed_{rufas_id}_wet", mass["fresh_mass"], info_map)
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_dm",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["dry_matter_mass"],
+                },
+                info_map,
+            )
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_wet",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["fresh_mass"],
+                },
+                info_map,
+            )
 
     def manage_daily_feed_request(
         self, requested_feed: RequestedFeed, time: RufasTime
@@ -617,8 +634,12 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {}
-        total_farmgrown_deducted: dict[RUFAS_ID, float] = {}
+        total_purchased_deducted: dict[RUFAS_ID, float] = {
+            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
+        }
+        total_farmgrown_deducted: dict[RUFAS_ID, float] = {
+            farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
+        }
 
         for feed_id, amount_needed in feeds_to_deduct.items():
             remaining_amount_needed = float(amount_needed)
@@ -681,9 +702,23 @@ class FeedManager:
             "simulation_day": simulation_day,
         }
         for feed_id, amount in total_purchased.items():
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed", amount, info_map)
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
         for feed_id, amount in total_farmgrown.items():
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", amount, info_map)
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
 
     def _deduct_from_storage(
         self,
@@ -792,6 +827,23 @@ class FeedManager:
 
         return dict(farmgrown_by_id), dict(purchased_by_id)
 
+    def _gather_valid_farmgrown_feed_ids(self) -> set[RUFAS_ID]:
+        """
+        Gathers the ids of valid farm-grown feeds.
+
+        Returns
+        -------
+        set[RUFAS_ID]
+            A set of valid farm-grown feed ids.
+        """
+        farmgrown_ids: set[RUFAS_ID] = set()
+        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
+        for storage in self.active_storages.values():
+            feed_id: RUFAS_ID = storage.rufas_feed_id
+            if feed_id in valid_feed_ids:
+                farmgrown_ids.add(feed_id)
+        return farmgrown_ids
+
     def _setup_available_feeds(
         self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
     ) -> list[Feed]:
@@ -834,7 +886,8 @@ class FeedManager:
             )
             available_feeds.append(new_feed)
 
-        return available_feeds
+        sorted_available_feeds = sorted(available_feeds, key=lambda feed: feed.rufas_id)
+        return sorted_available_feeds
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
         """
