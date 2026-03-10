@@ -3,11 +3,11 @@ are *much* easier to read and understand than JSON files, while still offering e
 flexibility for input types.
 
 In this system, there are system-level defaults ("_defaults.toml") that the program uses as
-a fall-back and that an end user should never manipulate or have access too (but default 
+a fall-back and that an end user should never manipulate or have access to (but default 
 values should be clearly documented and accessible).
 
 User-specified values are given in a config file ("user_config.toml") and, **optionally**,
-sub-config files. Sub-config files allows users to split their config into multiple files
+sub-config files. Sub-config files allow users to split their config into multiple files
 at their convenience. The "parse_toml_example.py" contains helper functions for combining
 the parsed (dict) data from multiple files. 
 
