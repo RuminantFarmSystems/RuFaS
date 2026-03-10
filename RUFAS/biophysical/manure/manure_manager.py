@@ -83,7 +83,7 @@ class ManureManager:
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
-        self._processing_order = self._traverse_adjacency_matrix()  # noqa
+        self._processing_order = self._traverse_adjacency_matrix()
 
     def run_daily_update(
         self, manure_streams: dict[str, ManureStream], time: RufasTime, current_day_conditions: CurrentDayConditions
