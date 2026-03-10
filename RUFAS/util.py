@@ -749,6 +749,11 @@ class Utility:
             1: {"value": 2, "other_keys": "other values"},
             3: {"value": 4, "other_keys": "other values"}
         }
+
+        Notes
+        -----
+        The use `deepcopy` is necessary here because `dict_.pop('ID')` mutates `list_of_dicts` in place.
+        To avoid side effects, we use `deepcopy` to make a copy before mutating the original list.
         """
         result = {}
         for dict_ in deepcopy(list_of_dicts):

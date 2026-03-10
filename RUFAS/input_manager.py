@@ -490,7 +490,8 @@ class InputManager:
         return is_runtime_data_added
 
     def _load_runtime_metadata_document(self, metadata_path: Path) -> dict[str, Any]:
-        """Load a runtime metadata document without disturbing the active metadata state.
+        """
+        Load a runtime metadata document without disturbing the active metadata state.
 
         Parameters
         ----------
@@ -506,6 +507,9 @@ class InputManager:
         -----
         The active metadata is restored after loading so callers retain their previously parsed
         metadata tree.
+        The use of `deepcopy()` here is necessary because `self.__metadata` is a mutable object,
+        so a shallow assignment would only copy the reference, causing both snapshots to reflect
+        the same underlying data.
         """
 
         original_metadata = deepcopy(self.__metadata)
@@ -1054,6 +1058,11 @@ class InputManager:
         If the requested data does not exist, the method will return None:
         >>> input_manager.get_data('animal.herd_information.nonexistent_property')
         None
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here to prevent callers from accidentally
+        mutating the internal pool data by modifying the returned value.
         """
 
         info_map = {
@@ -1151,6 +1160,11 @@ class InputManager:
         "maximum": 1.0,
         "default": 0.16
         }
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here to prevent callers from accidentally
+        mutating the internal metadata pool by modifying the returned value.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1862,6 +1876,10 @@ class InputManager:
     ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary to avoid modifying the original data structures.
         """
         info_map = {
             "class": self.__class__.__name__,
