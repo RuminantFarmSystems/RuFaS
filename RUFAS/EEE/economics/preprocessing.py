@@ -328,7 +328,7 @@ class EconomicPreprocessor:
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
                 print(f"Warning: Price data for '{key}' is not in expected format; skipping price extraction.")
                 continue
-                #TODO: We are hitting this condition because some of the commodity prices for certain years are not available in the csv files.
+                # TODO: We are hitting this condition because some of the commodity prices for certain years are not available in the csv files.
             fips_idx = value["fips"].index(fips_code)
             for year in range(start_year, end_year + 1):
                 try:
