@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RuFaS"
-version = "0.9.2"
+version = "1.0.0"
 description = "Ruminant Farm Systems Model"
 readme = "README.md"
 license = "GPL-3.0-only"

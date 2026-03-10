@@ -1,255 +1,25 @@
-\documentclass{article}
-
-% Language setting
-\usepackage[english]{babel}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\setlength{\parindent}{0pt}
-
-% Useful packages
-\usepackage{booktabs}  % For better looking tables
-\usepackage{array}     % More control over column formatting
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{float} % Allows strict image placement
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}% hyperref makes the TOC clickable
-\usepackage[most]{tcolorbox}
-% Fonts
-\usepackage[scaled]{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-\usepackage{pdflscape}  % or \usepackage{lscape}
-\usepackage{lipsum} % for dummy text
-\usepackage{longtable}
-\usepackage{caption}
-\usepackage{multirow}
-\usepackage{tocloft}     % Customize LoT and LoF formatting
-
-
-% Geometry
-\usepackage[
-  a4paper,
-  top=1.5in,
-  bottom=1in,
-  left=1in,
-  right=1in,
-  headheight=60pt,  % This must match the vertical space used
-  headsep=20pt
-]{geometry}
-
-% Define header and footer styles
-% Fancy Header
-\usepackage{fancyhdr}
-\usepackage{rotating}
-\pagestyle{fancy}
-\fancyhf{}  % clear all header/footer fields
-\renewcommand{\headrulewidth}{0pt}  % no horizontal line
-% Header setup
-\fancyhead[C]{%
-    \vspace{25pt}
-  \raisebox{15pt}[0pt][0pt]{%
-    \makebox[\textwidth]{%
-  \includegraphics[height=40pt]{resources/rufas.png}\hfill
-      \textbf{\today}%
-    }
-  }\\[-25pt]
-  \centering\textbf{Scientific Documentation of RuFaS Model} \\
-  \rule{\textwidth}{1pt}
-}
-
-
-% Footer setup with a divider line and two lines of text on left and right
-\renewcommand{\footrulewidth}{0.4pt}
-\fancyfoot[L]{%
-  \begin{tabular}[t]{@{}l@{}}
-    Ruminant Farm System\\
-    Sci Doc v.1
-  \end{tabular}%
-}
-\fancyfoot[C]{\thepage} % Center: page number
-\fancyfoot[R]{%
-  \begin{tabular}[t]{@{}r@{}}
-    \nouppercase{\leftmark}\\ % This pulls in the current section title
-  \end{tabular}%
-}
-% Landscape pages should be blank (no headers/footers)
-\fancypagestyle{landscapeplain}{
-  \fancyhf{} % clear all
-  \renewcommand{\headrulewidth}{0pt}
-  \renewcommand{\footrulewidth}{0pt}
-}
-
-
-% Bibliography setup
-\usepackage[
-  backend=biber,
-  style=authoryear,  % You can change this to numeric, apa, etc.
-  natbib=true         % Enables \citep, \citet if desired
-]{biblatex}
-
-\addbibresource{resources/animal.bib}  % Your .bib file name
-\usepackage{titlesec}
-\usepackage{etoolbox}
-
-% Reset subsection counter at each new section
-\pretocmd{\section}{\setcounter{subsection}{0}}{}{}
-
-% Roman for \section, Alpha for \subsection, alpha for \subsubsection
-\renewcommand{\thesection}{\Roman{section}.}           % I, II, III...
-\renewcommand{\thesubsection}{\Alph{subsection}.}       % A, B, C...
-\renewcommand{\thesubsubsection}{\alph{subsubsection}.} % a, b, c...
-
-% --- Title Formats (in size order) ---
-\titleformat{\section}
-  {\Large\bfseries}   % Section: largest
-  {\thesection}       % Label
-  {1em}               % Spacing between label and title
-  {}                  % Before-code
-
-\titleformat{\subsection}
-  {\normalsize\bfseries}   % Subsection: medium
-  {\thesubsection}
-  {1em}
-  {}
-
-\titleformat{\subsubsection}
-  {\normalsize\bfseries}  % Subsubsection: smallest
-  {\thesubsubsection}
-  {1em}
-  {}
-
-% --- Spacing for each level ---
-\titlespacing{\section}{0pt}{10pt plus 2pt minus 1pt}{5pt}
-\titlespacing{\subsection}{0pt}{8pt plus 1pt minus 1pt}{4pt}
-\titlespacing{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt}
-
-% Optional: Keep your TOC control if needed
-\usepackage{etoc}
-
-% Optional: If using headers/footers
-\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
-
-
-% Remove default date from title
-\date{} % Prevents date from appearing in \maketitle
-
-
-% Define title
-\title{\textbf{}}
-\author{ }
-\setlength{\topskip}{10pt}  % Ensures LaTeX reserves room above the first line
-%\usepackage{showframe}
-
-\begin{document}
-
-% Custom Title Page
-\begin{titlepage}
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Ruminant Farm System Model\par}
-  \vspace{1cm}
-
-  {\Large Animal Module\par}
-  \vspace{1cm}
-
-  {\large \today\par}
-  \vspace{1.5cm} % Add space before the image
-
-  \includegraphics[width=0.25\textwidth]{resources/animal1.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1; Updated 2025\par}
-  \vspace*{1cm}
-\end{titlepage}
-
-
-\newpage
-
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
+\part{Animal Module}
 % Global Table of Contents
 \thispagestyle{fancy}
-\tableofcontents
+
+% Local TOC that includes only what’s inside THIS section
+\etocsettocstyle{\subsection*{Contents}}{} % heading for the local toc
+\etocsetnexttocdepth{subsection}           % or subsubsection
+\localtableofcontents
 \newpage
 
-
-\listoffigures
+\section*{List of Figures}
+\locallistoffigures
 \newpage
 
-\listoftables
+\section*{List of Tables}
+\locallistoftables
 \newpage
-
-% --- Global Structure ---
-\section{Preface: A Day in the Life on a RuFaS Farm}
-
-This document provides a high-level overview of the daily operations of a ruminant farm, as modeled by RuFaS. The overview will be through the eyes of Dr. Rue Fas. One day, Dr. Rue woke up and decided the life of a computer scientist wasn’t for her. So she bought a dairy farm, and this is how she operates it every day.
-
-\paragraph{Feeding the Animals}
-Second thing in the morning, after coffee, Dr. Rue checks the calendar to see if it’s time to formulate a new ration for her animals.
-\vspace{0.2cm}
-
-If a new ration needs to be formulated, Dr. Rue heads over to the barn where she keeps all her forages and feed. While there, she checks how well all the forages are holding up. After considering the feeds available, the quality of each one, and how much each one costs, she decides on how productive she wants her animals to be. It is a difficult balancing act, but eventually a ration recipe is found that will keep the animals happy while keeping costs low and sustainability high until the calendar says the ration recipe needs to be reformulated.
-\vspace{0.2cm}
-
-When Dr. Rue doesn’t need to formulate a new ration, she takes the last ration recipe she made and grabs all the feed and forage the animals need for the day out of the feed barn. If there isn’t enough for the animals, then a new ration is formulated using the steps above.
-
-\paragraph{Taking Care of the Animals}
-After making sure all the animals’ feed is taken care of, Dr. Rue moves on to taking care of all the other animal tasks. This includes milking the animals, making sure they’re healthy, getting them pregnant, and numerous other tasks. 
-\vspace{0.2cm}
-
-As dawn breaks on the RuFaS farm, the animals awaken after a restful night. Joe, the farm master, prepares a large whiteboard to track HerdReproductionStatistics, ensuring he has all the data he needs for the day’s activities.
-
-\textit{Daily Routine} - After leaving their pens, each animal lines up in front of the barn. Julie, the diligent farm veterinarian, examines them one by one. This daily check includes updates on the following areas:
-\begin{itemize}
-    \item Nutrients: Each animal begins its day with a quick phosphorus requirement assessment. Julie records these details and updates the animal’s phosphorus-related metrics.
-    \item Digestive System: With nutrient information in hand, Julie shifts focus to each animal’s digestive system, estimating manure output and enteric methane production for that day.
-
-    \item Milk Production: All milking cows are assessed to gauge daily milk yield and milk component content (fat and protein). Any necessary adjustments are noted.
-
-    \item Animal Growth: Around midday, Julie returns to each animal to evaluate daily weight changes. She updates each animal’s body weight accordingly.
-
-    \item Reproduction: HeiferII and Cow stage animals undergo a reproduction check. Julie closely monitors their reproductive progress and updates the HerdReproductionStatistics details on Joe’s whiteboard.
-
-    \item Life Stage Evaluation: Once the daily routines are complete, Julie determines if any animal is ready to progress to the next life stage. Graduating animals are marked as “graduated” to be moved to their new pens. Animals that must leave the herd—due to health, productivity, or other issues—are labeled as “sold” or “dead” to be removed from the farm population.
-
-    \item Herd Size Maintenance: After every animal has been evaluated, Joe counts the herd to ensure it remains at a healthy size. If it is too large, he arranges the sale of some animals. If the herd is too small, he may opt to purchase additional heiferIIIs to keep numbers at the ideal level.
-
-    \item Herd Structure Management: Joe also manages pen assignments. Newly graduated or newborn animals are guided to suitable pens, while animals marked for removal (sold or deceased) are taken out of the herd and removed from the farm records.
-\end{itemize}
-
-
-\textit{Output Reporting}
-At day’s end, Joe and Julie review the updated HerdReproductionStatistics on the whiteboard. Joe then compiles a concise report summarizing the day’s herd stats. He forwards this information to the OutputManager before wrapping up another successful day on the RuFaS farm.
-\vspace{0.5cm}
-
-\paragraph{Dealing with the Manure}
-Once all the animal chores are finished, Dr. Rue moves on to handling the manure. There are a lot of different ways that manure is collected from the animals: it is flushed out of the milking parlor with water, some of the pens need to have it shoveled out along with the bedding in the pen, and some pens have grates that allow the manure to go straight into a pit beneath the barn.
-\vspace{0.2cm}
-
-There are a lot of different places where manure is processed and stored on the farm. Dr. Rue goes from place to place on the farm, moving the manure from one place to the next. The manure chores are finished after moving all of the manure into her lagoons, compost piles, and other storages. As this final manure chore is completed, she writes down all the information about how much manure is in all these storages, and some information about what that manure is made of. How much water, nitrogen, phosphorus, other solids, etc. are in each storage.
-
-\paragraph{Managing the Fields}
-Now that Dr. Rue is done making sure all the manure has been handled and stored properly, she can take care of all the field tasks. She has a lot of fields on her farm, each with its own unique schedule. Her field management routine starts with checking each field’s schedule to see if any of them are due to have manure applied, and if so, how much they should have applied. After noting all the manure that is supposed to go onto her fields, these amounts are checked against the amounts of manure that are in her manure storage. Dr. Rue then applies manure to each field on the schedule that day, trying to match the amount applied to the amount on the schedule as best she can.
-\vspace{0.2cm}
-
-After making sure every manure item on each farm’s schedule has been taken care of for the day, the schedule for each field is rechecked, one field at a time. In each schedule she checks to see if that field needs to be tilled, if any chemical fertilizer needs to be applied, and if any crops need to be planted or harvested. After all these activities are taken care of, Mother Nature goes to work. The sun shines and rain falls, providing the field with water and energy that grows crops and soaks the soil. After taking care of each field one by one, Dr. Rue drives back to the main farm with all of the crops that she harvested on that day.
-
-\paragraph{Storing the Feeds}
-Now that she is back at the barns, all the crops that were just harvested can be stored. Fortunately she is very organized, so all her harvested crops are separate from one another and each has a label, indicating where it will be stored inside the feed barn. As each feed is stored, it is labeled with the current date. Dr. Rue is exhausted from another long day. She goes back to the farmhouse and rests up, preparing to do the whole thing over again tomorrow. Her daily routine might seem repetitive, but each day is a crucial part of the larger, continuous process that keeps her farm running efficiently and sustainably.
-
-
-
-
 
 
 \section{Module Introduction}
 \begin{refsection}
+    \par\noindent\justifying
   The Animal Module simulates individual animals on a daily basis throughout each stage of life from birth until removal from the herd. In addition to the dynamic Monte-Carlo models that determine the occurrence of events throughout each animal’s life, the Animal Module uses process-based, dynamic models to simulate the following processes:
 
 \begin{figure}[H]
@@ -271,9 +41,11 @@ Now that she is back at the barns, all the crops that were just harvested can be
   \end{itemize}
 \end{minipage}
 \end{figure}
+\par\noindent\justifying
+
 Animals in the RuFaS model are divided into 5 life stages and a culling stage that were established based on the different management and physiological processes that need to be simulated for each class. The 5 classes and culling stage are described in more detail later in this document, but include: calves, heifers I, heifers II, heifers III, cow, and culled. 
 
-The attributes that define the animal characteristics and management are provided by the user and are comprehensively described in \hyperref[sec:animalINPUTS]{inputs section} of this module. When a simulation begins, the herd is populated by a semi-random draw of animals from a large, existing set of animal objects. This process and the process for regenerating the population of animals used to initialize the herd are described in detail in the \hyperref[herdinit]{Herd Initialization Section}. The initially selected animal objects are then grouped into pens based on their life stage and the user-provided pen information. Once the herd has been set up, a regular progression of functions is called each day to simulate and report outputs of the processes required to manage the herd and the processes that define each animal’s development and production. These daily updates are grouped into two classes in the RuFaS model: herd level daily routines (HerdManager) and animal level daily routines (AnimalManager). At the start of each day, the Herd-level daily update cycles through all the animals to call their daily update functions. Then based on the changes for each animal that resulted from the animal level daily updates, the HerdManager changes the animal life-stages, moves them to new pens, and removes them from the herd. If the herd size has decreased too much, the HerdManager will purchase new Heifer III animals to maintain the adult herd size. The HerdManager then checks if it is time to formulate a new diet (at a user-specified interval), summarizes and reports the herd statistics, and gathers and reports all of the manure excreted by the animals to pass to the Manure Module. 
+The attributes that define the animal characteristics and management are provided by the user and are comprehensively described in the inputs section of this module. When a simulation begins, the herd is populated by a semi-random draw of animals from a large, existing set of animal objects. This process and the process for regenerating the population of animals used to initialize the herd are described in detail in the \hyperref{herdinit}{Herd Initialization Section}. The initially selected animal objects are then grouped into pens based on their life stage and the user-provided pen information. Once the herd has been set up, a regular progression of functions is called each day to simulate and report outputs of the processes required to manage the herd and the processes that define each animal’s development and production. These daily updates are grouped into two classes in the RuFaS model: herd level daily routines (HerdManager) and animal level daily routines (AnimalManager). At the start of each day, the Herd-level daily update cycles through all the animals to call their daily update functions. Then based on the changes for each animal that resulted from the animal level daily updates, the HerdManager changes the animal life-stages, moves them to new pens, and removes them from the herd. If the herd size has decreased too much, the HerdManager will purchase new Heifer III animals to maintain the adult herd size. The HerdManager then checks if it is time to formulate a new diet (at a user-specified interval), summarizes and reports the herd statistics, and gathers and reports all of the manure excreted by the animals to pass to the Manure Module. 
 
 Daily outputs from the Animal module are provided at a variety of scales and time steps that range from reports at the individual animal level (e.g. animal event histories), animal class level (e.g. average dry-matter intake for Heifer II’s), at the pen level (e.g. average net energy requirement or intake for Pen 3), and at the herd level (i.e. number of animals sold each day). A complete list of potential outputs from the Animal Module is provided in this document.
 \vspace{1cm}
@@ -304,9 +76,11 @@ When a HeiferIII or Cow reaches full gestation length, they start lactating and 
 
 
 
-\section{Herd-level Processes and Management}\label{sec:AnManage}
-     
-\subsection{Herd Initialization} \label{sec:animalINPUTS}\label{herdinit}
+\section{Herd-level Processes and Management}
+\vspace{0.5cm}
+
+\subsection{Herd Initialization} \label{herdinit}
+\vspace{0.5cm}
 
 \begin{tcolorbox}[colback=white, colframe=black, title=Important Note]
 \textit{In RuFaS code, the term “herd initialization” is used to refer to both the process of generating an animal population file and of selecting from that population to create a specific herd at the start of a simulation. In this doc, those two processes will be differentiated by calling them “Generation” and “Selection”, respectively. }
@@ -518,7 +292,7 @@ The \_random\_sample\_with\_replacement() method selects animals from each of th
 
 
 
-\subsection{Pens and Animal Grouping} \label{animgen}
+\subsection{Pens and Animal Grouping}
 
  
     \paragraph{Introduction} All animals in RuFaS are assigned to a pen which is used to summarize nutrient requirements for diet formulation and feeding, aggregate enteric methane and manure excretions for reporting and passage to the Manure Module. Each pen tracks and updates daily a list of animals in the pen, the stocking density, the average nutrient requirement of the animals in the pen, the ration being fed to that pen, the manure excreted, and the methane emitted. In addition, constant attributes of each pen include the type of pen it is (freestall, tiestall, open lot, compost bedded pack barn), the type of animals that can be in that pen, the number stalls, the manure management practices associated with that pen, and the distance to the milking parlor for lactating cows.  Each day after the HerdManager has updated the status of each animal and determined which animals need to be bought or sold, the animals are added and removed from pens as needed. 
@@ -678,7 +452,7 @@ For the time being, only one set of feeds and ration formula can be provided for
 
 \subsubsection{Energy and Nutrition Requirements}
 
-\paragraph{NRC: Calculating Nutrient Requirements of Dairy Cattle} \label{sec:enreq}
+\paragraph{NRC: Calculating Nutrient Requirements of Dairy Cattle} 
 
 Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by the NRC and more recently the NASEM \parencite{nrc2001, nrc2021}.
 \vspace{0.2cm}
@@ -696,9 +470,9 @@ Calculations are included for the following requirement categories:
 Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 \vspace{0.5cm}
 
-\subsubsection{Nutrient Requirements of Dairy Cattle (NRC)} \label{sec:NRC}
+\subsubsection{Nutrient Requirements of Dairy Cattle (NRC)} 
 
-    \textbf{ Energy Requirements} For details about the variables included in each calculation, please refer to the \hyperref[energykey]{energy requirements key}.
+    \textbf{ Energy Requirements} For details about the variables included in each calculation, please refer to the energy requirements key.
     \vspace{0.2cm}
     
     \begin{itemize}
@@ -985,7 +759,7 @@ Where appropriate, requirement calculations are differentiated by animal age and
     \end{itemize}
 
     
-    \textbf{ Protein Requirements} Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the \hyperref[proteinkey]{protein requirements key}.
+    \textbf{ Protein Requirements} Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
     \vspace{0.2cm}
 
     \begin{itemize}
@@ -1110,7 +884,7 @@ Where appropriate, requirement calculations are differentiated by animal age and
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{3.5cm} L{2.5cm} @{}}
-\caption{Key variables used in protein requirement calculations.} \label{proteinkey} \\
+\caption{Key variables used in protein requirement calculations.} \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -1139,7 +913,7 @@ NPg & Net protein requirement for growth  & g \\
 
     \textbf{ Mineral Requirements} 
     \begin{tcolorbox}[colback=white, colframe=black, title=Important Note]
-        Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the \hyperref[minkey]{mineral requirements key}.
+        Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the mineral requirements key.
     \end{tcolorbox}
 
     \begin{itemize}
@@ -1291,7 +1065,7 @@ Phosphorus Equation
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{3.5cm} L{2.5cm} @{}}
-\caption{Key variables used in mineral requirement calculations.} \label{minkey} \\
+\caption{Key variables used in mineral requirement calculations.}  \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -1394,7 +1168,7 @@ If the heifer is \textbf{more} than 365 days old:
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{2.5cm} L{3.5cm} L{4.5cm} @{}}
-\caption{Key variables used in DMI requirement calculations.} \label{dmikey} \\
+\caption{Key variables used in DMI requirement calculations.} \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -1425,9 +1199,10 @@ WOL        & Week of lactation & Units are the integer part of days \(\frac{DIM}
 
 
 
-\paragraph{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition} \label{sec:NASEM}
+\paragraph{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition} 
 
-    \textbf{ Energy Requirements} The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the \hyperref[nasemenergykey]{energy requirements key}.
+    \textbf{ Energy Requirements} 
+    The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the energy requirements key.
     \vspace{0.2cm}
 
 \begin{itemize}
@@ -1665,7 +1440,7 @@ If true protein, (TP\_Milk) is measured, its energy content is adjusted to accou
     Each physiological function is quantified in terms of TP (true protein), instead of CP (crude protein).
     \vspace{0.2cm}
     
-    To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the \hyperref[nasemproteinkey]{protein requirements key}.
+    To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the protein requirements key.
     \vspace{0.5cm}
 
 \begin{itemize}
@@ -1848,7 +1623,7 @@ The following equation is used to translate the protein requirement into the req
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in protein requirement calculations.} \label{nasemproteinkey} \\
+\caption{Key variables used in protein requirement calculations.} \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -1892,7 +1667,7 @@ TargetEffMP and TargetEffAA &  Proposed target efficiencies of converting metabo
 \vspace{0.5cm}
 
 
-\textbf{ Mineral Requirements} Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the \hyperref[nasemminkey]{mineral requirements key}.
+\textbf{ Mineral Requirements} Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the mineral requirements key.
     \vspace{0.5cm}
 
 \begin{itemize}
@@ -2028,7 +1803,7 @@ Phosphorus Equations
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in mineral requirement calculations.} \label{nasemminkey} \\
+\caption{Key variables used in mineral requirement calculations.} \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -2068,7 +1843,7 @@ P\_preg & Phosphorus requirement for pregnancy & g \\
     \end{longtable}
 \vspace{0.5cm}
 
-\textbf{ Dry Matter Intake Estimation} Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the \hyperref[nasemdmikey]{DMI estimation key}.
+\textbf{ Dry Matter Intake Estimation} Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the DMI estimation key.
     \vspace{0.5cm}
                 
 \begin{center}
@@ -2102,7 +1877,7 @@ P\_preg & Phosphorus requirement for pregnancy & g \\
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in DMI estimation calculations.} \label{nasemdmikey} \\
+\caption{Key variables used in DMI estimation calculations.} \\
 \toprule
 \textbf{Variable} & \textbf{Description} & \textbf{Units} \\
 \midrule
@@ -2131,8 +1906,7 @@ Parity & adjustment factor & primiparous (0) or multiparous (1)\\
     \end{longtable}
 \vspace{0.5cm}
 
-\paragraph{NASEM: Calculating Amino Acid Requirements} \label{sec:NASEMAA} 
-
+\paragraph{NASEM: Calculating Amino Acid Requirements} 
 The methods for estimating the amino acids requirements for lactating cows based on the \textcite{nrc2021}, into RuFaS are described below.
 \begin{itemize}
     \item Amino acids are divided into essential (EAA) and non-essential (NEAA). 
@@ -2143,7 +1917,7 @@ The methods for estimating the amino acids requirements for lactating cows based
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{3.5cm}  @{}}
-\caption{Essential and non-essential amino acids} \label{nasemdmikey} \\
+\caption{Essential and non-essential amino acids}  \\
 \toprule
 \textbf{Essential (EAA)} & \textbf{Non-essential (NEAA)}  \\
 \midrule
@@ -2269,7 +2043,7 @@ Valine & Tyrosine \\
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{5cm} L{5.5cm} L{2.5cm} @{}}
-\caption{Key variables used in calculation of AA.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of AA.} \\
 \toprule
 
 \multicolumn{1}{c}{\textbf{Variable}} & 
@@ -2339,7 +2113,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
 
 
 
-\subsubsection{Energy and Nutrition Supply }\label{sec:nutsupply}
+\subsubsection{Energy and Nutrition Supply }
 \vspace{0.25cm}
 
 \paragraph{Nutrient Supply}
@@ -2484,7 +2258,7 @@ TargetEfficiencyAAi\textsuperscript{1} &  Proposed target efficiencies of essent
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in calculation of net energy in NRC 2001.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of net energy in NRC 2001.}  \\
 \toprule
 \multicolumn{1}{c}{\textbf{Variable}} & 
 \multicolumn{1}{c}{\textbf{Description}} & 
@@ -2676,7 +2450,7 @@ The dietary ME is calculated by subtracting the energy found in gaseous losses (
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in calculation of net energy supply from NASEM 2021.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of net energy supply from NASEM 2021.}  \\
 \toprule
 \multicolumn{1}{c}{\textbf{Variable}} & 
 \multicolumn{1}{c}{\textbf{Description}} & 
@@ -2810,7 +2584,7 @@ $dROM_{i}$ & Residual Organic Matter digestibility of feed i & proportion\\
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in calculation of AA.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of AA.} \\
 \toprule
 \multicolumn{1}{c}{\textbf{Variable}} & 
 \multicolumn{1}{c}{\textbf{Description}} & 
@@ -2866,7 +2640,7 @@ RUPdiet  &   Dietary digestible RUP, &   g/d\\
 
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{@{} L{3.5cm} L{5.5cm} L{3.5cm} @{}}
-\caption{Key variables used in calculation of AA.} \label{nasemminkey} \\
+\caption{Key variables used in calculation of AA.}  \\
 \toprule
 \multicolumn{1}{c}{\textbf{Variable}} & 
 \multicolumn{1}{c}{\textbf{Description}} \\
@@ -2893,7 +2667,7 @@ dP  &   (P digestibility) = 64\% for forage, 70\% for concentrate, 80\% for mine
 
 
     
-\paragraph{AA Nutrient Supply} \label{aanutrient}
+\paragraph{AA Nutrient Supply} 
 
 This section is divided into several subsections including Rumen Degraded and Undegraded Protein, Dry Matter Intake, Dietary Nutrient Intake, Dietary Nutrient Concentration, Digested Nutrients, Digested Rumen Undegradable Protein (RUP), Microbial Nitrogen Growth, Ruminal Nitrogen Outflow, and lastly Amino Acid Supply.
 \vspace{0.2cm}
@@ -3111,8 +2885,7 @@ This section is divided into several subsections including Rumen Degraded and Un
 
     
 
-\subsubsection{Automated Ration Formulation} \label{autoration}
-  
+\subsubsection{Automated Ration Formulation} 
 \paragraph{Introduction}
 Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in \cite{Li2022}. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (Table RF1), but the primary Feed input file (Table RF2), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files
 
@@ -3372,7 +3145,7 @@ milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary 
 \paragraph{Methodology}
 The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the user\_defined\_ration\_percentage values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
 
-The ration formulation will proceed as described in the \hyperref[autoration]{Automated Methodology} above, but when formulation fails, different outcomes will occur.
+The ration formulation will proceed as described in the Automated Methodology above, but when formulation fails, different outcomes will occur.
 
 
 \textit{For lactating cow pens}
@@ -3541,23 +3314,7 @@ Details of this method are described in the Culling section of Animal-level proc
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{Animal-level Processes and Management}\label{sec:AnManage}
-
+\section{Animal-level Processes and Management}
 The methods in the RuFaS model that simulate individual animals’ life events and the effects of herd management on individual animals are referred to as the Animal Life Cycle Sub-module. This part of the model is driven by a Monte Carlo stochastic process that simulates the growth, production, reproduction, and culling of individual dairy cattle animals and shares aggregated outcomes with the Herd Management Sub-Module to manage herd dynamics on a daily basis.
 
 The life cycle module represents the variation in animal performance through the use of Monte Carlo Simulation methods \parencite{reuven2017}. Monte Carlo simulation relies on random draws from probability distributions rather than assigning fixed values. In this model, two main strategies are used: 
@@ -3572,7 +3329,7 @@ The life cycle module represents the variation in animal performance through the
 
 \paragraph{Flow of information}
 
-For each animal object, the daily updates are called according to the order described in the \hyperref[sec:ADAY]{Day in the Life for Animal} on a RuFaS Farm. This is:
+For each animal object, the daily updates are called according to the order described in the \hyperref{rufasday}{Day in the Life for Animal} on a RuFaS Farm. This is:
 \setlength{\parskip}{1em}
 
 \setlength{\parindent}{0pt} DigestiveSystem $\rightarrow$ NutrientInputs $\rightarrow$ MilkProduction $\rightarrow$ BodyweightChange $\rightarrow$ Reproduction $\rightarrow$ LifeStage Change $\rightarrow$ Parturition
@@ -3593,7 +3350,7 @@ Each animal within the RuFaS herd will progress through the 5 main life stages f
   \centering
   \includegraphics[width=0.9\textwidth]{resources/animalgroups.png} % Replace with your image file
   \caption{There are 5 life stages from calf to cow and a cull stage as outlined in this figure.}
-  \label{fig:example}
+  
 \end{figure}
 
 \textbf{Progression Between Life Stages:} Calves progress to Heifer I when their age reaches the user-defined input for weaning day. Heifer I animals progress to Heifer II animals when their age reaches the user-defined input for breeding start day. Heifer II animals that successfully conceive progress to the Heifer III stage when they are close to calving. Specifically, Heifers II become Heifers III when the number of days left in their pregnancy is equal to the user-defined input for the prefresh days. When a Heifer III animal calves for the first time, she becomes a Cow and will remain a cow for the rest of her life on the RuFaS farm. 
@@ -3615,7 +3372,7 @@ When a Heifer III or Cow animal reaches the end of their pregnancy and starts la
     
     These methods are further described by \textcite{Li2023}
 
-\textbf{Required User Inputs} \label{ANbwinputs}
+\textbf{Required User Inputs} 
 
 \renewcommand{\arraystretch}{1.4}
 \begin{longtable}{@{} L{4cm} L{6.5cm} L{1.5cm} L{1cm} L{1cm} @{}}
@@ -3656,8 +3413,7 @@ wean\_day       &  The days of age at which calves are fully weaned from milk or
 target\_heifer\_preg\_day       & The target age (in days) for heifers to become pregnant - for adjusting heifer body weight (days)      & 420       & NA      & NA \\
 \end{longtable}
 
-\textbf{Expected Outputs} \label{ANbwoutputs}
-
+\textbf{Expected Outputs} 
 \begin{itemize}
     \item herd\_statistics.avg\_cow\_body\_weight (kg): the daily average bodyweight of all cows in the herd 
     \item Pen\_[pen ID]\_[pen animal combination].avg\_BW (kg): the daily average bodyweight of all animals in each pen
@@ -3885,7 +3641,7 @@ The gestation length for cows is estimated with the same methods that are used f
  
 
 
-\subsection{Animal Reproduction} \label{REPRO}
+\subsection{Animal Reproduction} 
  
     \paragraph{Introduction} The reproduction component of the RuFaS model is designed based on reproductive program options recommended by the Dairy Cattle Reproduction Council \parencite{dcrc_protocols} and experts in the field. It offers three pre-defined reproductive program options for nulliparous heifers (estrus detection [ED], timed artificial insemination [TAI], and synchronized estrus detection [Synch-ED]) and three options for lactating cows (ED, TAI, and a combined ED-TAI approach). Users can select appropriate reproductive protocols and specify reproductive performance variables for both nulliparous heifers and lactating cows.
     
@@ -4032,8 +3788,7 @@ These include:
     \item Updates to Protocols
 \end{itemize}
 
-    \paragraph{Methodology} \label{repromethod}
-
+    \paragraph{Methodology} 
     \textbf{\textit{Heifer Breeding}}
     \vspace{0.2cm}
     
@@ -4042,7 +3797,7 @@ These include:
   \centering
   \includegraphics[width=0.7\textwidth]{resources/repromethod.png} % Replace with your image file
   \caption{This is a high level schematic to illustrate the  methodology behind the heifer breeding and re-breeding in RuFaS Animal Module.}
-  \label{fig:example}
+  
 \end{figure}
     Pregnancy diagnosis and reconfirmation occur after each insemination [heifer\_pregnancy\_update]. If a heifer remains nonpregnant beyond a user-defined age threshold (heifer\_repro\_cull\_time, e.g., 500 days), she is culled due to reproductive failure. At a user-defined day in pregnancy (prefresh\_day, e.g., one month before calving), the animal either transitions to the Heifer III stage or is sold as a replacement heifer. 
     \vspace{0.2cm}
@@ -4062,7 +3817,7 @@ These include:
   \centering
   \includegraphics[width=0.75\textwidth]{resources/cowbreedmethod.png}
   \caption{This is a high level schematic to illustrate the methodology behind the cow breeding and re-breeding in RuFaS Animal Module.}
-  \label{fig:example}
+
 \end{figure}
 
 
@@ -4158,12 +3913,12 @@ open\_cow &  Handles open status updates for cows, reassigning protocols or mark
 \end{landscape}
 
 
-\subsection{Milk Production} \label{milkprod}
+\subsection{Milk Production} 
  
     \paragraph{Introduction} This section describes how RuFaS determines the amount of milk and milk components produced by a particular cow on a particular day. 
     \vspace{0.25cm}
     
-    Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the \hyperref[lactcurve]{Lactation Curve } section). At the beginning of each new lactation, each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
+    Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the Lactation Curve section). At the beginning of each new lactation, each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     \vspace{0.25cm}
     
     When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. Each day, each cow’s milk production is calculated and recorded. Milk production is calculated from the Wood’s curve equation using the given lactation curve parameters and days in milk, and then adjusted by applying random variation and any milk reduction required by other parts of the model. Milk components (protein, fat, and lactose) are calculated based on milk production and percent of each component for each cow. 
@@ -4393,7 +4148,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
          \textit{Parameters and Equations}
          \vspace{0.1cm}
 
-         These are comprehensively outlines in the \hyperref[lactcurve]{Lactation Curve Parameters Determination} Section.
+         These are comprehensively outlines in the Lactation Curve Parameters Determination Section.
         \vspace{0.1cm}
         
          LactationCurve.set\_lactation\_parameters() is called by:
@@ -4596,7 +4351,7 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
 
 
         \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-            For more information, refer to the \hyperref[REPRO]{Reproduction} section of this document.
+            For more information, refer to the Reproduction section of this document.
         \end{tcolorbox}
         \vspace{0.2cm}
     
@@ -4604,18 +4359,18 @@ lactation\_properties& milking\_cow\_fraction & Fraction of cows assumed to be i
     \vspace{0.2cm}
             
         \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-            For more details on milk changes and reductions, go to the \hyperref[myprodred]{Milk Production and Reduction} portion of this section. . 
+            For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section. . 
         \end{tcolorbox}
     
    
     \end{enumerate}
 
  
-\subsection{Lactation Curve: Parameters and Definitions} \label{lactcurve}
+\subsection{Lactation Curve: Parameters and Definitions} 
  
     \paragraph{Introduction} The Lactation Curve Parameter Determination module calculates and adjusts Wood’s lactation curve parameters (l, m, n) based on farm-specific attributes such as geographic location, management practices, and production levels. These parameters shape the milk production curve for cows across different parities (1st, 2nd, 3rd + lactations).
     
-    This module is part of the Animal Module and integrates with the \hyperref[milkprod]{Milk Production} calculations. The outputs influence various downstream models, including nutrient requirements, manure excretion, and greenhouse gas emission calculations.
+    This module is part of the Animal Module and integrates with the Milk Production calculations. The outputs influence various downstream models, including nutrient requirements, manure excretion, and greenhouse gas emission calculations.
     
     The primary class in this module is:
     
@@ -4958,7 +4713,7 @@ n & Unitless & Farm-specific rate of milk yield decline after peak lactation by 
     \end{enumerate}
 
         
-    Equations below are not in the LactationCurve class, but they are useful to understanding the bigger picture of how lactation curve parameter estimates are generated in RuFaS. Please see the \hyperref[milkprod]{Milk Production} section for more details on these equations \parencite{Wood1967}.
+    Equations below are not in the LactationCurve class, but they are useful to understanding the bigger picture of how lactation curve parameter estimates are generated in RuFaS. Please see the Milk Production section for more details on these equations \parencite{Wood1967}.
     \vspace{0.5cm}
 
     \textbf{Wood's Lactation Curve}
@@ -4992,7 +4747,7 @@ n & Unitless & Farm-specific rate of milk yield decline after peak lactation by 
             \vspace{0.5cm}
 
 
-\subsection{Culling} \label{herdexit} 
+\subsection{Culling} 
 
  
 \paragraph{Introduction} This section describes the processes of animals leaving the herd in RuFaS. 
@@ -5357,14 +5112,14 @@ If a cow is not pregnant when she reaches the days in milk cutoff specified by t
 
     The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are drawn from pen ration files and animal module constants. They are organized into the following groups:
     \begin{enumerate}
-        \item  \hyperref[ANgeneralmanexcinputs]{General Animal Inputs}
-        \item \hyperref[ANcowspecinputs]{Cow Specific Inputs} 
-        \item \hyperref[ANPinputs]{Phosphorus Specific Inputs}
+        \item  General Animal Inputs
+        \item Cow Specific Inputs
+        \item Phosphorus Specific Inputs
     \end{enumerate}
 
 
 % Begin longtable
-\textbf{General Inputs} Manure Excretion \label{ANgeneralmanexcinputs}
+\textbf{General Inputs} Manure Excretion 
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
 \begin{longtable}{@{} L{5cm} p{7cm} C{3cm} @{}}
@@ -5406,7 +5161,7 @@ nutrient\_concentrations & Nutrient concentrations (e.g., CP, NDF, ADF, ash) & \
 % Cow Specific Inputs Table
 % --------------------------
 
-\textbf{\large Cow Specific Inputs – Manure Excretion} \label{ANcowspecinputs}
+\textbf{\large Cow Specific Inputs – Manure Excretion} 
 
 \renewcommand{\arraystretch}{1.4}
 \begin{longtable}{@{} L{4.5cm} p{4.5cm} C{2cm} C{1cm} C{1cm} @{}}
@@ -5445,7 +5200,7 @@ metabolizable\_energy\_intake & Metabolizable energy intake per kg DM & Mcal/kg 
 % Phosphorus Excretion Inputs Table
 % --------------------------
 
-\textbf{\large Phosphorus Excretion Inputs – Manure Excretion} \label{ANPinputs}
+\textbf{\large Phosphorus Excretion Inputs – Manure Excretion} 
 
 \renewcommand{\arraystretch}{1.4}
 \begin{longtable}{@{} L{5cm} p{7cm} C{3cm} @{}}
@@ -5484,7 +5239,7 @@ The outputs from the Manure Excretion Calculator are organized into two main cat
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
 \begin{longtable}{@{} C{3cm} C{3cm} C{5cm} C{1cm} @{}}
-\caption{Expected outputs from this section.} \label{ANoutputes} \\
+\caption{Expected outputs from this section.} \\
 \toprule
 \textbf{Category} & \textbf{Parameter} & \textbf{Definition} & \textbf{Units} \\
 \midrule
@@ -6263,7 +6018,7 @@ The module predicts the daily enteric methane emissions for individual animals:
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
 
 \begin{longtable}{@{} C{3cm} C{3cm} C{5cm} C{1cm} @{} }
-\caption{Expected outputs from this section.} \label{ANoutputes} \\
+\caption{Expected outputs from this section.}  \\
 
 \toprule
 \textbf{Category} & \textbf{Parameter} & \textbf{Definition} & \textbf{Units} \\
@@ -6501,35 +6256,36 @@ methane\_mitigation\_method & Selected feed additive for methane mitigation & �
 \vspace{0.2cm}
 
 % --- Additive Dosage Table ---
-\begin{longtable}{@{} L{3cm} p{5cm} C{5cm} @{}}
-\caption{Dosage of methane mitigation additives.} \\
+\begin{longtable}{@{}L{3.3cm} L{6.7cm} L{5.0cm}@{}}
+\caption{Dosage of methane mitigation additives.}\\
 \toprule
-\textbf{Variable Name} & \textbf{Definition} & \textbf{Default and Range} \\
+\textbf{Variable name} & \textbf{Definition} & \textbf{Default and range} \\
 \midrule
 \endfirsthead
 
-\multicolumn{3}{@{}l}{\textit{Table continued from previous page}} \\
+\multicolumn{3}{@{}l}{\textit{Table \thetable\ continued from previous page}}\\
 \toprule
-\textbf{Variable Name} & \textbf{Definition} & \textbf{Default and Range} \\
+\textbf{Variable name} & \textbf{Definition} & \textbf{Default and range} \\
 \midrule
 \endhead
 
 \midrule
-\multicolumn{3}{@{}r@{}}{\textit{Continued on next page}} \\
+\multicolumn{3}{@{}r@{}}{\textit{Continued on next page}}\\
 \endfoot
 
 \bottomrule
 \endlastfoot
 
-methane\_mitigation\_additive\_amount & Dosage per kg of DMI & 3-NOP: 70 (40–100); Monensin: 24 (20–36) mg/kg DMI \\
+methane_mitigation_additive_amount &
+Dosage per kg of dry matter intake (DMI). &
+3-NOP: 70 (40--100)\,mg/kg DMI; Monensin: 24 (20--36)\,mg/kg DMI \\
 \end{longtable}
 
-\vspace{0.3cm}
 
 % --- Expected Outputs Table ---
 \renewcommand{\arraystretch}{1.4}
 \begin{longtable}{@{} C{3cm} C{6cm} C{2cm} @{}}
-\caption{Expected outputs from this section.} \label{ANoutputes} \\
+\caption{Expected outputs from this section.} \\
 \toprule
 \textbf{Parameter} & \textbf{Definition} & \textbf{Units} \\
 \midrule
@@ -6609,103 +6365,6 @@ Then the adjusted of methane production is calculated based on methane yield red
     \end{itemize}
  
 
-\newpage
-\section{Abbreviations}
-
-\renewcommand{\arraystretch}{1.3}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-
-\begin{longtable}{@{} L{4cm} L{12cm} @{}} 
-\caption{Common abbreviations used throughout this document} \\
-
-\toprule
-\textbf{Abbreviation} & \textbf{Full Term or Phrase} \\
-\midrule
-\endfirsthead
-
-\multicolumn{2}{@{}l}{\textit{Table continued from previous page}} \\
-\toprule
-\textbf{Abbreviation} & \textbf{Full Term or Phrase} \\
-\midrule
-\endhead
-
-\midrule
-\multicolumn{2}{@{}r@{}}{\textit{Continued on next page}} \\
-\endfoot
-
-\bottomrule
-\endlastfoot
-
-ADF & Acid detergent fiber (\% of DM) \\
-ADG & Average daily weight gain (g/d) \\
-Age1stBred & First breeding age (month) \\
-BCS5 & Body condition score (1–5 basis) \\
-BW & Body weight (kg) \\
-Ca & Calcium content (\% of DM) \\
-CBW & Calf birth weight (kg) \\
-CI & Calving interval (d) \\
-cm & centimeter \\
-Cost & Feed cost (\$/kg of DM) \\
-CP & Crude protein (\% of DM) \\
-d & days \\
-DE & Digestible energy (standard value, Mcal/kg) \\
-DIM & Days in milk \\
-DM & Dry matter (\% of as-fed basis) \\
-DMI & Dry matter intake \\
-DOP & Days of pregnancy (d) \\
-dRUP & RUP degradability (\% of RUP) \\
-EE & Ether extract, in crude fat (\% DM) \\
-EndCP & Endogenous CP \\
-EndN & Endogenous N \\
-EQSBW & Equivalent shrunk body weight (kg) \\
-FA & Fatty acids \\
-FIPS & Federal Information Processing Standards \\
-g & grams \\
-GE & Gross energy (standard value, Mcal/kg) \\
-GrUterW & Gravid uterine weight (kg) \\
-Kd & Rumen protein degradation rate (\%/h) \\
-kg & kilograms \\
-kJ & kilojoule \\
-L & liters \\
-m & meter \\
-max & maximum \\
-Mcal & Megacalorie \\
-MCP & Microbial Crude Protein \\
-ME & Metabolizable energy (standard value, Mcal/kg) \\
-MICP & Microbial CP \\
-min & minimum \\
-mL & milliliters \\
-MN & Microbial N \\
-MP & Metabolizable protein \\
-MTP & Microbial TP \\
-MW & Mature body weight (kg) \\
-MY & Milk yield \\
-N & Nitrogen (\% of DM) \\
-NASEM & National Academies of Sciences, Engineering, and Medicine \\
-NDF & Neutral detergent fiber (\% of DM) \\
-NEG & Net energy for growth (standard value, Mcal/kg) \\
-NEL & Net energy for lactation (standard value, Mcal/kg) \\
-NEM & Net energy for maintenance (standard value, Mcal/kg) \\
-nNDF & Nondigestible Neutral Detergent Fiber \\
-NPN & Non-protein Nitrogen \\
-NRC & National Research Council (updated in 2021 to NASEM) \\
-OM & Organic matter (\% of DM) \\
-P & Phosphorus content (\% of DM) \\
-PAF & Processing adjustment factor (not used) \\
-Parity & Number of lactations \\
-PrevTemp & Average daily temperature of last month (°C) \\
-RDP & Ruminally degraded CP \\
-ROM & Residual OM (\% of DM) \\
-RUP & Ruminally undegraded CP \\
-s & seconds \\
-TAN & Total ammoniacal N \\
-TDN & Total digestible nutrient (\% of DM) \\
-TP & True protein (\% of DM) \\
-USDA & United States Department of Agriculture \\
-UterW & Uterine weight (kg) \\
-WSC & Water Soluble Carbohydrates \\
-\end{longtable}
-
 
 
 
@@ -6716,4 +6375,3 @@ WSC & Water Soluble Carbohydrates \\
 \printbibliography[heading=subbibliography,title={ }]
 \end{refsection}
 
-\end{document}

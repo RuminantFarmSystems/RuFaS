@@ -98,13 +98,11 @@ class FeedManager:
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
-        sorted_purchased_allowances = sorted(
-            purchase_allowances,
-            key=lambda x: x["purchased_feed"]
-        )
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(sorted_purchased_allowances)
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = \
-            RuntimePurchaseAllowance(sorted_purchased_allowances)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
+            sorted_purchased_allowances
+        )
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -623,7 +621,9 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {}
+        total_purchased_deducted: dict[RUFAS_ID, float] = {
+            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
+        }
         total_farmgrown_deducted: dict[RUFAS_ID, float] = {
             farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
         }
