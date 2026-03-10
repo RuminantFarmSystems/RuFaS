@@ -668,8 +668,7 @@ class TaskManager:
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
 
-        if simulation_type.simulate_animals:
-            TaskManager.handle_herd_initializaition(args, output_manager)
+        TaskManager.handle_herd_initializaition(args, output_manager)
 
         simulator = SimulationEngine(simulation_type=simulation_type)
         simulator.simulate()

@@ -147,6 +147,7 @@ class SimulationEngine:
             self.time,
             is_ration_defined_by_user=self.is_ration_defined_by_user,
             available_feeds=self.feed_manager.available_feeds,
+            simulate_animals=self.simulate_animals,
         )
 
         self.manure_manager: ManureManager = ManureManager(
@@ -207,8 +208,8 @@ class SimulationEngine:
         2. Feed planning (recalculate feed availability, update purchase plans)
         3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
         update purchase plans)
-        4. Animal operations (distribute feed to herd)
-        5. Manure operations (collect and manage manure)
+        4. Animal operations (feeding, growth, reproduction, and milk production routines)
+        5. Manure operations (collect and process manure)
         6. Record keeping (time, weather, purchased feeds fed emissions)
         7. Advance simulation date
 
@@ -457,17 +458,12 @@ class SimulationEngine:
         self.annual_mass_balance(self.time)
         self.annual_reset()
 
-    def _annual_simulation(self, simulation_type: str) -> None:
+    def _annual_simulation(self) -> None:
         """
         Executes the annual simulation routines.
-
-        Parameters
-        ----------
-        simulation_type : str
-            The type of simulation to run. Determines which daily simulation function to execute.
         """
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
-            self._simulation_type_to_daily_simulation_function[simulation_type]()
+            self._simulation_type_to_daily_simulation_function[self.simulation_type]()
 
         self._run_post_annual_routines()
 

@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/example_no_animal_config.json",
+      "path": "input/data/config/example_field_and_feed_config.json",
       "type": "json",
       "properties": "config_properties"
     },
