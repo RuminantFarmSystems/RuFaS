@@ -76,7 +76,11 @@ class HerdManager:
         cls.ANIMAL_GROUPING_SCENARIO = scenario
 
     def __init__(
-        self, weather: Weather, time: RufasTime, is_ration_defined_by_user: bool, available_feeds: list[Feed],
+        self,
+        weather: Weather,
+        time: RufasTime,
+        is_ration_defined_by_user: bool,
+        available_feeds: list[Feed],
         simulate_animals: bool,
     ) -> None:
         """
