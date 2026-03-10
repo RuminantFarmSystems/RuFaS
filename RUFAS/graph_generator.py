@@ -171,11 +171,6 @@ class GraphGenerator:
         log_pool : list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
-
-        Raises
-        ------
-        Exception
-            Generic exception raised by utility functions.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -534,7 +529,7 @@ class GraphGenerator:
             if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
-            raise ValueError(f"Unsupported graph type: {graph_type}")
+            raise ValueError(f"Graph Generation error: Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         max_data_length = max(len(v) for v in data.values())
         if slice_start is not None:

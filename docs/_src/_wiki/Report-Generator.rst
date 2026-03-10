@@ -127,6 +127,18 @@ Each filter file contains several key components:
   variations in aggregation results. This occurs because mixing rounded
   and non-rounded data in aggregation functions may produce results that
   differ slightly from those obtained using only non-rounded data.
+- **direction**: (Optional) The output CSV orientation. Either ``“portrait”``
+  or ``“landscape”``. If no value is provided or providing an unexpected
+  value, the default ``“portrait”`` direction will be used.
+- **use_name**: (Optional) Whether to use the filter name when constructing
+  the key name for data pulled from a dictionary.
+- **use_verbose_report_name**: (Optional) When true, forces verbose report
+  names (report_name.full_variable_address) for single-column reports.
+  By default, single-column reports use compact names while multi-column
+  reports use verbose names to ensure distinct column headers.
+  This flag only affects vertically aggregated single-column reports
+  and unaggregated single-column reports; it has no effect on horizontally
+  aggregated reports or multi-column reports (which already use verbose names).
 
 Columns are the variables and rows are datapoints, i.e., each row
 corresponds to a ``OM.add_variable`` call and each column corresponds to
