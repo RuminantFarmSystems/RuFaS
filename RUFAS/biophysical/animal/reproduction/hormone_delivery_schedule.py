@@ -148,6 +148,11 @@ class HormoneDeliverySchedule:
         dict[int, dict] | None
             The hormone delivery schedule for the given animal category and protocol name. None if the
             animal category or protocol name is invalid.
+
+        Notes
+        -----
+        The returned schedule is a deep copy of the original schedule to prevent any modifications to
+        the original class-level constant.
         """
 
         animal_category_to_protocols = {

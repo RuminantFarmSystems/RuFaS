@@ -186,6 +186,7 @@ def test_task_manager_start(
             metadata_depth_limit,
             workers,
             Path("metadata/path"),
+            Path("output/directory"),
         )
         mock_summarize.assert_not_called()
     else:
@@ -696,7 +697,9 @@ def test_task(
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
-    task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
+    task_manager.task(
+        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -739,7 +742,9 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"))
+    result = task_manager.task(
+        args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
 
     assert result is None
 
@@ -794,7 +799,9 @@ def test_task_failed(task_manager: TaskManager) -> None:
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
+    result = task_manager.task(
+        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
     assert result == "test (1)"
 
 
@@ -845,7 +852,7 @@ def test_single_simulation_run(
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
-    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN}
+    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN, "simulation_type": "full_farm"}
 
     mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
     mock_simulation_engine_init = mocker.patch(
@@ -1628,6 +1635,7 @@ def test_run_tasks(
         metadata_depth_limit=metadata_depth_limit,
         workers=1,
         metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
     )
 
     mock_task_call_list = [
@@ -1637,6 +1645,7 @@ def test_run_tasks(
             produce_graphics=produce_graphics,
             metadata_depth_limit=metadata_depth_limit,
             workers=1,
+            output_directory=Path("output/"),
         )
         for single_run_task in single_run_tasks
     ]
@@ -1767,6 +1776,7 @@ def test_run_tasks_fail(
         metadata_depth_limit=metadata_depth_limit,
         workers=1,
         metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
     )
 
     mock_om_init.assert_called_once()
@@ -1899,7 +1909,7 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
             {"numpy": "1.24.0"},
             None,
             RuntimeError,
-            "does not satisfy required version",
+            "Required package 'numpy' version does not match. Installed: 1.24.0, Required: >=2.0.0",
         ),
     ],
 )

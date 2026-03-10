@@ -68,9 +68,9 @@
     },
     {
       "task_type": "END_TO_END_TESTING",
-      "metadata_file_path": "input/metadata/end_to_end_testing/no_animal_e2e_metadata.json",
-      "output_prefix": "no_animal_e2e",
-      "filters_directory": "input/data/end_to_end_testing/no_animal",
+      "metadata_file_path": "input/metadata/end_to_end_testing/field_and_feed_e2e_metadata.json",
+      "output_prefix": "field_and_feed_e2e",
+      "filters_directory": "input/data/end_to_end_testing/field_and_feed",
       "log_verbosity": "logs",
       "exclude_info_maps": true,
       "random_seed": 42,

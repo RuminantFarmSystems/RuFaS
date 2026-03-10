@@ -21,7 +21,7 @@ from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -111,6 +111,11 @@ class TaskManager:
         metadata_depth_limit : int
             Override value for maximum metadata properties depth set in Input Manager.
 
+        Raises
+        ------
+        Exception
+            If the input data is invalid.
+
         """
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
@@ -179,7 +184,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -240,6 +245,9 @@ class TaskManager:
 
         Raises
         ------
+        RuntimeError
+            If a required dependency is not installed or does not meet the version requirements
+            specified in pyproject.toml.
         ImportError
             If a required dependency is not installed.
         """
@@ -271,7 +279,7 @@ class TaskManager:
                     " to install all dependencies at required minimum levels.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
-                raise RuntimeError(f"[ERROR] Required package '{package_name}' is not installed.") from e
+                raise RuntimeError(f"Required package '{package_name}' is not installed.") from e
 
             if requirement.specifier and not requirement.specifier.contains(installed_version):
                 self.output_manager.add_error(
@@ -282,8 +290,8 @@ class TaskManager:
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
                 raise RuntimeError(
-                    f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
-                    f" {requirement.specifier}"
+                    f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
+                    f"Required: {requirement.specifier}"
                 )
 
     def check_python_version(self) -> None:
@@ -488,6 +496,7 @@ class TaskManager:
         metadata_depth_limit: int,
         workers: int,
         metadata_path: Path,
+        output_directory: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -496,6 +505,7 @@ class TaskManager:
             metadata_depth_limit=metadata_depth_limit,
             workers=workers,
             metadata_path=metadata_path,
+            output_directory=output_directory,
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -527,7 +537,8 @@ class TaskManager:
         produce_graphics: bool,
         workers: int,
         metadata_depth_limit: int | None,
-        metadata_path: Path, # TODO: variable not used?
+        metadata_path: Path, # TODO: Remove? variable not used.
+        output_directory: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -561,7 +572,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
-                output_directory=Path("output/"),
+                output_directory=output_directory,
                 clear_output_directory=False,
                 chunkification=args["chunkification"],
                 max_memory_usage_percent=int(args["maximum_memory_usage_percent"] / workers),
@@ -652,12 +663,24 @@ class TaskManager:
             "function": TaskManager.handle_single_simulation_run.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        TaskManager.handle_herd_initializaition(args, output_manager)
+
+        simulation_type_str = args.get("simulation_type")
+        if not simulation_type_str:
+            output_manager.add_error(
+                "Missing simulation type",
+                "No simulation type provided for simulation run task.",
+                info_map,
+            )
+            raise ValueError("Missing simulation type for simulation run task.")
+        simulation_type = SimulationType.get_simulation_type(simulation_type_str)
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
 
+        TaskManager.handle_herd_initializaition(args, output_manager)
+
+        simulator = SimulationEngine(simulation_type=simulation_type)
         simulator.simulate()
+
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
@@ -965,6 +988,7 @@ class TaskManager:
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
+        args["simulation_type"] = input_manager.get_data("config.simulation_type")
         TaskManager.handle_single_simulation_run(args, output_manager)
         TaskManager.handle_post_processing(
             args=args,

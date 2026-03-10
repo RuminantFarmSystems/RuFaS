@@ -62,6 +62,7 @@ def test_data_padder(
         actual_variable_value_to_add,
         simulation_day,
         info_map={},
+        first_info_map_only=True,
         units={},
     )
 
@@ -751,23 +752,14 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
     """Unit test for report_daily_pen_total()"""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    mock_data_padder = mocker.patch.object(AnimalModuleReporter, "data_padder")
 
     AnimalModuleReporter.report_daily_pen_total("1", "GROWING", 8, 10)
-
-    mock_data_padder.assert_called_once_with(
-        "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF",
-        "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_GROWING",
-        0,
-        10,
-        info_map := {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
-            "units": MeasurementUnits.ANIMALS,
-            "simulation_day": 10,
-        },
-        MeasurementUnits.ANIMALS,
-    )
+    info_map = {
+        "class": AnimalModuleReporter.__name__,
+        "function": AnimalModuleReporter.report_daily_pen_total.__name__,
+        "units": MeasurementUnits.ANIMALS,
+        "simulation_day": 10,
+    }
     mock_om_add_variable.assert_called_once_with("number_of_animals_in_pen_1_GROWING", 8, info_map)
 
 
