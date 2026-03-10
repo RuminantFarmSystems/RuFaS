@@ -2691,7 +2691,7 @@
         },
         "dry_matter_percentage": {
           "type": "number",
-          "description": "Percentage of fresh yield that is dry matter (unitless).",
+          "description": "Percentage of fresh yield at harvest that is dry matter (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
