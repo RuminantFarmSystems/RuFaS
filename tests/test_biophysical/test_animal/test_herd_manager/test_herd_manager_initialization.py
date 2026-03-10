@@ -95,7 +95,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mocker.patch.object(HerdManager, "set_milk_type_in_calf_ration_manager", return_value=None)
 
     config_data: dict[str, Any] = {
-        "simulate_animals": False,
+        "simulation_type": "no_animals",
         "nutrient_standard": {"dummy": "ns"},
     }
 

@@ -2,6 +2,7 @@ import sys
 from dataclasses import asdict
 from typing import Any
 
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
@@ -1091,8 +1092,8 @@ class AnimalModuleReporter:
         herd_statistics: HerdStatistics,
         herd_reproduction_statistics: HerdReproductionStatistics,
         time: RufasTime,
-        heiferII_events_by_id: dict[str, str],
-        cow_events_by_id: dict[str, str],
+        heiferII_events_by_id: dict[str, AnimalEvents],
+        cow_events_by_id: dict[str, AnimalEvents],
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1105,9 +1106,9 @@ class AnimalModuleReporter:
             Instance of HerdReproductionStatistics class.
         time : RufasTime
             The RufasTime object with the current time information.
-        heiferII_events_by_id : dict[str, str]
+        heiferII_events_by_id : dict[str, AnimalEvents]
             The dictionary of HeiferII events.
-        cow_events_by_id : dict[str, str]
+        cow_events_by_id : dict[str, AnimalEvents]
             The dictionary of Cow events.
         """
         empty_sold_animals: list[SoldAnimalTypedDict] = [{"sold_at_day": 0, "body_weight": 0}]
