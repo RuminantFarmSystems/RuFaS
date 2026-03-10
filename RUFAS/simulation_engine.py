@@ -27,14 +27,49 @@ class SimulationType(Enum):
 
     Attributes
     ----------
-    FULL_SIMULATION
-        A simulation that includes all processes and interactions in RuFaS.
-    FEED_AND_MANURE_ONLY
-        A simulation that focuses on feed management and manure management processes, excluding animal simulations.
+    FULL_FARM : str
+        Represents a full farm simulation with all sub-modules active.
+    FIELD_AND_FEED : str
+        Represents a simulation that includes only field and feed modules, no animal and manure modules.
     """
 
-    FULL_SIMULATION = 1
-    FEED_AND_MANURE_ONLY = 2
+    FULL_FARM = "full_farm"
+    FIELD_AND_FEED = "field_and_feed"
+
+    @property
+    def simulate_animals(self) -> bool:
+        """Return whether this simulation type includes the animal module."""
+        return self not in self._non_animal_simulation_types()
+
+    @classmethod
+    def _non_animal_simulation_types(cls) -> set["SimulationType"]:
+        """Return the set of simulation types that do not simulate animals."""
+        return {
+            cls.FIELD_AND_FEED,
+        }
+
+    @classmethod
+    def get_simulation_type(cls, simulation_type: str) -> "SimulationType":
+        """
+        Gets the simulation type.
+
+        Parameters
+        ----------
+        simulation_type : str
+            The type of simulation as a string.
+
+        Raises
+        ------
+        ValueError
+            If the simulation type is not recognized.
+        """
+        try:
+            return cls(simulation_type)
+        except ValueError as ve:
+            valid_simulation_types = ", ".join([e.value for e in cls])
+            raise ValueError(
+                f"Unknown simulation type: {simulation_type}. Expected one of: {valid_simulation_types}."
+            ) from ve
 
 
 class SimulationEngine:
@@ -62,22 +97,67 @@ class SimulationEngine:
         A boolean indicating whether user has chosen to simulate animals in config.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, simulation_type: SimulationType) -> None:
         """
         Initializes the simulation engine.
         """
         self.om = OutputManager()
         self.im = InputManager()
         self.time = RufasTime()
-
+        self.simulation_type = simulation_type
+        self.simulate_animals = self.simulation_type.simulate_animals
         self._simulation_type_to_daily_simulation_function = {
-            "full_farm": self._execute_full_farm_daily_simulation,
-            "no_animals": self._execute_no_animals_daily_simulation,
+            SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
+            SimulationType.FIELD_AND_FEED: self._execute_no_animals_daily_simulation,
         }
 
         self._initialize_simulation()
 
-    def simulate(self, simulation_type: str) -> None:
+    def _initialize_simulation(self) -> None:
+        """
+        Instantiates the simulation object by requesting data from the Input Manager.
+        """
+        weather_data = self.im.get_data("weather")
+        self.om.time = self.time
+        self.weather = Weather(weather_data, self.time)
+
+        self.field_manager: FieldManager = FieldManager()
+
+        nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
+        feeds_config = self.im.get_data("feed")
+        feed_storage_configs = self.im.get_data("feed_storage_configurations")
+        feed_storage_instances = self.im.get_data("feed_storage_instances")
+        self.feed_manager: FeedManager = FeedManager(
+            feeds_config,
+            nutrient_standard,
+            feed_storage_configs,
+            feed_storage_instances,
+        )
+
+        ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
+        self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
+        self.next_ration_reformulation = self.time.current_date.date()
+        self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
+        max_daily_feed_recalculations_per_year: int = self.im.get_data("feed.max_daily_feed_recalculations_per_year")
+        self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
+        self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
+
+        self.herd_manager: HerdManager = HerdManager(
+            self.weather,
+            self.time,
+            is_ration_defined_by_user=self.is_ration_defined_by_user,
+            available_feeds=self.feed_manager.available_feeds,
+        )
+
+        self.manure_manager: ManureManager = ManureManager(
+            self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
+        )
+
+        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
+        feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]
+        self.emissions_estimator.check_available_purchased_feed_data(feed_manager_available_feed_ids)
+
+    def simulate(self) -> None:
         """
         Executes the simulation.
 
@@ -93,7 +173,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
 
-        self._run_simulation_main_loop(simulation_type)
+        self._run_simulation_main_loop()
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics,
@@ -110,18 +190,13 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
-    def _run_simulation_main_loop(self, simulation_type: str) -> None:
+    def _run_simulation_main_loop(self) -> None:
         """
         The main loop for simulation.
 
-        Parameters
-        ----------
-        simulation_type : str
-            The type of simulation to run. Determines which daily simulation function to execute.
-
         """
         for simulation_year in range(self.time.simulation_length_years):
-            self._annual_simulation(simulation_type)
+            self._annual_simulation()
 
     def _execute_full_farm_daily_simulation(self) -> None:
         """
@@ -404,48 +479,3 @@ class SimulationEngine:
 
     def annual_mass_balance(self, time: RufasTime) -> None:
         pass
-
-    def _initialize_simulation(self) -> None:
-        """
-        Instantiates the simulation object by requesting data from the Input Manager.
-        """
-        weather_data = self.im.get_data("weather")
-        self.om.time = self.time
-        self.weather = Weather(weather_data, self.time)
-
-        self.field_manager: FieldManager = FieldManager()
-
-        nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
-        feeds_config = self.im.get_data("feed")
-        feed_storage_configs = self.im.get_data("feed_storage_configurations")
-        feed_storage_instances = self.im.get_data("feed_storage_instances")
-        self.feed_manager: FeedManager = FeedManager(
-            feeds_config,
-            nutrient_standard,
-            feed_storage_configs,
-            feed_storage_instances,
-        )
-
-        self.simulate_animals = self.im.get_data("config.simulation_type") != "no_animals"
-        ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
-        self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
-        self.next_ration_reformulation = self.time.current_date.date()
-        self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
-        max_daily_feed_recalculations_per_year: int = self.im.get_data("feed.max_daily_feed_recalculations_per_year")
-        self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
-        self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
-
-        self.herd_manager: HerdManager = HerdManager(
-            self.weather,
-            self.time,
-            is_ration_defined_by_user=self.is_ration_defined_by_user,
-            available_feeds=self.feed_manager.available_feeds,
-        )
-
-        self.manure_manager: ManureManager = ManureManager(
-            self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
-        )
-
-        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
-        feed_manager_available_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]
-        self.emissions_estimator.check_available_purchased_feed_data(feed_manager_available_feed_ids)
