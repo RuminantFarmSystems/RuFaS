@@ -180,7 +180,7 @@ class MineralizationDecomposition:
         phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
             carbon_phosphorus_ratio, 200
         )
-        assert nitrogen_term and phosphorus_term
+        assert nitrogen_term is not None and phosphorus_term is not None
         # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
         # rate factor
         return 1
