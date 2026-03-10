@@ -111,6 +111,11 @@ class TaskManager:
         metadata_depth_limit : int
             Override value for maximum metadata properties depth set in Input Manager.
 
+        Raises
+        ------
+        Exception
+            If the input data is invalid.
+
         """
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
@@ -240,6 +245,9 @@ class TaskManager:
 
         Raises
         ------
+        RuntimeError
+            If a required dependency is not installed or does not meet the version requirements
+            specified in pyproject.toml.
         ImportError
             If a required dependency is not installed.
         """
@@ -271,7 +279,7 @@ class TaskManager:
                     " to install all dependencies at required minimum levels.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
-                raise RuntimeError(f"[ERROR] Required package '{package_name}' is not installed.") from e
+                raise RuntimeError(f"Required package '{package_name}' is not installed.") from e
 
             if requirement.specifier and not requirement.specifier.contains(installed_version):
                 self.output_manager.add_error(
@@ -282,8 +290,8 @@ class TaskManager:
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
                 raise RuntimeError(
-                    f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
-                    f" {requirement.specifier}"
+                    f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
+                    f"Required: {requirement.specifier}"
                 )
 
     def check_python_version(self) -> None:

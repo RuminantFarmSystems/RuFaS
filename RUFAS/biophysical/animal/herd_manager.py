@@ -637,10 +637,7 @@ class HerdManager:
         herd_total_ration: dict[str, float] = {}
         for pen in self.all_pens:
             AnimalModuleReporter.report_daily_pen_total(
-                str(pen.id),
-                pen.animal_combination.name,
-                len(pen.animals_in_pen),
-                simulation_day,
+                str(pen.id), pen.animal_combination.name, len(pen.animals_in_pen), simulation_day
             )
 
             current_pen_ration = pen.total_pen_ration

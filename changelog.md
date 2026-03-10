@@ -29,9 +29,23 @@ v1.0.0
 - [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
+- [2737](https://github.com/RuminantFarmSystems/RuFaS/pull/2737) - [minor change] [NoInputChange] [NoOutputChange] Update CONTRIBUTING.md file to provide forking guidelines for contributors.
 - [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
 - [2720](https://github.com/RuminantFarmSystems/MASM/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
+<<<<<<< HEAD
 - [2772](https://github.com/RuminantFarmSystems/MASM/pull/2772) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Refactors `SimulationEngine`.`_daily_simulation()` to accommodate isolating modules.
+=======
+- [2791](https://github.com/RuminantFarmSystems/MASM/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
+- [2833](https://github.com/RuminantFarmSystems/MASM/pull/2833) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Remove unused animal_requirements.py file.
+- [2815](https://github.com/RuminantFarmSystems/MASM/pull/2815) - [minor change] [All Non-Biophysical Modules] [NoInputChange] [NoOutputChange] Updates error messages raised to be clearer and more helpful for diagnosis and fixing.
+- [2804](https://github.com/RuminantFarmSystems/MASM/pull/2804) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field.py.
+- [2828](https://github.com/RuminantFarmSystems/MASM/pull/2828) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Refactors `validate_metadata()` to be less complex.
+- [2819](https://github.com/RuminantFarmSystems/MASM/pull/2819) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_input_manager.py.
+- [2836](https://github.com/RuminantFarmSystems/MASM/pull/2836) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_output_manager.py.
+- [2826](https://github.com/RuminantFarmSystems/MASM/pull/2826) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds functionality to data_padder, removes unecessary use of method in ration reporting.
+- [2827](https://github.com/RuminantFarmSystems/MASM/pull/2827) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
+- [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
+>>>>>>> dev
 
 ### v1.0.0
 

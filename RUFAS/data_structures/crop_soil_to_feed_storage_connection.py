@@ -99,12 +99,6 @@ class HarvestedCrop:
     def __post_init__(self) -> None:
         """
         Validates that the type of the crop is consistent with its category.
-
-        Raises
-        ------
-        ValueError
-            If the crop type is not valid for the crop category.
-
         """
         self.estimated_maximum_effluent = self.estimate_maximum_effluent()
         self.bale_density = self._calculate_bale_density()
@@ -170,6 +164,12 @@ class HarvestedCrop:
         ----------
         dm_to_remove : float
             Dry-matter to remove (kg).
+
+        Raises
+        ------
+        ValueError
+            If the amount of dry matter to remove is greater than the amount of dry matter currently in
+            the crop.
         """
         if dm_to_remove > self.dry_matter_mass + 1e-6:
             dm_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
