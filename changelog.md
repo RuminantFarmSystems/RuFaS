@@ -42,6 +42,8 @@ v1.0.0
 - [2826](https://github.com/RuminantFarmSystems/MASM/pull/2826) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds functionality to data_padder, removes unecessary use of method in ration reporting.
 - [2827](https://github.com/RuminantFarmSystems/MASM/pull/2827) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
 - [2849](https://github.com/RuminantFarmSystems/MASM/pull/2849) - [minor change] [Crop and Soil] [NoInputChange] [NoOutputChange] Update the property definition of dry matter percent.
+- [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
+- [2843](https://github.com/RuminantFarmSystems/MASM/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
 
 ### v1.0.0
 
