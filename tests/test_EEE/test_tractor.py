@@ -159,6 +159,89 @@ def test_determine_operation_type(
 
 
 @pytest.mark.parametrize(
+    "application_depth",
+    [None, -1.0],
+)
+def test_fertilizer_application_invalid_depth_raises(
+    application_depth: float | None,
+    EEE_constants: list[dict[str, Any]],
+    tractor_dataset: dict[str, list[Any]],
+    mocker: MockFixture,
+) -> None:
+    """Tests that an invalid application depth raises AssertionError for fertilizer application."""
+    im = InputManager()
+    mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants)])
+    mocker.patch("RUFAS.EEE.tractor_implement.TractorImplement.__init__", return_value=None)
+    tractor = Tractor(
+        operation_event=FieldOperationEvent.PLANTING,
+        crop_type="alfalfa_hay",
+        tractor_size=TractorSize.SMALL,
+        application_depth=10.0,
+    )
+    with pytest.raises(AssertionError):
+        tractor._determine_fertilizer_application_operation_types(application_depth)
+
+
+@pytest.mark.parametrize(
+    "application_depth",
+    [None, -1.0],
+)
+def test_manure_application_invalid_depth_raises(
+    application_depth: float | None,
+    EEE_constants: list[dict[str, Any]],
+    tractor_dataset: dict[str, list[Any]],
+    mocker: MockFixture,
+) -> None:
+    """Tests that an invalid application depth raises AssertionError for manure application."""
+    im = InputManager()
+    mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants)])
+    mocker.patch("RUFAS.EEE.tractor_implement.TractorImplement.__init__", return_value=None)
+    tractor = Tractor(
+        operation_event=FieldOperationEvent.PLANTING,
+        crop_type="alfalfa_hay",
+        tractor_size=TractorSize.SMALL,
+        application_depth=10.0,
+    )
+    with pytest.raises(AssertionError):
+        tractor._determine_manure_application_operation_types(application_depth)
+
+
+@pytest.mark.parametrize(
+    "crop_type, expected_operations",
+    [
+        ("alfalfa_hay", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("alfalfa_silage", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("alfalfa_baleage", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("tall_fescue_hay", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("tall_fescue_silage", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("tall_fescue_baleage", [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        ("corn_silage", [OperationType.COLLECTION]),
+        ("winter_wheat_grain", [OperationType.COLLECTION]),
+        (None, [OperationType.COLLECTION]),
+    ],
+)
+def test_determine_harvest_operation_types(
+    crop_type: str | None,
+    expected_operations: list[OperationType],
+    EEE_constants: list[dict[str, Any]],
+    tractor_dataset: dict[str, list[Any]],
+    mocker: MockFixture,
+) -> None:
+    """Tests the harvest operation type determination for all crop types."""
+    im = InputManager()
+    mocker.patch.object(im, "get_data", side_effect=[deepcopy(EEE_constants)])
+    mocker.patch("RUFAS.EEE.tractor_implement.TractorImplement.__init__", return_value=None)
+    tractor = Tractor(
+        operation_event=FieldOperationEvent.PLANTING,
+        crop_type=crop_type,
+        tractor_size=TractorSize.SMALL,
+        application_depth=10.0,
+    )
+    tractor.crop_type = crop_type
+    assert tractor._determine_harvest_operation_types() == expected_operations
+
+
+@pytest.mark.parametrize(
     "tractor_size, expected_pto_kW",
     [
         (TractorSize.SMALL, 55.93),
