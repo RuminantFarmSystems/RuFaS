@@ -656,7 +656,9 @@ class Pen:
         general_stream_proportion, parlor_stream_proportion, parlor_stream = self._handle_parlor_stream(total_stream)
         if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
             assert parlor_stream is not None, "Parlor stream should not be None if parlor stream proportion is not None"
-            assert parlor_stream_proportion is not None, "Parlor stream proportion should not be None if parlor stream is not None"
+            assert (
+                parlor_stream_proportion is not None
+            ), "Parlor stream proportion should not be None if parlor stream is not None"
             base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
             animal_manure_streams[f"{base_parlor_stream_name}_PEN_{self.id}"] = parlor_stream
 
