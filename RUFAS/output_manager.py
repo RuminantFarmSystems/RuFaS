@@ -309,6 +309,11 @@ class OutputManager(object):
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        Notes
+        -----
+        The use of `deepcopy` is necessary here because `value` may be a mutable object,
+        and storing a reference would allow external modifications to corrupt the data
+        held in the pool.
 
         """
         discard_info_map = first_info_map_only

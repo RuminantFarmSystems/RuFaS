@@ -41,6 +41,7 @@ v1.0.0
 - [2836](https://github.com/RuminantFarmSystems/MASM/pull/2836) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_output_manager.py.
 - [2826](https://github.com/RuminantFarmSystems/MASM/pull/2826) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds functionality to data_padder, removes unecessary use of method in ration reporting.
 - [2827](https://github.com/RuminantFarmSystems/MASM/pull/2827) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
+- [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` Usage
 
 ### v1.0.0
 
