@@ -11,6 +11,7 @@ from typing import Any, Sequence, TextIO, Union, Callable
 
 from collections import Counter
 import collections
+from RUFAS.rufas_time import RufasTime
 import numpy as np
 import pandas as pd
 import psutil

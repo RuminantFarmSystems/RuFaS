@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 
 from RUFAS.EEE.emissions import EmissionsEstimator
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 import pytest
 from unittest.mock import MagicMock, PropertyMock, call
@@ -14,6 +15,7 @@ from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
     TotalInventory,
     RequestedFeed,
     NutrientStandard,
@@ -396,7 +398,7 @@ def test_build_harvest_schedule_no_feed_recalculation(
     harvested_crop_2 = MagicMock()
     harvested_crop_2.config_name = "alfalfa"
 
-    harvested_crops = [harvested_crop_1, harvested_crop_2]
+    harvested_crops: list[HarvestedCrop] = [harvested_crop_1, harvested_crop_2]
 
     expected_schedule = {
         "corn_silage": datetime(2026, 6, 1).date(),
@@ -410,14 +412,18 @@ def test_build_harvest_schedule_no_feed_recalculation(
         return_value=False,
     )
 
-    simulation_engine.field_manager.get_next_harvest_dates = MagicMock(return_value=expected_schedule)
+    mock_get_next_harvest_dates = mocker.patch.object(
+        simulation_engine.field_manager,
+        "get_next_harvest_dates",
+        return_value=expected_schedule,
+    )
 
     # Act
     result = simulation_engine._build_harvest_schedule(harvested_crops)
 
     # Assert
-    simulation_engine.field_manager.get_next_harvest_dates.assert_called_once()
-    called_crop_names = simulation_engine.field_manager.get_next_harvest_dates.call_args.args[0]
+    mock_get_next_harvest_dates.assert_called_once()
+    called_crop_names = mock_get_next_harvest_dates.call_args.args[0]
     assert set(called_crop_names) == {"corn_silage", "alfalfa"}
     assert result == expected_schedule
 
@@ -704,7 +710,7 @@ def test_execute_daily_animal_operations(
     }
     total_inventory = {"feed_1": 100.0}
     all_manure_data = {"pen_1": MagicMock(), "pen_2": MagicMock()}
-    available_feeds = [MagicMock(rufas_id=12), MagicMock(rufas_id=7)]
+    available_feeds: list[Feed] = [MagicMock(rufas_id=12), MagicMock(rufas_id=7)]
     simulation_engine.feed_manager.available_feeds = available_feeds
 
     mock_collect_daily_feed_request = mocker.patch.object(
@@ -785,14 +791,14 @@ def test_execute_daily_animal_operations(
 @pytest.mark.parametrize(
     "daily_manure_data, should_call_update",
     [
-        ({"pen_1": MagicMock()}, True),
+        ({"pen_1": MagicMock(spec=ManureStream)}, True),
         (None, False),
     ],
 )
 def test_execute_daily_manure_operations(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
-    daily_manure_data: dict[str, MagicMock] | None,
+    daily_manure_data: dict[str, ManureStream] | None,
     should_call_update: bool,
 ) -> None:
     """
