@@ -6,8 +6,8 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/example_no_animal_metadata.json",
-      "output_prefix": "no_animal",
+      "metadata_file_path": "input/metadata/example_field_and_feed_metadata.json",
+      "output_prefix": "field_and_feed",
       "log_verbosity": "errors",
       "random_seed": 42,
       "SA_load_balancing_stop": 1,
