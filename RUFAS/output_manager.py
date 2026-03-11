@@ -1293,7 +1293,6 @@ class OutputManager(object):
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
-        use_filter_key_name: bool = filter_content.get("use_filter_key_name", False)
         info_map = {
             "class": self.__class__.__name__,
             "function": self.filter_variables_pool.__name__,
@@ -1321,7 +1320,7 @@ class OutputManager(object):
         selected_variables: list[str] | None = filter_content.get("variables")
 
         results = self._parse_filtered_variables(
-            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion, use_filter_key_name
+            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion,
         )
 
         if filter_content.get("expand_data", False):
@@ -1356,7 +1355,6 @@ class OutputManager(object):
         filter_name: str,
         use_filter_name: bool,
         filter_by_exclusion: bool,
-        use_filter_key_name: bool,
     ) -> dict[str, OutputManager.pool_element_type]:
         """
         Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
@@ -1373,8 +1371,6 @@ class OutputManager(object):
             Whether to use the filter name when constructing the key name for data pulled from the filtered pool.
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
-        use_filter_key_name : bool
-            Whether to use the filtered key name when constructing the key name for data pulled from a dictionary.
 
         Returns
         -------
@@ -1413,14 +1409,9 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    if use_filter_key_name:
-                        # TODO DEPRECATED behavior, kept for backward compatibility
-                        # should be removed when closing #2718
-                        combined_key = filtered_key
-                    else:
-                        combined_key = (
-                            f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else f"{key}.{filtered_key}"
-                        )
+                    combined_key = (
+                        f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else f"{key}.{filtered_key}"
+                    )
                     if combined_key in results.keys():
                         results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
