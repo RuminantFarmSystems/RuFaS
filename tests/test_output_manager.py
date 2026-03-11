@@ -2430,7 +2430,8 @@ def test_filter_variables_pool_complex(
             False,
             {
                 "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
-                "a": {"values": ["A", "AA", "AAA"]},
+                "DummyClass1.dummy_fun1.dummy_var2.a": {"values": ["A", "AA"]},
+                "DummyClass1.dummy_fun2.dummy_var3.a": {"values": ["AAA"]},
             },
             Counter(
                 {
@@ -2452,8 +2453,10 @@ def test_filter_variables_pool_complex(
             True,
             {
                 "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
-                "b": {"values": [1.0, 2.0, 3.0]},
-                "c": {"values": [True, True, False]},
+                "DummyClass1.dummy_fun1.dummy_var2.b": {"values": [1.0, 2.0]},
+                "DummyClass1.dummy_fun1.dummy_var2.c": {"values": [True, True]},
+                "DummyClass1.dummy_fun2.dummy_var3.b": {"values": [3.0]},
+                "DummyClass1.dummy_fun2.dummy_var3.c": {"values": [False]},
             },
             Counter(
                 {
@@ -2478,7 +2481,7 @@ def test_parse_filtered_variables(
     """Tests _parse_filtered_variables in the Output Manager."""
     mock_output_manager._variables_usage_counter = Counter()
 
-    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion, True)
+    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion)
 
     assert actual == expected
     assert mock_output_manager._variables_usage_counter == expected_counter
