@@ -738,8 +738,7 @@ class HerdManager:
         """
         animals_added: list[Animal] = []
         while (
-            len(self.cows) + self.herd_statistics.bought_heifer_num < self.buying_threshold
-            and time.simulation_day > 1
+            len(self.cows) + self.herd_statistics.bought_heifer_num < self.buying_threshold and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:
                 break
