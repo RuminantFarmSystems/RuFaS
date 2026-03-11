@@ -979,9 +979,7 @@ def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> N
     assert pmd.stream_type == StreamType.GENERAL
 
 
-def test_calculate_methane_production_potential_growing_and_close_up_mixed(
-    pen: Pen, mocker: MockerFixture
-) -> None:
+def test_calculate_methane_production_potential_growing_and_close_up_mixed(pen: Pen, mocker: MockerFixture) -> None:
     """Mixed GROWING_AND_CLOSE_UP pen: weighted average of 0.17 (growing) and 0.24 (close-up)."""
     growing_animal = mocker.MagicMock(auto_spec=Animal)
     growing_animal.animal_type = AnimalType.HEIFER_I
@@ -998,9 +996,7 @@ def test_calculate_methane_production_potential_growing_and_close_up_mixed(
     assert result == approx(0.17 * 0.5 + 0.24 * 0.5)
 
 
-def test_calculate_methane_production_potential_growing_and_close_up_empty(
-    pen: Pen, mocker: MockerFixture
-) -> None:
+def test_calculate_methane_production_potential_growing_and_close_up_empty(pen: Pen, mocker: MockerFixture) -> None:
     """GROWING_AND_CLOSE_UP pen with no animals returns 0.0."""
     pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
     pen.animals_in_pen = {}
@@ -1191,12 +1187,15 @@ def test_handle_parlor_stream_lac_cow_no_pen_manure_data(pen: Pen) -> None:
     assert parlor_stream.pen_manure_data is None
 
 
-@pytest.mark.parametrize("combination", [
-    AnimalCombination.CALF,
-    AnimalCombination.GROWING,
-    AnimalCombination.CLOSE_UP,
-    AnimalCombination.GROWING_AND_CLOSE_UP,
-])
+@pytest.mark.parametrize(
+    "combination",
+    [
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.CLOSE_UP,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+    ],
+)
 def test_handle_parlor_stream_non_lac_cow_returns_no_split(
     pen: Pen, mocker: MockerFixture, combination: AnimalCombination
 ) -> None:
