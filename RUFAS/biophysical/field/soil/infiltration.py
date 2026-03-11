@@ -101,7 +101,7 @@ class Infiltration:
 
     # --- static methods ---
     @staticmethod
-    def _determine_first_moisture_condition_parameter(second_moisture_condition: float):
+    def _determine_first_moisture_condition_parameter(second_moisture_condition: float) -> float:
         """
         Determine the curve number for dry (wilting point) conditions.
 
@@ -125,7 +125,7 @@ class Infiltration:
         return second_moisture_condition - (top / bottom)
 
     @staticmethod
-    def _determine_third_moisture_condition_parameter(second_moisture_condition: float):
+    def _determine_third_moisture_condition_parameter(second_moisture_condition: float) -> float:
         """
         Determine the curve number for wet (field capacity) conditions.
 
