@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from RUFAS.EEE.economics.framework import EconomicFramework
+from RUFAS.EEE.economics.dcfror import DCFRORCalculator
 from RUFAS.EEE.economics.metrics import (
     calculate_roi,
     calculate_payback_period,
@@ -217,6 +218,32 @@ def test_get_digester_cost_profile_normalizes_names() -> None:
     assert pytest.approx(operating["labor"]) == 75 * 5000 + 45_000
     assert pytest.approx(operating["energy"]) == 12.5 * 5000 + 7_500
     assert pytest.approx(operating["repairs"]) == 37.5 * 5000 + 22_500
+
+
+def test_dcfror_goal_seek_reads_scalar_npv_from_output_pool(mocker: MockerFixture) -> None:
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.inputs = {"unit_cost": 10.0}
+
+    om = mocker.Mock()
+    om.filter_variables_pool.return_value = {
+        "DCFRORCalculator.calculate.econ_dcfror_npv": {
+            "values": [999.0, 1.0],
+            "info_maps": [{}],
+        }
+    }
+    calc.om = om
+
+    def calculate() -> None:
+        return None
+
+    calc.calculate = calculate
+
+    multiplier = calc.goal_seek("unit_cost", target_npv=1.0, max_iter=1)
+
+    om.filter_variables_pool.assert_called_once()
+    assert om.filter_variables_pool.call_args.args[0]["slice_start"] == -1
+    assert multiplier == pytest.approx(50.005)
+    assert calc.inputs["unit_cost"] == pytest.approx(500.05)
 
 
 def test_estimate_digester_trucking_cost() -> None:

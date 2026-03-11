@@ -72,11 +72,6 @@ class DCFRORCalculator:
                 "enable": _get_input("economic_inputs.cashflow_inputs.enable_dcfror"),
                 "tax_credit_used": _get_input("economic_inputs.cashflow_inputs.tax_credit_used"),
                 "tax_credit_revenue": _get_input("economic_inputs.cashflow_inputs.tax_credit_revenue"),
-                "goal_seek_enabled": _get_input("economic_inputs.cashflow_inputs.enable_goal_seek"),
-                "goal_seek_target_npv": _get_input("economic_inputs.cashflow_inputs.goal_seek_target_npv"),
-                "goal_seek_bounds": _get_input("economic_inputs.cashflow_inputs.goal_seek_bounds"),
-                "goal_seek_unit_price_multiplier": _get_input("economic_inputs.cashflow_inputs.goal_seek_unit_price_multiplier"),
-                "goal_seek_fixed_variables": _get_input("economic_inputs.cashflow_inputs.goal_seek_fixed_variables"),
             }
             return inputs
         except KeyError as e:
@@ -145,8 +140,6 @@ class DCFRORCalculator:
         operating_unit_costs = _to_numpy(self.inputs["cost_operational_unit_cost"])
         revenue_units = _to_numpy(self.inputs["units_produced"])
         revenue_prices = _to_numpy(self.inputs["unit_cost"])
-        price_multiplier = float(self.inputs.get("goal_seek_unit_price_multiplier", 1.0))
-        revenue_prices = revenue_prices * price_multiplier
 
         # Interest accrued during construction should be accounted for in cash
         # flow calculations, not added to the depreciable capital cost.
@@ -439,65 +432,31 @@ class DCFRORCalculator:
         tol: float = 1e-6,
         max_iter: int = 100,
     ) -> float:
-        """Binary search utility for solving a scalar DCFROR input."""
+        """Binary search utility for future goal-seek integrations."""
 
         info_map = {"class": self.__class__.__name__, "function": self.goal_seek.__name__}
         low, high = bounds
-        baseline_value = self.inputs.get(variable_name)
+        baseline_value = self.inputs[variable_name]
 
-        if baseline_value is None:
-            self.om.add_error("GoalSeekInvalidVariable", f"Unknown goal-seek variable: {variable_name}", info_map)
-            return float("nan")
-
-        try:
-            baseline_scalar = float(baseline_value)
-        except (TypeError, ValueError):
-            self.om.add_error(
-                "GoalSeekNonScalarVariable",
-                f"Goal-seek variable must be scalar: {variable_name}",
-                info_map,
-            )
-            return float("nan")
-
-        def _npv_for_multiplier(multiplier: float) -> float | None:
-            self.inputs[variable_name] = baseline_scalar * multiplier
+        for _ in range(max_iter):
+            mid = (low + high) / 2
+            override_inputs = {variable_name: baseline_value * mid}
+            self.inputs.update(override_inputs)
             self.calculate()
             npv_result = self.om.filter_variables_pool(
                 {
                     "name": "NPV Retrieval",
-                    "description": "Retrieve the latest DCFROR NPV for goal seek.",
+                    "description": "Retrieve the latest DCFROR NPV for goal seek; filter_variables_pool returns chronological matches, so we slice to the most recent entry.",
                     "filters": [f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv"],
+                    "slice_start": -1,
                 }
             )
-            return npv_result.get(
-                f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv",
-                None,
-            )
-
-        low_npv = _npv_for_multiplier(low)
-        high_npv = _npv_for_multiplier(high)
-        if low_npv is None or high_npv is None:
-            self.inputs[variable_name] = baseline_scalar
-            self.om.add_error("NPVNotFound", "NPV not found after DCFROR calculation. Check calculation logic.", info_map)
-            return float("nan")
-
-        if not (min(low_npv, high_npv) <= target_npv <= max(low_npv, high_npv)):
-            self.inputs[variable_name] = baseline_scalar
-            self.om.add_error(
-                "GoalSeekUnboundedTarget",
-                "Goal seek bounds do not bracket the target NPV.",
-                info_map,
-            )
-            return float("nan")
-
-        increasing = high_npv > low_npv
-
-        for _ in range(max_iter):
-            mid = (low + high) / 2
-            npv = _npv_for_multiplier(mid)
+            npv_key = f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv"
+            npv_record = npv_result.get(npv_key, None)
+            npv_values = npv_record.get("values") if isinstance(npv_record, dict) else None
+            npv = float(npv_values[0]) if npv_values else None
 
             if npv is None:
-                self.inputs[variable_name] = baseline_scalar
                 self.om.add_error(
                     "NPVNotFound", "NPV not found after DCFROR calculation. Check calculation logic.", info_map
                 )
@@ -505,19 +464,10 @@ class DCFRORCalculator:
 
             if abs(npv - target_npv) < tol:
                 return mid
-
-            if increasing:
-                if npv > target_npv:
-                    high = mid
-                else:
-                    low = mid
+            if npv > target_npv:
+                high = mid
             else:
-                if npv > target_npv:
-                    low = mid
-                else:
-                    high = mid
-
-        self.inputs[variable_name] = baseline_scalar
+                low = mid
 
         self.om.add_error(
             "GoalSeekFailed", "Goal seek did not converge within the maximum number of iterations.", info_map
