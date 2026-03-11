@@ -90,7 +90,18 @@
     ],
     "enable_dcfror": true,
     "tax_credit_used": 0.0,
-    "tax_credit_revenue": 0.0
+    "tax_credit_revenue": 0.0,
+    "enable_goal_seek": true,
+    "goal_seek_target_npv": 0.0,
+    "goal_seek_bounds": [
+      0.01,
+      100.0
+    ],
+    "goal_seek_unit_price_multiplier": 1.0,
+    "goal_seek_fixed_variables": [
+      "target_internal_rate_of_return",
+      "loan_term"
+    ]
   },
   "capital_costs": {
     "capital_cost_breakdown": [

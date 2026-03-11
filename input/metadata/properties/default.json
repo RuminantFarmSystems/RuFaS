@@ -3087,7 +3087,7 @@
     "data_collection_app_compatible": false,
     "Animal": {
       "type": "object",
-      "description": "Daily resource use for animal facilities (liters/day, kWh/day, m³/day, labor hours).",
+      "description": "Daily resource use for animal facilities (liters/day, kWh/day, m3/day, labor hours).",
       "diesel_liters_per_day": {
         "type": "number",
         "description": "Diesel burned daily by animal operations (L/day).",
@@ -3120,7 +3120,7 @@
       },
       "water_cubic_meter_per_day": {
         "type": "number",
-        "description": "Potable/process water used daily by animal operations (m³/day).",
+        "description": "Potable/process water used daily by animal operations (m3/day).",
         "minimum": 0,
         "default": 0
       },
@@ -3185,7 +3185,7 @@
         },
         "cubic_meters_water_per_day": {
           "type": "number",
-          "description": "Water used for slurry storage operations (m³/day).",
+          "description": "Water used for slurry storage operations (m3/day).",
           "minimum": 0,
           "default": 0
         }
@@ -3231,7 +3231,7 @@
         },
         "cubic_meters_water_per_day": {
           "type": "number",
-          "description": "Water used by the digester (m³/day).",
+          "description": "Water used by the digester (m3/day).",
           "minimum": 0,
           "default": 0
         },
@@ -3445,6 +3445,45 @@
         "type": "number",
         "description": "Tax credit revenue recognized in the project model.",
         "default": 0.0
+      },
+      "enable_goal_seek": {
+        "type": "bool",
+        "description": "Whether to run goal-seek after DCFROR to solve an input that yields the target NPV.",
+        "default": false
+      },
+      "goal_seek_target_npv": {
+        "type": "number",
+        "description": "Target net present value used by goal-seek.",
+        "default": 0.0
+      },
+      "goal_seek_bounds": {
+        "type": "array",
+        "description": "Lower and upper multiplier bounds used by goal-seek binary search.",
+        "properties": {
+          "type": "number"
+        },
+        "default": [
+          0.01,
+          100.0
+        ]
+      },
+      "goal_seek_unit_price_multiplier": {
+        "type": "number",
+        "description": "Multiplier applied to unit_price when solving for MPSP via goal-seek.",
+        "minimum": 0,
+        "default": 1.0
+      },
+      "goal_seek_fixed_variables": {
+        "type": "array",
+        "description": "Names of exactly two cashflow variables to keep fixed during goal-seek; the remaining one is solved automatically.",
+        "properties": {
+          "type": "string",
+          "pattern": "^(target_internal_rate_of_return|loan_term|goal_seek_unit_price_multiplier)$"
+        },
+        "default": [
+          "target_internal_rate_of_return",
+          "loan_term"
+        ]
       }
     },
     "capital_costs": {

@@ -115,7 +115,78 @@ class EconomicFramework:
 
         if capital_present:
             calculator = DCFRORCalculator()
+
+            calculator_inputs = calculator.inputs if isinstance(calculator.inputs, dict) else {}
+            goal_seek_name_map = {
+                "target_internal_rate_of_return": "internal_rate_of_return",
+                "loan_term": "loan_term",
+                "goal_seek_unit_price_multiplier": "goal_seek_unit_price_multiplier",
+            }
+            allowed_goal_seek_variables = set(goal_seek_name_map.keys())
+
             calculator.calculate()
+
+            calculator_inputs = calculator.inputs if isinstance(calculator.inputs, dict) else {}
+            if calculator_inputs.get("goal_seek_enabled", False):
+                fixed_variables = calculator_inputs.get("goal_seek_fixed_variables", [])
+                if not isinstance(fixed_variables, list):
+                    fixed_variables = []
+
+                invalid_fixed = [name for name in fixed_variables if name not in allowed_goal_seek_variables]
+
+                if invalid_fixed:
+                    self.om.add_error(
+                        "InvalidGoalSeekFixedVariables",
+                        f"Unknown fixed goal-seek variable names: {invalid_fixed}",
+                        {"class": __name__, "function": self.run_economic_analysis.__name__},
+                    )
+                    solved_value = float("nan")
+                    solved_variable = ""
+                elif len(fixed_variables) != 2:
+                    self.om.add_error(
+                        "GoalSeekFixedVariableCount",
+                        "Exactly two fixed variables must be provided for goal-seek.",
+                        {"class": __name__, "function": self.run_economic_analysis.__name__},
+                    )
+                    solved_value = float("nan")
+                    solved_variable = ""
+                else:
+                    remaining = list(allowed_goal_seek_variables.difference(set(fixed_variables)))
+                    if len(remaining) != 1:
+                        self.om.add_error(
+                            "GoalSeekSolveVariableInferenceFailed",
+                            "Unable to infer a single variable to solve from fixed variables.",
+                            {"class": __name__, "function": self.run_economic_analysis.__name__},
+                        )
+                        solved_value = float("nan")
+                        solved_variable = ""
+                    else:
+                        solved_variable = remaining[0]
+                        solved_value = calculator.goal_seek(
+                            variable_name=goal_seek_name_map[solved_variable],
+                            target_npv=float(calculator_inputs.get("goal_seek_target_npv", 0.0)),
+                            bounds=tuple(calculator_inputs.get("goal_seek_bounds", [0.01, 100.0])),
+                        )
+
+                self.om.add_variable(
+                    "econ_dcfror_goal_seek_solution",
+                    solved_value,
+                    info_map={
+                        "class": __name__,
+                        "function": self.run_economic_analysis.__name__,
+                        "units": MeasurementUnits.UNITLESS,
+                    },
+                )
+                self.om.add_variable(
+                    "econ_dcfror_goal_seek_variable",
+                    solved_variable,
+                    info_map={
+                        "class": __name__,
+                        "function": self.run_economic_analysis.__name__,
+                        "units": MeasurementUnits.UNITLESS,
+                    },
+                )
+
             if partial_budget_requested:
                 self.partial_budget.calculate_partial_budget(preprocessed_results)
         else:
