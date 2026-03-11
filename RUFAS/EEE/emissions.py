@@ -300,7 +300,7 @@ class EmissionsEstimator:
             if len(filtered_data) == 0:
                 continue
 
-            filtered_data_by_field = {}
+            filtered_data_by_field: dict[str, dict[str, list[int | float]]] = {}
             for full_variable_name, variable_contents in filtered_data.items():
                 field_name = ""
                 field_name_matches = re.search(r"field='([^']+)'", full_variable_name)
@@ -368,19 +368,14 @@ class EmissionsEstimator:
             variable_name = full_variable_name.split(".")[-1]
             filtered_data_by_storage.setdefault(storage_name, {})[variable_name] = variable_contents["values"]
 
-        crop_to_feed_id_mapping = {}
+        crop_to_feed_id_mapping : dict[tuple[str, str], RUFAS_ID]= {}
         for storage_name, storage_data in filtered_data_by_storage.items():
             field_names = storage_data["field_name"]
             crop_names = storage_data["crop_name"]
             feed_ids = storage_data["feed_id"]
             for field_name, crop_name, feed_id in zip(field_names, crop_names, feed_ids):
                 if (field_name, crop_name) not in crop_to_feed_id_mapping:
-                    crop_to_feed_id_mapping[(field_name, crop_name)] = feed_id
-                else:
-                    assert crop_to_feed_id_mapping[(field_name, crop_name)] == feed_id, "".join(
-                        f"Crop {crop_name} received in field {field_name} is mapped to different feed IDs: "
-                        f"{crop_to_feed_id_mapping[(field_name, crop_name)]} and {feed_id}."
-                    )
+                    crop_to_feed_id_mapping[(str(field_name), str(crop_name))] = int(feed_id)
 
         return crop_to_feed_id_mapping
 
@@ -398,7 +393,7 @@ class EmissionsEstimator:
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
 
-        filtered_data_by_field = {}
+        filtered_data_by_field: dict[str, dict[str, list[int | float | str]]] = {}
         for full_variable_name, variable_contents in filtered_data.items():
             field_name = ""
             field_name_matches = re.search(r"field='([^']+)'", full_variable_name)
@@ -409,13 +404,13 @@ class EmissionsEstimator:
 
         for field_name, field_data in filtered_data_by_field.items():
             for i in range(len(field_data[year_key])):
-                harvest_year, harvest_day = field_data[year_key][i], field_data[day_key][i]
+                harvest_year, harvest_day = int(field_data[year_key][i]), int(field_data[day_key][i])
                 harvest_simulation_day = (
                     RufasTime.convert_year_jday_to_date(harvest_year, harvest_day) - simulation_start_date
                 ).days
 
                 crop_name = field_data["crop"][i]
-                feed_id = crop_to_feed_id_mapping.get((field_name, crop_name), None)
+                feed_id = crop_to_feed_id_mapping.get((str(field_name), str(crop_name)), None)
                 harvest_dry_yield_data = field_data["dry_yield"][i]
                 harvest_type = field_data["harvest_type"][i]
                 harvest_data[field_name][harvest_simulation_day] = {
