@@ -133,6 +133,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
         time=time,
         is_ration_defined_by_user=False,
         available_feeds=available_feeds,
+        simulate_animals=True,
     )
 
     mock_set_ration_feeds.assert_called_once_with(feed_data)

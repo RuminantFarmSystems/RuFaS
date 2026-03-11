@@ -28,7 +28,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.field.field import Field
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
-from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
@@ -37,8 +37,9 @@ from RUFAS.weather import Weather
 def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     mocker.patch("RUFAS.simulation_engine.RufasTime")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
+    mock_simulation_type = SimulationType("full_farm")
 
-    simulation_engine = SimulationEngine()
+    simulation_engine = SimulationEngine(mock_simulation_type)
 
     simulation_engine.herd_manager = MagicMock(auto_spec=HerdManager)
     simulation_engine.manure_manager = MagicMock(auto_spec=ManureManager)
@@ -58,9 +59,10 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
     mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=mock_time)
+    mock_simulation_type = SimulationType("full_farm")
 
     # Act
-    simulation_engine = SimulationEngine()
+    simulation_engine = SimulationEngine(mock_simulation_type)
 
     # Assert
     mock_initialize_simulation.assert_called_once()
@@ -97,10 +99,9 @@ def test_simulate(
     }
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
-    simulation_type = "full_farm"
 
     # Act
-    simulation_engine.simulate(simulation_type)
+    simulation_engine.simulate()
 
     # Assert
     mock_run_simulation_main_loop.assert_called_once()
@@ -241,7 +242,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     """
     # Arrange
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
-    simulation_engine = SimulationEngine()
+    mock_simulation_type = SimulationType("full_farm")
+    simulation_engine = SimulationEngine(mock_simulation_type)
 
     simulation_engine.time = (mock_time := MagicMock(autospec=RufasTime))
     mock_time.current_date = datetime.today()
@@ -250,18 +252,25 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_output_manager = MagicMock(autospec=OutputManager)
     simulation_engine.im, simulation_engine.om = mock_input_manager, mock_output_manager
 
+    mock_max_daily_feed_recalculations_per_year = 4
     mock_weather_data = {"dummy": "weather data"}
     mock_config_nutrient_standard = "NASEM"
-    mock_feed_config = {"dummy": "feed config"}
+    mock_feed_config = {
+        "dummy": "feed config",
+        "max_daily_feed_recalculations_per_year": mock_max_daily_feed_recalculations_per_year,
+    }
     mock_feed_storage_configs = {"dummy": "storage configs"}
     mock_feed_storage_instances = {"dummy": "storage instances"}
 
-    mock_simulation_type = "full_farm"
     expected_simulate_animals = True
 
     mock_ration_interval_length = 30
     mock_is_ration_defined_by_user = True
-    mock_max_daily_feed_recalculations_per_year = 4
+    
+    mock_ration_config = {
+        "formulation_interval": mock_ration_interval_length,
+        "user_input": mock_is_ration_defined_by_user,
+    }
 
     mock_im_get_data = mocker.patch.object(
         mock_input_manager,
@@ -272,9 +281,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
             mock_feed_config,
             mock_feed_storage_configs,
             mock_feed_storage_instances,
-            mock_simulation_type,
-            mock_ration_interval_length,
-            mock_is_ration_defined_by_user,
+            mock_ration_config,
             mock_max_daily_feed_recalculations_per_year,
         ],
     )
@@ -305,6 +312,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_emissions_estimator_init = mocker.patch(
         "RUFAS.simulation_engine.EmissionsEstimator", return_value=mock_emissions_estimator
     )
+    simulation_engine.simulation_type = mock_simulation_type
+    simulation_engine.simulate_animals = True
 
     # Act
     simulation_engine._initialize_simulation()
@@ -316,10 +325,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         call("feed"),
         call("feed_storage_configurations"),
         call("feed_storage_instances"),
-        call("config.simulation_type"),
-        call("animal.ration.formulation_interval"),
-        call("animal.ration.user_input"),
-        call("feed.max_daily_feed_recalculations_per_year"),
+        call("animal.ration"),
     ]
 
     assert simulation_engine.om.time == mock_time
@@ -347,7 +353,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     assert simulation_engine.next_max_daily_feed_recalculation == mock_time.current_date + expected_interval
 
     mock_herd_manager_init.assert_called_once_with(
-        mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds
+        mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds,
+        simulate_animals=True
     )
     assert simulation_engine.herd_manager == mock_herd_manager
 
@@ -388,15 +395,13 @@ def test_annual_simulation(
     mock_time.year_start_day = year_start_day
     mock_time.year_end_day = year_end_day
 
-    mock_simulation_type = "full_farm"
-
     simulation_engine._simulation_type_to_daily_simulation_function = {
-        "full_farm": mock_daily_simulation,
-        "no_animals": mocker.MagicMock(name="no_animals_daily_simulation"),
+        SimulationType("full_farm"): mock_daily_simulation,
+        SimulationType("field_and_feed"): mocker.MagicMock(name="no_animals_daily_simulation"),
     }
 
     # Act
-    simulation_engine._annual_simulation(mock_simulation_type)
+    simulation_engine._annual_simulation()
 
     # Assert
     assert mock_daily_simulation.call_count == expected_day_count
@@ -480,11 +485,9 @@ def test_run_simulation_main_loop(
     mock_time.simulation_length_years = expected_iterations
 
     mock_annual_simulation = mocker.patch.object(simulation_engine, "_annual_simulation")
-    mock_simulation_type = "full_farm"
 
     # Act
-    simulation_engine._run_simulation_main_loop(mock_simulation_type)
+    simulation_engine._run_simulation_main_loop()
 
     # Assert
     assert mock_annual_simulation.call_count == expected_iterations
-    assert mock_annual_simulation.call_args_list == [call(mock_simulation_type)] * expected_iterations
