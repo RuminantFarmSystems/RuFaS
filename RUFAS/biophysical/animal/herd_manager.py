@@ -693,14 +693,16 @@ class HerdManager:
 
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
         """Finds the indices of cows with the lowest daily milk production among cows that meet the specified
-         days-in-milk and days-pregnant criteria."""
+        days-in-milk and days-pregnant criteria."""
         eligible_indices = []
 
         for index, cow in enumerate(self.cows):
             if cow in removed_animal:
                 continue
-            eligible_for_removal = (cow.days_in_milk > animal_constants.MIN_DIM_FOR_REMOVAL
-                and cow.days_in_pregnancy < animal_constants.MAX_DAYS_IN_PREG_FOR_REMOVAL)
+            eligible_for_removal = (
+                cow.days_in_milk > animal_constants.MIN_DIM_FOR_REMOVAL
+                and cow.days_in_pregnancy < animal_constants.MAX_DAYS_IN_PREG_FOR_REMOVAL
+            )
             if eligible_for_removal:
                 eligible_indices.append(index)
 
