@@ -126,8 +126,8 @@ class HerdManager:
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
-        self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"] / 100
-        self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"] / 100
+        self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
+        self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
@@ -720,9 +720,9 @@ class HerdManager:
                 animal_type=removed_cow.animal_type.value,
                 sold_at_day=removed_cow.sold_at_day,
                 body_weight=removed_cow.body_weight,
-                cull_reason="NA",
+                cull_reason="Herd resize",
                 days_in_milk=removed_cow.days_in_milk,
-                parity="NA",
+                parity=removed_cow.calves,
             )
         )
         self.herd_statistics.cow_num -= 1
@@ -734,7 +734,7 @@ class HerdManager:
         """Checks if surplus cows need to be sold based on herd size."""
         animals_removed: list[Animal] = []
 
-        while len(self.cows) > self.herd_statistics.herd_num * self.selling_threshold and len(self.cows) > 0:
+        while len(self.cows) > self.selling_threshold and len(self.cows) > 0:
             remove_index = self._get_cow_removal_index(removed_animal)
 
             if remove_index is None:
@@ -768,8 +768,7 @@ class HerdManager:
         """
         animals_added: list[Animal] = []
         while (
-            len(self.cows) + self.herd_statistics.bought_heifer_num
-            < self.herd_statistics.herd_num * self.buying_threshold
+            len(self.cows) + self.herd_statistics.bought_heifer_num < self.buying_threshold
             and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:

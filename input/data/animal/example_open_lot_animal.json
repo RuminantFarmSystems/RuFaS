@@ -8,8 +8,8 @@
     "replace_num": 5000,
     "herd_num": 1000,
 	"herd_size_adjustment_period": 30,
-  	"herd_size_sell_threshold": 103,
-  	"herd_size_buy_threshold": 101,
+  	"herd_size_sell_threshold": 1010,
+  	"herd_size_buy_threshold": 980,
     "breed": "HO",
 	"parity_fractions": {
 		"1": 0.35,

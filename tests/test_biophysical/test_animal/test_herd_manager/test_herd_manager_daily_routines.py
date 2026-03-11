@@ -522,7 +522,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
     5. Statistics are updated correctly based on source code logic.
     """
     HERD_TARGET = 10
-    SELLING_THRESHOLD = 1.0
+    SELLING_THRESHOLD = 10
     SIMULATION_DAY = 100
 
     herd_manager.herd_statistics.herd_num = HERD_TARGET

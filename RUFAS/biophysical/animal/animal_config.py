@@ -37,8 +37,6 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation days).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation days).
-    cull_milk_production : int
-        The threshold milk production below which cows are culled, (simulation days).
     semen_type : str
         Types of semen used for reproduction, e.g., "conventional", (unitless).
     male_calf_rate_conventional_semen : float
