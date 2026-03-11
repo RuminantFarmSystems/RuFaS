@@ -81,10 +81,7 @@ def test_get_simulation_type_invalid() -> None:
 
     with pytest.raises(
         ValueError,
-        match=(
-            "Unknown simulation type: not_a_real_simulation. "
-            "Expected one of: full_farm, field_and_feed."
-        ),
+        match=("Unknown simulation type: not_a_real_simulation. " "Expected one of: full_farm, field_and_feed."),
     ):
         SimulationType.get_simulation_type(invalid_simulation_type)
 
@@ -534,9 +531,7 @@ def test_execute_feed_planning(
         simulation_engine.time,
     )
 
-    mock_translate_crop_config_name_to_rufas_id.assert_called_once_with(
-        harvest_schedule
-    )
+    mock_translate_crop_config_name_to_rufas_id.assert_called_once_with(harvest_schedule)
 
     mock_update_all_max_daily_feeds.assert_called_once_with(
         projected_inventory,
@@ -876,9 +871,7 @@ def test_report_daily_records(
 
     # Assert
     if expect_emissions_call:
-        mock_calculate_purchased_feed_emissions.assert_called_once_with(
-            daily_purchased_feeds_fed
-        )
+        mock_calculate_purchased_feed_emissions.assert_called_once_with(daily_purchased_feeds_fed)
     else:
         mock_calculate_purchased_feed_emissions.assert_not_called()
 
@@ -1119,8 +1112,11 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     assert simulation_engine.next_max_daily_feed_recalculation == mock_time.current_date + expected_interval
 
     mock_herd_manager_init.assert_called_once_with(
-        mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds,
-        simulate_animals=True
+        mock_weather,
+        mock_time,
+        is_ration_defined_by_user=True,
+        available_feeds=mock_feed_manager.available_feeds,
+        simulate_animals=True,
     )
     assert simulation_engine.herd_manager == mock_herd_manager
 
