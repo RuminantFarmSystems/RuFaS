@@ -3461,11 +3461,7 @@
         "description": "Lower and upper multiplier bounds used by goal-seek binary search.",
         "properties": {
           "type": "number"
-        },
-        "default": [
-          0.01,
-          100.0
-        ]
+        }
       },
       "goal_seek_unit_price_multiplier": {
         "type": "number",
@@ -3479,11 +3475,7 @@
         "properties": {
           "type": "string",
           "pattern": "^(target_internal_rate_of_return|loan_term|goal_seek_unit_price_multiplier)$"
-        },
-        "default": [
-          "target_internal_rate_of_return",
-          "loan_term"
-        ]
+        }
       }
     },
     "capital_costs": {
