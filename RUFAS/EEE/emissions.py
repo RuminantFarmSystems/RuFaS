@@ -365,7 +365,7 @@ class EmissionsEstimator:
             variable_name = full_variable_name.split(".")[-1]
             filtered_data_by_storage.setdefault(storage_name, {})[variable_name] = variable_contents["values"]
 
-        crop_to_feed_id_mapping : dict[tuple[str, str], RUFAS_ID]= {}
+        crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID] = {}
         for storage_name, storage_data in filtered_data_by_storage.items():
             field_names = storage_data["field_name"]
             crop_names = storage_data["crop_name"]
