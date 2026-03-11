@@ -74,7 +74,9 @@ class DCFRORCalculator:
                 "enable_goal_seek": _get_input("economic_inputs.cashflow_inputs.enable_goal_seek"),
                 "goal_seek_target_npv": _get_input("economic_inputs.cashflow_inputs.goal_seek_target_npv"),
                 "goal_seek_bounds": _get_input("economic_inputs.cashflow_inputs.goal_seek_bounds"),
-                "goal_seek_unit_price_multiplier": _get_input("economic_inputs.cashflow_inputs.goal_seek_unit_price_multiplier"),
+                "goal_seek_unit_price_multiplier": _get_input(
+                    "economic_inputs.cashflow_inputs.goal_seek_unit_price_multiplier"
+                ),
                 "goal_seek_fixed_variables": _get_input("economic_inputs.cashflow_inputs.goal_seek_fixed_variables"),
             }
             return inputs
