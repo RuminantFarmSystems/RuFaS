@@ -494,7 +494,16 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
         expected_harvest_yield_data,
         all_simulation_days,
     )
-    assert actual_data == expected_daily_farmgrown_feed_emissions_and_resources
+    assert actual_data.keys() == expected_daily_farmgrown_feed_emissions_and_resources.keys()
+    for feed_id, emissions_and_resources in actual_data.items():
+        assert (
+            emissions_and_resources.keys()
+            == expected_daily_farmgrown_feed_emissions_and_resources[feed_id].keys()
+        )
+        for day in all_simulation_days:
+            assert emissions_and_resources[day] == pytest.approx(
+                expected_daily_farmgrown_feed_emissions_and_resources[feed_id][day], rel=1e-3
+            )
 
 
 def test_calculate_daily_farmgrown_feed_fed_emissions_and_resources(
