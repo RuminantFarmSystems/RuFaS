@@ -7,6 +7,13 @@
       "type": "csv",
       "properties": "_default_values_csv_properties"
     },
+     "_default_fallback_values": {
+      "title": "Defaults Fallabacks",
+      "description": "Fallback series providing default economic values used when default data is unavailable.",
+      "path": "input/data/EEE/econ/_default_values_fallback.csv",
+      "type": "csv",
+      "properties": "_default_values_csv_properties"
+    },
     "capital_costs-land_ha-dollar_per_hectare": {
       "title": "Capital costs",
       "description": "County-level 2023 cropland value expressed in dollars per hectare.",

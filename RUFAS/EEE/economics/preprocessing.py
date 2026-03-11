@@ -14,6 +14,7 @@ validated using the ``economic_preprocessing_properties`` metadata.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Set
@@ -26,7 +27,6 @@ from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
     ECONOMIC_QUANTITY_FALLBACK,
-    INPUT_MANAGER_FALLBACKS,
 )
 
 
@@ -99,10 +99,6 @@ class EconomicPreprocessor:
         if normalized_path != path:
             candidate_paths.append(normalized_path)
 
-        for candidate in candidate_paths:
-            if candidate in INPUT_MANAGER_FALLBACKS:
-                return INPUT_MANAGER_FALLBACKS[candidate]
-
         last_error: ValueError | None = None
         for candidate in candidate_paths:
             # Skip InputManager access entirely for wildcard paths (e.g., "*").
@@ -110,8 +106,6 @@ class EconomicPreprocessor:
             # generate validation spam inside the InputManager. Emit a single
             # warning and continue.
             if "*" in str(candidate):
-                if candidate in INPUT_MANAGER_FALLBACKS:
-                    return INPUT_MANAGER_FALLBACKS[candidate]
                 self.om.add_warning(
                     "MissingEconomicsFile",
                     f"Commodity pricing '{candidate}' uses wildcard and was skipped",
@@ -137,10 +131,6 @@ class EconomicPreprocessor:
 
             if data is not None:
                 return data
-
-        for candidate in candidate_paths:
-            if candidate in INPUT_MANAGER_FALLBACKS:
-                return INPUT_MANAGER_FALLBACKS[candidate]
 
         if last_error is not None:
             detail = (
@@ -320,15 +310,20 @@ class EconomicPreprocessor:
     def _extract_price_values(self, price_data: Any) -> List[float]:
         """Extract numeric price values from pricing payloads."""
 
+        info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
         start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
         end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
         fips_code: int = self.im.get_data("config.FIPS_county_code")
         values: List[float] = []
         for key, value in price_data.items():
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
-                print(f"Warning: Price data for '{key}' is not in expected format; skipping price extraction.")
+                self.om.add_warning(
+                    "MissingPriceData",
+                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format.",
+                    info_map,
+                )
+                values.extend(self._get_fallback_price(start_year, end_year, key))
                 continue
-                #TODO: We are hitting this condition because some of the commodity prices for certain years are not available in the csv files.
             fips_idx = value["fips"].index(fips_code)
             for year in range(start_year, end_year + 1):
                 try:
@@ -338,9 +333,46 @@ class EconomicPreprocessor:
                     self.om.add_warning(
                         "MissingPriceData",
                         f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'",
-                        {"class": self.__class__.__name__, "function": self._extract_price_values.__name__},
+                        info_map,
                     )
+                    values.extend(self._get_fallback_price(start_year, end_year, key))
                     continue
+        return values
+
+    def _get_fallback_price(self, start_year: int, end_year: int, commodity: str) -> List[float]:
+        """Get a fallback price for a commodity."""
+        info_map = {"class": self.__class__.__name__, "function": self._get_fallback_price.__name__}
+        defaults: Dict[str, List[float | str]] = self.im.get_data("_default_values")
+        defaults_fallback: Dict[str, List[float | str]] = self.im.get_data("_default_fallback_values")
+        if commodity not in defaults["commodity"] and commodity not in defaults_fallback["commodity"]:
+            self.om.add_warning(
+                "MissingFallbackPrice",
+                f"No fallback price found for commodity: {commodity}",
+                info_map,
+            )
+            return [ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)] * (end_year - start_year + 1)
+        commodity_idx = defaults["commodity"].index(commodity)
+        values: List[float] = []
+        use_fallback = False
+        for year in range(start_year, end_year + 1):
+            price = defaults[f"{year}"][commodity_idx]
+            if math.isnan(price):
+                use_fallback = True
+                break
+            values.append(price)
+        if use_fallback:
+            commodity_idx = defaults_fallback["commodity"].index(commodity)
+            values = []
+            for year in range(start_year, end_year + 1):
+                price = defaults_fallback[f"{year}"][commodity_idx]
+                if math.isnan(price):
+                    self.om.add_warning(
+                        "MissingFallbackPrice",
+                        f"No fallback price found for commodity: {commodity} in year: {year}",
+                        info_map,
+                    )
+                    price = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
+                values.append(price)
         return values
 
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
@@ -364,9 +396,6 @@ class EconomicPreprocessor:
 
         prices: Dict[str, Any] = {}
         info_map = {"class": self.__class__.__name__, "function": self._fetch_prices.__name__}
-        fallback_map = {
-            "commodity_prices.bedding_manure_solids.dollar_per_head": "economic_inputs.Manure.manure_disposal_price_per_kg",
-        }
 
         if economics_files is None:
             return prices
@@ -375,17 +404,6 @@ class EconomicPreprocessor:
             for file_key in economics_files:
                 price_data = self._get_data_with_handling(file_key, info_map)
                 if price_data is None:
-                    fallback_key = fallback_map.get(file_key)
-                    if fallback_key:
-                        price_data = self._get_data_with_handling(fallback_key, info_map)
-                        if price_data is not None:
-                            prices[file_key] = price_data
-                            self.om.add_warning(
-                                "MissingEconomicsFileFallback",
-                                f"Commodity pricing '{file_key}' not found; used '{fallback_key}' instead.",
-                                info_map,
-                            )
-                            continue
                     self.om.add_warning(
                         "MissingEconomicsFile",
                         f"Commodity pricing '{file_key}' not found in InputManager",

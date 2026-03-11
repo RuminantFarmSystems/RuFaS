@@ -2,19 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
-
-# Fallback values for InputManager lookups (pricing + selectors).
-INPUT_MANAGER_FALLBACKS: Dict[str, Any] = {
-    "animal.pen_information.*.manure_streams.0.bedding_name": "manure_solids",
-    "commodity_prices.bedding_compost_bedded_pack.dollar_per_head": 5.0,
-    "commodity_prices.bedding_manure_solids.dollar_per_head": 3.5,
-    "commodity_prices.bedding_sand.dollar_per_head": 4.0,
-    "commodity_prices.bedding_sawdust.dollar_per_head": 4.5,
-    "commodity_prices.bedding_straw.dollar_per_head": 3.0,
-    "commodity_prices.digester_carbon_credits_dollar_per_tonne_CO2e": 15.0,
-    "commodity_prices.*.dollar_per_square_meter": 0.25,
-}
+from typing import Dict, List
 
 # Fallback values for biophysical simulation patterns.
 BIOPHYSICAL_FALLBACKS: Dict[str, List[float]] = {
