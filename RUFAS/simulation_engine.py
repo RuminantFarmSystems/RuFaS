@@ -108,7 +108,7 @@ class SimulationEngine:
         self.simulate_animals = self.simulation_type.simulate_animals
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
-            SimulationType.FIELD_AND_FEED: self._execute_no_animals_daily_simulation,
+            SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
         }
 
         self._initialize_simulation()
@@ -223,11 +223,11 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def _execute_no_animals_daily_simulation(self) -> None:
+    def _execute_field_and_feed_daily_simulation(self) -> None:
         """
-        Executes the daily simulation routines for a farm with no animals.
+        Executes the daily simulation routines for a farm with only the field and feed modules.
 
-        Daily No Animals Simulation Process:
+        Daily Field and Feed Simulation Process:
         1. Field operations (manure applications, harvesting)
         2. Feed planning (recalculate feed availability, update purchase plans)
         3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
@@ -434,7 +434,7 @@ class SimulationEngine:
             A dictionary mapping feed types to the amount of purchased feed fed to the herd on the current day.
             If no purchased feed was fed, this will be None.
         """
-        if daily_purchased_feeds_fed is not None:
+        if daily_purchased_feeds_fed:
             self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
         self.time.record_time()
         self.weather.record_weather(self.time)
