@@ -127,7 +127,7 @@ class EconomicFramework:
             calculator.calculate()
 
             calculator_inputs = calculator.inputs if isinstance(calculator.inputs, dict) else {}
-            if calculator_inputs.get("goal_seek_enabled", False):
+            if calculator_inputs.get("enable_goal_seek", False):
                 fixed_variables = calculator_inputs.get("goal_seek_fixed_variables", [])
                 if not isinstance(fixed_variables, list):
                     fixed_variables = []
