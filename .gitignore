@@ -65,3 +65,8 @@ DataCollectionApp/schema/*
 !DataCollectionApp/schema/.keep
 
 docs/_build/
+
+# R files
+.Rhistory
+*.Rproj
+.Rproj.user*
