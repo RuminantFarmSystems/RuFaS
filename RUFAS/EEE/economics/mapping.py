@@ -395,13 +395,19 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "notes": "",
             },
             "Manure disposal quantity": {
-                "input_manager": ["economic_inputs.Manure.manure_disposal_kg"],
-                "economics_files": ["economic_inputs.Manure.manure_disposal_price_per_kg"],
+                "input_manager": [
+                    "economic_inputs.Manure.manure_disposal_kg",
+                    "economic_inputs.Manure.manure_disposal_price_per_kg",
+                ],
+                "economics_files": [],
                 "notes": "FULLY MANUAL",
             },
             "Manure disposal transport distance": {
-                "input_manager": ["economic_inputs.Manure.manure_disposal_transport_km"],
-                "economics_files": ["economic_inputs.Manure.manure_disposal_price_per_km"],
+                "input_manager": [
+                    "economic_inputs.Manure.manure_disposal_transport_km",
+                    "economic_inputs.Manure.manure_disposal_price_per_km",
+                ],
+                "economics_files": [],
                 "notes": "FULLY " "MANUAL",
             },
             "Purchased manure": {
