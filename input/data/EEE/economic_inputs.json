@@ -1,0 +1,114 @@
+{
+  "Animal": {
+    "diesel_liters_per_day": 1,
+    "gasoline_liters_per_day": 1,
+    "propane_liters_per_day": 1,
+    "natural_gas_megajoule_per_day": 1,
+    "electricity_kwh_per_day": 1,
+    "water_cubic_meter_per_day": 1,
+    "labor_hours_per_day": 100
+  },
+  "Manure": {
+    "general": {
+      "labor_hours": 1
+    },
+    "slurry_storage": {
+      "labor_hours": 1,
+      "diesel_liters_per_day": 1,
+      "gasoline_liters_per_day": 1,
+      "megajoules_per_day": 1,
+      "kwh_per_day": 1,
+      "propane_liters_per_day": 1,
+      "cubic_meters_water_per_day": 1
+    },
+    "digester": {
+      "labor_hours_per_day": 1,
+      "diesel_liters_per_day": 1,
+      "gasoline_liters_per_day": 1,
+      "propane_liters_per_day": 1,
+      "megajoules_per_day": 1,
+      "kwh_per_day": 1,
+      "cubic_meters_water_per_day": 1,
+      "kwh_per_day_produced": 1,
+      "digester_rng_produced": 1
+    },
+    "manure_disposal_kg": 1,
+    "manure_disposal_price_per_kg": 1,
+    "manure_disposal_km": 1,
+    "manure_disposal_price_per_km": 1,
+    "manure_disposal_transport_km": 1,
+    "manure_sales": 1
+  },
+  "Soil_and_crop": {
+    "land_ha_purchased": 1,
+    "land_ha_rented": 1,
+    "labor_hours_per_day": 1,
+    "carbon_credits_whole_simulation_tonnes": 1
+  },
+  "Feed_storage": {
+    "labor_hours_per_day": 1
+  },
+  "cashflow_inputs": {
+    "loan_term": 10,
+    "project_term": 20,
+    "operating_units": [
+      [
+        1.0
+      ]
+    ],
+    "operating_unit_costs": [
+      [
+        100.0
+      ]
+    ],
+    "units_produced": [
+      [
+        1.0
+      ]
+    ],
+    "unit_price": [
+      [
+        50.0
+      ]
+    ],
+    "loan_interest_rate": 0.05,
+    "loan_fraction": 0.5,
+    "equity": 0.5,
+    "const_int": 0.04,
+    "const_term": 1,
+    "const_rate_i": [
+      1.0
+    ],
+    "tax_rate": 0.21,
+    "target_internal_rate_of_return": 0.08,
+    "depreciation_i": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "enable_dcfror": true,
+    "tax_credit_used": 0.0,
+    "tax_credit_revenue": 0.0,
+    "enable_goal_seek": true,
+    "goal_seek_target_npv": 0.0,
+    "goal_seek_bounds": [
+      0.01,
+      100.0
+    ],
+    "goal_seek_unit_price_multiplier": 1.0,
+    "goal_seek_fixed_variables": [
+      "target_internal_rate_of_return",
+      "loan_term"
+    ]
+  },
+  "capital_costs": {
+    "capital_cost_breakdown": [
+      {
+        "Item": "Fallback capital cost",
+        "Cost": 10000.0
+      }
+    ]
+  }
+}
