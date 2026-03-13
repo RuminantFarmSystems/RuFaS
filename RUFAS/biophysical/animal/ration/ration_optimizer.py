@@ -849,7 +849,7 @@ class RationOptimizer:
             Average enteric methane produced in pen, used in constraint methods, g.
         pen_average_urine_nitrogen : float
             Average urine nitrogen generated in pen, used in constraint methods, kg.
-        requirements : AnimalRequirements
+        requirements : NutritionRequirements
             Summary of requirements for a group of animals.
         pen_available_feeds : list[Feed]
             A list of Feeds available during ration formulation.
@@ -886,13 +886,12 @@ class RationOptimizer:
             pen_average_urine_nitrogen,
         )
         sorted_previous_ration = dict(sorted(previous_ration.items())) if previous_ration else None
-        initial_decision_vector = np.array(self._build_initial_value(sorted_previous_ration, ration_config),
-                                           dtype=float)
+        initial_decision_vector = np.array(
+            self._build_initial_value(sorted_previous_ration, ration_config), dtype=float
+        )
 
         if user_defined_ration_dictionary:
-            sorted_user_defined_ration_dictionary = dict(
-                sorted(user_defined_ration_dictionary.items())
-            )
+            sorted_user_defined_ration_dictionary = dict(sorted(user_defined_ration_dictionary.items()))
             bounds = self._build_bounds_user_defined_ration(
                 ration_config=ration_config,
                 user_defined_ration_dictionary=sorted_user_defined_ration_dictionary,

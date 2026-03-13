@@ -829,7 +829,7 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false). This variable is default to true and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
         "type": "bool",
         "default": true
       },
@@ -2691,7 +2691,7 @@
         },
         "dry_matter_percentage": {
           "type": "number",
-          "description": "Percentage of fresh yield that is dry matter (unitless).",
+          "description": "Percentage of fresh yield at harvest that is dry matter (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
@@ -4362,7 +4362,7 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
+        "description": "Tolerance -- Allowable +/- fraction variance for each of the defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0

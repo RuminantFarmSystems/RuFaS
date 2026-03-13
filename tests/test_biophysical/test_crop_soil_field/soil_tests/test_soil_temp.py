@@ -17,7 +17,7 @@ from RUFAS.biophysical.field.soil.soil_temp import SoilTemp
         1.4013,
     ],
 )
-def test_determine_maximum_damping_depth(bulk_density):
+def test_determine_maximum_damping_depth(bulk_density: float) -> None:
     """tests _determine_maximum_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_maximum_damping_depth(bulk_density)
     expect = 1000 + ((2500 * bulk_density) / (bulk_density + (686 * exp(-5.63 * bulk_density))))
@@ -33,7 +33,7 @@ def test_determine_maximum_damping_depth(bulk_density):
         (45.8395, 1.543, 1874),
     ],
 )
-def test_determine_scaling_factor(water_content, density, bottom_depth):
+def test_determine_scaling_factor(water_content: float, density: float, bottom_depth: int) -> None:
     """tests _determine_scaling_factor() in soil_temp.py"""
     observe = SoilTemp._determine_scaling_factor(water_content, density, bottom_depth)
     bottom_term = (0.356 - (0.144 * density)) * bottom_depth
@@ -50,7 +50,7 @@ def test_determine_scaling_factor(water_content, density, bottom_depth):
         (2958, 0.3058),
     ],
 )
-def test_determine_damping_depth(max_damping_depth, scaling_factor):
+def test_determine_damping_depth(max_damping_depth: int, scaling_factor: float) -> None:
     """tests _determine_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_damping_depth(max_damping_depth, scaling_factor)
     expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor)) ** 2)
