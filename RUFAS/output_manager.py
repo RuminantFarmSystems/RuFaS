@@ -1337,14 +1337,23 @@ class OutputManager(object):
 
         if filter_content.get("expand_data", False):
             fill_value = filter_content.get("fill_value", np.nan)
+            use_fill_value_before_start = filter_content.get("use_fill_value_before_start", True)
             use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
             use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
+            expand_data_to_observed_range = filter_content.get("expand_data_to_observed_range", False)
+            assert self.time is not None
+            simulation_length = self.time.simulation_length_days
+            if filter_content.get("name") == "Feed Expand Full Sim, No Fill":
+                print("pause")
             try:
                 results = Utility.expand_data_temporally(
                     results,
+                    simulation_length=simulation_length,
                     fill_value=fill_value,
+                    use_fill_value_before_start=use_fill_value_before_start,
                     use_fill_value_in_gaps=use_fill_value_in_gaps,
                     use_fill_value_at_end=use_fill_value_at_end,
+                    expand_data_to_observed_range=expand_data_to_observed_range,
                 )
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"
@@ -2583,6 +2592,8 @@ class OutputManager(object):
             "use_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_filter_key_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "expand_data_to_observed_range": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():
