@@ -379,7 +379,7 @@ def test_setup_fertilizer_schedule(
     expected_schedule: FertilizerSchedule,
     mock_input_manager: InputManager,
     input_manager_original_method_states: dict[str, Callable[..., Any]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=fertilizer_schedule_data)
@@ -823,7 +823,7 @@ def test_setup_manure_schedule(
     expected_manure_schedule: ManureSchedule,
     mock_input_manager: InputManager,
     input_manager_original_method_states: dict[str, Callable[..., Any]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=manure_schedule_data)
@@ -1245,7 +1245,7 @@ def test_setup_tillage_schedule(
     expected_tillage_schedule: TillageSchedule,
     mock_input_manager: InputManager,
     input_manager_original_method_states: dict[str, Callable[..., Any]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=tillage_schedule_data)
@@ -1409,7 +1409,7 @@ def test_crop_schedule_setup(
     expected: List[CropSchedule],
     mock_input_manager: InputManager,
     input_manager_original_method_states: dict[str, Callable[..., Any]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=crop_schedule_config)
@@ -1818,10 +1818,10 @@ def test_setup_soil(
     soil_configuration: dict[str, float | int | list[dict[str, Any]]],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable[..., Any]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that Soil profiles are set up correctly with data from the InputManager."""
-    mock_get_data =mocker.patch.object(mock_input_manager, "get_data", return_value=soil_configuration)
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=soil_configuration)
     actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
     assert actual_soil.data.second_moisture_condition_parameter == soil_configuration.get(
         "second_moisture_condition_parameter"
@@ -1877,7 +1877,7 @@ def test_setup_soil_error(
     error_message: str,
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Any],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that errors are raised correctly when invalid soil configurations are passed."""
     mocker.patch.object(mock_input_manager, "get_data", return_value=soil_configuration)
