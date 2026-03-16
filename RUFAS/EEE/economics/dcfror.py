@@ -314,6 +314,7 @@ class DCFRORCalculator:
             loan_balance_column[construction_indices] = cumulative_draw
 
         prev_taxable = 0.0
+        prev_loss = 0.0
         op_indices = np.where(operational_mask)[0]
         for idx, year_index in enumerate(op_indices):
             revenue_y = revenue_schedule[idx]
@@ -333,8 +334,9 @@ class DCFRORCalculator:
                 )
 
             net_rev_y = EconomicEquations.net_revenue(revenue_y, operating_y, interest_y, depreciation_y)
-            carried_loss = EconomicEquations.loss_carry_forward(prev_taxable)
-            taxable_y = EconomicEquations.taxable_income(net_rev_y, carried_loss)
+            carried_loss = EconomicEquations.loss_carry_forward(prev_taxable, prev_loss) 
+            used_loss = EconomicEquations.max_loss_utilized(net_rev_y, carried_loss)
+            taxable_y = EconomicEquations.taxable_income(net_rev_y, used_loss)
             tax_y = EconomicEquations.income_tax(taxable_y, tax_rate)
             cash_income_y = EconomicEquations.annual_cash_income(revenue_y, operating_y, loan_pay_y, tax_y)
             pv_y = EconomicEquations.present_value(cash_income_y, EconomicEquations.discount_factors[year_index])
@@ -353,6 +355,7 @@ class DCFRORCalculator:
             loan_balance_column[year_index] = principal_balance
             cash_flows[year_index] = cash_income_y
             prev_taxable = taxable_y
+            prev_loss = carried_loss + used_loss
 
         cash_flow_df = pd.DataFrame(
             {

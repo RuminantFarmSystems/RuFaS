@@ -131,14 +131,19 @@ class EconomicEquations:
         return revenue - operating_cost - interest - depreciation
 
     @staticmethod
-    def loss_carry_forward(prev_taxable: float) -> float:
+    def loss_carry_forward(prev_taxable: float, prev_loss: float) -> float:
         """Loss carry forward using Equation 21."""
-        return prev_taxable if prev_taxable < 0 else 0.0
+        return prev_taxable + prev_loss if prev_taxable < 0 else prev_loss
+    
+    @staticmethod
+    def max_loss_utilized(net_rev: float, carried_loss: float) -> float:
+        carry_forward_limit = 0.8 
+        return min(abs(carried_loss), net_rev * carry_forward_limit)
 
     @staticmethod
-    def taxable_income(net_rev: float, carried_loss: float) -> float:
+    def taxable_income(net_rev: float, used_loss: float) -> float:
         """Taxable income using Equation 22."""
-        return net_rev + carried_loss
+        return net_rev - used_loss
 
     @staticmethod
     def income_tax(taxable: float, tax_rate: float) -> float:
