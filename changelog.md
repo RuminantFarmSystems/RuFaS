@@ -46,6 +46,7 @@ v1.0.0
 - [2843](https://github.com/RuminantFarmSystems/MASM/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
 - [2852](https://github.com/RuminantFarmSystems/MASM/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
 - [2863](https://github.com/RuminantFarmSystems/MASM/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
+- [2863](https://github.com/RuminantFarmSystems/MASM/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Updates expand_data_temporally() util function to offer options of full simulation expansion and front-padding data.
 
 ### v1.0.0
 
