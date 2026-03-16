@@ -116,6 +116,11 @@ class TaskManager:
         Exception
             If the input data is invalid.
 
+        Notes
+        -----
+        We set maxtasksperchild=1 to maintain isolation between tasks and ensure no memory
+        leaks happens in IO Managers.
+
         """
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
@@ -166,7 +171,6 @@ class TaskManager:
         self.output_manager.add_log(
             "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
         )
-        # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
         self.pool = multiprocessing.Pool(workers, maxtasksperchild=1) if workers > 1 else None
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         self.output_manager.add_log(
@@ -197,6 +201,7 @@ class TaskManager:
                 info_map,
             )
             json_output_directory = runnable_args[0]["json_output_directory"]
+
             self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes)
 
         TaskManager.handle_post_processing(
