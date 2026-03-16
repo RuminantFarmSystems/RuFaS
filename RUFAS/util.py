@@ -146,7 +146,7 @@ class Utility:
         use_fill_value_before_start: bool = True,
         use_fill_value_in_gaps: bool = True,
         use_fill_value_at_end: bool = True,
-        expand_data_to_full_simulation: bool = True,
+        expand_data_to_observed_range: bool = False,
     ) -> dict[str, dict[str, list[Any]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
@@ -170,8 +170,8 @@ class Utility:
         use_fill_value_at_end : bool, default True
             If true, days after the last known datapoint are filled with `fill_value`. If false, they are filled
             with the last known value.
-        expand_data_to_full_simulation : bool, default True
-            If true, expands data from simulation day 1 through `simulation_length`. If false, expands only
+        expand_data_to_observed_range : bool, default False
+            If false, expands data from simulation day 1 through `simulation_length`. If true, expands only
             from the first simulation day present in the dataset through the last simulation day present in the dataset.
 
         Returns
@@ -194,8 +194,8 @@ class Utility:
         all_simulation_days = Utility._gather_data_sim_days(data_to_expand)
         filtered_simulation_days = sorted(set(all_simulation_days))
 
-        first_day = 1 if expand_data_to_full_simulation else filtered_simulation_days[0]
-        last_day = simulation_length if expand_data_to_full_simulation else filtered_simulation_days[-1]
+        first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 1
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length
 
         expanded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_expand.items():
