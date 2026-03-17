@@ -1343,8 +1343,6 @@ class OutputManager(object):
             expand_data_to_observed_range = filter_content.get("expand_data_to_observed_range", False)
             assert self.time is not None
             simulation_length = self.time.simulation_length_days
-            if filter_content.get("name") == "Feed Expand Full Sim, No Fill":
-                print("pause")
             try:
                 results = Utility.expand_data_temporally(
                     results,
