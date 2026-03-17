@@ -1336,13 +1336,16 @@ class OutputManager(object):
         )
 
         if filter_content.get("expand_data", False):
+            if self.time is None:
+                raise RuntimeError(
+                    "Cannot expand data because OutputManager's 'time' attribute is not initialized."
+                )
+            simulation_length = self.time.simulation_length_days
             fill_value = filter_content.get("fill_value", np.nan)
             use_fill_value_before_start = filter_content.get("use_fill_value_before_start", True)
             use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
             use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
             expand_data_to_observed_range = filter_content.get("expand_data_to_observed_range", False)
-            assert self.time is not None
-            simulation_length = self.time.simulation_length_days
             try:
                 results = Utility.expand_data_temporally(
                     results,
