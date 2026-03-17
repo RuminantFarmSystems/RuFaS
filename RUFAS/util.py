@@ -242,8 +242,11 @@ class Utility:
 
                 else:
                     value_to_add = fill_value if use_fill_value_at_end else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
                     expanded_variable_data["values"].append(value_to_add)
-                    expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
 
             expanded_data[key] = expanded_variable_data
 
