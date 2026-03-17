@@ -355,7 +355,7 @@ class DCFRORCalculator:
             loan_balance_column[year_index] = principal_balance
             cash_flows[year_index] = cash_income_y
             prev_taxable = taxable_y
-            prev_loss = carried_loss + used_loss
+            prev_loss = carried_loss + used_loss # Econmic Equation 24
 
         cash_flow_df = pd.DataFrame(
             {

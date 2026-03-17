@@ -1,4 +1,4 @@
-"""Implementation of economic equations 7–26 from the April 2025 guidance."""
+"""Implementation of economic equations 7–28 from the March 2026 guidance."""
 
 from __future__ import annotations
 
@@ -137,31 +137,32 @@ class EconomicEquations:
     
     @staticmethod
     def max_loss_utilized(net_rev: float, carried_loss: float) -> float:
+        """Maximum loss utilization using Equation 22."""
         carry_forward_limit = 0.8 
         return min(abs(carried_loss), net_rev * carry_forward_limit)
 
     @staticmethod
     def taxable_income(net_rev: float, used_loss: float) -> float:
-        """Taxable income using Equation 22."""
+        """Taxable income using Equation 23."""
         return net_rev - used_loss
 
     @staticmethod
     def income_tax(taxable: float, tax_rate: float) -> float:
-        """Income tax using Equation 23."""
+        """Income tax using Equation 25."""
         taxable = max(taxable, 0.0)
         return taxable * tax_rate
 
     @staticmethod
     def annual_cash_income(revenue: float, operating_cost: float, loan_payment: float, tax_pay: float) -> float:
-        """Annual cash income using Equation 24."""
+        """Annual cash income using Equation 26."""
         return revenue - operating_cost - loan_payment - tax_pay
 
     @staticmethod
     def present_value(cash_income: float, discount: float) -> float:
-        """Present value of cash income using Equation 25."""
+        """Present value of cash income using Equation 27."""
         return cash_income * discount
 
     @staticmethod
     def net_present_value(apv: np.ndarray, capital_interest_pv: np.ndarray) -> float:
-        """Net present value using Equation 26."""
+        """Net present value using Equation 28."""
         return apv.sum() - capital_interest_pv.sum()
