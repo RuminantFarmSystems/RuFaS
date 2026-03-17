@@ -376,8 +376,9 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             False,
             {
                 "a": {
-                    "values": ["a", "a", "a", "b", "c", math.nan],
+                    "values": ["a", "a", "a", "a", "b", "c", math.nan],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "kg"},
                         {"simulation_day": 1, "units": "kg"},
                         {"simulation_day": 2, "units": "kg"},
                         {"simulation_day": 3, "units": "kg"},
@@ -387,8 +388,9 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
                 "b": {
-                    "values": ["d", "d", "d", "e", "e", "f"],
+                    "values": ["d", "d", "d", "d", "e", "e", "f"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "g"},
                         {"simulation_day": 1, "units": "g"},
                         {"simulation_day": 2, "units": "g"},
                         {"simulation_day": 3, "units": "g"},
@@ -426,8 +428,9 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             False,
             {
                 "a": {
-                    "values": ["a", math.nan, math.nan, "b", "c", "c"],
+                    "values": [math.nan, "a", math.nan, math.nan, "b", "c", "c"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "kg"},
                         {"simulation_day": 1, "units": "kg"},
                         {"simulation_day": 2, "units": "kg"},
                         {"simulation_day": 3, "units": "kg"},
@@ -437,8 +440,9 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
                 "b": {
-                    "values": [math.nan, math.nan, "d", "e", math.nan, "f"],
+                    "values": [math.nan, math.nan, math.nan, "d", "e", math.nan, "f"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "g"},
                         {"simulation_day": 1, "units": "g"},
                         {"simulation_day": 2, "units": "g"},
                         {"simulation_day": 3, "units": "g"},
@@ -501,12 +505,20 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             False,
             {
                 "a": {
-                    "values": ["a", "b"],
-                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                    "values": ["a", "a", "b"],
+                    "info_maps": [
+                        {"simulation_day": 0, "units": "ha"},
+                        {"simulation_day": 1, "units": "ha"},
+                        {"simulation_day": 2, "units": "ha"}
+                    ],
                 },
                 "b": {
-                    "values": ["c", "d"],
-                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                    "values": ["c", "c", "d"],
+                    "info_maps": [
+                        {"simulation_day": 0, "units": "ha"},
+                        {"simulation_day": 1, "units": "ha"},
+                        {"simulation_day": 2, "units": "ha"}
+                    ],
                 },
             },
         ),
@@ -529,16 +541,18 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             False,
             {
                 "a": {
-                    "values": ["a", "fill", "b"],
+                    "values": ["a", "a", "fill", "b"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "ha^2"},
                         {"simulation_day": 1, "units": "ha^2"},
                         {"simulation_day": 2, "units": "ha^2"},
                         {"simulation_day": 3, "units": "ha^2"},
                     ],
                 },
                 "b": {
-                    "values": ["c", "fill", "d"],
+                    "values": ["c", "c", "fill", "d"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "l"},
                         {"simulation_day": 1, "units": "l"},
                         {"simulation_day": 2, "units": "l"},
                         {"simulation_day": 3, "units": "l"},
@@ -561,8 +575,9 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             False,
             {
                 "a": {
-                    "values": [math.pi, "a", "b"],
+                    "values": [math.pi, math.pi, "a", "b"],
                     "info_maps": [
+                        {"simulation_day": 0, "units": "GB"},
                         {"simulation_day": 1, "units": "GB"},
                         {"simulation_day": 2, "units": "GB"},
                         {"simulation_day": 3, "units": "GB"},
