@@ -195,7 +195,7 @@ class Utility:
         filtered_simulation_days = sorted(set(all_simulation_days))
 
         first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 0
-        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length - 1
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length
 
         expanded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_expand.items():
