@@ -4755,7 +4755,7 @@ Information about death and sale events are tracked and aggregated daily, includ
 \thispagestyle{empty} % Suppress headers and footers on this landscape page
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
-\begin{longtable}{@{} L{4cm} L{8cm} C{2cm} C{2cm} C{2cm} @{}}
+\begin{longtable}{@{} L{6cm} L{12cm} C{2cm} C{2cm} C{2cm} @{}}
 \caption{The following inputs are used to determine the probability and timing of cow death and sales events.} \\
 \toprule
 \textbf{Variable} & \textbf{Definition} & \textbf{Default} & \textbf{Min} & \textbf{Max} \\
@@ -4792,8 +4792,6 @@ still\_birth\_rate & Stillbirth rate & 0.065 & 0 & 1 \\
 
 % <-- Ensure there's a final newline before closing the table
 \end{longtable}
-
-\vspace{0.2cm}
 
 {\footnotesize \textit{Note:} Variables marked with \textsuperscript{*} are commonly left at default values. Adjusting them changes the timing of cow exit from the herd but does not affect the total number of exits.}
 

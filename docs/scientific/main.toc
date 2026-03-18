@@ -97,247 +97,247 @@
 \contentsline {subsection}{\numberline {3.e}Culling}{95}{subsection.3.5}%
 \contentsline {paragraph}{Introduction}{95}{subsection.3.5}%
 \contentsline {table}{\numberline {37}{\ignorespaces The following inputs are used to determine the probability and timing of cow death and sales events.}}{97}{table.37}%
-\contentsline {paragraph}{Methodology}{99}{table.37}%
-\contentsline {table}{\numberline {38}{\ignorespaces Cumulative distribution function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time. Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}}{103}{table.caption.13}%
-\contentsline {section}{\numberline {4}Methane Emission and Manure Excretion}{104}{section.4}%
-\contentsline {subsection}{\numberline {4.a}Manure Excretion}{104}{subsection.4.1}%
-\contentsline {paragraph}{Introduction}{104}{subsection.4.1}%
-\contentsline {table}{\numberline {39}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{105}{table.39}%
-\contentsline {table}{\numberline {40}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{105}{table.40}%
-\contentsline {table}{\numberline {41}{\ignorespaces These inputs define phosphorus-related outputs relevant to lactating cows.}}{106}{table.41}%
-\contentsline {table}{\numberline {42}{\ignorespaces Expected outputs from this section.}}{106}{table.42}%
-\contentsline {paragraph}{Methodology}{107}{table.42}%
-\contentsline {paragraph}{Manure excretions}{107}{table.42}%
-\contentsline {paragraph}{Manure nutrient composition}{108}{table.42}%
-\contentsline {paragraph}{Manure excretions}{109}{table.42}%
-\contentsline {paragraph}{Manure nutrient composition}{110}{table.42}%
-\contentsline {paragraph}{Manure excretions}{111}{table.42}%
-\contentsline {paragraph}{Manure nutrient composition}{112}{table.42}%
-\contentsline {paragraph}{Manure excretions}{113}{table.42}%
-\contentsline {subsection}{\numberline {4.b}Enteric Methane Emission}{116}{subsection.4.2}%
-\contentsline {paragraph}{Introduction}{116}{subsection.4.2}%
-\contentsline {table}{\numberline {43}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{116}{table.43}%
-\contentsline {table}{\numberline {44}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{116}{table.44}%
-\contentsline {table}{\numberline {45}{\ignorespaces Inputs specific to the methane emissions model and selected mitigation strategies.}}{117}{table.45}%
-\contentsline {table}{\numberline {46}{\ignorespaces Expected outputs from this section.}}{117}{table.46}%
-\contentsline {paragraph}{Methodology}{117}{table.46}%
-\contentsline {paragraph}{Mutian Model}{118}{table.46}%
-\contentsline {paragraph}{Mills Model}{119}{table.46}%
-\contentsline {paragraph}{IPCC Model}{119}{table.46}%
-\contentsline {paragraph}{Mills Model}{119}{table.46}%
-\contentsline {paragraph}{IPCC Model}{119}{table.46}%
-\contentsline {subsection}{\numberline {4.c}Enteric Methane Mitigation}{120}{subsection.4.3}%
-\contentsline {paragraph}{Introduction}{120}{subsection.4.3}%
-\contentsline {table}{\numberline {47}{\ignorespaces General dietary fiber and fat concentration inputs.}}{120}{table.47}%
-\contentsline {table}{\numberline {48}{\ignorespaces Feed-based methane mitigation strategies.}}{120}{table.48}%
-\contentsline {table}{\numberline {49}{\ignorespaces Dosage of methane mitigation additives.}}{121}{table.49}%
-\contentsline {table}{\numberline {50}{\ignorespaces Expected outputs from this section.}}{121}{table.50}%
-\contentsline {paragraph}{Methodology}{121}{table.50}%
-\contentsline {section}{\numberline {5}References}{123}{section.5}%
-\contentsline {part}{III\hspace {1em}Manure Module}{125}{part.3}%
+\contentsline {paragraph}{Methodology}{98}{table.37}%
+\contentsline {table}{\numberline {38}{\ignorespaces Cumulative distribution function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time. Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}}{102}{table.caption.13}%
+\contentsline {section}{\numberline {4}Methane Emission and Manure Excretion}{103}{section.4}%
+\contentsline {subsection}{\numberline {4.a}Manure Excretion}{103}{subsection.4.1}%
+\contentsline {paragraph}{Introduction}{103}{subsection.4.1}%
+\contentsline {table}{\numberline {39}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{104}{table.39}%
+\contentsline {table}{\numberline {40}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{104}{table.40}%
+\contentsline {table}{\numberline {41}{\ignorespaces These inputs define phosphorus-related outputs relevant to lactating cows.}}{105}{table.41}%
+\contentsline {table}{\numberline {42}{\ignorespaces Expected outputs from this section.}}{105}{table.42}%
+\contentsline {paragraph}{Methodology}{106}{table.42}%
+\contentsline {paragraph}{Manure excretions}{106}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{107}{table.42}%
+\contentsline {paragraph}{Manure excretions}{108}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{109}{table.42}%
+\contentsline {paragraph}{Manure excretions}{110}{table.42}%
+\contentsline {paragraph}{Manure nutrient composition}{111}{table.42}%
+\contentsline {paragraph}{Manure excretions}{112}{table.42}%
+\contentsline {subsection}{\numberline {4.b}Enteric Methane Emission}{115}{subsection.4.2}%
+\contentsline {paragraph}{Introduction}{115}{subsection.4.2}%
+\contentsline {table}{\numberline {43}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{115}{table.43}%
+\contentsline {table}{\numberline {44}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{115}{table.44}%
+\contentsline {table}{\numberline {45}{\ignorespaces Inputs specific to the methane emissions model and selected mitigation strategies.}}{116}{table.45}%
+\contentsline {table}{\numberline {46}{\ignorespaces Expected outputs from this section.}}{116}{table.46}%
+\contentsline {paragraph}{Methodology}{116}{table.46}%
+\contentsline {paragraph}{Mutian Model}{117}{table.46}%
+\contentsline {paragraph}{Mills Model}{118}{table.46}%
+\contentsline {paragraph}{IPCC Model}{118}{table.46}%
+\contentsline {paragraph}{Mills Model}{118}{table.46}%
+\contentsline {paragraph}{IPCC Model}{118}{table.46}%
+\contentsline {subsection}{\numberline {4.c}Enteric Methane Mitigation}{119}{subsection.4.3}%
+\contentsline {paragraph}{Introduction}{119}{subsection.4.3}%
+\contentsline {table}{\numberline {47}{\ignorespaces General dietary fiber and fat concentration inputs.}}{119}{table.47}%
+\contentsline {table}{\numberline {48}{\ignorespaces Feed-based methane mitigation strategies.}}{119}{table.48}%
+\contentsline {table}{\numberline {49}{\ignorespaces Dosage of methane mitigation additives.}}{120}{table.49}%
+\contentsline {table}{\numberline {50}{\ignorespaces Expected outputs from this section.}}{120}{table.50}%
+\contentsline {paragraph}{Methodology}{120}{table.50}%
+\contentsline {section}{\numberline {5}References}{122}{section.5}%
+\contentsline {part}{III\hspace {1em}Manure Module}{124}{part.3}%
 \etoc@startlocaltoc {5}
 \etoc@startlocaltoc {6}
 \etoc@startlocaltoc {7}
-\contentsline {section}{\numberline {6}Module Introduction}{129}{section.6}%
-\contentsline {subsection}{\numberline {6.a}Structural setup of the Manure Module}{129}{subsection.6.1}%
-\contentsline {table}{\numberline {51}{\ignorespaces Examples of processor types by class.}}{129}{table.caption.14}%
-\contentsline {figure}{\numberline {5}{\ignorespaces A real-world example of a simplistic manure management chain. }}{130}{figure.caption.15}%
-\contentsline {figure}{\numberline {6}{\ignorespaces The manure management chain illustrated in the previous figure, with RuFaS-specific information reflected. }}{130}{figure.caption.16}%
-\contentsline {subsection}{\numberline {6.b}Overview of Required Inputs}{130}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.c}General Assumptions of the Manure Module}{131}{subsection.6.3}%
-\contentsline {section}{\numberline {7}Animal and Manure Module Connection}{132}{section.7}%
-\contentsline {subsection}{\numberline {7.a}Introduction}{132}{subsection.7.1}%
-\contentsline {table}{\numberline {52}{\ignorespaces List of Python classes for Animal to Manure Module connection.}}{132}{table.caption.17}%
-\contentsline {table}{\numberline {53}{\ignorespaces User inputs for Stream Formation and Bedding sections.}}{133}{table.53}%
-\contentsline {subsection}{\numberline {7.b}Methodology}{135}{subsection.7.2}%
-\contentsline {figure}{\numberline {7}{\ignorespaces If manure from a pen is routed to two different general manure streams, two sets of manure stream inputs must be defined. An example of a single pen’s manure stream inputs is above - in this example, manure from this pen is routed to two locations, one representing an exercise lot, the other representing a bedded pack area.}}{136}{figure.caption.18}%
-\contentsline {table}{\numberline {54}{\ignorespaces Recommended minutes\_away\_for\_milking by pen type based on published literature. Remember, this does not necessarily reflect the model defaults. }}{139}{table.caption.19}%
-\contentsline {table}{\numberline {55}{\ignorespaces Proportions of differnt streams for different animal classes.}}{140}{table.caption.20}%
-\contentsline {table}{\numberline {56}{\ignorespaces Calculated manure and bedding characteristics}}{141}{table.caption.21}%
-\contentsline {section}{\numberline {8}Manure Handler}{141}{section.8}%
-\contentsline {subsection}{\numberline {8.a}Introduction}{141}{subsection.8.1}%
-\contentsline {table}{\numberline {57}{\ignorespaces The classes of handlers that are used in this module.}}{143}{table.caption.22}%
-\contentsline {table}{\numberline {58}{\ignorespaces Required inputs for the Manure Handler (refreshed\_manure\_management.json)}}{143}{table.caption.23}%
-\contentsline {subsection}{\numberline {8.b}Methodology}{145}{subsection.8.2}%
-\contentsline {table}{\numberline {59}{\ignorespaces The surface area per stall that is covered with manure is a function of the pen type and type of animal housed.}}{147}{table.caption.24}%
-\contentsline {subsection}{\numberline {8.c}Manure composition update}{150}{subsection.8.3}%
-\contentsline {table}{\numberline {60}{\ignorespaces Calculated manure storage variables and their units}}{150}{table.caption.25}%
-\contentsline {section}{\numberline {9}Solid Liquid Separators}{150}{section.9}%
-\contentsline {subsection}{\numberline {9.a}Introduction}{150}{subsection.9.1}%
-\contentsline {table}{\numberline {61}{\ignorespaces List of Python classes for solid liquid separators.}}{151}{table.caption.26}%
-\contentsline {table}{\numberline {62}{\ignorespaces The required inputs of this section.}}{152}{table.62}%
-\contentsline {subsection}{\numberline {9.b}Methodology}{153}{subsection.9.2}%
-\contentsline {table}{\numberline {63}{\ignorespaces The default, minimums, and maximums for various separation efficiencies.}}{154}{table.caption.27}%
-\contentsline {subsection}{\numberline {9.c}Manure composition update}{155}{subsection.9.3}%
-\contentsline {table}{\numberline {64}{\ignorespaces Solids and liquid fraction calculations for separated manure components}}{155}{table.64}%
-\contentsline {section}{\numberline {10}Anaerobic Digestion}{157}{section.10}%
-\contentsline {subsection}{\numberline {10.a}Introduction}{157}{subsection.10.1}%
-\contentsline {table}{\numberline {65}{\ignorespaces List of Python classes for anaerobic digestors.}}{158}{table.caption.28}%
-\contentsline {table}{\numberline {66}{\ignorespaces Required inputs for this section.}}{158}{table.caption.29}%
-\contentsline {subsection}{\numberline {10.b}Methodology}{159}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.c}Manure composition update}{163}{subsection.10.3}%
-\contentsline {table}{\numberline {67}{\ignorespaces Calculated anaerobic digestion outputs.}}{164}{table.67}%
-\contentsline {section}{\numberline {11}Slurry Storage}{165}{section.11}%
-\contentsline {subsection}{\numberline {11.a}Introduction}{165}{subsection.11.1}%
-\contentsline {table}{\numberline {68}{\ignorespaces Key differences for two options of slurry storage.}}{165}{table.caption.30}%
-\contentsline {table}{\numberline {69}{\ignorespaces Required inputs for the slurry storage section.}}{166}{table.caption.32}%
-\contentsline {subsection}{\numberline {11.b}Methodology}{167}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.c}Received, stored, and emptied outputs}{173}{subsection.11.3}%
-\contentsline {subsection}{\numberline {11.d}Manure composition updates}{174}{subsection.11.4}%
-\contentsline {table}{\numberline {70}{\ignorespaces Manure storage variable calculations}}{174}{table.70}%
-\contentsline {section}{\numberline {12}Anaerobic Lagoon}{175}{section.12}%
-\contentsline {subsection}{\numberline {12.a}Introduction}{175}{subsection.12.1}%
-\contentsline {table}{\numberline {71}{\ignorespaces List of Python classes for anaerobic lagoon.}}{176}{table.caption.33}%
-\contentsline {table}{\numberline {72}{\ignorespaces Required inputs for the anaerobic lagoon section (refreshed\_manure\_management.json)}}{176}{table.caption.34}%
-\contentsline {subsection}{\numberline {12.b}Methodology}{177}{subsection.12.2}%
-\contentsline {subsection}{\numberline {12.c}Received, stored, and emptied outputs}{184}{subsection.12.3}%
-\contentsline {subsection}{\numberline {12.d}Manure composition updates}{184}{subsection.12.4}%
-\contentsline {table}{\numberline {73}{\ignorespaces Manure storage variable calculations}}{185}{table.73}%
-\contentsline {section}{\numberline {13}Bedded Pack}{186}{section.13}%
-\contentsline {subsection}{\numberline {13.a}Introduction}{186}{subsection.13.1}%
-\contentsline {table}{\numberline {74}{\ignorespaces List of classes for bedded pack.}}{187}{table.caption.35}%
-\contentsline {table}{\numberline {75}{\ignorespaces Required inputs for the bedded pack section (refreshed\_manure\_management.json)}}{187}{table.caption.36}%
-\contentsline {subsection}{\numberline {13.b}Methodology}{188}{subsection.13.2}%
-\contentsline {table}{\numberline {76}{\ignorespaces Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.}}{188}{table.caption.37}%
-\contentsline {subsection}{\numberline {13.c}Received, stored, and emptied outputs}{193}{subsection.13.3}%
-\contentsline {subsection}{\numberline {13.d}Manure composition updates}{194}{subsection.13.4}%
-\contentsline {table}{\numberline {77}{\ignorespaces Calculated manure storage variables and their units}}{195}{table.77}%
-\contentsline {section}{\numberline {14}Open Lot}{196}{section.14}%
-\contentsline {subsection}{\numberline {14.a}Introduction}{196}{subsection.14.1}%
-\contentsline {table}{\numberline {78}{\ignorespaces Classes available in open lots.}}{197}{table.caption.38}%
-\contentsline {table}{\numberline {79}{\ignorespaces Required inputs for the open lots section}}{197}{table.caption.39}%
-\contentsline {subsection}{\numberline {14.b}Methodology}{198}{subsection.14.2}%
-\contentsline {subsection}{\numberline {14.c}Received, stored, and emptied outputs}{203}{subsection.14.3}%
-\contentsline {subsection}{\numberline {14.d}Manure composition updates}{204}{subsection.14.4}%
-\contentsline {table}{\numberline {80}{\ignorespaces Calculated manure storage variables and their units}}{204}{table.80}%
-\contentsline {section}{\numberline {15}Composting}{206}{section.15}%
-\contentsline {subsection}{\numberline {15.a}Introduction}{206}{subsection.15.1}%
-\contentsline {table}{\numberline {81}{\ignorespaces Classes available in composting.}}{206}{table.caption.40}%
-\contentsline {table}{\numberline {82}{\ignorespaces Required inputs for the composting section (refreshed\_manure\_management.json)}}{207}{table.caption.41}%
-\contentsline {subsection}{\numberline {15.b}Methodology}{208}{subsection.15.2}%
-\contentsline {table}{\numberline {83}{\ignorespaces Methane conversion factor values for compost pens, based on composting method and average annual air temperature.}}{208}{table.caption.42}%
-\contentsline {table}{\numberline {84}{\ignorespaces NH\textsubscript {3}-N emission factors for compost by composting method.}}{212}{table.caption.43}%
-\contentsline {table}{\numberline {85}{\ignorespaces N\textsubscript {2}O-N emission factors for compost by composting method.}}{213}{table.caption.45}%
-\contentsline {subsection}{\numberline {15.c}Received, stored, and emptied outputs}{213}{subsection.15.3}%
-\contentsline {subsection}{\numberline {15.d}Manure composition updates}{214}{subsection.15.4}%
-\contentsline {table}{\numberline {86}{\ignorespaces Manure storage variable calculations}}{214}{table.86}%
-\contentsline {section}{\numberline {16}Daily spread}{216}{section.16}%
-\contentsline {subsection}{\numberline {16.a}Introduction}{216}{subsection.16.1}%
-\contentsline {table}{\numberline {87}{\ignorespaces List of classes for daily spread.}}{216}{table.caption.46}%
-\contentsline {table}{\numberline {88}{\ignorespaces Required inputs for the daily spread section (refreshed\_manure\_management.json)}}{216}{table.caption.47}%
-\contentsline {section}{\numberline {17}Manure to Soil and Crop Module Connection}{218}{section.17}%
-\contentsline {subsection}{\numberline {17.a}Introduction}{218}{subsection.17.1}%
-\contentsline {subsection}{\numberline {17.b}Implementation in RuFaS}{218}{subsection.17.2}%
-\contentsline {figure}{\numberline {8}{\ignorespaces \relax }}{219}{figure.caption.48}%
-\contentsline {subsection}{\numberline {17.c}Methodology}{219}{subsection.17.3}%
-\contentsline {section}{\numberline {18}Key Constants}{222}{section.18}%
-\contentsline {table}{\numberline {89}{\ignorespaces The key constants for all equations in the Manure Module}}{222}{table.89}%
-\contentsline {section}{\numberline {19}References}{225}{section.19}%
-\contentsline {part}{IV\hspace {1em}Soil and Crop Module}{227}{part.4}%
+\contentsline {section}{\numberline {6}Module Introduction}{128}{section.6}%
+\contentsline {subsection}{\numberline {6.a}Structural setup of the Manure Module}{128}{subsection.6.1}%
+\contentsline {table}{\numberline {51}{\ignorespaces Examples of processor types by class.}}{128}{table.caption.14}%
+\contentsline {figure}{\numberline {5}{\ignorespaces A real-world example of a simplistic manure management chain. }}{129}{figure.caption.15}%
+\contentsline {figure}{\numberline {6}{\ignorespaces The manure management chain illustrated in the previous figure, with RuFaS-specific information reflected. }}{129}{figure.caption.16}%
+\contentsline {subsection}{\numberline {6.b}Overview of Required Inputs}{129}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.c}General Assumptions of the Manure Module}{130}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Animal and Manure Module Connection}{131}{section.7}%
+\contentsline {subsection}{\numberline {7.a}Introduction}{131}{subsection.7.1}%
+\contentsline {table}{\numberline {52}{\ignorespaces List of Python classes for Animal to Manure Module connection.}}{131}{table.caption.17}%
+\contentsline {table}{\numberline {53}{\ignorespaces User inputs for Stream Formation and Bedding sections.}}{132}{table.53}%
+\contentsline {subsection}{\numberline {7.b}Methodology}{134}{subsection.7.2}%
+\contentsline {figure}{\numberline {7}{\ignorespaces If manure from a pen is routed to two different general manure streams, two sets of manure stream inputs must be defined. An example of a single pen’s manure stream inputs is above - in this example, manure from this pen is routed to two locations, one representing an exercise lot, the other representing a bedded pack area.}}{135}{figure.caption.18}%
+\contentsline {table}{\numberline {54}{\ignorespaces Recommended minutes\_away\_for\_milking by pen type based on published literature. Remember, this does not necessarily reflect the model defaults. }}{138}{table.caption.19}%
+\contentsline {table}{\numberline {55}{\ignorespaces Proportions of differnt streams for different animal classes.}}{139}{table.caption.20}%
+\contentsline {table}{\numberline {56}{\ignorespaces Calculated manure and bedding characteristics}}{140}{table.caption.21}%
+\contentsline {section}{\numberline {8}Manure Handler}{140}{section.8}%
+\contentsline {subsection}{\numberline {8.a}Introduction}{140}{subsection.8.1}%
+\contentsline {table}{\numberline {57}{\ignorespaces The classes of handlers that are used in this module.}}{142}{table.caption.22}%
+\contentsline {table}{\numberline {58}{\ignorespaces Required inputs for the Manure Handler (refreshed\_manure\_management.json)}}{142}{table.caption.23}%
+\contentsline {subsection}{\numberline {8.b}Methodology}{144}{subsection.8.2}%
+\contentsline {table}{\numberline {59}{\ignorespaces The surface area per stall that is covered with manure is a function of the pen type and type of animal housed.}}{146}{table.caption.24}%
+\contentsline {subsection}{\numberline {8.c}Manure composition update}{149}{subsection.8.3}%
+\contentsline {table}{\numberline {60}{\ignorespaces Calculated manure storage variables and their units}}{149}{table.caption.25}%
+\contentsline {section}{\numberline {9}Solid Liquid Separators}{149}{section.9}%
+\contentsline {subsection}{\numberline {9.a}Introduction}{149}{subsection.9.1}%
+\contentsline {table}{\numberline {61}{\ignorespaces List of Python classes for solid liquid separators.}}{150}{table.caption.26}%
+\contentsline {table}{\numberline {62}{\ignorespaces The required inputs of this section.}}{151}{table.62}%
+\contentsline {subsection}{\numberline {9.b}Methodology}{152}{subsection.9.2}%
+\contentsline {table}{\numberline {63}{\ignorespaces The default, minimums, and maximums for various separation efficiencies.}}{153}{table.caption.27}%
+\contentsline {subsection}{\numberline {9.c}Manure composition update}{154}{subsection.9.3}%
+\contentsline {table}{\numberline {64}{\ignorespaces Solids and liquid fraction calculations for separated manure components}}{154}{table.64}%
+\contentsline {section}{\numberline {10}Anaerobic Digestion}{156}{section.10}%
+\contentsline {subsection}{\numberline {10.a}Introduction}{156}{subsection.10.1}%
+\contentsline {table}{\numberline {65}{\ignorespaces List of Python classes for anaerobic digestors.}}{157}{table.caption.28}%
+\contentsline {table}{\numberline {66}{\ignorespaces Required inputs for this section.}}{157}{table.caption.29}%
+\contentsline {subsection}{\numberline {10.b}Methodology}{158}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.c}Manure composition update}{162}{subsection.10.3}%
+\contentsline {table}{\numberline {67}{\ignorespaces Calculated anaerobic digestion outputs.}}{163}{table.67}%
+\contentsline {section}{\numberline {11}Slurry Storage}{164}{section.11}%
+\contentsline {subsection}{\numberline {11.a}Introduction}{164}{subsection.11.1}%
+\contentsline {table}{\numberline {68}{\ignorespaces Key differences for two options of slurry storage.}}{164}{table.caption.30}%
+\contentsline {table}{\numberline {69}{\ignorespaces Required inputs for the slurry storage section.}}{165}{table.caption.32}%
+\contentsline {subsection}{\numberline {11.b}Methodology}{166}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.c}Received, stored, and emptied outputs}{172}{subsection.11.3}%
+\contentsline {subsection}{\numberline {11.d}Manure composition updates}{173}{subsection.11.4}%
+\contentsline {table}{\numberline {70}{\ignorespaces Manure storage variable calculations}}{173}{table.70}%
+\contentsline {section}{\numberline {12}Anaerobic Lagoon}{174}{section.12}%
+\contentsline {subsection}{\numberline {12.a}Introduction}{174}{subsection.12.1}%
+\contentsline {table}{\numberline {71}{\ignorespaces List of Python classes for anaerobic lagoon.}}{175}{table.caption.33}%
+\contentsline {table}{\numberline {72}{\ignorespaces Required inputs for the anaerobic lagoon section (refreshed\_manure\_management.json)}}{175}{table.caption.34}%
+\contentsline {subsection}{\numberline {12.b}Methodology}{176}{subsection.12.2}%
+\contentsline {subsection}{\numberline {12.c}Received, stored, and emptied outputs}{183}{subsection.12.3}%
+\contentsline {subsection}{\numberline {12.d}Manure composition updates}{183}{subsection.12.4}%
+\contentsline {table}{\numberline {73}{\ignorespaces Manure storage variable calculations}}{184}{table.73}%
+\contentsline {section}{\numberline {13}Bedded Pack}{185}{section.13}%
+\contentsline {subsection}{\numberline {13.a}Introduction}{185}{subsection.13.1}%
+\contentsline {table}{\numberline {74}{\ignorespaces List of classes for bedded pack.}}{186}{table.caption.35}%
+\contentsline {table}{\numberline {75}{\ignorespaces Required inputs for the bedded pack section (refreshed\_manure\_management.json)}}{186}{table.caption.36}%
+\contentsline {subsection}{\numberline {13.b}Methodology}{187}{subsection.13.2}%
+\contentsline {table}{\numberline {76}{\ignorespaces Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.}}{187}{table.caption.37}%
+\contentsline {subsection}{\numberline {13.c}Received, stored, and emptied outputs}{192}{subsection.13.3}%
+\contentsline {subsection}{\numberline {13.d}Manure composition updates}{193}{subsection.13.4}%
+\contentsline {table}{\numberline {77}{\ignorespaces Calculated manure storage variables and their units}}{194}{table.77}%
+\contentsline {section}{\numberline {14}Open Lot}{195}{section.14}%
+\contentsline {subsection}{\numberline {14.a}Introduction}{195}{subsection.14.1}%
+\contentsline {table}{\numberline {78}{\ignorespaces Classes available in open lots.}}{196}{table.caption.38}%
+\contentsline {table}{\numberline {79}{\ignorespaces Required inputs for the open lots section}}{196}{table.caption.39}%
+\contentsline {subsection}{\numberline {14.b}Methodology}{197}{subsection.14.2}%
+\contentsline {subsection}{\numberline {14.c}Received, stored, and emptied outputs}{202}{subsection.14.3}%
+\contentsline {subsection}{\numberline {14.d}Manure composition updates}{203}{subsection.14.4}%
+\contentsline {table}{\numberline {80}{\ignorespaces Calculated manure storage variables and their units}}{203}{table.80}%
+\contentsline {section}{\numberline {15}Composting}{205}{section.15}%
+\contentsline {subsection}{\numberline {15.a}Introduction}{205}{subsection.15.1}%
+\contentsline {table}{\numberline {81}{\ignorespaces Classes available in composting.}}{205}{table.caption.40}%
+\contentsline {table}{\numberline {82}{\ignorespaces Required inputs for the composting section (refreshed\_manure\_management.json)}}{206}{table.caption.41}%
+\contentsline {subsection}{\numberline {15.b}Methodology}{207}{subsection.15.2}%
+\contentsline {table}{\numberline {83}{\ignorespaces Methane conversion factor values for compost pens, based on composting method and average annual air temperature.}}{207}{table.caption.42}%
+\contentsline {table}{\numberline {84}{\ignorespaces NH\textsubscript {3}-N emission factors for compost by composting method.}}{211}{table.caption.43}%
+\contentsline {table}{\numberline {85}{\ignorespaces N\textsubscript {2}O-N emission factors for compost by composting method.}}{212}{table.caption.45}%
+\contentsline {subsection}{\numberline {15.c}Received, stored, and emptied outputs}{212}{subsection.15.3}%
+\contentsline {subsection}{\numberline {15.d}Manure composition updates}{213}{subsection.15.4}%
+\contentsline {table}{\numberline {86}{\ignorespaces Manure storage variable calculations}}{213}{table.86}%
+\contentsline {section}{\numberline {16}Daily spread}{215}{section.16}%
+\contentsline {subsection}{\numberline {16.a}Introduction}{215}{subsection.16.1}%
+\contentsline {table}{\numberline {87}{\ignorespaces List of classes for daily spread.}}{215}{table.caption.46}%
+\contentsline {table}{\numberline {88}{\ignorespaces Required inputs for the daily spread section (refreshed\_manure\_management.json)}}{215}{table.caption.47}%
+\contentsline {section}{\numberline {17}Manure to Soil and Crop Module Connection}{217}{section.17}%
+\contentsline {subsection}{\numberline {17.a}Introduction}{217}{subsection.17.1}%
+\contentsline {subsection}{\numberline {17.b}Implementation in RuFaS}{217}{subsection.17.2}%
+\contentsline {figure}{\numberline {8}{\ignorespaces \relax }}{218}{figure.caption.48}%
+\contentsline {subsection}{\numberline {17.c}Methodology}{218}{subsection.17.3}%
+\contentsline {section}{\numberline {18}Key Constants}{221}{section.18}%
+\contentsline {table}{\numberline {89}{\ignorespaces The key constants for all equations in the Manure Module}}{221}{table.89}%
+\contentsline {section}{\numberline {19}References}{224}{section.19}%
+\contentsline {part}{IV\hspace {1em}Soil and Crop Module}{226}{part.4}%
 \etoc@startlocaltoc {8}
 \etoc@startlocaltoc {9}
 \etoc@startlocaltoc {10}
-\contentsline {section}{\numberline {20}Module Introduction}{230}{section.20}%
-\contentsline {section}{\numberline {21}Field Management}{230}{section.21}%
-\contentsline {subsection}{\numberline {21.a}Introduction}{230}{subsection.21.1}%
-\contentsline {paragraph}{Setting up Field Management}{230}{subsection.21.1}%
-\contentsline {paragraph}{Field Management Initialization}{230}{subsection.21.1}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Example of the metadata input file.}}{231}{figure.caption.49}%
-\contentsline {paragraph}{Field Setup and Initialization}{231}{figure.caption.49}%
-\contentsline {paragraph}{Required Inputs}{232}{figure.caption.49}%
-\contentsline {table}{\numberline {90}{\ignorespaces Required user inputs for the FieldManager section.}}{232}{table.90}%
-\contentsline {subsection}{\numberline {21.b}Methodology}{238}{subsection.21.2}%
-\contentsline {paragraph}{Daily Field Management}{239}{subsection.21.2}%
-\contentsline {paragraph}{Fertilizer Application}{240}{subsection.21.2}%
-\contentsline {paragraph}{Where:}{240}{subsection.21.2}%
+\contentsline {section}{\numberline {20}Module Introduction}{229}{section.20}%
+\contentsline {section}{\numberline {21}Field Management}{229}{section.21}%
+\contentsline {subsection}{\numberline {21.a}Introduction}{229}{subsection.21.1}%
+\contentsline {paragraph}{Setting up Field Management}{229}{subsection.21.1}%
+\contentsline {paragraph}{Field Management Initialization}{229}{subsection.21.1}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Example of the metadata input file.}}{230}{figure.caption.49}%
+\contentsline {paragraph}{Field Setup and Initialization}{230}{figure.caption.49}%
+\contentsline {paragraph}{Required Inputs}{231}{figure.caption.49}%
+\contentsline {table}{\numberline {90}{\ignorespaces Required user inputs for the FieldManager section.}}{231}{table.90}%
+\contentsline {subsection}{\numberline {21.b}Methodology}{237}{subsection.21.2}%
+\contentsline {paragraph}{Daily Field Management}{238}{subsection.21.2}%
+\contentsline {paragraph}{Fertilizer Application}{239}{subsection.21.2}%
+\contentsline {paragraph}{Where:}{239}{subsection.21.2}%
+\contentsline {paragraph}{Where:}{239}{subsection.21.2}%
 \contentsline {paragraph}{Where:}{240}{subsection.21.2}%
 \contentsline {paragraph}{Where:}{241}{subsection.21.2}%
+\contentsline {paragraph}{Manure Application}{241}{subsection.21.2}%
 \contentsline {paragraph}{Where:}{242}{subsection.21.2}%
-\contentsline {paragraph}{Manure Application}{242}{subsection.21.2}%
+\contentsline {paragraph}{Surface Manure Application}{242}{subsection.21.2}%
+\contentsline {paragraph}{Where:}{242}{subsection.21.2}%
+\contentsline {paragraph}{Surface Phosphorus Application}{242}{subsection.21.2}%
 \contentsline {paragraph}{Where:}{243}{subsection.21.2}%
-\contentsline {paragraph}{Surface Manure Application}{243}{subsection.21.2}%
-\contentsline {paragraph}{Where:}{243}{subsection.21.2}%
-\contentsline {paragraph}{Surface Phosphorus Application}{243}{subsection.21.2}%
+\contentsline {paragraph}{Surface Nitrogen Application}{243}{subsection.21.2}%
 \contentsline {paragraph}{Where:}{244}{subsection.21.2}%
-\contentsline {paragraph}{Surface Nitrogen Application}{244}{subsection.21.2}%
-\contentsline {paragraph}{Where:}{245}{subsection.21.2}%
-\contentsline {paragraph}{Subsurface Manure Application}{245}{subsection.21.2}%
-\contentsline {paragraph}{Tillage Application}{246}{subsection.21.2}%
-\contentsline {paragraph}{Initiate Daily Biophysical Processes}{246}{subsection.21.2}%
-\contentsline {paragraph}{Crop Management}{246}{subsection.21.2}%
-\contentsline {section}{\numberline {22}Soil Management}{246}{section.22}%
-\contentsline {subsection}{\numberline {22.a}Introduction}{246}{subsection.22.1}%
-\contentsline {paragraph}{Soil Initialization}{247}{subsection.22.1}%
-\contentsline {paragraph}{Required Inputs}{248}{subsection.22.1}%
-\contentsline {table}{\numberline {91}{\ignorespaces Required inputs for the Soil section.}}{248}{table.91}%
-\contentsline {subsection}{\numberline {22.b}Methodology}{251}{subsection.22.2}%
-\contentsline {paragraph}{Soil Temperature}{251}{subsection.22.2}%
-\contentsline {paragraph}{Infiltration (implemented in infiltration.py)}{253}{subsection.22.2}%
-\contentsline {paragraph}{Evapotranspiration}{255}{subsection.22.2}%
-\contentsline {paragraph}{Potential Evapotranspiration (Implemented in field.py)}{256}{subsection.22.2}%
-\contentsline {paragraph}{Percolation (implemented in percolation.py)}{258}{subsection.22.2}%
-\contentsline {subsection}{\numberline {22.c}Soil Erosion (Implemented as soil\_erosion.py)}{259}{subsection.22.3}%
-\contentsline {paragraph}{Base Equation, Rainfall Intensity, and Peak Runoff}{259}{subsection.22.3}%
-\contentsline {subsection}{\numberline {22.d}Soil Nitrogen Cycling}{263}{subsection.22.4}%
-\contentsline {paragraph}{Nitrification and Volatilization (Implemented in nitirification\_volatilization.py)}{265}{subsection.22.4}%
-\contentsline {paragraph}{N loss in leaching and runoff (Implemented in leaching\_runoff\_erosion.py)}{267}{subsection.22.4}%
-\contentsline {paragraph}{N erosion (Implemented in leaching\_runoff\_erosion.py)}{268}{subsection.22.4}%
-\contentsline {paragraph}{Denitrification (Implemented in denitrification.py)}{269}{subsection.22.4}%
-\contentsline {subsection}{\numberline {22.e}Soil Phosphorus Cycling}{273}{subsection.22.5}%
-\contentsline {paragraph}{Phosphorus Initialization (Implemented in layer\_data.py)}{273}{subsection.22.5}%
-\contentsline {paragraph}{Soluble Phosphorus (Implemented in soluble\_phosphorus.py)}{274}{subsection.22.5}%
-\contentsline {paragraph}{Soluble Phosphorus Runoff}{274}{subsection.22.5}%
-\contentsline {paragraph}{Soluble Phosphorus Leaching}{275}{subsection.22.5}%
-\contentsline {paragraph}{Fertilizer Leaching and Runoff (Implemented in fertilizer.py)}{276}{subsection.22.5}%
-\contentsline {paragraph}{Available Fertilizer P pool }{276}{subsection.22.5}%
-\contentsline {paragraph}{Manure Decomposition (implemented in manure\_pool.py)}{280}{subsection.22.5}%
-\contentsline {paragraph}{Manure Runoff (implemented in manure\_pool.py)}{283}{subsection.22.5}%
-\contentsline {subsection}{\numberline {22.f}Soil Carbon Cycling}{286}{subsection.22.6}%
-\contentsline {paragraph}{Soil Carbon Partitioning (implemented in carbon\_cycle.py)}{286}{subsection.22.6}%
-\contentsline {paragraph}{Decomposition (implemented in decomposition.py)}{287}{subsection.22.6}%
-\contentsline {paragraph}{Residue Partitioning (implemented in residue\_partitioning.py)}{290}{subsection.22.6}%
-\contentsline {paragraph}{Above Ground: Lignin, Metabolic C, Structural C}{291}{subsection.22.6}%
-\contentsline {paragraph}{Pool and Gas Partitioning (implemented in pool\_gas\_partition.py)}{295}{subsection.22.6}%
-\contentsline {section}{\numberline {23}Crop Management}{299}{section.23}%
-\contentsline {subsection}{\numberline {23.a}Introduction}{299}{subsection.23.1}%
-\contentsline {paragraph}{Planting and Initialization}{300}{subsection.23.1}%
-\contentsline {paragraph}{Daily Biophysical Processes}{300}{subsection.23.1}%
-\contentsline {paragraph}{Harvest}{300}{subsection.23.1}%
-\contentsline {subsection}{\numberline {23.b}Methodology}{300}{subsection.23.2}%
-\contentsline {paragraph}{Crop Water Cycle Daily Updates}{300}{subsection.23.2}%
-\contentsline {paragraph}{Crop Evaporation}{300}{subsection.23.2}%
-\contentsline {paragraph}{Crop Canopy Water}{300}{subsection.23.2}%
-\contentsline {paragraph}{Crop Potential Transpiration}{301}{subsection.23.2}%
-\contentsline {paragraph}{Potential Water Uptake}{301}{subsection.23.2}%
-\contentsline {paragraph}{Actual water uptake}{302}{subsection.23.2}%
-\contentsline {paragraph}{Maturity}{303}{subsection.23.2}%
-\contentsline {paragraph}{Dormancy}{304}{subsection.23.2}%
-\contentsline {paragraph}{Accumulation of Heat Units}{305}{subsection.23.2}%
-\contentsline {paragraph}{Root Development}{306}{Item.55}%
-\contentsline {paragraph}{Potential Nitrogen Uptake}{306}{Item.55}%
-\contentsline {paragraph}{Actual Nitrogen Uptake}{308}{Item.55}%
-\contentsline {paragraph}{Nitrogen Fixation}{309}{Item.55}%
-\contentsline {paragraph}{Store Nitrogen in Plant}{310}{Item.55}%
-\contentsline {paragraph}{Water stress}{312}{Item.55}%
-\contentsline {paragraph}{Temperature stress}{312}{Item.55}%
-\contentsline {paragraph}{Nitrogen and Phosphorus Stress}{313}{Item.55}%
-\contentsline {part}{V\hspace {1em}Feed Storage Module}{320}{part.5}%
+\contentsline {paragraph}{Subsurface Manure Application}{244}{subsection.21.2}%
+\contentsline {paragraph}{Tillage Application}{245}{subsection.21.2}%
+\contentsline {paragraph}{Initiate Daily Biophysical Processes}{245}{subsection.21.2}%
+\contentsline {paragraph}{Crop Management}{245}{subsection.21.2}%
+\contentsline {section}{\numberline {22}Soil Management}{245}{section.22}%
+\contentsline {subsection}{\numberline {22.a}Introduction}{245}{subsection.22.1}%
+\contentsline {paragraph}{Soil Initialization}{246}{subsection.22.1}%
+\contentsline {paragraph}{Required Inputs}{247}{subsection.22.1}%
+\contentsline {table}{\numberline {91}{\ignorespaces Required inputs for the Soil section.}}{247}{table.91}%
+\contentsline {subsection}{\numberline {22.b}Methodology}{250}{subsection.22.2}%
+\contentsline {paragraph}{Soil Temperature}{250}{subsection.22.2}%
+\contentsline {paragraph}{Infiltration (implemented in infiltration.py)}{252}{subsection.22.2}%
+\contentsline {paragraph}{Evapotranspiration}{254}{subsection.22.2}%
+\contentsline {paragraph}{Potential Evapotranspiration (Implemented in field.py)}{255}{subsection.22.2}%
+\contentsline {paragraph}{Percolation (implemented in percolation.py)}{257}{subsection.22.2}%
+\contentsline {subsection}{\numberline {22.c}Soil Erosion (Implemented as soil\_erosion.py)}{258}{subsection.22.3}%
+\contentsline {paragraph}{Base Equation, Rainfall Intensity, and Peak Runoff}{258}{subsection.22.3}%
+\contentsline {subsection}{\numberline {22.d}Soil Nitrogen Cycling}{262}{subsection.22.4}%
+\contentsline {paragraph}{Nitrification and Volatilization (Implemented in nitirification\_volatilization.py)}{264}{subsection.22.4}%
+\contentsline {paragraph}{N loss in leaching and runoff (Implemented in leaching\_runoff\_erosion.py)}{266}{subsection.22.4}%
+\contentsline {paragraph}{N erosion (Implemented in leaching\_runoff\_erosion.py)}{267}{subsection.22.4}%
+\contentsline {paragraph}{Denitrification (Implemented in denitrification.py)}{268}{subsection.22.4}%
+\contentsline {subsection}{\numberline {22.e}Soil Phosphorus Cycling}{272}{subsection.22.5}%
+\contentsline {paragraph}{Phosphorus Initialization (Implemented in layer\_data.py)}{272}{subsection.22.5}%
+\contentsline {paragraph}{Soluble Phosphorus (Implemented in soluble\_phosphorus.py)}{273}{subsection.22.5}%
+\contentsline {paragraph}{Soluble Phosphorus Runoff}{273}{subsection.22.5}%
+\contentsline {paragraph}{Soluble Phosphorus Leaching}{274}{subsection.22.5}%
+\contentsline {paragraph}{Fertilizer Leaching and Runoff (Implemented in fertilizer.py)}{275}{subsection.22.5}%
+\contentsline {paragraph}{Available Fertilizer P pool }{275}{subsection.22.5}%
+\contentsline {paragraph}{Manure Decomposition (implemented in manure\_pool.py)}{279}{subsection.22.5}%
+\contentsline {paragraph}{Manure Runoff (implemented in manure\_pool.py)}{282}{subsection.22.5}%
+\contentsline {subsection}{\numberline {22.f}Soil Carbon Cycling}{285}{subsection.22.6}%
+\contentsline {paragraph}{Soil Carbon Partitioning (implemented in carbon\_cycle.py)}{285}{subsection.22.6}%
+\contentsline {paragraph}{Decomposition (implemented in decomposition.py)}{286}{subsection.22.6}%
+\contentsline {paragraph}{Residue Partitioning (implemented in residue\_partitioning.py)}{289}{subsection.22.6}%
+\contentsline {paragraph}{Above Ground: Lignin, Metabolic C, Structural C}{290}{subsection.22.6}%
+\contentsline {paragraph}{Pool and Gas Partitioning (implemented in pool\_gas\_partition.py)}{294}{subsection.22.6}%
+\contentsline {section}{\numberline {23}Crop Management}{298}{section.23}%
+\contentsline {subsection}{\numberline {23.a}Introduction}{298}{subsection.23.1}%
+\contentsline {paragraph}{Planting and Initialization}{299}{subsection.23.1}%
+\contentsline {paragraph}{Daily Biophysical Processes}{299}{subsection.23.1}%
+\contentsline {paragraph}{Harvest}{299}{subsection.23.1}%
+\contentsline {subsection}{\numberline {23.b}Methodology}{299}{subsection.23.2}%
+\contentsline {paragraph}{Crop Water Cycle Daily Updates}{299}{subsection.23.2}%
+\contentsline {paragraph}{Crop Evaporation}{299}{subsection.23.2}%
+\contentsline {paragraph}{Crop Canopy Water}{299}{subsection.23.2}%
+\contentsline {paragraph}{Crop Potential Transpiration}{300}{subsection.23.2}%
+\contentsline {paragraph}{Potential Water Uptake}{300}{subsection.23.2}%
+\contentsline {paragraph}{Actual water uptake}{301}{subsection.23.2}%
+\contentsline {paragraph}{Maturity}{302}{subsection.23.2}%
+\contentsline {paragraph}{Dormancy}{303}{subsection.23.2}%
+\contentsline {paragraph}{Accumulation of Heat Units}{304}{subsection.23.2}%
+\contentsline {paragraph}{Root Development}{305}{Item.55}%
+\contentsline {paragraph}{Potential Nitrogen Uptake}{305}{Item.55}%
+\contentsline {paragraph}{Actual Nitrogen Uptake}{307}{Item.55}%
+\contentsline {paragraph}{Nitrogen Fixation}{308}{Item.55}%
+\contentsline {paragraph}{Store Nitrogen in Plant}{309}{Item.55}%
+\contentsline {paragraph}{Water stress}{311}{Item.55}%
+\contentsline {paragraph}{Temperature stress}{311}{Item.55}%
+\contentsline {paragraph}{Nitrogen and Phosphorus Stress}{312}{Item.55}%
+\contentsline {part}{V\hspace {1em}Feed Storage Module}{319}{part.5}%
 \etoc@startlocaltoc {11}
 \etoc@startlocaltoc {12}
 \etoc@startlocaltoc {13}
-\contentsline {section}{\numberline {24}Module Introduction}{323}{section.24}%
-\contentsline {subsection}{\numberline {24.a}Feed Quality Assessment}{323}{subsection.24.1}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Farm grown feed allocation to cattle groups }}{323}{figure.caption.51}%
-\contentsline {section}{\numberline {25}Feed Storage Inputs}{324}{section.25}%
-\contentsline {section}{\numberline {26}Storage Classifications}{324}{section.26}%
-\contentsline {subsection}{\numberline {26.a}Grain}{324}{subsection.26.1}%
-\contentsline {subsection}{\numberline {26.b}Hay}{325}{subsection.26.2}%
-\contentsline {table}{\numberline {92}{\ignorespaces Hay storage types and associated fractional loss coefficients}}{326}{table.caption.52}%
-\contentsline {table}{\numberline {93}{\ignorespaces Protected and unprotected storage, nutrients, and associated fractional loss coefficients}}{327}{table.caption.53}%
-\contentsline {subsection}{\numberline {26.c}Silage}{327}{subsection.26.3}%
-\contentsline {table}{\numberline {94}{\ignorespaces Silage and the fractional loss coefficients}}{328}{table.caption.54}%
-\contentsline {subsection}{\numberline {26.d}Baleage}{330}{subsection.26.4}%
-\contentsline {subsection}{\numberline {26.e}Nutrient Composition}{330}{subsection.26.5}%
-\contentsline {section}{\numberline {27}References}{331}{section.27}%
-\contentsline {part}{VI\hspace {1em}Abbreviations}{332}{part.6}%
-\contentsline {table}{\numberline {95}{\ignorespaces Common abbreviations used throughout this document}}{332}{table.95}%
+\contentsline {section}{\numberline {24}Module Introduction}{322}{section.24}%
+\contentsline {subsection}{\numberline {24.a}Feed Quality Assessment}{322}{subsection.24.1}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Farm grown feed allocation to cattle groups }}{322}{figure.caption.51}%
+\contentsline {section}{\numberline {25}Feed Storage Inputs}{323}{section.25}%
+\contentsline {section}{\numberline {26}Storage Classifications}{323}{section.26}%
+\contentsline {subsection}{\numberline {26.a}Grain}{323}{subsection.26.1}%
+\contentsline {subsection}{\numberline {26.b}Hay}{324}{subsection.26.2}%
+\contentsline {table}{\numberline {92}{\ignorespaces Hay storage types and associated fractional loss coefficients}}{325}{table.caption.52}%
+\contentsline {table}{\numberline {93}{\ignorespaces Protected and unprotected storage, nutrients, and associated fractional loss coefficients}}{326}{table.caption.53}%
+\contentsline {subsection}{\numberline {26.c}Silage}{326}{subsection.26.3}%
+\contentsline {table}{\numberline {94}{\ignorespaces Silage and the fractional loss coefficients}}{327}{table.caption.54}%
+\contentsline {subsection}{\numberline {26.d}Baleage}{329}{subsection.26.4}%
+\contentsline {subsection}{\numberline {26.e}Nutrient Composition}{329}{subsection.26.5}%
+\contentsline {section}{\numberline {27}References}{330}{section.27}%
+\contentsline {part}{VI\hspace {1em}Abbreviations}{331}{part.6}%
+\contentsline {table}{\numberline {95}{\ignorespaces Common abbreviations used throughout this document}}{331}{table.95}%
