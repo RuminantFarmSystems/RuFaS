@@ -1,0 +1,96 @@
+[metadata]
+name = "Scenario A"
+date = "2026-03-18"
+years_collected = [
+  2018,
+  2020,
+  2021,
+]
+
+[metadata.author]
+name = "Clay Morrow"
+email = "25436787+morrowcj@users.noreply.github.com"
+affiliation = "RUFAS"
+
+[configuration]
+start = [
+  2013,
+  1,
+]
+end = [
+  2019,
+  365,
+]
+task_type = "SIMULATION_SINGLE_RUN"
+seed = 42
+exclude_info_maps = true
+sub-configs = []
+
+[[pool.animal.pens]]
+name = "first pen"
+cow_names = [
+  "bessy",
+  "sally",
+  "meridith",
+  "billy",
+]
+
+[pool.animal.pens.nicknames]
+bessy = "sleepy"
+sally = "softy"
+meridith = "m-dith"
+billy = "jennifer"
+
+[[pool.animal.pens]]
+name = "second pen"
+cow_names = [
+  "finn",
+  "jake",
+  "marcy",
+  "betty",
+  "simon",
+]
+
+[pool.field]
+custom_crops = [
+  { id = "my_corn", template = "corn_grain", minimum_temperature = 8.5 },
+]
+
+[pool.field.rotation]
+pattern_start = [
+  2015,
+  1,
+]
+
+[[pool.field.rotation.pattern]]
+crop = "corn_silage"
+plant_days = [
+  127,
+]
+harvest_days = [
+  263,
+]
+
+[[pool.field.rotation.pattern]]
+crop = "alfalfa_silage"
+plant_days = [
+  89,
+]
+harvest_days = [
+  [
+    120,
+    150,
+    179,
+    210,
+    242,
+  ],
+]
+
+[[pool.field.rotation.pattern]]
+crop = "my_corn"
+plant_days = [
+  130,
+]
+harvest_days = [
+  265,
+]
