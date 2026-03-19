@@ -93,8 +93,26 @@ class UserInput:
         """load default data from globals"""
         self.data = DEFAULT_DATA
 
+    def load_data_file(self, path: str | Path):
+        """load data from file"""
+        path = Path(path)
+        if path.suffix == ".pkl":
+            with open(path, "rb") as f:
+                self.data = pickle.load(f)
+        elif path.suffix == ".json":
+            with open(path, "r") as f:
+                self.data = json.load(f)
+        elif path.suffix == ".toml":
+            with open(path, "rb") as f:
+                self.data = tomli_w.load(f)
+        else:
+            raise Exception(f"Unsupported input format: {path.suffix}")
+
     def get_data(self):
         return self.data
+
+    def wipe_data(self):
+        self.data = None
 
     def write_data(self, path: str | Path = None, mkdir=True):
         if path is None:
@@ -125,3 +143,6 @@ if __name__ == '__main__':
     UI.write_data("_internal/defaults.pkl")
     UI.write_data("_internal/defaults.json")
     UI.write_data("_internal/defaults.toml")
+
+    UI.wipe_data()
+    UI.load_data_file("_internal/defaults.pkl")
