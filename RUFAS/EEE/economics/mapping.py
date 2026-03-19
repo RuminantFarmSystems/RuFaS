@@ -1,6 +1,6 @@
 """Hardcoded economics mapping derived from input/data/EEE/economics_map.json.
 
-This file is auto-generated to decouple the economics preprocessing from runtime JSON loading.
+This file is generated to decouple the economics preprocessing from runtime JSON loading.
 """
 
 from __future__ import annotations
@@ -12,49 +12,49 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         "Costs": {
             "Animal - Labor hours": {
                 "input_manager": ["economic_inputs.Animal.labor_hours_per_day"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
                 "future_expansion": "more " "subcategories, " "e.g. vet, " "milker",
                 "notes": "",
             },
             "Animal investment - Diesel consumption": {
                 "input_manager": ["economic_inputs.Animal.diesel_liters_per_day"],
-                "economics_files": ["commodity_prices.diesel-dollar_per_liter"],
+                "economics_files": ["commodity_prices_diesel_dollar_per_liter"],
                 "notes": "",
             },
             "Animal investment - Electricity consumption": {
                 "input_manager": ["economic_inputs.Animal.electricity_kwh_per_day"],
-                "economics_files": ["commodity_prices.elec_industrial-dollar_per_kwh"],
+                "economics_files": ["commodity_prices_elec_industrial_dollar_per_kwh"],
                 "notes": "",
             },
             "Animal investment - Gasoline consumption": {
                 "input_manager": ["economic_inputs.Animal.gasoline_liters_per_day"],
-                "economics_files": ["commodity_prices.gasoline-dollar_per_liter"],
+                "economics_files": ["commodity_prices_gasoline_dollar_per_liter"],
                 "notes": "",
             },
             "Animal investment - Natural gas consumption": {
                 "input_manager": ["economic_inputs.Animal.natural_gas_megajoule_per_day"],
-                "economics_files": ["commodity_prices.natgas_industrial-dollar_per_megajoule"],
+                "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
                 "notes": "",
             },
             "Animal investment - Propane consumption": {
                 "input_manager": ["economic_inputs.Animal.propane_liters_per_day"],
-                "economics_files": ["commodity_prices.propane_wholesale-dollar_per_liter"],
+                "economics_files": ["commodity_prices_propane_wholesale_dollar_per_liter"],
                 "notes": "",
             },
             "Animal investment - Water consumption": {
                 "input_manager": ["economic_inputs.Animal.water_cubic_meter_per_day"],
-                "economics_files": ["commodity_prices.water_municipal-dollar_per_cubic_meter"],
+                "economics_files": ["commodity_prices_water_municipal_dollar_per_cubic_meter"],
                 "notes": "",
             },
             "Bedding requirements": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
                 "economics_files": {
-                    "CBPB": "commodity_prices.bedding_compost_bedded_pack.dollar_per_head",
+                    "CBPB": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head",
                     "input_manager_location": "animal.pen_information.*.manure_streams.0.bedding_name",
-                    "manure_solids": "commodity_prices.bedding_manure_solids.dollar_per_head",
-                    "sand": "commodity_prices.bedding_sand.dollar_per_head",
-                    "sawdust": "commodity_prices.bedding_sawdust.dollar_per_head",
-                    "staw": "commodity_prices.bedding_straw.dollar_per_head",
+                    "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
+                    "sand": "commodity_prices_bedding_sand_dollar_per_head",
+                    "sawdust": "commodity_prices_bedding_sawdust_dollar_per_head",
+                    "staw": "commodity_prices_bedding_straw_dollar_per_head",
                 },
                 "preprocessing": "dollar per "
                 "head is "
@@ -71,7 +71,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Purchased heifers": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"],
-                "economics_files": ["commodity_prices.cow_dairy_heifer_bred_t3-dollar_per_animal"],
+                "economics_files": ["commodity_prices_cow_dairy_heifer_bred_t3_dollar_per_animal"],
             },
             "Semen purchased": {
                 "biophysical_simulation": [
@@ -79,10 +79,10 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "AnimalModuleReporter._record_cows_conception_rate.cow_total_num_ai_performed",
                 ],
                 "economics_files": {
-                    "beef": "commodity_prices.semen_beef.dollar_per_straw",
-                    "conventional": "commodity_prices.semen_conventional-dollar_per_straw",
+                    "beef": "commodity_prices_semen_beef_dollar_per_straw",
+                    "conventional": "commodity_prices_semen_conventional_dollar_per_straw",
                     "input_manager_location": "animal.animal_config.management_decisions.semen_type",
-                    "sexed": "commodity_prices.semen_sexed.dollar_per_straw",
+                    "sexed": "commodity_prices_semen_sexed_dollar_per_straw",
                 },
                 "preprocessing": "daily sum of both " "biophysical " "outputs, select " "econ file from " "user input",
                 "processing": "",
@@ -93,7 +93,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "biophysical_simulation": [
                     "AnimalModuleReporter.report_enteric_methane_emission.enteric_methane_emission.*"
                 ],
-                "economics_files": ["commodity_prices.carbon_credits_enteric-dollar_per_tonne_CO2e"],
+                "economics_files": ["commodity_prices_carbon_credits_enteric_dollar_per_tonne_CO2e"],
                 "notes": "Sum "
                 "across "
                 "all "
@@ -114,7 +114,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "FPCM (Milk Production)": {
                 "biophysical_simulation": ["Economic_preprocessing.Animal.FPCM"],
-                "economics_files": ["commodity_prices.milk_retail-dollar_per_liter"],
+                "economics_files": ["commodity_prices_milk_retail_dollar_per_liter"],
                 "preprocessing": "FPCM "
                 "calculation "
                 "from raw "
@@ -129,13 +129,13 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "biophysical_simulation": [
                     "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.sold_calves_sold_weight"
                 ],
-                "economics_files": ["commodity_prices.calves_all-dollar_per_kilogram"],
+                "economics_files": ["commodity_prices_calves_all_dollar_per_kilogram"],
             },
             "Sold cows": {
                 "biophysical_simulation": [
                     "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.sold_cows_sold_count"
                 ],
-                "economics_files": ["commodity_prices.cows_milk-dollar_per_animal"],
+                "economics_files": ["commodity_prices_cows_milk_dollar_per_animal"],
                 "preprocessing": "sum number sold",
             },
             "Sold heifer IIIs": {
@@ -143,14 +143,14 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferII_num",
                     "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferIII_oversupply_num",
                 ],
-                "economics_files": ["commodity_prices.cow_dairy_heifer_bred_t3-dollar_per_animal"],
+                "economics_files": ["commodity_prices_cow_dairy_heifer_bred_t3_dollar_per_animal"],
                 "preprocessing": "sum from both " "biophysical " "simulation " "locations",
             },
             "Sold heifer IIs": {
                 "biophysical_simulation": [
                     "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferII_sold_weight"
                 ],
-                "economics_files": ["commodity_prices.cow_dairy_heifer_open-dollar_per_animal"],
+                "economics_files": ["commodity_prices_cow_dairy_heifer_open_dollar_per_animal"],
             },
         },
     },
@@ -158,34 +158,34 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         "Costs": {
             "Feed storage - Labor hours": {
                 "input_manager": ["economic_inputs.Feed_storage.labor_hours_per_day"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
             "Purchased feed costs": {
                 "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_*_cost"],
                 "economics_files": [
-                    "commodity_prices.alfalfa_hay-dollar_per_kilogram",
-                    "commodity_prices.alfalfa_silage-dollar_per_kilogram",
-                    "commodity_prices.almond_hulls-dollar_per_kilogram",
-                    "commodity_prices.barley_silage-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_hulls-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_meal-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_whole-dollar_per_kilogram",
-                    "commodity_prices.corn_grain-dollar_per_kilogram",
-                    "commodity_prices.corn_silage-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_dried_10pct-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_modified_wet_50pct-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_wet_65pct-dollar_per_kilogram",
-                    "commodity_prices.hay_excluding_alfalfa-dollar_per_kilogram",
-                    "commodity_prices.hay_all-dollar_per_kilogram",
-                    "commodity_prices.rye_grain-dollar_per_kilogram",
-                    "commodity_prices.soybean_grain-dollar_per_kilogram",
-                    "commodity_prices.soybean_hulls-dollar_per_kilogram",
-                    "commodity_prices.soybean_meal-dollar_per_kilogram",
-                    "commodity_prices.sundan_silage-dollar_per_kilogram",
-                    "commodity_prices.winter_wheat_grain-dollar_per_kilogram",
-                    "commodity_prices.calcium_phosphate_di-dollar_per_kilogram",
-                    "commodity_prices.calf_starter_18cp-dollar_per_kilogram",
-                    "commodity_prices.limestone-dollar_per_kilogram",
+                    "commodity_prices_alfalfa_hay_dollar_per_kilogram",
+                    "commodity_prices_alfalfa_silage_dollar_per_kilogram",
+                    "commodity_prices_almond_hulls_dollar_per_kilogram",
+                    "commodity_prices_barley_silage_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_hulls_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_meal_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_whole_dollar_per_kilogram",
+                    "commodity_prices_corn_grain_dollar_per_kilogram",
+                    "commodity_prices_corn_silage_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_dried_10pct_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_modified_wet_50pct_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_wet_65pct_dollar_per_kilogram",
+                    "commodity_prices_hay_excluding_alfalfa_dollar_per_kilogram",
+                    "commodity_prices_hay_all_dollar_per_kilogram",
+                    "commodity_prices_rye_grain_dollar_per_kilogram",
+                    "commodity_prices_soybean_grain_dollar_per_kilogram",
+                    "commodity_prices_soybean_hulls_dollar_per_kilogram",
+                    "commodity_prices_soybean_meal_dollar_per_kilogram",
+                    "commodity_prices_sundan_silage_dollar_per_kilogram",
+                    "commodity_prices_winter_wheat_grain_dollar_per_kilogram",
+                    "commodity_prices_calcium_phosphate_di_dollar_per_kilogram",
+                    "commodity_prices_calf_starter_18cp_dollar_per_kilogram",
+                    "commodity_prices_limestone_dollar_per_kilogram",
                 ],
                 "future_expansion": "cases "
                 "where "
@@ -203,7 +203,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "all "
                 "end "
                 "in "
-                "'.dollar_per_kilogram', "
+                "'_dollar_per_kilogram', "
                 "compare "
                 "price "
                 "in "
@@ -305,29 +305,29 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Feed_sales": {
                 "biophysical_simulation": ["CropManagement._record_yield.harvest_yield.field='field_.*'"],
                 "economics_files": [
-                    "commodity_prices.alfalfa_hay-dollar_per_kilogram",
-                    "commodity_prices.alfalfa_silage-dollar_per_kilogram",
-                    "commodity_prices.almond_hulls-dollar_per_kilogram",
-                    "commodity_prices.barley_silage-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_hulls-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_meal-dollar_per_kilogram",
-                    "commodity_prices.cotton_seed_whole-dollar_per_kilogram",
-                    "commodity_prices.corn_grain-dollar_per_kilogram",
-                    "commodity_prices.corn_silage-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_dried_10pct-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_modified_wet_50pct-dollar_per_kilogram",
-                    "commodity_prices.distiller_grains_wet_65pct-dollar_per_kilogram",
-                    "commodity_prices.hay_excluding_alfalfa-dollar_per_kilogram",
-                    "commodity_prices.hay_all-dollar_per_kilogram",
-                    "commodity_prices.rye_grain-dollar_per_kilogram",
-                    "commodity_prices.soybean_grain-dollar_per_kilogram",
-                    "commodity_prices.soybean_hulls-dollar_per_kilogram",
-                    "commodity_prices.soybean_meal-dollar_per_kilogram",
-                    "commodity_prices.sundan_silage-dollar_per_kilogram",
-                    "commodity_prices.winter_wheat_grain-dollar_per_kilogram",
-                    "commodity_prices.calcium_phosphate_di-dollar_per_kilogram",
-                    "commodity_prices.calf_starter_18cp-dollar_per_kilogram",
-                    "commodity_prices.limestone-dollar_per_kilogram",
+                    "commodity_prices_alfalfa_hay_dollar_per_kilogram",
+                    "commodity_prices_alfalfa_silage_dollar_per_kilogram",
+                    "commodity_prices_almond_hulls_dollar_per_kilogram",
+                    "commodity_prices_barley_silage_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_hulls_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_meal_dollar_per_kilogram",
+                    "commodity_prices_cotton_seed_whole_dollar_per_kilogram",
+                    "commodity_prices_corn_grain_dollar_per_kilogram",
+                    "commodity_prices_corn_silage_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_dried_10pct_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_modified_wet_50pct_dollar_per_kilogram",
+                    "commodity_prices_distiller_grains_wet_65pct_dollar_per_kilogram",
+                    "commodity_prices_hay_excluding_alfalfa_dollar_per_kilogram",
+                    "commodity_prices_hay_all_dollar_per_kilogram",
+                    "commodity_prices_rye_grain_dollar_per_kilogram",
+                    "commodity_prices_soybean_grain_dollar_per_kilogram",
+                    "commodity_prices_soybean_hulls_dollar_per_kilogram",
+                    "commodity_prices_soybean_meal_dollar_per_kilogram",
+                    "commodity_prices_sundan_silage_dollar_per_kilogram",
+                    "commodity_prices_winter_wheat_grain_dollar_per_kilogram",
+                    "commodity_prices_calcium_phosphate_di_dollar_per_kilogram",
+                    "commodity_prices_calf_starter_18cp_dollar_per_kilogram",
+                    "commodity_prices_limestone_dollar_per_kilogram",
                 ],
                 "processing?": "Needs to loop "
                 "over each field, "
@@ -344,54 +344,54 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Digester operational costs": {
                 "biophysical_simulation": ["SEE " "NOTES"],
                 "economics_files": [
-                    "commodity_prices.natgas_industrial-dollar_per_megajoule",
-                    "commodity_prices.elec_industrial-dollar_per_kwh",
-                    "commodity_prices.digester_carbon_credits_dollar_per_tonne_CO2e",
+                    "commodity_prices_natgas_industrial_dollar_per_megajoule",
+                    "commodity_prices_elec_industrial_dollar_per_kwh",
+                    "commodity_prices_digester_carbon_credits_dollar_per_tonne_CO2e",
                 ],
                 "notes": "Get outputs " "from methods in " "digester_costs.py",
             },
             "Digester operational costs - Diesel consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.diesel_liters_per_day"],
-                "economics_files": ["commodity_prices.diesel-dollar_per_liter"],
+                "economics_files": ["commodity_prices_diesel_dollar_per_liter"],
                 "notes": "",
             },
             "Digester operational costs - Electricity consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.kwh_per_day"],
                 "economics_files": [
-                    "commodity_prices.elec_residential-dollar_per_kwh",
-                    "commodity_prices.elec_commercial-dollar_per_kwh",
-                    "commodity_prices.elec_industrial-dollar_per_kwh",
+                    "commodity_prices_elec_residential_dollar_per_kwh",
+                    "commodity_prices_elec_commercial_dollar_per_kwh",
+                    "commodity_prices_elec_industrial_dollar_per_kwh",
                 ],
                 "notes": "",
             },
             "Digester operational costs - Gasoline consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.gasoline_liters_per_day"],
-                "economics_files": ["commodity_prices.gasoline-dollar_per_liter"],
+                "economics_files": ["commodity_prices_gasoline_dollar_per_liter"],
                 "notes": "",
             },
             "Digester operational costs - Labor hours": {
                 "input_manager": ["economic_inputs.Manure.digester.labor_hours_per_day"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
                 "notes": "",
             },
             "Digester operational costs - Natural gas consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.megajoules_per_day"],
-                "economics_files": ["commodity_prices.natgas_industrial-dollar_per_megajoule"],
+                "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
                 "notes": "",
             },
             "Digester operational costs - Propane consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.propane_liters_per_day"],
-                "economics_files": ["commodity_prices.propane_wholesale-dollar_per_liter"],
+                "economics_files": ["commodity_prices_propane_wholesale_dollar_per_liter"],
                 "notes": "",
             },
             "Digester operational costs - Water consumption": {
                 "input_manager": ["economic_inputs.Manure.digester.cubic_meters_water_per_day"],
-                "economics_files": ["commodity_prices.water_municipal-dollar_per_cubic_meter"],
+                "economics_files": ["commodity_prices_water_municipal_dollar_per_cubic_meter"],
                 "notes": "",
             },
             "General manure operational costs - Labor hours": {
                 "input_manager": ["economic_inputs.Manure.general.labor_hours"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
                 "notes": "",
             },
             "Manure disposal quantity": {
@@ -414,53 +414,53 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "biophysical_simulation": [
                     "ManureManager._record_manure_request_results.off_farm_manure.total_manure_mass"
                 ],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
+                "economics_files": ["commodity_prices_bedding_manure_solids_dollar_per_head"],
                 "notes": "",
             },
             "Slurry storage operational costs - Diesel consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.diesel_liters_per_day"],
-                "economics_files": ["commodity_prices.diesel-dollar_per_liter"],
+                "economics_files": ["commodity_prices_diesel_dollar_per_liter"],
                 "notes": "",
             },
             "Slurry storage operational costs - Electricity consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.kwh_per_day"],
                 "economics_files": [
-                    "commodity_prices.elec_residential-dollar_per_kwh",
-                    "commodity_prices.elec_commercial-dollar_per_kwh",
-                    "commodity_prices.elec_industrial-dollar_per_kwh",
+                    "commodity_prices_elec_residential_dollar_per_kwh",
+                    "commodity_prices_elec_commercial_dollar_per_kwh",
+                    "commodity_prices_elec_industrial_dollar_per_kwh",
                 ],
                 "notes": "",
             },
             "Slurry storage operational costs - Gasoline consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.gasoline_liters_per_day"],
-                "economics_files": ["commodity_prices.gasoline-dollar_per_liter"],
+                "economics_files": ["commodity_prices_gasoline_dollar_per_liter"],
                 "notes": "",
             },
             "Slurry storage operational costs - Labor hours": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.labor_hours"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
                 "notes": "",
             },
             "Slurry storage operational costs - Natural gas consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.megajoules_per_day"],
-                "economics_files": ["commodity_prices.natgas_industrial-dollar_per_megajoule"],
+                "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
                 "notes": "",
             },
             "Slurry storage operational costs - Propane consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.propane_liters_per_day"],
-                "economics_files": ["commodity_prices.propane_wholesale-dollar_per_liter"],
+                "economics_files": ["commodity_prices_propane_wholesale_dollar_per_liter"],
                 "notes": "",
             },
             "Slurry storage operational costs - Water consumption": {
                 "input_manager": ["economic_inputs.Manure.slurry_storage.cubic_meters_water_per_day"],
-                "economics_files": ["commodity_prices.water_municipal-dollar_per_cubic_meter"],
+                "economics_files": ["commodity_prices_water_municipal_dollar_per_cubic_meter"],
                 "notes": "",
             },
         },
         "Revenue": {
             "Carbon credits from digester products and activities": {
                 "biophysical_simulation": ["see " "future_expansion"],
-                "economics_files": ["commodity_prices.carbon_credits_enteric-dollar_per_tonne_CO2e"],
+                "economics_files": ["commodity_prices_carbon_credits_enteric_dollar_per_tonne_CO2e"],
                 "future_expansion": "Placeholder "
                 "for "
                 "the "
@@ -473,7 +473,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Digester bedding co-product": {
                 "biophysical_simulation": ["see " "future_expansion"],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
+                "economics_files": ["commodity_prices_bedding_manure_solids_dollar_per_head"],
                 "future_expansion": "Placeholder "
                 "for "
                 "the "
@@ -487,9 +487,9 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Digester fertilizer production": {
                 "biophysical_simulation": ["see " "future_expansion"],
                 "economics_files": [
-                    "commodity_prices.net_fertilizer_nitrogen-dollar_per_kilogram",
-                    "commodity_prices.net_fertilizer_phosphorus-dollar_per_kilogram",
-                    "commodity_prices.net_fertilizer_potassium-dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_nitrogen_dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_phosphorus_dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_potassium_dollar_per_kilogram",
                 ],
                 "future_expansion": "Placeholder "
                 "for "
@@ -503,7 +503,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Electricity production from anaerobic digester": {
                 "input_manager": ["economic_inputs.Manure.digester.kwh_per_day_produced"],
-                "economics_files": ["commodity_prices.elec_industrial-dollar_per_kwh"],
+                "economics_files": ["commodity_prices_elec_industrial_dollar_per_kwh"],
                 "future_expansion": "Placeholder "
                 "for "
                 "the "
@@ -516,7 +516,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Renewable natural gas (RNG) production": {
                 "input_manager": ["economic_inputs.Manure.digester.digester_rng_produced"],
-                "economics_files": ["commodity_prices.natgas_industrial-dollar_per_megajoule"],
+                "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
                 "future_expansion": "Placeholder "
                 "for "
                 "the "
@@ -529,7 +529,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Sold manure": {
                 "input_manager": ["economic_inputs.Manure.manure_sales"],
-                "economics_files": ["commodity_prices.bedding_manure_solids.dollar_per_head"],
+                "economics_files": ["commodity_prices_bedding_manure_solids_dollar_per_head"],
                 "future_expansion": "perhaps scale as "
                 "a percentage of "
                 "total manure "
@@ -545,15 +545,15 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         "Costs": {
             "Crop labor hours": {
                 "input_manager": ["economic_inputs.Soil_and_crop.labor_hours_per_day"],
-                "economics_files": ["farm_services.labor_hours-dollar_per_hour"],
+                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
             "Crop water consumption": {
                 "biophysical_simulation": ["FieldDataReporter.send_crop_daily_variables.water_uptake.*"],
-                "economics_files": ["commodity_prices.water_irrigation-dollar_per_cubic_meter"],
+                "economics_files": ["commodity_prices_water_irrigation_dollar_per_cubic_meter"],
             },
             "Land purchase costs": {
                 "input_manager": ["economic_inputs.Soil_and_crop.land_ha_purchased"],
-                "economics_files": ["capital_costs.land_ha.dollar_per_hectare"],
+                "economics_files": ["capital_costs_land_ha_dollar_per_hectare"],
                 "notes": "This 'manual' "
                 "entry in "
                 "Economic_inputs "
@@ -585,11 +585,11 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Land rental costs": {
                 "input_manager": ["economic_inputs.Soil_and_crop.land_ha_rented"],
-                "economics_files": ["farm_services.land_ha_rent-dollar_per_hectare"],
+                "economics_files": ["farm_services_land_ha_rent_dollar_per_hectare"],
             },
             "Nitrogen fertilizer used": {
                 "biophysical_simulation": ["fertilizer_schedule " "SEE " "NOTES"],
-                "economics_files": ["commodity_prices.net_fertilizer_nitrogen-dollar_per_kilogram"],
+                "economics_files": ["commodity_prices_net_fertilizer_nitrogen_dollar_per_kilogram"],
                 "notes": "likely as "
                 "'simple' "
                 "as taking "
@@ -611,15 +611,15 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Other fertilizer types used": {
                 "biophysical_simulation": ["fertilizer_schedule " "SEE " "NOTES"],
                 "economics_files": [
-                    "commodity_prices.net_fertilizer_ammonium_nitrate-dollar_per_kilogram",
-                    "commodity_prices.net_fertilizer_super_phosphate_44to46pct-dollar_per_kilogram",
-                    "commodity_prices.net_fertilizer_urea-dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_ammonium_nitrate_dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_super_phosphate_44to46pct_dollar_per_kilogram",
+                    "commodity_prices_net_fertilizer_urea_dollar_per_kilogram",
                 ],
                 "notes": "Placeholder " "for the " "future",
             },
             "Phosphorus fertilizer used": {
                 "biophysical_simulation": ["fertilizer_schedule " "SEE " "NOTES"],
-                "economics_files": ["commodity_prices.net_fertilizer_phosphorus-dollar_per_kilogram"],
+                "economics_files": ["commodity_prices_net_fertilizer_phosphorus_dollar_per_kilogram"],
                 "notes": "likely "
                 "as "
                 "'simple' "
@@ -645,7 +645,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Potassium fertilizer used": {
                 "biophysical_simulation": ["fertilizer_schedule " "SEE " "NOTES"],
-                "economics_files": ["commodity_prices.net_fertilizer_potassium-dollar_per_kilogram"],
+                "economics_files": ["commodity_prices_net_fertilizer_potassium_dollar_per_kilogram"],
                 "notes": "likely as "
                 "'simple' "
                 "as taking "
@@ -673,16 +673,16 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "field.field_size",
                 ],
                 "economics_files": [
-                    "commodity_prices.*.dollar_per_square_meter",
-                    "commodity_prices.barley_seed-dollar_per_square_meter",
-                    "commodity_prices.corn_seed-dollar_per_square_meter",
-                    "commodity_prices.cotton_seed-dollar_per_square_meter",
-                    "commodity_prices.oat_seed-dollar_per_square_meter",
-                    "commodity_prices.peanut_seed-dollar_per_square_meter",
-                    "commodity_prices.rice_seed-dollar_per_square_meter",
-                    "commodity_prices.sorghum_seed-dollar_per_square_meter",
-                    "commodity_prices.soybean_seed-dollar_per_square_meter",
-                    "commodity_prices.wheat_seed-dollar_per_square_meter",
+                    "commodity_prices_*_dollar_per_square_meter",
+                    "commodity_prices_barley_seed_dollar_per_square_meter",
+                    "commodity_prices_corn_seed_dollar_per_square_meter",
+                    "commodity_prices_cotton_seed_dollar_per_square_meter",
+                    "commodity_prices_oat_seed_dollar_per_square_meter",
+                    "commodity_prices_peanut_seed_dollar_per_square_meter",
+                    "commodity_prices_rice_seed_dollar_per_square_meter",
+                    "commodity_prices_sorghum_seed_dollar_per_square_meter",
+                    "commodity_prices_soybean_seed_dollar_per_square_meter",
+                    "commodity_prices_wheat_seed_dollar_per_square_meter",
                 ],
                 "preprocessing": "Map "
                 "'crop_specification' "
@@ -736,16 +736,16 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "Waiting " "on " "tractor_implement " "and " "other " "parts " "of " "EEE " "outputs"
                 ],
                 "economics_files": [
-                    "farm_services.tractor_small-dollar_per_hour",
-                    "farm_services.tractor_medium-dollar_per_hour",
-                    "farm_services.tractor_large-dollar_per_hour",
+                    "farm_services_tractor_small_dollar_per_hour",
+                    "farm_services_tractor_medium_dollar_per_hour",
+                    "farm_services_tractor_large_dollar_per_hour",
                 ],
             },
         },
         "Revenue": {
             "Carbon credits from soil conservation practice": {
                 "input_manager": ["economic_inputs.Soil_and_crop.carbon_credits_whole_simulation_tonnes"],
-                "economics_files": ["commodity_prices.carbon_credits_soil-dollar_per_tonne_CO2e"],
+                "economics_files": ["commodity_prices_carbon_credits_soil_dollar_per_tonne_CO2e"],
                 "future_expansion": "scale " "this " "to " "crop " "outputs/scenarios",
             }
         },
