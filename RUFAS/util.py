@@ -141,9 +141,12 @@ class Utility:
     @staticmethod
     def expand_data_temporally(
         data_to_expand: dict[str, dict[str, list[Any]]],
+        simulation_length: int,
         fill_value: Any = np.nan,
+        use_fill_value_before_start: bool = True,
         use_fill_value_in_gaps: bool = True,
         use_fill_value_at_end: bool = True,
+        expand_data_to_observed_range: bool = False,
     ) -> dict[str, dict[str, list[Any]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
@@ -154,20 +157,27 @@ class Utility:
         data_to_expand : dict[str, dict[str, list[Any]]]
             The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
             contains the keys "values" and optionally "info_maps".
+        simulation_length : int
+            Total number of simulation days.
         fill_value : Any, default numpy.nan
-            Value that is used to pad the front of the data values, and optionally the values in between original values
-            and after the last original value.
+            Value used when a region is configured to use fill values.
+        use_fill_value_before_start : bool, default True
+            If true, days before the first known datapoint are filled with `fill_value`. If false, they are filled with
+            the first known value.
         use_fill_value_in_gaps : bool, default True
-            If false, values between known data points are expanded with the last known value from the data set. If
-            true, values between known data points are filled with `fill_value`.
+            If true, days between known datapoints are filled with `fill_value`. If false, they are filled with the last
+            known value.
         use_fill_value_at_end : bool, default True
-            If false, values after last known data point are padded with the last known value from the data set. If
-            true, values after the last known data point are filled with `fill_value`.
+            If true, days after the last known datapoint are filled with `fill_value`. If false, they are filled
+            with the last known value.
+        expand_data_to_observed_range : bool, default False
+            If false, expands data from simulation day 1 through `simulation_length`. If true, expands only
+            from the first simulation day present in the dataset through the last simulation day present in the dataset.
 
         Returns
         -------
         dict[str, dict[str, list[Any]]]
-            The filled data, so that gaps in the data are filled in with the last known value or `fill_value`.
+            The expanded data.
 
         Raises
         ------
@@ -177,16 +187,93 @@ class Utility:
             If there is no data to be filled.
             If the number of info maps does not match the number of values for a variable.
             If a value for "simulation_day" is not present in every info map.
-
-        Notes
-        -----
-        This method assumes there will never be multiple values recorded for a single variable on a single simulation
-        day.
-
         """
         if not data_to_expand:
             raise ValueError("Data Expansion error: Cannot fill empty dataset.")
 
+        all_simulation_days = Utility._gather_data_sim_days(data_to_expand)
+        filtered_simulation_days = sorted(set(all_simulation_days))
+
+        first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 0
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length
+
+        expanded_data: dict[str, dict[str, list[Any]]] = {}
+        for key, data in data_to_expand.items():
+            expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
+            original_units = data["info_maps"][0]["units"]
+
+            indexed_data = {
+                info_map["simulation_day"]: (value, info_map)
+                for value, info_map in zip(data["values"], data["info_maps"])
+            }
+
+            first_day_of_original_data = min(indexed_data.keys())
+            last_day_of_original_data = max(indexed_data.keys())
+
+            first_known_value, first_known_info_map = indexed_data[first_day_of_original_data]
+            last_known_value = fill_value
+            last_known_info_map = {"simulation_day": 0, "units": original_units}
+
+            for day in range(first_day, last_day + 1):
+                if day in indexed_data:
+                    value, info_map = indexed_data[day]
+                    expanded_variable_data["values"].append(value)
+                    expanded_variable_data["info_maps"].append(info_map.copy())
+                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
+
+                    last_known_value = value
+                    last_known_info_map = info_map.copy()
+
+                elif day < first_day_of_original_data:
+                    value_to_add = fill_value if use_fill_value_before_start else first_known_value
+                    info_map_to_add = first_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                elif day < last_day_of_original_data:
+                    value_to_add = fill_value if use_fill_value_in_gaps else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                else:
+                    value_to_add = fill_value if use_fill_value_at_end else last_known_value
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
+
+            expanded_data[key] = expanded_variable_data
+
+        return expanded_data
+
+    @staticmethod
+    def _gather_data_sim_days(data_to_expand: dict[str, dict[str, list[Any]]]) -> list[int]:
+        """
+        Helper function for `expand_data_temporally()`.
+        Validates the data structure and gathers the simulations days from the accompanying info maps.
+
+        Parameters
+        ----------
+        data_to_expand : dict[str, dict[str, list[Any]]]
+            The data to be expanded.
+
+        Returns
+        -------
+        list[int]
+            A list of simulation days from the info maps of the data_to_expand.
+
+        Raises
+        ------
+        TypeError
+            If info_maps are not present in the data_to_expand.
+        ValueError
+            If the lists of info_maps and values are not the same length.
+        ValueError
+            If `simulation_day` has not been reported in every info_maps instance.
+        """
         all_simulation_days = []
         for key, value in data_to_expand.items():
             info_maps = value.get("info_maps")
@@ -202,37 +289,7 @@ class Utility:
                 )
             all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
 
-        filtered_simulation_days = sorted(set(all_simulation_days))
-        first_day = filtered_simulation_days[0]
-        last_day = filtered_simulation_days[-1]
-
-        expanded_data: dict[str, dict[str, list[Any]]] = {}
-        for key, data in data_to_expand.items():
-            expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
-            original_units = data["info_maps"][0]["units"]
-            zipped_data = zip(data["values"], data["info_maps"])
-            indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
-            last_day_of_original_data = max(indexed_data.keys())
-            last_value = (fill_value, {"simulation_day": 0, "units": original_units})
-            for day in range(first_day, last_day_of_original_data + 1):
-                if day in indexed_data.keys():
-                    last_value = indexed_data[day] if not use_fill_value_in_gaps else (fill_value, indexed_data[day][1])
-                    expanded_variable_data["values"].append(indexed_data[day][0])
-                    expanded_variable_data["info_maps"].append(indexed_data[day][1])
-                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
-                else:
-                    expanded_variable_data["values"].append(last_value[0])
-                    expanded_variable_data["info_maps"].append(last_value[1].copy())
-                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
-
-            tail_fill_value = indexed_data[last_day_of_original_data][0] if not use_fill_value_at_end else fill_value
-            for day in range(last_day_of_original_data + 1, last_day + 1):
-                expanded_variable_data["values"].append(tail_fill_value)
-                expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
-
-            expanded_data[key] = expanded_variable_data
-
-        return expanded_data
+        return all_simulation_days
 
     @staticmethod
     def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
