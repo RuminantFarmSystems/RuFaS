@@ -6,13 +6,6 @@
       "path": "input/data/tasks/available_simulation_tasks.json",
       "type": "json",
       "properties": "tasks_properties"
-    },
-    "properties": {
-      "title": "Metadata Properties",
-      "description": "The properties of input data.",
-      "paths": ["input/metadata/properties/tasks_properties.json"],
-      "type": "json",
-      "properties": "NA"
     }
   },
   "cross-validation": null
