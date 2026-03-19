@@ -47,9 +47,13 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "user_feeds",
     "tractor_dataset",
     "EEE_constants",
-    "properties",
     "feed_storage_configurations",
     "feed_storage_instances",
+}
+PRROPERTIES_FILE_PATHS: dict[str, Path] = {
+    "default": Path("input/metadata/properties/default.json"),
+    "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
+    "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
 }
 
 
@@ -642,37 +646,23 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_metadata = self.__metadata["files"]["properties"]
-            properties_paths = properties_metadata.get("paths") or properties_metadata.get("path")
-
-            if isinstance(properties_paths, str):
-                properties_paths = [properties_paths]
-            if not isinstance(properties_paths, list) or len(properties_paths) == 0:
-                raise ValueError("Input Manager Error: Properties paths must be a non-empty string or list of strings")
-
-            if not all(isinstance(path, str) and path for path in properties_paths):
-                raise ValueError("Input Manager Error: Each properties path must be a non-empty string")
-
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {properties_paths}",
+                f"Attempting to load properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
             combined_properties: dict[str, Any] = {}
-            for properties_path_str in properties_paths:
-                properties_path = Path(properties_path_str)
+            for properties_path in PRROPERTIES_FILE_PATHS.values():
                 if not properties_path.exists():
                     raise FileNotFoundError(f"Input Manager Error: Properties file not found at {properties_path}")
                 loaded_properties = self._load_data_from_json(properties_path)
                 combined_properties.update(loaded_properties)
 
-            del self.__metadata["files"]["properties"]
-
             self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {properties_paths}",
+                f"Successfully loaded properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
