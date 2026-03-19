@@ -319,7 +319,8 @@ class EconomicPreprocessor:
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
                 self.om.add_warning(
                     "MissingPriceData",
-                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format.",
+                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
+                    "Using fallback price.",
                     info_map,
                 )
                 values.extend(self._get_fallback_price(start_year, end_year, key))
@@ -332,7 +333,8 @@ class EconomicPreprocessor:
                 except (KeyError, IndexError):
                     self.om.add_warning(
                         "MissingPriceData",
-                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'",
+                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
+                        "Using fallback price.",
                         info_map,
                     )
                     values.extend(self._get_fallback_price(start_year, end_year, key))
