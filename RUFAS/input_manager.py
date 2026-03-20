@@ -104,7 +104,12 @@ class InputManager:
         self.__pool = incoming_pool
 
     def start_data_processing(
-        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+        self,
+        metadata_path: Path,
+        input_root: Path,
+        task_id: Any,
+        cross_validation_file_paths: list[str] | None,
+        eager_termination: bool = True
     ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -117,6 +122,8 @@ class InputManager:
             Root directory for all input files.
         task_id : Any
             Task ID for the current process.
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation files.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
@@ -149,16 +156,20 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
-        is_input_data_valid = self._cross_validate_data(eager_termination) and is_input_data_valid
+        is_input_data_valid = (
+                self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
+        )
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
-    def _cross_validate_data(self, eager_termination: bool) -> bool:
+    def _cross_validate_data(self, cross_validation_file_paths: list[str] | None, eager_termination: bool) -> bool:
         """
         Validates data against cross-validation rules and reports any failures.
 
         Parameters
         ----------
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation rules.
         eager_termination : bool
             If True, the validation process stops after the first cross-validation
             failure. Otherwise, it continues validating all the rules.
@@ -170,7 +181,6 @@ class InputManager:
             or more rules fail.
         """
         failing_cross_validation_blocks: list[str] = []
-        cross_validation_file_paths: list[str] | None = self.__metadata.get("cross-validation", None)
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
         if cross_validation_rules is not None and len(cross_validation_rules) > 0:
             for cross_validation_ruleset in cross_validation_rules:

@@ -246,7 +246,6 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": ["input/metadata/cross_validation/example_cross_validation.json"],
   "runtime_metadata": {
     "EEE_econ": {
       "path": "input/metadata/EEE/econ_metadata.json"

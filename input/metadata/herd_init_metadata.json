@@ -7,6 +7,5 @@
       "type": "json",
       "properties": "tasks_properties"
     }
-  },
-  "cross-validation": null
+  }
 }
