@@ -930,8 +930,7 @@ Additional Materials
 --------------------
 
 -  Now that you’re familiar with the basics, we encourage you to review
-   the full recording of the `onboarding
-   session <https://youtu.be/Xqjse-fKQV0>`__
+   the full `onboarding video series <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
    for more details.
 
 -  If using VS Code or PyCharm and unsure of how to proceed with setting
