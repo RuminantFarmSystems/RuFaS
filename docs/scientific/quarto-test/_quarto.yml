@@ -7,16 +7,19 @@ book:
   date: "8/18/2021"
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
-    - references.qmd
+    - equations.qmd
 
-bibliography: references.bib
+
+
+bibliography: rufas.bib
 
 format:
   html:
     theme: cosmo
+    css: styles.css
   pdf:
     documentclass: scrreprt
+    pdf-engine: xelatex
+    include-in-header: preamble.tex
   epub:
     cover-image: rufas.png
