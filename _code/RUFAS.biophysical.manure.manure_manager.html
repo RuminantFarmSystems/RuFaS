@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -309,6 +310,11 @@ It also removes internal separator suffixes from destination references to simpl
 </dd>
 </dl>
 </section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>The use of <cite>deepcopy()</cite> is necessary here because the method needs to modify the adjacency matrix
+(merging and deleting rows/keys) without mutating the original <cite>self._adjacency_matrix</cite>.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._perform_topological_sort">
@@ -357,8 +363,8 @@ configuration dictionary.</p>
 </dd>
 </dl>
 </section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<section id="id14">
+<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <p>The method internally combines all processor configurations from different categories,
 extracts all processor names, checks for duplicates, and creates a mapping of processor
 names to their respective configurations.</p>
@@ -370,15 +376,15 @@ names to their respective configurations.</p>
 <dd><p>Checks for duplicate processor names in the provided list.</p>
 <p>If duplicate processor names are found, this method logs an error message
 and raises a ValueError indicating the duplicate names.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>all_processor_names<span class="classifier">list[str]</span></dt><dd><p>A list of processor names to be checked for duplicates.</p>
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h3>Raises<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If duplicate processor names are found, a ValueError is raised with
 the details of the duplicates.</p>
@@ -390,8 +396,8 @@ the details of the duplicates.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._validate_and_parse_processor_connections">
 <span class="sig-name descname"><span class="pre">_validate_and_parse_processor_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_connections_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_configs_by_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._validate_and_parse_processor_connections" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._validate_and_parse_processor_connections'"><span>#</span></a></dt>
 <dd><p>Validates and parses the processor connections defined in the manure management configuration.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_connections_input<span class="classifier">dict[str, list[dict[str, Any]]]</span></dt><dd><p>The processor connection configuration, containing regular processor and separator connections.</p>
 </dd>
@@ -399,8 +405,8 @@ the details of the duplicates.</p>
 </dd>
 </dl>
 </section>
-<section id="id17">
-<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, dict[str, list[dict[str, Any]]]]</dt><dd><p>A dictionary mapping processor names to their respective connection details.</p>
 </dd>
@@ -411,8 +417,8 @@ the details of the duplicates.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_unknown_processor_names">
 <span class="sig-name descname"><span class="pre">_check_for_unknown_processor_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_names_in_connection_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_configs_by_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_unknown_processor_names" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_unknown_processor_names'"><span>#</span></a></dt>
 <dd><p>Validates if all processor names referenced in connection config are defined in the processor configurations.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_names_in_connection_map<span class="classifier">set[str]</span></dt><dd><p>Set of all processor names referenced in the connection configuration.</p>
 </dd>
@@ -420,8 +426,8 @@ the details of the duplicates.</p>
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h3>Raises<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<section id="id20">
+<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If any referenced processor name does not exist in the processor configurations.</p>
 </dd>
@@ -432,8 +438,8 @@ the details of the duplicates.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_processors_without_connection_definition">
 <span class="sig-name descname"><span class="pre">_check_for_processors_without_connection_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_names_in_connection_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_connections_by_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_processors_without_connection_definition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._check_for_processors_without_connection_definition'"><span>#</span></a></dt>
 <dd><p>Checks for processors that are referenced but lack connection definitions.</p>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_names_in_connection_map<span class="classifier">set[str]</span></dt><dd><p>A set of names of all processors that are referenced and expected to have routing configurations.</p>
 </dd>
@@ -441,8 +447,8 @@ the details of the duplicates.</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h3>Raises<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
+<section id="id22">
+<h3>Raises<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If any processors are found to be missing a routing configuration.</p>
 </dd>
@@ -453,8 +459,8 @@ the details of the duplicates.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._find_all_processor_names_in_connection_map">
 <span class="sig-name descname"><span class="pre">_find_all_processor_names_in_connection_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._find_all_processor_names_in_connection_map" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._find_all_processor_names_in_connection_map'"><span>#</span></a></dt>
 <dd><p>Retrieves all referenced processor names from a list of processor connections.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_connections<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list containing dictionaries that define connections between processors. Each dictionary is expected to
 have a “processor_name” key, and either “solid_output_destinations” and “liquid_output_destinations”,
@@ -462,8 +468,8 @@ or “destinations”.</p>
 </dd>
 </dl>
 </section>
-<section id="id23">
-<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>set[str]</dt><dd><p>A set of all unique processor names (both as origin and as destination) referenced in the connections.</p>
 </dd>
@@ -474,16 +480,16 @@ or “destinations”.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._build_processor_connection_map">
 <span class="sig-name descname"><span class="pre">_build_processor_connection_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._build_processor_connection_map" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._build_processor_connection_map'"><span>#</span></a></dt>
 <dd><p>Adds a list of processor connections to a structured map.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_connections<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of dictionaries, where each dictionary represents a processor connection.
 Each dictionary should include information about the processor’s name and its destinations.</p>
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<section id="id26">
+<h3>Returns<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, dict[str, list[dict[str, Any]]]]</dt><dd><p>A dictionary mapping processor names to their connection details.
 If the processor acts as a separator, it contains keys including “solid_output_destinations”
@@ -491,8 +497,8 @@ and “liquid_output_destinations”. Otherwise, it contains a key “destinatio
 </dd>
 </dl>
 </section>
-<section id="id26">
-<h3>Raises<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<section id="id27">
+<h3>Raises<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If duplicate connection definitions are found for a processor name.</p>
 </dd>
@@ -545,8 +551,8 @@ and “liquid_output_destinations”. Otherwise, it contains a key “destinatio
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._create_all_processors">
 <span class="sig-name descname"><span class="pre">_create_all_processors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_connections_by_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_configs_by_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept_mean_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._create_all_processors" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._create_all_processors'"><span>#</span></a></dt>
 <dd><p>Creates and initializes all processors based on their definitions.</p>
-<section id="id27">
-<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_connections_by_name<span class="classifier">dict[str, dict[str, list[dict[str, Any]]]]</span></dt><dd><p>A dictionary that maps processor names to their associated connection configurations.</p>
 </dd>
@@ -571,8 +577,8 @@ a standard processor. It then creates corresponding columns in the adjacency mat
 proportions based on the processor type:
 - For separators: handles both solid and liquid output destinations.
 - For other processors: handles general destinations.</p>
-<section id="id28">
-<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>processor_connections_by_name<span class="classifier">dict[str, dict[str, list[dict[str, Any]]]]</span></dt><dd><p>A dictionary where the keys are processor names, and the values contain information about their
 connections to other processors.</p>
@@ -589,8 +595,8 @@ from the specified origin node to a list of destination nodes.
 For separators, it creates multiple columns representing distinct
 output types (input, solid output, liquid output). For non-separators,
 a single column is created.</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>origin_name<span class="classifier">str</span></dt><dd><p>The name of the origin node for which the column(s) will be created.</p>
 </dd>
@@ -608,8 +614,8 @@ a single column is created.</p>
 <p>This method updates the adjacency matrix to store the proportion of connections from the specified origin
 to each destination. If the receiving processor name corresponds to an separator, its name is modified to
 include the ‘_input’ suffix before updating the matrix.</p>
-<section id="id30">
-<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>connections<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of connection dictionaries, where each dictionary contains information about the
 receiving processor name and the proportion of the connection.</p>
@@ -623,8 +629,8 @@ receiving processor name and the proportion of the connection.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._generate_adjacency_matrix_keys">
 <span class="sig-name descname"><span class="pre">_generate_adjacency_matrix_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._generate_adjacency_matrix_keys" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._generate_adjacency_matrix_keys'"><span>#</span></a></dt>
 <dd><p>Generates a list of keys to be used in constructing an adjacency matrix.</p>
-<section id="id31">
-<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[str]</dt><dd><p>A list of keys representing the rows/columns of the adjacency matrix.</p>
 </dd>
@@ -642,12 +648,12 @@ and checks against the nutrients available in the manager.</p>
 is subtracted from the manager’s internal bookkeeping. The method then returns the results of
 the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
 If the request cannot be fulfilled at all, the method will return None.</p>
-<section id="id32">
-<h3>Notes<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <p>This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.</p>
 </section>
-<section id="id33">
-<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus.</p>
 </dd>
@@ -657,8 +663,8 @@ If the request cannot be fulfilled at all, the method will return None.</p>
 </dd>
 </dl>
 </section>
-<section id="id34">
-<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
 the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
@@ -672,8 +678,8 @@ Returns None if the request cannot be fulfilled.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._remove_nutrients_from_storage">
 <span class="sig-name descname"><span class="pre">_remove_nutrients_from_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._remove_nutrients_from_storage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._remove_nutrients_from_storage'"><span>#</span></a></dt>
 <dd><p>Remove nutrients from the storage based on the results of a nutrient request by manure type.</p>
-<section id="id35">
-<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>results<span class="classifier">NutrientRequestResults</span></dt><dd><p>The results of a nutrient request. See <code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientsRequestResults</span></code> for details.</p>
 </dd>
@@ -685,8 +691,8 @@ Returns None if the request cannot be fulfilled.</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_compute_stream_after_removal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_removal_proportion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_nitrogen_limiting_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_limiting_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._compute_stream_after_removal" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._compute_stream_after_removal'"><span>#</span></a></dt>
 <dd><p>Returns a new ManureStream with removals applied,
 plus a dict of how much was removed for each attribute.</p>
-<section id="id36">
-<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>stored_manure<span class="classifier">ManureStream</span></dt><dd><p>The stored manure in storage.</p>
 </dd>
@@ -698,8 +704,8 @@ plus a dict of how much was removed for each attribute.</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<section id="id38">
+<h3>Returns<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[Manure Stream, dict[str, Any]]</dt><dd><p>The stream after removal.
 The detail of the amount of nutrients removed.</p>
@@ -711,8 +717,8 @@ The detail of the amount of nutrients removed.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._determine_non_limiting_nutrient_removal_amount">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_non_limiting_nutrient_removal_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limiting_nutrient_proportion_to_be_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_limiting_nutrients_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_non_limiting_nutrient_removal_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_non_limiting_nutrient_removal_amount'"><span>#</span></a></dt>
 <dd><p>Calculates the amount of non-limiting nutrients to remove in each storage.</p>
-<section id="id38">
-<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>limiting_nutrient_proportion_to_be_removed<span class="classifier">float</span></dt><dd><p>The proportion of limiting nutrient to remove from each storage.</p>
 </dd>
@@ -720,8 +726,8 @@ The detail of the amount of nutrients removed.</p>
 </dd>
 </dl>
 </section>
-<section id="id39">
-<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of non-limiting nutrients to remove in each storage (kg).</p>
 </dd>
@@ -732,8 +738,8 @@ The detail of the amount of nutrients removed.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._determine_limiting_nutrient">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_limiting_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_limiting_nutrient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_limiting_nutrient'"><span>#</span></a></dt>
 <dd><p>Determines the limiting nutrient to remove.</p>
-<section id="id40">
-<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>requested_nitrogen_mass<span class="classifier">float</span></dt><dd><p>The mass of nitrogen requested (kg).</p>
 </dd>
@@ -745,8 +751,8 @@ The detail of the amount of nutrients removed.</p>
 </dd>
 </dl>
 </section>
-<section id="id41">
-<h3>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>If true, nitrogen is the limiting nutrients.
 If false, phosphorus is the limiting nutrients.</p>
@@ -758,8 +764,8 @@ If false, phosphorus is the limiting nutrients.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._determine_nutrient_proportion_to_be_removed">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_nutrient_proportion_to_be_removed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limiting_nutrient_requested_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limited_nutrient_available</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_nutrient_proportion_to_be_removed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._determine_nutrient_proportion_to_be_removed'"><span>#</span></a></dt>
 <dd><p>Calculates the proportion of limiting nutrients to remove.</p>
-<section id="id42">
-<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>limiting_nutrient_requested_mass<span class="classifier">float</span></dt><dd><p>The requested mass of limited nutrient (kg).</p>
 </dd>
@@ -767,8 +773,8 @@ If false, phosphorus is the limiting nutrients.</p>
 </dd>
 </dl>
 </section>
-<section id="id43">
-<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The proportion of limiting nutrient to remove from each storage.</p>
 </dd>
@@ -779,8 +785,8 @@ If false, phosphorus is the limiting nutrients.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._record_manure_request_results">
 <span class="sig-name descname"><span class="pre">_record_manure_request_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_request_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._record_manure_request_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._record_manure_request_results'"><span>#</span></a></dt>
 <dd><p>Record the results of a manure request in the Output Manager.</p>
-<section id="id44">
-<h3>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_request_results<span class="classifier">NutrientRequestResults | None</span></dt><dd><p>The results of a manure request. If None, it means that there was no available on-farm manure.</p>
 </dd>
@@ -795,8 +801,8 @@ If false, phosphorus is the limiting nutrients.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_manager.ManureManager._calculate_supplemental_manure_needed">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_supplemental_manure_needed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on_farm_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_manager.ManureManager._calculate_supplemental_manure_needed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.manure_manager.ManureManager._calculate_supplemental_manure_needed'"><span>#</span></a></dt>
 <dd><p>Calculate the amount of supplemental manure needed to fulfill the nutrient request.</p>
-<section id="id45">
-<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>on_farm_manure<span class="classifier">NutrientRequestResults | None</span></dt><dd><p>The results of the nutrient request for manure available from the farm. If None, it means that
 there was no available on-farm manure.</p>
@@ -805,8 +811,8 @@ there was no available on-farm manure.</p>
 </dd>
 </dl>
 </section>
-<section id="id46">
-<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<section id="id47">
+<h3>Returns<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NutrientRequest</dt><dd><p>The request for supplemental manure needed to fulfill the original nutrient request.</p>
 </dd>

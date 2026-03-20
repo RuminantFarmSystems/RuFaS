@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -590,6 +591,9 @@ in the soil profile (kg/ha).</p>
 mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
 20 mm of soil makes it more available to be eroded off the field by runoff.</p>
 <p>This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.</p>
+<p><cite>deepcopy()</cite> is necessary here because <cite>self.soil_layers[0]</cite> is a mutable object.
+A shallow copy would mean that modifying <cite>new_top_layer</cite>’s attributes would also
+affect the original layer still in <cite>self.soil_layers</cite>.</p>
 </section>
 </dd></dl>
 <dl class="py method">

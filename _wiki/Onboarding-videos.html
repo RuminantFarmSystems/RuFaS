@@ -21,16 +21,16 @@
 <meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Creating a GitHub Issue | Ruminant Farm Simulation (RuFaS)  documentation</title>
-<meta content="Creating a GitHub Issue | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
-<meta content="Creating a GitHub Issue | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<title>Onboarding Videos | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="Onboarding Videos | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="Onboarding Videos | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=73505e79" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="How-to-write-a-design-doc.html" rel="next" title="How To Write a Design Doc"/>
-<link href="SCRUM-at-RuFaS.html" rel="prev" title="RuFaS Team SCRUM Process"/>
+<link href="Task-Manager.html" rel="next" title="Task Manager"/>
+<link href="onboarding.html" rel="prev" title="Welcome to RuFaS"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -78,9 +78,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../_code/modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -110,8 +110,8 @@
 <li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating a GitHub Issue</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="creating_github_issue.html">Creating a GitHub Issue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-review.html">Code Review</a></li>
@@ -135,61 +135,68 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Creating a GitHub Issue</span>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Onboarding Videos</span>
 </nav>
 <div id="content" role="main">
-<section id="creating-a-github-issue">
-<h1>Creating a GitHub Issue<a class="headerlink" href="#creating-a-github-issue" title="Link to this heading"><span>#</span></a></h1>
+<section id="onboarding-videos">
+<h1>Onboarding Videos<a class="headerlink" href="#onboarding-videos" title="Link to this heading"><span>#</span></a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#introduction'"><span>#</span></a></h2>
-<p>GitHub issues are a powerful way to track bugs, enhancements, questions, and tasks for your project. They help maintainers and contributors collaborate effectively by providing a structured workflow for reporting and resolving problems.</p>
-</section>
-<section id="steps-to-create-an-issue">
-<h2>Steps to Create an Issue<a class="headerlink" href="#steps-to-create-an-issue" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#steps-to-create-an-issue'"><span>#</span></a></h2>
-<ol class="arabic simple">
-<li><p><strong>Navigate</strong> to the repository on GitHub (e.g., <cite>https://github.com/YourOrg/YourRepo</cite>).</p></li>
-<li><p><strong>Click</strong> on the <strong>Issues</strong> tab in the header menu.</p></li>
-<li><p><strong>Click</strong> the <strong>New issue</strong> button.</p></li>
-<li><p><strong>Enter a descriptive title</strong> in the <strong>Title</strong> field.</p></li>
-<li><p><strong>Write detailed information</strong> in the <strong>Comment</strong> field, including:
-- <strong>Description</strong>: What you expected to happen.
-- <strong>Steps to reproduce</strong>: A clear, numbered list of steps.
-- <strong>Actual behavior</strong>: What actually happened.
-- <strong>Screenshots or logs</strong> (if applicable).</p></li>
-<li><p>(Optional) <strong>Use the sidebar</strong> to assign labels, assignees, projects, or milestones.</p></li>
-<li><p><strong>Click</strong> <strong>Submit new issue</strong> to create the issue.</p></li>
+<p>The <a class="reference external" href="https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1">onboarding video series</a>
+introduces users to the RuFaS whole-farm modeling platform and open-source
+collaboration practices needed to begin working with the model.</p>
+<p>Users will learn how to do the following:</p>
+<ul class="simple">
+<li><p>Install and run RuFaS</p></li>
+<li><p>Contribute through GitHub</p></li>
+<li><p>Build and troubleshoot simulations</p></li>
+<li><p>Navigate the codebase</p></li>
+<li><p>Basic troubleshooting</p></li>
+</ul>
+<section id="series-videos">
+<h3>Series Videos<a class="headerlink" href="#series-videos" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#series-videos'"><span>#</span></a></h3>
+<ol class="arabic">
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=6RbJs0iZmgo&amp;list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&amp;index=1&amp;t=1s">Onboarding Introduction</a></p>
+<p>This introductory video provides a high-level overview of the tools and
+technologies needed to begin working with RuFaS. It also explains the
+basics of open-source collaboration and github, and shows where to access
+the RuFaS repository.</p>
+</li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=15sfDK986FQ&amp;list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&amp;index=2">Guide to Python, IDEs, GitHub, and RuFaS</a></p>
+<p>This video walks through setting up your workstation to run RuFaS by introducing
+the key tools and explaining how they support working with the model. It
+demonstrates how to install the programs on MacOS and Windows, set up a
+virtual environment, install RuFaS, and run a test to confirm everything is
+working correctly.</p>
+</li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=OmDQwiBGA8Y&amp;list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&amp;index=3">GitHub Tour, Communication Guidelines, and Pull Requests</a></p>
+<p>This video introduces how RuFaS uses github for collaboration, including where
+to find support, documentation, and project information. It walks through
+RuFaS communication guidelines and the pull request process.</p>
+</li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=opyd3_WUrZU&amp;list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&amp;index=4">End to End Simulation and Data Visualization</a></p>
+<p>This video walks through how to run a RuFaS simulation by creating biophysical
+input files, linking metadata and file paths, and setting up output filters to
+examine results. It also guides users through completing a full practice
+scenario, troubleshooting common eras and warnings, and exploring options for
+customizing solutions.</p>
+</li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=f5BWmh8v1Kk&amp;list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&amp;index=5">RuFaS Deeper Dive</a></p>
+<p>This video provides a deeper look at the RuFaS code, beginning with a core
+simulation structure and how to find something specific in the code. It also
+shows how inputs and outputs are connected and demonstrates debugging basics.</p>
+</li>
 </ol>
 </section>
-<section id="best-practices">
-<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#best-practices'"><span>#</span></a></h2>
-<ul>
-<li><p><strong>Search</strong> existing issues before creating a new one to avoid duplicates.</p></li>
-<li><p>Write <strong>concise yet informative titles</strong> that summarize the problem.</p></li>
-<li><p>Provide <strong>reproducible steps</strong> so maintainers can reproduce and debug the issue.</p></li>
-<li><p>Use <strong>code formatting</strong> for commands or output:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">$<span class="w"> </span>npm<span class="w"> </span>install
-</span><span id="line-2">$<span class="w"> </span>npm<span class="w"> </span><span class="nb">test</span>
-</span></code></pre></div>
-</div>
-</li>
-</ul>
-<div class="tip admonition">
-<p class="admonition-title">Tip</p>
-<p>Assign <strong>appropriate labels</strong> (e.g., <cite>bug</cite>, <cite>enhancement</cite>, <cite>question</cite>) to categorize your issue.</p>
-</div>
-</section>
-<section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#conclusion'"><span>#</span></a></h2>
-<p>By following these guidelines, you will help project maintainers understand, track, and resolve issues more efficiently. Clear, well-documented issues lead to faster fixes and better collaboration.</p>
 </section>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#introduction'" class="reference internal" href="#introduction">Introduction</a></li>
-<li><a :data-current="activeSection === '#steps-to-create-an-issue'" class="reference internal" href="#steps-to-create-an-issue">Steps to Create an Issue</a></li>
-<li><a :data-current="activeSection === '#best-practices'" class="reference internal" href="#best-practices">Best Practices</a></li>
-<li><a :data-current="activeSection === '#conclusion'" class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a :data-current="activeSection === '#introduction'" class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a :data-current="activeSection === '#series-videos'" class="reference internal" href="#series-videos">Series Videos</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </aside>
