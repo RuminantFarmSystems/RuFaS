@@ -109,7 +109,7 @@ class InputManager:
         input_root: Path,
         task_id: Any,
         cross_validation_file_paths: list[str] | None,
-        eager_termination: bool = True
+        eager_termination: bool = True,
     ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -157,7 +157,7 @@ class InputManager:
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
         is_input_data_valid = (
-                self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
+            self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
         )
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid

@@ -147,10 +147,7 @@ class TaskManager:
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(
-            metadata_path=metadata_path,
-            input_root=Path(""),
-            task_id="TASK MANAGER",
-            cross_validation_file_paths=None
+            metadata_path=metadata_path, input_root=Path(""), task_id="TASK MANAGER", cross_validation_file_paths=None
         )
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         for task in task_config.get("tasks", []):
@@ -791,7 +788,7 @@ class TaskManager:
             Path(args["input_root"]),
             args["task_id"],
             cross_validation_file_paths,
-            eager_termination
+            eager_termination,
         )
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map

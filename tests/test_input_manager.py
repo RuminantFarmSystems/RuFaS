@@ -420,7 +420,7 @@ def test_start_data_processing(
         input_root=Path(""),
         task_id="1",
         cross_validation_file_paths=[],
-        eager_termination=eager_termination
+        eager_termination=eager_termination,
     )
 
     assert result is expected_return
@@ -526,8 +526,7 @@ def test_cross_validate_data(
     mock_input_manager.data_validator.event_logs.clear()
 
     result = mock_input_manager._cross_validate_data(
-        cross_validation_file_paths=["dummy_path_1", "dummy_path_2"],
-        eager_termination=eager_termination
+        cross_validation_file_paths=["dummy_path_1", "dummy_path_2"], eager_termination=eager_termination
     )
 
     assert result is expected_return
@@ -564,11 +563,7 @@ def test_start_data_processing_invalid_metadata_raises(mock_input_manager: Input
 
     with pytest.raises(ValueError, match="bad meta"):
         mock_input_manager.start_data_processing(
-            Path("meta"),
-            Path(""),
-            task_id="1",
-            cross_validation_file_paths=[],
-            eager_termination=True
+            Path("meta"), Path(""), task_id="1", cross_validation_file_paths=[], eager_termination=True
         )
 
     mock_load_props.assert_not_called()
@@ -594,11 +589,7 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
 
     with pytest.raises(ValueError, match="bad props"):
         mock_input_manager.start_data_processing(
-            Path("meta"),
-            Path(""),
-            task_id="1",
-            cross_validation_file_paths=[],
-            eager_termination=False
+            Path("meta"), Path(""), task_id="1", cross_validation_file_paths=[], eager_termination=False
         )
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)

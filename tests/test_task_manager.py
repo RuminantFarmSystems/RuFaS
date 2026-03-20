@@ -183,7 +183,7 @@ def test_task_manager_start(
         metadata_path=Path("metadata/path"),
         input_root=Path(""),
         task_id="TASK MANAGER",
-        cross_validation_file_paths=None
+        cross_validation_file_paths=None,
     )
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
