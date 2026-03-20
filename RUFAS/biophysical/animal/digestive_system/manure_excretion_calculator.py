@@ -20,10 +20,6 @@ class ManureExcretionCalculator:
     }
 
     @staticmethod
-    def _safe_pct(n: int, d: int) -> float:
-        return (100.0 * n / d) if d else 0.0
-
-    @staticmethod
     def _track_and_warn_dmi_threshold(
         *,
         kind: str,
@@ -73,10 +69,12 @@ class ManureExcretionCalculator:
             else:
                 floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
 
+            pct_below = (100.0 * stats["n_below_min"] / stats["n_total"]) if stats["n_total"] else 0.0
+
             msg = (
                 f"Final counts for effective DMI below the literature minimum for {kind} cows "
                 f"({floor:.3f} kg/d): {stats['n_below_min']}/{stats['n_total']} "
-                f"({ManureExcretionCalculator._safe_pct(stats['n_below_min'], stats['n_total']):.1f}%)."
+                f"({pct_below:.1f}%)."
             )
 
             OutputManager().add_warning(
