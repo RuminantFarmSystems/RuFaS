@@ -314,7 +314,7 @@ def test_calculate_phosphorus_excretion_values(
         assert pytest.approx(res, rel=1e-3) == expected
 
 
-def test_track_and_warn_dmi_clip_tracks_below_min_counts(mocker: MockerFixture) -> None:
+def test_track_and_warn_dmi_threshold_tracks_below_min_counts(mocker: MockerFixture) -> None:
     ManureExcretionCalculator._dmi_below_min_stats = {
         "lact": {"n_total": 0, "n_below_min": 0},
         "dry": {"n_total": 0, "n_below_min": 0},
@@ -323,23 +323,17 @@ def test_track_and_warn_dmi_clip_tracks_below_min_counts(mocker: MockerFixture) 
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT_FOR_MANURE_VS", 7.1)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)
 
-    ManureExcretionCalculator._track_and_warn_dmi_clip(
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
         kind="lact",
-        dmi_predicted=6.0,
         dmi_effective=6.0,
-        context={"class": "test", "function": "track"},
     )
-    ManureExcretionCalculator._track_and_warn_dmi_clip(
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
         kind="lact",
-        dmi_predicted=8.0,
         dmi_effective=8.0,
-        context={"class": "test", "function": "track"},
     )
-    ManureExcretionCalculator._track_and_warn_dmi_clip(
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
         kind="dry",
-        dmi_predicted=6.0,
         dmi_effective=6.0,
-        context={"class": "test", "function": "track"},
     )
 
     lact_stats = ManureExcretionCalculator._dmi_below_min_stats["lact"]

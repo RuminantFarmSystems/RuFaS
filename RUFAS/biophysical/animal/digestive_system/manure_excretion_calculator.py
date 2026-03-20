@@ -51,7 +51,7 @@ class ManureExcretionCalculator:
             stats["n_below_min"] += 1
 
     @staticmethod
-    def emit_dmi_below_min_summary(context: dict[str, Any]) -> None:
+    def emit_dmi_below_min_summary(info_map: dict[str, Any]) -> None:
         """Emit a summary warning for DMI below-minimum frequency."""
         for kind in ("lact", "dry"):
             stats = ManureExcretionCalculator._dmi_below_min_stats[kind]
@@ -74,7 +74,7 @@ class ManureExcretionCalculator:
             OutputManager().add_warning(
                 "DMI minimum summary (manure excretion)",
                 msg,
-                context,
+                info_map,
             )
 
     @staticmethod
