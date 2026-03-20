@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
@@ -69,6 +70,8 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
+
+        ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics,
