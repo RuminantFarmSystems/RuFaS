@@ -38,5 +38,25 @@
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
     ]
+  },
+  {
+    "objectID": "animal.html",
+    "href": "animal.html",
+    "title": "3  Animal Module",
+    "section": "",
+    "text": "3.1 Introduction",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#introduction",
+    "href": "animal.html#introduction",
+    "title": "3  Animal Module",
+    "section": "",
+    "text": "3.1.1 Figure\nThis is a great example of how to set up a module. \n\n\n3.1.2 Table\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
   }
 ]

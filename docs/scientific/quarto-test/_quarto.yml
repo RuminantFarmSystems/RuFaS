@@ -8,6 +8,7 @@ book:
   chapters:
     - index.qmd
     - equations.qmd
+    - animal.qmd
 
 
 
@@ -21,5 +22,11 @@ format:
     documentclass: scrreprt
     pdf-engine: xelatex
     include-in-header: preamble.tex
+    toc: true
+    toc-depth: 2
+    toc-title: "Contents"
+    lof: true
+    lot: true
+    number-sections: true    
   epub:
     cover-image: rufas.png

@@ -1,0 +1,15 @@
+# Animal Module
+
+## Introduction
+
+### Figure
+
+This is a great example of how to set up a module. 
+![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+
+### Table
+| Variable | Definition |
+|---|---|
+| heiferI_num | Number of Heifer I animals |
+
+: Example animal inputs {#tbl-animal-inputs}
