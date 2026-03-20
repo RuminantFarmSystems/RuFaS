@@ -170,7 +170,8 @@ window.Quarto = {
   <ul>
   <li><a href="#sec-nrc" id="toc-sec-nrc" class="nav-link active" data-scroll-target="#sec-nrc"><span class="header-section-number">2.1</span> Nutrient Requirements of Dairy Cattle (NRC)</a></li>
   <li><a href="#reformatted-equations" id="toc-reformatted-equations" class="nav-link" data-scroll-target="#reformatted-equations"><span class="header-section-number">2.2</span> Reformatted equations</a></li>
-  <li><a href="#use-alphanumeric-equation-labels" id="toc-use-alphanumeric-equation-labels" class="nav-link" data-scroll-target="#use-alphanumeric-equation-labels"><span class="header-section-number">3</span> Use alphanumeric equation labels</a></li>
+  <li><a href="#use-alphanumeric-equation-labels" id="toc-use-alphanumeric-equation-labels" class="nav-link" data-scroll-target="#use-alphanumeric-equation-labels"><span class="header-section-number">2.3</span> Use alphanumeric equation labels</a></li>
+  <li><a href="#other-equation-templates" id="toc-other-equation-templates" class="nav-link" data-scroll-target="#other-equation-templates"><span class="header-section-number">2.4</span> Other equation Templates</a></li>
   </ul>
 </nav>
     </div>
@@ -213,13 +214,44 @@ window.Quarto = {
 <p><a href="#eq-nrc-cbw" class="quarto-xref">Equation&nbsp;<span>2.1</span></a> may be visually improved by using the <code>\times</code> LaTeX command:</p>
 <p><span class="math display">\[CBW = MW \times 0.06275\]</span></p>
 </section>
-<section id="use-alphanumeric-equation-labels" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Use alphanumeric equation labels</h1>
+<section id="use-alphanumeric-equation-labels" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="use-alphanumeric-equation-labels"><span class="header-section-number">2.3</span> Use alphanumeric equation labels</h2>
 <p>Though quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \tag latex command. <em>And</em> the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):</p>
 <div id="eqn-an-nrc-2">
 <p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
 </div>
 <p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
+</section>
+<section id="other-equation-templates" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="other-equation-templates"><span class="header-section-number">2.4</span> Other equation Templates</h2>
+<!-- Inline equations -->
+<p>The energy balance is <span class="math inline">\(E = mc^2\)</span>.</p>
+<!-- display centered, on its own line -->
+<p><span class="math display">\[
+E = mc^2
+\]</span></p>
+<!-- gets numbered automatically in PDF -->
+<p><span class="math display">\[
+\begin{equation}
+E = mc^2
+\end{equation}
+\]</span></p>
+<!-- Referencing equations - start with creating a label -->
+<p><span id="eq-energy"><span class="math display">\[
+\begin{equation}
+E = mc^2
+\end{equation}
+\tag{2.4}\]</span></span></p>
+<!-- reference that label -->
+<p>See Equation <a href="#eq-energy" class="quarto-xref">Equation&nbsp;<span>2.4</span></a>. <!-- additional example --> <span id="eq-nutrient-proportion"><span class="math display">\[
+\begin{equation}
+\text{nutrient\_proportion\_to\_be\_removed} =
+\min\left(
+\frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
+1
+\right)
+\end{equation}
+\tag{2.5}\]</span></span></p>
 
 
 </section>

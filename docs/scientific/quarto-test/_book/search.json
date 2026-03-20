@@ -40,6 +40,26 @@
     ]
   },
   {
+    "objectID": "equations.html#use-alphanumeric-equation-labels",
+    "href": "equations.html#use-alphanumeric-equation-labels",
+    "title": "2  Equation examples (from Animal Documentation)",
+    "section": "2.3 Use alphanumeric equation labels",
+    "text": "2.3 Use alphanumeric equation labels\nThough quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \\tag latex command. And the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\\]\n\nsee (eqn-an-nrc-2?)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
+    ]
+  },
+  {
+    "objectID": "equations.html#other-equation-templates",
+    "href": "equations.html#other-equation-templates",
+    "title": "2  Equation examples (from Animal Documentation)",
+    "section": "2.4 Other equation Templates",
+    "text": "2.4 Other equation Templates\n\nThe energy balance is \\(E = mc^2\\).\n\n\\[\nE = mc^2\n\\]\n\n\\[\n\\begin{equation}\nE = mc^2\n\\end{equation}\n\\]\n\n\\[\n\\begin{equation}\nE = mc^2\n\\end{equation}\n\\tag{2.4}\\]\n\nSee Equation Equation 2.4.  \\[\n\\begin{equation}\n\\text{nutrient\\_proportion\\_to\\_be\\_removed} =\n\\min\\left(\n\\frac{\\text{mass\\_requested\\_nutrient}}{\\text{manure\\_nutrient\\_available}},\n1\n\\right)\n\\end{equation}\n\\tag{2.5}\\]",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
+    ]
+  },
+  {
     "objectID": "animal.html",
     "href": "animal.html",
     "title": "3  Animal Module",
@@ -54,7 +74,7 @@
     "href": "animal.html#introduction",
     "title": "3  Animal Module",
     "section": "",
-    "text": "3.1.1 Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\nFigure 3.1: Animal module icon\n\n\n\nType 2\n\n\n\n\n\n\nFigure 3.2\n\n\n\nType 3\n\n\n\n\n\n\nFigure 3.3\n\n\n\n\n\n3.1.2 Table\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
+    "text": "3.1.1 Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\n\nFigure 3.1: Animal module icon\n\n\n\n\n\n3.1.2 Table\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
     ]

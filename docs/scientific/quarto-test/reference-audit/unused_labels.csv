@@ -1,0 +1,7 @@
+label,type,file,line
+fig-animal-icon,Figure,animal.qmd,10
+tbl-animal-inputs,Table,animal.qmd,18
+sec-nrc,Section,equations.qmd,4
+eq-nrc-cw,Equation,equations.qmd,15
+eq-nrc-ne-maint,Equation,equations.qmd,19
+eq-nutrient-proportion,Equation,equations.qmd,79

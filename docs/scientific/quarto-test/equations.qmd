@@ -25,7 +25,7 @@ command:
 
 $$CBW = MW \times 0.06275$$
 
-# Use alphanumeric equation labels
+## Use alphanumeric equation labels
 
 Though quarto does not allow custom cross-reference labels, you can
 include your own non-CR label with the \\tag latex command. *And* the
@@ -37,3 +37,43 @@ $$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
 :::
 
 see @eqn-an-nrc-2
+
+
+
+## Other equation Templates
+<!-- Inline equations -->
+The energy balance is $E = mc^2$.
+
+<!-- display centered, on its own line -->
+
+$$
+E = mc^2
+$$
+
+<!-- gets numbered automatically in PDF -->
+
+$$
+\begin{equation}
+E = mc^2
+\end{equation}
+$$
+
+<!-- Referencing equations - start with creating a label -->
+$$
+\begin{equation}
+E = mc^2
+\end{equation}
+$$ {#eq-energy}
+
+<!-- reference that label -->
+See Equation @eq-energy.
+<!-- additional example -->
+$$
+\begin{equation}
+\text{nutrient\_proportion\_to\_be\_removed} =
+\min\left(
+\frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
+1
+\right)
+\end{equation}
+$$ {#eq-nutrient-proportion}
