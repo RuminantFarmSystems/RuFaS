@@ -55,7 +55,7 @@ pip install .
 ```bash
 python main.py
 ```
-6. **Learn more** if you have further questions read through the documentation on our [GitHub Pages site](https://ruminantfarmsystems.github.io/RuFaS/)
+6. **Learn more** if you have further questions read through the documentation on our [GitHub Pages site](https://ruminantfarmsystems.github.io/RuFaS/) or watch our [onboarding video series](https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1).
 
 ---
 
