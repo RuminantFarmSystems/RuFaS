@@ -1,0 +1,95 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{vadas2007}{article}{}
+      \name{author}{7}{}{%
+        {{un=0,uniquepart=base,hash=0ccd882cd1b35af5e3b66329f8c482b8}{%
+           family={Vadas},
+           familyi={V\bibinitperiod},
+           given={P.A.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9f55ebf5bc78835f4f1e1b5c64dc35b4}{%
+           family={Gburek},
+           familyi={G\bibinitperiod},
+           given={W.J.},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=db922ce94c6cc486a0cc014bd32cd683}{%
+           family={Sharpley},
+           familyi={S\bibinitperiod},
+           given={A.N.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fac90c20c3ba68b52ae64303997cf3c8}{%
+           family={Kleinman},
+           familyi={K\bibinitperiod},
+           given={P.J.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5438bd3655c211aab38c1d5d5bd6f301}{%
+           family={Moore},
+           familyi={M\bibinitperiod},
+           given={P.A.\bibnamedelimi Jr.},
+           giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cf807a52f68b0c9518c0262b58f94da4}{%
+           family={Cabrera},
+           familyi={C\bibinitperiod},
+           given={M.L.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=79e5ff623f1703b100ac1bfd9d122788}{%
+           family={Harmel},
+           familyi={H\bibinitperiod},
+           given={R.D.},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{678003f4d6d3452a1ae65de262babbfd}
+      \strng{fullhash}{07b9400921c16e88e9116e0e416ff058}
+      \strng{bibnamehash}{678003f4d6d3452a1ae65de262babbfd}
+      \strng{authorbibnamehash}{678003f4d6d3452a1ae65de262babbfd}
+      \strng{authornamehash}{678003f4d6d3452a1ae65de262babbfd}
+      \strng{authorfullhash}{07b9400921c16e88e9116e0e416ff058}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Environmental Quality}
+      \field{number}{1}
+      \field{title}{A model for phosphorus transformation and runoff loss for surface-applied manures}
+      \field{volume}{36}
+      \field{year}{2007}
+      \field{pages}{324\bibrangedash 332}
+      \range{pages}{9}
+    \endentry
+  \enddatalist
+  \missing{fan2016root}
+  \missing{hargreaves1985}
+  \missing{hayes2020vindication}
+  \missing{mu-extsoil}
+  \missing{parton1987analysis}
+\endrefsection
+\endinput
+
