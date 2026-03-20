@@ -2576,7 +2576,6 @@ class OutputManager(object):
             "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
             "direction": self.validate_direction,
             "use_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
-            "use_filter_key_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
