@@ -1,0 +1,155 @@
+
+
+% Language setting
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\setlength{\parindent}{0pt}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float} % Allows strict image placement
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}% hyperref makes the TOC clickable
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+% Fonts
+\usepackage[scaled]{helvet}
+
+\usepackage{pdflscape}  % or \usepackage{lscape}
+\usepackage{lipsum} % for dummy text
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{tocloft}     % Customize LoT and LoF formatting
+
+% Better paragraph columns + hyphenation
+\usepackage{ragged2e}   % gives \RaggedRight and \Centering
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xurl}       % allows breaks in long strings (URLs-ish tokens)
+
+% Column types (wrap-friendly)
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
+
+% Optional: allow breaks at underscores in normal text
+% (useful if you *don't* typeset variable names in \texttt{})
+\usepackage[strings]{underscore}
+
+
+% --- Fix Roman numeral width in ToC ---
+\settowidth{\cftsecnumwidth}{\bfseries XXVIII.\hspace{0.1em}}
+
+% Geometry
+\usepackage[
+  a4paper,
+  top=1.5in,
+  bottom=1in,
+  left=1in,
+  right=1in,
+  headheight=60pt,  % This must match the vertical space used
+  headsep=20pt
+]{geometry}
+
+% Define header and footer styles
+% Fancy Header
+\usepackage{fancyhdr}
+\usepackage{rotating}
+\pagestyle{fancy}
+\fancyhf{}  % clear all header/footer fields
+\renewcommand{\headrulewidth}{0pt}  % no horizontal line
+% Header setup
+\fancyhead[C]{%
+  \makebox[\textwidth]{%
+    \includegraphics[height=35pt]{resources/rufas.png}\hfill
+    \textbf{\today}%
+  }\\
+  \textbf{Scientific Documentation of RuFaS Model}\\
+  \rule{\textwidth}{1pt}
+}
+
+
+% Footer setup with a divider line and two lines of text on left and right
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{%
+  \begin{tabular}[t]{@{}l@{}}
+    Ruminant Farm System\\
+    Sci Doc v.1
+  \end{tabular}%
+}
+\fancyfoot[C]{\thepage} % Center: page number
+\fancyfoot[R]{%
+  \begin{tabular}[t]{@{}r@{}}
+    \nouppercase{\leftmark}\\ % This pulls in the current section title
+  \end{tabular}%
+}
+% Landscape pages should be blank (no headers/footers)
+\fancypagestyle{landscapeplain}{
+  \fancyhf{} % clear all
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+
+% Bibliography setup
+\usepackage[
+  backend=biber,
+  style=authoryear,  % You can change this to numeric, apa, etc.
+  natbib=true         % Enables \citep, \citet if desired
+]{biblatex}
+
+\addbibresource{resources/animal.bib}  % Your .bib file name
+\usepackage{titlesec}
+\usepackage{etoolbox}
+
+% Reset subsection counter at each new section
+\pretocmd{\section}{\setcounter{subsection}{0}}{}{}
+\pretocmd{\subsection}{\setcounter{subsubsection}{0}}{}{}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\roman{subsubsection}}
+
+% --- Title Formats (in size order) ---
+\titleformat{\section}[block]
+  {\Large\bfseries}
+  {\thesection}
+  {1em}
+  {\raggedright} % <- key: prevents justification/stretching
+
+\titleformat{\subsection}[block]
+  {\normalsize\bfseries}   % Subsection: medium
+  {\thesubsection}
+  {1em}
+  {\raggedright} % <- key: prevents justification/stretching
+
+\titleformat{\subsubsection}[block]
+  {\normalsize\bfseries}  % Subsubsection: smallest
+  {\thesubsubsection}
+  {1em}
+  {\raggedright} % <- key: prevents justification/stretching
+
+% --- Spacing for each level ---
+\titlespacing{\section}{0pt}{10pt plus 2pt minus 1pt}{5pt}
+\titlespacing{\subsection}{0pt}{8pt plus 1pt minus 1pt}{4pt}
+\titlespacing{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt}
+
+% Optional: Keep your TOC control if needed
+\usepackage[lof,lot]{etoc}
+\etocsetlocaltop{part}
+% Optional: If using headers/footers
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+
+% Remove default date from title
+\date{} % Prevents date from appearing in \maketitle
+
+
+% Define title
+\title{\textbf{}}
+\author{ }
+\setlength{\topskip}{10pt}  % Ensures LaTeX reserves room above the first line
+%\usepackage{showframe}
+
