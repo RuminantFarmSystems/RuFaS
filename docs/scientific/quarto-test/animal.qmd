@@ -5,7 +5,27 @@
 ### Figure
 
 This is a great example of how to set up a module. 
+
+
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+
+
+
+
+Type 2
+
+
+![](resources/animal.png){#fig-animal-icon fig-cap="Animal module icon" width=35%}
+
+
+
+Type 3 
+
+
+![](resources/animal.png){#fig-animal-icon fig-alt="Animal module icon" fig-cap="Animal module icon" width=35%}
+
+
+
 
 ### Table
 | Variable | Definition |
