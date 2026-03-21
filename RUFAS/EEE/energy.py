@@ -41,7 +41,7 @@ class EnergyEstimator:
                 herd_size=herd_size,
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
-                harvest_type=harvest_type
+                harvest_type=harvest_type,
             )
 
             diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
@@ -133,10 +133,7 @@ class EnergyEstimator:
                 diesel_consumption_data.get("application_depth"),
                 {**base_info_map, **{"units": MeasurementUnits.CENTIMETERS}},
             )
-        if operation_event in [
-            FieldOperationEvent.MANURE_APPLICATION,
-            FieldOperationEvent.FERTILIZER_APPLICATION
-        ]:
+        if operation_event in [FieldOperationEvent.MANURE_APPLICATION, FieldOperationEvent.FERTILIZER_APPLICATION]:
             om.add_variable(
                 f"application_mass_{suffix}",
                 diesel_consumption_data.get("mass"),
@@ -331,7 +328,7 @@ class EnergyEstimator:
         tractor: Tractor,
         clay_percent: float,
         application_mass: float | None = None,
-        application_dm_content: float | None = None
+        application_dm_content: float | None = None,
     ) -> float:
         """
         General estimate of diesel fuel consumption for a given attachment type and tractor size.
@@ -362,8 +359,9 @@ class EnergyEstimator:
         for implement in tractor.implements:
             crop_yield_ton_ha = crop_yield * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
             if application_mass and application_dm_content:
-                application_mass_per_ha = (application_mass * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
-                                           / application_dm_content) / field_production_size
+                application_mass_per_ha = (
+                    application_mass * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS / application_dm_content
+                ) / field_production_size
             else:
                 application_mass_per_ha = None
 
