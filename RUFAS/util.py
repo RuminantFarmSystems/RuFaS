@@ -111,32 +111,49 @@ class Utility:
         return nested_structure
 
     @staticmethod
-    def find_max_index_from_keys(data: dict[str, Any]) -> int | None:
+    def find_group_prefixes_from_keys(
+        data: dict[str, Any],
+        required_suffixes: set[str] | None = None,
+    ) -> list[str]:
         """
-        Extracts and returns the maximum index (n) from the keys of the given dictionary.
-        Assumes keys follow the format `<prefix>_<number>.<suffix>` and number >= 0.
+        Extracts unique group prefixes from flattened keys of the form:
+
+            <group_prefix>.<suffix>
+
+        For example:
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'.year
+
+        would yield the group prefix:
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'
 
         Parameters
         ----------
-        data: Dict[str, Any]
-            The dictionary whose keys will be analyzed.
+        data : dict[str, Any]
+            Dictionary whose keys are flattened variable names.
+        required_suffixes : set[str] | None, default None
+            If provided, only prefixes that have at least one matching suffix from this set
+            will be included.
 
         Returns
         -------
-        int | None
-            The maximum index found among the keys, or None if no numeric index is found.
+        list[str]
+            Sorted list of unique group prefixes.
         """
-        pattern = re.compile(r"_([0-9]+)\.")
-        max_number = -1
+        prefixes: set[str] = set()
 
-        for key in data.keys():
-            match = pattern.search(key)
-            if match:
-                number = int(match.group(1))
-                if number > max_number:
-                    max_number = number
+        for key in data:
+            if "." not in key:
+                continue
 
-        return max_number if max_number != -1 else None
+            prefix, suffix = key.rsplit(".", 1)
+
+            if required_suffixes is not None and suffix not in required_suffixes:
+                continue
+
+            prefixes.add(prefix)
+
+        return sorted(prefixes)
 
     @staticmethod
     def expand_data_temporally(

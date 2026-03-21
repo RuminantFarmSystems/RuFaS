@@ -88,7 +88,7 @@ class EnergyEstimator:
         """
         base_info_map = {
             "class": EnergyEstimator.__name__,
-            "function": EnergyEstimator.estimate_all.__name__,
+            "function": EnergyEstimator.report_diesel_consumption.__name__,
         }
         operation_event: FieldOperationEvent = diesel_consumption_data["operation_event"]
         operation_event_str: str = (
@@ -162,10 +162,9 @@ class EnergyEstimator:
         """
         Parses the OutputManager variables pool for diesel consumption calculation.
         """
-        crop_and_soil_filters = [
+        crop_and_soil_filters: list[dict[str, Any]] = [
             {
                 "name": FieldOperationEvent.FERTILIZER_APPLICATION,
-                "use_name": True,
                 "filters": ["Field._record_fertilizer_application.fertilizer_application.field='.*'"],
                 "variables": [
                     "mass",
@@ -179,7 +178,6 @@ class EnergyEstimator:
             },
             {
                 "name": FieldOperationEvent.TILLING,
-                "use_name": True,
                 "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
                 "variables": [
                     "tillage_depth",
@@ -193,7 +191,6 @@ class EnergyEstimator:
             },
             {
                 "name": FieldOperationEvent.MANURE_APPLICATION,
-                "use_name": True,
                 "filters": ["Field._record_manure_application.manure_application.field='.*'"],
                 "variables": [
                     "dry_matter_mass",
@@ -208,20 +205,26 @@ class EnergyEstimator:
             },
             {
                 "name": FieldOperationEvent.HARVEST,
-                "use_name": True,
                 "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
                 "variables": [
-                    "dry_yield", "crop", "field_size", "harvest_year", "harvest_day", "field_name", "harvest_type"
+                    "dry_yield",
+                    "crop",
+                    "field_size",
+                    "harvest_year",
+                    "harvest_day",
+                    "field_name",
+                    "harvest_type",
                 ],
             },
             {
                 "name": FieldOperationEvent.PLANTING,
-                "use_name": True,
                 "filters": ["Field._record_planting.crop_planting.field='.*'"],
                 "variables": ["crop", "field_size", "average_clay_percent", "year", "day", "field_name"],
             },
         ]
+
         result: list[dict[str, Any]] = []
+
         eee_to_om_key_mapping = {
             FieldOperationEvent.PLANTING: {
                 "crop_type": "crop",
@@ -238,7 +241,7 @@ class EnergyEstimator:
                 "operation_year": "harvest_year",
                 "operation_day": "harvest_day",
                 "field_name": "field_name",
-                "harvest_type": "harvest_type"
+                "harvest_type": "harvest_type",
             },
             FieldOperationEvent.MANURE_APPLICATION: {
                 "mass": "dry_matter_mass",
@@ -269,25 +272,56 @@ class EnergyEstimator:
                 "field_name": "field_name",
             },
         }
-        for filter in crop_and_soil_filters:
-            filtered_pool = om.filter_variables_pool(filter)
-            max_index = Utility.find_max_index_from_keys(filtered_pool)
-            if max_index is None or max_index < 0:
+
+        for filter_config in crop_and_soil_filters:
+            filtered_pool = om.filter_variables_pool(filter_config)
+            if not filtered_pool:
                 continue
-            first_key_in_pool = next(iter(filtered_pool.keys()))
-            for event_type, key_mappings in eee_to_om_key_mapping.items():
-                if first_key_in_pool.startswith(event_type.value):
-                    for index in range(max_index + 1):
-                        key_prefix = f"{event_type}_{index}"
-                        _, first_om_key_in_the_map = next(iter(key_mappings.items()))
-                        length = len(filtered_pool[f"{key_prefix}.{first_om_key_in_the_map}"]["values"])
-                        for i in range(length):
-                            event_data = {
-                                eee_key: filtered_pool[f"{key_prefix}.{om_key_suffix}"]["values"][i]
-                                for eee_key, om_key_suffix in key_mappings.items()
-                            }
-                            event_data["operation_event"] = event_type
-                            result.append(event_data)
+
+            event_type = filter_config["name"]
+            key_mappings = eee_to_om_key_mapping[event_type]
+            required_suffixes = set(key_mappings.values())
+
+            group_prefixes = Utility.find_group_prefixes_from_keys(
+                data=filtered_pool,
+                required_suffixes=required_suffixes,
+            )
+            if not group_prefixes:
+                continue
+
+            first_required_suffix = next(iter(key_mappings.values()))
+
+            for key_prefix in group_prefixes:
+                first_key = f"{key_prefix}.{first_required_suffix}"
+                if first_key not in filtered_pool:
+                    continue
+
+                values = filtered_pool[first_key].get("values", [])
+                length = len(values)
+
+                for i in range(length):
+                    event_data: dict[str, Any] = {}
+
+                    for eee_key, om_key_suffix in key_mappings.items():
+                        full_key = f"{key_prefix}.{om_key_suffix}"
+                        if full_key not in filtered_pool:
+                            raise KeyError(
+                                f"Expected key '{full_key}' not found in filtered pool for "
+                                f"event type '{event_type.value}'."
+                            )
+
+                        field_values = filtered_pool[full_key].get("values", [])
+                        if i >= len(field_values):
+                            raise IndexError(
+                                f"Index {i} out of range for key '{full_key}' while building "
+                                f"diesel consumption event data."
+                            )
+
+                        event_data[eee_key] = field_values[i]
+
+                    event_data["operation_event"] = event_type
+                    result.append(event_data)
+
         return result
 
     def calculate_diesel_consumption(
