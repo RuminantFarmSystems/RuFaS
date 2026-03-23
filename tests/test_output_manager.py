@@ -2377,12 +2377,10 @@ def test_filter_variables_pool_complex(
 
     assert actual == expected_result
 
-    # use_name in dict data
     filter_content = {
         "name": "test_case_3",
         "filters": ["^DummyClass1.*"],
         "filter_by_exclusion": False,
-        "use_name": False,
         "variables": ["a", "b", "c"],
     }
     expected_result = {
