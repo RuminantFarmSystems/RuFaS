@@ -892,7 +892,9 @@ def test_combine(
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
-    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
+    input_dict: dict[str, list[Any]] = {
+        "id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]
+    }
     expected_output = [
         {"id": 1, "name": "Alice", "age": 25},
         {"id": 2, "name": "Bob", "age": 30},
@@ -902,13 +904,13 @@ def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_empty_input() -> None:
-    input_dict = {}
-    expected_output = []
+    input_dict: dict[str, list[Any]] = {}
+    expected_output: list[dict[str, Any]] = []
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists() -> None:
-    input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
+    input_dict: dict[str, list[Any]] = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
@@ -923,13 +925,13 @@ def test_convert_list_to_dict_by_key_basic() -> None:
 
 
 def test_convert_list_to_dict_by_key_empty_list() -> None:
-    list_of_dicts = []
-    expected_output = {}
+    list_of_dicts: list[dict[str, Any]] = []
+    expected_output: dict[Any, dict[str, Any]] = {}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
 
 
 def test_convert_list_to_dict_by_key_missing_key() -> None:
-    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
+    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]
     with pytest.raises(KeyError):
         Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
 
