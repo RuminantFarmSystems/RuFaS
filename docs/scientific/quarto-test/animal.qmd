@@ -2,7 +2,7 @@
 
 ## Introduction
 
-### Figure
+### Example of a Figure
 
 This is a great example of how to set up a module. 
 
@@ -10,9 +10,44 @@ This is a great example of how to set up a module.
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
 
 
-### Table
+### Example of a Table
 | Variable | Definition |
 |---|---|
 | heiferI_num | Number of Heifer I animals |
 
 : Example animal inputs {#tbl-animal-inputs}
+
+
+### Examples of Equations
+:::{#eqn-an-nrc-2}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
+:::
+
+
+
+:::{#eqn-an-nrc-3}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}$$
+:::
+
+
+
+:::{#eqn-an-nrc-4}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}$$
+:::
+
+
+
+:::{#eqn-an-nrc-5}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}$$
+:::
+
+
+
+:::{#eqn-an-nrc-1}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}$$
+:::
+
+:::{#eqn-an-nrc-2}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}$$
+:::
+see @eqn-an-nrc-2

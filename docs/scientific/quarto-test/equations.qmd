@@ -44,21 +44,10 @@ see @eqn-an-nrc-2
 <!-- Inline equations -->
 The energy balance is $E = mc^2$.
 
-<!-- display centered, on its own line -->
+<!-- display centered, on its own line 
+gets numbered automatically in PDF 
+Referencing equations - start with creating a label -->
 
-$$
-E = mc^2
-$$
-
-<!-- gets numbered automatically in PDF -->
-
-$$
-\begin{equation}
-E = mc^2
-\end{equation}
-$$
-
-<!-- Referencing equations - start with creating a label -->
 $$
 \begin{equation}
 E = mc^2

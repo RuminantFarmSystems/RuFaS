@@ -1,0 +1,26 @@
+<!-- ::: {.module-header-row} // ::: {.module-header} -->
+
+::: {.module-header-row} 
+![](resources/manure.png){width=140px}
+
+# Manure Module
+:::
+
+
+## Introduction
+
+### Example of a Figure
+
+<!--just a figure-->
+::: {.text-end}
+![](resources/manure.png){width=50%}
+:::
+
+
+
+### Example of a Table
+| Variable | Definition |
+|---|---|
+| heiferI_num | Number of Heifer I animals |
+
+: Example animal inputs {#tbl-animal-inputs}

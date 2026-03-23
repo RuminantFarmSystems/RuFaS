@@ -1,3 +1,19 @@
+.module-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.module-header-row img {
+  display: block;
+  margin: 0;
+}
+
+.module-header-row h1 {
+  margin: 0;
+}
+
 body {
   font-family: "Calibri", "Arial", sans-serif;
 }
@@ -21,4 +37,12 @@ figure figcaption {
   display: block;
   margin-top: 0.5rem;
   text-align: center;
+}
+
+.right-image {
+  text-align: right;
+}
+
+.right-image img {
+  display: inline-block;
 }
