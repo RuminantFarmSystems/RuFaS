@@ -343,6 +343,119 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     assert actual == expected
 
 
+def test_find_group_prefixes_basic() -> None:
+    """Test extraction of prefixes from standard flattened keys."""
+    data: dict[str, Any] = {
+        "a.b": 1,
+        "a.c": 2,
+        "d.e": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["a", "d"]
+
+
+def test_find_group_prefixes_deduplication() -> None:
+    """Ensure duplicate prefixes are only returned once."""
+    data: dict[str, Any] = {
+        "group1.x": 1,
+        "group1.y": 2,
+        "group1.z": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["group1"]
+
+
+def test_find_group_prefixes_complex_keys() -> None:
+    """Test realistic complex keys similar to production format."""
+    data: dict[str, Any] = {
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass": 1,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.year": 2020,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'.mass": 2,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    expected = [
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'",
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'",
+    ]
+
+    assert result == sorted(expected)
+
+
+def test_find_group_prefixes_with_required_suffixes() -> None:
+    """Test filtering using required_suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.mass": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == ["a", "c"]
+
+
+def test_find_group_prefixes_required_suffixes_no_match() -> None:
+    """Test when no suffix matches the required set."""
+    data: dict[str, Any] = {
+        "a.year": 2020,
+        "b.day": 10,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == []
+
+
+def test_find_group_prefixes_ignores_keys_without_dot() -> None:
+    """Ensure keys without a dot are ignored."""
+    data: dict[str, Any] = {
+        "a": 1,
+        "b": 2,
+        "c.d": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["c"]
+
+
+def test_find_group_prefixes_empty_input() -> None:
+    """Test behavior with empty input."""
+    result = Utility.find_group_prefixes_from_keys({})
+
+    assert result == []
+
+
+def test_find_group_prefixes_multiple_suffix_filtering() -> None:
+    """Test filtering with multiple allowed suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.depth": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass", "year"},
+    )
+
+    assert result == ["a"]
+
+
 @pytest.mark.parametrize(
     "data_to_pad,fill_value,gap_pad,end_pad,expected",
     [
