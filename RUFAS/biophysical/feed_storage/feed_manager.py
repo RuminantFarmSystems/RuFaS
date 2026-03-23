@@ -1,4 +1,4 @@
-from collections import Counter, defaultdict, namedtuple
+from collections import Counter, defaultdict
 from datetime import date
 from typing import Any, DefaultDict, Literal, Sequence
 
@@ -35,8 +35,6 @@ ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 """A type alias representing the context in which a feed purchase was initiated."""
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
-
-FeedDeduction = namedtuple("FeedDeduction", ["simulation_day", "amount"])
 
 
 class FeedManager:
@@ -100,8 +98,11 @@ class FeedManager:
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
-        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(sorted_purchased_allowances)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
+            sorted_purchased_allowances
+        )
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -342,10 +343,23 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
-
         for rufas_id, mass in feed_report.items():
-            self._om.add_variable(f"stored_feed_{rufas_id}_dm", mass["dry_matter_mass"], info_map)
-            self._om.add_variable(f"stored_feed_{rufas_id}_wet", mass["fresh_mass"], info_map)
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_dm",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["dry_matter_mass"],
+                },
+                info_map,
+            )
+            self._om.add_variable(
+                f"stored_feed_{rufas_id}_wet",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": mass["fresh_mass"],
+                },
+                info_map,
+            )
 
     def manage_daily_feed_request(
         self, requested_feed: RequestedFeed, time: RufasTime
@@ -620,7 +634,9 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {}
+        total_purchased_deducted: dict[RUFAS_ID, float] = {
+            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
+        }
         total_farmgrown_deducted: dict[RUFAS_ID, float] = {
             farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
         }
@@ -686,9 +702,23 @@ class FeedManager:
             "simulation_day": simulation_day,
         }
         for feed_id, amount in total_purchased.items():
-            self._om.add_variable(f"purchased_feed_{feed_id}_fed", FeedDeduction(simulation_day, amount), info_map)
+            self._om.add_variable(
+                f"purchased_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
         for feed_id, amount in total_farmgrown.items():
-            self._om.add_variable(f"farmgrown_feed_{feed_id}_fed", FeedDeduction(simulation_day, amount), info_map)
+            self._om.add_variable(
+                f"farmgrown_feed_{feed_id}_fed",
+                {
+                    "simulation_day": simulation_day,
+                    "amount": amount,
+                },
+                info_map,
+            )
 
     def _deduct_from_storage(
         self,
@@ -856,7 +886,8 @@ class FeedManager:
             )
             available_feeds.append(new_feed)
 
-        return available_feeds
+        sorted_available_feeds = sorted(available_feeds, key=lambda feed: feed.rufas_id)
+        return sorted_available_feeds
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
         """

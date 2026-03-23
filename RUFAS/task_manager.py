@@ -111,6 +111,16 @@ class TaskManager:
         metadata_depth_limit : int
             Override value for maximum metadata properties depth set in Input Manager.
 
+        Raises
+        ------
+        Exception
+            If the input data is invalid.
+
+        Notes
+        -----
+        We set maxtasksperchild=1 to maintain isolation between tasks and ensure no memory
+        leaks happens in IO Managers.
+
         """
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
@@ -161,9 +171,7 @@ class TaskManager:
         self.output_manager.add_log(
             "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
         )
-        self.pool = multiprocessing.Pool(
-            workers, maxtasksperchild=1
-        )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
+        self.pool = multiprocessing.Pool(workers, maxtasksperchild=1) if workers > 1 else None
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         self.output_manager.add_log(
             "Task Manager parsed tasks",
@@ -179,7 +187,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -193,6 +201,7 @@ class TaskManager:
                 info_map,
             )
             json_output_directory = runnable_args[0]["json_output_directory"]
+
             self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes)
 
         TaskManager.handle_post_processing(
@@ -240,6 +249,9 @@ class TaskManager:
 
         Raises
         ------
+        RuntimeError
+            If a required dependency is not installed or does not meet the version requirements
+            specified in pyproject.toml.
         ImportError
             If a required dependency is not installed.
         """
@@ -271,7 +283,7 @@ class TaskManager:
                     " to install all dependencies at required minimum levels.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
-                raise RuntimeError(f"[ERROR] Required package '{package_name}' is not installed.") from e
+                raise RuntimeError(f"Required package '{package_name}' is not installed.") from e
 
             if requirement.specifier and not requirement.specifier.contains(installed_version):
                 self.output_manager.add_error(
@@ -282,8 +294,8 @@ class TaskManager:
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
                 raise RuntimeError(
-                    f"[ERROR] {package_name}=={installed_version} does not satisfy required version:"
-                    f" {requirement.specifier}"
+                    f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
+                    f"Required: {requirement.specifier}"
                 )
 
     def check_python_version(self) -> None:
@@ -488,6 +500,7 @@ class TaskManager:
         metadata_depth_limit: int,
         workers: int,
         metadata_path: Path,
+        output_directory: Path,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -496,8 +509,12 @@ class TaskManager:
             metadata_depth_limit=metadata_depth_limit,
             workers=workers,
             metadata_path=metadata_path,
+            output_directory=output_directory,
         )
-        results = self.pool.imap(task_with_args, single_run_args)
+        if self.pool is not None:
+            results = self.pool.map(task_with_args, single_run_args)
+        else:
+            results = list(map(task_with_args, single_run_args))
         failed = []
         for result in results:
             if result is not None:
@@ -528,6 +545,7 @@ class TaskManager:
         workers: int,
         metadata_depth_limit: int | None,
         metadata_path: Path,
+        output_directory: Path,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -561,7 +579,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
-                output_directory=Path("output/"),
+                output_directory=output_directory,
                 clear_output_directory=False,
                 chunkification=args["chunkification"],
                 max_memory_usage_percent=int(args["maximum_memory_usage_percent"] / workers),

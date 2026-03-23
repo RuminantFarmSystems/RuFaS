@@ -1,0 +1,56 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {part}{I\hspace {1em}Manure Module}{2}{part.1}%
+\etoc@startlocaltoc {1}
+\contentsline {section}{\numberline {I.}Module Introduction}{6}{section.1}%
+\contentsline {subsection}{\numberline {A.}Structural setup of the Manure Module}{6}{subsection.1.1}%
+\contentsline {subsection}{\numberline {B.}Overview of Required Inputs}{7}{subsection.1.2}%
+\contentsline {subsection}{\numberline {C.}General Assumptions of the Manure Module}{8}{subsection.1.3}%
+\contentsline {section}{\numberline {II.}Animal and Manure Module Connection}{9}{section.2}%
+\contentsline {subsection}{\numberline {A.}Introduction}{9}{subsection.2.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{12}{subsection.2.2}%
+\contentsline {section}{\numberline {III.}Manure Handler}{17}{section.3}%
+\contentsline {subsection}{\numberline {A.}Introduction}{17}{subsection.3.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{21}{subsection.3.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{26}{subsection.3.3}%
+\contentsline {section}{\numberline {IV.}Solid Liquid Separators}{26}{section.4}%
+\contentsline {subsection}{\numberline {A.}Introduction}{26}{subsection.4.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{29}{subsection.4.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{31}{subsection.4.3}%
+\contentsline {section}{\numberline {V.}Anaerobic Digestion}{33}{section.5}%
+\contentsline {subsection}{\numberline {A.}Introduction}{33}{subsection.5.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{35}{subsection.5.2}%
+\contentsline {subsection}{\numberline {C.}Manure composition update}{39}{subsection.5.3}%
+\contentsline {section}{\numberline {VI.}Slurry Storage}{41}{section.6}%
+\contentsline {subsection}{\numberline {A.}Introduction}{41}{subsection.6.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{43}{subsection.6.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{49}{subsection.6.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{50}{subsection.6.4}%
+\contentsline {section}{\numberline {VII.}Anaerobic Lagoon}{51}{section.7}%
+\contentsline {subsection}{\numberline {A.}Introduction}{51}{subsection.7.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{53}{subsection.7.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{60}{subsection.7.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{60}{subsection.7.4}%
+\contentsline {section}{\numberline {VIII.}Bedded Pack}{62}{section.8}%
+\contentsline {subsection}{\numberline {A.}Introduction}{62}{subsection.8.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{64}{subsection.8.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{69}{subsection.8.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{70}{subsection.8.4}%
+\contentsline {section}{\numberline {IX.}Open Lot}{72}{section.9}%
+\contentsline {subsection}{\numberline {A.}Introduction}{72}{subsection.9.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{74}{subsection.9.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{79}{subsection.9.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{80}{subsection.9.4}%
+\contentsline {section}{\numberline {X.}Composting}{82}{section.10}%
+\contentsline {subsection}{\numberline {A.}Introduction}{82}{subsection.10.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{84}{subsection.10.2}%
+\contentsline {subsection}{\numberline {C.}Received, stored, and emptied outputs}{89}{subsection.10.3}%
+\contentsline {subsection}{\numberline {D.}Manure composition updates}{90}{subsection.10.4}%
+\contentsline {section}{\numberline {XI.}Daily spread}{92}{section.11}%
+\contentsline {subsection}{\numberline {A.}Introduction}{92}{subsection.11.1}%
+\contentsline {section}{\numberline {XII.}Manure to Soil and Crop Module Connection}{94}{section.12}%
+\contentsline {subsection}{\numberline {A.}Introduction}{94}{subsection.12.1}%
+\contentsline {subsection}{\numberline {B.}Implementation in RuFaS}{94}{subsection.12.2}%
+\contentsline {subsection}{\numberline {C.}Methodology}{95}{subsection.12.3}%
+\contentsline {section}{\numberline {XIII.}Key Constants}{98}{section.13}%
+\contentsline {section}{\numberline {XIV.}References}{101}{section.14}%

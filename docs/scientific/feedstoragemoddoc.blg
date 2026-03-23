@@ -1,0 +1,17 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'feedstoragemoddoc.blg'
+[216] biber-MSWIN64:340> INFO - === 
+[275] Biber.pm:419> INFO - Reading 'feedstoragemoddoc.bcf'
+[444] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[444] Biber.pm:979> INFO - Found 2 citekeys in bib section 1
+[444] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[494] Biber.pm:4419> INFO - Processing section 1
+[526] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 1
+[603] bibtex.pm:1713> INFO - LaTeX decoding ...
+[765] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/animal.bib'
+[909] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[909] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[909] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[909] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[914] bbl.pm:660> INFO - Writing 'feedstoragemoddoc.bbl' with encoding 'UTF-8'
+[921] bbl.pm:763> INFO - Output to feedstoragemoddoc.bbl

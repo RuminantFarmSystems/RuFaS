@@ -4,14 +4,14 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Type, Union, cast
+from typing import Any, Sequence, Type, Union, cast
 
 import pandas as pd
 import psutil
+import py
 import pytest
 from freezegun import freeze_time
-from mock import ANY, PropertyMock, mock_open, patch
-from mock.mock import MagicMock, call
+from unittest.mock import ANY, PropertyMock, mock_open, patch, MagicMock, call
 from pytest import CaptureFixture, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -138,8 +138,8 @@ def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVer
 )
 def test_dict_to_csv_column_list(
     variable_name: str,
-    data: Dict[str, List[Any]],
-    expected_result: List[pd.Series],
+    data: dict[str, list[Any]],
+    expected_result: list[pd.Series],
 ) -> None:
     """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
 
@@ -184,7 +184,7 @@ def test_dict_to_csv_column_list(
 )
 def test_get_units_substr(
     variable_name: str,
-    units: str | Dict[str, str] | None,
+    units: str | dict[str, str] | None,
     subkey: str | None,
     expected_result: str,
     expected_error: str | None,
@@ -642,7 +642,7 @@ def test_get_units_substr(
 )
 def test_dict_to_file_csv(
     mock_output_manager: OutputManager,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     direction: str,
     expected_result: str,
     should_write: bool,
@@ -919,7 +919,7 @@ def test_add_log(
 def test_add_variable(
     name: str,
     value: Any,
-    info_map: Dict[str, Any],
+    info_map: dict[str, Any],
     first_map: bool,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
@@ -968,7 +968,7 @@ def test_add_variable(
 def test_add_variable_chunkification_save_chunk_threshold_specified(
     name: str,
     value: Any,
-    info_map: Dict[str, Any],
+    info_map: dict[str, Any],
     first_map: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -1024,7 +1024,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
 def test_add_variable_chunkification_save_chunk_threshold_no_call(
     name: str,
     value: Any,
-    info_map: Dict[str, Any],
+    info_map: dict[str, Any],
     first_map: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -1080,7 +1080,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
 def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     name: str,
     value: Any,
-    info_map: Dict[str, Any],
+    info_map: dict[str, Any],
     first_map: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -1137,7 +1137,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
 def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     name: str,
     value: Any,
-    info_map: Dict[str, Any],
+    info_map: dict[str, Any],
     first_map: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -1279,7 +1279,7 @@ def test_add_variable_bulk(
 def test_stringify_units(
     mock_output_manager: OutputManager,
     units: dict[str, Any] | MeasurementUnits,
-    expected_result: Dict[str, str] | str | Exception,
+    expected_result: dict[str, str] | str | Exception,
     mocker: MockerFixture,
 ) -> None:
     """Test for function _stringify_units in file output_manager.py"""
@@ -1326,7 +1326,7 @@ def test_add_to_pool(
         "units": MeasurementUnits.ANIMALS.value,
     }
     key = "dummy_key"
-    pool: Dict[str, Dict[str, Any]] = {}
+    pool: dict[str, dict[str, Any]] = {}
     assert not mock_output_manager._exclude_info_maps_flag
     mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
 
@@ -1544,7 +1544,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         output_manager, "generate_file_name", return_value=expected_file_name
     )
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "_dict_to_file_csv")
-    data_dict: Dict[str, Dict[str, List[Any]]] = {
+    data_dict: dict[str, dict[str, list[Any]]] = {
         "variable_name": {"values": []},
         "usage_count": {"values": []},
     }
@@ -1696,13 +1696,13 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
 )
 def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
-    expected_result: List[str],
+    expected_result: list[str],
     exclude_info_maps: bool,
     format_option: str,
     mocker: MockerFixture,
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
-    mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
+    mock_variable_pool: dict[str, dict[str, list[Any]]] = {
         "var1": {
             "values": [1],
             "info_maps": [{"timestamp": "value1", "units": "units1"}, {"simulation_day": "value2", "units": "units2"}],
@@ -1916,7 +1916,7 @@ def test_list_to_file_txt(
     tmp_path: Path,
 ) -> None:
     """Test case for function _list_to_file_text in output_manager.py"""
-    dummy_file_path = tmp_path / "dummy_file.txt"
+    dummy_file_path = Path(tmp_path / "dummy_file.txt")
     dummy_list = ["apple", "banana", "cherry"]
 
     mock_output_manager._list_to_file_txt(dummy_list, dummy_file_path)
@@ -1925,14 +1925,14 @@ def test_list_to_file_txt(
     assert "applebananacherry" in dummy_file_content
 
     with pytest.raises(TypeError) as e:
-        mock_output_manager._list_to_file_txt(1234, dummy_file_path)
+        mock_output_manager._list_to_file_txt(cast(list[str], 1234), Path(dummy_file_path))
     assert "object is not iterable" in str(e.value)
 
     dummy_broken_file_path = ""
 
-    with pytest.raises(FileNotFoundError) as e:
-        mock_output_manager._list_to_file_txt(dummy_list, dummy_broken_file_path)
-    assert "No such file or directory" in str(e.value)
+    with pytest.raises(FileNotFoundError) as e1:
+        mock_output_manager._list_to_file_txt(dummy_list, cast(Path, dummy_broken_file_path))
+    assert "No such file or directory" in str(e1.value)
 
 
 def test_exclude_info_maps(
@@ -1940,18 +1940,18 @@ def test_exclude_info_maps(
 ) -> None:
     """Test case for function _exclude_info_maps in output_manager.py"""
     # Test case 1: Empty pool
-    pool = {}
-    expected_result = {}
+    pool: dict[str, dict[str, list[str]]] = {}
+    expected_result: dict[str, dict[str, list[str]]] = {}
     assert mock_output_manager._exclude_info_maps(pool) == expected_result
 
     # Test case 2: Pools with info_maps
     pool = {
-        "key1": {"info_maps": "value1", "other_key": "other_value"},
-        "key2": {"info_maps": "value1", "other_key": "other_value"},
+        "key1": {"info_maps": ["value1"], "other_key": ["other_value"]},
+        "key2": {"info_maps": ["value1"], "other_key": ["other_value"]},
     }
     expected_result = {
-        "key1": {"other_key": "other_value"},
-        "key2": {"other_key": "other_value"},
+        "key1": {"other_key": ["other_value"]},
+        "key2": {"other_key": ["other_value"]},
     }
     assert mock_output_manager._exclude_info_maps(pool) == expected_result
 
@@ -1987,7 +1987,7 @@ def test_load_filter_file_content_json(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {
+    data: dict[str, Any] = {
         "filters": ["filter1", "filter2"],
         "other_key": "value",
     }
@@ -2006,7 +2006,7 @@ def test_load_filter_file_content_json_with_direction(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": expected_direction}
+    data: dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": expected_direction}
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
@@ -2020,7 +2020,7 @@ def test_load_filter_file_content_json_multiple(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {
+    data: dict[str, Any] = {
         "multiple": [
             {
                 "filters": ["filter1", "filter2"],
@@ -2042,11 +2042,11 @@ def test_load_filter_file_content_json_multiple(
 @pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
 def test_load_filter_file_content_json_multiple_with_direction(
     mock_file: MagicMock,
-    direction: str,
+    direction: str | None,
     mock_output_manager: OutputManager,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
-    data: Dict[str, Any] = {
+    data: dict[str, Any] = {
         "direction": direction,
         "multiple": [
             {
@@ -2093,7 +2093,7 @@ def test_load_filter_file_content_exception(
 
 def test_list_filter_files_in_dir(
     mock_output_manager: OutputManager,
-    tmpdir,
+    tmpdir: py.path.local,
     mocker: MockerFixture,
 ) -> None:
     mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
@@ -2114,7 +2114,7 @@ def test_list_filter_files_in_dir(
 
 
 @pytest.fixture
-def mock_simple_variables_pool() -> Dict[str, OutputManager.pool_element_type]:
+def mock_simple_variables_pool() -> dict[str, OutputManager.pool_element_type]:
     """Simple variables pool to be used for testing the Output Manager."""
     return {
         "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
@@ -2179,10 +2179,10 @@ def mock_simple_variables_pool() -> Dict[str, OutputManager.pool_element_type]:
 )
 def test_filter_variables_pool(
     mock_output_manager: OutputManager,
-    mock_simple_variables_pool: Dict[str, OutputManager.pool_element_type],
+    mock_simple_variables_pool: dict[str, OutputManager.pool_element_type],
     mocker: MockerFixture,
-    filter_content: Dict[str, Any],
-    expected: Dict[str, Dict[str, str]],
+    filter_content: dict[str, Any],
+    expected: dict[str, dict[str, list[str]]],
     data_padded: bool,
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
@@ -2198,22 +2198,22 @@ def test_filter_variables_pool(
 
 
 @pytest.fixture
-def mock_variables_pool() -> Dict[str, Dict[str, str]]:
+def mock_variables_pool() -> dict[str, dict[str, list[str]]]:
     dummy_variables_pool = {
-        "DummyClass1.dummy_fun1.dummy_var1": {"values": "value1"},
-        "DummyClass1.dummy_fun1.dummy_var2": {"values": "value2"},  # same class as prev, same fun, different var
-        "DummyClass2.dummy_fun2.dummy_var3": {"values": "value3"},  # new class, new fun, new var
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},  # same class as prev, new fun, new var
-        "DummyClass2.dummy_fun4.dummy_var4": {"values": "value5"},  # same class as prev, new fun, same var
-        "DummyClass3.dummy_fun4.dummy_var2": {"values": "value6"},  # new class, new fun, same var name as 2nd entry
-        "DummyClass4.dummy_fun2.dummy_var5": {"values": "value7"},  # new class, same fun name as 3rd entry, new var
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1"]},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": ["value2"]},  # same class as prev, same fun, different var
+        "DummyClass2.dummy_fun2.dummy_var3": {"values": ["value3"]},  # new class, new fun, new var
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},  # same class as prev, new fun, new var
+        "DummyClass2.dummy_fun4.dummy_var4": {"values": ["value5"]},  # same class as prev, new fun, same var
+        "DummyClass3.dummy_fun4.dummy_var2": {"values": ["value6"]},  # new class, new fun, same var name as 2nd entry
+        "DummyClass4.dummy_fun2.dummy_var5": {"values": ["value7"]},  # new class, same fun name as 3rd entry, new var
     }
     return dummy_variables_pool
 
 
 def test_filter_variables_pool_regex_patterns(
     mock_output_manager: OutputManager,
-    mock_variables_pool: Dict[str, Dict[str, str]],
+    mock_variables_pool: dict[str, dict[str, list[str]]],
 ) -> None:
     """Test case for pattern pool using regex patterns with
     function filter_variables_pool in output_manager.py"""
@@ -2222,8 +2222,8 @@ def test_filter_variables_pool_regex_patterns(
     # get all Class1 vars
     filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False}
     expected_result = {
-        "DummyClass1.dummy_fun1.dummy_var1": {"values": "value1"},
-        "DummyClass1.dummy_fun1.dummy_var2": {"values": "value2"},
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1"]},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": ["value2"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2231,8 +2231,8 @@ def test_filter_variables_pool_regex_patterns(
     # get only vars from fun2s
     filter_content = {"filters": [".*fun2.*"], "filter_by_exclusion": False}
     expected_result = {
-        "DummyClass2.dummy_fun2.dummy_var3": {"values": "value3"},
-        "DummyClass4.dummy_fun2.dummy_var5": {"values": "value7"},
+        "DummyClass2.dummy_fun2.dummy_var3": {"values": ["value3"]},
+        "DummyClass4.dummy_fun2.dummy_var5": {"values": ["value7"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2240,8 +2240,8 @@ def test_filter_variables_pool_regex_patterns(
     # get Class2 with var4 but not Class2 with var3
     filter_content = {"filters": ["^DummyClass2.*var4$"], "filter_by_exclusion": False}
     expected_result = {
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},
-        "DummyClass2.dummy_fun4.dummy_var4": {"values": "value5"},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},
+        "DummyClass2.dummy_fun4.dummy_var4": {"values": ["value5"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2249,10 +2249,10 @@ def test_filter_variables_pool_regex_patterns(
     # get all var2s and var4s
     filter_content = {"filters": [".*var2$", ".*var4$"], "filter_by_exclusion": False}
     expected_result = {
-        "DummyClass1.dummy_fun1.dummy_var2": {"values": "value2"},
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},
-        "DummyClass2.dummy_fun4.dummy_var4": {"values": "value5"},
-        "DummyClass3.dummy_fun4.dummy_var2": {"values": "value6"},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": ["value2"]},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},
+        "DummyClass2.dummy_fun4.dummy_var4": {"values": ["value5"]},
+        "DummyClass3.dummy_fun4.dummy_var2": {"values": ["value6"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2261,7 +2261,7 @@ def test_filter_variables_pool_regex_patterns(
 
 def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager: OutputManager,
-    mock_variables_pool: Dict[str, str],
+    mock_variables_pool: dict[str, dict[str, list[str]]],
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
     function filter_variables_pool in output_manager.py"""
@@ -2270,11 +2270,11 @@ def test_filter_variables_pool_exclude_regex_patterns(
     # get everything except Class1 vars
     filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": True}
     expected_result = {
-        "DummyClass2.dummy_fun2.dummy_var3": {"values": "value3"},
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},
-        "DummyClass2.dummy_fun4.dummy_var4": {"values": "value5"},
-        "DummyClass3.dummy_fun4.dummy_var2": {"values": "value6"},
-        "DummyClass4.dummy_fun2.dummy_var5": {"values": "value7"},
+        "DummyClass2.dummy_fun2.dummy_var3": {"values": ["value3"]},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},
+        "DummyClass2.dummy_fun4.dummy_var4": {"values": ["value5"]},
+        "DummyClass3.dummy_fun4.dummy_var2": {"values": ["value6"]},
+        "DummyClass4.dummy_fun2.dummy_var5": {"values": ["value7"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2282,11 +2282,11 @@ def test_filter_variables_pool_exclude_regex_patterns(
     # get everything except vars from fun2s
     filter_content = {"filters": ["exclude", ".*fun2.*"], "filter_by_exclusion": True}
     expected_result = {
-        "DummyClass1.dummy_fun1.dummy_var1": {"values": "value1"},
-        "DummyClass1.dummy_fun1.dummy_var2": {"values": "value2"},
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},
-        "DummyClass2.dummy_fun4.dummy_var4": {"values": "value5"},
-        "DummyClass3.dummy_fun4.dummy_var2": {"values": "value6"},
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1"]},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": ["value2"]},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},
+        "DummyClass2.dummy_fun4.dummy_var4": {"values": ["value5"]},
+        "DummyClass3.dummy_fun4.dummy_var2": {"values": ["value6"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2294,11 +2294,11 @@ def test_filter_variables_pool_exclude_regex_patterns(
     # get everything without Class2 with var4
     filter_content = {"filters": ["^DummyClass2.*var4$"], "filter_by_exclusion": True}
     expected_result = {
-        "DummyClass1.dummy_fun1.dummy_var1": {"values": "value1"},
-        "DummyClass1.dummy_fun1.dummy_var2": {"values": "value2"},
-        "DummyClass2.dummy_fun2.dummy_var3": {"values": "value3"},
-        "DummyClass3.dummy_fun4.dummy_var2": {"values": "value6"},
-        "DummyClass4.dummy_fun2.dummy_var5": {"values": "value7"},
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1"]},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": ["value2"]},
+        "DummyClass2.dummy_fun2.dummy_var3": {"values": ["value3"]},
+        "DummyClass3.dummy_fun4.dummy_var2": {"values": ["value6"]},
+        "DummyClass4.dummy_fun2.dummy_var5": {"values": ["value7"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2306,9 +2306,9 @@ def test_filter_variables_pool_exclude_regex_patterns(
     # get everything that doesn't have var2s and var4s
     filter_content = {"filters": [".*var2$", ".*var4$"], "filter_by_exclusion": True}
     expected_result = {
-        "DummyClass1.dummy_fun1.dummy_var1": {"values": "value1"},
-        "DummyClass2.dummy_fun2.dummy_var3": {"values": "value3"},
-        "DummyClass4.dummy_fun2.dummy_var5": {"values": "value7"},
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1"]},
+        "DummyClass2.dummy_fun2.dummy_var3": {"values": ["value3"]},
+        "DummyClass4.dummy_fun2.dummy_var5": {"values": ["value7"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
@@ -2323,7 +2323,7 @@ def mock_variables_pool_complex() -> dict[str, OutputManager.pool_element_type]:
             "values": [{"a": "A", "b": 1.0, "c": True}, {"a": "AA", "b": 2.0, "c": True}]
         },
         "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
-        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": ["value4"]},
     }
     return dummy_variables_pool
 
@@ -2337,7 +2337,7 @@ def test_filter_variables_pool_complex(
     output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool_complex
     # use filter_name
-    filter_content: Dict[str, Any] = {
+    filter_content: dict[str, Any] = {
         "name": "test_case_1",
         "filters": ["^DummyClass1.*"],
         "filter_by_exclusion": False,
@@ -2430,7 +2430,8 @@ def test_filter_variables_pool_complex(
             False,
             {
                 "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
-                "a": {"values": ["A", "AA", "AAA"]},
+                "DummyClass1.dummy_fun1.dummy_var2.a": {"values": ["A", "AA"]},
+                "DummyClass1.dummy_fun2.dummy_var3.a": {"values": ["AAA"]},
             },
             Counter(
                 {
@@ -2452,8 +2453,10 @@ def test_filter_variables_pool_complex(
             True,
             {
                 "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
-                "b": {"values": [1.0, 2.0, 3.0]},
-                "c": {"values": [True, True, False]},
+                "DummyClass1.dummy_fun1.dummy_var2.b": {"values": [1.0, 2.0]},
+                "DummyClass1.dummy_fun1.dummy_var2.c": {"values": [True, True]},
+                "DummyClass1.dummy_fun2.dummy_var3.b": {"values": [3.0]},
+                "DummyClass1.dummy_fun2.dummy_var3.c": {"values": [False]},
             },
             Counter(
                 {
@@ -2478,7 +2481,7 @@ def test_parse_filtered_variables(
     """Tests _parse_filtered_variables in the Output Manager."""
     mock_output_manager._variables_usage_counter = Counter()
 
-    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion, True)
+    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion)
 
     assert actual == expected
     assert mock_output_manager._variables_usage_counter == expected_counter
@@ -2524,7 +2527,7 @@ def test_save_results(
     mock_output_manager: OutputManager,
     exclude_info_maps: bool,
     produce_graphics: bool,
-    filter_content: List[Dict[str, str]],
+    filter_content: list[dict[str, str]],
     is_faulty: bool,
     chunkification: bool,
     direction: str,
@@ -2704,7 +2707,7 @@ def test_save_results_report_generation(
     mock_output_manager: OutputManager,
     exclude_info_maps: bool,
     produce_graphics: bool,
-    filter_contents: List[Dict[str, str]],
+    filter_contents: list[dict[str, str]],
     is_faulty: bool,
     warn_on_conflict: bool,
     direction: str,
@@ -2730,7 +2733,7 @@ def test_save_results_report_generation(
     )
     mocker.patch.object(mock_output_manager, "_exclude_info_maps", return_value={})
     mock_dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
-    mocker.patch.object(mock_output_manager, "add_error")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
     mocker.patch.object(mock_output_manager, "route_logs", return_value=None)
     mock_output_manager.set_metadata_prefix("test_prefix")
     mocker.patch.object(mock_output_manager, "create_directory")
@@ -2747,18 +2750,23 @@ def test_save_results_report_generation(
         )
 
         # Assert
-        assert mock_output_manager.add_error.call_count == is_faulty * len(
-            mock_output_manager._list_filter_files_in_dir.return_value
+        assert mock_add_error.call_count == is_faulty * len(
+            [
+                "report_input_filepath1.txt",
+                "report_input_filepath2.txt",
+            ]
         )
         if not is_faulty:
-            mock_output_manager.add_error.assert_not_called()
-            assert mock_dict_to_file_csv.call_count == len(mock_output_manager._list_filter_files_in_dir.return_value)
+            mock_add_error.assert_not_called()
+            assert mock_dict_to_file_csv.call_count == 2
 
         if not is_faulty and any("graph_details" in content for content in filter_contents):
             for content in filter_contents:
                 if "graph_details" in content:
                     assert "graphics_dir" in content["graph_details"]
-                    assert content["graph_details"]["graphics_dir"] == graphics_dir
+                    graph_details = content["graph_details"]
+                    assert isinstance(graph_details, dict)
+                    assert graph_details["graphics_dir"] == graphics_dir
                     assert content["graph_details"]["metadata_prefix"] == "test_prefix"
 
         expected_warning_count = 0
@@ -2782,8 +2790,8 @@ def test_route_save_functions_csv_with_rounding(
         "RUFAS.util.Utility.round_numeric_values_in_dict", side_effect=lambda x, y: x
     )
 
-    filtered_pool = {"key": {"var": 123.456789}}
-    filter_content = {
+    filtered_pool = {"key": {"var": [123.456789]}}
+    filter_content: dict[str, str | int] = {
         "filters": "regex",
         "data_significant_digits": 3,
     }
@@ -2801,10 +2809,10 @@ def test_route_save_functions_csv_with_rounding(
     )
 
     # Assert
-    round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
+    round_numeric_values_in_dict.assert_called_once_with({"var": [123.456789]}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path), direction
+        {"key": {"var": [123.456789]}}, Path("output", "CSVs", variable_csv_file_path), direction
     )
     mock_add_log.assert_called_once_with(
         "Rounding Values",
@@ -2824,9 +2832,9 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "json_file"
     jsons_dir = Path("json_dir")
-    filtered_pool = {"key": {"var": "value"}}
+    filtered_pool = {"key": {"var": ["value"]}}
     produce_graphics = True
-    filter_content = {"filters": "regex"}
+    filter_content: dict[str, str | int] = {"filters": "regex"}
     graphics_dir = Path("graphics_dir")
     csvs_dir = Path("csvs_dir")
 
@@ -2853,9 +2861,9 @@ def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "comparison_file"
     json_dir = Path("json_dir")
-    filtered_pool = {"key": {"var": "value"}}
+    filtered_pool = {"key": {"var": ["value"]}}
     produce_graphics = True
-    filter_content = {"filters": "regex"}
+    filter_content: dict[str, str | int] = {"filters": "regex"}
     graphics_dir = Path("graphics_dir")
     csv_dir = Path("csvs_dir")
 
@@ -2885,7 +2893,7 @@ def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
 def test_save_to_json(
     mocker: MockerFixture,
     tmp_path: Path,
-    filter_content: Dict[str, Union[str, int]],
+    filter_content: dict[str, Union[str, int]],
     filter_file_extension: str,
     filter_file_prefix: str,
     expected_filename: str,
@@ -2902,7 +2910,7 @@ def test_save_to_json(
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
     filter_file = f"{filter_file_prefix}_filter_file{filter_file_extension}"
     save_path = tmp_path  # Using pytest's tmp_path fixture
-    filtered_pool = {"key": "value"}
+    filtered_pool = {"key": {"value": ["value"]}}
 
     # Act
     output_manager._save_to_json(filter_file, save_path, filtered_pool, filter_content)
@@ -2934,11 +2942,11 @@ def test_route_save_functions_graph(
     add_warning = mocker.patch.object(mock_output_manager, "add_warning")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
     mocker.patch.object(mock_output_manager, "route_logs", return_value=True)
-    graph_data = {"filters": ".*", "other keys": "other values"}
+    graph_data: dict[str, str | int] = {"filters": ".*", "other keys": "other values"}
 
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         False,
         graph_data,
         Path("jsons_dir"),
@@ -2957,7 +2965,7 @@ def test_route_save_functions_graph(
 
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         True,
         graph_data,
         Path("jsons_dir"),
@@ -2972,13 +2980,13 @@ def test_route_save_functions_graph(
     )
 
     mock_generate_graph.assert_called_once_with(
-        {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
+        {"key": {"value": [1, 2, 3, 4]}}, graph_data, "graph_file", Path("graphics_dir"), True
     )
 
     mock_generate_graph.side_effect = Exception("test exception")
     mock_output_manager._route_save_functions(
         "graph_file",
-        {"key": [1, 2, 3, 4]},
+        {"key": {"value": [1, 2, 3, 4]}},
         True,
         graph_data,
         Path("jsons_dir"),
@@ -3125,7 +3133,7 @@ def test_route_logs(
     ],
 )
 def test_route_logs_mismatch(
-    log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+    log_pool: list[dict[str, str | dict[str, str]]], expected_calls: dict[str, int], mocker: MockerFixture
 ) -> None:
     output_manager = OutputManager()
 
@@ -3331,7 +3339,7 @@ def test_get_error_and_warning_counts(
     errors_pool: dict[str, dict[str, list[Any]]],
     warnings_pool: dict[str, dict[str, list[Any]]],
     logs_pool: dict[str, dict[str, list[Any]]],
-    expected: tuple[int, int],
+    expected: tuple[int, int, int],
 ) -> None:
     """
     Unit test for the _get_errors_warnings_logs_counts() method in OutputManager class.
@@ -3375,7 +3383,11 @@ def test_print_credits(
     """
     Unit test for the print_credits() method in OutputManager class.
     """
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     version = "v"
     mock_output_manager.print_credits(version)
 
@@ -3403,7 +3415,11 @@ def test_print_task_id(
     """
     Unit test for the print_task_id() method in OutputManager class.
     """
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     mock_output_manager.print_task_id(task_id)
     captured = capfd.readouterr()
     assert captured.out == expected_output
@@ -3422,7 +3438,11 @@ def test_print_task_id(
 def test_print_errors_warnings_logs(
     mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd: CaptureFixture[str]
 ) -> None:
-    mock_output_manager._OutputManager__log_verbose = log_verbose
+    setattr(
+        mock_output_manager,
+        "_OutputManager__log_verbose",
+        log_verbose,
+    )
     task_id = "id"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
         mock_output_manager.print_errors_warnings_logs_counts(task_id)
@@ -3482,7 +3502,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
 
     mock_add_error.assert_any_call(
         "Invalid e2e output prefix",
-        pytest.helpers.contains("NoMatch_comparison.json") if hasattr(pytest, "helpers") else ANY,
+        ANY,
         ANY,
     )
 
@@ -3518,7 +3538,7 @@ def test__print_e2e_results_summary_formats_output(
     capsys: CaptureFixture[str], mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     """Unit test for the _print_e2e_results_summary() method in OutputManager class."""
-    summary = {
+    summary: dict[str, dict[str, bool | str]] = {
         "E2E_Animal": {
             "Animal": True,
             "CropAndSoil": False,
@@ -3799,7 +3819,7 @@ def test_add_detailed_values(
         ({"info_maps": [{"data_origin": "source"}], "values": []}, False),
     ],
 )
-def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result: bool) -> None:
+def test_can_add_detailed_values(sub_data_dict: dict[str, Any], expected_result: bool) -> None:
     """
     Unit test for the _can_add_detailed_values() method in OutputManager class.
     """
@@ -3842,7 +3862,11 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
 
     dummy_saved_pool_chunks_num = 0
-    dummy_variable_pool = {"a": 1, "b": "B", "c": True}
+    dummy_variable_pool: dict[str, dict[str, list[Any]]] = {
+        "a": {"values": [1]},
+        "b": {"values": ["B"]},
+        "c": {"values": [True]},
+    }
 
     output_manager.saved_pool_chunks_path = Path("dummy_path")
     output_manager.saved_pool_chunks_num = dummy_saved_pool_chunks_num
@@ -3870,7 +3894,7 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     assert output_manager.saved_pool_chunks_num == 1
 
 
-def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> None:
+def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir: py.path.local) -> None:
     tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content")
     tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content")
     tmpdir.join("saved_pool_3_dummy_timestamp.json").write("File 3 content")
@@ -4088,7 +4112,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.save_chunk_threshold_call_count = 0
     mock_output_manager.maximum_pool_size = 0
     mock_output_manager.set_metadata_prefix("test_prefix")
 

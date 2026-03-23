@@ -1,0 +1,14 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {part}{I\hspace {1em}Feed Storage Module}{2}{part.1}%
+\etoc@startlocaltoc {1}
+\contentsline {section}{\numberline {I.}Module Introduction}{5}{section.1}%
+\contentsline {subsection}{\numberline {A.}Feed Quality Assessment}{5}{subsection.1.1}%
+\contentsline {section}{\numberline {II.}Feed Storage Inputs}{6}{section.2}%
+\contentsline {section}{\numberline {III.}Storage Classifications}{6}{section.3}%
+\contentsline {subsection}{\numberline {A.}Grain}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {B.}Hay}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {C.}Silage}{9}{subsection.3.3}%
+\contentsline {subsection}{\numberline {D.}Baleage}{12}{subsection.3.4}%
+\contentsline {subsection}{\numberline {E.}Nutrient Composition}{12}{subsection.3.5}%
+\contentsline {section}{\numberline {IV.}References}{13}{section.4}%

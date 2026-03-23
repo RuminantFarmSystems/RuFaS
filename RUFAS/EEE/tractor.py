@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
@@ -34,7 +34,7 @@ class Tractor:
         herd_size: int | None = None,
         application_depth: float | None = None,
         tillage_implement: TillageImplement | None = None,
-        harvest_type: HarvestOperation | None = None
+        harvest_type: HarvestOperation | None = None,
     ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
@@ -76,12 +76,12 @@ class Tractor:
                 self.tractor_size,
                 tillage_implement,
                 application_depth,
-                harvest_type
+                harvest_type,
             )
             for operation_type in self.operation_types
         ]
         constants = input_manager.get_data("EEE_constants.constants")
-        self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
+        self.constants_by_ID: dict[Any, dict[str, Any]] = Utility.convert_list_to_dict_by_key(constants, "ID")
 
     def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
         """
@@ -97,43 +97,82 @@ class Tractor:
         else:
             return TractorSize.LARGE
 
-    def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:  # noqa C901
+    def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:
         """
         Assigns a specific field operation based on the general name for the operation and the crop type for harvest
         operations or depth for nutrient application.
         Implements Helper Function 421 in EEE Functions file.
         """
         if self.operation_event == FieldOperationEvent.HARVEST:
-            if self.crop_type in [
-                "alfalfa_hay",
-                "alfalfa_silage",
-                "alfalfa_baleage",
-                "tall_fescue_hay",
-                "tall_fescue_silage",
-                "tall_fescue_baleage",
-            ]:
-                return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
-            else:
-                return [OperationType.COLLECTION]
+            return self._determine_harvest_operation_types()
         elif self.operation_event == FieldOperationEvent.FERTILIZER_APPLICATION:
-            if application_depth == 0:
-                return [OperationType.FERTILIZER_APPLICATION_SURFACE]
-            elif application_depth > 0:
-                return [OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE]
+            return self._determine_fertilizer_application_operation_types(application_depth)
         elif self.operation_event == FieldOperationEvent.MANURE_APPLICATION:
-            if application_depth == 0:
-                return [OperationType.LIQUID_MANURE_APPLICATION_SURFACE]
-            elif application_depth > 0:
-                return [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE]
+            return self._determine_manure_application_operation_types(application_depth)
         elif self.operation_event == FieldOperationEvent.PLANTING:
             return [OperationType.PLANTING]
         elif self.operation_event == FieldOperationEvent.TILLING:
             return [OperationType.TILLING]
 
+    def _determine_fertilizer_application_operation_types(self, application_depth: float | None) -> list[OperationType]:
+        """
+        Determines the types of fertilizer application operations required based on the application depth.
+
+        Returns
+        -------
+        list[OperationType]
+            A list of operation types required for the fertilizer application.
+        """
+        assert (
+            application_depth is not None and application_depth >= 0
+        ), "Application depth must be provided and non-negative for fertilizer application."
+        if application_depth > 0:
+            return [OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE]
+        else:
+            return [OperationType.FERTILIZER_APPLICATION_SURFACE]
+
+    def _determine_manure_application_operation_types(self, application_depth: float | None) -> list[OperationType]:
+        """
+        Determines the types of manure application operations required based on the application depth.
+
+        Returns
+        -------
+        list[OperationType]
+            A list of operation types required for the manure application.
+        """
+        assert (
+            application_depth is not None and application_depth >= 0
+        ), "Application depth must be provided and non-negative for manure application."
+        if application_depth > 0:
+            return [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE]
+        else:
+            return [OperationType.LIQUID_MANURE_APPLICATION_SURFACE]
+
+    def _determine_harvest_operation_types(self) -> list[OperationType]:
+        """
+        Determines the types of harvest operations required based on the crop type.
+
+        Returns
+        -------
+        list[OperationType]
+            A list of operation types required for harvesting the crop.
+        """
+        if self.crop_type in [
+            "alfalfa_hay",
+            "alfalfa_silage",
+            "alfalfa_baleage",
+            "tall_fescue_hay",
+            "tall_fescue_silage",
+            "tall_fescue_baleage",
+        ]:
+            return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
+        else:
+            return [OperationType.COLLECTION]
+
     @property
     def PTO_kW(self) -> float:
         """Constants 589, 592, 595 in EEE Functions file"""
-        pto_mapping = {
+        pto_mapping: dict[TractorSize, float] = {
             TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_PTO_CONSTANT_ID]["Value"],
             TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_PTO_CONSTANT_ID]["Value"],
             TractorSize.LARGE: self.constants_by_ID[LARGE_TRACTOR_PTO_CONSTANT_ID]["Value"],
@@ -148,7 +187,7 @@ class Tractor:
     @property
     def mass_kg(self) -> float:
         """Constants 591, 594, 597 in EEE Functions file"""
-        mass_mapping = {
+        mass_mapping: dict[TractorSize, float] = {
             TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_MASS_CONSTANT_ID]["Value"],
             TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_MASS_CONSTANT_ID]["Value"],
             TractorSize.LARGE: self.constants_by_ID[LARGE_TRACTOR_MASS_CONSTANT_ID]["Value"],
@@ -158,7 +197,7 @@ class Tractor:
     @property
     def speed_km_hr(self) -> float:
         """Constant 598 in EEE Functions file"""
-        return self.constants_by_ID[TRACTOR_SPEED_CONSTANT_ID]["Value"]
+        return float(self.constants_by_ID[TRACTOR_SPEED_CONSTANT_ID]["Value"])
 
     def calculate_axel_power(self, implement: TractorImplement) -> float:
         """
