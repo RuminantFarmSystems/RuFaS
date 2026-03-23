@@ -1005,9 +1005,7 @@ def test_combine(
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
-    input_dict: dict[str, list[Any]] = {
-        "id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]
-    }
+    input_dict: dict[str, list[Any]] = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
     expected_output = [
         {"id": 1, "name": "Alice", "age": 25},
         {"id": 2, "name": "Bob", "age": 30},
