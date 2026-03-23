@@ -1,247 +1,25 @@
-\documentclass{article}
-
-% Language setting
-\usepackage[english]{babel}
-\setlength{\parindent}{0pt}
-
-% Useful packages
-\usepackage{booktabs}  % For better looking tables
-\usepackage{array}     % More control over column formatting
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{float} % Allows strict image placement
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}% hyperref makes the TOC clickable
-\usepackage[most]{tcolorbox}
-% Fonts
-\usepackage[scaled]{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-\usepackage{pdflscape}  % or \usepackage{lscape}
-\usepackage{lipsum} % for dummy text
-\usepackage{longtable}
-\usepackage{caption}
-\usepackage{multirow}
-\usepackage{mhchem}
-
-
-% Geometry
-\usepackage[
-  a4paper,
-  top=1.5in,
-  bottom=1in,
-  left=1in,
-  right=1in,
-  headheight=60pt,  % This must match the vertical space used
-  headsep=20pt
-]{geometry}
-
-% Define header and footer styles
-% Fancy Header
-\usepackage{fancyhdr}
-\usepackage{rotating}
-\usepackage{tablefootnote}
-\pagestyle{fancy}
-\fancyhf{}  % clear all header/footer fields
-\renewcommand{\headrulewidth}{0pt}  % no horizontal line
-% Header setup
-\fancyhead[C]{%
-    \vspace{25pt}
-  \raisebox{15pt}[0pt][0pt]{%
-    \makebox[\textwidth]{%
-      \includegraphics[height=40pt]{resources/rufas.png}\hfill
-      \textbf{\today}%
-    }
-  }\\[-25pt]
-  \centering\textbf{Scientific Documentation of RuFaS Model} \\
-  \rule{\textwidth}{1pt}
-}
-
-\renewcommand{\sectionmark}[1]{\markboth{\thesection~#1}{}}
-% Footer setup with a divider line and two lines of text on left and right
-\renewcommand{\footrulewidth}{0.4pt}
-\fancyfoot[L]{%
-  \begin{tabular}[t]{@{}l@{}}
-    Ruminant Farm System\\
-    Sci Doc v.1
-  \end{tabular}%
-}
-\fancyfoot[C]{\thepage} % Center: page number
-\fancyfoot[R]{%
-  \begin{tabular}[t]{@{}r@{}}
-    \nouppercase{\leftmark}\\ % This pulls in the current section title
-  \end{tabular}%
-}
-% Landscape pages should be blank (no headers/footers)
-\fancypagestyle{landscapeplain}{
-  \fancyhf{} % clear all
-  \renewcommand{\headrulewidth}{0pt}
-  \renewcommand{\footrulewidth}{0pt}
-}
-
-\usepackage[utf8]{inputenc} % Ensure you're using UTF-8 encoding
-% Bibliography setup
-\usepackage[
-  backend=biber,
-  style=authoryear,  % You can change this to numeric, apa, etc.
-  natbib=true         % Enables \citep, \citet if desired
-]{biblatex}
-
-\addbibresource{resources/manure.bib}  % Your .bib file name
-\usepackage{titlesec}
-\usepackage{etoolbox}
-
-% Reset subsection counter at each new section
-\pretocmd{\section}{\setcounter{subsection}{0}}{}{}
-
-% Roman for \section, Alpha for \subsection, alpha for \subsubsection
-\renewcommand{\thesection}{\Roman{section}.}           % I, II, III...
-\renewcommand{\thesubsection}{\Alph{subsection}.}       % A, B, C...
-\renewcommand{\thesubsubsection}{\alph{subsubsection}.} % a, b, c...
-
-% --- Title Formats (in size order) ---
-\titleformat{\section}
-  {\Large\bfseries}   % Section: largest
-  {\thesection}       % Label
-  {1em}               % Spacing between label and title
-  {}                  % Before-code
-
-\titleformat{\subsection}
-  {\normalsize\bfseries}   % Subsection: medium
-  {\thesubsection}
-  {1em}
-  {}
-
-\titleformat{\subsubsection}
-  {\normalsize\bfseries}  % Subsubsection: smallest
-  {\thesubsubsection}
-  {1em}
-  {}
-
-% --- Spacing for each level ---
-\titlespacing{\section}{0pt}{10pt plus 2pt minus 1pt}{5pt}
-\titlespacing{\subsection}{0pt}{8pt plus 1pt minus 1pt}{4pt}
-\titlespacing{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt}
-
-% Optional: Keep your TOC control if needed
-\usepackage{etoc}
-
-% Optional: If using headers/footers
-\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
-
-% Remove default date from title
-\date{} % Prevents date from appearing in \maketitle
-
-
-% Define title
-\title{\textbf{}}
-\author{ }
-\setlength{\topskip}{10pt}  % Ensures LaTeX reserves room above the first line
-%\usepackage{showframe}
-
-\begin{document}
-
-% Custom Title Page
-\begin{titlepage}
-  \thispagestyle{empty}
-  \centering
-  \vspace*{2cm}
-
-  {\Huge\bfseries Ruminant Farm System Model\par}
-  \vspace{1cm}
-
-  {\Large Manure Module\par}
-  \vspace{1cm}
-
-  {\large \today\par}
-  \vspace{1.5cm} % Add space before the image
-
-  \includegraphics[width=0.25\textwidth]{resources/manure.png} % Adjust size and filename
-
-  \vfill
-
-  {\small v.1; Updated 2025\par}
-  \vspace*{1cm}
-\end{titlepage}
-
-% Continue with front matter (e.g., table of contents)
-\thispagestyle{fancy} % Ensure the header/footer appears on the first page
-
+\part{Manure Module}
 % Global Table of Contents
 \thispagestyle{fancy}
-\tableofcontents
+
+% Local TOC that includes only what’s inside THIS section
+\etocsettocstyle{\subsection*{Contents}}{} % heading for the local toc
+\etocsetnexttocdepth{subsection}           % or subsubsection
+\localtableofcontents
 \newpage
 
-\listoffigures
+\section*{List of Figures}
+\locallistoffigures
 \newpage
 
-\listoftables
+\section*{List of Tables}
+\locallistoftables
 \newpage
-
-
-
-\section{Preface: A Day in the Life on a RuFaS Farm}
-
-This document provides a high-level overview of the daily operations of a ruminant farm, as modeled by RuFaS. The overview will be through the eyes of Dr. Rue Fas. One day, Dr. Rue woke up and decided the life of a computer scientist wasn’t for her. So she bought a dairy farm, and this is how she operates it every day.
-
-\paragraph{Feeding the Animals}
-Second thing in the morning, after coffee, Dr. Rue checks the calendar to see if it’s time to formulate a new ration for her animals.
-\vspace{0.2cm}
-
-If a new ration needs to be formulated, Dr. Rue heads over to the barn where she keeps all her forages and feed. While there, she checks how well all the forages are holding up. After considering the feeds available, the quality of each one, and how much each one costs, she decides on how productive she wants her animals to be. It is a difficult balancing act, but eventually a ration recipe is found that will keep the animals happy while keeping costs low and sustainability high until the calendar says the ration recipe needs to be reformulated.
-\vspace{0.2cm}
-
-When Dr. Rue doesn’t need to formulate a new ration, she takes the last ration recipe she made and grabs all the feed and forage the animals need for the day out of the feed barn. If there isn’t enough for the animals, then a new ration is formulated using the steps above.
-
-\paragraph{Taking Care of the Animals}
-After making sure all the animals’ feed is taken care of, Dr. Rue moves on to taking care of all the other animal tasks. This includes milking the animals, making sure they’re healthy, getting them pregnant, and numerous other tasks. 
-\vspace{0.2cm}
-
-As dawn breaks on the RuFaS farm, the animals awaken after a restful night. Joe, the farm master, prepares a large whiteboard to track HerdReproductionStatistics, ensuring he has all the data he needs for the day’s activities.
-
-\textit{Daily Routine} - After leaving their pens, each animal lines up in front of the barn. Julie, the diligent farm veterinarian, examines them one by one. This daily check includes updates on the following areas:
-\begin{itemize}
-    \item Nutrients: Each animal begins its day with a quick phosphorus requirement assessment. Julie records these details and updates the animal’s phosphorus-related metrics.
-    \item Digestive System: With nutrient information in hand, Julie shifts focus to each animal’s digestive system, estimating manure output and enteric methane production for that day.
-
-    \item Milk Production: All milking cows are assessed to gauge daily milk yield and milk component content (fat and protein). Any necessary adjustments are noted.
-
-    \item Animal Growth: Around midday, Julie returns to each animal to evaluate daily weight changes. She updates each animal’s body weight accordingly.
-
-    \item Reproduction: HeiferII and Cow stage animals undergo a reproduction check. Julie closely monitors their reproductive progress and updates the HerdReproductionStatistics details on Joe’s whiteboard.
-
-    \item Life Stage Evaluation: Once the daily routines are complete, Julie determines if any animal is ready to progress to the next life stage. Graduating animals are marked as “graduated” to be moved to their new pens. Animals that must leave the herd—due to health, productivity, or other issues—are labeled as “sold” or “dead” to be removed from the farm population.
-
-    \item Herd Size Maintenance: After every animal has been evaluated, Joe counts the herd to ensure it remains at a healthy size. If it is too large, he arranges the sale of some animals. If the herd is too small, he may opt to purchase additional heiferIIIs to keep numbers at the ideal level.
-
-    \item Herd Structure Management: Joe also manages pen assignments. Newly graduated or newborn animals are guided to suitable pens, while animals marked for removal (sold or deceased) are taken out of the herd and removed from the farm records.
-\end{itemize}
-
-
-\textit{Output Reporting}
-At day’s end, Joe and Julie review the updated HerdReproductionStatistics on the whiteboard. Joe then compiles a concise report summarizing the day’s herd stats. He forwards this information to the OutputManager before wrapping up another successful day on the RuFaS farm.
-\vspace{0.5cm}
-
-\paragraph{Dealing with the Manure}
-Once all the animal chores are finished, Dr. Rue moves on to handling the manure. There are a lot of different ways that manure is collected from the animals: it is flushed out of the milking parlor with water, some of the pens need to have it shoveled out along with the bedding in the pen, and some pens have grates that allow the manure to go straight into a pit beneath the barn.
-\vspace{0.2cm}
-
-There are a lot of different places where manure is processed and stored on the farm. Dr. Rue goes from place to place on the farm, moving the manure from one place to the next. The manure chores are finished after moving all of the manure into her lagoons, compost piles, and other storages. As this final manure chore is completed, she writes down all the information about how much manure is in all these storages, and some information about what that manure is made of. How much water, nitrogen, phosphorus, other solids, etc. are in each storage.
-
-\paragraph{Managing the Fields}
-Now that Dr. Rue is done making sure all the manure has been handled and stored properly, she can take care of all the field tasks. She has a lot of fields on her farm, each with its own unique schedule. Her field management routine starts with checking each field’s schedule to see if any of them are due to have manure applied, and if so, how much they should have applied. After noting all the manure that is supposed to go onto her fields, these amounts are checked against the amounts of manure that are in her manure storage. Dr. Rue then applies manure to each field on the schedule that day, trying to match the amount applied to the amount on the schedule as best she can.
-\vspace{0.2cm}
-
-After making sure every manure item on each farm’s schedule has been taken care of for the day, the schedule for each field is rechecked, one field at a time. In each schedule she checks to see if that field needs to be tilled, if any chemical fertilizer needs to be applied, and if any crops need to be planted or harvested. After all these activities are taken care of, Mother Nature goes to work. The sun shines and rain falls, providing the field with water and energy that grows crops and soaks the soil. After taking care of each field one by one, Dr. Rue drives back to the main farm with all of the crops that she harvested on that day.
-
-\paragraph{Storing the Feeds}
-Now that she is back at the barns, all the crops that were just harvested can be stored. Fortunately she is very organized, so all her harvested crops are separate from one another and each has a label, indicating where it will be stored inside the feed barn. As each feed is stored, it is labeled with the current date. Dr. Rue is exhausted from another long day. She goes back to the farmhouse and rests up, preparing to do the whole thing over again tomorrow. Her daily routine might seem repetitive, but each day is a crucial part of the larger, continuous process that keeps her farm running efficiently and sustainably.
-
 
 
 \section{Module Introduction}
 \begin{refsection}
-    
+\par\noindent\justifying
 The responsibility of the manure module in RuFaS is to simulate the loss and/or gain of manure mass and nutrients on a daily timestep at each step of the manure management chain on a dairy farm. On the majority of farms, manure represents an important link in the cycling of nutrients through animals, land, crops, and back to animals. Therefore, modeling both greenhouse gas (GHG) emissions as well as non-GHG nutrient and losses is crucial in capturing nutrient flows through the whole-farm system. 
     
 The manure module accomplishes its responsibilities by tracking a critical, core set of variables called “ManureStream” variables, which include key agronomic nutrients (N, P, K), carbon (e.g. total and volatile solids), water, ash, mass, and volume. The Manure Module receives manure excretion and bedding information from the animal module, then passes manure through the manure management chain, until manure is either applied to fields or exported. The specific steps of the manure management chain are user-defined, and the individual steps/options in manure management chains are referred to as “processors”. The exact chemical, physical, or other processes that occur at each step along the management chain depend on what type of processor the manure is being held in. For example, parlor cleaning processors, which represent removing manure from the milking parlor and holding areas, principally add water to manure but do not estimate GH emissions or other nutrient losses. A slurry storage outdoor processor (a type of manure storage), however, estimates daily methane (CH\textsubscript{4}) and ammonia (NH\textsubscript{3}-N) losses, which are then reflected by reducing the quantity of nutrients remaining in the stored manure at the end of the day. 
@@ -281,8 +59,7 @@ How manure moves between processors is based on defining the destination process
     \centering
     \includegraphics[width=0.9\textwidth]{resources/manuremanchain.png} % Replace with your image file
     \caption{A real-world example of a simplistic manure management chain.  }
-    \label{fig:manchain}
-    \end{figure}
+       \end{figure}
 
 
 
@@ -310,7 +87,7 @@ For defining destinations and proportions, there are very few rules and restrict
 \vspace{0.2cm}
 
 \begin{tcolorbox}[colback=white, colframe=black, boxrule=0.5pt, arc=3pt, width=\textwidth]
-The assignment of manure generated in the Animal Module (which also reflects the quantity of bedding used) to its destination in the Manure Module occurs in the Animal Module. See the \hyperref[AnimalManureConn]{Animal to Manure Connection} section for more information. 
+The assignment of manure generated in the Animal Module (which also reflects the quantity of bedding used) to its destination in the Manure Module occurs in the Animal Module. See the Animal to Manure Connection section for more information. 
 
 \end{tcolorbox}
 \vspace{0.2cm}
@@ -337,7 +114,7 @@ The assignment of manure generated in the Animal Module (which also reflects the
 	\end {enumerate}
 
 
-\section{Animal and Manure Module Connection} \label{AnimalManureConn}
+\section{Animal and Manure Module Connection} 
 \subsection{Introduction}
 
     Though animals are typically fed and managed in groups, referred to as pens in RuFaS, manure from a single group of animals may not always remain in or be transported to the same location on the farm. For example, lactating cows who must travel to a milking parlor deposit some proportion of their manure outside of their pen. Or, in open lot systems, manure deposited in the concrete feed alley apron is often removed and managed separately from manure deposited on the lot surface. Additionally, more than one type of bedding may be used in a pen (e.g., no bedding during summer but straw provided in winter), which also eventually becomes part of manure. Considering this, RuFaS accommodates routing of manure from a single group (pen) of animals to multiple locations, which are then received by the Manure module. This document describes how a pen’s total manure excretion and bedding are allocated to one or more discrete quantities of manure, referred to as manure streams, and passed to the Manure module. How the user configures this manure routing and bedding options and addition of bedding to manure are also described here.
@@ -613,14 +390,12 @@ Recommended minutes\_away\_for\_milking values for lactating cows are based on c
 \vspace{0.1cm}
 
 
-\begin{table}[h!]
+\clearpage
+\begin{sidewaystable}
+     \caption{Recommended minutes\_away\_for\_milking by pen type based on published literature. Remember, this does not necessarily reflect the model defaults. }
 \centering
 \renewcommand{\arraystretch}{1.3}
 
-\begin{center}
-    \caption{Recommended minutes\_away\_for\_milking by pen type based on published literature. Remember, this does not necessarily reflect the model defaults. }
-\end{center}\
-\vspace{-1cm}
 
 \begin{tabular}{@{} L{2cm} L{4cm} L{1.5cm} L{8cm} @{}}
 \toprule
@@ -644,7 +419,7 @@ Compost bedded pack barn & 200 m (3.33 h) & 0.139 & Limited data; value is based
 
 \end{tabular}
 
-\end{table}
+\end{sidewaystable}
 
 
 
@@ -840,7 +615,7 @@ volume  &  m\textsuperscript{3} & ManureStream volume ( m\textsuperscript{3}) + 
 
 
 
-\section{Manure Handler} \label{sec:Manure Handler}
+\section{Manure Handler}
 \subsection{Introduction}
     \vspace{0.2cm}
     
@@ -1382,7 +1157,7 @@ volume  & m\textsuperscript{3} & \( \frac{\text{Entering volume} - \text{total\_
  
 
 
-\section{Solid Liquid Separators} \label{sec:Solid Liquid Separators}
+\section{Solid Liquid Separators} 
 \subsection{Introduction} A solid-liquid separator (SLS) is a specialized piece of equipment or system designed to separate larger, solid particles from the liquid component of manure. This type of system may be implemented for a variety of reasons, such as to improve ease of handling of manure liquid, improve the nutrient concentration in manure liquid, reduce storage volume required for manure lagoons or other storage systems, prevent solid accumulation in a covered manure storage, or reclaim manure solids for use as bedding or compost. 
     
 The solid fraction of manure slurry is composed of fibers originating primarily from manure, but also from feed, bedding, and other environmental sources. Once mechanically separated, the moisture content of the solid fraction ranges from 70\% to 90\%, depending on the specific separator system used. To further reduce moisture content of the separated solids, an additional dewatering or drying step may be incorporated. Manure solids may be directly used or sold for animal bedding (after stabilization), composted, or land applied. 
@@ -1732,7 +1507,7 @@ volume  & m\textsuperscript{3} &
 
 
 
-\section{Anaerobic Digestion} \label{sec:Anaerobic Digestion}
+\section{Anaerobic Digestion} 
 \subsection{Introduction} Anaerobic digestion is a process where dairy cow manure is treated in an oxygen-free (anaerobic) environment to produce biogas, containing approximately 60\% CH\textsubscript{4}, 40\% CO\textsubscript{2}, which can be utilized as an on-farm or exported energy source. Additional benefits of anaerobic digestion include reduced manure odor, improved stability and quality of manure for fertilization purposes, and reductions in nutrient losses via undesirable greenhouse gas emissions.
 
 
@@ -2199,7 +1974,7 @@ volume  & m\textsuperscript{3} &
 
 \newpage
 
-\section{Slurry Storage} \label{sec:Slurry Storage}
+\section{Slurry Storage} 
 
 \subsection{Introduction} Manure that is stored and managed at ~7 to 12\% dry matter is generally considered to be “slurry” manure. Several common options exist for storing manure at this \%DM range. Slurry may be stored in underfloor pits, where manure is deposited directly into the pit through slatted floors, or is moved to an underfloor storage via scrapers or other manure handling systems. Manure may also be transported to outdoor storage tanks or pits/basins, which may be covered or uncovered.
 \vspace{0.2cm}
@@ -2778,7 +2553,7 @@ volume  & m\textsuperscript{3} &
 
     
 \newpage
-\section{Anaerobic Lagoon} \label{sec:Anaerobic Lagoon}
+\section{Anaerobic Lagoon} 
  
 \subsection{Introduction} Manure that is stored and managed at less than \~5\% dry matter is generally considered to be liquid manure. Liquid manure is generated by either dilution of raw or slurry manure, generally through the addition of wash or flush water, or removal of a portion of manure solids through solid liquid separation methods (mechanical separator, settling basin, etc.) or anaerobic digestion. Liquid manure is generally stored in a type of large, outdoor storage structure called an anaerobic lagoon, or simply a lagoon. Anaerobic lagoons are not simply structures in which to store manure. Lagoons facilitate biological breakdown of organic materials, which reduces volatile solids content and odor, though also increases N mineralization and loss as ammonia, particularly if the lagoon is uncovered. Accordingly, anaerobic lagoons have specific design and management requirements to facilitate biological treatment activity \parencite{NRCS2017}. Some characteristics that separate an anaerobic lagoon from slurry or liquid manure storage are:
 
@@ -2985,7 +2760,7 @@ The use of covers has implications for inclusion or exclusion of precipitation v
         \item No cover
     \end{itemize}
 
-Detailed descriptions are outlined in the \hyperref[sec:Slurry Storage]{Slurry Storage} section of this module. Precipitation volume for anaerobic lagoons that are uncovered or have a crust is calculated as follows:\\
+Detailed descriptions are outlined in the Slurry Storage section of this module. Precipitation volume for anaerobic lagoons that are uncovered or have a crust is calculated as follows:\\
         \vspace{0.5cm}
 
     \begin{center}
@@ -5097,8 +4872,11 @@ Determine the nutrient that manure storage removal will be based on using the co
 The projected manure mass is then calculated as:
 \begin{equation}
 \text{projected manure mass} = \min\left( \text{mass\_N\_requested}, \text{mass\_P\_requested} \right)
-\label{MN.MSC.1}
 \end{equation}
+\vspace{0.5cm} 
+    
+    {\raggedleft \textbf{[MN.MSC.1]}\par}
+    \vspace{0.5cm}
 
 where:
 \begin{itemize}
@@ -5118,8 +4896,10 @@ Using the limiting nutrient identified in Step 1 and considering the total quant
 \frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
 1
 \right)
-\label{MN.MSC.2}
 \end{equation}
+\vspace{0.5cm} 
+    
+    {\raggedleft \textbf{[MN.MSC.2]}\par}
 
 \vspace{0.2cm}
 \textbf{Step 3: Removal of Nutrients from Individual Storages}
@@ -5130,8 +4910,11 @@ For each nutrient and each storage, the nutrient removal is calculated as:
 \begin{equation}
 \text{nutrient\_to\_be\_removed\_from\_storage} =
 \text{nutrient\_in\_storage} \times \text{nutrient\_proportion\_to\_be\_removed}
-\label{MN.MSC.3}
 \end{equation}
+\vspace{0.5cm} 
+    
+    {\raggedleft \textbf{[MN.MSC.3]}\par}
+    \vspace{0.5cm}
 
 where:
 \begin{itemize}
@@ -5235,103 +5018,6 @@ LIQUID\_MANURE\_DENSITY & 1000 kg/m\textsuperscript{3} & Default liquid manure d
 \end{longtable}
 \end{landscape}
 
-\newpage
-\section{Abbreviations}
-
-\renewcommand{\arraystretch}{1.3}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-
-\begin{longtable}{@{} L{4cm} L{12cm} @{}} 
-\caption{Common abbreviations used throughout this document} \\
-
-\toprule
-\textbf{Abbreviation} & \textbf{Full Term or Phrase} \\
-\midrule
-\endfirsthead
-
-\multicolumn{2}{@{}l}{\textit{Table continued from previous page}} \\
-\toprule
-\textbf{Abbreviation} & \textbf{Full Term or Phrase} \\
-\midrule
-\endhead
-
-\midrule
-\multicolumn{2}{@{}r@{}}{\textit{Continued on next page}} \\
-\endfoot
-
-\bottomrule
-\endlastfoot
-
-ADF & Acid detergent fiber (\% of DM) \\
-ADG & Average daily weight gain (g/d) \\
-Age1stBred & First breeding age (month) \\
-BCS5 & Body condition score (1–5 basis) \\
-BW & Body weight (kg) \\
-Ca & Calcium content (\% of DM) \\
-CBW & Calf birth weight (kg) \\
-CI & Calving interval (d) \\
-cm & centimeter \\
-Cost & Feed cost (\$/kg of DM) \\
-CP & Crude protein (\% of DM) \\
-d & days \\
-DE & Digestible energy (standard value, Mcal/kg) \\
-DIM & Days in milk \\
-DM & Dry matter (\% of as-fed basis) \\
-DMI & Dry matter intake \\
-DOP & Days of pregnancy (d) \\
-dRUP & RUP degradability (\% of RUP) \\
-EE & Ether extract, in crude fat (\% DM) \\
-EndCP & Endogenous CP \\
-EndN & Endogenous N \\
-EQSBW & Equivalent shrunk body weight (kg) \\
-FA & Fatty acids \\
-FIPS & Federal Information Processing Standards \\
-g & grams \\
-GE & Gross energy (standard value, Mcal/kg) \\
-GrUterW & Gravid uterine weight (kg) \\
-Kd & Rumen protein degradation rate (\%/h) \\
-kg & kilograms \\
-kJ & kilojoule \\
-L & liters \\
-m & meter \\
-max & maximum \\
-Mcal & Megacalorie \\
-MCP & Microbial Crude Protein \\
-ME & Metabolizable energy (standard value, Mcal/kg) \\
-MICP & Microbial CP \\
-min & minimum \\
-mL & milliliters \\
-MN & Microbial N \\
-MP & Metabolizable protein \\
-MTP & Microbial TP \\
-MW & Mature body weight (kg) \\
-MY & Milk yield \\
-N & Nitrogen (\% of DM) \\
-NASEM & National Academies of Sciences, Engineering, and Medicine \\
-NDF & Neutral detergent fiber (\% of DM) \\
-NEG & Net energy for growth (standard value, Mcal/kg) \\
-NEL & Net energy for lactation (standard value, Mcal/kg) \\
-NEM & Net energy for maintenance (standard value, Mcal/kg) \\
-nNDF & Nondigestible Neutral Detergent Fiber \\
-NPN & Non-protein Nitrogen \\
-NRC & National Research Council (updated in 2021 to NASEM) \\
-OM & Organic matter (\% of DM) \\
-P & Phosphorus content (\% of DM) \\
-PAF & Processing adjustment factor (not used) \\
-Parity & Number of lactations \\
-PrevTemp & Average daily temperature of last month (°C) \\
-RDP & Ruminally degraded CP \\
-ROM & Residual OM (\% of DM) \\
-RUP & Ruminally undegraded CP \\
-s & seconds \\
-TAN & Total ammoniacal N \\
-TDN & Total digestible nutrient (\% of DM) \\
-TP & True protein (\% of DM) \\
-USDA & United States Department of Agriculture \\
-UterW & Uterine weight (kg) \\
-WSC & Water Soluble Carbohydrates \\
-\end{longtable}
-
 
 
 \newpage
@@ -5339,4 +5025,3 @@ WSC & Water Soluble Carbohydrates \\
 \label{sec:References for Manure Module}
 \printbibliography[heading=subbibliography,title={}]
 \end{refsection}
-\end{document}
