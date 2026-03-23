@@ -282,6 +282,14 @@ class Field:
             application_depth = 0.0
             surface_remainder_fraction = 1.0
 
+        assert (
+            self.soil
+            and self.soil.data
+            and self.soil.data.soil_layers
+            and self.soil.data.soil_layers[-1]
+            and self.soil.data.soil_layers[-1].bottom_depth is not None
+        )
+
         if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
             self._record_nutrient_application_error(application_depth, None, error_message, year, day)
             application_depth = self.soil.data.soil_layers[-1].bottom_depth
