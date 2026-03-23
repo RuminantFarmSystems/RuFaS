@@ -1,4 +1,5 @@
 import sys
+from datetime import timedelta
 from random import random
 from typing import Any, Callable
 
@@ -7,12 +8,14 @@ from numpy import sqrt
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
+from RUFAS.biophysical.animal.data_types.genetic_history import GeneticHistory
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import (
     MilkProductionInputs,
@@ -85,8 +88,10 @@ class Animal:
         The mature body weight of the animal, (kg).
     wean_weight: float
         The body weight of the animal at weaning, (kg).
-    net_merit: float
-        The net merit value of the animal, ($USD).
+    genetics: Genetics
+        The genetic attributes of the animal.
+    genetic_history: list[GeneticHistory]
+        The genetic history of the animal.
     body_condition_score_5: float
         The body condition score on a scale of 1 to 5, (unitless).
     cull_reason: str
@@ -151,7 +156,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
-        simulation_day: int = 0,
+        time: RufasTime | None = None,
     ) -> None:
         """
         Initializes an Animal object.
@@ -181,12 +186,12 @@ class Animal:
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
-        self.net_merit = args.get("net_merit", 0.0)
         self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
 
         self.cull_reason = ""
         self.body_weight_history: list[BodyWeightHistory] = []
         self.pen_history: list[PenHistory] = []
+        self.genetic_history: list[GeneticHistory] = []
         self.sold_at_day: int | None = None
         self.stillborn_day: int | None = None
         self.dead_at_day: int | None = None
@@ -211,10 +216,35 @@ class Animal:
         self._daily_vertical_distance: float = 0.0
         self._daily_distance: float = 0.0
 
-        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
-            self._initialize_newborn_calf(args, simulation_day)
+        is_newborn_calf = self.animal_type == AnimalType.CALF and "body_weight" not in args.keys()
+        if is_newborn_calf:
+            self._initialize_newborn_calf(args, time.simulation_day)
+            dam_tbv_fat, dam_tbv_protein = args.get("dam_tbv_fat"), args.get("dam_tbv_protein")
+            if dam_tbv_fat and dam_tbv_protein:
+                self.genetics = Genetics(
+                    birth_year=time.current_date.year,
+                    birth_month=time.current_date.month,
+                    animal_type=AnimalType.CALF,
+                    initialize_new_born_calf=True,
+                    dam_tbv_fat=dam_tbv_fat,
+                    dam_tbv_protein=dam_tbv_protein,
+                )
+            else:
+                self.genetics = Genetics(
+                    birth_year=time.current_date.year,
+                    animal_type=AnimalType.CALF,
+                    initialize_new_born_calf=False,
+                    parity=self.calves,
+                )
         else:
             initialize_animal_methods[self.animal_type](args)
+            self.genetics = Genetics(
+                birth_year=(time.current_date - timedelta(days=self.days_born)).year,
+                animal_type=self.animal_type,
+                initialize_new_born_calf=False,
+                parity=self.calves,
+            )
+        self.update_genetic_history(simulation_day=time.simulation_day)
 
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
@@ -1091,6 +1121,20 @@ class Animal:
             milk_fat=self.milk_production.fat_content,
             milk_lactose=self.milk_production.lactose_content,
             parity=self.calves,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            animal_type=self.animal_type,
+            TBV_fat=self.genetics.TBV_fat,
+            TBV_protein=self.genetics.TBV_protein,
+            E_permanent_fat=self.genetics.E_permanent_fat,
+            E_permanent_protein=self.genetics.E_permanent_protein,
+            E_temporary_fat=self.genetics.E_temporary_fat,
+            E_temporary_protein=self.genetics.E_temporary_protein,
+            phenotype_fat=self.genetics.phenotype_fat,
+            phenotype_protein=self.genetics.phenotype_protein,
+            EBV_fat=self.genetics.EBV_fat,
+            EBV_protein=self.genetics.EBV_protein,
+            ranking_index=self.genetics.ranking_index,
         )
 
     def _assign_sex_to_newborn_calf(self) -> None:
@@ -1508,7 +1552,8 @@ class Animal:
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
             days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
+            dam_tbv_fat=self.genetics.TBV_fat,
+            dam_tbv_protein=self.genetics.TBV_protein,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
         )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
@@ -1950,7 +1995,6 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
         )
 
     def _get_heiferI_values(self) -> HeiferIValuesTypedDict:
@@ -1973,7 +2017,6 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
         )
 
     def _get_heiferII_values(self) -> HeiferIIValuesTypedDict:
@@ -1996,7 +2039,6 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.reproduction.reproduction_statistics.estrus_count,
@@ -2030,7 +2072,6 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.reproduction.reproduction_statistics.estrus_count,
@@ -2064,7 +2105,6 @@ class Animal:
             wean_weight=self.wean_weight,
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
-            net_merit=self.net_merit,
             calf_birth_weight=self.calf_birth_weight,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
@@ -2367,3 +2407,38 @@ class Animal:
             )
 
         return requirements
+
+    def update_genetic_history(self, simulation_day: int) -> None:
+        if simulation_day not in [data_point["simulation_day"] for data_point in self.genetic_history]:
+            self.genetic_history.append(
+                GeneticHistory(
+                    simulation_day=simulation_day,
+                    id=self.id,
+                    days_born=self.days_born,
+                    animal_type=self.animal_type,
+                    days_in_milk=self.days_in_milk,
+                    days_in_pregnancy=self.days_in_pregnancy,
+                    parity=self.calves,
+                    TBV_fat=self.genetics.TBV_fat,
+                    TBV_protein=self.genetics.TBV_protein,
+                    E_permanent_fat=self.genetics.E_permanent_fat,
+                    E_permanent_protein=self.genetics.E_permanent_protein,
+                    E_temporary_fat=self.genetics.E_temporary_fat,
+                    E_temporary_protein=self.genetics.E_temporary_protein,
+                    phenotype_fat=self.genetics.phenotype_fat,
+                    phenotype_protein=self.genetics.phenotype_protein,
+                    EBV_fat=self.genetics.EBV_fat,
+                    EBV_protein=self.genetics.EBV_protein,
+                    ranking_index=self.genetics.ranking_index,
+                )
+            )
+        else:
+            om = OutputManager()
+            om.add_warning(
+                "Duplicate Genetic History Entry",
+                f"Animal {self.id} already has a genetic history entry on day {simulation_day}.",
+                {
+                    "class": Animal.__name__,
+                    "function": Animal.update_genetic_history.__name__,
+                },
+            )
