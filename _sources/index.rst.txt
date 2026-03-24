@@ -74,7 +74,7 @@ Release Notes
    :maxdepth: 1
    :caption: Release Notes:
 
-   _release_note/index
+   _release_notes/index
 
 Contributing to RuFaS
 ---------------------
