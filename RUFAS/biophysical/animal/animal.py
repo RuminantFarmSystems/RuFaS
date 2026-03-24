@@ -1222,7 +1222,7 @@ class Animal:
             details and nutrient requirements.
 
         Returns
-        ------
+        -------
         None
 
         """
