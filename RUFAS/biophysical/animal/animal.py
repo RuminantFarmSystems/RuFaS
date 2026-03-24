@@ -1257,7 +1257,7 @@ class Animal:
             A dictionary containing values used for initializing the cow's attributes.
 
         Returns
-        ------
+        -------
         None
 
         """
@@ -1448,23 +1448,23 @@ class Animal:
         -----
         This method determines the `days_in_milk` value based on the following conditions:
 
-            1. **If the animal is not lactating at the start of the day (`self.days_in_milk == 0`)**:
-               - The method uses the `days_in_milk` value from the reproduction update.
-               - This is because a dry cow (not lactating) always has `days_in_milk = 0` in the milk production update.
-               - However, if the animal gives birth that day, the reproduction update will set `days_in_milk = 1`.
+        1. **If the animal is not lactating at the start of the day (`self.days_in_milk == 0`)**:
+            - The method uses the `days_in_milk` value from the reproduction update.
+            - This is because a dry cow (not lactating) always has `days_in_milk = 0` in the milk production update.
+            - However, if the animal gives birth that day, the reproduction update will set `days_in_milk = 1`.
 
-            2. **If the animal is lactating at the start of the day (`self.days_in_milk > 0`)**:
-               - In most cases, the method uses the `days_in_milk` value from the milk production update.
-               - This is because the reproduction update does not change the `days_in_milk` for lactating cows.
-               - The milk production update may either:
-                 - Increment `days_in_milk` by 1 (normal lactation progression).
-                 - Set `days_in_milk` to 0 if the animal is scheduled to dry off.
+        2. **If the animal is lactating at the start of the day (`self.days_in_milk > 0`)**:
+            - In most cases, the method uses the `days_in_milk` value from the milk production update.
+            - This is because the reproduction update does not change the `days_in_milk` for lactating cows.
+            - The milk production update may either:
+                - Increment `days_in_milk` by 1 (normal lactation progression).
+                - Set `days_in_milk` to 0 if the animal is scheduled to dry off.
 
-            3. **Edge case: If the animal dries off and gives birth on the same day**:
-               - The lactation cycle restarts, and `days_in_milk` is set to 1.
-               - This occurs when:
-                 - The milk production update sets `days_in_milk = 0` (indicating drying off).
-                 - The reproduction update sets `days_in_milk = 1` (due to giving birth).
+        3. **Edge case: If the animal dries off and gives birth on the same day**:
+            - The lactation cycle restarts, and `days_in_milk` is set to 1.
+            - This occurs when:
+                - The milk production update sets `days_in_milk = 0` (indicating drying off).
+                - The reproduction update sets `days_in_milk = 1` (due to giving birth).
 
         """
         if self.days_in_milk == 0:
@@ -1675,10 +1675,11 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            A tuple containing the animal's status:
-            - AnimalStatus.LIFE_STAGE_CHANGED along with the newborn calf
-              configuration if the life stage transitions to Cow.
-            - AnimalStatus.REMAIN and None if the animal stays in the HeiferIII stage.
+            A tuple containing the animal's status.
+
+            - `AnimalStatus.LIFE_STAGE_CHANGED` along with the newborn calf
+            configuration if the life stage transitions to Cow.
+            - `AnimalStatus.REMAIN` and `None` if the animal stays in the HeiferIII stage.
 
         """
         if self.evaluate_heiferIII_for_cow():
