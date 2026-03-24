@@ -276,7 +276,7 @@
         },
         "cross_validation_file_paths": {
           "type": "array",
-          "description": "Collection of file paths to the cross validation rule JSON files.",
+          "description": "List the of file path(s) to the cross validation rule JSON file(s).",
           "properties": {
             "type": "string",
             "pattern": "^(?:[a-zA-Z]:[\\\\/]|/)?(?:[a-zA-Z0-9._\\-\\s]+[\\\\/])*(?:[a-zA-Z0-9._\\-\\s]+\\.json)$",
