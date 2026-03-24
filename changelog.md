@@ -49,6 +49,7 @@ v1.0.0
 - [2863](https://github.com/RuminantFarmSystems/MASM/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
 - [2854](https://github.com/RuminantFarmSystems/MASM/pull/2854) - [minor change] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
 - [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
+- [2880](https://github.com/RuminantFarmSystems/RuFaS/pull/2880) - [minor change] [NoInputChange] [NoOutputChange] Add warning message for e2e filter updates
 
 ### v1.0.0
 
