@@ -29,8 +29,6 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.EEE.tractor_implement.html" rel="next" title="RUFAS.EEE.tractor_implement module"/>
-<link href="RUFAS.EEE.energy.html" rel="prev" title="RUFAS.EEE.energy module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -74,13 +72,12 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -135,9 +132,6 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.EEE.html">RUFAS.EEE package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.EEE.tractor module</span>
 </nav>
 <div id="content" role="main">
@@ -194,42 +188,6 @@ Implements Helper Function 420 in EEE Functions file.</p>
 operations or depth for nutrient application.
 Implements Helper Function 421 in EEE Functions file.</p>
 </dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.tractor.Tractor._determine_fertilizer_application_operation_types">
-<span class="sig-name descname"><span class="pre">_determine_fertilizer_application_operation_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType" title="RUFAS.data_structures.tillage_implements.OperationType"><span class="pre">OperationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.tractor.Tractor._determine_fertilizer_application_operation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.tractor.Tractor._determine_fertilizer_application_operation_types'"><span>#</span></a></dt>
-<dd><p>Determines the types of fertilizer application operations required based on the application depth.</p>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>list[OperationType]</dt><dd><p>A list of operation types required for the fertilizer application.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.tractor.Tractor._determine_manure_application_operation_types">
-<span class="sig-name descname"><span class="pre">_determine_manure_application_operation_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType" title="RUFAS.data_structures.tillage_implements.OperationType"><span class="pre">OperationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.tractor.Tractor._determine_manure_application_operation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.tractor.Tractor._determine_manure_application_operation_types'"><span>#</span></a></dt>
-<dd><p>Determines the types of manure application operations required based on the application depth.</p>
-<section id="id1">
-<h2>Returns<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>list[OperationType]</dt><dd><p>A list of operation types required for the manure application.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.tractor.Tractor._determine_harvest_operation_types">
-<span class="sig-name descname"><span class="pre">_determine_harvest_operation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.OperationType" title="RUFAS.data_structures.tillage_implements.OperationType"><span class="pre">OperationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.tractor.Tractor._determine_harvest_operation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.tractor.Tractor._determine_harvest_operation_types'"><span>#</span></a></dt>
-<dd><p>Determines the types of harvest operations required based on the crop type.</p>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>list[OperationType]</dt><dd><p>A list of operation types required for harvesting the crop.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.EEE.tractor.Tractor.PTO_kW">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">PTO_kW</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.EEE.tractor.Tractor.PTO_kW" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.tractor.Tractor.PTO_kW'"><span>#</span></a></dt>
@@ -265,9 +223,6 @@ Implements Helper Function 413 in EEE Functions file.</p>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.__init__'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.__init__"><code class="docutils literal notranslate"><span class="pre">Tractor.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.herd_size_to_tractor_size'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.herd_size_to_tractor_size"><code class="docutils literal notranslate"><span class="pre">Tractor.herd_size_to_tractor_size()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.determine_operation_type'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.determine_operation_type"><code class="docutils literal notranslate"><span class="pre">Tractor.determine_operation_type()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor._determine_fertilizer_application_operation_types'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor._determine_fertilizer_application_operation_types"><code class="docutils literal notranslate"><span class="pre">Tractor._determine_fertilizer_application_operation_types()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor._determine_manure_application_operation_types'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor._determine_manure_application_operation_types"><code class="docutils literal notranslate"><span class="pre">Tractor._determine_manure_application_operation_types()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor._determine_harvest_operation_types'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor._determine_harvest_operation_types"><code class="docutils literal notranslate"><span class="pre">Tractor._determine_harvest_operation_types()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.PTO_kW'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.PTO_kW"><code class="docutils literal notranslate"><span class="pre">Tractor.PTO_kW</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.power_available_kW'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.power_available_kW"><code class="docutils literal notranslate"><span class="pre">Tractor.power_available_kW</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.tractor.Tractor.mass_kg'" class="reference internal" href="#RUFAS.EEE.tractor.Tractor.mass_kg"><code class="docutils literal notranslate"><span class="pre">Tractor.mass_kg</span></code></a></li>

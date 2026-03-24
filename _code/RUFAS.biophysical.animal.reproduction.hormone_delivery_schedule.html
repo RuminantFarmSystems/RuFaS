@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -231,19 +230,14 @@ animal category or protocol name is invalid.</p>
 </dd>
 </dl>
 </section>
-<section id="id1">
-<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<p>The returned schedule is a deep copy of the original schedule to prevent any modifications to
-the original class-level constant.</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_adjusted_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'heifers'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cows'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule'"><span>#</span></a></dt>
 <dd><p>Get the hormone delivery schedule for the given animal category and protocol name, adjusted to start
 on the given start day.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal_category<span class="classifier">Literal[‘heifers’, ‘cows’]</span></dt><dd><p>The animal category to get the schedule for. Must be either ‘heifers’ or ‘cows’.</p>
 </dd>
@@ -254,8 +248,8 @@ HEIFER_REPRO_PROTOCOLS or COW_REPRO_PROTOCOLS.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[int, dict] | None</dt><dd><p>The hormone delivery schedule for the given animal category and protocol name, adjusted to start
 on the given start day. None if the animal category or protocol name is invalid.</p>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Release Notes — v1.0.0 | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="Release Notes — v1.0.0 | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="Release Notes — v1.0.0 | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<link href="../../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="../../_static/theme.css?v=73505e79" rel="stylesheet" type="text/css"/>
+<link href="../../_static/rufas.png" rel="icon"/>
+<link href="../../search.html" rel="search" title="Search"/>
+<link href="../../genindex.html" rel="index" title="Index"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="24" src="../../_static/RuFaS Logo Vector.svg" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../../index.html">
+<img alt="Logo" class="mr-2 dark:invert" height="16" src="../../_static/RuFaS Logo Vector.svg" width="16"/><span class="font-bold text-clip whitespace-nowrap">Ruminant Farm Simulation (RuFaS)  documentation</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_code/modules.html">RuFaS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Task-Manager.html">Task Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Input-Manager.html">Input Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RuFaS-Command-Line-Arguments.html">RuFaS Command Line Arguments</a></li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../om.html">Output Manager<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="../Output-Manager.html">Output Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Chunkification.html">Chunkification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Data-Origins.html">Data Origins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Report-Generator.html">Report Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Graph-Generator.html">Graph Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Data-Collection-App.html">Data Collection App</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Github-Actions.html">Github Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Using-Mypy.html">Using Mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Using-Python%27s-Black-Formatter.html">Using Python’s Black Formatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Using-Sphinx.html">Using Sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Using-Flake8.html">Using Flake8</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to RuFaS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_github_issue.html">Creating a GitHub Issue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../How-to-write-a-design-doc.html">How To Write a Design Doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Branching-Strategy-in-RuFaS.html">Branching Strategy in RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Code-review.html">Code Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../best_practices.html">Best Practices</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../../index.html">
+<span class="hidden md:inline">Ruminant Farm Simulation (RuFaS)  documentation</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Release Notes — v1.0.0</span>
+</nav>
+<div id="content" role="main">
+<section id="release-notes-v1-0-0">
+<h1>Release Notes — v1.0.0<a class="headerlink" href="#release-notes-v1-0-0" title="Link to this heading"><span>#</span></a></h1>
+<section id="highlights">
+<h2>Highlights<a class="headerlink" href="#highlights" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#highlights'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>[core, architecture] Large refactor and modularization across animal,
+manure, crop/soil, feed, and I/O subsystems.</p></li>
+<li><p>[animal] Major reorganization of the animal module (growth,
+digestion, milk/lactation, genetics, reproduction and ration
+management).</p></li>
+<li><p>[manure] Comprehensive manure-module refresh (streams, processors,
+storages, separators, anaerobic digester fixes, temperature model).</p></li>
+<li><p>[output] OutputManager and reporting rework: chunked outputs,
+data-origin tracking, improved rounding/significant-digits and CSV
+unit handling.</p></li>
+<li><p>[testing] Expanded unit and end-to-end (E2E) test coverage and
+automated E2E expected-results regeneration.</p></li>
+<li><p>[tooling] Packaging and CI updates (pyproject.toml, GitHub Actions);
+baseline Python compatibility changed in CI tooling.</p></li>
+<li><p>Note: Many renames and refactors were introduced (examples include
+output keys and time/unit names). These changes may be
+backward-incompatible for scripts and downstream reports.</p></li>
+</ul>
+</section>
+<section id="scientific-evaluation">
+<h2>Scientific evaluation<a class="headerlink" href="#scientific-evaluation" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#scientific-evaluation'"><span>#</span></a></h2>
+<section id="evaluation-objective">
+<h3>Evaluation Objective:<a class="headerlink" href="#evaluation-objective" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#evaluation-objective'"><span>#</span></a></h3>
+<p>A structured whole-farm evaluation was conducted prior to release of
+v1.0 to assess integrated model performance following recent updates.
+While individual methods are tested throughout development, this
+whole-farm assessment focused on system-wide behavior across diverse
+farm conditions.</p>
+</section>
+<section id="key-findings">
+<h3>Key Findings:<a class="headerlink" href="#key-findings" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#key-findings'"><span>#</span></a></h3>
+<ul class="simple">
+<li><p><strong>Alignment with reported production:</strong> Predicted annual milk
+production closely matched farm-reported values across the 13
+evaluation farms</p></li>
+<li><p><strong>Environmental outcomes within expected ranges:</strong> Enteric methane,
+manure emissions, and carbon intensity estimates were expected ranges
+and behaved consistently with production efficiency and manure system
+configuration.</p></li>
+<li><p><strong>Methodological updates performed as intended:</strong> Differences between
+v0.8 and v1.0 were consistent with documented updates to herd
+demographics simulation, lactation curve implementation, diet
+formulation, and manure module methodology. Observed shifts were
+directionally logical and explainable.</p></li>
+<li><p><strong>No evidence of unintended system instability:</strong> Production and
+emissions outputs remained coherent across diverse farm scenarios.</p></li>
+</ul>
+</section>
+<section id="methodology">
+<h3>Methodology:<a class="headerlink" href="#methodology" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methodology'"><span>#</span></a></h3>
+<p>Thirteen farms representing variation in herd size, geography,
+production level, and management practices were simulated four times
+each, with outputs averaged to reduce stochastic variability. We
+evaluated production metrics (e.g., milk yield, intake, herd
+demographics) and environmental outcomes (e.g. enteric methane, manure
+methane and N₂O, and carbon intensity).</p>
+<p>Model performance was assessed through:</p>
+<ul class="simple">
+<li><p>Comparison of predicted milk production with farm-reported values,</p></li>
+<li><p>Benchmarking environmental outputs against published literature
+ranges, and</p></li>
+<li><p>Comparison with v0.8 model outputs to ensure changes aligned with
+documented methodological updates.</p></li>
+</ul>
+<p>This review was designed to confirm biologically and environmentally
+plausible system-level behavior prior to release. While not a formal
+external validation, the results provide confidence that the v1.0 update
+performs as intended across a diverse set of farm scenarios.</p>
+</section>
+</section>
+<section id="improvements">
+<h2>Improvements<a class="headerlink" href="#improvements" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#improvements'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>[animal] Reorganized animal/ herd initialization, ration formulation
+and ration-optimizer refactor to enable user-defined rations.</p></li>
+<li><p>[animal] Nutrition and requirements refactors; improved unit-test
+coverage for animal components.</p></li>
+<li><p>[manure] New/updated manure storage classes (composting, slurry,
+covered/bedded-pack) and improved processor models
+(temperature-dependent processes, damping/Arrhenius adjustments).</p></li>
+<li><p>[manure] Manure manager adjacency matrix validation and traversal
+improvements to clarify routing and processor order.</p></li>
+<li><p>[feed] FeedManager and FeedStorage fixes: storage-based deductions,
+mapping/uniqueness handling, inventory rounding and buffer/shrink
+handling.</p></li>
+<li><p>[emissions] Updates to feed and emissions handling including
+purchased-feed emissions, farmgrown feed LCA/LUC-related handling,
+and interpolated feed-emissions data support.</p></li>
+<li><p>[output] ReportGenerator / GraphGenerator improvements: legend
+alignment, mapping logs, aggregation logging, and more consistent
+reporting of units.</p></li>
+<li><p>[input, validation] InputManager and DataValidator consolidation:
+improved cross-validation, alias handling, more helpful error
+messages, and lazy runtime metadata loading.</p></li>
+<li><p>[crop/soil] Crop and soil refactors including canopy water and
+root-depth handling; harvested crop dry-matter (DM) refactor.</p></li>
+<li><p>[io] UTF‑8 CSV handling and CSV units improvements.</p></li>
+<li><p>[performance] Performance optimizations (new numba usage in parts of
+the codebase).</p></li>
+<li><p>[docs] Documentation improvements and Data Collection App (DCA)
+integration: schema, dropdowns and improved validation messages.</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#bug-fixes'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>[time/units] Fixed time-unit handling (unit renames and Time.day
+corrections).</p></li>
+<li><p>[manure] Fixes to anaerobic digester behavior and separator handling
+that addressed processing and emissions flows.</p></li>
+<li><p>[animal] Fixes to herd/reproduction handling (estrus, herd
+initialization) and enteric methane reporting adjustments.</p></li>
+<li><p>[feed] Resolved feed-storage deduction and feed-purchase accounting
+defects; fixes that prevented potential infinite-loop conditions in
+ration/feeding logic.</p></li>
+<li><p>[io] OutputManager parsing and report naming fixes to reduce
+ambiguity in aggregation and export.</p></li>
+<li><p>[tests] Multiple E2E and unit-test fixes aligned with refactors to
+restore expected behaviour in automated tests.</p></li>
+</ul>
+</section>
+<section id="data-i-o-changes">
+<h2>Data / I/O Changes<a class="headerlink" href="#data-i-o-changes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#data-i-o-changes'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>[output] OutputManager now supports chunked output writing and
+enhanced data-origin metadata for reported variables.</p></li>
+<li><p>[output] Standardized rounding and significant-digit behavior for
+reported values; CSV outputs now include unit information where
+available.</p></li>
+<li><p>[input, dca] Data Collection App schema changes and new validation
+fields; improved error messaging and dropdown behavior.</p></li>
+<li><p>[input] Support for multiple properties files and input_root
+handling; metadata loading moved to lazy/runtime where applicable.</p></li>
+<li><p>[e2e] E2E expected-results regeneration was automated; tolerances and
+overwrite behaviour were adjusted in test automation.</p></li>
+<li><p>Caution: renaming of output keys (examples noted during refactor) and
+changes to units/rounding can affect downstream dashboards, filters
+and comparisons.</p></li>
+</ul>
+</section>
+<section id="internal-tooling">
+<h2>Internal / Tooling<a class="headerlink" href="#internal-tooling" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#internal-tooling'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>[ci] CI and packaging updates: pyproject.toml and GitHub Actions
+workflow updates; CI now targets newer Python runtime(s) in
+workflows.</p></li>
+<li><p>[deps] Added/used numba in parts of the codebase for
+performance-critical paths.</p></li>
+<li><p>[testing] Increased unit-test coverage and improved E2E automation,
+including test fixes and fork/CI reliability improvements.</p></li>
+<li><p>[docs] Sphinx documentation updates and repo governance additions
+(LICENSE, CODEOWNERS, CONTRIBUTING).</p></li>
+<li><p>[constants] Consolidation of constants and units across modules to
+reduce duplication.</p></li>
+</ul>
+</section>
+<section id="known-risks-and-notes">
+<h2>Known Risks and Notes<a class="headerlink" href="#known-risks-and-notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#known-risks-and-notes'"><span>#</span></a></h2>
+<ul class="simple">
+<li><p>Large refactors and many moved/renamed symbols may cause
+backward-incompatible API changes; downstream tools and reports may
+require updates.</p></li>
+<li><p>New dependency (numba) and CI/tooling changes may require environment
+adjustments for users and CI runners.</p></li>
+<li><p>Changes to emissions defaults, interpolated feed-emissions data, and
+rounding/units may materially change model outputs relative to
+previous releases; subject-matter review is advised.</p></li>
+<li><p>OutputManager chunkification and altered reporting/origins increase
+complexity for downstream consumers; verify memory/IO behavior for
+large runs.</p></li>
+<li><p>DataValidator now consolidates validation behavior; callers that
+previously relied on OutputManager side effects should confirm new
+control flow and event logging.</p></li>
+</ul>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#highlights'" class="reference internal" href="#highlights">Highlights</a></li>
+<li><a :data-current="activeSection === '#scientific-evaluation'" class="reference internal" href="#scientific-evaluation">Scientific evaluation</a><ul>
+<li><a :data-current="activeSection === '#evaluation-objective'" class="reference internal" href="#evaluation-objective">Evaluation Objective:</a></li>
+<li><a :data-current="activeSection === '#key-findings'" class="reference internal" href="#key-findings">Key Findings:</a></li>
+<li><a :data-current="activeSection === '#methodology'" class="reference internal" href="#methodology">Methodology:</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#improvements'" class="reference internal" href="#improvements">Improvements</a></li>
+<li><a :data-current="activeSection === '#bug-fixes'" class="reference internal" href="#bug-fixes">Bug Fixes</a></li>
+<li><a :data-current="activeSection === '#data-i-o-changes'" class="reference internal" href="#data-i-o-changes">Data / I/O Changes</a></li>
+<li><a :data-current="activeSection === '#internal-tooling'" class="reference internal" href="#internal-tooling">Internal / Tooling</a></li>
+<li><a :data-current="activeSection === '#known-risks-and-notes'" class="reference internal" href="#known-risks-and-notes">Known Risks and Notes</a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2025, RuFaS team Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script defer="defer" src="../../_static/theme.js?v=582b20c5"></script>
+</body>
+</html>

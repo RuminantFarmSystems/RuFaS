@@ -30,7 +30,7 @@
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="RUFAS.weather.html" rel="next" title="RUFAS.weather module"/>
-<link href="RUFAS.user_constants.html" rel="prev" title="RUFAS.user_constants module"/>
+<link href="RUFAS.units.html" rel="prev" title="RUFAS.units module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -616,7 +615,7 @@ value is the corresponding dictionary minus the identifier key.</p>
 </section>
 <section id="id37">
 <h2>Notes<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
-<p>The use of <a href="#id70"><span class="problematic" id="id71">dict_</span></a>.pop(‘ID’) mutates the original dictionaries in list_of_dicts by removing their ‘ID’ keys.
+<p>The use of <a href="#id69"><span class="problematic" id="id70">dict_</span></a>.pop(‘ID’) mutates the original dictionaries in list_of_dicts by removing their ‘ID’ keys.
 If you need to keep the original list and dictionaries intact, make a copy before calling this function.</p>
 </section>
 <section id="id38">
@@ -638,18 +637,13 @@ And using ‘ID’ as the id_key:</p>
 </div></blockquote>
 <p>}</p>
 </section>
-<section id="id39">
-<h2>Notes<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
-<p>The use <cite>deepcopy</cite> is necessary here because <cite>dict_.pop(‘ID’)</cite> mutates <cite>list_of_dicts</cite> in place.
-To avoid side effects, we use <cite>deepcopy</cite> to make a copy before mutating the original list.</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.elongate_list">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">elongate_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_to_elongate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_list_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.elongate_list" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.elongate_list'"><span>#</span></a></dt>
 <dd><p>Takes a list and lengthens it to match the length of the reference list, if the original length was 1.</p>
-<section id="id40">
-<h2>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
+<section id="id39">
+<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>list_to_elongate<span class="classifier">list[Any]</span></dt><dd><p>List to be extended if its length is 1.</p>
 </dd>
@@ -657,15 +651,15 @@ To avoid side effects, we use <cite>deepcopy</cite> to make a copy before mutati
 </dd>
 </dl>
 </section>
-<section id="id41">
-<h2>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
+<section id="id40">
+<h2>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>list[Any]</dt><dd><p>The elongated list.</p>
 </dd>
 </dl>
 </section>
-<section id="id42">
-<h2>Notes<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<section id="id41">
+<h2>Notes<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
 <p>In the context of Schedule-descendant classes, the reference list length will always be the length of the years
 list.</p>
 </section>
@@ -674,15 +668,15 @@ list.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.determine_if_all_non_negative_values">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_if_all_non_negative_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.determine_if_all_non_negative_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.determine_if_all_non_negative_values'"><span>#</span></a></dt>
 <dd><p>Checks that all values in a list are &gt;= 0.</p>
-<section id="id43">
-<h2>Parameters<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>values<span class="classifier">List[Any]</span></dt><dd><p>List of values to be checked.</p>
 </dd>
 </dl>
 </section>
-<section id="id44">
-<h2>Returns<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<section id="id43">
+<h2>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if all values are &gt;= 0, False otherwise.</p>
 </dd>
@@ -693,31 +687,31 @@ list.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.validate_fractions">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.validate_fractions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.validate_fractions'"><span>#</span></a></dt>
 <dd><p>Checks that all fractions passed are valid.</p>
-<section id="id45">
-<h2>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<section id="id44">
+<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>fractions<span class="classifier">List[float]</span></dt><dd><p>List of fractions to be valid</p>
 </dd>
 </dl>
 </section>
-<section id="id46">
-<h2>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<section id="id45">
+<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if all fractions passed are valid, False otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="id47">
-<h2>Notes<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<section id="id46">
+<h2>Notes<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
 <p>A fraction is valid if it is in the range[0.0, 1.0]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.round_numeric_values_in_dict">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">round_numeric_values_in_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significant_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.round_numeric_values_in_dict" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.round_numeric_values_in_dict'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">round_numeric_values_in_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significant_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.round_numeric_values_in_dict" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.round_numeric_values_in_dict'"><span>#</span></a></dt>
 <dd><p>Rounds all numeric values in a dictionary to the specified number of significant digits.</p>
-<section id="id48">
-<h2>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<section id="id47">
+<h2>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">dict[str, any]</span></dt><dd><p>The dictionary containing numeric values to be rounded.</p>
 </dd>
@@ -725,15 +719,15 @@ list.</p>
 </dd>
 </dl>
 </section>
-<section id="id49">
-<h2>Returns<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
+<section id="id48">
+<h2>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>dict[str, any]</dt><dd><p>The dictionary with numeric values rounded to the specified number of significant digits.</p>
 </dd>
 </dl>
 </section>
-<section id="id50">
-<h2>Notes<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
+<section id="id49">
+<h2>Notes<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
 <p>Some specific behavior of the round() function used by this method:</p>
 <p>If significant_digits is None or 0, floats are converted to ints.
 round(12.7) -&gt; 13 (int)
@@ -754,15 +748,15 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.compare_randomized_rate_less_than">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_randomized_rate_less_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.compare_randomized_rate_less_than" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.compare_randomized_rate_less_than'"><span>#</span></a></dt>
 <dd><p>Compare a random rate to a reference rate to determine if an event occurs.</p>
-<section id="id51">
-<h2>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<section id="id50">
+<h2>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>reference_rate<span class="classifier">float</span></dt><dd><p>Reference rate for comparison.</p>
 </dd>
 </dl>
 </section>
-<section id="id52">
-<h2>Returns<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<section id="id51">
+<h2>Returns<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the randomized rate is less than the reference rate, False otherwise.</p>
 </dd>
@@ -773,15 +767,15 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.validate_date_format">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_date_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.validate_date_format" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.validate_date_format'"><span>#</span></a></dt>
 <dd><p>Checks if date_format is a valid Python datetime format for both strftime() and strptime().</p>
-<section id="id53">
-<h2>Parameters<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
+<section id="id52">
+<h2>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>date_format<span class="classifier">str</span></dt><dd><p>The date format to be validated.</p>
 </dd>
 </dl>
 </section>
-<section id="id54">
-<h2>Returns<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
+<section id="id53">
+<h2>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
 <p>bool</p>
 </section>
 </dd></dl>
@@ -789,8 +783,8 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.get_date_formatter">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_date_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">DateFormatter</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.get_date_formatter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.get_date_formatter'"><span>#</span></a></dt>
 <dd><p>Get a <cite>matplotlib.dates.DateFormatter</cite> instance for the requested date format.</p>
-<section id="id55">
-<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
+<section id="id54">
+<h2>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>date_format<span class="classifier">str</span></dt><dd><p>The format requested by the user. Common date formats are:
 - “%j/%Y”: Formats dates as “day_of_year/year” (e.g., “123/2024”).
@@ -804,15 +798,15 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 </dd>
 </dl>
 </section>
-<section id="id56">
-<h2>Returns<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
+<section id="id55">
+<h2>Returns<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>matplotlib.dates.DateFormatter</dt><dd><p>A <cite>DateFormatter</cite> instance for the specified format.</p>
 </dd>
 </dl>
 </section>
-<section id="id57">
-<h2>Notes<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
+<section id="id56">
+<h2>Notes<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
 <p>If the date_format is None or invalid, the default format “%d/%m/%Y” will be used instead.</p>
 </section>
 </dd></dl>
@@ -825,15 +819,15 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.average">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.average'"><span>#</span></a></dt>
 <dd><p>Calculates the average of a list of numbers.</p>
-<section id="id58">
-<h2>Parameters<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose average is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id59">
-<h2>Returns<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The average of the input numbers.</p>
 </dd>
@@ -844,15 +838,15 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.division">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">division</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.division" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.division'"><span>#</span></a></dt>
 <dd><p>Divides the first number in the list by each of the subsequent numbers.</p>
-<section id="id60">
-<h2>Parameters<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
+<section id="id59">
+<h2>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the division operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id61">
-<h2>Returns<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
+<section id="id60">
+<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The result of dividing the first number by each subsequent number.
 Returns None if the list is empty or has only one element.</p>
@@ -864,15 +858,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.product">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.product" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.product'"><span>#</span></a></dt>
 <dd><p>Returns the product of a list of numbers.</p>
-<section id="id62">
-<h2>Parameters<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h2>
+<section id="id61">
+<h2>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose product is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id63">
-<h2>Returns<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h2>
+<section id="id62">
+<h2>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The product of the input numbers. Returns 1 for an empty list.</p>
 </dd>
@@ -883,15 +877,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.standard_deviation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.standard_deviation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.standard_deviation'"><span>#</span></a></dt>
 <dd><p>Calculates the standard deviation of a list of numbers.</p>
-<section id="id64">
-<h2>Parameters<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h2>
+<section id="id63">
+<h2>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose standard deviation is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id65">
-<h2>Returns<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h2>
+<section id="id64">
+<h2>Returns<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The standard deviation of the input numbers.</p>
 </dd>
@@ -902,15 +896,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.sum">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.sum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.sum'"><span>#</span></a></dt>
 <dd><p>Returns the sum of a list of numbers.</p>
-<section id="id66">
-<h2>Parameters<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h2>
+<section id="id65">
+<h2>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose sum is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id67">
-<h2>Returns<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h2>
+<section id="id66">
+<h2>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The sum of the input numbers.</p>
 </dd>
@@ -921,15 +915,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.subtraction">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">subtraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.subtraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.subtraction'"><span>#</span></a></dt>
 <dd><p>Subtracts each subsequent number in the list from the first number.</p>
-<section id="id68">
-<h2>Parameters<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h2>
+<section id="id67">
+<h2>Parameters<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the subtraction operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id69">
-<h2>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h2>
+<section id="id68">
+<h2>Returns<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The result of subtracting each subsequent number from the first number.
 Returns None if the list is empty or has only one element.</p>

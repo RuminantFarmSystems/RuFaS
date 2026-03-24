@@ -7,9 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
-   RUFAS.EEE
    RUFAS.biophysical
-   RUFAS.data_structures
 
 Submodules
 ----------
@@ -30,7 +28,6 @@ Submodules
    RUFAS.simulation_engine
    RUFAS.task_manager
    RUFAS.units
-   RUFAS.user_constants
    RUFAS.util
    RUFAS.weather
 

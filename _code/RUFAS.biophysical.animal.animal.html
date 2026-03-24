@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -871,35 +870,48 @@ milk production output <cite>days_in_milk</cite> and the reproduction output <ci
 <section id="id50">
 <h3>Notes<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <p>This method determines the <cite>days_in_milk</cite> value based on the following conditions:</p>
-<blockquote>
-<div><ol class="arabic">
-<li><p><strong>If the animal is not lactating at the start of the day (`self.days_in_milk == 0`)</strong>:
-- The method uses the <cite>days_in_milk</cite> value from the reproduction update.
-- This is because a dry cow (not lactating) always has <cite>days_in_milk = 0</cite> in the milk production update.
-- However, if the animal gives birth that day, the reproduction update will set <cite>days_in_milk = 1</cite>.</p></li>
-<li><p><strong>If the animal is lactating at the start of the day (`self.days_in_milk &gt; 0`)</strong>:
-- In most cases, the method uses the <cite>days_in_milk</cite> value from the milk production update.
-- This is because the reproduction update does not change the <cite>days_in_milk</cite> for lactating cows.
-- The milk production update may either:</p>
-<blockquote>
-<div><ul class="simple">
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt><strong>If the animal is not lactating at the start of the day (`self.days_in_milk == 0`)</strong>:</dt><dd><ul class="simple">
+<li><p>The method uses the <cite>days_in_milk</cite> value from the reproduction update.</p></li>
+<li><p>This is because a dry cow (not lactating) always has <cite>days_in_milk = 0</cite> in the milk production update.</p></li>
+<li><p>However, if the animal gives birth that day, the reproduction update will set <cite>days_in_milk = 1</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>If the animal is lactating at the start of the day (`self.days_in_milk &gt; 0`)</strong>:</dt><dd><ul class="simple">
+<li><p>In most cases, the method uses the <cite>days_in_milk</cite> value from the milk production update.</p></li>
+<li><p>This is because the reproduction update does not change the <cite>days_in_milk</cite> for lactating cows.</p></li>
+<li><dl class="simple">
+<dt>The milk production update may either:</dt><dd><ul>
 <li><p>Increment <cite>days_in_milk</cite> by 1 (normal lactation progression).</p></li>
 <li><p>Set <cite>days_in_milk</cite> to 0 if the animal is scheduled to dry off.</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </li>
-<li><p><strong>Edge case: If the animal dries off and gives birth on the same day</strong>:
-- The lactation cycle restarts, and <cite>days_in_milk</cite> is set to 1.
-- This occurs when:</p>
-<blockquote>
-<div><ul class="simple">
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Edge case: If the animal dries off and gives birth on the same day</strong>:</dt><dd><ul class="simple">
+<li><p>The lactation cycle restarts, and <cite>days_in_milk</cite> is set to 1.</p></li>
+<li><dl class="simple">
+<dt>This occurs when:</dt><dd><ul>
 <li><p>The milk production update sets <cite>days_in_milk = 0</cite> (indicating drying off).</p></li>
 <li><p>The reproduction update sets <cite>days_in_milk = 1</cite> (due to giving birth).</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
 </li>
 </ol>
-</div></blockquote>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -1013,10 +1025,9 @@ has changed, or it remains in the current state) and None.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal.Animal._heiferIII_life_stage_update">
 <span class="sig-name descname"><span class="pre">_heiferIII_life_stage_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalStatus</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">NewBornCalfValuesTypedDict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal.Animal._heiferIII_life_stage_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal.Animal._heiferIII_life_stage_update'"><span>#</span></a></dt>
 <dd><p>Updates the life stage of a HeiferIII animal.</p>
-<p>This function evaluates whether a HeiferIII animal should transition to
-the Cow life stage. If the animal transitions, configuration data for a
-newborn calf is returned. If the transition does not occur, the animal
-remains in the HeiferIII life stage, and no newborn calf data is provided.</p>
+<p>Evaluates whether a HeiferIII animal transitions to the Cow life stage.
+If a transition occurs, newborn calf configuration data is returned.
+Otherwise, the animal remains in the HeiferIII stage and no calf data is produced.</p>
 <section id="id61">
 <h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
@@ -1027,14 +1038,13 @@ remains in the HeiferIII life stage, and no newborn calf data is provided.</p>
 <section id="id62">
 <h3>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <dl>
-<dt>tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]</dt><dd><p>A tuple containing the animal’s status:
-- AnimalStatus.LIFE_STAGE_CHANGED along with the newborn calf</p>
-<blockquote>
-<div><p>configuration if the life stage transitions to Cow.</p>
-</div></blockquote>
+<dt>tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]</dt><dd><p>A tuple containing the animal status and optional newborn calf data.</p>
 <ul class="simple">
-<li><p>AnimalStatus.REMAIN and None if the animal stays in the HeiferIII stage.</p></li>
+<li><p><cite>AnimalStatus.LIFE_STAGE_CHANGED</cite> and newborn calf configuration</p></li>
 </ul>
+<p>if the animal transitions to Cow.
+* <cite>AnimalStatus.REMAIN</cite> and <cite>None</cite> if the animal remains in the
+HeiferIII stage.</p>
 </dd>
 </dl>
 </section>

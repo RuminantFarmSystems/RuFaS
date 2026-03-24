@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -154,7 +153,7 @@
 <p>Enum for different task types handled by TaskManager.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.HERD_INITIALIZATION">
-<span class="sig-name descname"><span class="pre">HERD_INITIALIZATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Initializes</span> <span class="pre">simulation</span> <span class="pre">to</span> <span class="pre">generate</span> <span class="pre">a</span> <span class="pre">stable</span> <span class="pre">herd'</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.HERD_INITIALIZATION" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.HERD_INITIALIZATION'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">HERD_INITIALIZATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Herd</span> <span class="pre">Initialization'</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.HERD_INITIALIZATION" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.HERD_INITIALIZATION'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.SIMULATION_SINGLE_RUN">
@@ -162,7 +161,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN">
-<span class="sig-name descname"><span class="pre">SIMULATION_MULTI_RUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Runs</span> <span class="pre">multiple</span> <span class="pre">simulations</span> <span class="pre">to</span> <span class="pre">generate</span> <span class="pre">statistically</span> <span class="pre">significant</span> <span class="pre">results.</span> <span class="pre">Automatically</span> <span class="pre">changes</span> <span class="pre">the</span> <span class="pre">random</span> <span class="pre">seed.'</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">SIMULATION_MULTI_RUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Multiple</span> <span class="pre">simulation</span> <span class="pre">with</span> <span class="pre">different</span> <span class="pre">random</span> <span class="pre">seeds'</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.SIMULATION_MULTI_RUN'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.SENSITIVITY_ANALYSIS">
@@ -174,7 +173,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.END_TO_END_TESTING">
-<span class="sig-name descname"><span class="pre">END_TO_END_TESTING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">"Runs</span> <span class="pre">RuFaS's</span> <span class="pre">end-to-end</span> <span class="pre">testing</span> <span class="pre">routine.</span> <span class="pre">Ensures</span> <span class="pre">all</span> <span class="pre">components</span> <span class="pre">of</span> <span class="pre">RuFaS</span> <span class="pre">work</span> <span class="pre">together</span> <span class="pre">correctly</span> <span class="pre">from</span> <span class="pre">start</span> <span class="pre">to</span> <span class="pre">finish."</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.END_TO_END_TESTING" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.END_TO_END_TESTING'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">END_TO_END_TESTING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Run</span> <span class="pre">e2e</span> <span class="pre">testing'</span></span><a class="headerlink" href="#RUFAS.task_manager.TaskType.END_TO_END_TESTING" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskType.END_TO_END_TESTING'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskType.POST_PROCESSING">
@@ -243,18 +242,6 @@
 </dd>
 </dl>
 </section>
-<section id="raises">
-<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>Exception</dt><dd><p>If the input data is invalid.</p>
-</dd>
-</dl>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>We set maxtasksperchild=1 to maintain isolation between tasks and ensure no memory
-leaks happens in IO Managers.</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager.get_rufas_version">
@@ -272,12 +259,9 @@ leaks happens in IO Managers.</p>
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager.check_dependencies">
 <span class="sig-name descname"><span class="pre">check_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager.check_dependencies" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager.check_dependencies'"><span>#</span></a></dt>
 <dd><p>Checks if the required dependencies are installed.</p>
-<section id="id1">
-<h2>Raises<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>RuntimeError</dt><dd><p>If a required dependency is not installed or does not meet the version requirements
-specified in pyproject.toml.</p>
-</dd>
 <dt>ImportError</dt><dd><p>If a required dependency is not installed.</p>
 </dd>
 </dl>
@@ -292,8 +276,8 @@ specified in pyproject.toml.</p>
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager._parse_input_tasks">
 <span class="sig-name descname"><span class="pre">_parse_input_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager._parse_input_tasks" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager._parse_input_tasks'"><span>#</span></a></dt>
 <dd><p>Parses input tasks into single and multiple run tasks.</p>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id1">
+<h2>Returns<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>tuple[list[dict[str, Any]], list[dict[str, Any]]]</dt><dd><p>Parsed single run and multi-run task arguments.</p>
 </dd>
@@ -304,15 +288,15 @@ specified in pyproject.toml.</p>
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager._expand_multi_runs_to_single_runs">
 <span class="sig-name descname"><span class="pre">_expand_multi_runs_to_single_runs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_run_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager._expand_multi_runs_to_single_runs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager._expand_multi_runs_to_single_runs'"><span>#</span></a></dt>
 <dd><p>Expands multi-run tasks into single-run tasks for execution.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>multi_run_args<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>list of multi-run task arguments.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>list[dict[str, Any]]</dt><dd><p>Expanded list of single-run tasks.</p>
 </dd>
@@ -330,7 +314,7 @@ specified in pyproject.toml.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager._run_tasks">
-<span class="sig-name descname"><span class="pre">_run_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_run_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager._run_tasks" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager._run_tasks'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_run_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_run_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager._run_tasks" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager._run_tasks'"><span>#</span></a></dt>
 <dd><p>Runs the tasks based on the provided arguments.</p>
 </dd></dl>
 <dl class="py method">
@@ -340,7 +324,7 @@ specified in pyproject.toml.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager.task">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager.task" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager.task'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager.task" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager.task'"><span>#</span></a></dt>
 <dd><p>Executes a single task with specified arguments.</p>
 </dd></dl>
 <dl class="py method">
@@ -372,8 +356,8 @@ specified in pyproject.toml.</p>
 <dt class="sig sig-object py" id="RUFAS.task_manager.TaskManager.handle_post_processing">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">handle_post_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.input_manager.html#RUFAS.input_manager.InputManager" title="RUFAS.input_manager.InputManager"><span class="pre">InputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.output_manager.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_flush_im_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_pool_from_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_input_data_to_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.task_manager.TaskManager.handle_post_processing" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.task_manager.TaskManager.handle_post_processing'"><span>#</span></a></dt>
 <dd><p>Handles post-processing tasks based on specified arguments.</p>
-<section id="id5">
-<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>args<span class="classifier">dict[str, Any]</span></dt><dd><p>Arguments for post-processing.</p>
 </dd>
@@ -398,8 +382,8 @@ continuing with post-processing.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h2>Notes<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
 <ul class="simple">
 <li><p>For args, when the optional <code class="docutils literal notranslate"><span class="pre">run_eee</span></code> key is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the Emissions, Energy, and Economics</p></li>
 </ul>

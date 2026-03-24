@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -186,6 +185,13 @@ NOTE: This class is not multi-thread safe!!!</p>
 <dl class="simple">
 <dt>log_pool<span class="classifier">list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]</span></dt><dd><p>A list of log, warning, and error dictionaries containing all the components needed
 to log the information to the appropriate pool.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>Exception</dt><dd><p>Generic exception raised by utility functions.</p>
 </dd>
 </dl>
 </section>
@@ -355,8 +361,8 @@ values.</p>
 </dd>
 </dl>
 </section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Raises<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.</p>
 </dd>
@@ -367,15 +373,15 @@ values.</p>
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._mask_values">
 <span class="sig-name descname"><span class="pre">_mask_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float32</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._mask_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._mask_values'"><span>#</span></a></dt>
 <dd><p>Masks values to remove None and NaN values.</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>values<span class="classifier">list[Any]</span></dt><dd><p>list of data to be masked.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[NDArray[Any], NDArray[np.float32]]</dt><dd><p>list of NumPy arrays, the first containing the indices of the masked data and the second containing the
 actual masked data.</p>
@@ -387,8 +393,8 @@ actual masked data.</p>
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._customize_graph">
 <span class="sig-name descname"><span class="pre">_customize_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customization_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._customize_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._customize_graph'"><span>#</span></a></dt>
 <dd><p>Apply customizations to the graph.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>fig<span class="classifier">Figure</span></dt><dd><p>The matplotlib Figure object to customize.</p>
 </dd>
@@ -401,8 +407,8 @@ actual masked data.</p>
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._save_graph">
 <span class="sig-name descname"><span class="pre">_save_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._save_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._save_graph'"><span>#</span></a></dt>
 <dd><p>Save the generated graph to a file.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
@@ -414,15 +420,15 @@ actual masked data.</p>
 </dd>
 </dl>
 </section>
-<section id="id14">
-<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>str</dt><dd><p>The path to the saved graph.</p>
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h3>Raises<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Exception</dt><dd><p>Generic exception raised if saving the graph fails.</p>
 </dd>
@@ -433,8 +439,8 @@ actual masked data.</p>
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._generate_graph_path">
 <span class="sig-name descname"><span class="pre">_generate_graph_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._generate_graph_path" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._generate_graph_path'"><span>#</span></a></dt>
 <dd><p>Generate the full path for the output graph and create parent folders if necessary.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
@@ -444,8 +450,8 @@ actual masked data.</p>
 </dd>
 </dl>
 </section>
-<section id="id17">
-<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Path</dt><dd><p>The full path to the output graph file.</p>
 </dd>

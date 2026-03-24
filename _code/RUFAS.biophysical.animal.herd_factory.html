@@ -80,7 +80,6 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -169,7 +168,7 @@ after random sampling with replacement.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory.post_animal_population">
-<span class="sig-name descname"><span class="pre">post_animal_population</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AnimalPopulation</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_factory.HerdFactory.post_animal_population" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_factory.HerdFactory.post_animal_population'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">post_animal_population</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AnimalPopulation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_factory.HerdFactory.post_animal_population" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_factory.HerdFactory.post_animal_population'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__">
@@ -344,13 +343,6 @@ reproduction outputs (newborn calf configuration) and animal life stage status.<
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory._heiferIIIs_update">
 <span class="sig-name descname"><span class="pre">_heiferIIIs_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_factory.HerdFactory._heiferIIIs_update" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_factory.HerdFactory._heiferIIIs_update'"><span>#</span></a></dt>
 <dd><p>HeiferIIIs update for generating herd simulation</p>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<p>The use of <cite>deepcopy()</cite> is necessary here because the graduated <cite>heiferIII`s are
-subsequently mutated by `transition_heiferIII_to_cow()</cite> and appended to <cite>cows</cite>,
-so without it the snapshot saved to the <cite>replacement</cite> array would reflect the cow
-state rather than the heiferIII state.</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory._cows_update">
@@ -387,13 +379,6 @@ from the simulation start date.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory._random_sample_with_replacement_by_type">
 <span class="sig-name descname"><span class="pre">_random_sample_with_replacement_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_factory.HerdFactory._random_sample_with_replacement_by_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_factory.HerdFactory._random_sample_with_replacement_by_type'"><span>#</span></a></dt>
 <dd><p>Function to randomly sample a specific animal type with replacement</p>
-<section id="id15">
-<h3>Notes<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
-<p>The use of <cite>deepcopy</cite> is necessary here because the same animal may be
-randomly selected multiple times, and without it all duplicate entries
-in <cite>post_animals</cite> would share the same object, meaning mutations to
-one would affect all others.</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_factory.HerdFactory.initialize_herd">
