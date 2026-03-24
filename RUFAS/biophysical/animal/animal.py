@@ -1748,14 +1748,6 @@ class Animal:
             self.cull_reason = animal_constants.DEATH_CULL
             animal_status = AnimalStatus.DEAD
 
-        if (
-            self.animal_type.is_cow
-            and self.reproduction.do_not_breed
-            and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production
-        ):
-            self.cull_reason = animal_constants.LOW_PROD_CULL
-            self.sold_at_day = time.simulation_day
-            animal_status = AnimalStatus.SOLD
         return animal_status, newborn_calf_config
 
     def _evaluate_calf_for_heiferI(self) -> bool:
