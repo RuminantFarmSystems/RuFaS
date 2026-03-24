@@ -661,10 +661,7 @@ class Pen:
         self._validate_general_manure_stream_proportions()
         for stream_config in self.manure_streams:
             manure_stream = self._split_general_manure_stream(
-                general_stream_proportion,
-                parlor_stream_proportion,
-                stream_config,
-                total_stream
+                general_stream_proportion, parlor_stream_proportion, stream_config, total_stream
             )
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream_config.get("first_processor")))
@@ -675,11 +672,11 @@ class Pen:
         return animal_manure_streams
 
     def _split_general_manure_stream(
-            self,
-            general_stream_proportion: float,
-            parlor_stream_proportion: Any | None,
-            stream_config: dict[str, str | float],
-            total_stream: ManureStream
+        self,
+        general_stream_proportion: float,
+        parlor_stream_proportion: Any | None,
+        stream_config: dict[str, str | float],
+        total_stream: ManureStream,
     ) -> ManureStream:
         """
         Split the total manure stream by the given general stream proportion..
@@ -788,10 +785,10 @@ class Pen:
         return general_stream_proportion, parlor_stream_proportion, parlor_stream
 
     def _validate_parlor_stream_proportion(
-            self,
-            general_stream_proportion: float,
-            parlor_stream: ManureStream | None,
-            parlor_stream_proportion: float | None
+        self,
+        general_stream_proportion: float,
+        parlor_stream: ManureStream | None,
+        parlor_stream_proportion: float | None,
     ) -> None:
         """
         Validates that the parlor stream proportion is within the expected range.
@@ -808,7 +805,7 @@ class Pen:
         if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
             assert parlor_stream is not None, "Parlor stream should not be None if parlor stream proportion is not None"
             assert (
-                    parlor_stream_proportion is not None
+                parlor_stream_proportion is not None
             ), "Parlor stream proportion should not be None if parlor stream is not None"
 
     def _calculate_methane_production_potential(self) -> float:
