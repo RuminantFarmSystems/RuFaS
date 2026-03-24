@@ -931,6 +931,104 @@ def test_get_manure_streams(
             assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(proportion)
 
 
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, stream_config, total_stream, expected_result",
+    [
+        (
+            1.0,
+            None,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0, ammoniacal_nitrogen=10.0, nitrogen=10.0, phosphorus=10.0, potassium=10.0, ash=10.0,
+                non_degradable_volatile_solids=10.0, degradable_volatile_solids=10.0, total_solids=100.0, volume=100.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=10.0
+            ),
+            ManureStream(
+                water=10.0, ammoniacal_nitrogen=10.0, nitrogen=10.0, phosphorus=10.0, potassium=10.0, ash=10.0,
+                non_degradable_volatile_solids=10.0, degradable_volatile_solids=10.0, total_solids=100.0, volume=100.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=10.0
+            )
+
+        ),
+        (
+            0.8,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0, ammoniacal_nitrogen=10.0, nitrogen=10.0, phosphorus=10.0, potassium=10.0, ash=10.0,
+                non_degradable_volatile_solids=10.0, degradable_volatile_solids=10.0, total_solids=100.0, volume=100.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=10.0
+            ),
+            ManureStream(
+                water=8.0, ammoniacal_nitrogen=8.0, nitrogen=8.0, phosphorus=8.0, potassium=8.0, ash=8.0,
+                non_degradable_volatile_solids=8.0, degradable_volatile_solids=8.0, total_solids=80.0, volume=80.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=8.0
+            )
+
+        ),
+        (
+            0.3,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0, ammoniacal_nitrogen=10.0, nitrogen=10.0, phosphorus=10.0, potassium=10.0, ash=10.0,
+                non_degradable_volatile_solids=10.0, degradable_volatile_solids=10.0, total_solids=100.0, volume=100.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=10.0
+            ),
+            ManureStream(
+                water=3.0, ammoniacal_nitrogen=3.0, nitrogen=3.0, phosphorus=3.0, potassium=3.0, ash=3.0,
+                non_degradable_volatile_solids=3.0, degradable_volatile_solids=3.0, total_solids=30.0, volume=30.0,
+                methane_production_potential=10.0, pen_manure_data=None, bedding_non_degradable_volatile_solids=3.0
+            )
+
+        )
+    ]
+)
+def test_split_general_manure_stream(
+        general_stream_proportion: float,
+        parlor_stream_proportion: Any | None,
+        stream_config: dict[str, str | float],
+        total_stream: ManureStream,
+        expected_result: ManureStream,
+        pen: Pen,
+        animals_in_pen: dict[int, Animal]
+) -> None:
+    """Tests the split_general_manure_stream method."""
+    result = pen._split_general_manure_stream(
+        general_stream_proportion,
+        parlor_stream_proportion,
+        stream_config,
+        total_stream,
+    )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, parlor_stream, assertion_error_expected",
+    [
+        (1.0, None, None, False),
+        (0.5, None, None, True),
+        (1.0, 0.5, None, True),
+        (0.5, 0.5, None, True),
+        (0.5, None, MagicMock(spec=ManureStream), True),
+        (0.5, 0.5, MagicMock(spec=ManureStream), False),
+    ]
+)
+def test_validate_parlor_stream_proportion(
+        general_stream_proportion: float,
+        parlor_stream_proportion: Any | None,
+        parlor_stream: ManureStream,
+        assertion_error_expected: bool,
+        pen: Pen,
+) -> None:
+    """Tests the validate_parlor_stream_proportion method."""
+    if assertion_error_expected:
+        with pytest.raises(AssertionError):
+            pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+    else:
+        pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+
+
 def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> None:
     """Tests the calculation of total pen manure stream."""
     excretions = AnimalManureExcretions(
