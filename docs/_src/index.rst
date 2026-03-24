@@ -33,6 +33,7 @@ Navigation
    :caption: Getting Started:
 
    _wiki/onboarding
+   _wiki/Onboarding-videos
 
 .. toctree::
    :maxdepth: 2
