@@ -12,7 +12,6 @@ from RUFAS.util import Utility
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.EEE.tractor_implement import TractorImplement
 
-
 EEE_TO_OM_KEY_MAPPING = {
     FieldOperationEvent.PLANTING: {
         "crop_type": "crop",
@@ -120,7 +119,7 @@ CROP_AND_SOIL_FILTERS: list[dict[str, Any]] = [
         "filters": ["Field._record_planting.crop_planting.field='.*'"],
         "variables": ["crop", "field_size", "average_clay_percent", "year", "day", "field_name"],
     },
-    ]
+]
 
 im = InputManager()
 om = OutputManager()
