@@ -1,0 +1,13 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/farm3_wcrops_metadata.json",
+      "output_prefix": "dfarm3_mcrdef",
+      "log_verbosity": "errors",
+      "input_root": "C:/Users/gmg228/Documents/RuFaS/RuFaS-Evaluation/",
+      "multi_run_counts": 4
+    }
+]
+}
