@@ -224,16 +224,6 @@
       "type": "json",
       "properties": "EEE_constants_properties"
     },
-    "properties": {
-      "title": "Metadata Properties",
-      "description": "The properties of input data.",
-      "paths": [
-        "input/metadata/properties/default.json",
-        "input/metadata/properties/commodity_properties.json"
-      ],
-      "type": "json",
-      "properties": "NA"
-    },
     "feed_storage_configurations": {
       "title": "Feed Management",
       "description": "Configurations for feed storage units.",
@@ -249,7 +239,6 @@
       "properties": "feed_storage_instances"
     }
   },
-  "cross-validation": ["input/metadata/cross_validation/example_cross_validation.json"],
   "runtime_metadata": {
     "EEE_econ": {
       "path": "input/metadata/EEE/econ_metadata.json"

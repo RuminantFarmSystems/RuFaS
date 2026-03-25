@@ -343,6 +343,119 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     assert actual == expected
 
 
+def test_find_group_prefixes_basic() -> None:
+    """Test extraction of prefixes from standard flattened keys."""
+    data: dict[str, Any] = {
+        "a.b": 1,
+        "a.c": 2,
+        "d.e": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["a", "d"]
+
+
+def test_find_group_prefixes_deduplication() -> None:
+    """Ensure duplicate prefixes are only returned once."""
+    data: dict[str, Any] = {
+        "group1.x": 1,
+        "group1.y": 2,
+        "group1.z": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["group1"]
+
+
+def test_find_group_prefixes_complex_keys() -> None:
+    """Test realistic complex keys similar to production format."""
+    data: dict[str, Any] = {
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass": 1,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.year": 2020,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'.mass": 2,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    expected = [
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'",
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'",
+    ]
+
+    assert result == sorted(expected)
+
+
+def test_find_group_prefixes_with_required_suffixes() -> None:
+    """Test filtering using required_suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.mass": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == ["a", "c"]
+
+
+def test_find_group_prefixes_required_suffixes_no_match() -> None:
+    """Test when no suffix matches the required set."""
+    data: dict[str, Any] = {
+        "a.year": 2020,
+        "b.day": 10,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == []
+
+
+def test_find_group_prefixes_ignores_keys_without_dot() -> None:
+    """Ensure keys without a dot are ignored."""
+    data: dict[str, Any] = {
+        "a": 1,
+        "b": 2,
+        "c.d": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["c"]
+
+
+def test_find_group_prefixes_empty_input() -> None:
+    """Test behavior with empty input."""
+    result = Utility.find_group_prefixes_from_keys({})
+
+    assert result == []
+
+
+def test_find_group_prefixes_multiple_suffix_filtering() -> None:
+    """Test filtering with multiple allowed suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.depth": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass", "year"},
+    )
+
+    assert result == ["a"]
+
+
 @pytest.mark.parametrize(
     "data_to_pad,fill_value,gap_pad,end_pad,expected",
     [
@@ -892,7 +1005,7 @@ def test_combine(
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
-    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
+    input_dict: dict[str, list[Any]] = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
     expected_output = [
         {"id": 1, "name": "Alice", "age": 25},
         {"id": 2, "name": "Bob", "age": 30},
@@ -902,13 +1015,13 @@ def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_empty_input() -> None:
-    input_dict = {}
-    expected_output = []
+    input_dict: dict[str, list[Any]] = {}
+    expected_output: list[dict[str, Any]] = []
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists() -> None:
-    input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
+    input_dict: dict[str, list[Any]] = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
@@ -923,13 +1036,13 @@ def test_convert_list_to_dict_by_key_basic() -> None:
 
 
 def test_convert_list_to_dict_by_key_empty_list() -> None:
-    list_of_dicts = []
-    expected_output = {}
+    list_of_dicts: list[dict[str, Any]] = []
+    expected_output: dict[Any, dict[str, Any]] = {}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
 
 
 def test_convert_list_to_dict_by_key_missing_key() -> None:
-    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
+    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]
     with pytest.raises(KeyError):
         Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
 
@@ -938,38 +1051,6 @@ def test_convert_list_to_dict_by_key_different_key() -> None:
     list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
     expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
-
-
-def test_find_max_index_from_keys_mixed_single_and_multi_digit_numbers() -> None:
-    data = {
-        "Prefix_0.suffix": ["value"],
-        "Prefix_1.suffix": ["value"],
-        "Prefix_10.suffix": ["value"],
-        "Prefix_2.suffix": ["value"],
-        "Prefix_21.suffix": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) == 21
-
-
-def test_find_max_index_from_keys_no_matching_keys() -> None:
-    data = {
-        "NoPrefixOrNumber.suffix": ["value"],
-        "AnotherWithoutNumber": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) is None
-
-
-def test_find_max_index_from_keys_negative_numbers() -> None:
-    data = {
-        "Prefix_-1.suffix": ["value"],
-        "Prefix_-2.suffix": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) is None
-
-
-def test_find_max_index_from_keys_empty_dictionary() -> None:
-    data = {}
-    assert Utility.find_max_index_from_keys(data) is None
 
 
 @pytest.mark.parametrize(

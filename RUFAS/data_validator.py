@@ -578,7 +578,7 @@ class DataValidator:
             "function": DataValidator._metadata_array_validator.__name__,
         }
         required_array_property_keys = {"type", "properties"}
-        optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
+        optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable", "default"}
         valid, message = self._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )

@@ -47,9 +47,13 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "user_feeds",
     "tractor_dataset",
     "EEE_constants",
-    "properties",
     "feed_storage_configurations",
     "feed_storage_instances",
+}
+PRROPERTIES_FILE_PATHS: dict[str, Path] = {
+    "default": Path("input/metadata/properties/default.json"),
+    "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
+    "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
 }
 
 
@@ -100,7 +104,12 @@ class InputManager:
         self.__pool = incoming_pool
 
     def start_data_processing(
-        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+        self,
+        metadata_path: Path,
+        input_root: Path,
+        task_id: Any,
+        cross_validation_file_paths: list[str] | None,
+        eager_termination: bool = True,
     ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -113,6 +122,8 @@ class InputManager:
             Root directory for all input files.
         task_id : Any
             Task ID for the current process.
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation files.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
@@ -145,16 +156,20 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
-        is_input_data_valid = self._cross_validate_data(eager_termination) and is_input_data_valid
+        is_input_data_valid = (
+            self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
+        )
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
-    def _cross_validate_data(self, eager_termination: bool) -> bool:
+    def _cross_validate_data(self, cross_validation_file_paths: list[str] | None, eager_termination: bool) -> bool:
         """
         Validates data against cross-validation rules and reports any failures.
 
         Parameters
         ----------
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation rules.
         eager_termination : bool
             If True, the validation process stops after the first cross-validation
             failure. Otherwise, it continues validating all the rules.
@@ -166,7 +181,6 @@ class InputManager:
             or more rules fail.
         """
         failing_cross_validation_blocks: list[str] = []
-        cross_validation_file_paths: list[str] | None = self.__metadata.get("cross-validation", None)
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
         if cross_validation_rules is not None and len(cross_validation_rules) > 0:
             for cross_validation_ruleset in cross_validation_rules:
@@ -642,37 +656,23 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_metadata = self.__metadata["files"]["properties"]
-            properties_paths = properties_metadata.get("paths") or properties_metadata.get("path")
-
-            if isinstance(properties_paths, str):
-                properties_paths = [properties_paths]
-            if not isinstance(properties_paths, list) or len(properties_paths) == 0:
-                raise ValueError("Input Manager Error: Properties paths must be a non-empty string or list of strings")
-
-            if not all(isinstance(path, str) and path for path in properties_paths):
-                raise ValueError("Input Manager Error: Each properties path must be a non-empty string")
-
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {properties_paths}",
+                f"Attempting to load properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
             combined_properties: dict[str, Any] = {}
-            for properties_path_str in properties_paths:
-                properties_path = Path(properties_path_str)
+            for properties_path in PRROPERTIES_FILE_PATHS.values():
                 if not properties_path.exists():
                     raise FileNotFoundError(f"Input Manager Error: Properties file not found at {properties_path}")
                 loaded_properties = self._load_data_from_json(properties_path)
                 combined_properties.update(loaded_properties)
 
-            del self.__metadata["files"]["properties"]
-
             self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {properties_paths}",
+                f"Successfully loaded properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
