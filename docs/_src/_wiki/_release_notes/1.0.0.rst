@@ -78,8 +78,8 @@ performs as intended across a diverse set of farm scenarios.
 Improvements
 ------------
 
--  [animal] Reorganized animal/ herd initialization, ration formulation
-   and ration-optimizer refactor to enable user-defined rations.
+-  [animal] Reorganized animal/herd initialization; ration formulation
+   and ration-optimizer refactored to enable user-defined rations.
 -  [animal] Nutrition and requirements refactors; improved unit-test
    coverage for animal components.
 -  [manure] New/updated manure storage classes (composting, slurry,
