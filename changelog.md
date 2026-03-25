@@ -32,6 +32,7 @@ v1.0.0
 - [2737](https://github.com/RuminantFarmSystems/RuFaS/pull/2737) - [minor change] [NoInputChange] [NoOutputChange] Update CONTRIBUTING.md file to provide forking guidelines for contributors.
 - [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
 - [2720](https://github.com/RuminantFarmSystems/MASM/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
+- [2772](https://github.com/RuminantFarmSystems/MASM/pull/2772) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Refactors `SimulationEngine`.`_daily_simulation()` to accommodate isolating modules.
 - [2791](https://github.com/RuminantFarmSystems/MASM/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
 - [2833](https://github.com/RuminantFarmSystems/MASM/pull/2833) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Remove unused animal_requirements.py file.
 - [2815](https://github.com/RuminantFarmSystems/MASM/pull/2815) - [minor change] [All Non-Biophysical Modules] [NoInputChange] [NoOutputChange] Updates error messages raised to be clearer and more helpful for diagnosis and fixing.
@@ -50,8 +51,8 @@ v1.0.0
 - [2854](https://github.com/RuminantFarmSystems/MASM/pull/2854) - [minor change] [Emissions][OutputManager] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
 - [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
 - [2876](https://github.com/RuminantFarmSystems/RuFaS/pull/2876) - [minor change] [DieselConsumption][OutputManager] [NoInputChange] [NoOutputChange] Removes `use_name` output filter option and updates `DieselConsumption` to filter properly without it.
-- [2850](https://github.com/RuminantFarmSystems/MASM/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
 - [2869](https://github.com/RuminantFarmSystems/RuFaS/pull/2869) - [minor change] [InputChange] [NoOutputChange] Removes `properties` and `cross-validation` file path definitions from metadata JSON files. Properties file paths are now defined as a module-level constant in `input_manager.py`, and cross-validation file paths are moved to the task configuration JSON files.
+- [2850](https://github.com/RuminantFarmSystems/MASM/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
 
 ### v1.0.0
 
