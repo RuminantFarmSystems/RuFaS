@@ -137,9 +137,7 @@ def test_task_manager_start(
             "output_prefix": "update_prefix",
             "json_output_directory": Path("out/update_e2e"),
         }
-        mock_parse_input_tasks = mocker.patch.object(
-            tm, "_parse_input_tasks", return_value=([update_e2e_task], [{}])
-        )
+        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([update_e2e_task], [{}]))
         mock_expand_multi_runs_to_single_runs = mocker.patch.object(
             tm, "_expand_multi_runs_to_single_runs", return_value=[]
         )
