@@ -66,19 +66,20 @@ def test_task_manager_init(
 
 @pytest.mark.parametrize(
     "verbosity, exclude_info_maps, clear_output_directory, produce_graphics, suppress_log_files, metadata_depth_limit,"
-    "workers, is_end_to_end_test_task",
+    "workers, is_end_to_end_test_task, is_update_end_to_end_test_task",
     [
-        (LogVerbosity.LOGS, True, True, True, True, 8, 1, False),
-        (LogVerbosity.CREDITS, True, True, True, True, 8, 2, False),
-        (LogVerbosity.ERRORS, True, True, True, True, 8, 3, False),
-        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4, False),
-        (LogVerbosity.NONE, True, True, True, True, 8, 5, False),
-        (LogVerbosity.LOGS, False, True, True, True, 8, 6, False),
-        (LogVerbosity.CREDITS, False, True, True, True, 8, 7, False),
-        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, False),
-        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9, False),
-        (LogVerbosity.NONE, False, True, True, True, 8, 10, False),
-        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, True),
+        (LogVerbosity.LOGS, True, True, True, True, 8, 1, False, False),
+        (LogVerbosity.CREDITS, True, True, True, True, 8, 2, False, False),
+        (LogVerbosity.ERRORS, True, True, True, True, 8, 3, False, False),
+        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4, False, False),
+        (LogVerbosity.NONE, True, True, True, True, 8, 5, False, False),
+        (LogVerbosity.LOGS, False, True, True, True, 8, 6, False, False),
+        (LogVerbosity.CREDITS, False, True, True, True, 8, 7, False, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, False, False),
+        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9, False, False),
+        (LogVerbosity.NONE, False, True, True, True, 8, 10, False, False),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8, True, False),
+        (LogVerbosity.LOGS, False, True, True, True, 8, 1, False, True),
     ],
 )
 def test_task_manager_start(
@@ -92,6 +93,8 @@ def test_task_manager_start(
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
     is_end_to_end_test_task: bool,
+    is_update_end_to_end_test_task: bool,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Unit test for TaskManager.start() with and without the e2e summary branch."""
     tm = TaskManager()
@@ -118,12 +121,7 @@ def test_task_manager_start(
     mock_check_dependencies = mocker.patch.object(tm, "check_dependencies")
     mock_check_python_version = mocker.patch.object(tm, "check_python_version")
 
-    if not is_end_to_end_test_task:
-        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([{}], [{}]))
-        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-            tm, "_expand_multi_runs_to_single_runs", return_value=[{}]
-        )
-    else:
+    if is_end_to_end_test_task:
         e2e_task = {
             "task_type": TaskType.END_TO_END_TESTING,
             "output_prefix": "test_prefix",
@@ -132,6 +130,23 @@ def test_task_manager_start(
         mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([e2e_task], [{}]))
         mock_expand_multi_runs_to_single_runs = mocker.patch.object(
             tm, "_expand_multi_runs_to_single_runs", return_value=[]
+        )
+    elif is_update_end_to_end_test_task:
+        update_e2e_task = {
+            "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
+            "output_prefix": "update_prefix",
+            "json_output_directory": Path("out/update_e2e"),
+        }
+        mock_parse_input_tasks = mocker.patch.object(
+            tm, "_parse_input_tasks", return_value=([update_e2e_task], [{}])
+        )
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm, "_expand_multi_runs_to_single_runs", return_value=[]
+        )
+    else:
+        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([{}], [{}]))
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm, "_expand_multi_runs_to_single_runs", return_value=[{}]
         )
 
     mock_run_tasks = mocker.patch.object(tm, "_run_tasks")
@@ -170,7 +185,7 @@ def test_task_manager_start(
     )
 
     info_map = {"class": TaskManager.__name__, "function": TaskManager.start.__name__}
-    expanded_len = 1 if is_end_to_end_test_task else 2
+    expanded_len = 1 if (is_end_to_end_test_task or is_update_end_to_end_test_task) else 2
     expected_add_log_calls = [
         call("Task Manager Start", "Task Manager Started.", info_map),
         call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
@@ -189,7 +204,7 @@ def test_task_manager_start(
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
 
-    if not is_end_to_end_test_task:
+    if not is_end_to_end_test_task and not is_update_end_to_end_test_task:
         mock_run_tasks.assert_called_once_with(
             [{"task_id": "1/2"}, {"task_id": "2/2"}],
             produce_graphics,
@@ -199,7 +214,7 @@ def test_task_manager_start(
             Path("output/directory"),
         )
         mock_summarize.assert_not_called()
-    else:
+    elif is_end_to_end_test_task:
         args, _kwargs = mock_run_tasks.call_args
         runnable_passed = args[0]
         assert len(runnable_passed) == 1
@@ -215,6 +230,23 @@ def test_task_manager_start(
             info_map,
         )
         mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"])
+    else:
+        args, _kwargs = mock_run_tasks.call_args
+        runnable_passed = args[0]
+        assert len(runnable_passed) == 1
+        assert runnable_passed[0]["task_id"] == "1/1"
+        assert args[1] == produce_graphics
+        assert args[2] == metadata_depth_limit
+        assert args[3] == workers
+        assert args[4] == Path("metadata/path")
+        mock_summarize.assert_not_called()
+
+        captured = capsys.readouterr()
+        assert (
+            captured.out
+            == "Reminder: remove the autogenerated // WARNING line at the top of filter files before using it as"
+            " JSON.\n"
+        )
 
     mock_print_credits.assert_called_once_with("1.0.0")
     mock_check_dependencies.assert_called_once()
