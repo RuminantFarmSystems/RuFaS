@@ -21,7 +21,7 @@ from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -672,12 +672,24 @@ class TaskManager:
             "function": TaskManager.handle_single_simulation_run.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        TaskManager.handle_herd_initializaition(args, output_manager)
+
+        simulation_type_str = args.get("simulation_type")
+        if not simulation_type_str:
+            output_manager.add_error(
+                "Missing simulation type",
+                "No simulation type provided for simulation run task.",
+                info_map,
+            )
+            raise ValueError("Missing simulation type for simulation run task.")
+        simulation_type = SimulationType.get_simulation_type(simulation_type_str)
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
 
+        TaskManager.handle_herd_initializaition(args, output_manager)
+
+        simulator = SimulationEngine(simulation_type=simulation_type)
         simulator.simulate()
+
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
@@ -990,6 +1002,7 @@ class TaskManager:
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
+        args["simulation_type"] = input_manager.get_data("config.simulation_type")
         TaskManager.handle_single_simulation_run(args, output_manager)
         TaskManager.handle_post_processing(
             args=args,

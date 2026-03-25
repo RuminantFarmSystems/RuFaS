@@ -1302,14 +1302,12 @@ class OutputManager(object):
             A filtered variables pool based on either inclusion or exclusion.
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
-        use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
             "function": self.filter_variables_pool.__name__,
             "filter_name": filter_name,
             "filter_by_exclusion": filter_by_exclusion,
-            "use_filter_name": use_filter_name,
         }
         if filter_by_exclusion:
             filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
@@ -1334,7 +1332,6 @@ class OutputManager(object):
             filtered_pool,
             selected_variables,
             filter_name,
-            use_filter_name,
             filter_by_exclusion,
         )
 
@@ -1368,7 +1365,6 @@ class OutputManager(object):
         filtered_pool: dict[str, OutputManager.pool_element_type],
         selected_variables: list[str] | None,
         filter_name: str,
-        use_filter_name: bool,
         filter_by_exclusion: bool,
     ) -> dict[str, OutputManager.pool_element_type]:
         """
@@ -1382,8 +1378,6 @@ class OutputManager(object):
             list of key names to select or exclude from variables containing dictionaries.
         filter_name : str
             Name of the filter used to collect variables for the filtered pool.
-        use_filter_name : bool
-            Whether to use the filter name when constructing the key name for data pulled from the filtered pool.
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
 
@@ -1399,7 +1393,6 @@ class OutputManager(object):
             "function": self._parse_filtered_variables.__name__,
             "filter_name": filter_name,
             "filter_by_exclusion": filter_by_exclusion,
-            "use_filter_name": use_filter_name,
         }
         results: dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
@@ -1410,8 +1403,7 @@ class OutputManager(object):
             data: list[Any] = filtered_pool[key]["values"]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
-                combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
+                results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
@@ -1424,9 +1416,7 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    combined_key = (
-                        f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else f"{key}.{filtered_key}"
-                    )
+                    combined_key = f"{key}.{filtered_key}"
                     if combined_key in results.keys():
                         results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
