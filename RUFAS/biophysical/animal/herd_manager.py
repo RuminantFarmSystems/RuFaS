@@ -627,8 +627,11 @@ class HerdManager:
         self.update_herd_statistics()
 
         no_milk_cow_num = len(
-            [cow for cow in self.cows if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and
-             cow.days_in_milk > 1]
+            [
+                cow
+                for cow in self.cows
+                if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
+            ]
         )
 
         if no_milk_cow_num > 0:
