@@ -2336,21 +2336,6 @@ def test_filter_variables_pool_complex(
     """Test case for pattern pool with regex patterns and exclude keyword with function filter_variables_pool in
     output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool_complex
-    # use filter_name
-    filter_content: dict[str, Any] = {
-        "name": "test_case_1",
-        "filters": ["^DummyClass1.*"],
-        "filter_by_exclusion": False,
-        "use_name": True,
-        "variables": ["var2", "a"],
-    }
-    expected_result: dict[str, OutputManager.pool_element_type] = {
-        "test_case_1_0": {"values": ["value1", "value2", "value3"]},
-        "test_case_1_1.a": {"values": ["A", "AA"]},
-        "test_case_1_2.a": {"values": ["AAA"]},
-    }
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
     # unpacking pool error
     filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False, "variables": "a"}
     expected_result = {
@@ -2372,7 +2357,6 @@ def test_filter_variables_pool_complex(
                     "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
-                    "use_filter_name": False,
                 },
             ),
             call(
@@ -2385,7 +2369,6 @@ def test_filter_variables_pool_complex(
                     "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
-                    "use_filter_name": False,
                 },
             ),
         ],
@@ -2394,12 +2377,10 @@ def test_filter_variables_pool_complex(
 
     assert actual == expected_result
 
-    # use_name in dict data
     filter_content = {
         "name": "test_case_3",
         "filters": ["^DummyClass1.*"],
         "filter_by_exclusion": False,
-        "use_name": False,
         "variables": ["a", "b", "c"],
     }
     expected_result = {
@@ -2481,7 +2462,7 @@ def test_parse_filtered_variables(
     """Tests _parse_filtered_variables in the Output Manager."""
     mock_output_manager._variables_usage_counter = Counter()
 
-    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion)
+    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", exclusion)
 
     assert actual == expected
     assert mock_output_manager._variables_usage_counter == expected_counter
