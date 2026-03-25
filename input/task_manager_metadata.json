@@ -3,9 +3,9 @@
     "tasks": {
       "title": "Task manager data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/tasks/example_freestall_task.json",
+      "path": "input/data/tasks/eval_farm.json",
       "type": "json",
       "properties": "tasks_properties"
-    }
   }
+}
 }
