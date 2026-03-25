@@ -390,6 +390,8 @@ def test_update_expected_test_results(
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    mock_stdout_write = mocker.patch("sys.stdout.write")
+    mocker.patch.object(E2ETestResultsHandler, "_write_formatted_json")
 
     results_path = mocker.MagicMock()
     results_path.domain = "test_domain"
@@ -417,7 +419,6 @@ def test_update_expected_test_results(
         mock_move = mocker.patch("shutil.move")
         mocker.patch("pathlib.Path.exists", return_value=True)
         mocker.patch("pathlib.Path.unlink")
-        mock_write_json = mocker.patch.object(E2ETestResultsHandler, "_write_formatted_json")
 
     # Act
     if raise_exception:
@@ -434,16 +435,17 @@ def test_update_expected_test_results(
             add_error.assert_called_once()
             expected_backup_path = str(results_path.expected_results_path) + ".bak"
             mock_move.assert_called_once_with(Path(expected_backup_path), results_path.expected_results_path)
+            mock_stdout_write.assert_not_called()
         else:
             assert add_error.call_count == 0
             expected_log_count = 3 if should_update else 2
             assert add_log.call_count == expected_log_count
-            mock_write_json.assert_called_once()
             if diff:
                 add_warning.assert_called_once()
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1
+        mock_stdout_write.assert_not_called()
 
 
 @pytest.mark.parametrize(
