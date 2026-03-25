@@ -19,6 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     TotalInventory,
     IdealFeeds,
+    AdvancePurchaseAllowance,
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
@@ -103,6 +104,7 @@ class FeedManager:
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
             sorted_purchased_allowances
         )
+        self.advanced_purchase_allowance: AdvancePurchaseAllowance = AdvancePurchaseAllowance(sorted_purchased_allowances)
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
@@ -499,6 +501,28 @@ class FeedManager:
             available_amount = current_feed_totals[feed_id]
 
             amount_to_purchase = max(amount_requested - available_amount, 0.0) * (1 + feed_info.buffer)
+            tolerance = 1e-6
+            is_fulfillable_with_purchase = (
+                amount_requested - available_amount
+            ) <= self.advanced_purchase_allowance.allowances.get(feed_id) + tolerance
+            if not is_fulfillable_with_purchase:
+                self._om.add_warning(
+                    "Ration Interval Purchase Warning",
+                    f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
+                    f"Requested: {amount_requested}, Available: {available_amount}, "
+                    f"Allowance: ${self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
+                    f"Still making full purchase.",
+                    {
+                        "class": self.__class__.__name__,
+                        "function": self.manage_ration_interval_purchases.__name__,
+                    },
+                )
+                print(
+                    f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
+                    f"Requested: {amount_requested}, Available: {available_amount}, "
+                    f"Allowance: {self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
+                    f"Still making full purchase."
+                )
             feeds_to_purchase[feed_id] = amount_to_purchase
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
