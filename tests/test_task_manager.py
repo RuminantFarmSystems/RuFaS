@@ -179,7 +179,12 @@ def test_task_manager_start(
     ]
     mock_add_log.assert_has_calls(expected_add_log_calls)
 
-    mock_start_data.assert_called_once_with(Path("metadata/path"), Path(""), task_id="TASK MANAGER")
+    mock_start_data.assert_called_once_with(
+        metadata_path=Path("metadata/path"),
+        input_root=Path(""),
+        task_id="TASK MANAGER",
+        cross_validation_file_paths=None,
+    )
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
