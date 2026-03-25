@@ -156,7 +156,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
-        time: RufasTime
+        time: RufasTime,
     ) -> None:
         """
         Initializes an Animal object.
@@ -1971,13 +1971,13 @@ class Animal:
             Callable[
                 [],
                 (
-                        CalfValuesTypedDict
-                        | HeiferIValuesTypedDict
-                        | HeiferIIValuesTypedDict
-                        | HeiferIIIValuesTypedDict
-                        | CowValuesTypedDict
-                )
-            ]
+                    CalfValuesTypedDict
+                    | HeiferIValuesTypedDict
+                    | HeiferIIValuesTypedDict
+                    | HeiferIIIValuesTypedDict
+                    | CowValuesTypedDict
+                ),
+            ],
         ] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
