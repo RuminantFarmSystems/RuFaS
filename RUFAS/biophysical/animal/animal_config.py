@@ -376,6 +376,9 @@ class AnimalConfig:
 
     milk_reduction_maximum: float
 
+    average_phenotype: dict[str, dict[int, float]] = {}
+    top_listing_semen: dict[str, dict[str, float]] = {}
+
     @classmethod
     def initialize_animal_config(cls) -> None:
         """Initialize the animal config from the input manager user input data."""
@@ -531,3 +534,17 @@ class AnimalConfig:
                     "function": "initialize_animal_config",
                 },
             )
+
+        average_phenotype = im.get_data("animal_mean_phenotype")
+        cls.average_phenotype = {
+            trait: dict(zip(average_phenotype["birth_year"], values))
+            for trait, values in average_phenotype.items()
+            if trait != "birth_year"
+        }
+
+        top_listing_semen = im.get_data("animal_top_listing_semen")
+        cls.top_listing_semen = {
+            trait: dict(zip(top_listing_semen["year_month"], values))
+            for trait, values in top_listing_semen.items()
+            if trait != "year_month"
+        }
