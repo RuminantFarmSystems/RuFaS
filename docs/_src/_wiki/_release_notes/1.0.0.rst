@@ -22,7 +22,7 @@ Highlights
    output keys and time/unit names). These changes may be
    backward-incompatible for scripts and downstream reports.
 
-Scientific evaluation
+Scientific Evaluation
 ---------------------
 
 Evaluation Objective:
