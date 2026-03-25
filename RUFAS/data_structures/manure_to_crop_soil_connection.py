@@ -36,9 +36,9 @@ class NutrientRequest:
         for field in fields(self):
             value = getattr(self, field.name)
             if field.name != "manure_type" and value < 0:
-                raise ValueError(f"Field {field.name} must be non-negative.")
+                raise ValueError(f"NutrientRequest Error: Field {field.name} must be non-negative.")
             if field.name == "manure_type" and not isinstance(value, ManureType):
-                raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+                raise ValueError(f"NutrientRequest Error: Field {field.name} must be an instance of ManureType.")
 
         if any(
             isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0
@@ -46,7 +46,7 @@ class NutrientRequest:
         ):
             return
         else:
-            raise ValueError("At least one nutrient must be requested and positive.")
+            raise ValueError("NutrientRequest Error: At least one nutrient must be requested and positive.")
 
 
 @dataclass(frozen=True)
@@ -100,25 +100,27 @@ class NutrientRequestResults:
 
         for field in fractional_fields:
             if not 0.0 <= getattr(self, field.name) <= 1.0:
-                raise ValueError(f"{field.name} must be between 0 and 1.")
+                raise ValueError(f"NutrientRequestResults Error: {field.name} must be between 0 and 1.")
 
         for field in non_fractional_fields:
             if getattr(self, field.name) < 0.0:
-                raise ValueError(f"{field.name} must be non-negative.")
+                raise ValueError(f"NutrientRequestResults Error: {field.name} must be non-negative.")
 
         if not math.isclose(
             self.organic_nitrogen_fraction + self.inorganic_nitrogen_fraction,
             1.0,
             abs_tol=1e-6,
         ):
-            raise ValueError("Sum of organic and inorganic nitrogen fractions must be 1.")
+            raise ValueError("NutrientRequestResults Error: Sum of organic and inorganic nitrogen fractions must be 1.")
 
         if not math.isclose(
             self.organic_phosphorus_fraction + self.inorganic_phosphorus_fraction,
             1.0,
             abs_tol=1e-6,
         ):
-            raise ValueError("Sum of organic and inorganic phosphorus fractions must be 1.")
+            raise ValueError(
+                "NutrientRequestResults Error: Sum of organic and inorganic phosphorus fractions must be " "1."
+            )
 
     def __add__(self, other: "NutrientRequestResults") -> "NutrientRequestResults":
         """

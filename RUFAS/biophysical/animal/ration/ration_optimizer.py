@@ -849,7 +849,7 @@ class RationOptimizer:
             Average enteric methane produced in pen, used in constraint methods, g.
         pen_average_urine_nitrogen : float
             Average urine nitrogen generated in pen, used in constraint methods, kg.
-        requirements : AnimalRequirements
+        requirements : NutritionRequirements
             Summary of requirements for a group of animals.
         pen_available_feeds : list[Feed]
             A list of Feeds available during ration formulation.

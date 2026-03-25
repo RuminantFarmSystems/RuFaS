@@ -149,6 +149,11 @@ def test_task_manager_start(
         metadata_depth_limit=metadata_depth_limit,
     )
 
+    if workers > 1:
+        assert isinstance(tm.pool, multiprocessing.pool.Pool)
+    else:
+        assert tm.pool is None
+
     mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,
@@ -174,7 +179,12 @@ def test_task_manager_start(
     ]
     mock_add_log.assert_has_calls(expected_add_log_calls)
 
-    mock_start_data.assert_called_once_with(Path("metadata/path"), Path(""), task_id="TASK MANAGER")
+    mock_start_data.assert_called_once_with(
+        metadata_path=Path("metadata/path"),
+        input_root=Path(""),
+        task_id="TASK MANAGER",
+        cross_validation_file_paths=None,
+    )
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
@@ -186,6 +196,7 @@ def test_task_manager_start(
             metadata_depth_limit,
             workers,
             Path("metadata/path"),
+            Path("output/directory"),
         )
         mock_summarize.assert_not_called()
     else:
@@ -696,7 +707,9 @@ def test_task(
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
-    task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
+    task_manager.task(
+        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -739,7 +752,9 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"))
+    result = task_manager.task(
+        args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
 
     assert result is None
 
@@ -794,7 +809,9 @@ def test_task_failed(task_manager: TaskManager) -> None:
         "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"))
+    result = task_manager.task(
+        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+    )
     assert result == "test (1)"
 
 
@@ -1615,12 +1632,9 @@ def test_run_tasks(
 ) -> None:
     """Unit tests for TaskManager._run_tasks() with all tasks run successfully"""
     task_manager = TaskManager()
-    mock_task = mocker.patch.object(task_manager, "task")
-    mock_task.return_value = None
+    mock_task = mocker.patch.object(task_manager, "task", return_value=None)
 
-    mock_pool = mocker.patch("multiprocessing.Pool")
-    mock_pool.return_value.imap = lambda func, args: map(func, args)
-    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+    task_manager.pool = None
 
     task_manager._run_tasks(
         single_run_tasks,
@@ -1628,6 +1642,7 @@ def test_run_tasks(
         metadata_depth_limit=metadata_depth_limit,
         workers=1,
         metadata_path=Path("metadata/path"),
+        output_directory=Path("output"),
     )
 
     mock_task_call_list = [
@@ -1637,6 +1652,7 @@ def test_run_tasks(
             produce_graphics=produce_graphics,
             metadata_depth_limit=metadata_depth_limit,
             workers=1,
+            output_directory=Path("output"),
         )
         for single_run_task in single_run_tasks
     ]
@@ -1756,10 +1772,7 @@ def test_run_tasks_fail(
     mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
     mock_add_error = mocker.patch.object(mock_output_manager, "add_error", return_value=None)
 
-    mock_pool = mocker.patch("multiprocessing.Pool")
-
-    mock_pool.return_value.imap = lambda func, args: map(func, args)
-    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+    task_manager.pool = None
 
     task_manager._run_tasks(
         single_run_tasks,
@@ -1767,13 +1780,16 @@ def test_run_tasks_fail(
         metadata_depth_limit=metadata_depth_limit,
         workers=1,
         metadata_path=Path("metadata/path"),
+        output_directory=Path("output"),
     )
 
     mock_om_init.assert_called_once()
     info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
     failed = [fail for fail in task_return_values if fail is not None]
     mock_add_error.assert_called_once_with(
-        "Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map
+        "Task(s) failed",
+        f"Failed task(s) and output prefix are: {failed}",
+        info_map,
     )
 
 
@@ -1899,7 +1915,7 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
             {"numpy": "1.24.0"},
             None,
             RuntimeError,
-            "does not satisfy required version",
+            "Required package 'numpy' version does not match. Installed: 1.24.0, Required: >=2.0.0",
         ),
     ],
 )

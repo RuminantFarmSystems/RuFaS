@@ -80,7 +80,7 @@
       <file>main.bcf</file>
     </requires>
     <requires type="editable">
-      <file>rufas.bib</file>
+      <file>resources/animal.bib</file>
     </requires>
   </external>
 </requests>
