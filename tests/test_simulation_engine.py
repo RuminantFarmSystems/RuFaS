@@ -119,6 +119,7 @@ def test_simulate(
         simulation_engine.time,
         simulation_engine.herd_manager.heiferII_events_by_id,
         simulation_engine.herd_manager.cow_events_by_id,
+        simulation_engine.herd_manager.animal_genetic_history_by_id,
     )
 
     mock_estimate_emissions.assert_called_once()
