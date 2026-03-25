@@ -59,6 +59,20 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.rufas_time import RufasTime
 
 
+@pytest.fixture
+def mock_time() -> RufasTime:
+    mock_time = MagicMock(spec=RufasTime)
+    mock_time.current_date = (dummy_date := datetime(2023, 1, 1))
+    mock_time.simulation_day = 18
+    AnimalConfig.top_listing_semen["estimated_fat"] = {f"{dummy_date.year}-{dummy_date.month:02d}": 10.0}
+    AnimalConfig.top_listing_semen["estimated_protein"] = {f"{dummy_date.year}-{dummy_date.month:02d}": 10.0}
+    AnimalConfig.average_phenotype["fat_kg"] = {year: 10.0 for year in range(dummy_date.year - 10, dummy_date.year + 1)}
+    AnimalConfig.average_phenotype["protein_kg"] = {
+        year: 10.0 for year in range(dummy_date.year - 10, dummy_date.year + 1)
+    }
+    return mock_time
+
+
 def mock_submodule_init(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.biophysical.animal.growth.growth.Growth", return_value=MagicMock(auto_spec=Growth))
 
@@ -110,7 +124,6 @@ def assert_animal_init_properties(
     assert result.animal_type == AnimalType(args["animal_type"])
     assert result.days_born == args["days_born"]
     assert result.birth_weight == args["birth_weight"]
-    assert result.net_merit == args["net_merit"]
     assert result.cull_reason == ""
 
 
@@ -124,12 +137,13 @@ def assert_animal_init_properties(
             birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             initial_phosphorus=10.0,
+            dam_tbv_fat=10.0,
+            dam_tbv_protein=10.0,
         )
     ],
 )
-def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -139,7 +153,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -160,8 +174,9 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
                 initial_phosphorus=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
             ),
             "conventional",
             Sex.FEMALE,
@@ -176,8 +191,9 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
                 initial_phosphorus=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
             ),
             "sexed",
             Sex.FEMALE,
@@ -192,8 +208,9 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
                 initial_phosphorus=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
             ),
             "conventional",
             Sex.MALE,
@@ -208,7 +225,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "sexed",
@@ -224,7 +242,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "random",
@@ -240,7 +259,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "conventional",
@@ -256,7 +276,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "sexed",
@@ -272,7 +293,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "conventional",
@@ -288,7 +310,8 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
                 birth_date="2023-01-01",
                 days_born=10,
                 birth_weight=10.0,
-                net_merit=10.0,
+                dam_tbv_fat=10.0,
+                dam_tbv_protein=10.0,
                 initial_phosphorus=10.0,
             ),
             "sexed",
@@ -299,14 +322,20 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
     ],
 )
 def test_initialize_newborn_calf(
-    args: NewBornCalfValuesTypedDict, semen_type: str, sex: Sex, culled: bool, sold: bool, mocker: MockerFixture
+    args: NewBornCalfValuesTypedDict,
+    semen_type: str,
+    sex: Sex,
+    culled: bool,
+    sold: bool,
+    mocker: MockerFixture,
+    mock_time: RufasTime,
 ) -> None:
     original_semen_type = AnimalConfig.semen_type
     AnimalConfig.semen_type = semen_type
 
     if not (semen_type in ["conventional", "sexed"]):
         with pytest.raises(ValueError):
-            Animal(args)
+            Animal(args, mock_time)
         return
     male_calf_rate = (
         AnimalConfig.male_calf_rate_conventional_semen
@@ -323,7 +352,7 @@ def test_initialize_newborn_calf(
     )
     mock_rvs = mocker.patch("RUFAS.biophysical.animal.animal.truncnorm.rvs", return_value=600)
 
-    animal = Animal(args)
+    animal = Animal(args, mock_time)
     assert animal.sex == sex
     assert animal.sold == sold
     assert animal.birth_weight == args["birth_weight"]
@@ -350,7 +379,6 @@ def test_initialize_newborn_calf(
             animal_type="Calf",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -358,7 +386,7 @@ def test_initialize_newborn_calf(
         )
     ],
 )
-def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -368,7 +396,7 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -387,7 +415,6 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="HeiferI",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -395,7 +422,7 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
         )
     ],
 )
-def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -405,7 +432,7 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -424,7 +451,6 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
             animal_type="Calf",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -436,7 +462,6 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
             animal_type="HeiferI",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -444,12 +469,14 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
         ),
     ],
 )
-def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTypedDict, mocker: MockerFixture) -> None:
+def test_initialize_calf_or_heiferI(
+    args: CalfValuesTypedDict | HeiferIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime
+) -> None:
     mock_init_events_from_string = mocker.patch(
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
 
-    animal = Animal(args)
+    animal = Animal(args, mock_time)
     assert animal.sex == Sex.FEMALE
     assert animal.sold is False
     assert animal.birth_weight == args["birth_weight"]
@@ -468,7 +495,6 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
             animal_type="HeiferII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -478,7 +504,7 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
         )
     ],
 )
-def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -488,7 +514,7 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -507,7 +533,6 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
             animal_type="HeiferII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -517,7 +542,7 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
         )
     ],
 )
-def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -527,7 +552,7 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -546,7 +571,6 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             animal_type="HeiferII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -560,7 +584,6 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             animal_type="HeiferIII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -574,7 +597,6 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             animal_type="HeiferII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -589,7 +611,6 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             animal_type="HeiferIII",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -601,7 +622,7 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
     ],
 )
 def test_initialize_heiferII_or_heiferIII(
-    args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture
+    args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime
 ) -> None:
     mock_init_events_from_string = mocker.patch(
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
@@ -618,7 +639,7 @@ def test_initialize_heiferII_or_heiferIII(
         else HeiferSynchEDSubProtocol(args["heifer_reproduction_sub_protocol"])
     )
 
-    animal = Animal(args)
+    animal = Animal(args, mock_time)
 
     assert animal.days_in_pregnancy == expected_days_in_pregnancy
     assert animal.nutrients.phosphorus_for_gestation_required_for_calf == expected_p_calf
@@ -649,7 +670,6 @@ def test_initialize_heiferII_or_heiferIII(
             animal_type="DryCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -668,7 +688,6 @@ def test_initialize_heiferII_or_heiferIII(
             animal_type="LacCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -683,7 +702,7 @@ def test_initialize_heiferII_or_heiferIII(
         ),
     ],
 )
-def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
+def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_submodule_init(mocker)
 
     (
@@ -693,7 +712,7 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
         mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
-    result = Animal(args)
+    result = Animal(args, mock_time)
 
     assert_animal_init_properties(result, args)
 
@@ -712,7 +731,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="DryCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -731,7 +749,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="LacCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -750,7 +767,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="DryCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -769,7 +785,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="LacCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -789,7 +804,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="DryCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -809,7 +823,6 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             animal_type="LacCow",
             days_born=10,
             birth_weight=10.0,
-            net_merit=10.0,
             mature_body_weight=10.0,
             body_weight=12.3,
             wean_weight=10.0,
@@ -825,7 +838,9 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
         ),
     ],
 )
-def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture) -> None:
+def test_initialize_cow(
+    args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture, mock_time: RufasTime
+) -> None:
     mock_init_events_from_string = mocker.patch(
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
@@ -836,7 +851,7 @@ def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
     expected_calves = args.get("parity", 0)
     expected_calving_interval = args.get("calving_interval", AnimalConfig.calving_interval)
 
-    animal = Animal(args)
+    animal = Animal(args, mock_time)
 
     assert animal.days_in_milk == expected_days_in_milk
     assert animal.reproduction.calves == expected_calves
@@ -846,41 +861,39 @@ def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
 
 
 @pytest.fixture
-def mock_calf() -> Animal:
+def mock_calf(mock_time: RufasTime) -> Animal:
     args = CalfValuesTypedDict(
         id=1,
         breed="HO",
         animal_type="Calf",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
         events="",
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
 @pytest.fixture
-def mock_heiferI() -> Animal:
+def mock_heiferI(mock_time: RufasTime) -> Animal:
     args = HeiferIValuesTypedDict(
         id=1,
         breed="HO",
         animal_type="HeiferI",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
         events="",
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
 @pytest.fixture
-def mock_heiferII(mocker: MockerFixture) -> Animal:
+def mock_heiferII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIValuesTypedDict(
         id=1,
@@ -888,7 +901,6 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
         animal_type="HeiferII",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -897,11 +909,11 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
         heifer_reproduction_sub_protocol="5dCG2P",
         days_in_pregnancy=10,
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
 @pytest.fixture
-def mock_heiferIII(mocker: MockerFixture) -> Animal:
+def mock_heiferIII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIIValuesTypedDict(
         id=1,
@@ -909,7 +921,6 @@ def mock_heiferIII(mocker: MockerFixture) -> Animal:
         animal_type="HeiferIII",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -918,11 +929,11 @@ def mock_heiferIII(mocker: MockerFixture) -> Animal:
         heifer_reproduction_sub_protocol="5dCG2P",
         days_in_pregnancy=10,
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
 @pytest.fixture
-def mock_lactating_cow(mocker: MockerFixture) -> Animal:
+def mock_lactating_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
@@ -930,7 +941,6 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
         animal_type="LacCow",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -944,11 +954,11 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
         calf_birth_weight=15.0,
         days_in_milk=10,
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
 @pytest.fixture
-def mock_dry_cow(mocker: MockerFixture) -> Animal:
+def mock_dry_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
@@ -956,7 +966,6 @@ def mock_dry_cow(mocker: MockerFixture) -> Animal:
         animal_type="DryCow",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -970,14 +979,13 @@ def mock_dry_cow(mocker: MockerFixture) -> Animal:
         calf_birth_weight=15.0,
         parity=3,
     )
-    return Animal(args)
+    return Animal(args, mock_time)
 
 
-def test_setup_lactation_curve_parameters(mocker: MockerFixture) -> None:
+def test_setup_lactation_curve_parameters(mocker: MockerFixture, mock_time: RufasTime) -> None:
     mock_set_lactation_parameters = mocker.patch(
         "RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.set_lactation_parameters"
     )
-    mock_time = mocker.MagicMock(auto_spec=RufasTime)
 
     Animal.setup_lactation_curve_parameters(time=mock_time)
 
@@ -2773,7 +2781,6 @@ def test_get_calf_values(mock_calf: Animal) -> None:
         animal_type="Calf",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -2789,7 +2796,6 @@ def test_get_heiferI_values(mock_heiferI: Animal) -> None:
         animal_type="HeiferI",
         days_born=10,
         birth_weight=10.0,
-        net_merit=10.0,
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
@@ -2829,7 +2835,6 @@ def test_get_heiferII_values(mock_heiferII: Animal) -> None:
         heifer_reproduction_sub_protocol="5dCG2P",
         id=1,
         mature_body_weight=10.0,
-        net_merit=10.0,
         phosphorus_for_gestation_required_for_calf=1,
         wean_weight=10.0,
     )
@@ -2867,7 +2872,6 @@ def test_get_heiferIII_values(mock_heiferIII: Animal) -> None:
         heifer_reproduction_sub_protocol="5dCG2P",
         id=1,
         mature_body_weight=10.0,
-        net_merit=10.0,
         phosphorus_for_gestation_required_for_calf=1,
         wean_weight=10.0,
     )
@@ -2905,7 +2909,6 @@ def test_get_cow_values(mock_lactating_cow: Animal) -> None:
         heifer_reproduction_sub_protocol="5dCG2P",
         id=1,
         mature_body_weight=10.0,
-        net_merit=10.0,
         phosphorus_for_gestation_required_for_calf=1,
         wean_weight=10.0,
         calving_interval=400,
