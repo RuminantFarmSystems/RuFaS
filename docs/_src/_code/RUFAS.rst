@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 1
 
    RUFAS.biophysical
-   RUFAS.routines
 
 Submodules
 ----------
@@ -20,8 +19,6 @@ Submodules
    RUFAS.data_collection_app_updater
    RUFAS.data_validator
    RUFAS.e2e_test_results_handler
-   RUFAS.enums
-   RUFAS.errors
    RUFAS.general_constants
    RUFAS.graph_generator
    RUFAS.input_manager
