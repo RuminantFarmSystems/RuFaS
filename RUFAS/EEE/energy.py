@@ -138,7 +138,7 @@ class EnergyEstimator:
         }
         estimator = EnergyEstimator()
         diesel_consumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
-        total_diesel_consumption_tractor_implement_liter_per_ha = 0
+        total_diesel_consumption_tractor_implement_liter_per_ha: float = 0.0
         herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_consumption_data_list:
             harvest_type: HarvestOperation | None = None
@@ -249,13 +249,11 @@ class EnergyEstimator:
                 {**base_info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}},
             )
         if operation_event == FieldOperationEvent.TILLING:
+            tillage_implement_enum = diesel_consumption_data.get("tillage_implement")
+            tillage_implement = tillage_implement_enum.value if tillage_implement_enum is not None else None
             om.add_variable(
                 f"tillage_implement_for_{suffix}",
-                (
-                    diesel_consumption_data.get("tillage_implement").value
-                    if diesel_consumption_data.get("tillage_implement")
-                    else diesel_consumption_data.get("tillage_implement")
-                ),
+                tillage_implement,
                 {**base_info_map, **{"units": MeasurementUnits.UNITLESS}},
             )
         om.add_variable(
