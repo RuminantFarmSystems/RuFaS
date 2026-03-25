@@ -1,3 +1,4 @@
+from sys import maxsize
 import math
 import random
 from math import floor
@@ -526,7 +527,7 @@ class Reproduction:
         simulation_day: int,
         estrus_note: str,
         avg_estrus_cycle: float,
-        max_cycle_length: float = math.inf,
+        max_cycle_length: int = maxsize,
     ) -> ReproductionDataStream:
         """
         Calculate and set first next estrus day for an heiferII.
@@ -541,7 +542,7 @@ class Reproduction:
             Note explaining the reason for estrus simulation.
         avg_estrus_cycle : float
             Average length of the estrus cycle.
-        max_cycle_length : float, optional
+        max_cycle_length : int, optional
             Maximum allowable length for the estrus cycle, by default inf.
 
         Returns

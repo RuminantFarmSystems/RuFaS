@@ -198,7 +198,7 @@ class Genetics:
         parity: int | None,
     ) -> tuple[float, float]:
         """Calculate EBV values."""
-        parity_index = min(parity, 3) if animal_type.is_cow else 0
+        parity_index = min(parity, 3) if animal_type.is_cow and parity is not None else 0
         fat_accuracy, protein_accuracy = FAT_ACCURACY_BY_PARITY[parity_index], PROTEIN_ACCURACY_BY_PARITY[parity_index]
 
         mean_ebv_fat = group_specific_TBV_fat_mean + (self.TBV_fat - group_specific_TBV_fat_mean) * (fat_accuracy**2)
@@ -253,7 +253,7 @@ class Genetics:
             }
 
     @staticmethod
-    def calculate_average_tbv(list_of_genetics: list["Genetics"]) -> tuple[float | None, float | None]:
+    def calculate_average_tbv(list_of_genetics: list["Genetics"]) -> tuple[float, float]:
         """Calculate average TBV values for a specific group of animals."""
         num_animals = len(list_of_genetics)
         return (

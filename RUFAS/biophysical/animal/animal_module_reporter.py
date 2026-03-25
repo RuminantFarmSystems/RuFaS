@@ -3,6 +3,7 @@ from dataclasses import asdict
 from typing import Any
 
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
@@ -179,7 +180,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_average_genetics(
-        cls, average_genetics: dict[str, float], variable_name_prefix: str, simulation_day: int
+        cls, average_genetics: dict[str, float | None], variable_name_prefix: str, simulation_day: int
     ) -> None:
         """
         Reports the average genetics data with associated simulation metadata. The
@@ -188,7 +189,7 @@ class AnimalModuleReporter:
 
         Parameters
         ----------
-        average_genetics : dict[str, float]
+        average_genetics : dict[str, float | None]
             A dictionary containing genetic measurements, where the key is
             the measurement name and the value is the averaged measurement.
         variable_name_prefix : str
@@ -1129,8 +1130,8 @@ class AnimalModuleReporter:
         herd_statistics: HerdStatistics,
         herd_reproduction_statistics: HerdReproductionStatistics,
         time: RufasTime,
-        heiferII_events_by_id: dict[str, str],
-        cow_events_by_id: dict[str, str],
+        heiferII_events_by_id: dict[str, AnimalEvents],
+        cow_events_by_id: dict[str, AnimalEvents],
         all_animals_genetic_history: dict[int, str],
     ) -> None:
         """
@@ -1144,9 +1145,9 @@ class AnimalModuleReporter:
             Instance of HerdReproductionStatistics class.
         time : RufasTime
             The RufasTime object with the current time information.
-        heiferII_events_by_id : dict[str, str]
+        heiferII_events_by_id : dict[str, AnimalEvents]
             The dictionary of HeiferII events.
-        cow_events_by_id : dict[str, str]
+        cow_events_by_id : dict[str, AnimalEvents]
             The dictionary of Cow events.
         all_animals_genetic_history : dict[int, str]
             The dict of genetic histories for all animals in the herd by their IDs.
@@ -1227,13 +1228,13 @@ class AnimalModuleReporter:
         AnimalModuleReporter._report_all_animals_genetic_history(all_animals_genetic_history)
 
     @classmethod
-    def _record_animal_events(cls, animal_events_by_id: dict[str, str], simulation_day: int) -> None:
+    def _record_animal_events(cls, animal_events_by_id: dict[str, AnimalEvents], simulation_day: int) -> None:
         """
         Record the events of the animals.
 
         Parameters
         ----------
-        animal_events_by_id : dict[str, str]
+        animal_events_by_id : dict[str, AnimalEvents]
             A dictionary of animal events, where the key is a string containing the animal id and the animal type,
             and the value is the string representation of the events of the animal.
         simulation_day : int

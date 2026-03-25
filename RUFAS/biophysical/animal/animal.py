@@ -1,7 +1,7 @@
 import sys
 from datetime import timedelta
 from random import random
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from scipy.stats import truncnorm
 from numpy import sqrt
@@ -156,7 +156,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
-        time: RufasTime | None = None,
+        time: RufasTime
     ) -> None:
         """
         Initializes an Animal object.
@@ -173,7 +173,7 @@ class Animal:
             The dictionary that contains the configuration to initialize an Animal object.
 
         """
-        initialize_animal_methods = {
+        initialize_animal_methods: dict[AnimalType, Callable[..., None]] = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
@@ -218,8 +218,9 @@ class Animal:
 
         is_newborn_calf = self.animal_type == AnimalType.CALF and "body_weight" not in args.keys()
         if is_newborn_calf:
-            self._initialize_newborn_calf(args, time.simulation_day)
-            dam_tbv_fat, dam_tbv_protein = args.get("dam_tbv_fat"), args.get("dam_tbv_protein")
+            newborn_args = cast(NewBornCalfValuesTypedDict, args)
+            self._initialize_newborn_calf(newborn_args, time.simulation_day)
+            dam_tbv_fat, dam_tbv_protein = newborn_args.get("dam_tbv_fat"), newborn_args.get("dam_tbv_protein")
             if dam_tbv_fat and dam_tbv_protein:
                 self.genetics = Genetics(
                     birth_year=time.current_date.year,
@@ -1965,7 +1966,19 @@ class Animal:
             If the animal_type is not present in the mapping dictionary.
 
         """
-        mapping: dict[AnimalType, Callable[[], Any]] = {
+        mapping: dict[
+            AnimalType,
+            Callable[
+                [],
+                (
+                        CalfValuesTypedDict
+                        | HeiferIValuesTypedDict
+                        | HeiferIIValuesTypedDict
+                        | HeiferIIIValuesTypedDict
+                        | CowValuesTypedDict
+                )
+            ]
+        ] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
             AnimalType.HEIFER_II: self._get_heiferII_values,
