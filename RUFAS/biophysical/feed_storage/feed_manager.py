@@ -104,7 +104,9 @@ class FeedManager:
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
             sorted_purchased_allowances
         )
-        self.advanced_purchase_allowance: AdvancePurchaseAllowance = AdvancePurchaseAllowance(sorted_purchased_allowances)
+        self.advanced_purchase_allowance: AdvancePurchaseAllowance = AdvancePurchaseAllowance(
+            sorted_purchased_allowances
+        )
 
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
