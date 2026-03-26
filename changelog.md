@@ -53,7 +53,9 @@ v1.0.0
 - [2876](https://github.com/RuminantFarmSystems/RuFaS/pull/2876) - [minor change] [DieselConsumption][OutputManager] [NoInputChange] [NoOutputChange] Removes `use_name` output filter option and updates `DieselConsumption` to filter properly without it.
 - [2880](https://github.com/RuminantFarmSystems/RuFaS/pull/2880) - [minor change] [NoInputChange] [NoOutputChange] Add warning message for e2e filter updates
 - [2869](https://github.com/RuminantFarmSystems/RuFaS/pull/2869) - [minor change] [InputChange] [NoOutputChange] Removes `properties` and `cross-validation` file path definitions from metadata JSON files. Properties file paths are now defined as a module-level constant in `input_manager.py`, and cross-validation file paths are moved to the task configuration JSON files.
+- [2882](https://github.com/RuminantFarmSystems/RuFaS/pull/2882) - [minor change] [InputChange] [NoOutputChange] Reduces mypy errors in field.py
 - [2850](https://github.com/RuminantFarmSystems/MASM/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
+
 
 ### v1.0.0
 

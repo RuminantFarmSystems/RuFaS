@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, TypeVar
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -30,6 +30,8 @@ from RUFAS.biophysical.field.field.tillage_application import TillageApplication
 from RUFAS.biophysical.field.soil.soil import Soil
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+
+FieldManagementEventT = TypeVar("FieldManagementEventT", bound=BaseFieldManagementEvent)
 
 
 class Field:
@@ -281,7 +283,6 @@ class Field:
             )
             application_depth = 0.0
             surface_remainder_fraction = 1.0
-
         if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
             self._record_nutrient_application_error(application_depth, None, error_message, year, day)
             application_depth = self.soil.data.soil_layers[-1].bottom_depth
@@ -1175,8 +1176,8 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: Sequence[BaseFieldManagementEvent], time: RufasTime
-    ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
+        all_events: Sequence[FieldManagementEventT], time: RufasTime
+    ) -> tuple[list[FieldManagementEventT], list[FieldManagementEventT]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -1730,7 +1731,7 @@ class Field:
         """
         avg_air_temp = avg_air_temp if avg_air_temp else (max_air_temp + min_air_temp) / 2
         latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
-        potential_evapotranspiration = (
+        potential_evapotranspiration: float = (
             0.0023 * extraterrestrial_radiation * ((max_air_temp - min_air_temp) ** 0.5) * (avg_air_temp + 17.8)
         ) / latent_heat_vaporization
         return max(0.0, potential_evapotranspiration)
