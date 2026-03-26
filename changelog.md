@@ -24,7 +24,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 v1.0.0
 
 ### Next Version Updates
-- [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
+
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
 - [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
@@ -46,6 +46,7 @@ v1.0.0
 - [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
 - [2843](https://github.com/RuminantFarmSystems/MASM/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
 - [2852](https://github.com/RuminantFarmSystems/MASM/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
+- [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
 - [2866](https://github.com/RuminantFarmSystems/MASM/pull/2866) - [minor change] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field_manager.py.
 - [2863](https://github.com/RuminantFarmSystems/MASM/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
 - [2854](https://github.com/RuminantFarmSystems/MASM/pull/2854) - [minor change] [Emissions][OutputManager] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
@@ -54,6 +55,7 @@ v1.0.0
 - [2880](https://github.com/RuminantFarmSystems/RuFaS/pull/2880) - [minor change] [NoInputChange] [NoOutputChange] Add warning message for e2e filter updates
 - [2869](https://github.com/RuminantFarmSystems/RuFaS/pull/2869) - [minor change] [InputChange] [NoOutputChange] Removes `properties` and `cross-validation` file path definitions from metadata JSON files. Properties file paths are now defined as a module-level constant in `input_manager.py`, and cross-validation file paths are moved to the task configuration JSON files.
 - [2850](https://github.com/RuminantFarmSystems/MASM/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
+- [2897](https://github.com/RuminantFarmSystems/RuFaS/pull/2897) - [minor change] [NoInputChange] [NoOutputChange] Update references in scientific documentation and proposal of workflow.
 
 ### v1.0.0
 
