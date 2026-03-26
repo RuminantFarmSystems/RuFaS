@@ -143,7 +143,7 @@
     "manure_schedule_1": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/no_manure.json",
+      "path": "input/data/manure_schedule/apr_oct_apply2.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
@@ -199,7 +199,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/example_arid_weather_w_irrigation.csv",
+      "path": "input/data/weather/Filer_ID_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
