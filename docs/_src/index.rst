@@ -69,6 +69,13 @@ Team Culture
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
 
+Release Notes
+-------------
+.. toctree::
+   :maxdepth: 1
+   :caption: Release Notes:
+
+   _wiki/_release_notes/index
 
 Contributing to RuFaS
 ---------------------
@@ -88,7 +95,6 @@ Other Resources
 - `Unit Testing Reference <https://realpython.com/python-testing/>`_
 - `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 - `Doc String Guide <https://realpython.com/documenting-python-code/>`_
-
 
 Indices and tables
 ------------------

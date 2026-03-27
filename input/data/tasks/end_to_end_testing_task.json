@@ -33,7 +33,10 @@
       "csv_output_directory": "output/CSVs/.",
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
-      "graphics_directory": "output/graphics/."
+      "graphics_directory": "output/graphics/.",
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/example_cross_validation.json"
+      ]
     },
     {
       "task_type": "END_TO_END_TESTING",
@@ -64,7 +67,10 @@
       "csv_output_directory": "output/CSVs/.",
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
-      "graphics_directory": "output/graphics/."
+      "graphics_directory": "output/graphics/.",
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/example_cross_validation.json"
+      ]
     },
     {
       "task_type": "END_TO_END_TESTING",
@@ -95,7 +101,8 @@
       "csv_output_directory": "output/CSVs/.",
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
-      "graphics_directory": "output/graphics/."
+      "graphics_directory": "output/graphics/.",
+      "cross_validation_file_paths": []
     }
   ]
 }

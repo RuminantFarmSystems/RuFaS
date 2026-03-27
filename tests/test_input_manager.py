@@ -162,24 +162,16 @@ def test_load_properties_combines_multiple_files(mock_input_manager: InputManage
     mocker.patch.object(Path, "exists", return_value=True)
     first_properties = {"key1": "value1"}
     second_properties = {"key2": "value2"}
+    third_properties = {"key3": "value3"}
     mocker.patch(
         "RUFAS.input_manager.InputManager._load_data_from_json",
-        side_effect=[first_properties, second_properties],
+        side_effect=[first_properties, second_properties, third_properties],
     )
 
     setattr(
         mock_input_manager,
         "_InputManager__metadata",
-        {
-            "files": {
-                "properties": {
-                    "paths": [
-                        "path/to/properties.json",
-                        "path/to/commodity_properties.json",
-                    ]
-                }
-            }
-        },
+        {},
     )
 
     mock_input_manager._load_properties()
@@ -188,6 +180,7 @@ def test_load_properties_combines_multiple_files(mock_input_manager: InputManage
     assert metadata["properties"] == {
         "key1": "value1",
         "key2": "value2",
+        "key3": "value3",
     }
 
 
@@ -198,22 +191,11 @@ def test_load_properties_overlapping_keys_last_file_wins(
 
     mocker.patch.object(Path, "exists", return_value=True)
     first_properties = {"key1": "value1", "shared": "original"}
-    second_properties = {"shared": "updated"}
+    second_properties = {"shared": "intermediate"}
+    third_properties = {"shared": "updated"}
     load_json = mocker.patch(
         "RUFAS.input_manager.InputManager._load_data_from_json",
-        side_effect=[first_properties, second_properties],
-    )
-
-    setattr(
-        mock_input_manager,
-        "_InputManager__metadata",
-        {
-            "files": {
-                "properties": {
-                    "paths": ["path/to/properties.json", "path/to/commodity_properties.json"],
-                }
-            }
-        },
+        side_effect=[first_properties, second_properties, third_properties],
     )
 
     mock_input_manager._load_properties()
@@ -223,39 +205,7 @@ def test_load_properties_overlapping_keys_last_file_wins(
         "key1": "value1",
         "shared": "updated",
     }
-    assert "properties" not in metadata["files"]
-    assert load_json.call_count == 2
-
-
-def test_load_properties_empty_paths_list_raises_value_error(
-    mock_input_manager: InputManager, mocker: MockerFixture
-) -> None:
-    mocker.patch.object(Path, "exists", return_value=True)
-    setattr(
-        mock_input_manager,
-        "_InputManager__metadata",
-        {"files": {"properties": {"paths": []}}},
-    )
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        with pytest.raises(ValueError):
-            mock_input_manager._load_properties()
-        add_error.assert_called_once()
-
-
-def test_load_properties_rejects_non_string_paths(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Tests the_load_properties on invalid non string paths."""
-    mocker.patch.object(Path, "exists", return_value=True)
-    setattr(
-        mock_input_manager,
-        "_InputManager__metadata",
-        {"files": {"properties": {"paths": ["valid/path.json", 123]}}},
-    )
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        with pytest.raises(ValueError):
-            mock_input_manager._load_properties()
-        add_error.assert_called_once()
+    assert load_json.call_count == 3
 
 
 def test_load_properties_missing_second_file_triggers_error(
@@ -466,7 +416,11 @@ def test_start_data_processing(
     mock_input_manager.data_validator.event_logs.clear()
 
     result = mock_input_manager.start_data_processing(
-        metadata_path=Path("mock/metadata/path"), input_root=Path(""), task_id="1", eager_termination=eager_termination
+        metadata_path=Path("mock/metadata/path"),
+        input_root=Path(""),
+        task_id="1",
+        cross_validation_file_paths=[],
+        eager_termination=eager_termination,
     )
 
     assert result is expected_return
@@ -571,7 +525,9 @@ def test_cross_validate_data(
     cv_call = mocker.patch.object(cv_mock, "cross_validate_data", side_effect=side_effect)
     mock_input_manager.data_validator.event_logs.clear()
 
-    result = mock_input_manager._cross_validate_data(eager_termination=eager_termination)
+    result = mock_input_manager._cross_validate_data(
+        cross_validation_file_paths=["dummy_path_1", "dummy_path_2"], eager_termination=eager_termination
+    )
 
     assert result is expected_return
 
@@ -606,7 +562,9 @@ def test_start_data_processing_invalid_metadata_raises(mock_input_manager: Input
     setattr(mock_input_manager, "_InputManager__metadata", {"files": {}, "cross-validation": []})
 
     with pytest.raises(ValueError, match="bad meta"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=True)
+        mock_input_manager.start_data_processing(
+            Path("meta"), Path(""), task_id="1", cross_validation_file_paths=[], eager_termination=True
+        )
 
     mock_load_props.assert_not_called()
     mock_validate_props.assert_not_called()
@@ -630,7 +588,9 @@ def test_start_data_processing_invalid_properties_routes_logs_and_raises(
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     with pytest.raises(ValueError, match="bad props"):
-        mock_input_manager.start_data_processing(Path("meta"), Path(""), task_id="1", eager_termination=False)
+        mock_input_manager.start_data_processing(
+            Path("meta"), Path(""), task_id="1", cross_validation_file_paths=[], eager_termination=False
+        )
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
