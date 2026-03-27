@@ -50,6 +50,7 @@ v1.0.0
 - [2854](https://github.com/RuminantFarmSystems/RuFaS/pull/2854) - [minor change] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
 - [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
 - [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
+- [2902](https://github.com/RuminantFarmSystems/RuFaS/pull/2902) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
 
 ### v1.0.0
 
