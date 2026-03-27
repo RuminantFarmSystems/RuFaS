@@ -24,7 +24,7 @@ class RufasTime:
         self.end_date: datetime = end_date or datetime.strptime(str(config_data["end_date"]), "%Y:%j")
 
         self.current_date: datetime = current_date or self.start_date
-        self.simulation_length_days: int = (self.end_date - self.start_date).days
+        self.simulation_length_days: int = (self.end_date - self.start_date).days + 1
         self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
 
     def advance(self) -> None:
@@ -162,7 +162,7 @@ class RufasTime:
         if slice_day == 0:
             return 1
         if slice_day < 0:
-            return self.simulation_length_days + slice_day + 1
+            return self.simulation_length_days + slice_day
         return slice_day
 
     def __str__(self) -> str:
