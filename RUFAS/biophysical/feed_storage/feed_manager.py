@@ -506,7 +506,7 @@ class FeedManager:
             tolerance = 1e-6
             is_fulfillable_with_purchase = (
                 amount_requested - available_amount
-            ) <= self.advanced_purchase_allowance.allowances.get(feed_id) + tolerance
+            ) <= self.advanced_purchase_allowance.allowances.get(feed_id, 0.0) + tolerance
             if not is_fulfillable_with_purchase:
                 self._om.add_warning(
                     "Ration Interval Purchase Warning",
