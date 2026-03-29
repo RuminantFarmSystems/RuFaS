@@ -19,7 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     PlanningCycleAllowance,
     RuntimePurchaseAllowance,
     RequestedFeed,
-    IdealFeeds,
+    IdealFeeds, AdvancePurchaseAllowance,
 )
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
@@ -219,6 +219,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "runtime_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
+    feed_manager.advanced_purchase_allowance = AdvancePurchaseAllowance
 
     return feed_manager
 

@@ -519,12 +519,6 @@ class FeedManager:
                         "function": self.manage_ration_interval_purchases.__name__,
                     },
                 )
-                print(
-                    f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
-                    f"Requested: {amount_requested}, Available: {available_amount}, "
-                    f"Allowance: {self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
-                    f"Still making full purchase."
-                )
             feeds_to_purchase[feed_id] = amount_to_purchase
 
         self.purchase_feed(feeds_to_purchase, time, purchase_type="ration_interval")
