@@ -435,7 +435,8 @@ class SimulationEngine:
             If no purchased feed was fed, this will be None.
         """
         if daily_purchased_feeds_fed:
-            self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed)
+            self.emissions_estimator.calculate_purchased_feed_emissions(daily_purchased_feeds_fed,
+                                                                        self.time.simulation_day)
         self.time.record_time()
         self.weather.record_weather(self.time)
 

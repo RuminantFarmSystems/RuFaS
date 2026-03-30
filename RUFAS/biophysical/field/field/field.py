@@ -1469,7 +1469,7 @@ class Field:
         of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
-        manure_water = self._get_manure_water()
+        manure_water = self._get_manure_water(time)
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
             manure_water=manure_water,
@@ -1609,7 +1609,7 @@ class Field:
         else:
             return 0.0
 
-    def _get_manure_water(self) -> float:
+    def _get_manure_water(self, time: RufasTime) -> float:
         """
         Grabs water from a manure application and records it, if any.
 
@@ -1626,6 +1626,7 @@ class Field:
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "units": MeasurementUnits.MILLIMETERS,
+            "simulation_day": time.simulation_day
         }
         self.om.add_variable("manure_water", manure_water, info_map)
 
