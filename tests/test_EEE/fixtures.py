@@ -7937,6 +7937,9 @@ def raw_fertilizer_application_data() -> dict[str, dict[str, list[Any]]]:
         "Field._record_fertilizer_application.fertilizer_application.field='field_1'.field_name": {
             "values": ["field_1", "field_1", "field_1"]
         },
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.field_size": {
+            "values": [100, 100, 100]
+        },
         "Field._record_fertilizer_application.fertilizer_application.field='field_2'.nitrogen": {
             "values": [30.84580509652931, 499.99999999999994, 499.99999999999994]
         },
@@ -7952,6 +7955,9 @@ def raw_fertilizer_application_data() -> dict[str, dict[str, list[Any]]]:
         "Field._record_fertilizer_application.fertilizer_application.field='field_2'.day": {"values": [124, 126, 126]},
         "Field._record_fertilizer_application.fertilizer_application.field='field_2'.field_name": {
             "values": ["field_2", "field_2", "field_2"]
+        },
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'.field_size": {
+            "values": [100, 100, 100]
         },
     }
 
@@ -7969,6 +7975,9 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
         "Field._record_manure_application.manure_application.field='field_1'.field_name": {
             "values": ["field_1", "field_1", "field_1", "field_1"]
         },
+        "Field._record_manure_application.manure_application.field='field_1'.field_size": {
+            "values": [100, 100, 100, 100]
+        },
         "Field._record_manure_application.manure_application.field='field_2'.nitrogen": {
             "values": [571.0, 857.0, 857.0, 857.0]
         },
@@ -7979,6 +7988,9 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
         "Field._record_manure_application.manure_application.field='field_2'.field_name": {
             "values": ["field_2", "field_2", "field_2", "field_2"]
         },
+        "Field._record_manure_application.manure_application.field='field_2'.field_size": {
+            "values": [100, 100, 100, 100]
+        },
     }
 
 
@@ -7987,28 +7999,28 @@ def parsed_fertilizer_and_manure_application_data() -> dict[str, dict[str, dict[
     return {
         "manure_applications": {
             "field_1": {
-                123: {"nitrogen": 571.0},
-                675: {"nitrogen": 857.0},
-                1040: {"nitrogen": 857.0},
-                1405: {"nitrogen": 857.0},
+                123: {"nitrogen": 5.71},
+                675: {"nitrogen": 8.57},
+                1040: {"nitrogen": 8.57},
+                1405: {"nitrogen": 8.57},
             },
             "field_2": {
-                123: {"nitrogen": 571.0},
-                675: {"nitrogen": 857.0},
-                1040: {"nitrogen": 857.0},
-                1405: {"nitrogen": 857.0},
+                123: {"nitrogen": 5.71},
+                675: {"nitrogen": 8.57},
+                1040: {"nitrogen": 8.57},
+                1405: {"nitrogen": 8.57},
             },
         },
         "fertilizer_applications": {
             "field_1": {
-                123: {"nitrogen": 52.20280385127508, "phosphorus": 87.00454371259605, "potassium": 174.0090874251921},
-                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
-                1586: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                123: {"nitrogen": 0.5220280385127508, "phosphorus": 0.8700454371259605, "potassium": 1.740090874251921},
+                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                1586: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
             "field_2": {
-                123: {"nitrogen": 30.84580509652931, "phosphorus": 51.40959871651896, "potassium": 102.81919743303791},
-                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
-                1586: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                123: {"nitrogen": 0.3084580509652931, "phosphorus": 0.5140959871651896, "potassium": 1.0281919743303791},
+                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                1586: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
         },
     }
