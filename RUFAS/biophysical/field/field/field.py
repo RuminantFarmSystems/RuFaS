@@ -1626,7 +1626,7 @@ class Field:
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "units": MeasurementUnits.MILLIMETERS,
-            "simulation_day": time.simulation_day
+            "simulation_day": time.simulation_day,
         }
         self.om.add_variable("manure_water", manure_water, info_map)
 

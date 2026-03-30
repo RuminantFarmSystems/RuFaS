@@ -192,7 +192,7 @@ class EmissionsEstimator:
             "class": self.__class__.__name__,
             "function": self.calculate_purchased_feed_emissions.__name__,
             "units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
-            "simulation_day": simulation_day
+            "simulation_day": simulation_day,
         }
         self.om.add_variable("purchased_feed_emissions", purchased_feed_emissions, info_map)
         self.om.add_variable("land_use_change_emissions", land_use_change_emissions, info_map)
