@@ -7944,6 +7944,9 @@ def raw_fertilizer_application_data() -> dict[str, dict[str, list[Any]]]:
         "field_name": {
             "values": ["field_1", "field_1", "field_2", "field_2"],
         },
+        "field_size": {
+            "values": [100, 100, 100, 100],
+        }
     }
 
 
@@ -7962,6 +7965,9 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
         "field_name": {
             "values": ["field_1", "field_1", "field_2", "field_2"],
         },
+        "field_size": {
+            "values": [100, 100, 100, 100],
+        }
     }
 
 
@@ -7969,17 +7975,17 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
 def parsed_fertilizer_and_manure_application_data() -> dict[str, dict[str, dict[int, dict[str, float]]]]:
     return {
         "manure_applications": {
-            "field_1": {123: {"nitrogen": 571.0}, 675: {"nitrogen": 857.0}},
-            "field_2": {123: {"nitrogen": 571.0}, 675: {"nitrogen": 857.0}},
+            "field_1": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
+            "field_2": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
         },
         "fertilizer_applications": {
             "field_1": {
-                123: {"nitrogen": 52.871123969561054, "phosphorus": 88.11840892012549, "potassium": 176.23681784025098},
-                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                123: {"nitrogen": 0.52871123969561054, "phosphorus": 0.8811840892012549, "potassium": 1.7623681784025098},
+                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
             "field_2": {
-                123: {"nitrogen": 30.84580509652931, "phosphorus": 51.40959871651896, "potassium": 102.81919743303791},
-                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                123: {"nitrogen": 0.3084580509652931, "phosphorus": 0.5140959871651896, "potassium": 1.0281919743303791},
+                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
         },
     }

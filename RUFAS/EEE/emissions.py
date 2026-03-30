@@ -43,7 +43,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Fertilizer Applications",
         "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-        "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "year", "day"],
+        "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
         "use_filter_key_name": True,
     },
@@ -51,7 +51,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Manure Applications",
         "description": "Collects all manure applications that occurred in the simulation.",
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-        "variables": ["nitrogen", "field_name", "year", "day"],
+        "variables": ["nitrogen", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
         "use_filter_key_name": True,
     },
@@ -256,6 +256,10 @@ class EmissionsEstimator:
         """
         Parses farmgrown feeds emission data from the OutputManager and returns a dictionary with emission data for
         each field on every simulation day.
+
+        Notes
+        -----
+        The farmgrown feeds Nitrous Oxide and Ammonia emission data has unit kg/ha.
         """
         emission_data: dict[str, dict[str, dict[int, float]]] = defaultdict(dict)
         for filter_key in ["nitrous_oxide_emissions", "ammonia_emissions"]:
@@ -290,6 +294,10 @@ class EmissionsEstimator:
         """
         Parses manure and fertilizer application data from the OutputManager and returns a dictionary with
         application data for each field by simulation day.
+
+        Notes
+        -----
+        The manure and fertilizer application data has unit kg/ha.
         """
         resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = defaultdict(dict)
         for filter_key in ["manure_applications", "fertilizer_applications"]:
@@ -311,12 +319,13 @@ class EmissionsEstimator:
             simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
             for i, simulation_day in enumerate(simulation_days):
                 field_name = filtered_data["field_name"]["values"][i]
+                field_size: float = filtered_data["field_size"]["values"][i]
                 if field_name not in resource_data[filter_key]:
                     resource_data[filter_key][field_name] = {}
                 resource_data[filter_key][field_name][simulation_day] = {
-                    variable: filtered_data[variable]["values"][i]
+                    variable: filtered_data[variable]["values"][i] / field_size
                     for variable in filtered_data
-                    if variable not in [year_key, day_key, "field_name", "DISCLAIMER"]
+                    if variable not in [year_key, day_key, "field_name", "field_size", "DISCLAIMER"]
                 }
 
         return resource_data
@@ -361,7 +370,13 @@ class EmissionsEstimator:
     def _parse_harvest_data(
         self, crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID], simulation_start_date: datetime
     ) -> dict[str, dict[int, dict[str, Any]]]:
-        """Parses harvest data by field name and simulation day from the simulation OutputManager."""
+        """
+        Parses harvest data by field name and simulation day from the simulation OutputManager.
+
+        Notes
+        -----
+        The harvest dry yield data has unit kg/ha.
+        """
         harvest_data: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
@@ -397,7 +412,25 @@ class EmissionsEstimator:
         harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]],
         all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
-        """Calculates daily emissions and resources used for farmgrown feeds production."""
+        """
+        Calculates daily emissions and resources used for farmgrown feeds production.
+
+        Parameters
+        ----------
+        emission_data : dict[str, dict[str, dict[int, float]]]
+            The Nitrous Oxide and Ammonia emission data for farmgrown feeds, (kg/ha).
+        resource_data : dict[str, dict[str, dict[int, dict[str, float]]]]
+            The manure and fertilizer application data for farmgrown feeds, (kg/ha).
+        harvest_yield_by_field : dict[str, dict[int, dict[str, Any]]]
+            The harvest dry yield data for farmgrown feeds, (kg/ha).
+        all_simulation_days : list[int]
+            A list of all simulation days.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[int, dict[str, float]]]
+            The calculated daily emissions and resources used for farmgrown feeds production.
+        """
 
         total_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[str, float]] = defaultdict(dict)
         total_harvest_dry_yield_by_feed_id: dict[RUFAS_ID, float] = defaultdict(float)
