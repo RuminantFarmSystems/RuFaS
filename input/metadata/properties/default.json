@@ -4394,8 +4394,7 @@
         "advance_purchase_allowance": {
           "type": "number",
           "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
-          "minimum": 0,
-          "maximum": 10000.0
+          "minimum": 0
         },
         "planning_cycle_allowance": {
           "type": "number",
