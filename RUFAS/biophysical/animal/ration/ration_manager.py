@@ -120,9 +120,10 @@ class RationManager:
             info_map["ration"] = ration
             info_map["animal_combination"] = animal_combo.value
             info_map["units"] = MeasurementUnits.PERCENT
-            if abs(total_percentage_of_ration - 100.0) > ration_config["user_defined_ration_percentages"]["tolerance"]:
-                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to"
-                f"{total_percentage_of_ration}. Simulation will be halted."
+            if abs(total_percentage_of_ration - 100.0) > (ration_config["user_defined_ration_percentages"]
+                                                          ["tolerance"] * 100):
+                error_msg = (f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to "
+                             f"{total_percentage_of_ration}. Simulation will be halted.")
                 cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
                 invalid_ration_found = True
             else:
