@@ -18,7 +18,6 @@ dependencies = [
     "pandas>=2.2.3",
     "scipy>=1.15.1",
     "typing_extensions>=4.12.2",
-    "juliandate>=1.0.5",
     "salib==1.5.1",
     "tqdm>=4.67.1",
     "deepdiff>=8.2.0",
