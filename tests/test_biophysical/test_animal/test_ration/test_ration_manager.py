@@ -30,7 +30,7 @@ def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] 
             "growing": [{"feed_type": 201, "ration_percentage": 60.0}, {"feed_type": 202, "ration_percentage": 50.0}],
             "close_up": [{"feed_type": 301, "ration_percentage": 90.0}, {"feed_type": 302, "ration_percentage": 10.0}],
             "lac_cow": [{"feed_type": 401, "ration_percentage": 85.0}, {"feed_type": 402, "ration_percentage": 25.0}],
-            "tolerance": 0.1,
+            "tolerance": 0.01,
         }
     }
 
