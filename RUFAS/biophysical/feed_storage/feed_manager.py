@@ -495,7 +495,7 @@ class FeedManager:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.manage_ration_interval_purchases.__name__,
-            "simulation_day": time.simulation_day
+            "simulation_day": time.simulation_day,
         }
         allowance_tolerance = 1e-6
         current_feed_totals = self._query_available_feed_totals(list(requested_feeds.requested_feed.keys()))
@@ -505,9 +505,11 @@ class FeedManager:
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == feed_id), None
             )
             if feed_info is None:
-                self._om.add_error("Trying to purchase unavailable feed",
-                                   f"Trying to purchase unavailable feed {feed_id} during ration interval purchases.",
-                                   info_map)
+                self._om.add_error(
+                    "Trying to purchase unavailable feed",
+                    f"Trying to purchase unavailable feed {feed_id} during ration interval purchases.",
+                    info_map,
+                )
                 raise ValueError(f"Trying to purchase unavailable feed {feed_id} during ration interval purchases.")
             available_amount = current_feed_totals[feed_id]
 
