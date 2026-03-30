@@ -12,7 +12,6 @@ from RUFAS.EEE.tractor import Tractor
 from RUFAS.input_manager import InputManager
 from tests.test_EEE.fixtures import EEE_constants, tractor_dataset, mock_tractor
 
-
 assert EEE_constants is not None
 assert tractor_dataset is not None
 
@@ -41,7 +40,7 @@ def test_herd_size_to_tractor_size(
         FieldOperationEvent.TILLING,
         herd_size=herd_size,
         tillage_implement=TillageImplement.DISK_HARROW,
-        application_depth=10
+        application_depth=10,
     )
     assert specs.tractor_size == expected_size
 

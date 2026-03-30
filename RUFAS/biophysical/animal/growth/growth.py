@@ -113,8 +113,8 @@ class Growth:
 
         elif is_pregnant_heifer:
             if growth_inputs.body_weight < growth_inputs.mature_body_weight:
-                (self.daily_growth, growth_outputs.conceptus_weight) = (
-                    self.calculate_pregnant_heifer_body_weight_change(growth_inputs)
+                self.daily_growth, growth_outputs.conceptus_weight = self.calculate_pregnant_heifer_body_weight_change(
+                    growth_inputs
                 )
                 growth_outputs.body_weight += self.daily_growth
             else:
@@ -233,7 +233,7 @@ class Growth:
         """
         target_average_daily_growth_pregnant_heifer = self._calculate_pregnant_heifer_target_daily_growth(growth_inputs)
 
-        (conceptus_growth, updated_conceptus_weight) = self._calculate_pregnant_heifer_conceptus_growth(growth_inputs)
+        conceptus_growth, updated_conceptus_weight = self._calculate_pregnant_heifer_conceptus_growth(growth_inputs)
 
         return (
             target_average_daily_growth_pregnant_heifer + conceptus_growth,
@@ -261,13 +261,13 @@ class Growth:
             tissue changed (kg).
 
         """
-        (conceptus_growth, updated_conceptus_weight, self.tissue_changed) = self._calculate_cow_conceptus_growth(
+        conceptus_growth, updated_conceptus_weight, self.tissue_changed = self._calculate_cow_conceptus_growth(
             growth_inputs
         )
 
         target_adg_cow = self._calculate_cow_target_daily_growth(growth_inputs)
 
-        (body_weight_tissue, self.tissue_changed) = self._calculate_cow_body_weight_tissue_change(growth_inputs)
+        body_weight_tissue, self.tissue_changed = self._calculate_cow_body_weight_tissue_change(growth_inputs)
 
         return (
             target_adg_cow + conceptus_growth + body_weight_tissue,

@@ -5,7 +5,6 @@ from enum import Enum
 
 from RUFAS.units import MeasurementUnits
 
-
 """
 Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
 other input files and the RuFaS codebase.
