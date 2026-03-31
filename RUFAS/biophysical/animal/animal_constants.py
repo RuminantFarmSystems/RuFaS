@@ -44,6 +44,12 @@ INJECT_PGF = "inject PGF"
 # heifer repro
 INJECT_CIDR = "inject CIDR"
 
+# herd size management
+MIN_DIM_FOR_REMOVAL = 60
+"""Minimum days in milk required for a cow to be eligible for removal."""
+MAX_DAYS_IN_PREG_FOR_REMOVAL = 180
+"""Maximum pregnancy duration for a cow to be eligible for removal."""
+
 # presynch protocols
 PRESYNCH_PERIOD_START = "Presynch period started"
 PRESYNCH_PERIOD_END = "Presynch period ended"
@@ -86,7 +92,7 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
-LOW_PROD_CULL = "culled for low production"
+OVERSUPPLY_CULL = "culled for herd resize"
 DEATH_CULL = "culled for death"
 LAMENESS_CULL = "culled for lameness"
 INJURY_CULL = "culled for injury"

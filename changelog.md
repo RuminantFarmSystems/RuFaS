@@ -46,6 +46,7 @@ v1.0.0
 - [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
 - [2843](https://github.com/RuminantFarmSystems/MASM/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
 - [2852](https://github.com/RuminantFarmSystems/MASM/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
+- [2622](https://github.com/RuminantFarmSystems/MASM/pull/2622) - [minor change] [InputChange][OutputChange] Update culling logic to respond to number of available heifers.
 - [2866](https://github.com/RuminantFarmSystems/MASM/pull/2866) - [minor change] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field_manager.py.
 - [2863](https://github.com/RuminantFarmSystems/MASM/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
 - [2867](https://github.com/RuminantFarmSystems/MASM/pull/2867) - [minor change] [NoInputChange] [NoOutputChange] Updates expand_data_temporally() util function to offer options of full simulation expansion and front-padding data.
@@ -344,6 +345,7 @@ v1.0.0
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2881](https://github.com/RuminantFarmSystems/RuFaS/pull/2881) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
+
 
 ### v0.9.2
 
