@@ -514,7 +514,7 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     },
                 },
-                []
+                [],
             ),
         ),
         (
@@ -569,8 +569,8 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     },
                 },
-                []
-            )
+                [],
+            ),
         ),
         (
             {
@@ -605,8 +605,8 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     },
                 },
-                []
-            )
+                [],
+            ),
         ),
         (
             {
@@ -644,8 +644,8 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     },
                 },
-                []
-            )
+                [],
+            ),
         ),
         (
             {
@@ -685,8 +685,8 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     },
                 },
-                []
-            )
+                [],
+            ),
         ),
         (
             {
@@ -713,8 +713,8 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
                         ],
                     }
                 },
-                []
-            )
+                [],
+            ),
         ),
     ],
 )
