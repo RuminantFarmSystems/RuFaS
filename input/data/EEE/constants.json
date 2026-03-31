@@ -10,31 +10,13 @@
       "Notes and remarks": "Where S can be taken as 10km/h, refer to the external link or IFSM handbook for W, and field efficiency is taken as 0.90."
     },
     {
-      "ID": 586,
-      "Grouping": "",
-      "Name": "Machine width",
-      "Description": "formerly W for width or number of rows or tools",
-      "Value": 0,
-      "Unit": "m",
-      "Notes and remarks": "What should be the value for W?"
-    },
-    {
       "ID": 587,
       "Grouping": "",
       "Name": "Field Efficiency",
       "Description": "",
       "Value": 0.9,
       "Unit": "unitless",
-      "Notes and remarks": "can we explain this in a few words?"
-    },
-    {
-      "ID": 588,
-      "Grouping": "Tillage",
-      "Name": "Fi",
-      "Description": "Soil Adjustment parameter i = {1 for fine, 2 for medium, 3 for coarse}",
-      "Value": 0,
-      "Unit": "unitless",
-      "Notes and remarks": "we need a value for this parameter for each  i in {1,2,3}"
+      "Notes and remarks": "The proportion of time in the field that is spent conducting the work"
     },
     {
       "ID": 589,

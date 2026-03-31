@@ -1,9 +1,9 @@
 from enum import Enum
 from typing import Dict, List
 
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.animal import Animal
-from ...enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 
 
 class AnimalGroupingScenario(Enum):
@@ -15,7 +15,7 @@ class AnimalGroupingScenario(Enum):
     """
 
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
-    # GitHub Issue #1205
+    #  Issue #1205
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
@@ -168,7 +168,7 @@ class AnimalGroupingScenario(Enum):
 
         """
 
-        return Animal.type  # type: ignore
+        return animal.animal_type  # type: ignore
 
     def find_animal_combination(self, animal: Animal) -> AnimalCombination:
         """

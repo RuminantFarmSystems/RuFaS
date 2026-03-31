@@ -1,0 +1,59 @@
+{
+  "years": [
+    2013,
+    2014,
+    2015,
+    2016
+  ],
+  "days": [
+    124,
+    311,
+    311,
+    311
+  ],
+  "nitrogen_masses": [
+    2000,
+    3000,
+    3000,
+    3000
+  ],
+  "phosphorus_masses": [
+    1000,
+    1200,
+    1200,
+    1200
+  ],
+  "potassium_masses": [
+    3000,
+    3000,
+    3000,
+    3000
+  ],
+  "coverage_fractions": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "application_depths": [
+    30.0,
+    30.0,
+    30.0,
+    30.0
+  ],
+  "surface_remainder_fractions": [
+    0.20,
+    0.20,
+    0.20,
+    0.20
+  ],
+  "manure_types": [
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid"
+  ],
+  "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure", "manure", "manure", "manure"],
+  "pattern_repeat": 1,
+  "pattern_skip": 4
+}

@@ -2,8 +2,8 @@ import math
 from dataclasses import dataclass
 from typing import Optional
 
-from RUFAS.util import Utility
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.util import Utility
 
 
 @dataclass

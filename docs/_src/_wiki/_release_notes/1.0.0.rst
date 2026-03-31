@@ -1,0 +1,177 @@
+Release Notes — v1.0.0
+======================
+
+Highlights
+----------
+
+-  [core, architecture] Large refactor and modularization across animal,
+   manure, crop/soil, feed, and I/O subsystems.
+-  [animal] Major reorganization of the animal module (growth,
+   digestion, milk/lactation, genetics, reproduction and ration
+   management).
+-  [manure] Comprehensive manure-module refresh (streams, processors,
+   storages, separators, anaerobic digester fixes, temperature model).
+-  [output] OutputManager and reporting rework: chunked outputs,
+   data-origin tracking, improved rounding/significant-digits and CSV
+   unit handling.
+-  [testing] Expanded unit and end-to-end (E2E) test coverage and
+   automated E2E expected-results regeneration.
+-  [tooling] Packaging and CI updates (pyproject.toml, GitHub Actions);
+   baseline Python compatibility changed in CI tooling.
+-  Note: Many renames and refactors were introduced (examples include
+   output keys and time/unit names). These changes may be
+   backward-incompatible for scripts and downstream reports.
+
+Scientific Evaluation
+---------------------
+
+Evaluation Objective:
+~~~~~~~~~~~~~~~~~~~~~
+
+A structured whole-farm evaluation was conducted prior to release of
+v1.0 to assess integrated model performance following recent updates.
+While individual methods are tested throughout development, this
+whole-farm assessment focused on system-wide behavior across diverse
+farm conditions.
+
+Key Findings:
+~~~~~~~~~~~~~
+
+-  **Alignment with reported production:** Predicted annual milk
+   production closely matched farm-reported values across the 13
+   evaluation farms
+-  **Environmental outcomes within expected ranges:** Enteric methane,
+   manure emissions, and carbon intensity estimates were within expected ranges
+   and behaved consistently in response to production efficiency and manure system
+   configuration.
+-  **Methodological updates performed as intended:** Differences between
+   v0.8 and v1.0 were consistent with documented updates to herd
+   demographics simulation, lactation curve implementation, diet
+   formulation, and manure module methodology. Observed shifts were
+   directionally logical and explainable.
+-  **No evidence of unintended system instability:** Production and
+   emissions outputs remained coherent across diverse farm scenarios.
+
+Methodology:
+~~~~~~~~~~~~
+
+Thirteen farms representing variation in herd size, geography,
+production level, and management practices were simulated four times
+each, with outputs averaged to reduce stochastic variability. We
+evaluated production metrics (e.g., milk yield, intake, herd
+demographics) and environmental outcomes (e.g. enteric methane, manure
+methane and N₂O, and carbon intensity).
+
+Model performance was assessed through:
+
+-  Comparison of predicted milk production with farm-reported values,
+-  Benchmarking environmental outputs against published literature
+   ranges, and
+-  Comparison with v0.8 model outputs to ensure changes aligned with
+   documented methodological updates.
+
+This review was designed to confirm biologically and environmentally
+plausible system-level behavior prior to release. While not a formal
+external validation, the results provide confidence that the v1.0 update
+performs as intended across a diverse set of farm scenarios. For a more detailed
+report of the methods, results, and key findings, please see the full report which is `linked here. <https://github.com/RuminantFarmSystems/RuFaS/blob/main/docs/_src/_wiki/_release_notes/RuFaSV1_Eval_article.pdf>`__
+
+Improvements
+------------
+
+-  [animal] Reorganized animal/herd initialization; ration formulation
+   and ration-optimizer refactored to enable user-defined rations.
+-  [animal] Nutrition and requirements refactors; improved unit-test
+   coverage for animal components.
+-  [manure] New/updated manure storage classes (composting, slurry,
+   covered/bedded-pack) and improved processor models
+   (temperature-dependent processes, damping/Arrhenius adjustments).
+-  [manure] Manure manager adjacency matrix validation and traversal
+   improvements to clarify routing and processor order.
+-  [feed] FeedManager and FeedStorage fixes: storage-based deductions,
+   mapping/uniqueness handling, inventory rounding and buffer/shrink
+   handling.
+-  [emissions] Updates to feed and emissions handling including
+   purchased-feed emissions, farmgrown feed LCA/LUC-related handling,
+   and interpolated feed-emissions data support.
+-  [output] ReportGenerator/GraphGenerator improvements: legend
+   alignment, mapping logs, aggregation logging, and more consistent
+   reporting of units.
+-  [input, validation] InputManager and DataValidator consolidation:
+   improved cross-validation, alias handling, more helpful error
+   messages, and lazy runtime metadata loading.
+-  [crop/soil] Crop and soil refactors including canopy water and
+   root-depth handling; harvested crop dry-matter (DM) refactor.
+-  [io] UTF‑8 CSV handling and CSV units improvements.
+-  [performance] Performance optimizations (new numba usage in parts of
+   the codebase).
+-  [docs] Documentation improvements and Data Collection App (DCA)
+   integration: schema, dropdowns and improved validation messages.
+
+Bug Fixes
+---------
+
+-  [time/units] Fixed time-unit handling (unit renames and Time.day
+   corrections).
+-  [manure] Fixes to anaerobic digester behavior and separator handling
+   that addressed processing and emissions flows.
+-  [animal] Fixes to herd/reproduction handling (estrus, herd
+   initialization) and enteric methane reporting adjustments.
+-  [feed] Resolved feed-storage deduction and feed-purchase accounting
+   defects; fixes that prevented potential infinite-loop conditions in
+   ration/feeding logic.
+-  [io] OutputManager parsing and report naming fixes to reduce
+   ambiguity in aggregation and export.
+-  [tests] Multiple E2E and unit-test fixes aligned with refactors to
+   restore expected behaviour in automated tests.
+
+Data / I/O Changes
+------------------
+
+-  [output] OutputManager now supports chunked output writing and
+   enhanced data-origin metadata for reported variables.
+-  [output] Standardized rounding and significant-digit behavior for
+   reported values; CSV outputs now include unit information where
+   available.
+-  [input, dca] Data Collection App schema changes and new validation
+   fields; improved error messaging and dropdown behavior.
+-  [input] Support for multiple properties files and input_root
+   handling; metadata loading moved to lazy/runtime where applicable.
+-  [e2e] E2E expected-results regeneration was automated; tolerances and
+   overwrite behaviour were adjusted in test automation.
+-  Caution: renaming of output keys (examples noted during refactor) and
+   changes to units/rounding can affect downstream dashboards, filters
+   and comparisons.
+
+Internal / Tooling
+------------------
+
+-  [ci] CI and packaging updates: pyproject.toml and GitHub Actions
+   workflow updates; CI now targets newer Python runtime(s) in
+   workflows.
+-  [deps] Added/used numba in parts of the codebase for
+   performance-critical paths.
+-  [testing] Increased unit-test coverage and improved E2E automation,
+   including test fixes and fork/CI reliability improvements.
+-  [docs] Sphinx documentation updates and repo governance additions
+   (LICENSE, CODEOWNERS, CONTRIBUTING).
+-  [constants] Consolidation of constants and units across modules to
+   reduce duplication.
+
+Known Risks and Notes
+---------------------
+
+-  Large refactors and many moved/renamed symbols may cause
+   backward-incompatible API changes; downstream tools and reports may
+   require updates.
+-  New dependency (numba) and CI/tooling changes may require environment
+   adjustments for users and CI runners.
+-  Changes to emissions defaults, interpolated feed-emissions data, and
+   rounding/units may materially change model outputs relative to
+   previous releases; subject-matter review is advised.
+-  OutputManager chunkification and altered reporting/origins increase
+   complexity for downstream consumers; verify memory/IO behavior for
+   large runs.
+-  DataValidator now consolidates validation behavior; callers that
+   previously relied on OutputManager side effects should confirm new
+   control flow and event logging.

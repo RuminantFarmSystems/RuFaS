@@ -1,11 +1,12 @@
 import datetime
+import math
 
 import numpy as np
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
+from RUFAS.units import MeasurementUnits
 
 
 class Weather:
@@ -26,7 +27,7 @@ class Weather:
 
     """
 
-    def __init__(self, weather_file: dict, time: Time):
+    def __init__(self, weather_file: dict, time: RufasTime):
         """
         Initializes the `Weather` instance using user-supplied whether data and overall simulation parameters.
 
@@ -34,8 +35,8 @@ class Weather:
         ----------
         weather_file : dict
             All the weather data available to be used by the simulation.
-        time : Time
-            The Time instance containing time configuration information of the simulation.
+        time : RufasTime
+            The RufasTime instance containing time configuration information of the simulation.
 
         Notes
         -----
@@ -52,13 +53,23 @@ class Weather:
         start_time = time.start_date
         end_time = time.end_date
 
+        self.cos: list[float] = []
+        self.sin: list[float] = []
+        self.means: list[float] = []
+        self.phase_shift: float = 0.0
+        self.intercept_mean_temp: float = 0.0
+        self.amplitude: float = 0.0
+
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
-            date_key = Time.convert_year_jday_to_date(year, jday)
+            date_key = RufasTime.convert_year_jday_to_date(year, jday)
 
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
+                self.cos.append(math.cos(2 * math.pi / 365 * jday))
+                self.sin.append(math.sin(2 * math.pi / 365 * jday))
+                self.means.append(weather_file["avg"][i])
                 conditions = CurrentDayConditions(
                     incoming_light=weather_file["Hday"][i],
                     min_air_temperature=weather_file["low"][i],
@@ -80,6 +91,8 @@ class Weather:
 
         self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
 
+        self.set_linest_temperature_factors()
+
         info_map = {
             "class": self.__class__.__name__,
             "function": "__init__",
@@ -91,14 +104,54 @@ class Weather:
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
-    def get_current_day_conditions(self, time: Time, latitude: float | None = None) -> CurrentDayConditions:
+    def set_linest_temperature_factors(self) -> None:
+        """
+        This function performs least-squares regression using cosine and sine components to model seasonal air
+        temperature. This enables determination of the amplitude and phase shift (peak) of the sinusoidal curve of
+        seasonal air temperature. First, sin and cos coefficients are generated for each Julian day of the simulation.
+        The function then fits the model:
+
+        T(d) = A*cos(d) + B*sin(d) + C
+
+        where:
+            - T(d) is the mean air temperature for day d in the simulation
+            - A and B are coefficients
+            - C is the intercept (mean)
+
+        From the fitted model, the method calculates and stores the fitted intercept term representing average air
+        temperature, amplitude of the modeled cos/sin function, and phase shift (peak temperature). These parameters are
+        simulation-wide, i.e., only weather data utilized in the simulation is used.
+
+        """
+        mean_temperatures = np.array(self.means, dtype=float)
+        cosine_components = np.array(self.cos, dtype=float)
+        sine_components = np.array(self.sin, dtype=float)
+
+        design_matrix = np.column_stack((cosine_components, sine_components, np.ones_like(mean_temperatures)))
+
+        regression_coefficients, *_ = np.linalg.lstsq(design_matrix, mean_temperatures, rcond=None)
+
+        cosine_coefficient, sine_coefficient, intercept_mean_temperature = regression_coefficients
+
+        self.intercept_mean_temp = intercept_mean_temperature
+
+        self.amplitude = math.sqrt(cosine_coefficient**2 + sine_coefficient**2)
+
+        phase_angle_radians = math.atan2(sine_coefficient, cosine_coefficient)
+        phase_shift_days = (phase_angle_radians / (2 * math.pi) * 365) + 365
+        if phase_shift_days > 365:
+            self.phase_shift = (phase_angle_radians / (2 * math.pi) * 365) - 365
+        else:
+            self.phase_shift = phase_shift_days
+
+    def get_current_day_conditions(self, time: RufasTime, latitude: float | None = None) -> CurrentDayConditions:
         """
         Creates a CurrentDayConditions object containing all the weather conditions on the current day.
 
         Parameters
         ----------
-        time: Time
-            Time object containing the current time of the simulation.
+        time: RufasTime
+            RufasTime object containing the current time of the simulation.
         latitude : float | None, default None
             Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
             then the daylength will not be provided in the returned CurrentDayConditions instance.
@@ -132,15 +185,15 @@ class Weather:
         return self.weather_data[time.current_date]
 
     def get_conditions_series(
-        self, time: Time, starting_offset: int, ending_offset: int, latitude: float | None = None
+        self, time: RufasTime, starting_offset: int, ending_offset: int, latitude: float | None = None
     ) -> list[CurrentDayConditions]:
         """
         Generates a series of CurrentDayConditions.
 
         Parameters
         ----------
-        time : Time
-            A time instance containing the current time information of the simulation.
+        time : RufasTime
+            A RufasTime instance containing the current time information of the simulation.
         starting_offset : int
             Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
@@ -169,14 +222,14 @@ class Weather:
 
         return conditions_list
 
-    def record_weather(self, time: Time) -> None:
+    def record_weather(self, time: RufasTime) -> None:
         """
         Records the current weather conditions in the OutputManager.
 
         Parameters
         ----------
-        time: Time
-            Time object containing the current time of the simulation.
+        time: RufasTime
+            RufasTime object containing the current time of the simulation.
 
         """
         info_map = {
@@ -253,7 +306,7 @@ class Weather:
         return np.mean(np.array(daily_average_temperatures))
 
     @staticmethod
-    def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
+    def check_adequate_weather_data(weather_file: dict, time: RufasTime) -> None:
         """
         Checks that there is enough weather data to cover the whole simulation time.
 
@@ -261,8 +314,8 @@ class Weather:
         ----------
         weather_file: dict
             File containing weather data.
-        time: Time
-            The Time instance containing time configuration information of the simulation.
+        time: RufasTime
+            The RufasTime instance containing time configuration information of the simulation.
 
         Returns
         -------

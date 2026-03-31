@@ -4,13 +4,13 @@
 
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
       "output_prefix": "Task 1",
       "log_verbosity": "errors"
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
       "output_prefix": "Task 2",
       "log_verbosity": "errors",
       "random_seed": 42
@@ -47,6 +47,23 @@
           "lower_bound": 378,
           "upper_bound": 382,
           "data_type":"int"
+        }
+      ]
+    },
+    {
+      "task_type": "POST_PROCESSING",
+      "output_prefix": "Post Processing",
+      "log_verbosity": "errors",
+      "run_eee": true,
+      "load_saved_output_pools": true,
+      "saved_output_pools": [
+        {
+          "name": "baseline",
+          "path": "output/saved_pools/baseline.json"
+        },
+        {
+          "name": "scenario",
+          "path": "output/saved_pools/scenario.json"
         }
       ]
     }

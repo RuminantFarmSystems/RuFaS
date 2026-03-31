@@ -1,0 +1,15 @@
+{
+    "years": [2013],
+    "days": [134],
+    "nitrogen_masses": [1800],
+    "phosphorus_masses": [250],
+    "potassium_masses": [1500],
+    "coverage_fractions": [1.0],
+    "application_depths": [0],
+    "surface_remainder_fractions": [1.0],
+    "manure_types": ["liquid"],
+    "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure"],
+    "pattern_repeat": 7,
+    "pattern_skip": 0
+}
+

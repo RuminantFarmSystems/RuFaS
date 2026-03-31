@@ -1,0 +1,19 @@
+{
+  "files": {
+    "tasks": {
+      "title": "Task manager data",
+      "description": "Configuration file for updating end-to-end testing expected results.",
+      "path": "input/data/tasks/update_end_to_end_expected_results.json",
+      "type": "json",
+      "properties": "tasks_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "paths": ["input/metadata/properties/tasks_properties.json"],
+      "type": "json",
+      "properties": "NA"
+    }
+  },
+  "cross-validation": {}
+}

@@ -1,0 +1,12 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_open_lot_metadata.json",
+      "output_prefix": "open_lot",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}

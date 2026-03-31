@@ -1,14 +1,15 @@
 import math
-from typing import Dict, List, Callable
+from typing import Callable, Dict, List
 
 import numpy as np
 
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
+from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.user_constants import UserConstants
 
 om = OutputManager()
 
@@ -185,31 +186,31 @@ class AnimalRequirements:
                     attribute_name,
                     EssentialAminoAcidRequirements(
                         histidine=calc_method_to_function_map[calc_method](
-                            [eaa_req["histidine"] for eaa_req in arg], *stats_args
+                            [eaa_req.histidine for eaa_req in arg], *stats_args
                         ),
                         isoleucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.isoleucine for eaa_req in arg], *stats_args
                         ),
                         leucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["leucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.leucine for eaa_req in arg], *stats_args
                         ),
                         lysine=calc_method_to_function_map[calc_method](
-                            [eaa_req["lysine"] for eaa_req in arg], *stats_args
+                            [eaa_req.lysine for eaa_req in arg], *stats_args
                         ),
                         methionine=calc_method_to_function_map[calc_method](
-                            [eaa_req["methionine"] for eaa_req in arg], *stats_args
+                            [eaa_req.methionine for eaa_req in arg], *stats_args
                         ),
                         phenylalanine=calc_method_to_function_map[calc_method](
-                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args
+                            [eaa_req.phenylalanine for eaa_req in arg], *stats_args
                         ),
                         threonine=calc_method_to_function_map[calc_method](
-                            [eaa_req["threonine"] for eaa_req in arg], *stats_args
+                            [eaa_req.threonine for eaa_req in arg], *stats_args
                         ),
                         thryptophan=calc_method_to_function_map[calc_method](
-                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args
+                            [eaa_req.thryptophan for eaa_req in arg], *stats_args
                         ),
                         valine=calc_method_to_function_map[calc_method](
-                            [eaa_req["valine"] for eaa_req in arg], *stats_args
+                            [eaa_req.valine for eaa_req in arg], *stats_args
                         ),
                     ),
                 )
@@ -719,11 +720,10 @@ class AnimalRequirements:
                 parity,
             )
         else:
-            nutrient_standard_error = f"Nutrient Standard \
-                {Animal.config['nutrient_standard']} \
-                not supported"
+            nutrient_standard_error = f"Nutrient Standard {Animal.config['nutrient_standard']} not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
+            raise ValueError(nutrient_standard_error)
 
         if Animal.config["ration"]["phosphorus_requirement_buffer"] > 0:
             phosphorus_requirement = phosphorus_requirement * (
@@ -863,7 +863,7 @@ class AnimalRequirements:
         else:
             calf_birth_weight = mature_body_weight * 0.06275
             gravid_uterine_weight = (calf_birth_weight * 1.825) * math.exp(
-                -0.0243 - (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy)
+                -(0.0243 - (0.0000245 * day_of_pregnancy)) * (280 - day_of_pregnancy)
             )
             if days_in_milk is None:
                 days_in_milk = 0
@@ -1141,7 +1141,10 @@ class AnimalRequirements:
             gravid_uterine_weight_gain = 0.0
         else:
             gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
-        net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        if gravid_uterine_weight_gain > 0:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        else:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14)
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
     def calculate_NRC_energy_lactation_requirements(
@@ -1434,8 +1437,6 @@ class AnimalRequirements:
         NPMilk: Net protein in milk, or milk true protein yield, g
         TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
 
-        # TODO Include equations for estimating requirement for Non-Essential Aminoacids (NEAA) GitHub Issue #1210
-
         References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
@@ -1443,7 +1444,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        NPEndUrin: float = 53 * UserConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP: float = CPMFP * 0.73
         NPGrowth: float = frame_weight_gain * 0.11 * 0.86
@@ -1691,8 +1692,8 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
-        milk_true_protein: float,
-        milk_production: float,
+        milk_true_protein: float | None,
+        milk_production: float | None,
         parity: int,
     ) -> float:
         """Calculates total Phosphorus requirement according to NASEM (2021).
@@ -2003,4 +2004,4 @@ class AnimalRequirements:
                 f"The nutrient standard '{nutrient_standard}' does not exist.",
                 info_map,
             )
-            raise
+            raise ValueError("Unavailable nutrient standard.")

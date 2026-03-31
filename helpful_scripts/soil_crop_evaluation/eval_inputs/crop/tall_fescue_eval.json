@@ -1,0 +1,16 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "tall_fescue_hay",
+      "planting_years": [1980],
+      "planting_days": [106],
+      "harvest_years": [1980, 1980, 1980, 1981, 1981, 1981, 1981, 1982, 1982, 1982, 1982, 1983, 1983, 1983, 1983, 1984, 1984, 1984, 1984, 1985, 1985, 1985, 1985, 1986, 1986, 1986, 1986, 1987, 1987, 1987, 1987, 1988, 1988, 1988, 1988, 1989, 1989, 1989, 1989, 1990, 1990, 1990, 1990, 1991, 1991, 1991, 1991, 1992, 1992, 1992, 1992, 1993, 1993, 1993, 1993, 1994, 1994, 1994, 1994, 1995, 1995, 1995, 1995, 1996, 1996, 1996, 1996, 1997, 1997, 1997, 1997, 1998, 1998, 1998, 1998, 1999, 1999, 1999, 1999, 2000, 2000, 2000, 2000, 2001, 2001, 2001, 2001, 2002, 2002, 2002, 2002, 2003, 2003, 2003, 2003, 2004, 2004, 2004, 2004],
+      "harvest_days": [167, 199, 231, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245],
+      "harvest_operations": ["harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_kill"],
+      "harvest_type": "scheduled",
+      "pattern_repeat": 0,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+    "name": "manure_e2e_results",
+    "filters": ["Manure.*"]
+}

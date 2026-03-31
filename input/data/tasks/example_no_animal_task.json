@@ -1,0 +1,39 @@
+{
+  "parallel_workers": 4,
+  "input_data_csv_export_path": "output/saved_input_data/.",
+  "input_data_csv_import_path": ".",
+  "export_input_data_to_csv": false,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_no_animal_metadata.json",
+      "output_prefix": "no_animal",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "SA_load_balancing_stop": 1,
+      "SA_load_balancing_start": 0,
+      "sampler_n": 2,
+      "skip_values": 0,
+      "sampler": "sobol",
+      "multi_run_counts": 4,
+      "maximum_memory_usage_percent": 80,
+      "maximum_memory_usage": 0,
+      "save_chunk_threshold_call_count": 0,
+      "chunkification": false,
+      "suppress_log_files": false,
+      "logs_directory": "output/logs/.",
+      "properties_file_path": "input/metadata/properties/default.json",
+      "comparison_properties_file_path": "input/metadata/properties/default.json",
+      "variable_name_style": "basic",
+      "exclude_info_maps": false,
+      "init_herd": false,
+      "save_animals": false,
+      "save_animals_directory": "output/.",
+      "filters_directory": "output/output_filters/.",
+      "csv_output_directory": "output/CSVs/.",
+      "json_output_directory": "output/JSONs/.",
+      "report_directory": "output/reports/.",
+      "graphics_directory": "output/graphics/."
+    }
+  ]
+}

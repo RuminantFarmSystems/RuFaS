@@ -7,12 +7,12 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
+import sys
 import traceback
 from pathlib import Path
 from typing import Any
-import sys
 
-from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.task_manager import TaskManager
 
 
@@ -32,10 +32,7 @@ def main() -> None:
             metadata_depth_limit=cmd_arguments.metadata_depth_limit,
         )
     except Exception as e:
-        info_map = {
-            "class": "No caller class",
-            "function": main.__name__,
-        }
+        info_map = {"class": "No caller class", "function": main.__name__}
         output_manager = OutputManager()
         error_message = "This terminal error occurred during runtime. "
         error_message += traceback.format_exc()
@@ -54,6 +51,10 @@ def main() -> None:
             "Early termination",
             "Unexpected early termination of the simulation. Please see logs for details.\n",
             info_map,
+        )
+        raise RuntimeError(
+            f"An error occurred during simulation: {e} - check error logs in"
+            f" '{cmd_arguments.output_dir}' directory for further details."
         )
 
 
@@ -117,7 +118,7 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
         "-p",
         "--path-to-metadata",
         help="Path to the task manager metadata that will determine the tasks run",
-        default="input/metadata/task_manager_metadata.json",
+        default="input/task_manager_metadata.json",
     )
     return parser.parse_args(args)
 

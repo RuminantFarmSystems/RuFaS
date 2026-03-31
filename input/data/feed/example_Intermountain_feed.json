@@ -1,0 +1,256 @@
+{
+  "calf_feeds": [
+    202,
+    216
+  ],
+  "growing_feeds": [
+    44,
+    51,
+    95,
+    108,
+    301,
+    305
+  ],
+  "close_up_feeds": [
+    44,
+    51,
+    95,
+    100,
+    108,
+    301,
+    305
+  ],
+  "lac_cow_feeds": [
+    44,
+    51,
+    100,
+    108,
+    301,
+    305
+  ],
+  "purchased_feeds": [
+    {
+      "purchased_feed": 18,
+      "purchased_feed_cost": 0.01,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 23,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 44,
+      "purchased_feed_cost": 0.5,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 51,
+      "purchased_feed_cost": 0.01,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 95,
+      "purchased_feed_cost": 0.01,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 100,
+      "purchased_feed_cost": 0.01,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 108,
+      "purchased_feed_cost": 0.01,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 202,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 216,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 301,
+      "purchased_feed_cost": 1.0,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 302,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 303,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 304,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    },
+    {
+      "purchased_feed": 305,
+      "purchased_feed_cost": 0.1,
+      "buffer": 0.15
+    }
+  ],
+  "milk_reduction_maximum": 0.5,
+  "user_defined_ration_percentages": {
+    "calf": [
+      {
+        "feed_type": 202,
+        "ration_percentage": 50
+      },
+      {
+        "feed_type": 216,
+        "ration_percentage": 50
+      }
+    ],
+    "growing": [
+      {
+        "feed_type": 44,
+        "ration_percentage": 2.75
+      },
+      {
+        "feed_type": 51,
+        "ration_percentage": 17.22
+      },
+      {
+        "feed_type": 95,
+        "ration_percentage": 26.08
+      },
+      {
+        "feed_type": 108,
+        "ration_percentage": 31.34
+      },
+      {
+        "feed_type": 301,
+        "ration_percentage": 2.39
+      },
+      {
+        "feed_type": 305,
+        "ration_percentage": 20.22
+      }
+    ],
+    "close_up": [
+      {
+        "feed_type": 44,
+        "ration_percentage": 2.73
+      },
+      {
+        "feed_type": 51,
+        "ration_percentage": 20.53
+      },
+      {
+        "feed_type": 95,
+        "ration_percentage": 18.97
+      },
+      {
+        "feed_type": 100,
+        "ration_percentage": 18.97
+      },
+      {
+        "feed_type": 108,
+        "ration_percentage": 18.35
+      },
+      {
+        "feed_type": 301,
+        "ration_percentage": 1.95
+      },
+      {
+        "feed_type": 305,
+        "ration_percentage": 18.5
+      }
+    ],
+    "lac_cow": [
+      {
+        "feed_type": 51,
+        "ration_percentage": 27.37
+      },
+      {
+        "feed_type": 108,
+        "ration_percentage": 20.6
+      },
+      {
+        "feed_type": 100,
+        "ration_percentage": 1.72
+      },
+      {
+        "feed_type": 44,
+        "ration_percentage": 16.99
+      },
+      {
+        "feed_type": 301,
+        "ration_percentage": 3.35
+      },
+      {
+        "feed_type": 305,
+        "ration_percentage": 29.98
+      }
+    ],
+    "tolerance": 0.1
+  },
+  "max_daily_feed_recalculations_per_year": 4,
+  "allowances": [
+    {
+      "purchased_feed": 44,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 51,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 95,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 100,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 108,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 301,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 305,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 202,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    },
+    {
+      "purchased_feed": 216,
+      "runtime_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000.0,
+      "planning_cycle_allowance": 1000.0
+    }
+  ]
+}

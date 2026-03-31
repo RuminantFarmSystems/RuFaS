@@ -1,0 +1,85 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\babel@toc {english}{}\relax 
+\contentsline {part}{I\hspace {1em}Soil and Crop Module}{2}{part.1}%
+\etoc@startlocaltoc {1}
+\contentsline {section}{\numberline {I.}Module Introduction}{5}{section.1}%
+\contentsline {section}{\numberline {II.}Field Management}{5}{section.2}%
+\contentsline {subsection}{\numberline {A.}Introduction}{5}{subsection.2.1}%
+\contentsline {paragraph}{Setting up Field Management}{5}{subsection.2.1}%
+\contentsline {paragraph}{Field Management Initialization}{5}{subsection.2.1}%
+\contentsline {paragraph}{Field Setup and Initialization}{6}{figure.caption.1}%
+\contentsline {paragraph}{Required Inputs}{7}{figure.caption.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{13}{subsection.2.2}%
+\contentsline {paragraph}{Daily Field Management}{14}{subsection.2.2}%
+\contentsline {paragraph}{Fertilizer Application}{15}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{15}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{15}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{16}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{17}{subsection.2.2}%
+\contentsline {paragraph}{Manure Application}{17}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{18}{subsection.2.2}%
+\contentsline {paragraph}{Surface Manure Application}{18}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{18}{subsection.2.2}%
+\contentsline {paragraph}{Surface Phosphorus Application}{18}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{19}{subsection.2.2}%
+\contentsline {paragraph}{Surface Nitrogen Application}{19}{subsection.2.2}%
+\contentsline {paragraph}{Where:}{20}{subsection.2.2}%
+\contentsline {paragraph}{Subsurface Manure Application}{20}{subsection.2.2}%
+\contentsline {paragraph}{Tillage Application}{21}{subsection.2.2}%
+\contentsline {paragraph}{Initiate Daily Biophysical Processes}{21}{subsection.2.2}%
+\contentsline {paragraph}{Crop Management}{21}{subsection.2.2}%
+\contentsline {section}{\numberline {III.}Soil Management}{21}{section.3}%
+\contentsline {subsection}{\numberline {A.}Introduction}{21}{subsection.3.1}%
+\contentsline {paragraph}{Soil Initialization}{22}{subsection.3.1}%
+\contentsline {paragraph}{Required Inputs}{23}{subsection.3.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{26}{subsection.3.2}%
+\contentsline {paragraph}{Soil Temperature}{26}{subsection.3.2}%
+\contentsline {paragraph}{Infiltration (implemented in infiltration.py)}{28}{subsection.3.2}%
+\contentsline {paragraph}{Evapotranspiration}{30}{subsection.3.2}%
+\contentsline {paragraph}{Potential Evapotranspiration (Implemented in field.py)}{31}{subsection.3.2}%
+\contentsline {paragraph}{Percolation (implemented in percolation.py)}{33}{subsection.3.2}%
+\contentsline {subsection}{\numberline {C.}Soil Erosion (Implemented as soil\_erosion.py)}{34}{subsection.3.3}%
+\contentsline {paragraph}{Base Equation, Rainfall Intensity, and Peak Runoff}{34}{subsection.3.3}%
+\contentsline {subsection}{\numberline {D.}Soil Nitrogen Cycling}{38}{subsection.3.4}%
+\contentsline {paragraph}{Nitrification and Volatilization (Implemented in nitirification\_volatilization.py)}{40}{subsection.3.4}%
+\contentsline {paragraph}{N loss in leaching and runoff (Implemented in leaching\_runoff\_erosion.py)}{42}{subsection.3.4}%
+\contentsline {paragraph}{N erosion (Implemented in leaching\_runoff\_erosion.py)}{43}{subsection.3.4}%
+\contentsline {paragraph}{Denitrification (Implemented in denitrification.py)}{44}{subsection.3.4}%
+\contentsline {subsection}{\numberline {E.}Soil Phosphorus Cycling}{48}{subsection.3.5}%
+\contentsline {paragraph}{Phosphorus Initialization (Implemented in layer\_data.py)}{48}{subsection.3.5}%
+\contentsline {paragraph}{Soluble Phosphorus (Implemented in soluble\_phosphorus.py)}{49}{subsection.3.5}%
+\contentsline {paragraph}{Soluble Phosphorus Runoff}{49}{subsection.3.5}%
+\contentsline {paragraph}{Soluble Phosphorus Leaching}{50}{subsection.3.5}%
+\contentsline {paragraph}{Fertilizer Leaching and Runoff (Implemented in fertilizer.py)}{51}{subsection.3.5}%
+\contentsline {paragraph}{Available Fertilizer P pool }{51}{subsection.3.5}%
+\contentsline {paragraph}{Manure Decomposition (implemented in manure\_pool.py)}{55}{subsection.3.5}%
+\contentsline {paragraph}{Manure Runoff (implemented in manure\_pool.py)}{58}{subsection.3.5}%
+\contentsline {subsection}{\numberline {F.}Soil Carbon Cycling}{61}{subsection.3.6}%
+\contentsline {paragraph}{Soil Carbon Partitioning (implemented in carbon\_cycle.py)}{61}{subsection.3.6}%
+\contentsline {paragraph}{Decomposition (implemented in decomposition.py)}{62}{subsection.3.6}%
+\contentsline {paragraph}{Residue Partitioning (implemented in residue\_partitioning.py)}{65}{subsection.3.6}%
+\contentsline {paragraph}{Above Ground: Lignin, Metabolic C, Structural C}{66}{subsection.3.6}%
+\contentsline {paragraph}{Pool and Gas Partitioning (implemented in pool\_gas\_partition.py)}{70}{subsection.3.6}%
+\contentsline {section}{\numberline {IV.}Crop Management}{74}{section.4}%
+\contentsline {subsection}{\numberline {A.}Introduction}{74}{subsection.4.1}%
+\contentsline {paragraph}{Planting and Initialization}{75}{subsection.4.1}%
+\contentsline {paragraph}{Daily Biophysical Processes}{75}{subsection.4.1}%
+\contentsline {paragraph}{Harvest}{75}{subsection.4.1}%
+\contentsline {subsection}{\numberline {B.}Methodology}{75}{subsection.4.2}%
+\contentsline {paragraph}{Crop Water Cycle Daily Updates}{75}{subsection.4.2}%
+\contentsline {paragraph}{Crop Evaporation}{75}{subsection.4.2}%
+\contentsline {paragraph}{Crop Canopy Water}{75}{subsection.4.2}%
+\contentsline {paragraph}{Crop Potential Transpiration}{76}{subsection.4.2}%
+\contentsline {paragraph}{Potential Water Uptake}{76}{subsection.4.2}%
+\contentsline {paragraph}{Actual water uptake}{77}{subsection.4.2}%
+\contentsline {paragraph}{Maturity}{78}{subsection.4.2}%
+\contentsline {paragraph}{Dormancy}{79}{subsection.4.2}%
+\contentsline {paragraph}{Accumulation of Heat Units}{80}{subsection.4.2}%
+\contentsline {paragraph}{Root Development}{81}{Item.4}%
+\contentsline {paragraph}{Potential Nitrogen Uptake}{81}{Item.4}%
+\contentsline {paragraph}{Actual Nitrogen Uptake}{83}{Item.4}%
+\contentsline {paragraph}{Nitrogen Fixation}{84}{Item.4}%
+\contentsline {paragraph}{Store Nitrogen in Plant}{85}{Item.4}%
+\contentsline {paragraph}{Water stress}{87}{Item.4}%
+\contentsline {paragraph}{Temperature stress}{87}{Item.4}%
+\contentsline {paragraph}{Nitrogen and Phosphorus Stress}{88}{Item.4}%

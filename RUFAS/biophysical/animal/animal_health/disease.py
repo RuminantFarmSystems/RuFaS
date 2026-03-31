@@ -1,6 +1,7 @@
-from RUFAS.biophysical.animal.animal_health.animal_health_status import AnimalHealthStatus
-from RUFAS.time import Time
 from abc import ABC, abstractmethod
+
+from RUFAS.biophysical.animal.animal_health.animal_health_status import AnimalHealthStatus
+from RUFAS.rufas_time import RufasTime
 
 
 class Disease(ABC):
@@ -14,12 +15,12 @@ class Disease(ABC):
         self.risk_factors: list[str] = []
 
     @abstractmethod
-    def assess_disease_risk(self, time: Time, animal_health_status: AnimalHealthStatus) -> bool:
+    def assess_disease_risk(self, time: RufasTime, animal_health_status: AnimalHealthStatus) -> bool:
         """Base function for disease risk determination.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The point in time in the simulation.
         animal_health_status : AnimalHealthStatus
             The health status of the animal.

@@ -1,0 +1,260 @@
+{
+  "files": {
+    "end_to_end_testing_result_paths": {
+      "title": "Actual and Expected end-to-end testing results paths",
+      "description": "Specifies how to find actual and expected results for end-to-end testing of different RuFaS domains.",
+      "path": "input/data/end_to_end_testing/end_to_end_testing_result_paths.json",
+      "type": "json",
+      "properties": "end_to_end_test_result_path_properties"
+    },
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration file for general simulation parameters.",
+      "path": "input/data/config/end_to_end_testing_config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
+      "path": "input/data/animal/example_freestall_animal.json",
+      "type": "json",
+      "properties": "animal_properties"
+    },
+    "animal_population": {
+      "title": "Animal population data",
+      "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
+      "path": "input/data/animal/animal_population.json",
+      "type": "json",
+      "properties": "animal_population_properties"
+    },
+    "animal_net_merit": {
+      "title": "Animal Net Merit data",
+      "description": "The net merit value for cows.",
+      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
+      "type": "csv",
+      "properties": "animal_net_merit_properties"
+    },
+    "animal_top_listing_semen": {
+      "title": "Animal Top Listing Semen data",
+      "description": "The top listing semen value for new born calves.",
+      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
+      "type": "csv",
+      "properties": "animal_top_listing_semen_properties"
+    },
+    "lactation": {
+      "title": "Lactation curve adjustment values",
+      "description": "Values for the adjustment of the three wood parameters based on farm specific data",
+      "path": "input/data/animal/lactation_curve_adjustment_inputs.json",
+      "type": "json",
+      "properties": "lactation_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Energy prices used in the EEE module.",
+      "path": "input/data/EEE/default_costs.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "General emission values used in the EEE module.",
+      "path": "input/data/EEE/default_emissions.csv",
+      "type": "csv",
+      "properties": "emissions_properties"
+    },
+    "purchased_feeds_emissions": {
+      "title": "Emissions from purchased feeds",
+      "description": "Purchased feeds emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_emissions_July2024_interpolated_regional_average.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "purchased_feed_land_use_change_emissions": {
+      "title": "Land Use Change emissions from purchased feeds",
+      "description": "Purchased feeds land use change emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024_interpolated_regional_average.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
+      "path": "input/data/feed/example_Midwest_feed.json",
+      "type": "json",
+      "properties": "feed_properties"
+    },
+    "NRC_Comp": {
+      "title": "NRC Comp data",
+      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
+      "path": "input/data/feed/NRC_comp.csv",
+      "type": "csv",
+      "properties": "NRC_Comp_properties"
+    },
+    "NASEM_Comp": {
+      "title": "NASEM Comp data",
+      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
+      "path": "input/data/feed/NASEM_Comp_with_TDN_urea.csv",
+      "type": "csv",
+      "properties": "NASEM_Comp_properties"
+    },
+    "manure_management": {
+      "title": "Manure data",
+      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
+      "path": "input/data/manure/example_freestall_processor_configs.json",
+      "type": "json",
+      "properties": "manure_management_properties"
+    },
+    "manure_processor_connection": {
+      "title": "Manure Processor Connections",
+      "description": "The connection configs for all manure processors.",
+      "path": "input/data/manure/example_freestall_processor_connections.json",
+      "type": "json",
+      "properties": "manure_processor_connection_properties"
+    },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
+    },
+    "field_1": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/example_small_field_corn_alf_silage.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "soil_1": {
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
+      "path": "input/data/soil/example_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "Corn-Alf-Silage": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/example_alf_corn_silage_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_1": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_1": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_1": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/no_till.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "field_2": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/example_small_field_corn_grain_alf_hay.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "soil_2": {
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
+      "path": "input/data/soil/example_soil_2.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "CornGrain-AlfHay": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/example_alf_hay_corn_grain_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_2": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_2": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_2": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/no_till.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
+      "path": "input/data/weather/example_temperate_weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
+      "path": "input/data/feed/user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
+    },
+    "tractor_dataset": {
+      "title": "Tractor Dataset",
+      "description": "Details agricultural machinery operations for various crops, including tractor size, operations (planting, mowing, collection, etc.), implement details, operational parameters (depth, width, mass), and throughput metrics, spanning different crop types and soil management practices.",
+      "path": "input/data/EEE/tractor_dataset.csv",
+      "type": "csv",
+      "properties": "tractor_dataset_properties"
+    },
+    "EEE_constants": {
+      "title": "EEE Constants",
+      "description": "The constants that are used in EEE module.",
+      "path": "input/data/EEE/constants.json",
+      "type": "json",
+      "properties": "EEE_constants_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "paths": [
+        "input/metadata/properties/default.json",
+        "input/metadata/properties/commodity_properties.json"
+      ],
+      "type": "json",
+      "properties": "NA"
+    },
+    "feed_storage_configurations": {
+      "title": "Feed Management",
+      "description": "Configurations for feed storage units.",
+      "path": "input/data/feed_management/example_feed_storage_configs.json",
+      "type": "json",
+      "properties": "feed_storage_configurations"
+    },
+    "feed_storage_instances": {
+      "title": "Feed Storages",
+      "description": "Names of feed storage configs used in the simulation.",
+      "path": "input/data/feed_management/example_freestall_feed_storages.json",
+      "type": "json",
+      "properties": "feed_storage_instances"
+    }
+  },
+  "cross-validation": {}
+}

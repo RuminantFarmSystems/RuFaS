@@ -16,6 +16,7 @@ jobs:
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
+      unauthorized_files: ${{ steps.unauthorized_files.outputs.unauthorized_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,15 +24,15 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install .
 
       - name: Get all added or modified files
         run: |
@@ -42,26 +43,75 @@ jobs:
             BASE_BRANCH="dev"
             git fetch origin $BASE_BRANCH
           fi
-          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
-          echo "All Changed Files: $ALL_CHANGED_FILES"
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
 
-          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
+          echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
+
+          FILES=$(echo "$MODIFIED_FILES_ONLY" | grep '\.py$' | tr '\n' ' ')
           echo "FILES=$FILES" >> $GITHUB_ENV
 
-          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          OTHER_FILES=$(echo "$MODIFIED_FILES_ONLY" | grep -v '\.py$' | tr '\n' ' ')
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
+        id: unauthorized_files
         run: |
           paths_to_protect=(
-            "input/data/tasks/default_task.json"
+            "input/data/tasks/example_freestall_task.json"
+            "input/data/tasks/example_open_lot_task.json"
+            "input/data/tasks/example_no_animal_task.json"
+            "input/metadata/example_freestall_dairy_metadata.json"
+            "input/metadata/example_open_lot_metadata.json"
+            "input/metadata/example_no_animal_metadata.json"
+            "input/data/animal/example_freestall_animal.json"
+            "input/data/animal/example_open_lot_animal.json"
+            "input/data/config/example_freestall_config.json"
+            "input/data/config/example_open_lot_config.json"
+            "input/data/config/example_no_animal_config.json"
+            "input/data/crop/example_alf_corn_silage_rotation.json"
+            "input/data/crop/example_alf_hay_corn_grain_rotation.json"
+            "input/data/crop/example_corn_silage_trit_cover_crop.json"
+            "input/data/crop/no_crop.json"
+            "input/data/EEE/default_costs.json"
+            "input/data/EEE/default_emissions.json"
+            "input/data/feed/example_Intermountain_feed.json"
+            "input/data/feed/example_Midwest_feed.json"
+            "input/data/feed/example_Northeast_feed.json"
+            "input/data/feed/example_Southwest_feed.json"
+            "input/data/feed_management/example_feed_management.json"
+            "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json"
+            "input/data/fertilizer_schedule/example_corn_silage_cover_crop_fert_app.json"
+            "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json"
+            "input/data/fertilizer_schedule/no_fertilizer.json"
+            "input/data/field/example_field_corn_alf_silage.json"
+            "input/data/field/example_field_corn_cover_crop.json"
+            "input/data/field/example_field_corn_grain_alf_hay.json"
+            "input/data/field/example_small_field_corn_alf_silage.json"
+            "input/data/field/example_small_field_corn_grain_alf_hay.json"
+            "input/data/manure_schedule/example_corn_alf_manure_schedule.json"
+            "input/data/manure_schedule/example_corn_silage_cover_crop_manure_app.json"
+            "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json"
+            "input/data/manure_schedule/example_sm_corn_silage_cover_crop_manure_app.json"
+            "input/data/manure_schedule/no_manure.json"
+            "input/data/manure/example_freestall_processor_configs.json"
+            "input/data/manure/example_freestall_processor_connections.json"
+            "input/data/manure/example_open_lot_processor_configs.json"
+            "input/data/manure/example_open_lot_processor_connections.json"
+            "input/data/manure/manure_management.json"
+            "input/data/soil/example_soil.json"
+            "input/data/soil/example_soil_2.json"
+            "input/data/tillage_schedule/example_corn_silage_cover_crop_tillage.json"
+            "input/data/tillage_schedule/no_till.json"
           )
           unauthorized_changes=false
           unauthorized_paths=""
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
+            if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
@@ -70,9 +120,10 @@ jobs:
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
-            exit 1
+            echo "unauthorized_files=true" >> $GITHUB_OUTPUT
           else
             echo "No unauthorized changes detected."
+            echo "unauthorized_files=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Record if changelog has been updated
@@ -87,7 +138,7 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
@@ -104,10 +155,16 @@ jobs:
           echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
         
       - name: Capture the commit hash
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         id: capture_commit_sha
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
+      - name: Format code with Black for forked branches
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository != 'RuminantFarmSystems/RuFaS' }}
+        run: |
+          echo $(black ${{ env.FILES }})
 
 
   lint_test_type_check:
@@ -126,15 +183,15 @@ jobs:
         with:
           ref: ${{ needs.format_code.outputs.pushed_commit_sha }}
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+          pip install .
 
       - name: Lint with flake8
         id: flake8
@@ -189,7 +246,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/dev'
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -228,6 +285,7 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"
@@ -238,13 +296,15 @@ jobs:
         if: ${{ steps.flake8.outcome == 'failure' }}
         run: |
           echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Check for Pytest Errors
         if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
           echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Comment on Coverage and Mypy Errors
         env:
@@ -277,17 +337,35 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-      - name: Notify User of Missing Changelog Updates
-        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
+      - name: Final Aggregated Check
         run: |
-          if [ -n "$URL" ]; then
-            curl \
+          MESSAGE=""
+          CURRENT_BRANCH="${GITHUB_REF##*/}"
+          echo "Current branch: $CURRENT_BRANCH"
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
+          fi
+          if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
+            MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
+          fi
+          if [ "${{ steps.flake8.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
+          fi
+          if [ "${{ steps.coverage.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Some tests have failed."
+          fi
+      
+          if [ -n "$MESSAGE" ]; then
+            if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
+              curl \
                 -X POST \
-                $URL \
+                "${{ github.event.pull_request.comments_url }}" \
                 -H "Content-Type: application/json" \
                 -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+                --data "{\"body\": \"$MESSAGE\"}"
+            fi
+            echo "$MESSAGE"
             exit 1
+          else
+            echo "All checks passed."
           fi

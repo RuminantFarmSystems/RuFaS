@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>RuFaS Data Collection</title>
+    <script src="./js/jsoneditor.min.js"></script>
+    <script src="./js/ace.js"></script>
+    <script src="./js/assign.js"></script>
+    <script src="./js/lz-string.min.js"></script>
+    <script src="./schema/config_schema.js"></script>
+    <script src="./schema/animal_schema.js"></script>
+    <script src="./schema/crop_schedule_schema.js"></script>
+    <script src="./schema/crop_configuration_schema.js"></script>
+    <script src="./schema/fertilizer_schedule_schema.js"></script>
+    <script src="./schema/manure_schedule_schema.js"></script>
+    <script src="./schema/tillage_schedule_schema.js"></script>
+    <script src="./schema/feed_schema.js"></script>
+    <script src="./schema/manure_management_schema.js"></script>
+    <script src="./schema/field_schema.js"></script>
+    <script src="./schema/tractor_dataset_schema.js"></script>
+    <script src="./schema/tasks_schema.js"></script>
+    <link rel='stylesheet' id='theme-link'>
+    <link rel='stylesheet' id='iconlib-link'>
+    <style>
+        .dropdown {
+        position: relative;
+        display: inline-block;
+        }
+
+         .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        }
+
+        .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        }
+
+        .dropdown-content a:hover {background-color: #ddd;}
+        .dropdown:hover .dropdown-content {display: block;}
+        .dropdown:hover .dropbtn {background-color: #3e8e41;}
+    </style>
+</head>
+
+<body>
+    <div class='container grid-xl' style="padding: 15px 0;">
+        <div class="row columns md:flex">            
+            <div class='col-1 col-md-1 w-1/12'>
+                <img src="./images/RuFaS Logo Vector.svg" alt="RuFaS logo" style="width:85px;height:auto; padding-top: 5px">
+            </div>
+            <div class='col-3 col-md-3 w-3/12'>
+                <h1>RuFaS Data Collection</h1>
+            </div>
+            <div class='col-7 col-md-7 w-7/12'>                
+                <div class="alert alert-info text-center alert-dismissible" role="alert">
+                    Start by adding a Data Entry. Once done, click "Save Results" button.
+                    Values are <span style="color: blue;">BLUE</span>.
+                    When a value is deleted, a placeholder default is shown in <span style="color: grey;">GREY</span>.
+                    Placeholders are NOT tracked and will show up blank in the Saved Result.
+                </div>    
+            </div>
+            <div class="col-1 col-md-1 w-1/12">        
+                <a class="btn btn-primary text-light" id="save_results" title="When finished collecting data, click on this button to save results.">Save Results</a>
+                <div class="dropdown" style="padding: 5px;">
+                    <button class="btn btn-primary text-light">User Guide</button>
+                    <div class="dropdown-content">
+                        <a class="btn" href="https://youtu.be/V8y1OC3oQSA" target="_blank" id="user_guide" rel="noopener noreferrer" title="For additional info or help, click here to open User Guide Instructional Video.">User Guide Video</a>
+                        <a class="btn" href="https://youtu.be/avFdNwD5S_Q" target="_blank" id="user_guide" rel="noopener noreferrer" title="For additional info or help, click here to open Crop Rotation use case Video.">Use Case Video</a>
+                        <a class="btn" href="./documents/User_Guide.pdf" target="_blank" id="user_guide" rel="noopener noreferrer" title="For additional info or help, click here to open the User Guide PDF.">PDF</a>
+                    </div>
+                </div> 
+            </div>
+
+        </div>
+        
+        <div class="row columns md:flex">
+            <div class='col-12 col-md-12 w-12/12'>
+                <div id="json-editor-form"></div>
+            </div>
+        </div>
+        <div class="row columns md:flex">
+            <div class='col-12 col-md-12 w-12/12'>
+                <h2>JSON Output</h2>
+                <p>You can also make changes to the JSON here and set the value in the editor by clicking "Update Form"</p>
+                <label for="output-textarea"></label>
+                <textarea id='output-textarea' rows="15" style="width: 100%; font-family: monospace;" class='form-control'></textarea>
+                <button class='btn btn-primary btn-block' id='setvalue'>Update Form</button>
+                <h2>Validation</h2>
+                <label for="validate-textarea">This will update whenever the form changes to show validation errors if there are any.</label>
+                <br>
+                <textarea id='validate-textarea' readonly disabled class='form-control'></textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        var mySchema = {
+            "title": "Data Collection Schema",
+            "type": "array",
+            "format": "tabs-top",
+            "items": {
+                "type": "object",
+                "title": "Data Entry",
+                "oneOf": [config_schema, animal_schema, crop_schedule_schema, crop_configuration_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema, tasks_schema]
+            }
+        }
+        var data = {}
+        var defaultOptions = {
+            iconlib: 'fontawesome4',
+            object_layout: 'normal',
+            schema: mySchema,
+            show_errors: 'interaction',
+            theme: 'bootstrap4'
+        }
+        var jsoneditor = null
+        var directLink = document.querySelector('#direct-link')
+        var head = document.getElementsByTagName('head')[0]
+        var iconlibLink = document.querySelector('#iconlib-link')
+        var jsonEditorForm = document.querySelector('#json-editor-form')
+        var setSchema = document.querySelector('#setschema')
+        var setValue = document.querySelector('#setvalue')
+        var themeLink = document.querySelector('#theme-link')
+        var validateTextarea = document.querySelector('#validate-textarea')
+        var aceConfig = {
+            mode: 'ace/mode/json',
+            selection: false,
+            maxLines: Infinity,
+            minLines: 5
+        }
+        var outputTextarea = ace.edit('output-textarea', aceConfig)
+        var parseUrl = function() {
+            var url = window.location.search
+            var queryParamsString = url.substring(1, url.length)
+            var queryParams = queryParamsString.split('&')
+            if (queryParamsString.length) {
+                queryParams.forEach(function(queryParam) {
+                    var splittedParam = queryParam.split('=')
+                    var param = splittedParam[0]
+                    var value = splittedParam[1]
+                    if (param === 'data') {
+                        try {
+                            data = JSON.parse(LZString.decompressFromBase64(value))
+                        } catch (reason) {}
+                    }
+                })
+            }
+            mergeOptions()
+        }
+        var mergeOptions = function() {
+            data.options = Object.assign(defaultOptions, data.options)
+            data.options["show_opt_in"] = true
+            data.options["required_by_default"] = true
+            refreshUI()
+        }
+        var refreshUI = function() {
+            themeLink.href = './css/bootstrap4.0.0.min.css'
+            iconlibLink.href = './css/font-awesome.css'
+            initJsoneditor()
+        }
+        var initJsoneditor = function() {
+            if (jsoneditor) {
+                jsoneditor.destroy()
+            }
+            jsoneditor = new window.JSONEditor(jsonEditorForm, data.options)
+            jsoneditor.on('change', function() {
+                var json = jsoneditor.getValue()
+                outputTextarea.setValue(JSON.stringify(json, null, 2))
+                var validationErrors = jsoneditor.validate()
+                if (validationErrors.length) {
+                    schemaIndexesToNames = mapSchemaIndexToPropertyNames(mySchema.items.oneOf)
+                    errors = stringifyRelevantErrorObjects(validationErrors, schemaIndexesToNames)
+                    validateTextarea.value = errors.join("\n")
+                } else {
+                    validateTextarea.value = 'valid'
+                }
+            })
+            jsoneditor.options.keep_oneof_values = false
+        }
+        setValue.addEventListener('click', function() {
+            jsoneditor.setValue(JSON.parse(outputTextarea.getValue()))
+        })
+        document.getElementById('save_results').addEventListener('click', function() {
+            var data = jsoneditor.getValue();
+
+            if (Array.isArray(data)) {
+                data.forEach((item, index) => {
+                    var fileName = item.fileName;
+
+                    const { fileName: _, ...jsonDataToDownload } = item;
+
+                    var jsonData = JSON.stringify(jsonDataToDownload, null, 2);
+
+                    saveJsonFile(jsonData, fileName, 'application/json');
+                });
+                alert(`${data.length} JSON files have been saved.`);
+            } else {
+                var jsonData = JSON.stringify(data, null, 2);
+                saveJsonFile(jsonData, 'data.json', 'application/json');
+                alert("Cannot parse data as an array. Saving all data in a single file instead.");
+            }
+        });
+
+        function saveJsonFile(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], {
+                type: contentType
+            });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+        parseUrl()
+
+        /**
+         * Maps the index of a Schema to the name of those properties.
+         * @param {array of objects} schema - Array of available input schemas.
+         * @returns {object mapping ints to strings} - Object mapping index of a schema to the schema's name.
+         */
+        function mapSchemaIndexToPropertyNames(schema) {
+            var schemaIndexToName = {}
+
+            for (let index = 0; index < schema.length; index++) {
+                const name = schema[index].title
+                schemaIndexToName[index] = name
+            }
+
+            return schemaIndexToName
+        }
+
+        /**
+         * Filters out irrelevant and duplicative errors, and converts them to user-friendly strings.
+         * @param {array of objects} errors - All errors found.
+         * @param {object mapping ints to strings} schemaIndexesToNames - Maps schema indexes to propery names.
+         * @returns {array of strings} Reduced array of errors stringified to be more human-readable.
+         */
+        function stringifyRelevantErrorObjects(errors, schemaIndexesToNames) {
+            const rootErrorPathPattern = /^root\.(\d+)$/;
+            relevantErrors = errors.filter(error => (
+                error.message !== "Property must be set" && !error.path.match(rootErrorPathPattern)
+            ));
+
+            var errorsInfo = []
+            var fileNameErrorsIndices = []
+            const errorPathPattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
+            for (let index = 0; index < relevantErrors.length; index++) {
+                error = relevantErrors[index]
+                const matches = error.path.match(errorPathPattern);
+
+                const dataEntryIndex = matches[1]
+                const schemaIndex = matches[2]
+                const schemaName = schemaIndexesToNames[schemaIndex]
+                const inputVarName = matches[3]
+
+                const isFileNameError = inputVarName === "fileName"
+                const isAlreadyPresentForDataEntry = fileNameErrorsIndices.includes(dataEntryIndex)
+                if (isFileNameError && !isAlreadyPresentForDataEntry) {
+                    const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid file name: ${error.message}.`
+                    errorsInfo.push(errorString)
+                    fileNameErrorsIndices.push(dataEntryIndex)
+                    continue
+                } else if (isFileNameError && isAlreadyPresentForDataEntry) {
+                    continue
+                }
+
+                const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for "${inputVarName}" against "${schemaName}": ${error.message}.`
+                errorsInfo.push(errorString)
+            }
+            return errorsInfo
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+{
+    "parallel_workers": 4,
+    "tasks": [
+      {
+        "task_type": "UPDATE_E2E_TEST_RESULTS",
+        "metadata_file_path": "input/metadata/end_to_end_testing/freestall_e2e_metadata.json",
+        "output_prefix": "freestall_e2e",
+        "filters_directory": "input/data/end_to_end_testing/freestall",
+        "log_verbosity": "logs",
+        "exclude_info_maps": true,
+        "random_seed": 42
+      },
+      {
+        "task_type": "UPDATE_E2E_TEST_RESULTS",
+        "metadata_file_path": "input/metadata/end_to_end_testing/open_lot_e2e_metadata.json",
+        "output_prefix": "open_lot_e2e",
+        "filters_directory": "input/data/end_to_end_testing/open_lot",
+        "log_verbosity": "logs",
+        "exclude_info_maps": true,
+        "random_seed": 42
+      },
+      {
+        "task_type": "UPDATE_E2E_TEST_RESULTS",
+        "metadata_file_path": "input/metadata/end_to_end_testing/no_animal_e2e_metadata.json",
+        "output_prefix": "no_animal_e2e",
+        "filters_directory": "input/data/end_to_end_testing/no_animal",
+        "log_verbosity": "logs",
+        "exclude_info_maps": true,
+        "random_seed": 42
+      }
+    ]
+  }

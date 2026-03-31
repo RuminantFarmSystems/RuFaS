@@ -1,0 +1,11 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "DATA_COLLECTION_APP_UPDATE",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
+      "output_prefix": "DCA_Update",
+      "log_verbosity": "logs"
+    }
+  ]
+}

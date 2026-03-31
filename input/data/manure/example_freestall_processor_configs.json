@@ -1,0 +1,141 @@
+{
+  "anaerobic_digester": [
+    {
+      "name": "anaerobic_digester_1",
+      "processor_type": "ContinuousMix",
+      "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 10,
+      "biogas_leakage_fraction": 0.01
+    },
+    {
+      "name": "anaerobic_digester_2",
+      "processor_type": "ContinuousMix",
+      "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 25,
+      "biogas_leakage_fraction": 0.01
+    }
+  ],
+  "handler": [
+    {
+      "name": "calf_manual_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0
+    },
+    {
+      "name": "growing_alley_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0
+    },
+    {
+      "name": "closeup_manual_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0
+    },
+    {
+      "name": "lac_alley_scraper",
+      "processor_type": "AlleyScraper",
+      "cleaning_water_use_amount": 0.0
+    },
+    {
+      "name": "flush_system_1",
+      "processor_type": "FlushSystem",
+      "cleaning_water_use_amount": 189.0,
+      "use_parlor_flush": true,
+      "cleaning_water_recycle_fraction": 0.8
+    },
+    {
+      "name": "parlor_cleaning_handler",
+      "processor_type": "ParlorCleaningHandler",
+      "cleaning_water_use_amount": 189.0,
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": true
+    }
+  ],
+  "separator": [
+    {
+      "name": "rotary_screen_1",
+      "processor_type": "RotaryScreen",
+      "separated_solids_dry_matter": 0.20,
+      "total_solids_efficiency": 0.35,
+      "volatile_solids_efficiency": 0.40,
+      "nitrogen_efficiency": 0.30,
+      "ammoniacal_nitrogen_efficiency": 0.15,
+      "phosphorus_efficiency": 0.40,
+      "potassium_efficiency": 0.15,
+      "ash_efficiency": 0.20
+    },
+    {
+      "name": "screw_press_1",
+      "processor_type": "ScrewPress",
+      "separated_solids_dry_matter": 0.35,
+      "total_solids_efficiency": 0.25,
+      "volatile_solids_efficiency": 0.30,
+      "nitrogen_efficiency": 0.30,
+      "ammoniacal_nitrogen_efficiency": 0.10,
+      "phosphorus_efficiency": 0.20,
+      "potassium_efficiency": 0.23,
+      "ash_efficiency": 0.20
+    }
+  ],
+  "storage": [
+    {
+      "name": "slurry_storage_outdoor_growing",
+      "processor_type": "SlurryStorageOutdoor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
+      "storage_time_period": 120,
+      "surface_area": 500
+    },
+    {
+      "name": "slurry_storage_outdoor_lac",
+      "processor_type": "SlurryStorageOutdoor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
+      "storage_time_period": 120,
+      "surface_area": 615
+    },
+    {
+      "name": "slurry_storage_underfloor_1",
+      "processor_type": "SlurryStorageUnderfloor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
+      "storage_time_period": 120,
+      "surface_area": null
+    },
+    {
+      "name": "anaerobic_lagoon_1",
+      "processor_type": "AnaerobicLagoon",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
+      "storage_time_period": 365,
+      "surface_area": null
+    },
+    {
+      "name": "compost",
+      "processor_type": "Composting",
+      "composting_type": "intensive windrow",
+      "storage_time_period": 365
+    },
+    {
+      "name": "open_lot_1",
+      "processor_type": "OpenLot",
+      "storage_time_period": 365
+    },
+    {
+      "name": "bedded_pack_1",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 30,
+      "is_mixed": false
+    },
+    {
+      "name": "compost_bedded_pack_1",
+      "processor_type": "BeddedPack",
+      "storage_time_period": 183,
+      "is_mixed": true
+    },
+    {
+      "name": "dailyspread",
+      "processor_type": "DailySpread"
+    }
+  ]
+}
