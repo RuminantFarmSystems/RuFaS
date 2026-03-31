@@ -53,7 +53,8 @@ v1.0.0
 - [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
 - [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
 - [2902](https://github.com/RuminantFarmSystems/RuFaS/pull/2902) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
-- [2740](https://github.com/RuminantFarmSystems/RuFaS/pull/2740) - [minor change] [NoInputChange] [NoOutputChange] Added warnings for feed purchases exceeding advance purchase allowance/
+- [2740](https://github.com/RuminantFarmSystems/RuFaS/pull/2740) - [minor change] [NoInputChange] [NoOutputChange] Added warnings for feed purchases exceeding advance purchase allowance.
+- [2921](https://github.com/RuminantFarmSystems/RuFaS/pull/2921) - [minor change] [OutputManager][NoInputChange] [NoOutputChange] Override incorrect fill type for complex data structure data padding.
 
 ### v1.0.0
 
