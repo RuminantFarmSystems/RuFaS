@@ -1709,7 +1709,6 @@ class DataValidator:
         >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         'straw'
         """
-
         for key in variable_path:
             if isinstance(data, list) and 0 <= int(key) < len(data):
                 data = data[int(key)]
@@ -1835,6 +1834,7 @@ class CrossValidator:
                 }
             )
             if eager_termination:
+                print(self._alias_pool)
                 raise ValueError(f"Cross-validation error: Unknown alias name: {alias_name}")
 
         return value

@@ -1,0 +1,686 @@
+{
+  "cross-validation": [
+    {
+      "description": "alfalfa_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.0.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.0.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.0.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.0.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "alfalfa_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.1.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.1.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.1.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.1.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "alfalfa_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.2.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.2.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.2.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.2.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.3.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.3.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.3.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.3.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.4.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.4.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.4.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.4.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.5.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.5.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.5.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.5.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.6.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.6.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.6.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.6.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "corn_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.7.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.7.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.7.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.7.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "corn_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.8.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.8.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.8.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.8.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soybean_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.9.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.9.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.9.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.9.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soybean_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.10.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.10.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.10.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.10.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.11.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.11.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.11.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.11.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.12.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.12.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.12.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.12.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.13.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.13.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.13.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.13.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.14.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.14.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.14.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.14.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.15.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.15.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.15.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.15.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.16.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.16.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.16.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.16.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.17.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.17.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.17.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.17.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.18.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.18.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.18.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.18.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.19.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.19.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.19.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.19.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.20.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.20.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.20.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.20.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "minimum_temperature": "crop_configurations.crop_configurations.21.minimum_temperature",
+          "optimal_temperature": "crop_configurations.crop_configurations.21.optimal_temperature",
+          "minimum_harvest_index": "crop_configurations.crop_configurations.21.minimum_harvest_index",
+          "optimal_harvest_index": "crop_configurations.crop_configurations.21.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_temperature"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_temperature"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["optimal_harvest_index"]
+          },
+          "right_hand": {
+            "ordered_variables": ["minimum_harvest_index"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    }
+  ]
+}
