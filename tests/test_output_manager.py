@@ -2187,6 +2187,7 @@ def test_filter_variables_pool(
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
     mock_output_manager.variables_pool = mock_simple_variables_pool
+    mocker.patch.object(mock_output_manager, "time")
     expand_data_temporally = mocker.patch.object(Utility, "expand_data_temporally", side_effect=lambda _: _)
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected
