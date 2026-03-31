@@ -775,9 +775,8 @@ def test_expand_data_temporally_observed_range_only() -> None:
                 ],
             }
         },
-        []
+        [],
     )
-
 
     assert actual == expected
 
