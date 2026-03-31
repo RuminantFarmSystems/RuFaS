@@ -487,32 +487,35 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             False,
             True,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "a", "a", "b", "c", math.nan],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "kg"},
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a", "a", "b", "c", math.nan],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                            {"simulation_day": 6, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["d", "d", "d", "d", "e", "e", "f"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                            {"simulation_day": 6, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["d", "d", "d", "d", "e", "e", "f"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "g"},
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                []
+            ),
         ),
         (
             {
@@ -539,32 +542,35 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             False,
-            {
-                "a": {
-                    "values": [math.nan, "a", math.nan, math.nan, "b", "c", "c"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "kg"},
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": [math.nan, "a", math.nan, math.nan, "b", "c", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                            {"simulation_day": 6, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": [math.nan, math.nan, math.nan, "d", "e", math.nan, "f"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                            {"simulation_day": 6, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [math.nan, math.nan, math.nan, "d", "e", math.nan, "f"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "g"},
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                []
+            )
         ),
         (
             {
@@ -580,24 +586,27 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             True,
-            {
-                "a": {
-                    "values": ["a", "a", "a"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
+                    "b": {
+                        "values": [None, "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [None, "b", "c"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
-                },
-            },
+                []
+            )
         ),
         (
             {
@@ -616,24 +625,27 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             True,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha"},
-                        {"simulation_day": 1, "units": "ha"},
-                        {"simulation_day": 2, "units": "ha"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "b"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                            {"simulation_day": 2, "units": "ha"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c", "d"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                            {"simulation_day": 2, "units": "ha"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "c", "d"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha"},
-                        {"simulation_day": 1, "units": "ha"},
-                        {"simulation_day": 2, "units": "ha"},
-                    ],
-                },
-            },
+                []
+            )
         ),
         (
             {
@@ -652,26 +664,29 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "fill", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha^2"},
-                        {"simulation_day": 1, "units": "ha^2"},
-                        {"simulation_day": 2, "units": "ha^2"},
-                        {"simulation_day": 3, "units": "ha^2"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "fill", "b"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha^2"},
+                            {"simulation_day": 1, "units": "ha^2"},
+                            {"simulation_day": 2, "units": "ha^2"},
+                            {"simulation_day": 3, "units": "ha^2"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c", "fill", "d"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "l"},
+                            {"simulation_day": 1, "units": "l"},
+                            {"simulation_day": 2, "units": "l"},
+                            {"simulation_day": 3, "units": "l"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "c", "fill", "d"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "l"},
-                        {"simulation_day": 1, "units": "l"},
-                        {"simulation_day": 2, "units": "l"},
-                        {"simulation_day": 3, "units": "l"},
-                    ],
-                },
-            },
+                []
+            )
         ),
         (
             {
@@ -686,17 +701,20 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             True,
             False,
-            {
-                "a": {
-                    "values": [math.pi, math.pi, "a", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "GB"},
-                        {"simulation_day": 1, "units": "GB"},
-                        {"simulation_day": 2, "units": "GB"},
-                        {"simulation_day": 3, "units": "GB"},
-                    ],
-                }
-            },
+            (
+                {
+                    "a": {
+                        "values": [math.pi, math.pi, "a", "b"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "GB"},
+                            {"simulation_day": 1, "units": "GB"},
+                            {"simulation_day": 2, "units": "GB"},
+                            {"simulation_day": 3, "units": "GB"},
+                        ],
+                    }
+                },
+                []
+            )
         ),
     ],
 )

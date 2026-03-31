@@ -1345,7 +1345,7 @@ class OutputManager(object):
             use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
             expand_data_to_observed_range = filter_content.get("expand_data_to_observed_range", False)
             try:
-                results = Utility.expand_data_temporally(
+                results, logs = Utility.expand_data_temporally(
                     results,
                     simulation_length=simulation_length,
                     fill_value=fill_value,
@@ -1354,6 +1354,7 @@ class OutputManager(object):
                     use_fill_value_at_end=use_fill_value_at_end,
                     expand_data_to_observed_range=expand_data_to_observed_range,
                 )
+                self.route_logs(logs)
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"
                 error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
@@ -1726,7 +1727,6 @@ class OutputManager(object):
                         isinstance(log["error"], str)
                         and isinstance(log["message"], str)
                         and isinstance(log["info_map"], dict)
-                        and list(log.keys()) == ["error", "message", "info_map"]
                     ):
                         self.add_error(log["error"], log["message"], log["info_map"])
                     else:
@@ -1740,7 +1740,6 @@ class OutputManager(object):
                         isinstance(log["log"], str)
                         and isinstance(log["message"], str)
                         and isinstance(log["info_map"], dict)
-                        and list(log.keys()) == ["log", "message", "info_map"]
                     ):
                         self.add_log(log["log"], log["message"], log["info_map"])
                     else:
@@ -1754,7 +1753,6 @@ class OutputManager(object):
                         isinstance(log["warning"], str)
                         and isinstance(log["message"], str)
                         and isinstance(log["info_map"], dict)
-                        and list(log.keys()) == ["warning", "message", "info_map"]
                     ):
                         self.add_warning(log["warning"], log["message"], log["info_map"])
                     else:
