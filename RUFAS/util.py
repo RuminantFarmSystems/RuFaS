@@ -235,8 +235,8 @@ class Utility:
                         fill_warning: dict[str, str | dict[str, str]] = {
                             "warning": "Data expansion fill warning",
                             "message": f"User-provided fill value type {type(fill_value)} does not match "
-                                       f"type of data to be expanded {type(first_value)}, "
-                                       "filling with last reported value.",
+                            f"type of data to be expanded {type(first_value)}, "
+                            "filling with last reported value.",
                             "info_map": {
                                 "class": Utility.__name__,
                                 "function": Utility.expand_data_temporally.__name__,
