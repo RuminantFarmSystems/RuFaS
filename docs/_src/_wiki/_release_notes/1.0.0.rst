@@ -74,7 +74,7 @@ This review was designed to confirm biologically and environmentally
 plausible system-level behavior prior to release. While not a formal
 external validation, the results provide confidence that the v1.0 update
 performs as intended across a diverse set of farm scenarios. For a more detailed
-report of the methods, results, and key findings, please see the full report which is `linked here. <https://github.com/RuminantFarmSystems/RuFaS/blob/evaluation-report/docs/_src/_wiki/_release_notes/RuFaSV1_Eval_article.pdf>`__
+report of the methods, results, and key findings, please see the full report which is `linked here. <https://github.com/RuminantFarmSystems/RuFaS/blob/main/docs/_src/_wiki/_release_notes/RuFaSV1_Eval_article.pdf>`__
 
 Improvements
 ------------
