@@ -2,13 +2,14 @@ project:
   type: book
 
 book:
-  title: "mybook"
-  author: "Jane Doe"
-  date: "8/18/2021"
+  title: "Ruminant Farm Systems (RuFaS)"
+  subtitle: "Scientific Documentation"
+  date: "4/1/2026"
+  search: true
+  page-navigation: true
   chapters:
-   
     - index.qmd
-    - equations.qmd
+    - example_structures.qmd
     - animal.qmd
     - manure.qmd
 

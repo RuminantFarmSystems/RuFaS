@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Jane Doe">
-<meta name="dcterms.date" content="2021-08-18">
 
-<title>mybook</title>
+<title>3&nbsp; Animal Module – Ruminant Farm Systems (RuFaS)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -25,41 +23,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -70,7 +33,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./equations.html" rel="next">
+<link href="./manure.html" rel="next">
+<link href="./example_structures.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -109,6 +73,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -122,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface: A Day in the Life on a RuFaS Farm</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./animal.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -137,7 +130,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">mybook</a> 
+      <a href="./">Ruminant Farm Systems (RuFaS)</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -149,19 +142,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface: A Day in the Life on a RuFaS Farm</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./equations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Equation examples (from Animal Documentation)</span></span></a>
+  <a href="./example_structures.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Example Inserts</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./animal.html" class="sidebar-item-text sidebar-link">
+  <a href="./animal.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></span></a>
   </div>
 </li>
@@ -181,7 +174,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#preface-a-day-in-the-life-on-a-rufas-farm" id="toc-preface-a-day-in-the-life-on-a-rufas-farm" class="nav-link active" data-scroll-target="#preface-a-day-in-the-life-on-a-rufas-farm"><span class="header-section-number">1</span> Preface: A Day in the Life on a RuFaS Farm</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">3.1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#example-of-a-figure" id="toc-example-of-a-figure" class="nav-link" data-scroll-target="#example-of-a-figure"><span class="header-section-number">3.1.1</span> Example of a Figure</a></li>
+  <li><a href="#example-of-a-table" id="toc-example-of-a-table" class="nav-link" data-scroll-target="#example-of-a-table"><span class="header-section-number">3.1.2</span> Example of a Table</a></li>
+  <li><a href="#examples-of-equations" id="toc-examples-of-equations" class="nav-link" data-scroll-target="#examples-of-equations"><span class="header-section-number">3.1.3</span> Examples of Equations</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -190,26 +188,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">mybook</h1>
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Jane Doe </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">August 18, 2021</p>
-    </div>
-  </div>
   
     
   </div>
@@ -219,65 +205,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="preface-a-day-in-the-life-on-a-rufas-farm" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Preface: A Day in the Life on a RuFaS Farm</h1>
-<p><img src="resources/rufas.png" class="img-fluid" width="90"></p>
-<p>This document provides a high-level overview of the daily operations of a ruminant farm, as modeled by RuFaS. The overview will be through the eyes of Dr.&nbsp;Rue Fas. One day, Dr.&nbsp;Rue woke up and decided the life of a computer scientist wasn’t for her. So she bought a dairy farm, and this is how she operates it every day.</p>
-<p><strong>Feeding the Animals</strong> Second thing in the morning, after coffee, Dr. Rue checks the calendar to see if it’s time to formulate a new ration for her animals.</p>
-<p>If a new ration needs to be formulated, Dr.&nbsp;Rue heads over to the barn where she keeps all her forages and feed. While there, she checks how well all the forages are holding up. After considering the feeds available, the quality of each one, and how much each one costs, she decides on how productive she wants her animals to be. It is a difficult balancing act, but eventually a ration recipe is found that will keep the animals happy while keeping costs low and sustainability high until the calendar says the ration recipe needs to be reformulated.</p>
-<p>When Dr.&nbsp;Rue doesn’t need to formulate a new ration, she takes the last ration recipe she made and grabs all the feed and forage the animals need for the day out of the feed barn. If there isn’t enough for the animals, then a new ration is formulated using the steps above.</p>
-<p><strong>Taking Care of the Animals</strong> After making sure all the animals’ feed is taken care of, Dr.&nbsp;Rue moves on to taking care of all the other animal tasks. This includes milking the animals, making sure they’re healthy, getting them pregnant, and numerous other tasks.</p>
-<p>As dawn breaks on the RuFaS farm, the animals awaken after a restful night. Joe, the farm master, prepares a large whiteboard to track HerdReproductionStatistics, ensuring he has all the data he needs for the day’s activities.</p>
-<p><em>Daily Routine</em> - After leaving their pens, each animal lines up in front of the barn. Julie, the diligent farm veterinarian, examines them one by one. This daily check includes updates on the following areas:</p>
-<ul>
-<li><p>Nutrients: Each animal begins its day with a quick phosphorus requirement assessment. Julie records these details and updates the animal’s phosphorus-related metrics.</p></li>
-<li><p>Digestive System: With nutrient information in hand, Julie shifts focus to each animal’s digestive system, estimating manure output and enteric methane production for that day.</p></li>
-<li><p>Milk Production: All milking cows are assessed to gauge daily milk yield and milk component content (fat and protein). Any necessary adjustments are noted.</p></li>
-<li><p>Animal Growth: Around midday, Julie returns to each animal to evaluate daily weight changes. She updates each animal’s body weight accordingly.</p></li>
-<li><p>Reproduction: HeiferII and Cow stage animals undergo a reproduction check. Julie closely monitors their reproductive progress and updates the HerdReproductionStatistics details on Joe’s whiteboard.</p></li>
-<li><p>Life Stage Evaluation: Once the daily routines are complete, Julie determines if any animal is ready to progress to the next life stage. Graduating animals are marked as “graduated” to be moved to their new pens. Animals that must leave the herd—due to health, productivity, or other issues—are labeled as “sold” or “dead” to be removed from the farm population.</p></li>
-<li><p>Herd Size Maintenance: After every animal has been evaluated, Joe counts the herd to ensure it remains at a healthy size. If it is too large, he arranges the sale of some animals. If the herd is too small, he may opt to purchase additional heiferIIIs to keep numbers at the ideal level.</p></li>
-<li><p>Herd Structure Management: Joe also manages pen assignments. Newly graduated or newborn animals are guided to suitable pens, while animals marked for removal (sold or deceased) are taken out of the herd and removed from the farm records.</p></li>
-</ul>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<section id="introduction" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">3.1</span> Introduction</h2>
+<section id="example-of-a-figure" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="example-of-a-figure"><span class="header-section-number">3.1.1</span> Example of a Figure</h3>
+<p>This is a great example of how to set up a module.</p>
+<!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
+<div id="fig-animal-icon" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-animal-icon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="resources/animal.png" class="img-fluid figure-img" style="width:35.0%">
 </div>
-<div class="callout-title-container flex-fill">
-Note
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-animal-icon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Animal module icon
+</figcaption>
+</figure>
 </div>
+</section>
+<section id="example-of-a-table" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="example-of-a-table"><span class="header-section-number">3.1.2</span> Example of a Table</h3>
+<div id="tbl-animal-inputs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-animal-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3.1: Example animal inputs
+</figcaption>
+<div aria-describedby="tbl-animal-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>heiferI_num</td>
+<td>Number of Heifer I animals</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="callout-body-container callout-body">
-<p>Note: if only interested in a PDF version of the documentation (no website version), then the original LaTeX code can still be used and processed by quarto. For example, the bullet points works as the original LaTeX or translated into markdown syntax:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{latex}</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{itemize}</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="in">    \item first bullet point</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="in">    \item second bullet point</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="in">    \item ...</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="in">\end{itemize}</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>first bullet point</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>second bullet point</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>...</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<ul>
-<li>first bullet point</li>
-<li>second bullet point</li>
-<li>…</li>
-</ul>
-<p>but only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).</p>
+</figure>
 </div>
+</section>
+<section id="examples-of-equations" class="level3" data-number="3.1.3">
+<h3 data-number="3.1.3" class="anchored" data-anchor-id="examples-of-equations"><span class="header-section-number">3.1.3</span> Examples of Equations</h3>
+<div id="eqn-an-nrc-2">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
 </div>
-<p><strong>Output Reporting</strong> At day’s end, Joe and Julie review the updated HerdReproductionStatistics on the whiteboard. Joe then compiles a concise report summarizing the day’s herd stats. He forwards this information to the OutputManager before wrapping up another successful day on the RuFaS farm.</p>
-<p><strong>Dealing with the Manure</strong> Once all the animal chores are finished, Dr.&nbsp;Rue moves on to handling the manure. There are a lot of different ways that manure is collected from the animals: it is flushed out of the milking parlor with water, some of the pens need to have it shoveled out along with the bedding in the pen, and some pens have grates that allow the manure to go straight into a pit beneath the barn.</p>
-<p>There are a lot of different places where manure is processed and stored on the farm. Dr.&nbsp;Rue goes from place to place on the farm, moving the manure from one place to the next. The manure chores are finished after moving all of the manure into her lagoons, compost piles, and other storages. As this final manure chore is completed, she writes down all the information about how much manure is in all these storages, and some information about what that manure is made of. How much water, nitrogen, phosphorus, other solids, etc. are in each storage.</p>
-<p><strong>Managing the Fields</strong> Now that Dr.&nbsp;Rue is done making sure all the manure has been handled and stored properly, she can take care of all the field tasks. She has a lot of fields on her farm, each with its own unique schedule. Her field management routine starts with checking each field’s schedule to see if any of them are due to have manure applied, and if so, how much they should have applied. After noting all the manure that is supposed to go onto her fields, these amounts are checked against the amounts of manure that are in her manure storage. Dr.&nbsp;Rue then applies manure to each field on the schedule that day, trying to match the amount applied to the amount on the schedule as best she can.</p>
-<p>After making sure every manure item on each farm’s schedule has been taken care of for the day, the schedule for each field is rechecked, one field at a time. In each schedule she checks to see if that field needs to be tilled, if any chemical fertilizer needs to be applied, and if any crops need to be planted or harvested. After all these activities are taken care of, Mother Nature goes to work. The sun shines and rain falls, providing the field with water and energy that grows crops and soaks the soil. After taking care of each field one by one, Dr.&nbsp;Rue drives back to the main farm with all of the crops that she harvested on that day.</p>
-<p><strong>Storing the Feeds</strong> Now that she is back at the barns, all the crops that were just harvested can be stored. Fortunately she is very organized, so all her harvested crops are separate from one another and each has a label, indicating where it will be stored inside the feed barn. As each feed is stored, it is labeled with the current date. Dr.&nbsp;Rue is exhausted from another long day. She goes back to the farmhouse and rests up, preparing to do the whole thing over again tomorrow. Her daily routine might seem repetitive, but each day is a crucial part of the larger, continuous process that keeps her farm running efficiently and sustainably.</p>
+<div id="eqn-an-nrc-3">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}\]</span></p>
+</div>
+<div id="eqn-an-nrc-4">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}\]</span></p>
+</div>
+<div id="eqn-an-nrc-5">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}\]</span></p>
+</div>
+<div id="eqn-an-nrc-1">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}\]</span></p>
+</div>
+<div id="eqn-an-nrc-2">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}\]</span></p>
+</div>
+<p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -683,10 +677,13 @@ Note
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./example_structures.html" class="pagination-link" aria-label="Example Inserts">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Example Inserts</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./equations.html" class="pagination-link" aria-label="Equation examples (from Animal Documentation)">
-        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Equation examples (from Animal Documentation)</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./manure.html" class="pagination-link" aria-label="Manure Module">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Manure Module</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

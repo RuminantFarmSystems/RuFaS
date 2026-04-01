@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; Animal Module – mybook</title>
+<title>2&nbsp; Example Inserts – Ruminant Farm Systems (RuFaS)</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -33,8 +33,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./manure.html" rel="next">
-<link href="./equations.html" rel="prev">
+<link href="./animal.html" rel="next">
+<link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -115,7 +115,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./animal.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_structures.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Example Inserts</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -130,7 +130,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">mybook</a> 
+      <a href="./">Ruminant Farm Systems (RuFaS)</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -148,13 +148,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./equations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Equation examples (from Animal Documentation)</span></span></a>
+  <a href="./example_structures.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Example Inserts</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./animal.html" class="sidebar-item-text sidebar-link active">
+  <a href="./animal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></span></a>
   </div>
 </li>
@@ -174,11 +174,21 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">3.1</span> Introduction</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">2.1</span> Introduction</a></li>
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">2.2</span> Methodology</a>
   <ul class="collapse">
-  <li><a href="#example-of-a-figure" id="toc-example-of-a-figure" class="nav-link" data-scroll-target="#example-of-a-figure"><span class="header-section-number">3.1.1</span> Example of a Figure</a></li>
-  <li><a href="#example-of-a-table" id="toc-example-of-a-table" class="nav-link" data-scroll-target="#example-of-a-table"><span class="header-section-number">3.1.2</span> Example of a Table</a></li>
-  <li><a href="#examples-of-equations" id="toc-examples-of-equations" class="nav-link" data-scroll-target="#examples-of-equations"><span class="header-section-number">3.1.3</span> Examples of Equations</a></li>
+  <li><a href="#example-of-a-figure" id="toc-example-of-a-figure" class="nav-link" data-scroll-target="#example-of-a-figure"><span class="header-section-number">2.2.1</span> Example of a Figure</a></li>
+  <li><a href="#example-of-a-table" id="toc-example-of-a-table" class="nav-link" data-scroll-target="#example-of-a-table"><span class="header-section-number">2.2.2</span> Example of a Table</a></li>
+  <li><a href="#examples-of-equations" id="toc-examples-of-equations" class="nav-link" data-scroll-target="#examples-of-equations"><span class="header-section-number">2.2.3</span> Examples of Equations</a></li>
+  </ul></li>
+  <li><a href="#key-inputs" id="toc-key-inputs" class="nav-link" data-scroll-target="#key-inputs"><span class="header-section-number">2.3</span> Key Inputs</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">2.4</span> References</a></li>
+  <li><a href="#equation-examples-from-animal-documentation" id="toc-equation-examples-from-animal-documentation" class="nav-link" data-scroll-target="#equation-examples-from-animal-documentation"><span class="header-section-number">3</span> Equation examples (from Animal Documentation)</a>
+  <ul class="collapse">
+  <li><a href="#sec-nrc" id="toc-sec-nrc" class="nav-link" data-scroll-target="#sec-nrc"><span class="header-section-number">3.1</span> Nutrient Requirements of Dairy Cattle (NRC)</a></li>
+  <li><a href="#reformatted-equations" id="toc-reformatted-equations" class="nav-link" data-scroll-target="#reformatted-equations"><span class="header-section-number">3.2</span> Reformatted equations</a></li>
+  <li><a href="#use-alphanumeric-equation-labels" id="toc-use-alphanumeric-equation-labels" class="nav-link" data-scroll-target="#use-alphanumeric-equation-labels"><span class="header-section-number">3.3</span> Use alphanumeric equation labels</a></li>
+  <li><a href="#other-equation-templates" id="toc-other-equation-templates" class="nav-link" data-scroll-target="#other-equation-templates"><span class="header-section-number">3.4</span> Other equation Templates</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -188,7 +198,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></h1>
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Example Inserts</span></h1>
 </div>
 
 
@@ -205,10 +215,15 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">3.1</span> Introduction</h2>
-<section id="example-of-a-figure" class="level3" data-number="3.1.1">
-<h3 data-number="3.1.1" class="anchored" data-anchor-id="example-of-a-figure"><span class="header-section-number">3.1.1</span> Example of a Figure</h3>
+<section id="introduction" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">2.1</span> Introduction</h2>
+<p>This is a section that should be included in all modules.</p>
+</section>
+<section id="methodology" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="methodology"><span class="header-section-number">2.2</span> Methodology</h2>
+<p>This is a section that should be included in all modules. Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.</p>
+<section id="example-of-a-figure" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="example-of-a-figure"><span class="header-section-number">2.2.1</span> Example of a Figure</h3>
 <p>This is a great example of how to set up a module.</p>
 <!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
 <div id="fig-animal-icon" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -217,17 +232,17 @@ window.Quarto = {
 <img src="resources/animal.png" class="img-fluid figure-img" style="width:35.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-animal-icon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.1: Animal module icon
+Figure&nbsp;2.1: Animal module icon
 </figcaption>
 </figure>
 </div>
 </section>
-<section id="example-of-a-table" class="level3" data-number="3.1.2">
-<h3 data-number="3.1.2" class="anchored" data-anchor-id="example-of-a-table"><span class="header-section-number">3.1.2</span> Example of a Table</h3>
+<section id="example-of-a-table" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="example-of-a-table"><span class="header-section-number">2.2.2</span> Example of a Table</h3>
 <div id="tbl-animal-inputs" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-animal-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3.1: Example animal inputs
+Table&nbsp;2.1: Example animal inputs
 </figcaption>
 <div aria-describedby="tbl-animal-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -248,27 +263,72 @@ Table&nbsp;3.1: Example animal inputs
 </figure>
 </div>
 </section>
-<section id="examples-of-equations" class="level3" data-number="3.1.3">
-<h3 data-number="3.1.3" class="anchored" data-anchor-id="examples-of-equations"><span class="header-section-number">3.1.3</span> Examples of Equations</h3>
+<section id="examples-of-equations" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="examples-of-equations"><span class="header-section-number">2.2.3</span> Examples of Equations</h3>
 <div id="eqn-an-nrc-2">
 <p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
-</div>
-<div id="eqn-an-nrc-3">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}\]</span></p>
-</div>
-<div id="eqn-an-nrc-4">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}\]</span></p>
-</div>
-<div id="eqn-an-nrc-5">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}\]</span></p>
-</div>
-<div id="eqn-an-nrc-1">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}\]</span></p>
 </div>
 <div id="eqn-an-nrc-2">
 <p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}\]</span></p>
 </div>
 <p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
+</section>
+</section>
+<section id="key-inputs" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="key-inputs"><span class="header-section-number">2.3</span> Key Inputs</h2>
+</section>
+<section id="references" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="references"><span class="header-section-number">2.4</span> References</h2>
+</section>
+<section id="equation-examples-from-animal-documentation" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Equation examples (from Animal Documentation)</h1>
+<section id="sec-nrc" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="sec-nrc"><span class="header-section-number">3.1</span> Nutrient Requirements of Dairy Cattle (NRC)</h2>
+<p><strong>Energy Requirements</strong> For details about the variables included in each calculation, please refer to the <a href="energy requirements key">energykey</a>.</p>
+<ul>
+<li><p><strong><em>Maintenance</em></strong> - The maintenance requirement is calculated based on metabolic body weight (body weight<span class="math inline">\(^{0.75}\)</span>).</p>
+<p><u>Lactating and Dry Cows</u></p>
+<p><span id="eq-nrc-cbw"><span class="math display">\[CBW = MW * 0.06275 \tag{3.1}\]</span></span></p>
+<p><span id="eq-nrc-cw"><span class="math display">\[ CW = {(18 + (DOP - 190) * 0.665) * (\frac{CBW}{45}),\text{if}DOP &gt; 190.0}  \tag{3.2}\]</span></span></p>
+<p><em>Otherwise</em></p>
+<p><span id="eq-nrc-ne-maint"><span class="math display">\[ NEmaint = 0.08 \times (BW - CW)^{0.75}  \tag{3.3}\]</span></span></p></li>
+</ul>
+</section>
+<section id="reformatted-equations" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="reformatted-equations"><span class="header-section-number">3.2</span> Reformatted equations</h2>
+<p><a href="#eq-nrc-cbw" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> may be visually improved by using the <code>\times</code> LaTeX command:</p>
+<p><span class="math display">\[CBW = MW \times 0.06275\]</span></p>
+</section>
+<section id="use-alphanumeric-equation-labels" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="use-alphanumeric-equation-labels"><span class="header-section-number">3.3</span> Use alphanumeric equation labels</h2>
+<p>Though quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \tag latex command. <em>And</em> the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):</p>
+<div id="eqn-an-nrc-2">
+<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
+</div>
+<p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
+</section>
+<section id="other-equation-templates" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="other-equation-templates"><span class="header-section-number">3.4</span> Other equation Templates</h2>
+<!-- Inline equations -->
+<p>The energy balance is <span class="math inline">\(E = mc^2\)</span>.</p>
+<!-- display centered, on its own line 
+gets numbered automatically in PDF 
+Referencing equations - start with creating a label -->
+<p><span id="eq-energy"><span class="math display">\[
+\begin{equation}
+E = mc^2
+\end{equation}
+\tag{3.4}\]</span></span></p>
+<!-- reference that label -->
+<p>See Equation <a href="#eq-energy" class="quarto-xref">Equation&nbsp;<span>3.4</span></a>. <!-- additional example --> <span id="eq-nutrient-proportion"><span class="math display">\[
+\begin{equation}
+\text{nutrient\_proportion\_to\_be\_removed} =
+\min\left(
+\frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
+1
+\right)
+\end{equation}
+\tag{3.5}\]</span></span></p>
 
 
 </section>
@@ -677,13 +737,13 @@ Table&nbsp;3.1: Example animal inputs
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./equations.html" class="pagination-link" aria-label="Equation examples (from Animal Documentation)">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Equation examples (from Animal Documentation)</span></span>
+      <a href="./index.html" class="pagination-link" aria-label="Preface: A Day in the Life on a RuFaS Farm">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface: A Day in the Life on a RuFaS Farm</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./manure.html" class="pagination-link" aria-label="Manure Module">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Manure Module</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./animal.html" class="pagination-link" aria-label="Animal Module">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Animal Module</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

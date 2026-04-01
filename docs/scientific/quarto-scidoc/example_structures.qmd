@@ -1,3 +1,43 @@
+# Example Inserts
+
+## Introduction
+This is a section that should be included in all modules. 
+
+
+## Methodology
+This is a section that should be included in all modules. 
+Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.
+
+### Example of a Figure 
+
+This is a great example of how to set up a module. 
+
+<!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
+![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+
+
+### Example of a Table
+| Variable | Definition |
+|---|---|
+| heiferI_num | Number of Heifer I animals |
+
+: Example animal inputs {#tbl-animal-inputs}
+
+
+### Examples of Equations
+:::{#eqn-an-nrc-2}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
+:::
+
+:::{#eqn-an-nrc-2}
+$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}$$
+:::
+see @eqn-an-nrc-2
+
+## Key Inputs
+
+## References
+
 
 # Equation examples (from Animal Documentation)
 
