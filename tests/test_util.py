@@ -781,6 +781,74 @@ def test_expand_data_temporally_observed_range_only() -> None:
     assert actual == expected
 
 
+def test_expand_data_temporally_error_empty_dataset() -> None:
+    """Tests expand_data_temporally raises on an empty dataset."""
+    with pytest.raises(ValueError, match="Data Expansion error: Cannot fill empty dataset."):
+        Utility.expand_data_temporally(
+            data_to_expand={},
+            simulation_length=5,
+        )
+
+
+def test_expand_data_temporally_logs_warning_for_mismatched_complex_fill_value() -> None:
+    """Tests complex data with mismatched fill_value type logs a warning and fills with last reported values."""
+    data_to_expand: dict[str, dict[str, list[Any]]] = {
+        "a": {
+            "values": [{"x": 1}, {"x": 2}],
+            "info_maps": [
+                {"simulation_day": 1, "units": "kg"},
+                {"simulation_day": 3, "units": "kg"},
+            ],
+        }
+    }
+
+    actual_data, actual_logs = Utility.expand_data_temporally(
+        data_to_expand=data_to_expand,
+        simulation_length=4,
+        fill_value="bad fill value",
+        use_fill_value_before_start=True,
+        use_fill_value_in_gaps=True,
+        use_fill_value_at_end=True,
+        expand_data_to_observed_range=False,
+    )
+
+    expected_data = {
+        "a": {
+            "values": [
+                {"x": 1},
+                {"x": 1},
+                {"x": 1},
+                {"x": 2},
+                {"x": 2},
+            ],
+            "info_maps": [
+                {"simulation_day": 0, "units": "kg"},
+                {"simulation_day": 1, "units": "kg"},
+                {"simulation_day": 2, "units": "kg"},
+                {"simulation_day": 3, "units": "kg"},
+                {"simulation_day": 4, "units": "kg"},
+            ],
+        }
+    }
+    expected_logs = [
+        {
+            "warning": "Data expansion fill warning",
+            "message": (
+                "User-provided fill value type <class 'str'> does not match "
+                "type of data to be expanded <class 'dict'>, "
+                "filling with last reported value."
+            ),
+            "info_map": {
+                "class": "Utility",
+                "function": "expand_data_temporally",
+            },
+        }
+    ]
+
+    assert actual_data == expected_data
+    assert actual_logs == expected_logs
+
+
 @pytest.mark.parametrize(
     "data_to_expand,expected",
     [

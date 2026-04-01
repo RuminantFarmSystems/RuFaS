@@ -227,22 +227,21 @@ class Utility:
             if data["values"]:
                 first_value = data["values"][0]
 
-                if isinstance(first_value, (dict, list, tuple)):
-                    if not isinstance(fill_value, type(first_value)):
-                        start_fill = False
-                        gap_fill = False
-                        end_fill = False
-                        fill_warning: dict[str, str | dict[str, str]] = {
-                            "warning": "Data expansion fill warning",
-                            "message": f"User-provided fill value type {type(fill_value)} does not match "
-                            f"type of data to be expanded {type(first_value)}, "
-                            "filling with last reported value.",
-                            "info_map": {
-                                "class": Utility.__name__,
-                                "function": Utility.expand_data_temporally.__name__,
-                            },
-                        }
-                        log_pool.append(fill_warning)
+                if isinstance(first_value, (dict, list, tuple)) and not isinstance(fill_value, type(first_value)):
+                    start_fill = False
+                    gap_fill = False
+                    end_fill = False
+                    fill_warning: dict[str, str | dict[str, str]] = {
+                        "warning": "Data expansion fill warning",
+                        "message": f"User-provided fill value type {type(fill_value)} does not match "
+                        f"type of data to be expanded {type(first_value)}, "
+                        "filling with last reported value.",
+                        "info_map": {
+                            "class": Utility.__name__,
+                            "function": Utility.expand_data_temporally.__name__,
+                        },
+                    }
+                    log_pool.append(fill_warning)
 
             indexed_data = {
                 info_map["simulation_day"]: (value, info_map)
