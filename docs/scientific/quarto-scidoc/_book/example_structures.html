@@ -265,13 +265,13 @@ Table&nbsp;2.1: Example animal inputs
 </section>
 <section id="examples-of-equations" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="examples-of-equations"><span class="header-section-number">2.2.3</span> Examples of Equations</h3>
-<div id="eqn-an-nrc-2">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
-</div>
-<div id="eqn-an-nrc-2">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}\]</span></p>
-</div>
-<p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
+<p><span id="eq-an-nrc-2"><span class="math display">\[
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+\tag{2.1}\]</span></span></p>
+<p><span id="eq-an-nrc-6"><span class="math display">\[
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+\tag{2.2}\]</span></span></p>
+<p>See <a href="animal.html#eq-an-nrc-2" class="quarto-xref">Equation&nbsp;<span>3.1</span></a>.</p>
 </section>
 </section>
 <section id="key-inputs" class="level2" data-number="2.3">
@@ -288,47 +288,47 @@ Table&nbsp;2.1: Example animal inputs
 <ul>
 <li><p><strong><em>Maintenance</em></strong> - The maintenance requirement is calculated based on metabolic body weight (body weight<span class="math inline">\(^{0.75}\)</span>).</p>
 <p><u>Lactating and Dry Cows</u></p>
-<p><span id="eq-nrc-cbw"><span class="math display">\[CBW = MW * 0.06275 \tag{3.1}\]</span></span></p>
-<p><span id="eq-nrc-cw"><span class="math display">\[ CW = {(18 + (DOP - 190) * 0.665) * (\frac{CBW}{45}),\text{if}DOP &gt; 190.0}  \tag{3.2}\]</span></span></p>
+<p><span id="eq-nrc-cbw"><span class="math display">\[
+CBW = MW * 0.06275
+\tag{3.1}\]</span></span></p>
+<p><span id="eq-nrc-cw"><span class="math display">\[
+CW = {(18 + (DOP - 190) * 0.665) * \left(\frac{CBW}{45}\right), \text{if } DOP &gt; 190.0}
+\tag{3.2}\]</span></span></p>
 <p><em>Otherwise</em></p>
-<p><span id="eq-nrc-ne-maint"><span class="math display">\[ NEmaint = 0.08 \times (BW - CW)^{0.75}  \tag{3.3}\]</span></span></p></li>
+<p><span id="eq-nrc-ne-maint"><span class="math display">\[
+NEmaint = 0.08 \times (BW - CW)^{0.75}
+\tag{3.3}\]</span></span></p></li>
 </ul>
 </section>
 <section id="reformatted-equations" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="reformatted-equations"><span class="header-section-number">3.2</span> Reformatted equations</h2>
 <p><a href="#eq-nrc-cbw" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> may be visually improved by using the <code>\times</code> LaTeX command:</p>
-<p><span class="math display">\[CBW = MW \times 0.06275\]</span></p>
+<p><span id="eq-nrc-cbw-times"><span class="math display">\[
+CBW = MW \times 0.06275
+\tag{3.4}\]</span></span></p>
 </section>
 <section id="use-alphanumeric-equation-labels" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="use-alphanumeric-equation-labels"><span class="header-section-number">3.3</span> Use alphanumeric equation labels</h2>
-<p>Though quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \tag latex command. <em>And</em> the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):</p>
-<div id="eqn-an-nrc-2">
-<p><span class="math display">\[ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}\]</span></p>
-</div>
-<p>see <span class="citation" data-cites="eqn-an-nrc-2">(<a href="#ref-eqn-an-nrc-2" role="doc-biblioref"><strong>eqn-an-nrc-2?</strong></a>)</span></p>
+<p>Though Quarto does not allow custom cross-reference labels, you can include your own non-CR label with the <code>\tag</code> LaTeX command. The equation can still be cross-referenceable using a standard Quarto equation ID.</p>
+<p><span id="eq-an-nrc-2-tagged"><span class="math display">\[
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+\tag{3.5}\]</span></span></p>
+<p>See <a href="#eq-an-nrc-2-tagged" class="quarto-xref">Equation&nbsp;<span>3.5</span></a>.</p>
 </section>
 <section id="other-equation-templates" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="other-equation-templates"><span class="header-section-number">3.4</span> Other equation Templates</h2>
-<!-- Inline equations -->
 <p>The energy balance is <span class="math inline">\(E = mc^2\)</span>.</p>
-<!-- display centered, on its own line 
-gets numbered automatically in PDF 
-Referencing equations - start with creating a label -->
 <p><span id="eq-energy"><span class="math display">\[
-\begin{equation}
 E = mc^2
-\end{equation}
-\tag{3.4}\]</span></span></p>
-<!-- reference that label -->
-<p>See Equation <a href="#eq-energy" class="quarto-xref">Equation&nbsp;<span>3.4</span></a>. <!-- additional example --> <span id="eq-nutrient-proportion"><span class="math display">\[
-\begin{equation}
+\tag{3.6}\]</span></span></p>
+<p>See Equation <a href="#eq-energy" class="quarto-xref">Equation&nbsp;<span>3.6</span></a>.</p>
+<p><span id="eq-nutrient-proportion"><span class="math display">\[
 \text{nutrient\_proportion\_to\_be\_removed} =
 \min\left(
 \frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
 1
 \right)
-\end{equation}
-\tag{3.5}\]</span></span></p>
+\tag{3.7}\]</span></span></p>
 
 
 </section>

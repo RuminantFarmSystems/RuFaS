@@ -9,45 +9,38 @@ This is a great example of how to set up a module.
 <!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
 
-
 ### Example of a Table
+
 | Variable | Definition |
 |---|---|
 | heiferI_num | Number of Heifer I animals |
 
 : Example animal inputs {#tbl-animal-inputs}
 
-
 ### Examples of Equations
-:::{#eqn-an-nrc-2}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
-:::
 
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+$$ {#eq-an-nrc-2}
 
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}
+$$ {#eq-an-nrc-3}
 
-:::{#eqn-an-nrc-3}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}$$
-:::
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}
+$$ {#eq-an-nrc-4}
 
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}
+$$ {#eq-an-nrc-5}
 
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}
+$$ {#eq-an-nrc-1}
 
-:::{#eqn-an-nrc-4}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}$$
-:::
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+$$ {#eq-an-nrc-6}
 
-
-
-:::{#eqn-an-nrc-5}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}$$
-:::
-
-
-
-:::{#eqn-an-nrc-1}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}$$
-:::
-
-:::{#eqn-an-nrc-2}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}$$
-:::
-see @eqn-an-nrc-2
+See @eq-an-nrc-2.

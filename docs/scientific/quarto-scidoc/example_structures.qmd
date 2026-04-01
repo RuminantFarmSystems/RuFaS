@@ -1,10 +1,11 @@
 # Example Inserts
 
 ## Introduction
+
 This is a section that should be included in all modules. 
 
-
 ## Methodology
+
 This is a section that should be included in all modules. 
 Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.
 
@@ -15,29 +16,29 @@ This is a great example of how to set up a module.
 <!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
 
-
 ### Example of a Table
+
 | Variable | Definition |
 |---|---|
 | heiferI_num | Number of Heifer I animals |
 
 : Example animal inputs {#tbl-animal-inputs}
 
-
 ### Examples of Equations
-:::{#eqn-an-nrc-2}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
-:::
 
-:::{#eqn-an-nrc-2}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}$$
-:::
-see @eqn-an-nrc-2
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+$$ {#eq-an-nrc-2}
+
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+$$ {#eq-an-nrc-6}
+
+See @eq-an-nrc-2.
 
 ## Key Inputs
 
 ## References
-
 
 # Equation examples (from Animal Documentation)
 
@@ -50,59 +51,56 @@ calculation, please refer to the [energykey](energy requirements key).
 
   [Lactating and Dry Cows]{.underline}
   
-  $$CBW = MW * 0.06275$$ {#eq-nrc-cbw}
+  $$
+  CBW = MW * 0.06275
+  $$ {#eq-nrc-cbw}
   
-  $$ CW = {(18 + (DOP - 190) * 0.665) * (\frac{CBW}{45}),\text{if}DOP > 190.0} $$ {#eq-nrc-cw}
+  $$
+  CW = {(18 + (DOP - 190) * 0.665) * \left(\frac{CBW}{45}\right), \text{if } DOP > 190.0}
+  $$ {#eq-nrc-cw}
   
   *Otherwise*
   
-  $$ NEmaint = 0.08 \times (BW - CW)^{0.75} $$ {#eq-nrc-ne-maint}
+  $$
+  NEmaint = 0.08 \times (BW - CW)^{0.75}
+  $$ {#eq-nrc-ne-maint}
 
 ## Reformatted equations
 
 @eq-nrc-cbw may be visually improved by using the `\times` LaTeX
-command: 
+command:
 
-$$CBW = MW \times 0.06275$$
+$$
+CBW = MW \times 0.06275
+$$ {#eq-nrc-cbw-times}
 
 ## Use alphanumeric equation labels
 
-Though quarto does not allow custom cross-reference labels, you can
-include your own non-CR label with the \\tag latex command. *And* the
-equation can still be cross-referenceable (and assigned a dynamic 
-equation number) by using a custom cross-reference class (defined in _quarto.yml):
+Though Quarto does not allow custom cross-reference labels, you can
+include your own non-CR label with the `\tag` LaTeX command. The
+equation can still be cross-referenceable using a standard Quarto
+equation ID.
 
-:::{#eqn-an-nrc-2}
-$$ CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}$$
-:::
+$$
+CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+$$ {#eq-an-nrc-2-tagged}
 
-see @eqn-an-nrc-2
-
-
+See @eq-an-nrc-2-tagged.
 
 ## Other equation Templates
-<!-- Inline equations -->
+
 The energy balance is $E = mc^2$.
 
-<!-- display centered, on its own line 
-gets numbered automatically in PDF 
-Referencing equations - start with creating a label -->
-
 $$
-\begin{equation}
 E = mc^2
-\end{equation}
 $$ {#eq-energy}
 
-<!-- reference that label -->
 See Equation @eq-energy.
-<!-- additional example -->
+
 $$
-\begin{equation}
 \text{nutrient\_proportion\_to\_be\_removed} =
 \min\left(
 \frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
 1
 \right)
-\end{equation}
 $$ {#eq-nutrient-proportion}

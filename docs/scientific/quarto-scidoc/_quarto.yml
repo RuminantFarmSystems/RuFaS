@@ -22,14 +22,20 @@ format:
     theme: cosmo
     css: styles.css
   pdf:
-    documentclass: scrreprt
     pdf-engine: xelatex
-    include-in-header: preamble.tex
+    documentclass: scrbook
+    classoption:
+      - oneside
+      - openany
+    papersize: letter
+    margin-top: 1in
+    margin-bottom: 1in
+    margin-left: 1in
+    margin-right: 1in
     toc: true
     toc-depth: 2
     toc-title: "Contents"
     lof: true
     lot: true
-    number-sections: true    
-  epub:
-    cover-image: rufas.png
+    number-sections: true
+    keep-tex: true

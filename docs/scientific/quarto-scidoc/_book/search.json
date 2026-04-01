@@ -10,96 +10,6 @@
     ]
   },
   {
-    "objectID": "equations.html",
-    "href": "equations.html",
-    "title": "2  Equation examples (from Animal Documentation)",
-    "section": "",
-    "text": "2.1 Nutrient Requirements of Dairy Cattle (NRC)\nEnergy Requirements For details about the variables included in each calculation, please refer to the energykey.",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
-    ]
-  },
-  {
-    "objectID": "equations.html#sec-nrc",
-    "href": "equations.html#sec-nrc",
-    "title": "2  Equation examples (from Animal Documentation)",
-    "section": "",
-    "text": "Maintenance - The maintenance requirement is calculated based on metabolic body weight (body weight\\(^{0.75}\\)).\nLactating and Dry Cows\n\\[CBW = MW * 0.06275 \\tag{2.1}\\]\n\\[ CW = {(18 + (DOP - 190) * 0.665) * (\\frac{CBW}{45}),\\text{if}DOP &gt; 190.0}  \\tag{2.2}\\]\nOtherwise\n\\[ NEmaint = 0.08 \\times (BW - CW)^{0.75}  \\tag{2.3}\\]",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
-    ]
-  },
-  {
-    "objectID": "equations.html#reformatted-equations",
-    "href": "equations.html#reformatted-equations",
-    "title": "2  Equation examples (from Animal Documentation)",
-    "section": "2.2 Reformatted equations",
-    "text": "2.2 Reformatted equations\nEquation 2.1 may be visually improved by using the \\times LaTeX command:\n\\[CBW = MW \\times 0.06275\\]",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
-    ]
-  },
-  {
-    "objectID": "equations.html#use-alphanumeric-equation-labels",
-    "href": "equations.html#use-alphanumeric-equation-labels",
-    "title": "2  Equation examples (from Animal Documentation)",
-    "section": "2.3 Use alphanumeric equation labels",
-    "text": "2.3 Use alphanumeric equation labels\nThough quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \\tag latex command. And the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\\]\n\nsee (eqn-an-nrc-2?)",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
-    ]
-  },
-  {
-    "objectID": "equations.html#other-equation-templates",
-    "href": "equations.html#other-equation-templates",
-    "title": "2  Equation examples (from Animal Documentation)",
-    "section": "2.4 Other equation Templates",
-    "text": "2.4 Other equation Templates\n\nThe energy balance is \\(E = mc^2\\).\n\n\\[\n\\begin{equation}\nE = mc^2\n\\end{equation}\n\\tag{2.4}\\]\n\nSee Equation Equation 2.4.  \\[\n\\begin{equation}\n\\text{nutrient\\_proportion\\_to\\_be\\_removed} =\n\\min\\left(\n\\frac{\\text{mass\\_requested\\_nutrient}}{\\text{manure\\_nutrient\\_available}},\n1\n\\right)\n\\end{equation}\n\\tag{2.5}\\]",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Equation examples (from Animal Documentation)</span>"
-    ]
-  },
-  {
-    "objectID": "animal.html",
-    "href": "animal.html",
-    "title": "3  Animal Module",
-    "section": "",
-    "text": "3.1 Introduction",
-    "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
-    ]
-  },
-  {
-    "objectID": "animal.html#introduction",
-    "href": "animal.html#introduction",
-    "title": "3  Animal Module",
-    "section": "",
-    "text": "3.1.1 Example of a Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\n\nFigure 3.1: Animal module icon\n\n\n\n\n\n3.1.2 Example of a Table\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals\n\n\n\n\n\n\n\n\n3.1.3 Examples of Equations\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.3}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.4}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.5}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.1}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.6}}\\]\n\nsee (eqn-an-nrc-2?)",
-    "crumbs": [
-      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
-    ]
-  },
-  {
-    "objectID": "manure.html",
-    "href": "manure.html",
-    "title": "4  Manure Module",
-    "section": "",
-    "text": "4.1 Introduction",
-    "crumbs": [
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Manure Module</span>"
-    ]
-  },
-  {
-    "objectID": "manure.html#introduction",
-    "href": "manure.html#introduction",
-    "title": "4  Manure Module",
-    "section": "",
-    "text": "4.1.1 Example of a Figure\n\n\n\n\n\n\n4.1.2 Example of a Table\n\n\n\nTable 4.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
-    "crumbs": [
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Manure Module</span>"
-    ]
-  },
-  {
     "objectID": "example_structures.html",
     "href": "example_structures.html",
     "title": "2  Example Inserts",
@@ -114,7 +24,7 @@
     "href": "example_structures.html#methodology",
     "title": "2  Example Inserts",
     "section": "2.2 Methodology",
-    "text": "2.2 Methodology\nThis is a section that should be included in all modules. Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.\n\n2.2.1 Example of a Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\n\nFigure 2.1: Animal module icon\n\n\n\n\n\n2.2.2 Example of a Table\n\n\n\nTable 2.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals\n\n\n\n\n\n\n\n\n2.2.3 Examples of Equations\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\\]\n\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.6}}\\]\n\nsee (eqn-an-nrc-2?)",
+    "text": "2.2 Methodology\nThis is a section that should be included in all modules. Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.\n\n2.2.1 Example of a Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\n\nFigure 2.1: Animal module icon\n\n\n\n\n\n2.2.2 Example of a Table\n\n\n\nTable 2.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals\n\n\n\n\n\n\n\n\n2.2.3 Examples of Equations\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\n\\tag{2.1}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.6}}\n\\tag{2.2}\\]\nSee Equation 3.1.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Example Inserts</span>"
     ]
@@ -144,7 +54,7 @@
     "href": "example_structures.html#sec-nrc",
     "title": "2  Example Inserts",
     "section": "3.1 Nutrient Requirements of Dairy Cattle (NRC)",
-    "text": "3.1 Nutrient Requirements of Dairy Cattle (NRC)\nEnergy Requirements For details about the variables included in each calculation, please refer to the energykey.\n\nMaintenance - The maintenance requirement is calculated based on metabolic body weight (body weight\\(^{0.75}\\)).\nLactating and Dry Cows\n\\[CBW = MW * 0.06275 \\tag{3.1}\\]\n\\[ CW = {(18 + (DOP - 190) * 0.665) * (\\frac{CBW}{45}),\\text{if}DOP &gt; 190.0}  \\tag{3.2}\\]\nOtherwise\n\\[ NEmaint = 0.08 \\times (BW - CW)^{0.75}  \\tag{3.3}\\]",
+    "text": "3.1 Nutrient Requirements of Dairy Cattle (NRC)\nEnergy Requirements For details about the variables included in each calculation, please refer to the energykey.\n\nMaintenance - The maintenance requirement is calculated based on metabolic body weight (body weight\\(^{0.75}\\)).\nLactating and Dry Cows\n\\[\nCBW = MW * 0.06275\n\\tag{3.1}\\]\n\\[\nCW = {(18 + (DOP - 190) * 0.665) * \\left(\\frac{CBW}{45}\\right), \\text{if } DOP &gt; 190.0}\n\\tag{3.2}\\]\nOtherwise\n\\[\nNEmaint = 0.08 \\times (BW - CW)^{0.75}\n\\tag{3.3}\\]",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Example Inserts</span>"
     ]
@@ -154,7 +64,7 @@
     "href": "example_structures.html#reformatted-equations",
     "title": "2  Example Inserts",
     "section": "3.2 Reformatted equations",
-    "text": "3.2 Reformatted equations\nEquation 3.1 may be visually improved by using the \\times LaTeX command:\n\\[CBW = MW \\times 0.06275\\]",
+    "text": "3.2 Reformatted equations\nEquation 3.1 may be visually improved by using the \\times LaTeX command:\n\\[\nCBW = MW \\times 0.06275\n\\tag{3.4}\\]",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Example Inserts</span>"
     ]
@@ -164,7 +74,7 @@
     "href": "example_structures.html#use-alphanumeric-equation-labels",
     "title": "2  Example Inserts",
     "section": "3.3 Use alphanumeric equation labels",
-    "text": "3.3 Use alphanumeric equation labels\nThough quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \\tag latex command. And the equation can still be cross-referenceable (and assigned a dynamic equation number) by using a custom cross-reference class (defined in _quarto.yml):\n\n\\[ CBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\\]\n\nsee (eqn-an-nrc-2?)",
+    "text": "3.3 Use alphanumeric equation labels\nThough Quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \\tag LaTeX command. The equation can still be cross-referenceable using a standard Quarto equation ID.\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\n\\tag{3.5}\\]\nSee Equation 3.5.",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Example Inserts</span>"
     ]
@@ -174,9 +84,49 @@
     "href": "example_structures.html#other-equation-templates",
     "title": "2  Example Inserts",
     "section": "3.4 Other equation Templates",
-    "text": "3.4 Other equation Templates\n\nThe energy balance is \\(E = mc^2\\).\n\n\\[\n\\begin{equation}\nE = mc^2\n\\end{equation}\n\\tag{3.4}\\]\n\nSee Equation Equation 3.4.  \\[\n\\begin{equation}\n\\text{nutrient\\_proportion\\_to\\_be\\_removed} =\n\\min\\left(\n\\frac{\\text{mass\\_requested\\_nutrient}}{\\text{manure\\_nutrient\\_available}},\n1\n\\right)\n\\end{equation}\n\\tag{3.5}\\]",
+    "text": "3.4 Other equation Templates\nThe energy balance is \\(E = mc^2\\).\n\\[\nE = mc^2\n\\tag{3.6}\\]\nSee Equation Equation 3.6.\n\\[\n\\text{nutrient\\_proportion\\_to\\_be\\_removed} =\n\\min\\left(\n\\frac{\\text{mass\\_requested\\_nutrient}}{\\text{manure\\_nutrient\\_available}},\n1\n\\right)\n\\tag{3.7}\\]",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html",
+    "href": "animal.html",
+    "title": "3  Animal Module",
+    "section": "",
+    "text": "3.1 Introduction",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#introduction",
+    "href": "animal.html#introduction",
+    "title": "3  Animal Module",
+    "section": "",
+    "text": "3.1.1 Example of a Figure\nThis is a great example of how to set up a module.\n\n\n\n\n\n\n\nFigure 3.1: Animal module icon\n\n\n\n\n\n3.1.2 Example of a Table\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals\n\n\n\n\n\n\n\n\n3.1.3 Examples of Equations\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.2}}\n\\tag{3.1}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.3}}\n\\tag{3.2}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.4}}\n\\tag{3.3}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.5}}\n\\tag{3.4}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.1}}\n\\tag{3.5}\\]\n\\[\nCBW = MW * 0.06275 \\tag{\\textbf{AN.NRC.6}}\n\\tag{3.6}\\]\nSee Equation 3.1.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "manure.html",
+    "href": "manure.html",
+    "title": "4  Manure Module",
+    "section": "",
+    "text": "4.1 Introduction",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Manure Module</span>"
+    ]
+  },
+  {
+    "objectID": "manure.html#introduction",
+    "href": "manure.html#introduction",
+    "title": "4  Manure Module",
+    "section": "",
+    "text": "4.1.1 Example of a Figure\n\n\n\n\n\n\n4.1.2 Example of a Table\n\n\n\nTable 4.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Manure Module</span>"
     ]
   }
 ]
