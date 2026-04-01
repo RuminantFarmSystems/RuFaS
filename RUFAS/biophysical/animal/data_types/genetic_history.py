@@ -12,62 +12,22 @@ class GeneticHistory(TypedDict):
 
     Attributes
     ----------
-    simulation_day : int
-        The day of the simulation corresponding to the genetic record of the animal.
+    start_day : int
+        The simulation day corresponding to the start of the genetic record of the animal.
+    end_day : int
+        The simulation day corresponding to the end of the genetic record of the animal.
     id : int
         The unique identifier of the animal.
-    days_born : int
-        The number of days since the birth of the animal.
     animal_type : AnimalType
-        The type of animal, (unitless).
-    days_in_milk : int
-        The number of days the animal has been in milk production, (simulation days).
-    days_in_pregnancy : int
-        The number of days the animal has been pregnant, (simulation days).
-    parity : int
-        The number of times the animal has given birth.
-    TBV_fat : float
-        The True Breed Value for fat of the animal, (kg).
-    TBV_protein : float
-        The True Breed Value for protein of the animal, (kg).
-    E_permanent_fat : float
-        The Permanent Environment Effect for fat of the animal, (kg).
-    E_permanent_protein : float
-        The Permanent Environment Effect for protein of the animal, (kg).
-    E_temporary_fat : float
-        The Temporary Environment Effect for fat of the animal, (kg).
-    E_temporary_protein : float
-        The Temporary Environment Effect for protein of the animal, (kg).
-    phenotype_fat : float
-        The fat phenotype of the animal, (kg).
-    phenotype_protein : float
-        The protein phenotype of the animal, (kg).
-    EBV_fat : float
-        The Estimated Breeding Value for fat of the animal, (kg).
-    EBV_protein : float
-        The Estimated Breeding Value for protein of the animal, (kg).
-    ranking_index : float
-        The ranking index of the animal, (unitless).
+        The type of animal.
+    genetics: dict[str, float]
+        Dictionary containing the genetic attributes of the animal.
     """
 
-    simulation_day: int
+    start_day: int
+    end_day: int
 
     id: int
-    days_born: int
     animal_type: AnimalType
-    days_in_milk: int
-    days_in_pregnancy: int
-    parity: int
 
-    TBV_fat: float
-    TBV_protein: float
-    E_permanent_fat: float
-    E_permanent_protein: float
-
-    E_temporary_fat: float
-    E_temporary_protein: float
-    phenotype_fat: float
-    phenotype_protein: float
-    EBV_fat: float
-    EBV_protein: float
-    ranking_index: float
+    genetics: dict[str, float]

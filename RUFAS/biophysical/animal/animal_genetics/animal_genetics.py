@@ -260,3 +260,19 @@ class Genetics:
             sum([genetic.TBV_fat for genetic in list_of_genetics]) / num_animals if num_animals > 0 else 0.0,
             sum([genetic.TBV_protein for genetic in list_of_genetics]) / num_animals if num_animals > 0 else 0.0,
         )
+
+    def to_dict(self) -> dict[str, float]:
+        """Return dictionary representation of the genetics properties of the animal."""
+        return {
+            "TBV_fat": self.TBV_fat,
+            "TBV_protein": self.TBV_protein,
+            "E_permanent_fat": self.E_permanent_fat,
+            "E_permanent_protein": self.E_permanent_protein,
+            "E_temporary_fat": self.E_temporary_fat,
+            "E_temporary_protein": self.E_temporary_protein,
+            "phenotype_fat": self.phenotype_fat,
+            "phenotype_protein": self.phenotype_protein,
+            "EBV_fat": self.EBV_fat,
+            "EBV_protein": self.EBV_protein,
+            "ranking_index": self.ranking_index,
+        }

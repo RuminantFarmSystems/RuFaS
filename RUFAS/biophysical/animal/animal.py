@@ -2422,36 +2422,25 @@ class Animal:
         return requirements
 
     def update_genetic_history(self, simulation_day: int) -> None:
-        if simulation_day not in [data_point["simulation_day"] for data_point in self.genetic_history]:
+        if len(self.genetic_history) == 0 or self.genetic_history[-1] != self.genetics.to_dict():
             self.genetic_history.append(
                 GeneticHistory(
-                    simulation_day=simulation_day,
+                    start_day=simulation_day,
+                    end_day=simulation_day,
                     id=self.id,
-                    days_born=self.days_born,
                     animal_type=self.animal_type,
-                    days_in_milk=self.days_in_milk,
-                    days_in_pregnancy=self.days_in_pregnancy,
-                    parity=self.calves,
-                    TBV_fat=self.genetics.TBV_fat,
-                    TBV_protein=self.genetics.TBV_protein,
-                    E_permanent_fat=self.genetics.E_permanent_fat,
-                    E_permanent_protein=self.genetics.E_permanent_protein,
-                    E_temporary_fat=self.genetics.E_temporary_fat,
-                    E_temporary_protein=self.genetics.E_temporary_protein,
-                    phenotype_fat=self.genetics.phenotype_fat,
-                    phenotype_protein=self.genetics.phenotype_protein,
-                    EBV_fat=self.genetics.EBV_fat,
-                    EBV_protein=self.genetics.EBV_protein,
-                    ranking_index=self.genetics.ranking_index,
+                    genetics=self.genetics.to_dict(),
                 )
             )
         else:
-            om = OutputManager()
-            om.add_warning(
-                "Duplicate Genetic History Entry",
-                f"Animal {self.id} already has a genetic history entry on day {simulation_day}.",
-                {
-                    "class": Animal.__name__,
-                    "function": Animal.update_genetic_history.__name__,
-                },
-            )
+            if simulation_day == self.genetic_history[-1]["end_day"]:
+                om = OutputManager()
+                om.add_warning(
+                    "Duplicate Genetic History Entry",
+                    f"Animal {self.id} already has a genetic history entry on day {simulation_day}.",
+                    {
+                        "class": Animal.__name__,
+                        "function": Animal.update_genetic_history.__name__,
+                    },
+                )
+            self.genetic_history[-1]["end_day"] = simulation_day
