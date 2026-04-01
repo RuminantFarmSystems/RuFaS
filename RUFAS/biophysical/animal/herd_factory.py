@@ -54,7 +54,7 @@ class HerdFactory:
         after random sampling with replacement.
     """
 
-    post_animal_population: AnimalPopulation = None
+    post_animal_population: AnimalPopulation | None = None
 
     def __init__(
         self,
