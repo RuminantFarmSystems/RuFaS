@@ -20,27 +20,27 @@ This is a great example of how to set up a module.
 ### Examples of Equations
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
 $$ {#eq-an-nrc-2}
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.3)}
 $$ {#eq-an-nrc-3}
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.4)}
 $$ {#eq-an-nrc-4}
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.5)}
 $$ {#eq-an-nrc-5}
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
 $$ {#eq-an-nrc-1}
 
 $$
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
 $$ {#eq-an-nrc-6}
 
 See @eq-an-nrc-2.

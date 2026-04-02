@@ -153,6 +153,28 @@
  
 
 
+% preamble.tex
+
+% Language / paragraph style
+\usepackage[english]{babel}
+\setlength{\parindent}{0pt}
+
+% Core packages
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{longtable}
+\makeatletter
+\renewcommand{\tagform@}[1]{}
+\makeatother
+
+% Fonts: Arial-like / Calibri-like via XeLaTeX
+\usepackage{fontspec}
+\setmainfont{Arial}
+\setsansfont{Arial}
+
+% If Arial fails on your machine, replace both lines above with:
+% \setmainfont{TeX Gyre Heros}
+% \setsansfont{TeX Gyre Heros}
 \makeatletter
 \@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
 \@ifpackageloaded{fontawesome5}{}{\usepackage{fontawesome5}}
@@ -481,11 +503,11 @@ heiferI\_num & Number of Heifer I animals \\
 \subsection{Examples of Equations}\label{examples-of-equations}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
 }\end{equation}
 
 See Equation~\ref{eq-an-nrc-2}.
@@ -545,7 +567,7 @@ LaTeX command. The equation can still be cross-referenceable using a
 standard Quarto equation ID.
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2-tagged}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+CBW = MW * 0.06275 \tag{AN.NRC.2}
 }\end{equation}
 
 See Equation~\ref{eq-an-nrc-2-tagged}.
@@ -610,27 +632,27 @@ heiferI\_num & Number of Heifer I animals \\
 \subsection{Examples of Equations}\label{examples-of-equations-1}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.2}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-3}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.3}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.3)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-4}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.4}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.4)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-5}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.5}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.5)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-1}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.1}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
 }\end{equation}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \tag{\textbf{AN.NRC.6}}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
 }\end{equation}
 
 See Equation~\ref{eq-an-nrc-2}.

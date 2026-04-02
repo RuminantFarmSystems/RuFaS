@@ -80,6 +80,23 @@ CROSSREF_PREFIXES = (
     "apx-",
 )
 
+# Display equations with Quarto equation labels, e.g.
+# $$
+# E = mc^2 \qquad \text{(AN.NRC.2)}
+# $$ {#eq-an-nrc-2}
+DISPLAY_EQUATION_RE = re.compile(
+    r"\$\$(?P<body>.*?)\$\$\s*\{#(?P<eq_id>eq-[A-Za-z0-9][A-Za-z0-9:_-]*)\}",
+    re.DOTALL,
+)
+
+# Visible custom IDs inside equation text, preferred pattern
+# \text{(AN.NRC.2)}
+EQ_CUSTOM_TEXT_RE = re.compile(r"\\text\s*\{\s*\(([^(){}]+)\)\s*\}")
+
+# Optional fallback if any old \tag{...} still remains
+EQ_CUSTOM_TAG_RE = re.compile(r"\\tag\s*\{\s*([^{}]+?)\s*\}")
+
+
 # ------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------
@@ -189,6 +206,27 @@ def classify_link_target(target: str) -> str:
 
 def normalize_link_target(target: str) -> str:
     return target.strip().split()[0]
+
+def normalize_custom_equation_id(raw: str) -> str:
+    raw = raw.strip()
+
+    # Strip simple wrappers like \textbf{...}, \mathrm{...}, \mathbf{...}
+    wrapper_re = re.compile(r"\\(?:textbf|mathrm|mathbf|textrm)\s*\{([^{}]+)\}")
+    while True:
+        m = wrapper_re.fullmatch(raw)
+        if not m:
+            break
+        raw = m.group(1).strip()
+
+    raw = raw.strip("()[]{} ")
+    return raw
+
+
+def expected_custom_equation_id(eq_id: str) -> str:
+    # eq-an-nrc-2 -> AN.NRC.2
+    core = eq_id[3:] if eq_id.startswith("eq-") else eq_id
+    return core.replace("-", ".").upper()
+
 
 # ------------------------------------------------------------
 # Extractors
@@ -345,6 +383,43 @@ def extract_hyperlinks(text: str, relpath: str) -> list[dict]:
 
     return dedupe_rows(rows, ("link_text", "target", "file", "line"))
 
+def extract_equation_registry(text: str, relpath: str) -> list[dict]:
+    rows: list[dict] = []
+    lines = text.splitlines()
+
+    for match in DISPLAY_EQUATION_RE.finditer(text):
+        eq_body = match.group("body").strip()
+        eq_id = match.group("eq_id")
+        lineno = line_number(text, match.start())
+
+        custom_id = None
+
+        text_match = EQ_CUSTOM_TEXT_RE.search(eq_body)
+        if text_match:
+            custom_id = normalize_custom_equation_id(text_match.group(1))
+        else:
+            tag_match = EQ_CUSTOM_TAG_RE.search(eq_body)
+            if tag_match:
+                custom_id = normalize_custom_equation_id(tag_match.group(1))
+
+        expected_id = expected_custom_equation_id(eq_id)
+
+        rows.append(
+            {
+                "eq_id": eq_id,
+                "custom_id": custom_id or "",
+                "expected_custom_id": expected_id,
+                "matches_expected": "YES" if custom_id == expected_id else "NO",
+                "has_custom_id": "YES" if custom_id else "NO",
+                "file": relpath,
+                "line": lineno,
+                "equation_body": " ".join(eq_body.split()),
+                "context": line_context(lines, lineno - 1),
+            }
+        )
+
+    return dedupe_rows(rows, ("eq_id", "file", "line"))
+
 # ------------------------------------------------------------
 # Excel writer
 # ------------------------------------------------------------
@@ -372,6 +447,7 @@ def add_sheet(wb: Workbook, title: str, headers: list[str], rows: list[dict]) ->
 # ------------------------------------------------------------
 # Main
 # ------------------------------------------------------------
+
 def main() -> None:
     if not PROJECT_ROOT.exists():
         raise FileNotFoundError(f"Project root not found: {PROJECT_ROOT}")
@@ -384,6 +460,7 @@ def main() -> None:
     bib_citations: list[dict] = []
     bib_entries: list[dict] = []
     hyperlinks: list[dict] = []
+    equations: list[dict] = []
     declared_bib_paths: set[Path] = set()
 
     for file_path in qmd_files:
@@ -393,6 +470,7 @@ def main() -> None:
         label_refs.extend(extract_label_references(text, relpath))
         bib_citations.extend(extract_bib_citations(text, relpath))
         hyperlinks.extend(extract_hyperlinks(text, relpath))
+        equations.extend(extract_equation_registry(text, relpath))
         declared_bib_paths.update(extract_declared_bib_paths(text, file_path))
 
     for bib_file in bib_files:
@@ -544,6 +622,67 @@ def main() -> None:
                 }
             )
 
+        eqid_to_rows: dict[str, list[dict]] = defaultdict(list)
+    for row in equations:
+        eqid_to_rows[row["eq_id"]].append(row)
+
+    customeq_to_rows: dict[str, list[dict]] = defaultdict(list)
+    for row in equations:
+        if row["custom_id"]:
+            customeq_to_rows[row["custom_id"]].append(row)
+
+    missing_equation_custom_ids: list[dict] = []
+    equation_id_mismatches: list[dict] = []
+    duplicate_equation_custom_ids: list[dict] = []
+    duplicate_equation_custom_groups: list[dict] = []
+
+    for row in equations:
+        if not row["custom_id"]:
+            missing_equation_custom_ids.append(
+                {
+                    "eq_id": row["eq_id"],
+                    "expected_custom_id": row["expected_custom_id"],
+                    "file": row["file"],
+                    "line": row["line"],
+                    "equation_body": row["equation_body"],
+                    "context": row["context"],
+                }
+            )
+        elif row["custom_id"] != row["expected_custom_id"]:
+            equation_id_mismatches.append(
+                {
+                    "eq_id": row["eq_id"],
+                    "custom_id": row["custom_id"],
+                    "expected_custom_id": row["expected_custom_id"],
+                    "file": row["file"],
+                    "line": row["line"],
+                    "equation_body": row["equation_body"],
+                    "context": row["context"],
+                }
+            )
+
+    for custom_id, rows in sorted(customeq_to_rows.items()):
+        if len(rows) > 1:
+            duplicate_equation_custom_groups.append(
+                {
+                    "custom_id": custom_id,
+                    "count": len(rows),
+                    "files": "; ".join(sorted({r["file"] for r in rows})),
+                }
+            )
+            for row in rows:
+                duplicate_equation_custom_ids.append(
+                    {
+                        "custom_id": custom_id,
+                        "eq_id": row["eq_id"],
+                        "file": row["file"],
+                        "line": row["line"],
+                        "equation_body": row["equation_body"],
+                        "context": row["context"],
+                        "count": len(rows),
+                    }
+                )
+
     output_path = PROJECT_ROOT / OUTPUT_FILE
     wb = Workbook()
     default_sheet = wb.active
@@ -572,6 +711,11 @@ def main() -> None:
         {"metric": "other_links", "value": len(other_links)},
         {"metric": "broken_internal_links", "value": len(broken_internal_links)},
         {"metric": "output_file", "value": str(output_path)},
+        {"metric": "equations_found", "value": len(equations)},
+        {"metric": "missing_equation_custom_ids", "value": len(missing_equation_custom_ids)},
+        {"metric": "equation_id_mismatches", "value": len(equation_id_mismatches)},
+        {"metric": "duplicate_equation_custom_rows", "value": len(duplicate_equation_custom_ids)},
+        {"metric": "duplicate_equation_custom_groups", "value": len(duplicate_equation_custom_groups)},
     ]
 
     add_sheet(wb, "summary", ["metric", "value"], summary_rows)
@@ -593,6 +737,39 @@ def main() -> None:
     add_sheet(wb, "anchor_links", ["link_text", "target", "link_type", "file", "line", "context"], anchor_links)
     add_sheet(wb, "other_links", ["link_text", "target", "link_type", "file", "line", "context"], other_links)
     add_sheet(wb, "broken_internal_links", ["link_text", "target", "resolved_path", "file", "line", "context"], broken_internal_links)
+    add_sheet(wb, "broken_internal_links", ["link_text", "target", "resolved_path", "file", "line", "context"], broken_internal_links)
+    add_sheet(
+        wb,
+        "equations",
+        ["eq_id", "custom_id", "expected_custom_id", "matches_expected", "has_custom_id", "file", "line", "equation_body", "context"],
+        sorted(equations, key=lambda r: (r["file"], r["line"], r["eq_id"])),
+    )
+    add_sheet(
+        wb,
+        "missing_eq_custom_ids",
+        ["eq_id", "expected_custom_id", "file", "line", "equation_body", "context"],
+        missing_equation_custom_ids,
+    )
+    add_sheet(
+        wb,
+        "equation_id_mismatches",
+        ["eq_id", "custom_id", "expected_custom_id", "file", "line", "equation_body", "context"],
+        equation_id_mismatches,
+    )
+    add_sheet(
+        wb,
+        "dup_eq_custom_ids",
+        ["custom_id", "eq_id", "file", "line", "equation_body", "context", "count"],
+        duplicate_equation_custom_ids,
+    )
+    add_sheet(
+        wb,
+        "dup_eq_custom_groups",
+        ["custom_id", "count", "files"],
+        duplicate_equation_custom_groups,
+    )
+
+
 
     wb.save(output_path)
 

@@ -32,6 +32,7 @@ format:
     margin-bottom: 1in
     margin-left: 1in
     margin-right: 1in
+    include-in-header: preamble.tex
     toc: true
     toc-depth: 2
     toc-title: "Contents"

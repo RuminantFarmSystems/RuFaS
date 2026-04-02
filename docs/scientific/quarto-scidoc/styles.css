@@ -46,3 +46,8 @@ figure figcaption {
 .right-image img {
   display: inline-block;
 }
+
+/* Hide right-side MathJax equation numbers/tags in HTML */
+mjx-container[jax="CHTML"][display="true"] mjx-tag {
+  display: none !important;
+}
