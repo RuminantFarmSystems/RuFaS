@@ -186,6 +186,7 @@ our Scientific Documentation (below).
    :align: center
 
 **Introduction to Setting Up RuFaS**
+
 Click on the image for an introduction to this process.
 
 **Downloading the Software**
@@ -422,7 +423,7 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
 .. image:: ../_static/VSsite.png
    :alt: image
-   :width: 25%
+   :width: 40%
    :align: center
 
 -  **Set Up Virtual Environment** A virtual environment is a
