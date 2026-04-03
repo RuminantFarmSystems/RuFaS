@@ -352,7 +352,7 @@ class DCFRORCalculator:
                 )
 
             net_rev_y = EconomicEquations.net_revenue(revenue_y, operating_y, interest_y, depreciation_y)
-            carried_loss = EconomicEquations.loss_carry_forward(prev_taxable, prev_loss) 
+            carried_loss = EconomicEquations.loss_carry_forward(prev_taxable, prev_loss)
             used_loss = EconomicEquations.max_loss_utilized(net_rev_y, carried_loss)
             taxable_y = EconomicEquations.taxable_income(net_rev_y, used_loss)
             tax_y = EconomicEquations.income_tax(taxable_y, tax_rate)
@@ -373,7 +373,7 @@ class DCFRORCalculator:
             loan_balance_column[year_index] = principal_balance
             cash_flows[year_index] = cash_income_y
             prev_taxable = taxable_y
-            prev_loss = carried_loss + used_loss # Econmic Equation 24
+            prev_loss = carried_loss + used_loss  # Econmic Equation 24
 
         cash_flow_df = pd.DataFrame(
             {
