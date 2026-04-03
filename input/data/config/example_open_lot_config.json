@@ -3,7 +3,7 @@
     "end_date": "2019:365",
     "random_seed": 42,
     "set_seed": true,
-    "simulate_animals": true,
+    "simulation_type": "full_farm",
     "nutrient_standard": "NASEM",
     "FIPS_county_code": 16065,
     "include_detailed_values": false

@@ -1,0 +1,11 @@
+PWD c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific
+INPUT C:\Users\gmg228\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
+INPUT c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific\feed_storage.tex
+OUTPUT feed_storage.log
+OUTPUT feed_storage.pdf
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\tex\latex\base\omscmr.fd
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\tex\latex\base\omscmr.fd
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\tex\latex\base\omscmr.fd
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti10.tfm
+INPUT C:\Users\gmg228\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map

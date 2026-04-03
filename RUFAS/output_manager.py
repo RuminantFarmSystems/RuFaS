@@ -1302,15 +1302,12 @@ class OutputManager(object):
             A filtered variables pool based on either inclusion or exclusion.
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
-        use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
-        use_filter_key_name: bool = filter_content.get("use_filter_key_name", False)
         info_map = {
             "class": self.__class__.__name__,
             "function": self.filter_variables_pool.__name__,
             "filter_name": filter_name,
             "filter_by_exclusion": filter_by_exclusion,
-            "use_filter_name": use_filter_name,
         }
         if filter_by_exclusion:
             filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
@@ -1332,19 +1329,30 @@ class OutputManager(object):
         selected_variables: list[str] | None = filter_content.get("variables")
 
         results = self._parse_filtered_variables(
-            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion, use_filter_key_name
+            filtered_pool,
+            selected_variables,
+            filter_name,
+            filter_by_exclusion,
         )
 
         if filter_content.get("expand_data", False):
+            if self.time is None:
+                raise RuntimeError("Cannot expand data because OutputManager's 'time' attribute is not initialized.")
+            simulation_length = self.time.simulation_length_days
             fill_value = filter_content.get("fill_value", np.nan)
+            use_fill_value_before_start = filter_content.get("use_fill_value_before_start", True)
             use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
             use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
+            expand_data_to_observed_range = filter_content.get("expand_data_to_observed_range", False)
             try:
                 results = Utility.expand_data_temporally(
                     results,
+                    simulation_length=simulation_length,
                     fill_value=fill_value,
+                    use_fill_value_before_start=use_fill_value_before_start,
                     use_fill_value_in_gaps=use_fill_value_in_gaps,
                     use_fill_value_at_end=use_fill_value_at_end,
+                    expand_data_to_observed_range=expand_data_to_observed_range,
                 )
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"
@@ -1365,9 +1373,7 @@ class OutputManager(object):
         filtered_pool: dict[str, OutputManager.pool_element_type],
         selected_variables: list[str] | None,
         filter_name: str,
-        use_filter_name: bool,
         filter_by_exclusion: bool,
-        use_filter_key_name: bool,
     ) -> dict[str, OutputManager.pool_element_type]:
         """
         Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
@@ -1380,12 +1386,8 @@ class OutputManager(object):
             list of key names to select or exclude from variables containing dictionaries.
         filter_name : str
             Name of the filter used to collect variables for the filtered pool.
-        use_filter_name : bool
-            Whether to use the filter name when constructing the key name for data pulled from the filtered pool.
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
-        use_filter_key_name : bool
-            Whether to use the filtered key name when constructing the key name for data pulled from a dictionary.
 
         Returns
         -------
@@ -1399,7 +1401,6 @@ class OutputManager(object):
             "function": self._parse_filtered_variables.__name__,
             "filter_name": filter_name,
             "filter_by_exclusion": filter_by_exclusion,
-            "use_filter_name": use_filter_name,
         }
         results: dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
@@ -1410,8 +1411,7 @@ class OutputManager(object):
             data: list[Any] = filtered_pool[key]["values"]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
-                combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
+                results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
@@ -1424,14 +1424,7 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    if use_filter_key_name:
-                        # TODO DEPRECATED behavior, kept for backward compatibility
-                        # should be removed when closing #2718
-                        combined_key = filtered_key
-                    else:
-                        combined_key = (
-                            f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else f"{key}.{filtered_key}"
-                        )
+                    combined_key = f"{key}.{filtered_key}"
                     if combined_key in results.keys():
                         results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
@@ -2581,8 +2574,9 @@ class OutputManager(object):
             "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
             "direction": self.validate_direction,
             "use_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
-            "use_filter_key_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "expand_data_to_observed_range": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():

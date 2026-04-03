@@ -651,6 +651,172 @@ class Pen:
 
         """
         animal_manure_streams: dict[str, ManureStream] = {}
+        total_stream = self._calculate_total_pen_manure_stream()
+
+        general_stream_proportion, parlor_stream_proportion, parlor_stream = self._handle_parlor_stream(total_stream)
+        if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
+            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
+            animal_manure_streams[f"{base_parlor_stream_name}_PEN_{self.id}"] = parlor_stream
+
+        self._validate_general_manure_stream_proportions()
+        for stream_config in self.manure_streams:
+            manure_stream = self._split_general_manure_stream(
+                general_stream_proportion, parlor_stream_proportion, stream_config, total_stream
+            )
+            if manure_stream.pen_manure_data is not None:
+                manure_stream.pen_manure_data.set_first_processor(str(stream_config.get("first_processor")))
+            manure_stream = self._apply_bedding(manure_stream, str(stream_config.get("bedding_name")))
+            stream_name = f"{str(stream_config.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
+            animal_manure_streams[stream_name] = manure_stream
+
+        return animal_manure_streams
+
+    def _split_general_manure_stream(
+        self,
+        general_stream_proportion: float,
+        parlor_stream_proportion: Any | None,
+        stream_config: dict[str, str | float],
+        total_stream: ManureStream,
+    ) -> ManureStream:
+        """
+        Split the total manure stream by the given general stream proportion..
+
+        Parameters
+        ----------
+        general_stream_proportion : float
+            The proportion of the total manure stream to be assigned to the general stream.
+        parlor_stream_proportion : float | None
+            The proportion of the total manure stream to be assigned to the parlor stream.
+        stream_config : dict[str, str | float]
+            The config of the target stream to be split.
+        total_stream : ManureStream
+            The total manure stream to be split from.
+
+        Returns
+        -------
+        ManureStream
+            The split manure stream.
+
+        """
+        general_substream_proportion = float(stream_config.get("stream_proportion", 1.0))
+        split_ratio = general_substream_proportion * general_stream_proportion
+        manure_stream_deposit_split = (
+            general_substream_proportion if parlor_stream_proportion is not None else split_ratio
+        )
+        manure_stream = total_stream.split_stream(
+            split_ratio=split_ratio,
+            stream_type=StreamType.GENERAL,
+            manure_stream_deposition_split=manure_stream_deposit_split,
+        )
+        return manure_stream
+
+    def _calculate_total_pen_manure_stream(self) -> ManureStream:
+        """
+        Calculates and returns the total manure stream for the pen.
+
+        Returns
+        -------
+        ManureStream
+            The aggregate manure stream for the pen.
+        """
+        methane_production_potential = self._calculate_methane_production_potential()
+        pen_animal_excretions = self.total_manure_excretion
+        total_pen_manure_data = PenManureData(
+            num_animals=len(self.animals_in_pen),
+            manure_deposition_surface_area=self._calculate_manure_surface_area(),
+            animal_combination=self.animal_combination,
+            pen_type=self.pen_type,
+            manure_urine_mass=pen_animal_excretions.urine,
+            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
+            stream_type=StreamType.GENERAL,
+        )
+        total_stream = ManureStream(
+            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
+            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
+            nitrogen=pen_animal_excretions.manure_nitrogen,
+            phosphorus=pen_animal_excretions.phosphorus * GeneralConstants.GRAMS_TO_KG,
+            potassium=pen_animal_excretions.potassium * GeneralConstants.GRAMS_TO_KG,
+            ash=0,
+            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
+            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
+            total_solids=pen_animal_excretions.total_solids,
+            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
+            methane_production_potential=methane_production_potential,
+            pen_manure_data=total_pen_manure_data,
+            bedding_non_degradable_volatile_solids=0.0,
+        )
+        return total_stream
+
+    def _handle_parlor_stream(self, total_stream: ManureStream) -> tuple[float, float | None, ManureStream | None]:
+        """
+        Handles the processing of the parlor stream based on the type of animal combination and the given total stream.
+        If the animal combination indicates lactating cows, the parlor stream is split from the total stream using the
+        specified milking time proportion.
+
+        Parameters
+        ----------
+        total_stream : ManureStream
+            The complete manure stream that is available for processing. The function processes this stream to
+            derive the parlor stream proportion and data if applicable.
+
+        Returns
+        -------
+        tuple[float, float | None, ManureStream | None]
+            A tuple containing:
+            - general_stream_proportion (float): The proportion of the general stream that remains.
+            - parlor_stream_proportion (float or None): The proportion of the parlor stream, or None if not applicable.
+            - parlor_stream (ManureStream or None): The resulting parlor stream, or None if not applicable.
+        """
+        parlor_stream_proportion = None
+        parlor_stream = None
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            parlor_stream_proportion = self.minutes_away_for_milking / 1440
+            general_stream_proportion = 1 - parlor_stream_proportion
+            parlor_stream = total_stream.split_stream(
+                split_ratio=parlor_stream_proportion,
+                stream_type=StreamType.PARLOR,
+                manure_stream_deposition_split=0.0,
+            )
+            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
+        else:
+            general_stream_proportion = 1.0
+        self._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+        return general_stream_proportion, parlor_stream_proportion, parlor_stream
+
+    def _validate_parlor_stream_proportion(
+        self,
+        general_stream_proportion: float,
+        parlor_stream: ManureStream | None,
+        parlor_stream_proportion: float | None,
+    ) -> None:
+        """
+        Validates that the parlor stream proportion is within the expected range.
+
+        Parameters
+        ----------
+        general_stream_proportion:  float
+            The proportion of the general stream that remains.
+        parlor_stream_proportion: float | None
+            The proportion of the parlor stream, or None if not applicable.
+        parlor_stream : ManureStream | None
+            The resulting parlor stream, or None if not applicable.
+        """
+        if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
+            assert parlor_stream is not None, "Parlor stream should not be None if parlor stream proportion is not None"
+            assert (
+                parlor_stream_proportion is not None
+            ), "Parlor stream proportion should not be None if parlor stream is not None"
+
+    def _calculate_methane_production_potential(self) -> float:
+        """
+        Calculates the methane production potential based on the combination and type of animals in the pen.
+
+        Returns
+        -------
+        float
+            The methane production potential for the animals in the pen.
+        """
         if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
             total_animals_in_pen = len(self.animals_in_pen)
             num_growing = len(
@@ -676,70 +842,7 @@ class Pen:
             methane_production_potential = (
                 0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
             )
-
-        pen_animal_excretions = self.total_manure_excretion
-        total_pen_manure_data = PenManureData(
-            num_animals=len(self.animals_in_pen),
-            manure_deposition_surface_area=self._calculate_manure_surface_area(),
-            animal_combination=self.animal_combination,
-            pen_type=self.pen_type,
-            manure_urine_mass=pen_animal_excretions.urine,
-            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
-            stream_type=StreamType.GENERAL,
-        )
-
-        total_stream = ManureStream(
-            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
-            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
-            nitrogen=pen_animal_excretions.manure_nitrogen,
-            phosphorus=pen_animal_excretions.phosphorus * GeneralConstants.GRAMS_TO_KG,
-            potassium=pen_animal_excretions.potassium * GeneralConstants.GRAMS_TO_KG,
-            ash=0,
-            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
-            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
-            total_solids=pen_animal_excretions.total_solids,
-            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
-            methane_production_potential=methane_production_potential,
-            pen_manure_data=total_pen_manure_data,
-            bedding_non_degradable_volatile_solids=0.0,
-        )
-
-        parlor_stream_proportion = None
-        if self.animal_combination == AnimalCombination.LAC_COW:
-            parlor_stream_proportion = self.minutes_away_for_milking / 1440
-            general_stream_proportion = 1 - parlor_stream_proportion
-            parlor_stream = total_stream.split_stream(
-                split_ratio=parlor_stream_proportion,
-                stream_type=StreamType.PARLOR,
-                manure_stream_deposition_split=0.0,
-            )
-            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
-                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
-            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
-            parlor_stream_name = f"{base_parlor_stream_name}_PEN_{self.id}"
-            animal_manure_streams[parlor_stream_name] = parlor_stream
-        else:
-            general_stream_proportion = 1.0
-
-        self._validate_general_manure_stream_proportions()
-        for stream in self.manure_streams:
-            general_substream_proportion = float(stream.get("stream_proportion", 1.0))
-            split_ratio = general_substream_proportion * general_stream_proportion
-            manure_stream_deposit_split = (
-                general_substream_proportion if parlor_stream_proportion is not None else split_ratio
-            )
-            manure_stream = total_stream.split_stream(
-                split_ratio=split_ratio,
-                stream_type=StreamType.GENERAL,
-                manure_stream_deposition_split=manure_stream_deposit_split,
-            )
-            if manure_stream.pen_manure_data is not None:
-                manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
-            manure_stream = self._apply_bedding(manure_stream, str(stream.get("bedding_name")))
-            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
-            animal_manure_streams[stream_name] = manure_stream
-
-        return animal_manure_streams
+        return methane_production_potential
 
     def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
         """

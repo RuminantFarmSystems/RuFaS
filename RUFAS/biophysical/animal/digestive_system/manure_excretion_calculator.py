@@ -498,7 +498,7 @@ class ManureExcretionCalculator:
         """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
         Notes
-        ----
+        -----
         Urine excretion: [AN.EXC.28]
         Total manure excretion: [AN.EXC.29]
         Total solids excretion: [AN.EXC.12]
