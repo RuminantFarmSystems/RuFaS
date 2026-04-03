@@ -34,7 +34,6 @@ def mock_output_manager() -> OutputManager:
     output_manager = OutputManager()
     return output_manager
 
-
 @pytest.mark.parametrize(
     "is_end_to_end_testing_run, expected_prefixes",
     [
@@ -874,20 +873,22 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "name, value, info_map, first_map, expected_exception",
+    "name, value, info_map, first_map, overwrite_simulation_day, current_simulation_day, expected_exception",
     [
         # Case 1: Everything correct, no exception should be raised
-        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, None),
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, True, 220, None),
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
-        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False, None),
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False, True, 220, None),
         # Case 2: 'units' key missing, should raise KeyError
-        ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, KeyError),
+        ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, True, 220, KeyError),
         # Case 3: Value is a dict, should process sub-keys
         (
             "var3",
             {"sub1": 10, "sub2": 20},
             {"class": "TestClass", "function": "test_function", "units": "kg"},
             True,
+            True,
+            220,
             None,
         ),
         # Case 4: 'units' is a dict, but lengths do not match with value, should raise KeyError
@@ -896,6 +897,8 @@ def test_add_log(
             [1, 2, 3],
             {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
             True,
+            True,
+            220,
             KeyError,
         ),
         # Case 5: 'units' is a dict, lengths match with value, no exception
@@ -904,6 +907,8 @@ def test_add_log(
             [1, 2],
             {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
             True,
+            True,
+            220,
             None,
         ),
         # Case 6: 'units' is a dict, lengths do not match with value (empty value), no exception
@@ -912,8 +917,49 @@ def test_add_log(
             {},
             {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
             True,
+            True,
+            220,
             None,
         ),
+        # Case 7: don't overwrite included "simulation_day"
+        (
+            "var6",
+            "one day only",
+            {
+                "class": "TestClass", "function": "test_function",
+                "units": {"key1": "kg", "key2": "g"}, "simulation_day": 379
+            },
+            True,
+            False,
+            220,
+            None,
+        ),
+        # Case 8: do overwrite included simulation day
+        (
+            "var6",
+            "one day only",
+            {
+                "class": "TestClass", "function": "test_function",
+                "units": {"key1": "kg", "key2": "g"}, "simulation_day": 379
+            },
+            True,
+            True,
+            220,
+            None,
+        ),
+        # Case 9: no simulation day provided in info map
+        (
+            "var6",
+            "one day only",
+            {
+                "class": "TestClass", "function": "test_function",
+                "units": {"key1": "kg", "key2": "g"}
+            },
+            True,
+            True,
+            220,
+            None,
+        )
     ],
 )
 def test_add_variable(
@@ -921,6 +967,8 @@ def test_add_variable(
     value: Any,
     info_map: dict[str, Any],
     first_map: bool,
+    overwrite_simulation_day: bool,
+    current_simulation_day: int,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -934,14 +982,20 @@ def test_add_variable(
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
     mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch("RUFAS.rufas_time.RufasTime.simulation_day", return_value=current_simulation_day)
 
     if expected_exception:
         with pytest.raises(expected_exception):
             output_manager.add_variable(name, value, info_map, first_map)
     else:
         # Act
+        mapped_simday = info_map["simulation_day"] | None
         output_manager.add_variable(name, value, info_map, first_map)
         # Assert
+        if overwrite_simulation_day or "simulation_day" not in info_map.keys:
+            assert info_map["simulation_day"] == current_simulation_day
+        else:
+            assert info_map["simulation_day"] == mapped_simday
         patched_add_to_pool.assert_called_once_with(
             output_manager.variables_pool,
             "key_with_prefix",

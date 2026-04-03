@@ -136,15 +136,6 @@ def test_year_end_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> Non
         time.advance()
 
 
-def test_record_time(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
-    """Tests that RufasTime instances correctly add current time information to the OutputManager."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
-    time = RufasTime()
-    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
-        time.record_time()
-        assert add_var.call_count == 4
-
-
 @pytest.mark.parametrize(
     "start_date_str, simulation_day, expected_date",
     [

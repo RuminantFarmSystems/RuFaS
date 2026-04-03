@@ -1,11 +1,11 @@
 from datetime import date, datetime, timedelta
-from typing import cast
+from typing import cast, Dict, Any
 
 from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 import pytest
-from unittest.mock import MagicMock, PropertyMock, call
+from unittest.mock import MagicMock, PropertyMock, call, patch
 
 from pytest_mock import MockerFixture
 
@@ -36,6 +36,21 @@ from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
+@pytest.fixture
+def mock_time_config() -> Dict[str, Any]:
+    config = {
+        "start_date": "1999:2",
+        "end_date": "2000:1",
+    }
+    return config
+
+def test_record_time(mock_time_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that RufasTime instances correctly add current time information to the OutputManager."""
+    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_time_config)
+    time = RufasTime()
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
+        time.record_time()
+        assert add_var.call_count == 4
 
 def test_simulation_type_enum_values() -> None:
     """Unit test for SimulationType enum values."""
