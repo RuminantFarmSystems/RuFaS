@@ -5,11 +5,11 @@
 
 **Introduction to RuFaS for New Team Members**
 ----------------------------------------------
-   **Onboarding Document v.2**
-   2026-04-02
+**Onboarding Document v.2**
+2026-04-02
+
 
    .. image:: ../_static/rufas.png
-      :align: center
       :alt: image
       :width: 30%
 
