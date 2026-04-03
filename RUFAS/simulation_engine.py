@@ -35,6 +35,7 @@ class SimulationType(Enum):
 
     FULL_FARM = "full_farm"
     FIELD_AND_FEED = "field_and_feed"
+    FIELD_ONLY = "field_only"
 
     @property
     def simulate_animals(self) -> bool:
@@ -109,6 +110,7 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
+            simulation_type.FIELD_ONLY: self._execute_field_only_simulation
         }
 
         self._initialize_simulation()
@@ -220,6 +222,17 @@ class SimulationEngine:
         self._execute_daily_manure_operations(daily_manure_data)
 
         self._report_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _execute_field_only_simulation(self) -> None:
+        manure_applications: list[ManureEventNutrientRequestResults] = self.generate_daily_manure_applications()
+
+        self.field_manager.daily_update_routine(
+            self.weather, self.time, manure_applications
+        )
+
+        self._report_daily_records()
 
         self._advance_time()
 
