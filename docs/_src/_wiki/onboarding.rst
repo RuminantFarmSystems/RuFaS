@@ -168,16 +168,16 @@ If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
 our Scientific Documentation (below).
 
-.. container:: scidoc-button
+.. list-table::
+   :align: center
 
-   .. image:: ../_static/scidoccover.png
-      :alt: Scientific documentation cover
-      :target: https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf
-      :width: 30%
-      :align: center
+   * - .. image:: ../_static/scidoccover.png
+          :alt: Scientific documentation cover
+          :target: https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf
+          :width: 100%
 
-   `Link to Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
-
+     - `**Open Scientific Documentation** <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
+     
 **Introduction to Setting Up RuFaS**
 
 Click on the image for an introduction to this process.
