@@ -173,8 +173,9 @@ our Scientific Documentation (below).
    :target: https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf
    :width: 30%
    :align: center
+   :class: button-image
 
-Link to Scientific documentation
+`Link to Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
 
 **Introduction to Setting Up RuFaS**
 
