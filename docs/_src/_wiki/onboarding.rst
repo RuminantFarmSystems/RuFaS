@@ -164,17 +164,11 @@ If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
 our Scientific Documentation (linked at the top of this page).
 
-.. raw:: html
-
-   <div style="text-align: center; margin: 20px 0;">
-     <iframe width="70%" height="400"
-       src="https://www.youtube.com/embed/6RbJs0iZmgo"
-       title="Introduction to Working with RuFaS"
-       frameborder="0"
-       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-       allowfullscreen>
-     </iframe>
-   </div>
+.. image:: /_static/vidimg_onboardintro.png
+   :alt: Watch the RuFaS introduction video
+   :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
+   :width: 70%
+   :align: center
 
 **Downloading the Software**
 ----------------------------
@@ -265,6 +259,12 @@ Still have questions? Maybe this clip can help before you dive in.
        allowfullscreen>
      </iframe>
    </div>
+
+.. image:: /_static/vidimg_softwaresetup.png
+   :alt: Watch the RuFaS introduction video
+   :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
+   :width: 70%
+   :align: center
 
 The following sections will describe the steps of installation in more
 detail. 
