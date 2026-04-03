@@ -7,41 +7,6 @@
       "type": "json",
       "properties": "config_properties"
     },
-    "animal": {
-      "title": "Animal data",
-      "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/example_freestall_animal.json",
-      "type": "json",
-      "properties": "animal_properties"
-    },
-    "animal_population": {
-      "title": "Animal population data",
-      "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
-      "path": "input/data/animal/animal_population.json",
-      "type": "json",
-      "properties": "animal_population_properties"
-    },
-    "animal_net_merit": {
-      "title": "Animal Net Merit data",
-      "description": "The net merit value for cows.",
-      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
-      "type": "csv",
-      "properties": "animal_net_merit_properties"
-    },
-    "animal_top_listing_semen": {
-      "title": "Animal Top Listing Semen data",
-      "description": "The top listing semen value for new born calves.",
-      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
-      "type": "csv",
-      "properties": "animal_top_listing_semen_properties"
-    },
-    "lactation": {
-      "title": "Lactation curve adjustment values",
-      "description": "Values for the adjustment of the three wood parameters based on farm specific data",
-      "path": "input/data/animal/lactation_curve_adjustment_inputs.json",
-      "type": "json",
-      "properties": "lactation_properties"
-    },
     "economy": {
       "title": "Economy data",
       "description": "Energy prices used in the EEE module.",
@@ -69,41 +34,6 @@
       "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024_interpolated_regional_average.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
-    },
-    "feed": {
-      "title": "Feed data",
-      "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/example_Midwest_feed.json",
-      "type": "json",
-      "properties": "feed_properties"
-    },
-    "NRC_Comp": {
-      "title": "NRC Comp data",
-      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
-      "path": "input/data/feed/NRC_comp.csv",
-      "type": "csv",
-      "properties": "NRC_Comp_properties"
-    },
-    "NASEM_Comp": {
-      "title": "NASEM Comp data",
-      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
-      "path": "input/data/feed/NASEM_Comp_with_TDN_urea.csv",
-      "type": "csv",
-      "properties": "NASEM_Comp_properties"
-    },
-    "manure_management": {
-      "title": "Manure Processor Configurations",
-      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
-      "path": "input/data/manure/example_freestall_processor_configs.json",
-      "type": "json",
-      "properties": "manure_management_properties"
-    },
-    "manure_processor_connection": {
-      "title": "Manure Processor Connections",
-      "description": "The connection configs for all manure processors.",
-      "path": "input/data/manure/example_freestall_processor_connections.json",
-      "type": "json",
-      "properties": "manure_processor_connection_properties"
     },
     "crop_configurations": {
       "title": "Crop Configurations",
