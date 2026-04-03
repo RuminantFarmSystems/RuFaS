@@ -173,8 +173,8 @@
     "enable_goal_seek": true,
     "goal_seek_target_npv": 0.0,
     "goal_seek_bounds": [
-      0.01,
-      100.0
+      -10000,
+      10000.0
     ],
     "goal_seek_unit_price_multiplier": 1.0,
     "goal_seek_fixed_variables": [
