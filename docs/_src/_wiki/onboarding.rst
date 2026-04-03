@@ -7,14 +7,15 @@
    **Welcome to RuFaS**
     `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/tree/dev/scientific_documentation>`__
 
-   Introduction to RuFaS for New Team Members
-
-   2025-06-20
+   
+**Introduction to RuFaS for New Team Members**
+----------------------------------------------
+   2026-04-02
 
    .. image:: ../_static/rufas.png
       :align: center
       :alt: image
-      :width: 40%
+      :width: 30%
 
    Onboarding Document v.2
 
@@ -52,7 +53,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: ../_static/animalmod.png
       :alt: image
-      :width: 60%
+      :width: 15%
       :align: center
 
    Remember, while overarching decisions about whether you’d like to
@@ -89,7 +90,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: ../_static/manuremod.png
       :alt: image
-      :width: 60%
+      :width: 15%
       :align: center
 
    The output of this module estimates manure composition, quantity of
@@ -118,7 +119,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: ../_static/feedmod.png
       :alt: image
-      :width: 60%
+      :width: 15%
       :align: center
 
    Outputs of interest for this module will consider production and
@@ -138,27 +139,22 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: ../_static/soilcropmod.png
       :alt: image
-      :width: 60%
+      :width: 15%
       :align: center
 
    Outputs are estimated crop measures like biomass accumulation or
    harvest yields and field parameters like emissions, soil erosion,
-   phosphorus runoff and nitrate percolation.
+   phosphorus runoff and nitrate percolation. This image summarizes 
+   the processes and outputs of the four modules of the RuFaS Model
 
-.. figure:: ../_static/Modules.png
+.. list-table::
    :align: center
-   :alt: image
-   :name: fig:example
-   :width: 80%
 
-This image summarizes the processes and outputs of the four
-modules of the RuFaS Model
+   * - .. image:: ../_static/Modules.png
+         :width: 100%
 
-.. figure:: ../_static/EEE.png
-   :align: center
-   :alt: image
-   :name: fig:example
-   :width: 80%
+     - .. image:: ../_static/EEE.png
+         :width: 100%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
