@@ -84,8 +84,16 @@ class DCFRORCalculator:
             self.om.add_error("MissingInputKey", f"Missing input key: {str(e)}", info_map)
             raise
 
-    def calculate(self) -> None:
-        """Run the DCFROR calculation and export results."""
+    def calculate(self, override_inputs: Dict[str, Any] | None = None) -> None:
+        """Run the DCFROR cash-flow model and export summary outputs.
+
+        Parameters
+        ----------
+        override_inputs : dict[str, Any] | None, optional
+            Temporary input overrides applied only for this call. This is used
+            by :meth:`goal_seek` so each trial evaluates a fresh DCFROR run
+            with the candidate value.
+        """
 
         info_map = {"class": self.__class__.__name__, "function": self.calculate.__name__}
 
@@ -100,8 +108,12 @@ class DCFRORCalculator:
         self.om.add_log("DCFROR calculation", "Starting DCFROR calculation", info_map)
 
         try:
-            cost_inputs = self._prepare_costs()
-            financing = self._prepare_financing(cost_inputs["project_term"])
+            active_inputs = dict(self.inputs)
+            if override_inputs:
+                active_inputs.update(override_inputs)
+
+            cost_inputs = self._prepare_costs(active_inputs)
+            financing = self._prepare_financing(active_inputs, cost_inputs["project_term"])
             cash_flows, cash_flow_df = self._compute_cash_flows(
                 **cost_inputs,
                 **financing,
@@ -118,12 +130,12 @@ class DCFRORCalculator:
             self.om.add_error("DCFRORCalculationFailed", f"DCFROR calculation failed: {exc}", info_map)
             raise
 
-    def _prepare_costs(self) -> Dict[str, Any]:
-        """Collect project term, capital cost, and operating schedules."""
+    def _prepare_costs(self, input_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Build capital, operating-cost, and revenue schedules from inputs."""
 
         info_map = {"class": self.__class__.__name__, "function": self._prepare_costs.__name__}
 
-        cap_breakdown = self.inputs["cost_capital_multiple"]
+        cap_breakdown = input_dict["cost_capital_multiple"]
         if isinstance(cap_breakdown, pd.DataFrame) and cap_breakdown.empty:
             self.om.add_warning("EmptyCapitalCostBreakdown", "Capital cost breakdown is empty", info_map)
 
@@ -131,21 +143,29 @@ class DCFRORCalculator:
         if base_cost == 0:
             self.om.add_warning("ZeroCapitalCost", "Total capital cost is zero", info_map)
 
-        interest_rate = self.inputs["interest_rate_construction"]
+        interest_rate = input_dict["interest_rate_construction"]
         # The construction-period financing uses the dedicated
         # ``interest_rate_construction`` input (IRCon in the documentation).
-        construction_years = int(self.inputs["construction_term"])
-        finish_percentages = self.inputs["construction_finish_pcts"]
+        construction_years = int(input_dict["construction_term"])
+        finish_percentages = input_dict["construction_finish_pcts"]
 
         def _to_numpy(values: Any) -> np.ndarray:
             if isinstance(values, pd.DataFrame):
                 return values.to_numpy(dtype=float)
             return np.asarray(values, dtype=float)
 
-        operating_units = _to_numpy(self.inputs["cost_operational_units"])
-        operating_unit_costs = _to_numpy(self.inputs["cost_operational_unit_cost"])
-        revenue_units = _to_numpy(self.inputs["units_produced"])
-        revenue_prices = _to_numpy(self.inputs["unit_cost"])
+        operating_units = _to_numpy(input_dict["cost_operational_units"])
+        operating_unit_costs = _to_numpy(input_dict["cost_operational_unit_cost"])
+        revenue_units = _to_numpy(input_dict["units_produced"])
+        unit_price_multiplier = float(input_dict.get("goal_seek_unit_price_multiplier", 1.0))
+        if unit_price_multiplier < 0:
+            self.om.add_warning(
+                "GoalSeekUnitPriceMultiplierAdjusted",
+                "goal_seek_unit_price_multiplier was negative; clamped to 0.0.",
+                info_map,
+            )
+            unit_price_multiplier = 0.0
+        revenue_prices = _to_numpy(input_dict["unit_cost"]) * unit_price_multiplier
 
         # Interest accrued during construction should be accounted for in cash
         # flow calculations, not added to the depreciable capital cost.
@@ -156,7 +176,7 @@ class DCFRORCalculator:
         operating_costs = np.asarray((operating_units * operating_unit_costs).sum(axis=0), dtype=float)
         revenue = np.asarray((revenue_units * revenue_prices).sum(axis=0), dtype=float)
 
-        project_term = int(self.inputs["project_term"])
+        project_term = int(input_dict["project_term"])
         if project_term <= 0:
             self.om.add_error("InvalidProjectTerm", "Project term must be positive.", info_map)
             raise ValueError("Project term must be positive.")
@@ -170,10 +190,8 @@ class DCFRORCalculator:
             "operating_costs": operating_costs[:project_term],
         }
 
-    def _prepare_financing(self, project_term: int) -> Dict[str, Any]:
-        """Normalise the financing inputs used in the cash flow model."""
-
-        input_dict = self.inputs
+    def _prepare_financing(self, input_dict: Dict[str, Any], project_term: int) -> Dict[str, Any]:
+        """Normalise financing inputs and enforce valid borrowing shares."""
         depreciation_rate = input_dict["depreciation_rate"]
         depreciation_rate = depreciation_rate[~np.isnan(depreciation_rate)]
 
@@ -441,21 +459,65 @@ class DCFRORCalculator:
         tol: float = 1e-6,
         max_iter: int = 100,
     ) -> float:
-        """Binary search utility for future goal-seek integrations."""
+        """Solve for one DCFROR input value that drives NPV toward a target.
+
+        The solver performs a binary search over a *multiplier* (`mid`) and
+        evaluates ``candidate_value = baseline_value * mid``. It then reruns
+        :meth:`calculate` with that candidate override and reads the most
+        recent ``econ_dcfror_npv`` output.
+
+        Parameters
+        ----------
+        variable_name : str
+            Name of the scalar input in ``self.inputs`` to perturb.
+        target_npv : float, optional
+            Desired NPV setpoint.
+        bounds : tuple[float, float], optional
+            Lower/upper bounds for the multiplier search interval.
+        tol : float, optional
+            Absolute tolerance on ``abs(npv - target_npv)``.
+        max_iter : int, optional
+            Maximum bisection iterations.
+        """
 
         info_map = {"class": self.__class__.__name__, "function": self.goal_seek.__name__}
-        low, high = bounds
-        baseline_value = self.inputs[variable_name]
+        if variable_name not in self.inputs:
+            self.om.add_error("GoalSeekVariableMissing", f"Unknown variable: {variable_name}", info_map)
+            return float("nan")
+        if max_iter <= 0:
+            self.om.add_error("GoalSeekInvalidMaxIter", "max_iter must be > 0.", info_map)
+            return float("nan")
+
+        low, high = map(float, bounds)
+        if not np.isfinite(low) or not np.isfinite(high) or low >= high:
+            self.om.add_error("GoalSeekInvalidBounds", f"Invalid bounds: {bounds}", info_map)
+            return float("nan")
+
+        baseline_value = float(self.inputs[variable_name])
+        if not np.isfinite(baseline_value):
+            self.om.add_error("GoalSeekInvalidBaseline", "Baseline goal-seek value must be finite.", info_map)
+            return float("nan")
+
+        project_term = int(self.inputs.get("project_term", 1))
+
+        def _bounded_candidate(multiplier: float) -> float:
+            candidate = baseline_value * multiplier
+            if variable_name == "loan_term":
+                return float(max(1, min(project_term, int(round(candidate)))))
+            if variable_name == "internal_rate_of_return":
+                return float(max(-0.99, candidate))
+            if variable_name == "goal_seek_unit_price_multiplier":
+                return float(max(0.0, candidate))
+            return float(candidate)
 
         for _ in range(max_iter):
             mid = (low + high) / 2
-            override_inputs = {variable_name: baseline_value * mid}
-            self.inputs.update(override_inputs)
-            self.calculate()
+            override_inputs = {variable_name: _bounded_candidate(mid)}
+            self.calculate(override_inputs=override_inputs)
             npv_result = self.om.filter_variables_pool(
                 {
                     "name": "NPV Retrieval",
-                    "description": "Retrieve the latest DCFROR NPV for goal seek; filter_variables_pool returns chronological matches, so we slice to the most recent entry.",
+                    "description": "Retrieve the latest DCFROR NPV for goal seek; results are chronological so slice to newest entry.",
                     "filters": [f"{self.__class__.__name__}.{self.calculate.__name__}.econ_dcfror_npv"],
                     "slice_start": -1,
                 }
@@ -472,12 +534,14 @@ class DCFRORCalculator:
                 return float("nan")
 
             if abs(npv - target_npv) < tol:
+                self.inputs[variable_name] = override_inputs[variable_name]
                 return mid
             if npv > target_npv:
                 high = mid
             else:
                 low = mid
 
+        self.inputs[variable_name] = _bounded_candidate((low + high) / 2)
         self.om.add_error(
             "GoalSeekFailed", "Goal seek did not converge within the maximum number of iterations.", info_map
         )

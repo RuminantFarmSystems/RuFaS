@@ -227,13 +227,13 @@ def test_dcfror_goal_seek_reads_scalar_npv_from_output_pool(mocker: MockerFixtur
     om = mocker.Mock()
     om.filter_variables_pool.return_value = {
         "DCFRORCalculator.calculate.econ_dcfror_npv": {
-            "values": [999.0, 1.0],
+            "values": [1.0],
             "info_maps": [{}],
         }
     }
     calc.om = om
 
-    def calculate() -> None:
+    def calculate(*args, **kwargs) -> None:
         return None
 
     calc.calculate = calculate
@@ -244,6 +244,40 @@ def test_dcfror_goal_seek_reads_scalar_npv_from_output_pool(mocker: MockerFixtur
     assert om.filter_variables_pool.call_args.args[0]["slice_start"] == -1
     assert multiplier == pytest.approx(50.005)
     assert calc.inputs["unit_cost"] == pytest.approx(500.05)
+
+
+def test_dcfror_goal_seek_returns_nan_for_invalid_bounds(mocker: MockerFixture) -> None:
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.inputs = {"unit_cost": 10.0}
+    calc.om = mocker.Mock()
+
+    multiplier = calc.goal_seek("unit_cost", bounds=(2.0, 1.0))
+
+    assert np.isnan(multiplier)
+    calc.om.add_error.assert_called()
+
+
+def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: MockerFixture) -> None:
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.om = mocker.Mock()
+    calc.inputs = {}
+
+    prepared = calc._prepare_costs(
+        {
+            "cost_capital_multiple": [{"Cost": 100.0}],
+            "interest_rate_construction": 0.05,
+            "construction_term": 1,
+            "construction_finish_pcts": [1.0],
+            "cost_operational_units": [[1.0, 1.0]],
+            "cost_operational_unit_cost": [[1.0, 1.0]],
+            "units_produced": [[2.0, 2.0]],
+            "unit_cost": [[10.0, 10.0]],
+            "goal_seek_unit_price_multiplier": 3.0,
+            "project_term": 2,
+        }
+    )
+
+    assert prepared["revenue"].tolist() == [60.0, 60.0]
 
 
 def test_estimate_digester_trucking_cost() -> None:
