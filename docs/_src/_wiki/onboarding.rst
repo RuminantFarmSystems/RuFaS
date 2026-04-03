@@ -25,7 +25,7 @@ This section is not required for installing software or working with the
 RuFaS model specifically, but instead provides a general overview of the
 capabilities of RuFaS and expected outputs of each module.
 
-.. figure:: /_static/fullmodelsummary.png
+.. image:: ../_static/fullmodelsummary.png
    :alt: image
    :name: fig:example
    :width: 100%
@@ -50,7 +50,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Herd exits
 
-   .. image:: /_static/animalmod.png
+   .. image:: ../_static/animalmod.png
       :alt: image
       :width: 60%
       :align: center
@@ -87,7 +87,7 @@ capabilities of RuFaS and expected outputs of each module.
    -  Storage: length of time, cover/crust/cap and flare on liquid
       manure storage
 
-   .. image:: /_static/manuremod.png
+   .. image:: ../_static/manuremod.png
       :alt: image
       :width: 60%
       :align: center
@@ -116,7 +116,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Milk reduction maximum and tolerance
 
-   .. image:: /_static/feedmod.png
+   .. image:: ../_static/feedmod.png
       :alt: image
       :width: 60%
       :align: center
@@ -136,7 +136,7 @@ capabilities of RuFaS and expected outputs of each module.
    manure application or manage inventories of the harvested crops and
    provide feed to the herd based on availability.
 
-   .. image:: /_static/soilcropmod.png
+   .. image:: ../_static/soilcropmod.png
       :alt: image
       :width: 60%
       :align: center
@@ -145,7 +145,7 @@ capabilities of RuFaS and expected outputs of each module.
    harvest yields and field parameters like emissions, soil erosion,
    phosphorus runoff and nitrate percolation.
 
-.. figure:: /_static/Modules.png
+.. figure:: ../_static/Modules.png
    :align: center
    :alt: image
    :name: fig:example
@@ -154,7 +154,7 @@ capabilities of RuFaS and expected outputs of each module.
 This image summarizes the processes and outputs of the four
 modules of the RuFaS Model
 
-.. figure:: /_static/EEE.png
+.. figure:: ../_static/EEE.png
    :align: center
    :alt: image
    :name: fig:example
@@ -164,7 +164,7 @@ If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
 our Scientific Documentation (linked at the top of this page).
 
-.. image:: /_static/vidimg_onboardintro.png
+.. image:: ../_static/vidimg_onboardintro.png
    :alt: Watch the RuFaS introduction video
    :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
    :width: 70%
@@ -249,7 +249,7 @@ while collaborating.
 Still have questions? Maybe this clip can help before you dive in.
 
 
-.. image:: /_static/vidimg_softwaresetup.png
+.. image:: ../_static/vidimg_softwaresetup.png
    :alt: A little more about software setup!
    :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
    :width: 70%
@@ -293,7 +293,7 @@ repository for your offline repository.
 
                             git version 2.40.0.windows.
 
-   .. image:: /_static/GitSite.png
+   .. image:: ../_static/GitSite.png
       :alt: image
 
    **Cloning and Repository Set Up** To set up RuFaS, we first must
@@ -391,7 +391,7 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
 -  Follow the setup wizard to install VS Code.
 
-.. image:: /_static/VSsite.png
+.. image:: ../_static/VSsite.png
    :alt: image
 
 -  **Set Up Virtual Environment** A virtual environment is a
@@ -407,13 +407,13 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
    -  Open VS Code and locate the terminal at the bottom of the window.
 
-   .. image:: /_static/locateTerm.png
+   .. image:: ../_static/locateTerm.png
       :alt: image
 
    -  If it is not immediately apparent, go to the menu at the top of
       the window and create a "New Terminal"
 
-   .. image:: /_static/newterminal.png
+   .. image:: ../_static/newterminal.png
       :alt: image
 
    -  You'll need to have at least the minimum supported versions of each dependency installed to run RuFaS.
@@ -423,7 +423,7 @@ To ensure your dependencies are up to date, you'll just need to run:
 
                   pip install .
 
-  .. image:: /_static/configrufas.png
+  .. image:: ../_static/configrufas.png
      :alt: image
 
 **Great job!** If you’re reading this, you’ve reached the end of this
@@ -598,7 +598,7 @@ Git Desktop.
 
 -  ** Test Default Settings of RuFaS **
 
-   .. figure:: /_static/terminal.png
+   .. image:: ../_static/terminal.png
       :alt: image
       :name: fig:example
 
@@ -760,7 +760,7 @@ open your Git Desktop and VS Code.
    in by looking at the bottom left of your screen. You may also create
    a new branch to work in if you wish.
 
-   .. figure:: /_static/checkbranch.png
+   .. image:: ../_static/checkbranch.png
       :alt: image
       :name: fig:example
       :width: 80%
@@ -775,7 +775,7 @@ open your Git Desktop and VS Code.
    -  In the menu to the left select the input dropdown and then select
       metadata dropdown.
 
-    .. figure:: /_static/findmeta.png
+    .. image:: ../_static/findmeta.png
       :alt: image
       :name: fig:findmeta
       :width: 80%
@@ -798,7 +798,7 @@ open your Git Desktop and VS Code.
 
       There you will find example_freestall_task.json.
 
-   .. figure:: /_static/default_task.png
+   .. image:: ../_static/default_task.png
       :alt: image
       :name: fig:example
       :width: 100%
@@ -813,7 +813,7 @@ open your Git Desktop and VS Code.
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-    .. figure:: /_static/default_task.png
+    .. image:: ../_static/default_task.png
        :alt: image
        :name: fig:example
        :width: 100%
@@ -837,7 +837,7 @@ open your Git Desktop and VS Code.
          remember. We recommend "example_metadatav1.json" or something
          similar.
 
-    .. figure:: /_static/example_metadata.png
+    .. image:: ../_static/example_metadata.png
        :alt: image
        :name: fig:example
        :width: 100%
@@ -861,7 +861,7 @@ open your Git Desktop and VS Code.
    -  In your newly created json file, change the "cow_num" from 100 to
       10000 and your "replace_num" from 500 to 3000.
 
-   .. image:: /_static/cownum.png
+   .. image:: ../_static/cownum.png
       :alt: image
 
 #. Now we need to make sure that all of the paths that we just walked
@@ -906,7 +906,7 @@ open your Git Desktop and VS Code.
 
       -  Graphs (see Step 11 on how to generate Graphs)
 
-   .. image:: /_static/reveal.png
+   .. image:: ../_static/reveal.png
       :alt: image
 
 #. You may have noticed that your output includes ALL possible variables
@@ -940,22 +940,20 @@ open your Git Desktop and VS Code.
       indicates it is ’off.’ The one in GREEN will be used to generate a
       report.
 
-   .. image:: /_static/onoff.png
+   .. image:: ../_static/onoff.png
       :alt: image
 
 Additional Materials
 --------------------
 
 -  Now that you’re familiar with the basics, we encourage you to review
-   the `onboarding video series <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
+   the `onboarding video series <https://www.youtube.com/embedPLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
    for more details.
-
--  If using VS Code or PyCharm and unsure of how to proceed with setting
-   up the virtual environment (or if you have any other questions or
-   concerns), please reach out to the RuFaS team for support.
 
 -  If you are going to be creating or running a lot of code, we
    recommend you review `Uncle Bob’s clean code philosophy
    videos <https://www.youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`__.
    Take your time and review all 6 videos in the series.
 
+-  If you still unsure of how to get started, you're stuck, or have any other questions or
+   concerns, please reach out to the RuFaS team for support!
