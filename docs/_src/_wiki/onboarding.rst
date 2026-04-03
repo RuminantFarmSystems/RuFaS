@@ -26,7 +26,7 @@ RuFaS model specifically, but instead provides a general overview of the
 capabilities of RuFaS and expected outputs of each module.
 
 .. figure:: /_static/fullmodelsummary.png
-   :alt: This is a brief overview of the RuFaS Model
+   :alt: image
    :name: fig:example
    :width: 100%
 
@@ -168,7 +168,7 @@ our Scientific Documentation (linked at the top of this page).
 
    <div style="text-align: center; margin: 20px 0;">
      <iframe width="70%" height="400"
-       src="https://www.youtube.com/watch?v=6RbJs0iZmgo"
+       src="https://www.youtube.com/embed/6RbJs0iZmgo"
        title="Introduction to Working with RuFaS"
        frameborder="0"
        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -258,7 +258,7 @@ Still have questions? Maybe this clip can help before you dive in.
 
    <div style="text-align: center; margin: 20px 0;">
      <iframe width="70%" height="400"
-       src="https://www.youtube.com/watch?v=15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2"
+       src="https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2"
        title="Guide to Python, IDEs, GitHub, and RuFaS"
        frameborder="0"
        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -454,7 +454,7 @@ more straighforward.
 
 If you need more, check out the introductory videos created by our team of experts and developers below!
 
-`Checkout the whole playlist! <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
+`Checkout the whole playlist! <https://www.youtube.com/embedPLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
 
 
 **Beginner’s Guide to RuFaS: Basic Principles and Practice**
