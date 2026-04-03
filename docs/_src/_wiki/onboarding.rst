@@ -1,38 +1,41 @@
+.. container:: titlepage
 ====================
 **Welcome to RuFaS**
 ====================
 
-.. container:: titlepage
+**Introduction to RuFaS for New Team Members**
+----------------------------------------------
+**Onboarding Document v.2**
+2026-04-02
 
-   **Welcome to RuFaS**
-    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/tree/dev/scientific_documentation>`__
 
-   Introduction to RuFaS for New Team Members
-
-   2025-06-20
-
-   .. image:: /_static/rufas.png
-      :align: center
+   .. image:: ../_static/rufas.png
       :alt: image
-      :width: 40.0%
-
-   Onboarding Document v.2
+      :width: 30%
 
 **The Modules of RuFaS**
 ------------------------
+
+.. image:: ../_static/fullmodelsummary.png
+   :alt: image
+   :name: fig:example
+   :width: 100%
+
+.. container:: itemize
 
 This section is not required for installing software or working with the
 RuFaS model specifically, but instead provides a general overview of the
 capabilities of RuFaS and expected outputs of each module.
 
-.. figure:: /_static/fullmodelsummary.png
-   :alt: This is a brief overview of the RuFaS Model
-   :name: fig:example
-   :width: 100.0%
+Animal Module
+^^^^^^^^^^^^^^
 
-.. container:: itemize
+   .. image:: ../_static/animalmod.png
+      :alt: image
+      :width: 10%
+      :align: center
 
-   **Animal Module** - is in charge of simulating individual animal’s
+   This module is in charge of simulating individual animal’s
    daily activities within the herd. In order to sufficiently simulate a
    herd, there are many inputs in the animal module covering herd
    performance and management.The module covers the lifecycle classes of
@@ -50,10 +53,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Herd exits
 
-   .. image:: /_static/animalmod.png
-      :alt: image
-      :width: 60.0%
-      :align: center
+
 
    Remember, while overarching decisions about whether you’d like to
    provide the diet recipe or have RuFaS formulate one for you and
@@ -68,7 +68,16 @@ capabilities of RuFaS and expected outputs of each module.
    intakes and feed efficiency, enteric methane emissions, feed or
    manure emissions, and manure housing emissions.
 
-   **Manure Module** - after the animal module has modeled animal
+
+Manure Module
+^^^^^^^^^^^^^^
+
+   .. image:: ../_static/manuremod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   After the animal module has modeled animal
    excretion, the manure passes to the manure module where it is removed
    from the housing area by a manure handler, digested and / or
    separated, if appropriate, and stored. Each pen in the animal module
@@ -87,16 +96,18 @@ capabilities of RuFaS and expected outputs of each module.
    -  Storage: length of time, cover/crust/cap and flare on liquid
       manure storage
 
-   .. image:: /_static/manuremod.png
-      :alt: image
-      :width: 60.0%
-      :align: center
-
    The output of this module estimates manure composition, quantity of
    manure, storage emissions, biogas capture from anaerobic digestion,
    and avoided ammonium emissions..
 
-   **Feed Storage Module** - is flexible for users that may choose to
+Feed Storage Module
+^^^^^^^^^^^^^^^^^^^^
+   .. image:: ../_static/feedmod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   The Feed Storage Module is flexible for users that may choose to
    provide their own ration or have RuFaS build and feed a ration
    optimized for least-cost, RuFaS needs a set of ingredients to work
    from. The RuFaS feed library should be consulted for the full list of
@@ -116,15 +127,18 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Milk reduction maximum and tolerance
 
-   .. image:: /_static/feedmod.png
-      :alt: image
-      :width: 60.0%
-      :align: center
-
    Outputs of interest for this module will consider production and
    environmental impacts.
 
-   **Soil and Crop Module** - simulates the daily changes in soil
+
+Soil and Crop Module
+^^^^^^^^^^^^^^^^^^^^
+   .. image:: ../_static/soilcropmod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   This simulates the daily changes in soil
    composition and crop growth based on nutrient availability, weather
    and soil types. A user provides information like the application of
    manure or synthetic fertilizer, tillage, planting and harvesting.
@@ -136,33 +150,44 @@ capabilities of RuFaS and expected outputs of each module.
    manure application or manage inventories of the harvested crops and
    provide feed to the herd based on availability.
 
-   .. image:: /_static/soilcropmod.png
-      :alt: image
-      :width: 60.0%
-      :align: center
-
    Outputs are estimated crop measures like biomass accumulation or
    harvest yields and field parameters like emissions, soil erosion,
-   phosphorus runoff and nitrate percolation.
+   phosphorus runoff and nitrate percolation. This image summarizes 
+   the processes and outputs of the four modules of the RuFaS Model
 
-.. figure:: /_static/Modules.png
+.. list-table::
    :align: center
-   :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
-   :name: fig:example
-   :width: 80.0%
 
-This image summarizes the processes and outputs of the four
-modules of the RuFaS Model
+   * - .. image:: ../_static/Modules.png
+         :width: 100%
 
-.. figure:: /_static/EEE.png
-   :align: center
-   :alt: This is my image
-   :name: fig:example
-   :width: 80.0%
+     - .. image:: ../_static/EEE.png
+         :width: 100%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
-our Scientific Documentation Manual available in This is XXXXXXXXXXX.
+our Scientific Documentation (below).
+
+.. container:: scidoc-button
+
+   .. image:: ../_static/scidoccover.png
+      :alt: Scientific documentation cover
+      :target: https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf
+      :width: 30%
+      :align: center
+
+   `Link to Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
+
+
+.. image:: ../_static/vidimg_onboardintro.png
+   :alt: Watch the RuFaS introduction video
+   :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
+   :width: 30%
+   :align: center
+
+**Introduction to Setting Up RuFaS**
+
+Click on the image for an introduction to this process.
 
 **Downloading the Software**
 ----------------------------
@@ -196,6 +221,8 @@ the tools needed to work with RuFaS. You will be downloading:
    debugging software. At it’s most basic, an IDE consists of at least a
    source-code editor, build automation tools, and a debugger. There are
    many to choose from, but our RuFaS team primarily works in VS Code.
+   
+   
    *\*NOTE: If you are familiar with IDE’s and how to use them, you may
    download PyCharm or another IDE of your choice.*
 
@@ -240,8 +267,26 @@ while collaborating.
 -  Has an integrated terminal where you can run Git commands manually if
    needed.
 
+
+
+**Video Guide to the Tools of Running RuFaS**
+
+.. image:: ../_static/vidimg_softwaresetup.png
+   :alt: link
+   :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
+   :width: 30%
+   :align: center
+
+   Still have questions? Click the link above.
+
+
+
+
+
 The following sections will describe the steps of installation in more
-detail. Let’s get started!
+detail. 
+
+Let’s get started!
 
 *Install Git* 
 --------------
@@ -276,8 +321,10 @@ repository for your offline repository.
 
                             git version 2.40.0.windows.
 
-   .. image:: /_static/GitSite.png
+   .. image:: ../_static/GitSite.png
       :alt: image
+      :width: 40%
+      :align: center
 
    **Cloning and Repository Set Up** To set up RuFaS, we first must
    clone the GitHub repository. Recall that this creates a working copy
@@ -374,8 +421,10 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
 -  Follow the setup wizard to install VS Code.
 
-.. image:: /_static/VSsite.png
+.. image:: ../_static/VSsite.png
    :alt: image
+   :width: 40%
+   :align: center
 
 -  **Set Up Virtual Environment** A virtual environment is a
    self-contained directory that isolates Python packages and their
@@ -390,13 +439,13 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
    -  Open VS Code and locate the terminal at the bottom of the window.
 
-   .. image:: /_static/locateTerm.png
+   .. image:: ../_static/locateTerm.png
       :alt: image
 
    -  If it is not immediately apparent, go to the menu at the top of
       the window and create a "New Terminal"
 
-   .. image:: /_static/newterminal.png
+   .. image:: ../_static/newterminal.png
       :alt: image
 
    -  You'll need to have at least the minimum supported versions of each dependency installed to run RuFaS.
@@ -406,8 +455,8 @@ To ensure your dependencies are up to date, you'll just need to run:
 
                   pip install .
 
-  .. image:: /_static/configrufas.png
-     :alt: RuFaS Configuration
+  .. image:: ../_static/configrufas.png
+     :alt: image
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.
@@ -423,6 +472,11 @@ you should have already:
 If you have completed all of those steps, let’s learn a little bit about
 the program and some basic principles to make running RuFaS a little
 more straighforward.
+
+If you need more, check out the introductory videos created by our team of experts and developers below!
+
+`Checkout the whole playlist! <https://www.youtube.com/embedPLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
+
 
 **Beginner’s Guide to RuFaS: Basic Principles and Practice**
 ------------------------------------------------------------
@@ -574,10 +628,10 @@ online GitHub repository and should be updated. If you are not a
 developer, it is recommended that you do most of your work through the
 Git Desktop.
 
--  Test Default Settings of RuFaS
+-  ** Test Default Settings of RuFaS **
 
-   .. figure:: /_static/terminal.png
-      :alt: Your terminal will appear at the bottom of your VS Code screen.
+   .. image:: ../_static/terminal.png
+      :alt: image
       :name: fig:example
 
       Your terminal will appear at the bottom of your VS Code screen.
@@ -596,11 +650,7 @@ Git Desktop.
       concerned about the number or severity, contact a Dev team member
       for more details.
 
-   -  For more details about how to set up your virtual environment and
-      run simulations, check out this `training
-      video <https://www.youtube.com/watch?v=A_u2cxla42c>`__.
-
--  Checkout a new branch
+-  ** Checkout a new branch **
 
    -  Using Git Desktop - At the top of your screen, click on the
       "Current Branch" tab and search for the branch that you want to
@@ -742,11 +792,10 @@ open your Git Desktop and VS Code.
    in by looking at the bottom left of your screen. You may also create
    a new branch to work in if you wish.
 
-   .. figure:: /_static/checkbranch.png
-      :alt: The bottom of your VS Code window is where you will find the
-      branch you’re working in.
+   .. image:: ../_static/checkbranch.png
+      :alt: image
       :name: fig:example
-      :width: 80.0%
+      :width: 80%
 
       The bottom of your VS Code window is where you will find the
       branch you’re working in.
@@ -758,10 +807,10 @@ open your Git Desktop and VS Code.
    -  In the menu to the left select the input dropdown and then select
       metadata dropdown.
 
-    .. figure:: /_static/findmeta.png
-      :alt: Navigating metadata
+    .. image:: ../_static/findmeta.png
+      :alt: image
       :name: fig:findmeta
-      :width: 80.0%
+      :width: 80%
 
       The VS Code window has a menu on the left side of the screen where
       you will spend the most time navigating between dropdowns to find
@@ -781,10 +830,10 @@ open your Git Desktop and VS Code.
 
       There you will find example_freestall_task.json.
 
-   .. figure:: /_static/default_task.png
-      :alt: default task mngr
+   .. image:: ../_static/default_task.png
+      :alt: image
       :name: fig:example
-      :width: 100.0%
+      :width: 100%
 
       This figure demonstrates where you may find the
       task_manager_metadata.json file and the location of the path for
@@ -796,10 +845,10 @@ open your Git Desktop and VS Code.
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-    .. figure:: /_static/default_task.png
-       :alt: default task
+    .. image:: ../_static/default_task.png
+       :alt: image
        :name: fig:example
-       :width: 100.0%
+       :width: 100%
 
         When you open the example_freestall_task.json file, this is what you should
         see. Notice that the example scenario is a single run of a
@@ -820,10 +869,10 @@ open your Git Desktop and VS Code.
          remember. We recommend "example_metadatav1.json" or something
          similar.
 
-    .. figure:: /_static/example_metadata.png
-       :alt: default meta
+    .. image:: ../_static/example_metadata.png
+       :alt: image
        :name: fig:example
-       :width: 100.0%
+       :width: 100%
 
         This is an example of what you will see when you open your example
         metadata json file. Depending on what you are looking for, you may
@@ -844,7 +893,7 @@ open your Git Desktop and VS Code.
    -  In your newly created json file, change the "cow_num" from 100 to
       10000 and your "replace_num" from 500 to 3000.
 
-   .. image:: /_static/cownum.png
+   .. image:: ../_static/cownum.png
       :alt: image
 
 #. Now we need to make sure that all of the paths that we just walked
@@ -889,7 +938,7 @@ open your Git Desktop and VS Code.
 
       -  Graphs (see Step 11 on how to generate Graphs)
 
-   .. image:: /_static/reveal.png
+   .. image:: ../_static/reveal.png
       :alt: image
 
 #. You may have noticed that your output includes ALL possible variables
@@ -923,22 +972,20 @@ open your Git Desktop and VS Code.
       indicates it is ’off.’ The one in GREEN will be used to generate a
       report.
 
-   .. image:: /_static/onoff.png
+   .. image:: ../_static/onoff.png
       :alt: image
 
 Additional Materials
 --------------------
 
 -  Now that you’re familiar with the basics, we encourage you to review
-   the `onboarding video series <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
+   the `onboarding video series <https://www.youtube.com/embedPLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
    for more details.
-
--  If using VS Code or PyCharm and unsure of how to proceed with setting
-   up the virtual environment (or if you have any other questions or
-   concerns), please reach out to the RuFaS team for support.
 
 -  If you are going to be creating or running a lot of code, we
    recommend you review `Uncle Bob’s clean code philosophy
    videos <https://www.youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`__.
    Take your time and review all 6 videos in the series.
 
+-  If you still unsure of how to get started, you're stuck, or have any other questions or
+   concerns, please reach out to the RuFaS team for support!
