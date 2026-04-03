@@ -178,15 +178,15 @@ our Scientific Documentation (below).
 
    `Link to Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
 
-**Introduction to Setting Up RuFaS**
-
-Click on the image for an introduction to this process.
 
 .. image:: ../_static/vidimg_onboardintro.png
    :alt: Watch the RuFaS introduction video
    :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
    :width: 30%
    :align: center
+
+**Introduction to Setting Up RuFaS**
+Click on the image for an introduction to this process.
 
 **Downloading the Software**
 ----------------------------
@@ -220,6 +220,8 @@ the tools needed to work with RuFaS. You will be downloading:
    debugging software. At it’s most basic, an IDE consists of at least a
    source-code editor, build automation tools, and a debugger. There are
    many to choose from, but our RuFaS team primarily works in VS Code.
+   
+   
    *\*NOTE: If you are familiar with IDE’s and how to use them, you may
    download PyCharm or another IDE of your choice.*
 
