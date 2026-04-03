@@ -175,7 +175,9 @@ science and formulas behind the curtain, please take some time to review
 our Scientific Documentation (linked at the top of this page).
 
 **Introduction to Setting Up RuFaS**
+
 Click on the image for an introduction to this process.
+
 .. image:: ../_static/vidimg_onboardintro.png
    :alt: Watch the RuFaS introduction video
    :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
@@ -261,11 +263,13 @@ while collaborating.
 
 
 **Video Guide to the Tools of Running RuFaS**
+
 .. image:: ../_static/vidimg_softwaresetup.png
    :alt: link
    :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
    :width: 10%
    :align: center
+
    Still have questions? Click the link above.
 
 
@@ -312,6 +316,8 @@ repository for your offline repository.
 
    .. image:: ../_static/GitSite.png
       :alt: image
+      :width: 25%
+      :align: center
 
    **Cloning and Repository Set Up** To set up RuFaS, we first must
    clone the GitHub repository. Recall that this creates a working copy
@@ -410,6 +416,8 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
 
 .. image:: ../_static/VSsite.png
    :alt: image
+   :width: 25%
+   :align: center
 
 -  **Set Up Virtual Environment** A virtual environment is a
    self-contained directory that isolates Python packages and their
