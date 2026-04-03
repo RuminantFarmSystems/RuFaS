@@ -11,7 +11,7 @@
 
    2025-06-20
 
-   .. image:: /_static/rufas.png
+   .. image:: ../_static/rufas.png
       :align: center
       :alt: image
       :width: 40%
@@ -248,20 +248,9 @@ while collaborating.
 
 Still have questions? Maybe this clip can help before you dive in.
 
-.. raw:: html
-
-   <div style="text-align: center; margin: 20px 0;">
-     <iframe width="70%" height="400"
-       src="https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2"
-       title="Guide to Python, IDEs, GitHub, and RuFaS"
-       frameborder="0"
-       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-       allowfullscreen>
-     </iframe>
-   </div>
 
 .. image:: /_static/vidimg_softwaresetup.png
-   :alt: Watch the RuFaS introduction video
+   :alt: A little more about software setup!
    :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
    :width: 70%
    :align: center
@@ -607,7 +596,7 @@ online GitHub repository and should be updated. If you are not a
 developer, it is recommended that you do most of your work through the
 Git Desktop.
 
--  Test Default Settings of RuFaS
+-  ** Test Default Settings of RuFaS **
 
    .. figure:: /_static/terminal.png
       :alt: image
@@ -629,7 +618,7 @@ Git Desktop.
       concerned about the number or severity, contact a Dev team member
       for more details.
 
--  Checkout a new branch
+-  ** Checkout a new branch **
 
    -  Using Git Desktop - At the top of your screen, click on the
       "Current Branch" tab and search for the branch that you want to
