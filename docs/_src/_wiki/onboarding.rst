@@ -10,6 +10,7 @@
    
 **Introduction to RuFaS for New Team Members**
 ----------------------------------------------
+   **Onboarding Document v.2**
    2026-04-02
 
    .. image:: ../_static/rufas.png
@@ -17,7 +18,7 @@
       :alt: image
       :width: 30%
 
-   Onboarding Document v.2
+  
 
 **The Modules of RuFaS**
 ------------------------
@@ -181,7 +182,7 @@ Click on the image for an introduction to this process.
 .. image:: ../_static/vidimg_onboardintro.png
    :alt: Watch the RuFaS introduction video
    :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
-   :width: 10%
+   :width: 30%
    :align: center
 
 **Downloading the Software**
@@ -267,7 +268,7 @@ while collaborating.
 .. image:: ../_static/vidimg_softwaresetup.png
    :alt: link
    :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
-   :width: 10%
+   :width: 30%
    :align: center
 
    Still have questions? Click the link above.
@@ -316,7 +317,7 @@ repository for your offline repository.
 
    .. image:: ../_static/GitSite.png
       :alt: image
-      :width: 25%
+      :width: 40%
       :align: center
 
    **Cloning and Repository Set Up** To set up RuFaS, we first must
