@@ -22,10 +22,6 @@
 **The Modules of RuFaS**
 ------------------------
 
-This section is not required for installing software or working with the
-RuFaS model specifically, but instead provides a general overview of the
-capabilities of RuFaS and expected outputs of each module.
-
 .. image:: ../_static/fullmodelsummary.png
    :alt: image
    :name: fig:example
@@ -33,7 +29,19 @@ capabilities of RuFaS and expected outputs of each module.
 
 .. container:: itemize
 
-   **Animal Module** - is in charge of simulating individual animal’s
+This section is not required for installing software or working with the
+RuFaS model specifically, but instead provides a general overview of the
+capabilities of RuFaS and expected outputs of each module.
+
+Animal Module
+^^^^^^^^^^^^^^
+
+   .. image:: ../_static/animalmod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   This module is in charge of simulating individual animal’s
    daily activities within the herd. In order to sufficiently simulate a
    herd, there are many inputs in the animal module covering herd
    performance and management.The module covers the lifecycle classes of
@@ -51,10 +59,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Herd exits
 
-   .. image:: ../_static/animalmod.png
-      :alt: image
-      :width: 15%
-      :align: center
+
 
    Remember, while overarching decisions about whether you’d like to
    provide the diet recipe or have RuFaS formulate one for you and
@@ -69,7 +74,16 @@ capabilities of RuFaS and expected outputs of each module.
    intakes and feed efficiency, enteric methane emissions, feed or
    manure emissions, and manure housing emissions.
 
-   **Manure Module** - after the animal module has modeled animal
+
+Manure Module
+^^^^^^^^^^^^^^
+
+   .. image:: ../_static/manuremod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   After the animal module has modeled animal
    excretion, the manure passes to the manure module where it is removed
    from the housing area by a manure handler, digested and / or
    separated, if appropriate, and stored. Each pen in the animal module
@@ -88,16 +102,18 @@ capabilities of RuFaS and expected outputs of each module.
    -  Storage: length of time, cover/crust/cap and flare on liquid
       manure storage
 
-   .. image:: ../_static/manuremod.png
-      :alt: image
-      :width: 15%
-      :align: center
-
    The output of this module estimates manure composition, quantity of
    manure, storage emissions, biogas capture from anaerobic digestion,
    and avoided ammonium emissions..
 
-   **Feed Storage Module** - is flexible for users that may choose to
+Feed Storage Module
+^^^^^^^^^^^^^^^^^^^^
+   .. image:: ../_static/feedmod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   The Feed Storage Module is flexible for users that may choose to
    provide their own ration or have RuFaS build and feed a ration
    optimized for least-cost, RuFaS needs a set of ingredients to work
    from. The RuFaS feed library should be consulted for the full list of
@@ -117,15 +133,18 @@ capabilities of RuFaS and expected outputs of each module.
 
    -  Milk reduction maximum and tolerance
 
-   .. image:: ../_static/feedmod.png
-      :alt: image
-      :width: 15%
-      :align: center
-
    Outputs of interest for this module will consider production and
    environmental impacts.
 
-   **Soil and Crop Module** - simulates the daily changes in soil
+
+Soil and Crop Module
+^^^^^^^^^^^^^^^^^^^^
+   .. image:: ../_static/soilcropmod.png
+      :alt: image
+      :width: 10%
+      :align: center
+
+   This simulates the daily changes in soil
    composition and crop growth based on nutrient availability, weather
    and soil types. A user provides information like the application of
    manure or synthetic fertilizer, tillage, planting and harvesting.
@@ -136,11 +155,6 @@ capabilities of RuFaS and expected outputs of each module.
    Manure module and the Feed Storage module to request farm generated
    manure application or manage inventories of the harvested crops and
    provide feed to the herd based on availability.
-
-   .. image:: ../_static/soilcropmod.png
-      :alt: image
-      :width: 15%
-      :align: center
 
    Outputs are estimated crop measures like biomass accumulation or
    harvest yields and field parameters like emissions, soil erosion,
@@ -160,10 +174,12 @@ If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
 our Scientific Documentation (linked at the top of this page).
 
+**Introduction to Setting Up RuFaS**
+Click on the image for an introduction to this process.
 .. image:: ../_static/vidimg_onboardintro.png
    :alt: Watch the RuFaS introduction video
    :target: https://www.youtube.com/watch?v=6RbJs0iZmgo
-   :width: 70%
+   :width: 10%
    :align: center
 
 **Downloading the Software**
@@ -242,14 +258,19 @@ while collaborating.
 -  Has an integrated terminal where you can run Git commands manually if
    needed.
 
-Still have questions? Maybe this clip can help before you dive in.
 
 
+**Video Guide to the Tools of Running RuFaS**
 .. image:: ../_static/vidimg_softwaresetup.png
-   :alt: A little more about software setup!
+   :alt: link
    :target: https://www.youtube.com/embed/15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2
-   :width: 70%
+   :width: 10%
    :align: center
+   Still have questions? Click the link above.
+
+
+
+
 
 The following sections will describe the steps of installation in more
 detail. 
