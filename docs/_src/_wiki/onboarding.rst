@@ -14,7 +14,7 @@
    .. image:: /_static/rufas.png
       :align: center
       :alt: image
-      :width: 40.0%
+      :width: 40%
 
    Onboarding Document v.2
 
@@ -28,7 +28,7 @@ capabilities of RuFaS and expected outputs of each module.
 .. figure:: /_static/fullmodelsummary.png
    :alt: This is a brief overview of the RuFaS Model
    :name: fig:example
-   :width: 100.0%
+   :width: 100%
 
 .. container:: itemize
 
@@ -52,7 +52,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/animalmod.png
       :alt: image
-      :width: 60.0%
+      :width: 60%
       :align: center
 
    Remember, while overarching decisions about whether you’d like to
@@ -89,7 +89,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/manuremod.png
       :alt: image
-      :width: 60.0%
+      :width: 60%
       :align: center
 
    The output of this module estimates manure composition, quantity of
@@ -118,7 +118,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/feedmod.png
       :alt: image
-      :width: 60.0%
+      :width: 60%
       :align: center
 
    Outputs of interest for this module will consider production and
@@ -138,7 +138,7 @@ capabilities of RuFaS and expected outputs of each module.
 
    .. image:: /_static/soilcropmod.png
       :alt: image
-      :width: 60.0%
+      :width: 60%
       :align: center
 
    Outputs are estimated crop measures like biomass accumulation or
@@ -147,22 +147,34 @@ capabilities of RuFaS and expected outputs of each module.
 
 .. figure:: /_static/Modules.png
    :align: center
-   :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
+   :alt: image
    :name: fig:example
-   :width: 80.0%
+   :width: 80%
 
 This image summarizes the processes and outputs of the four
 modules of the RuFaS Model
 
 .. figure:: /_static/EEE.png
    :align: center
-   :alt: This is my image
+   :alt: image
    :name: fig:example
-   :width: 80.0%
+   :width: 80%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
-our Scientific Documentation Manual available in This is XXXXXXXXXXX.
+our Scientific Documentation (linked at the top of this page).
+
+.. raw:: html
+
+   <div style="text-align: center; margin: 20px 0;">
+     <iframe width="70%" height="400"
+       src="https://www.youtube.com/watch?v=6RbJs0iZmgo"
+       title="Introduction to Working with RuFaS"
+       frameborder="0"
+       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+       allowfullscreen>
+     </iframe>
+   </div>
 
 **Downloading the Software**
 ----------------------------
@@ -240,8 +252,24 @@ while collaborating.
 -  Has an integrated terminal where you can run Git commands manually if
    needed.
 
+Still have questions? Maybe this clip can help before you dive in.
+
+.. raw:: html
+
+   <div style="text-align: center; margin: 20px 0;">
+     <iframe width="70%" height="400"
+       src="https://www.youtube.com/watch?v=15sfDK986FQ&list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1&index=2"
+       title="Guide to Python, IDEs, GitHub, and RuFaS"
+       frameborder="0"
+       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+       allowfullscreen>
+     </iframe>
+   </div>
+
 The following sections will describe the steps of installation in more
-detail. Let’s get started!
+detail. 
+
+Let’s get started!
 
 *Install Git* 
 --------------
@@ -407,7 +435,7 @@ To ensure your dependencies are up to date, you'll just need to run:
                   pip install .
 
   .. image:: /_static/configrufas.png
-     :alt: RuFaS Configuration
+     :alt: image
 
 **Great job!** If you’re reading this, you’ve reached the end of this
 section and have downloaded all of the programs you need to get started.
@@ -423,6 +451,11 @@ you should have already:
 If you have completed all of those steps, let’s learn a little bit about
 the program and some basic principles to make running RuFaS a little
 more straighforward.
+
+If you need more, check out the introductory videos created by our team of experts and developers below!
+
+`Checkout the whole playlist! <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
+
 
 **Beginner’s Guide to RuFaS: Basic Principles and Practice**
 ------------------------------------------------------------
@@ -577,7 +610,7 @@ Git Desktop.
 -  Test Default Settings of RuFaS
 
    .. figure:: /_static/terminal.png
-      :alt: Your terminal will appear at the bottom of your VS Code screen.
+      :alt: image
       :name: fig:example
 
       Your terminal will appear at the bottom of your VS Code screen.
@@ -595,10 +628,6 @@ Git Desktop.
       Studio). Many of the errors can be ignored, but if you are
       concerned about the number or severity, contact a Dev team member
       for more details.
-
-   -  For more details about how to set up your virtual environment and
-      run simulations, check out this `training
-      video <https://www.youtube.com/watch?v=A_u2cxla42c>`__.
 
 -  Checkout a new branch
 
@@ -743,10 +772,9 @@ open your Git Desktop and VS Code.
    a new branch to work in if you wish.
 
    .. figure:: /_static/checkbranch.png
-      :alt: The bottom of your VS Code window is where you will find the
-      branch you’re working in.
+      :alt: image
       :name: fig:example
-      :width: 80.0%
+      :width: 80%
 
       The bottom of your VS Code window is where you will find the
       branch you’re working in.
@@ -759,9 +787,9 @@ open your Git Desktop and VS Code.
       metadata dropdown.
 
     .. figure:: /_static/findmeta.png
-      :alt: Navigating metadata
+      :alt: image
       :name: fig:findmeta
-      :width: 80.0%
+      :width: 80%
 
       The VS Code window has a menu on the left side of the screen where
       you will spend the most time navigating between dropdowns to find
@@ -782,9 +810,9 @@ open your Git Desktop and VS Code.
       There you will find example_freestall_task.json.
 
    .. figure:: /_static/default_task.png
-      :alt: default task mngr
+      :alt: image
       :name: fig:example
-      :width: 100.0%
+      :width: 100%
 
       This figure demonstrates where you may find the
       task_manager_metadata.json file and the location of the path for
@@ -797,9 +825,9 @@ open your Git Desktop and VS Code.
    path, navigate to the metadata json file.
 
     .. figure:: /_static/default_task.png
-       :alt: default task
+       :alt: image
        :name: fig:example
-       :width: 100.0%
+       :width: 100%
 
         When you open the example_freestall_task.json file, this is what you should
         see. Notice that the example scenario is a single run of a
@@ -821,9 +849,9 @@ open your Git Desktop and VS Code.
          similar.
 
     .. figure:: /_static/example_metadata.png
-       :alt: default meta
+       :alt: image
        :name: fig:example
-       :width: 100.0%
+       :width: 100%
 
         This is an example of what you will see when you open your example
         metadata json file. Depending on what you are looking for, you may
