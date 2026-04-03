@@ -134,11 +134,11 @@ class EconomicEquations:
     def loss_carry_forward(prev_taxable: float, prev_loss: float) -> float:
         """Loss carry forward using Equation 21."""
         return prev_taxable + prev_loss if prev_taxable < 0 else prev_loss
-    
+
     @staticmethod
     def max_loss_utilized(net_rev: float, carried_loss: float) -> float:
         """Maximum loss utilization using Equation 22."""
-        carry_forward_limit = 0.8 
+        carry_forward_limit = 0.8
         return min(abs(carried_loss), net_rev * carry_forward_limit)
 
     @staticmethod
