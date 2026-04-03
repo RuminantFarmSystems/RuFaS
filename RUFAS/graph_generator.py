@@ -468,40 +468,38 @@ class GraphGenerator:
         title = graph_details.get("title")
         log_pool: list[dict[str, str | dict[str, str]]] = []
         for key, value in filtered_pool.items():
-            if isinstance(value["values"], list):
-                values = value["values"]
+            values = value["values"]
+            if isinstance(values, list):
+                bad_items = [
+                    (index, item)
+                    for index, item in enumerate(values)
+                    if not isinstance(item, (int, float))
+                ]
+                if bad_items:
+                    bad_types = {type(item) for _, item in bad_items}
+                    bad_locations = [f"index {index}: {repr(item)}" for index, item in bad_items]
 
-                if isinstance(values, list):
-                    bad_items = [
-                        (index, item)
-                        for index, item in enumerate(values)
-                        if not isinstance(item, (int, float))
-                    ]
-                    if bad_items:
-                        bad_types = {type(item) for _, item in bad_items}
-                        bad_locations = [f"index {index}: {repr(item)}" for index, item in bad_items]
-
-                        log_pool.append(
-                            {
-                                "warning": f"Bad data found in {title} data set",
-                                "message": (
-                                    f"{key} key contains non-numerical data of type(s) {bad_types} at "
-                                    f"{', '.join(bad_locations)} and will be sanitized for graphing."
-                                ),
-                                "info_map": info_map,
-                            }
-                        )
-                elif not isinstance(values, (int, float)):
                     log_pool.append(
                         {
                             "warning": f"Bad data found in {title} data set",
                             "message": (
-                                f"{key} key contains non-numerical data of type {type(values)} "
-                                "and will be sanitized for graphing."
+                                f"{key} key contains non-numerical data of type(s) {bad_types} at "
+                                f"{', '.join(bad_locations)} and will be sanitized for graphing."
                             ),
                             "info_map": info_map,
                         }
                     )
+            elif not isinstance(values, (int, float)):
+                log_pool.append(
+                    {
+                        "warning": f"Bad data found in {title} data set",
+                        "message": (
+                            f"{key} key contains non-numerical data of type {type(values)} "
+                            "and will be sanitized for graphing."
+                        ),
+                        "info_map": info_map,
+                    }
+                )
 
         return log_pool
 
