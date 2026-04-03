@@ -2701,6 +2701,7 @@ class OutputManager(object):
             "omit_legend_suffix": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "mask_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_calendar_dates": partial(self.validate_type, expected=bool, type_label="a boolean"),
