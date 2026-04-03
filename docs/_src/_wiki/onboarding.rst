@@ -5,7 +5,7 @@
 .. container:: titlepage
 
    **Welcome to RuFaS**
-    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/tree/dev/scientific_documentation>`__
+    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
 
    
 **Introduction to RuFaS for New Team Members**
