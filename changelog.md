@@ -55,6 +55,7 @@ v1.0.0
 - [2902](https://github.com/RuminantFarmSystems/RuFaS/pull/2902) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
 - [2740](https://github.com/RuminantFarmSystems/RuFaS/pull/2740) - [minor change] [NoInputChange] [NoOutputChange] Added warnings for feed purchases exceeding advance purchase allowance.
 - [2924](https://github.com/RuminantFarmSystems/RuFaS/pull/2924) - [minor change] [NoInputChange] [NoOutputChange] Updated advance purchase allowance to prevent excessive warnings for example run.
+- [2929](https://github.com/RuminantFarmSystems/RuFaS/pull/2929) - [minor change] [GraphGenerator] [NoInputChange] [NoOutputChange] Sanitizes non-numerical data sent to graph generator to allow graphing to occur despite.
 
 ### v1.0.0
 
