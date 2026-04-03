@@ -1,13 +1,8 @@
+.. container:: titlepage
 ====================
 **Welcome to RuFaS**
 ====================
 
-.. container:: titlepage
-
-   **Welcome to RuFaS**
-    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf>`__
-
-   
 **Introduction to RuFaS for New Team Members**
 ----------------------------------------------
    **Onboarding Document v.2**
@@ -17,8 +12,6 @@
       :align: center
       :alt: image
       :width: 30%
-
-  
 
 **The Modules of RuFaS**
 ------------------------
@@ -173,7 +166,15 @@ Soil and Crop Module
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
-our Scientific Documentation (linked at the top of this page).
+our Scientific Documentation (below).
+
+.. image:: ../_static/scidoccover.png
+   :alt: link
+   :target: https://github.com/RuminantFarmSystems/RuFaS/blob/dev/docs/scientific/main.pdf
+   :width: 30%
+   :align: center
+
+Link to Scientific documentation
 
 **Introduction to Setting Up RuFaS**
 
