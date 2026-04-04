@@ -327,7 +327,7 @@ def test_execute_daily_field_operations(
     simulation_engine.feed_manager = MagicMock()
 
     # Act
-    result = simulation_engine._execute_daily_field_operations()
+    result = simulation_engine._execute_daily_field_with_storage_operations()
 
     # Assert
     mock_generate_daily_manure_applications.assert_called_once_with()
@@ -371,7 +371,7 @@ def test_execute_daily_field_operations_no_harvested_crops(
     simulation_engine.feed_manager = MagicMock()
 
     # Act
-    result = simulation_engine._execute_daily_field_operations()
+    result = simulation_engine._execute_daily_field_with_storage_operations()
 
     # Assert
     mock_generate_daily_manure_applications.assert_called_once_with()
