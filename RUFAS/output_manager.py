@@ -333,8 +333,12 @@ class OutputManager(object):
             pool[key]["values"].append(deepcopy(value))
 
     def add_variable(
-            self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False,
-            overwrite_simulation_day: bool = False
+        self,
+        name: str,
+        value: Any,
+        info_map: dict[str, Any],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Adds a variable to the pool.
@@ -2710,6 +2714,7 @@ class OutputManager(object):
             "omit_legend_suffix": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "mask_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_calendar_dates": partial(self.validate_type, expected=bool, type_label="a boolean"),
