@@ -955,6 +955,7 @@ def test_add_variable(
             for k in value.keys():
                 assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
 
+
 @pytest.mark.parametrize(
     "info_map, current_simulation_day, overwrite_simulation_day, expected_day_value",
     [
@@ -974,11 +975,14 @@ def test_add_variable(
         ({"class": "testClass", "function": "test_function", "simulation_day": 220}, None, True, None),
         ({"class": "testClass", "function": "test_function"}, None, True, None),
         # TODO: handle provided time argument...
-    ]
+    ],
 )
 def test_add_variable_infomap_simulation_day(
-        info_map: dict, current_simulation_day: int, overwrite_simulation_day: bool, expected_day_value: int,
-        mocker: MockerFixture
+    info_map: dict,
+    current_simulation_day: int,
+    overwrite_simulation_day: bool,
+    expected_day_value: int,
+    mocker: MockerFixture,
 ):
     """
     Test that add_variable properly adds simulation_day to the info map and respects previously specified
@@ -986,21 +990,23 @@ def test_add_variable_infomap_simulation_day(
     """
     # Setup
     om = OutputManager()
-    mocker.patch.object(om, attribute = "variables_pool", new = {}, clear = True) # mock an empty pool
-    rt = RufasTime(datetime(year = 1992, month = 1, day = 1), datetime(year = 2026, month = 1, day = 1))
-    mocker.patch(target = "rt.simulation_day", return_value = current_simulation_day)
+    mocker.patch.object(om, attribute="variables_pool", new={}, clear=True)  # mock an empty pool
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch(target="rt.simulation_day", return_value=current_simulation_day)
 
     if current_simulation_day is not None:
         # with time reference (simulate setup with SimulationEngine)
-        mocker.patch.object(om, attribute = "time", new = rt)
+        mocker.patch.object(om, attribute="time", new=rt)
     else:
         # no time reference (simulate default initialization)
-        mocker.patch.object(om, attribute = "time", new = None)
+        mocker.patch.object(om, attribute="time", new=None)
 
     # Calculations
     om.add_variable(
-        name = "test_variable", value = "hello, friends",  info_map = info_map,
-        overwrite_simulation_day = overwrite_simulation_day
+        name="test_variable",
+        value="hello, friends",
+        info_map=info_map,
+        overwrite_simulation_day=overwrite_simulation_day,
     )
 
     # Assertions
@@ -1009,8 +1015,10 @@ def test_add_variable_infomap_simulation_day(
     else:
         assert info_map.get("simulation_day") == expected_day_value
 
+
 def test_bulk_add_variable_infomap_simulation_day():
     assert False
+
 
 @pytest.mark.parametrize(
     "name, value, info_map, first_map",

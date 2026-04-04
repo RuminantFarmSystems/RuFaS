@@ -333,8 +333,12 @@ class OutputManager(object):
             pool[key]["values"].append(deepcopy(value))
 
     def add_variable(
-            self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False,
-            overwrite_simulation_day: bool = False
+        self,
+        name: str,
+        value: Any,
+        info_map: dict[str, Any],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Adds a variable to the pool.
