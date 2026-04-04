@@ -35,6 +35,8 @@ class SimulationType(Enum):
 
     FULL_FARM = "full_farm"
     FIELD_AND_FEED = "field_and_feed"
+    FIELD_ONLY = "field_only"
+    FIELD_WITH_STORAGE = "field_with_storage"
 
     @property
     def simulate_animals(self) -> bool:
@@ -109,6 +111,8 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
+            simulation_type.FIELD_ONLY: self._execute_field_only_simulation,
+            simulation_type.FIELD_WITH_STORAGE: self._execute_field_with_storage_simulation
         }
 
         self._initialize_simulation()
@@ -208,7 +212,7 @@ class SimulationEngine:
         7. Advance simulation date
 
         """
-        daily_harvested_crops = self._execute_daily_field_operations()
+        daily_harvested_crops = self._execute_daily_field_with_storage_operations()
 
         harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
         self._execute_feed_planning(harvest_schedule)
@@ -220,6 +224,38 @@ class SimulationEngine:
         self._execute_daily_manure_operations(daily_manure_data)
 
         self._report_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _execute_field_with_storage_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a farm with only the field and storage modules.
+
+        Daily Field and Feed Simulation Process:
+        1. Field operations (manure applications, harvesting)
+        4. Record keeping (time, weather, purchased feeds fed emissions)
+        5. Advance simulation date
+
+        """
+        self._execute_daily_field_with_storage_operations()
+
+        self._report_daily_records()
+
+        self._advance_time()
+
+    def _execute_field_only_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a field only modules.
+
+        Daily Field Process:
+        1. Field operations without sending the crops to the feed manager
+        2. Record keeping (time, weather, purchased feeds fed emissions)
+        3. Advance simulation date
+
+        """
+        self._execute_daily_field_only_operations()
+
+        self._report_daily_records()
 
         self._advance_time()
 
@@ -236,7 +272,7 @@ class SimulationEngine:
         5. Advance simulation date
 
         """
-        daily_harvested_crops = self._execute_daily_field_operations()
+        daily_harvested_crops = self._execute_daily_field_with_storage_operations()
 
         harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
         self._execute_feed_planning(harvest_schedule)
@@ -247,12 +283,19 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def _execute_daily_field_operations(self) -> list[HarvestedCrop]:
-        """Handles daily field operations including manure applications and crop harvesting/receiving."""
+    def _execute_daily_field_only_operations(self) -> list[HarvestedCrop]:
+        """Handles daily field operations including manure applications."""
         manure_applications: list[ManureEventNutrientRequestResults] = self.generate_daily_manure_applications()
+
         harvested_crops: list[HarvestedCrop] = self.field_manager.daily_update_routine(
             self.weather, self.time, manure_applications
         )
+
+        return harvested_crops
+
+    def _execute_daily_field_with_storage_operations(self) -> list[HarvestedCrop]:
+        """Handles daily field operations including manure applications and crop harvesting/receiving."""
+        harvested_crops: list[HarvestedCrop] = self._execute_daily_field_only_operations()
 
         for crop in harvested_crops:
             self.feed_manager.receive_crop(crop, self.time.simulation_day)
