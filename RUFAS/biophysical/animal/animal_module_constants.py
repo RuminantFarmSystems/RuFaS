@@ -95,13 +95,29 @@ class AnimalModuleConstants:
     MINIMUM_DAILY_DMI_RATIO: float = 0.01
     """Minimum estimated DMI (kg/day), as a fraction of body_weight in kg"""
 
-    MINIMUM_DMI_LACT: float = 2.0
-    """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
-    the mimimum DMI is 3.94 kg/day (Reed et al. 2015)"""
+    MINIMUM_DMI_LACT: float = 6.06
+    """Minimum pen-level DMI for lactating cows, calculated as an average across the
+    literature, kg/day (Appuhamy 2014; Appuhamy 2018; Reed 2015; Nennich 2015)."""
 
-    MINIMUM_DMI_DRY: float = 2.0
-    """Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation,
-    the minimum DMI is 7.1 kg/day (Appuhamy 2018)"""
+    MINIMUM_DMI_DRY: float = 3.6
+    """Minimum pen-level DMI for dry cows, calculated as an average across the
+    literature, kg/day (Reed 2015; Nennich 2015)."""
+
+    MINIMUM_DMI_HEIFER: float = 4.17
+    """Minimum pen-level DMI for heifers, calculated as an average across the
+    literature, kg/day (Reed 2015; Nennich 2015)."""
+
+    MINIMUM_DMI_CALF: float = 2.38
+    """Minimum pen-level DMI for calves, calculated as an average across the
+    literature, kg/day (Nennich 2015)."""
+
+    MINIMUM_DMI_LACT_FOR_MANURE_VS: float = 7.1
+    """Minimum DMI for lactating cows in the dataset used to generate the equation,
+    kg/day (Appuhamy 2018)."""
+
+    MINIMUM_DMI_DRY_FOR_MANURE_VS: float = 7.1
+    """Minimum DMI for dry cows in the dataset used to generate the equation,
+    kg/day (Appuhamy 2018)."""
 
     MINIMUM_PHOSPHORUS: float = 0.0
     """Minimum phosphorus estimate, g/day"""
