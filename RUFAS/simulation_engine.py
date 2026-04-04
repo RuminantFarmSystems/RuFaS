@@ -112,7 +112,7 @@ class SimulationEngine:
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
             simulation_type.FIELD_ONLY: self._execute_field_only_simulation,
-            simulation_type.FIELD_WITH_STORAGE: self._execute_field_with_storage_simulation
+            simulation_type.FIELD_WITH_STORAGE: self._execute_field_with_storage_simulation,
         }
 
         self._initialize_simulation()
