@@ -111,7 +111,7 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
-            simulation_type.FIELD_ONLY: self._execute_field_only_simulation
+            simulation_type.FIELD_ONLY: self._execute_field_only_simulation,
         }
 
         self._initialize_simulation()
@@ -229,9 +229,7 @@ class SimulationEngine:
     def _execute_field_only_simulation(self) -> None:
         manure_applications: list[ManureEventNutrientRequestResults] = self.generate_daily_manure_applications()
 
-        self.field_manager.daily_update_routine(
-            self.weather, self.time, manure_applications
-        )
+        self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
 
         self._report_daily_records()
 
