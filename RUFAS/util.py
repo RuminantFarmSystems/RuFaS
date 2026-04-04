@@ -164,7 +164,7 @@ class Utility:
         use_fill_value_in_gaps: bool = True,
         use_fill_value_at_end: bool = True,
         expand_data_to_observed_range: bool = False,
-    ) -> dict[str, dict[str, list[Any]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
         recorded, so that values are present for all days in a certain range.
@@ -193,8 +193,8 @@ class Utility:
 
         Returns
         -------
-        dict[str, dict[str, list[Any]]]
-            The expanded data.
+        tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
+            A tuple of the expanded data and the logs generated from the expansion process.
 
         Raises
         ------
@@ -212,12 +212,36 @@ class Utility:
         filtered_simulation_days = sorted(set(all_simulation_days))
 
         first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 0
-        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length - 1
 
+        log_pool: list[dict[str, str | dict[str, str]]] = []
         expanded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_expand.items():
             expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
             original_units = data["info_maps"][0]["units"]
+
+            start_fill = use_fill_value_before_start
+            gap_fill = use_fill_value_in_gaps
+            end_fill = use_fill_value_at_end
+
+            if data["values"]:
+                first_value = data["values"][0]
+
+                if isinstance(first_value, (dict, list, tuple)) and not isinstance(fill_value, type(first_value)):
+                    start_fill = False
+                    gap_fill = False
+                    end_fill = False
+                    fill_warning: dict[str, str | dict[str, str]] = {
+                        "warning": "Data expansion fill warning",
+                        "message": f"User-provided fill value type {type(fill_value)} does not match "
+                        f"type of data to be expanded {type(first_value)}, "
+                        "filling with last reported value.",
+                        "info_map": {
+                            "class": Utility.__name__,
+                            "function": Utility.expand_data_temporally.__name__,
+                        },
+                    }
+                    log_pool.append(fill_warning)
 
             indexed_data = {
                 info_map["simulation_day"]: (value, info_map)
@@ -242,7 +266,7 @@ class Utility:
                     last_known_info_map = info_map.copy()
 
                 elif day < first_day_of_original_data:
-                    value_to_add = fill_value if use_fill_value_before_start else first_known_value
+                    value_to_add = fill_value if start_fill else first_known_value
                     info_map_to_add = first_known_info_map.copy()
                     info_map_to_add["simulation_day"] = day
 
@@ -250,7 +274,7 @@ class Utility:
                     expanded_variable_data["info_maps"].append(info_map_to_add)
 
                 elif day < last_day_of_original_data:
-                    value_to_add = fill_value if use_fill_value_in_gaps else last_known_value
+                    value_to_add = fill_value if gap_fill else last_known_value
                     info_map_to_add = last_known_info_map.copy()
                     info_map_to_add["simulation_day"] = day
 
@@ -258,7 +282,7 @@ class Utility:
                     expanded_variable_data["info_maps"].append(info_map_to_add)
 
                 else:
-                    value_to_add = fill_value if use_fill_value_at_end else last_known_value
+                    value_to_add = fill_value if end_fill else last_known_value
                     info_map_to_add = last_known_info_map.copy()
                     info_map_to_add["simulation_day"] = day
 
@@ -267,7 +291,7 @@ class Utility:
 
             expanded_data[key] = expanded_variable_data
 
-        return expanded_data
+        return expanded_data, log_pool
 
     @staticmethod
     def _gather_data_sim_days(data_to_expand: dict[str, dict[str, list[Any]]]) -> list[int]:
