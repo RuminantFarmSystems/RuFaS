@@ -324,15 +324,15 @@ def test_track_and_warn_dmi_threshold_tracks_below_min_counts(mocker: MockerFixt
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)
 
     ManureExcretionCalculator._track_and_warn_dmi_threshold(
-        kind="lact",
+        dmi_kind="lact",
         dmi_effective=6.0,
     )
     ManureExcretionCalculator._track_and_warn_dmi_threshold(
-        kind="lact",
+        dmi_kind="lact",
         dmi_effective=8.0,
     )
     ManureExcretionCalculator._track_and_warn_dmi_threshold(
-        kind="dry",
+        dmi_kind="dry",
         dmi_effective=6.0,
     )
 
