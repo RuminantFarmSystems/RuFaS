@@ -2,7 +2,7 @@ from math import exp, log
 from unittest.mock import patch
 
 import pytest
-from mock.mock import PropertyMock
+from unittest.mock import PropertyMock
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
