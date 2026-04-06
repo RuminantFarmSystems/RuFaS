@@ -24,7 +24,7 @@ jobs:
       - name: Install docs dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[docs]"
+          pip install -e ".[build_docs]"
 
       - name: Build Sphinx HTML
         run: |
