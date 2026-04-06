@@ -487,32 +487,33 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             False,
             True,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "a", "a", "b", "c", math.nan],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "kg"},
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a", "a", "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["d", "d", "d", "d", "e", "e"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["d", "d", "d", "d", "e", "e", "f"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "g"},
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -539,32 +540,33 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             False,
-            {
-                "a": {
-                    "values": [math.nan, "a", math.nan, math.nan, "b", "c", "c"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "kg"},
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": [math.nan, "a", math.nan, math.nan, "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": [math.nan, math.nan, math.nan, "d", "e", math.nan],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [math.nan, math.nan, math.nan, "d", "e", math.nan, "f"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "g"},
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -580,24 +582,27 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             True,
-            {
-                "a": {
-                    "values": ["a", "a", "a"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
+                    "b": {
+                        "values": [None, "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [None, "b", "c"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -616,24 +621,25 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             True,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha"},
-                        {"simulation_day": 1, "units": "ha"},
-                        {"simulation_day": 2, "units": "ha"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "c", "d"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha"},
-                        {"simulation_day": 1, "units": "ha"},
-                        {"simulation_day": 2, "units": "ha"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -652,26 +658,27 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             False,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "fill", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "ha^2"},
-                        {"simulation_day": 1, "units": "ha^2"},
-                        {"simulation_day": 2, "units": "ha^2"},
-                        {"simulation_day": 3, "units": "ha^2"},
-                    ],
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "fill"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha^2"},
+                            {"simulation_day": 1, "units": "ha^2"},
+                            {"simulation_day": 2, "units": "ha^2"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c", "fill"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "l"},
+                            {"simulation_day": 1, "units": "l"},
+                            {"simulation_day": 2, "units": "l"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "c", "fill", "d"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "l"},
-                        {"simulation_day": 1, "units": "l"},
-                        {"simulation_day": 2, "units": "l"},
-                        {"simulation_day": 3, "units": "l"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -686,17 +693,19 @@ def test_find_group_prefixes_multiple_suffix_filtering() -> None:
             True,
             True,
             False,
-            {
-                "a": {
-                    "values": [math.pi, math.pi, "a", "b"],
-                    "info_maps": [
-                        {"simulation_day": 0, "units": "GB"},
-                        {"simulation_day": 1, "units": "GB"},
-                        {"simulation_day": 2, "units": "GB"},
-                        {"simulation_day": 3, "units": "GB"},
-                    ],
-                }
-            },
+            (
+                {
+                    "a": {
+                        "values": [math.pi, math.pi, "a"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "GB"},
+                            {"simulation_day": 1, "units": "GB"},
+                            {"simulation_day": 2, "units": "GB"},
+                        ],
+                    }
+                },
+                [],
+            ),
         ),
     ],
 )
@@ -708,7 +717,7 @@ def test_expand_data_temporally(
     use_fill_value_in_gaps: bool,
     use_fill_value_at_end: bool,
     expand_data_to_observed_range: bool,
-    expected: dict[str, dict[str, list[Any]]],
+    expected: tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]],
 ) -> None:
     """Tests the util method expand_data_temporally()."""
     actual = Utility.expand_data_temporally(
@@ -746,18 +755,87 @@ def test_expand_data_temporally_observed_range_only() -> None:
         expand_data_to_observed_range=True,
     )
 
-    expected = {
+    expected: tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]] = (
+        {
+            "a": {
+                "values": ["x", "x", "y"],
+                "info_maps": [
+                    {"simulation_day": 3, "units": "kg"},
+                    {"simulation_day": 4, "units": "kg"},
+                    {"simulation_day": 5, "units": "kg"},
+                ],
+            }
+        },
+        [],
+    )
+
+    assert actual == expected
+
+
+def test_expand_data_temporally_error_empty_dataset() -> None:
+    """Tests expand_data_temporally raises on an empty dataset."""
+    with pytest.raises(ValueError, match="Data Expansion error: Cannot fill empty dataset."):
+        Utility.expand_data_temporally(
+            data_to_expand={},
+            simulation_length=5,
+        )
+
+
+def test_expand_data_temporally_logs_warning_for_mismatched_complex_fill_value() -> None:
+    """Tests complex data with mismatched fill_value type logs a warning and fills with last reported values."""
+    data_to_expand: dict[str, dict[str, list[Any]]] = {
         "a": {
-            "values": ["x", "x", "y"],
+            "values": [{"x": 1}, {"x": 2}],
             "info_maps": [
+                {"simulation_day": 1, "units": "kg"},
                 {"simulation_day": 3, "units": "kg"},
-                {"simulation_day": 4, "units": "kg"},
-                {"simulation_day": 5, "units": "kg"},
             ],
         }
     }
 
-    assert actual == expected
+    actual_data, actual_logs = Utility.expand_data_temporally(
+        data_to_expand=data_to_expand,
+        simulation_length=4,
+        fill_value="bad fill value",
+        use_fill_value_before_start=True,
+        use_fill_value_in_gaps=True,
+        use_fill_value_at_end=True,
+        expand_data_to_observed_range=False,
+    )
+
+    expected_data = {
+        "a": {
+            "values": [
+                {"x": 1},
+                {"x": 1},
+                {"x": 1},
+                {"x": 2},
+            ],
+            "info_maps": [
+                {"simulation_day": 0, "units": "kg"},
+                {"simulation_day": 1, "units": "kg"},
+                {"simulation_day": 2, "units": "kg"},
+                {"simulation_day": 3, "units": "kg"},
+            ],
+        }
+    }
+    expected_logs = [
+        {
+            "warning": "Data expansion fill warning",
+            "message": (
+                "User-provided fill value type <class 'str'> does not match "
+                "type of data to be expanded <class 'dict'>, "
+                "filling with last reported value."
+            ),
+            "info_map": {
+                "class": "Utility",
+                "function": "expand_data_temporally",
+            },
+        }
+    ]
+
+    assert actual_data == expected_data
+    assert actual_logs == expected_logs
 
 
 @pytest.mark.parametrize(

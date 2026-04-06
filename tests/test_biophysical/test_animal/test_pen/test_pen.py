@@ -1,5 +1,4 @@
 from typing import Any
-from unittest import mock
 from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import numpy as np
@@ -1103,7 +1102,7 @@ def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> N
     methane_potential = 0.25
     surface_area = 150.0
 
-    mocker.patch.object(Pen, "total_manure_excretion", new_callable=mock.PropertyMock, return_value=excretions)
+    mocker.patch.object(Pen, "total_manure_excretion", new_callable=PropertyMock, return_value=excretions)
     mocker.patch.object(pen, "_calculate_methane_production_potential", return_value=methane_potential)
     mocker.patch.object(pen, "_calculate_manure_surface_area", return_value=surface_area)
 
