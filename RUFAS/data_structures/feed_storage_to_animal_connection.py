@@ -1,5 +1,5 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
 
@@ -393,6 +393,56 @@ class RequestedFeed:
 
     def __rmul__(self, multiplier: int | float) -> "RequestedFeed":
         return multiplier * self
+
+
+@dataclass
+class FeedFulfillmentResults:
+    """Tracks how much feed was deducted from purchased and farmgrown sources to fulfill a request."""
+
+    purchased: dict[RUFAS_ID, float] = field(default_factory=dict)
+    farmgrown: dict[RUFAS_ID, float] = field(default_factory=dict)
+
+    @classmethod
+    def fulfill_feed_request_as_purchased(
+        cls, requested_feed: RequestedFeed
+    ) -> "FeedFulfillmentResults":
+        """
+        Create a fulfillment result where all requested feed is satisfied by purchased sources.
+
+        This is used when the feed module is not simulated.
+        """
+        return cls(
+            purchased=dict(requested_feed.requested_feed),
+            farmgrown={},
+        )
+
+    @classmethod
+    def empty(
+        cls,
+        *,
+        requested_feed_ids: list[RUFAS_ID] | None = None,
+        farmgrown_feed_ids: list[RUFAS_ID] | None = None,
+    ) -> "FeedFulfillmentResults":
+        """Create an empty results object with initialized keys."""
+        requested_feed_ids = requested_feed_ids or []
+        farmgrown_feed_ids = farmgrown_feed_ids or []
+
+        return cls(
+            purchased={feed_id: 0.0 for feed_id in requested_feed_ids},
+            farmgrown={feed_id: 0.0 for feed_id in farmgrown_feed_ids},
+        )
+
+    def add_purchased(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted purchased feed for a given feed ID."""
+        self.purchased[feed_id] = self.purchased.get(feed_id, 0.0) + amount
+
+    def add_farmgrown(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted farmgrown feed for a given feed ID."""
+        self.farmgrown[feed_id] = self.farmgrown.get(feed_id, 0.0) + amount
+
+    def total_deducted_for_feed(self, feed_id: RUFAS_ID) -> float:
+        """Return total deducted amount for a single feed ID across all sources."""
+        return self.purchased.get(feed_id, 0.0) + self.farmgrown.get(feed_id, 0.0)
 
 
 class PurchaseAllowance:

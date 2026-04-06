@@ -11,6 +11,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     FeedCategorization,
     FeedComponentType,
     RUFAS_ID,
+    FeedFulfillmentResults,
     NASEMFeed,
     NRCFeed,
     NutrientStandard,
@@ -628,7 +629,7 @@ class FeedManager:
 
     def _deduct_feeds_from_inventory(
         self, feeds_to_deduct: dict[RUFAS_ID, float], simulation_day: int
-    ) -> dict[str, dict[RUFAS_ID, float]]:
+    ) -> FeedFulfillmentResults:
         """
         Removes feeds by RuFaS ID. Feed is deducted from farmgrown storages first (FIFO by storage_time),
         then purchased.
@@ -642,10 +643,9 @@ class FeedManager:
 
         Returns
         -------
-        dict[str, dict[RUFAS_ID, float]]
-            A dictionary with two keys: 'purchased' and 'farmgrown'. Each key maps to another dictionary that contains
-            the RuFaS Feed IDs and the corresponding amounts of feed deducted (kg dry matter) from purchased and
-            farmgrown sources, respectively.
+        FeedFulfillmentResults
+            A data structure that tracks how much feed was deducted from purchased and farmgrown sources to fulfill
+            a request.
 
         Raises
         ------
@@ -661,12 +661,10 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {
-            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
-        }
-        total_farmgrown_deducted: dict[RUFAS_ID, float] = {
-            farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
-        }
+        deduction_results = FeedFulfillmentResults.empty(
+            requested_feed_ids=list(feeds_to_deduct.keys()),
+            farmgrown_feed_ids=list(self._gather_valid_farmgrown_feed_ids()),
+        )
 
         for feed_id, amount_needed in feeds_to_deduct.items():
             remaining_amount_needed = float(amount_needed)
@@ -677,15 +675,17 @@ class FeedManager:
                 farmgrown_by_id.get(feed_id, ()),
             )
             if farmgrown_deducted:
-                total_farmgrown_deducted[feed_id] = total_farmgrown_deducted.get(feed_id, 0.0) + farmgrown_deducted
+                deduction_results.add_farmgrown(feed_id, farmgrown_deducted)
                 remaining_amount_needed -= farmgrown_deducted
 
             if remaining_amount_needed > 1e-3:
                 purchased_deducted = self._deduct_from_storage(
-                    feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ())
+                    feed_id,
+                    remaining_amount_needed,
+                    purchased_by_id.get(feed_id, ()),
                 )
                 if purchased_deducted:
-                    total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
+                    deduction_results.add_purchased(feed_id, purchased_deducted)
                     remaining_amount_needed -= purchased_deducted
 
             if remaining_amount_needed > 1e-3:
@@ -698,9 +698,13 @@ class FeedManager:
                     f"Not adequate feed to deduct remaining {remaining_amount_needed:.3f} kg DM of feed {feed_id}."
                 )
 
-        self._log_feed_deductions(total_purchased_deducted, total_farmgrown_deducted, simulation_day)
+        self._log_feed_deductions(
+            deduction_results.purchased,
+            deduction_results.farmgrown,
+            simulation_day,
+        )
 
-        return {"purchased": total_purchased_deducted, "farmgrown": total_farmgrown_deducted}
+        return deduction_results
 
     def _log_feed_deductions(
         self,
