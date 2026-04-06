@@ -38,3 +38,9 @@ html_permalinks_icon = "<span>#</span>"
 html_theme = "sphinxawesome_theme"
 html_logo = "_static/img/RuFaS Logo Vector.svg"
 html_favicon = "_static/rufas.png"
+
+html_static_path = ["_static"]
+
+html_css_files = [
+    "custom.css",
+]
