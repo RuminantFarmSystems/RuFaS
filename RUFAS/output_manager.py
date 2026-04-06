@@ -407,7 +407,10 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-        self, variables: list[tuple[dict[str, Any], dict[str, Any]]], first_info_map_only: bool = False
+            self,
+            variables: list[tuple[dict[str, Any], dict[str, Any]]],
+            first_info_map_only: bool = False,
+            overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Iterate through all variables and call add_variable() on each of them.
@@ -419,10 +422,12 @@ class OutputManager(object):
             being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
             If true, records only the first info_map passed for each variable.
+        overwrite_simulation_day: bool, default False
+            Passed to add_variable(). If true, any simulation_day value provided in the info_maps is overwritten.
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
-            self.add_variable(name, value, info_map, first_info_map_only)
+            self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
     def _save_current_variable_pool(self) -> None:
         """
