@@ -681,6 +681,286 @@
           "relationship": "greater_or_equal_to"
         }
       ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.0.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.0.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.0.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.1.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.1.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.1.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.2.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.2.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.2.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.3.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.3.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.3.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.0.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.0.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.0.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.1.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.1.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.1.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.2.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.2.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.2.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.3.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.3.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.3.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["planting_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["planting_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["harvest_years"],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": ["harvest_days"],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
     }
   ]
 }
