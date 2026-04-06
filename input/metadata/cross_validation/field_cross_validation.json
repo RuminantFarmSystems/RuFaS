@@ -1,0 +1,350 @@
+{
+  "cross-validation": [
+    {
+      "description": "field_1 watering amount must be zero when watering interval is zero",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering interval must be greater than zero when watering amount is positive",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering amount must be zero when watering interval is zero",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering interval must be greater than zero when watering amount is positive",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 0 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.0.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.0.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.0.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 1 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.1.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.1.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.1.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 2 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.2.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.2.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.2.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 0 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.0.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.0.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.0.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 1 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.1.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.1.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.1.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 2 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.2.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.2.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.2.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 3 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.3.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.3.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.3.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    }
+  ]
+}
