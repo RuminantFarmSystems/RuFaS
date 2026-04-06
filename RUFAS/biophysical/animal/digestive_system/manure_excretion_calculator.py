@@ -39,10 +39,10 @@ class ManureExcretionCalculator:
         dmi_effective : float
             Effective DMI after applying the minimum bound (kg/day).
         """
-        stats = ManureExcretionCalculator._dmi_below_min_stats[kind]
+        stats = ManureExcretionCalculator._dmi_below_min_stats[dmi_kind]
         stats["n_total"] += 1
 
-        if kind == "lact":
+        if dmi_kind == "lact":
             floor = AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS
         else:
             floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
@@ -455,7 +455,7 @@ class ManureExcretionCalculator:
         dry_matter_intake = dmi_predicted
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
         ManureExcretionCalculator._track_and_warn_dmi_threshold(
-            kind="lact",
+            dmi_kind="lact",
             dmi_effective=dry_matter_intake,
         )
         ash_diet_content = nutrient_amounts.ash_supply
@@ -624,7 +624,7 @@ class ManureExcretionCalculator:
         dry_matter_intake = dmi_predicted
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
         ManureExcretionCalculator._track_and_warn_dmi_threshold(
-            kind="dry",
+            dmi_kind="dry",
             dmi_effective=dry_matter_intake,
         )
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage

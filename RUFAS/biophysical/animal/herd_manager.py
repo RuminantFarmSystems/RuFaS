@@ -511,21 +511,42 @@ class HerdManager:
                         sold_newborn_calves.append(newborn_calf)
                     else:
                         newborn_calves.append(newborn_calf)
-                    birth_year = Utility.back_track_birth_date(animal.days_born, time.current_date).year
-                    mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
-                        [animal.genetics for animal in self.cows]
-                    )
-                    animal.genetics.recalculate_values_at_lactation_start(
-                        birth_year=birth_year,
-                        animal_type=animal.animal_type,
-                        parity=animal.calves,
-                        group_specific_TBV_fat_mean=mean_tbv_fat,
-                        group_specific_TBV_protein_mean=mean_tbv_protein,
-                    )
+                    self._update_genetic_values_at_lactation_start(animal, time)
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
             animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
+
+    def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
+        """
+        Updates the genetic values of an animal at the start of a new lactation.
+
+        If genetics simulation is disabled, the method returns without making any
+        changes. Otherwise, the animal's genetic values are recalculated using the
+        animal's birth year, type, parity, and the mean true breeding values (TBV)
+        for fat and protein across the current cow group.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal whose genetic values are to be updated at lactation start.
+        time : RufasTime
+            RufasTime object containing the current date of the simulation, used to
+            derive the animal's birth year.
+        """
+        if not AnimalConfig.simulate_genetics:
+            return
+        birth_year = Utility.back_track_birth_date(animal.days_born, time.current_date).year
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in self.cows]
+        )
+        animal.genetics.recalculate_values_at_lactation_start(
+            birth_year=birth_year,
+            animal_type=animal.animal_type,
+            parity=animal.calves,
+            group_specific_TBV_fat_mean=mean_tbv_fat,
+            group_specific_TBV_protein_mean=mean_tbv_protein,
+        )
 
     def _update_herd_structure(
         self,
@@ -678,6 +699,8 @@ class HerdManager:
         """
         Calculates and reports the average genetics for the herd, calves, heiferIs, heiferIIs, heiferIIIs, and cows.
         """
+        if not AnimalConfig.simulate_genetics:
+            return
         herd_average_genetics = Genetics.calculate_average_genetic_values(
             [animal.genetics for animal in self.all_animals]
         )
@@ -739,10 +762,11 @@ class HerdManager:
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
         newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
-        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in self.calves])
-        newborn_calf.genetics.calculate_ebv_and_ranking_index(
-            newborn_calf.animal_type, mean_tbv_fat, mean_tbv_protein, newborn_calf.calves
-        )
+        if AnimalConfig.simulate_genetics:
+            mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in self.calves])
+            newborn_calf.genetics.calculate_ebv_and_ranking_index(
+                newborn_calf.animal_type, mean_tbv_fat, mean_tbv_protein, newborn_calf.calves
+            )
         if not (newborn_calf.sold or newborn_calf.stillborn):
             newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
@@ -826,7 +850,8 @@ class HerdManager:
             replacement.nutrients.total_phosphorus_in_animal = (
                 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
             )
-            self._update_replacement_animal_genetics(replacement, time)
+            if AnimalConfig.simulate_genetics:
+                self._update_replacement_animal_genetics(replacement, time)
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
 

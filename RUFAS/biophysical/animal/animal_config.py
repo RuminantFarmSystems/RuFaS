@@ -378,6 +378,7 @@ class AnimalConfig:
 
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
+    simulate_genetics: bool = True
 
     @classmethod
     def initialize_animal_config(cls) -> None:
@@ -548,3 +549,4 @@ class AnimalConfig:
             for trait, values in top_listing_semen.items()
             if trait != "year_month"
         }
+        cls.simulate_genetics = animal_config_data["management_decisions"]["simulate_genetics"]

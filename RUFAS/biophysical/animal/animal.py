@@ -220,6 +220,37 @@ class Animal:
         if is_newborn_calf:
             newborn_args = cast(NewBornCalfValuesTypedDict, args)
             self._initialize_newborn_calf(newborn_args, time.simulation_day)
+            self._initialize_newborn_calf_genetics(newborn_args, time)
+        else:
+            initialize_animal_methods[self.animal_type](args)
+            self.genetics = Genetics(
+                birth_year=(time.current_date - timedelta(days=self.days_born)).year,
+                animal_type=self.animal_type,
+                initialize_new_born_calf=False,
+                parity=self.calves,
+            ) if AnimalConfig.simulate_genetics else None
+        self.update_genetic_history(simulation_day=time.simulation_day)
+
+    def _initialize_newborn_calf_genetics(self, newborn_args: NewBornCalfValuesTypedDict, time: RufasTime) -> None:
+        """
+        Initializes the genetics for a newborn calf.
+
+        If genetics simulation is enabled, a ``Genetics`` object is created using dam
+        true breeding values (TBV) for fat and protein when both are available. If either
+        dam TBV value is absent, genetics are initialized without dam information using
+        the current parity count. If genetics simulation is disabled, genetics are set
+        to ``None``.
+
+        Parameters
+        ----------
+        newborn_args : NewBornCalfValuesTypedDict
+            Dictionary of values for the newborn calf, including optional dam TBV
+            values for fat and protein.
+        time : RufasTime
+            RufasTime object containing the current date of the simulation, used to
+            set the birth year and month of the calf's genetics.
+        """
+        if AnimalConfig.simulate_genetics:
             dam_tbv_fat, dam_tbv_protein = newborn_args.get("dam_tbv_fat"), newborn_args.get("dam_tbv_protein")
             if dam_tbv_fat and dam_tbv_protein:
                 self.genetics = Genetics(
@@ -238,14 +269,7 @@ class Animal:
                     parity=self.calves,
                 )
         else:
-            initialize_animal_methods[self.animal_type](args)
-            self.genetics = Genetics(
-                birth_year=(time.current_date - timedelta(days=self.days_born)).year,
-                animal_type=self.animal_type,
-                initialize_new_born_calf=False,
-                parity=self.calves,
-            )
-        self.update_genetic_history(simulation_day=time.simulation_day)
+            self.genetics = None
 
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
@@ -1113,30 +1137,45 @@ class Animal:
         """Returns the milk statistics for the animal."""
         if not self.animal_type.is_cow:
             raise TypeError()
-        return MilkProductionStatistics(
-            cow_id=self.id,
-            pen_id=self.pen_history[-1]["pen"],
-            days_in_milk=self.days_in_milk,
-            estimated_daily_milk_produced=self.milk_production.daily_milk_produced,
-            milk_protein=self.milk_production.true_protein_content,
-            milk_fat=self.milk_production.fat_content,
-            milk_lactose=self.milk_production.lactose_content,
-            parity=self.calves,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-            animal_type=self.animal_type,
-            TBV_fat=self.genetics.TBV_fat,
-            TBV_protein=self.genetics.TBV_protein,
-            E_permanent_fat=self.genetics.E_permanent_fat,
-            E_permanent_protein=self.genetics.E_permanent_protein,
-            E_temporary_fat=self.genetics.E_temporary_fat,
-            E_temporary_protein=self.genetics.E_temporary_protein,
-            phenotype_fat=self.genetics.phenotype_fat,
-            phenotype_protein=self.genetics.phenotype_protein,
-            EBV_fat=self.genetics.EBV_fat,
-            EBV_protein=self.genetics.EBV_protein,
-            ranking_index=self.genetics.ranking_index,
-        )
+        if AnimalConfig.simulate_genetics:
+            return MilkProductionStatistics(
+                cow_id=self.id,
+                pen_id=self.pen_history[-1]["pen"],
+                days_in_milk=self.days_in_milk,
+                estimated_daily_milk_produced=self.milk_production.daily_milk_produced,
+                milk_protein=self.milk_production.true_protein_content,
+                milk_fat=self.milk_production.fat_content,
+                milk_lactose=self.milk_production.lactose_content,
+                parity=self.calves,
+                days_born=self.days_born,
+                days_in_pregnancy=self.days_in_pregnancy,
+                animal_type=self.animal_type,
+                TBV_fat=self.genetics.TBV_fat,
+                TBV_protein=self.genetics.TBV_protein,
+                E_permanent_fat=self.genetics.E_permanent_fat,
+                E_permanent_protein=self.genetics.E_permanent_protein,
+                E_temporary_fat=self.genetics.E_temporary_fat,
+                E_temporary_protein=self.genetics.E_temporary_protein,
+                phenotype_fat=self.genetics.phenotype_fat,
+                phenotype_protein=self.genetics.phenotype_protein,
+                EBV_fat=self.genetics.EBV_fat,
+                EBV_protein=self.genetics.EBV_protein,
+                ranking_index=self.genetics.ranking_index,
+            )
+        else:
+            return MilkProductionStatistics(
+                cow_id=self.id,
+                pen_id=self.pen_history[-1]["pen"],
+                days_in_milk=self.days_in_milk,
+                estimated_daily_milk_produced=self.milk_production.daily_milk_produced,
+                milk_protein=self.milk_production.true_protein_content,
+                milk_fat=self.milk_production.fat_content,
+                milk_lactose=self.milk_production.lactose_content,
+                parity=self.calves,
+                days_born=self.days_born,
+                days_in_pregnancy=self.days_in_pregnancy,
+                animal_type=self.animal_type
+            )
 
     def _assign_sex_to_newborn_calf(self) -> None:
         """
@@ -1555,6 +1594,14 @@ class Animal:
             days_in_milk=self.days_in_milk,
             dam_tbv_fat=self.genetics.TBV_fat,
             dam_tbv_protein=self.genetics.TBV_protein,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+        ) if AnimalConfig.simulate_genetics else ReproductionInputs(
+            animal_type=self.animal_type,
+            body_weight=self.body_weight,
+            breed=self.breed,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            days_in_milk=self.days_in_milk,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
         )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
@@ -2422,6 +2469,21 @@ class Animal:
         return requirements
 
     def update_genetic_history(self, simulation_day: int) -> None:
+        """
+        Updates the genetic history record for the animal on the given simulation day.
+
+        If the animal's current genetics differ from the most recent genetic history entry,
+        a new ``GeneticHistory`` record is appended. Otherwise, the end day of the most
+        recent entry is extended to the current simulation day. A warning is issued if a
+        duplicate entry is detected for the same day.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current simulation day used to timestamp the genetic history entry.
+        """
+        if not AnimalConfig.simulate_genetics:
+            return
         if len(self.genetic_history) == 0 or self.genetic_history[-1] != self.genetics.to_dict():
             self.genetic_history.append(
                 GeneticHistory(

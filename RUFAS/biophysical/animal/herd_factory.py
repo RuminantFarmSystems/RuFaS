@@ -484,6 +484,8 @@ class HerdFactory:
         animals: list[Animal],
     ) -> None:
         """Function to update EBV and ranking index values of a specific group of animals."""
+        if not AnimalConfig.simulate_genetics:
+            return
         mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in animals])
         for animal in animals:
             animal.genetics.calculate_ebv_and_ranking_index(

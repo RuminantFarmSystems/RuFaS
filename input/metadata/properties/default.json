@@ -226,6 +226,11 @@
           "description": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk",
           "default": 3.2,
           "minimum": 0
+        },
+        "simulate_genetics": {
+          "type": "bool",
+          "description": "Whether or not to simulate genetics for animals",
+          "default": true
         }
       },
       "farm_level": {

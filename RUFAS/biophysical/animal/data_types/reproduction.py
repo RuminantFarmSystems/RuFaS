@@ -40,9 +40,9 @@ class ReproductionInputs:
     days_born: int
     days_in_pregnancy: int
     days_in_milk: int
-    dam_tbv_fat: float
-    dam_tbv_protein: float
     phosphorus_for_gestation_required_for_calf: float
+    dam_tbv_fat: float | None = None
+    dam_tbv_protein: float | None = None
 
     @property
     def is_pregnant(self) -> bool:

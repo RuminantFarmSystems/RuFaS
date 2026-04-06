@@ -119,18 +119,18 @@ class MilkProductionStatistics:
     days_in_pregnancy: int
     animal_type: AnimalType
 
-    TBV_fat: float
-    TBV_protein: float
-    E_permanent_fat: float
-    E_permanent_protein: float
+    TBV_fat: float | None = None
+    TBV_protein: float | None = None
+    E_permanent_fat: float | None = None
+    E_permanent_protein: float | None = None
 
-    E_temporary_fat: float
-    E_temporary_protein: float
-    phenotype_fat: float
-    phenotype_protein: float
-    EBV_fat: float
-    EBV_protein: float
-    ranking_index: float
+    E_temporary_fat: float | None = None
+    E_temporary_protein: float | None = None
+    phenotype_fat: float | None = None
+    phenotype_protein: float | None = None
+    EBV_fat: float | None = None
+    EBV_protein: float | None = None
+    ranking_index: float | None = None
 
     UNITS = {
         "cow_id": MeasurementUnits.UNITLESS,
