@@ -1,4 +1,6 @@
 import numpy as np
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
@@ -74,6 +76,11 @@ class Genetics:
     EBV_fat: float
     EBV_protein: float
     ranking_index: float
+
+    top_semen_too_early_warning: bool = False
+    top_semen_too_recent_warning: bool = False
+    phenotype_too_early_warning: bool = False
+    phenotype_too_recent_warning: bool = False
 
     def __init__(
         self,
@@ -152,8 +159,45 @@ class Genetics:
         self, dam_tbv_fat: float, dam_tbv_protein: float, birth_year_month: str
     ) -> tuple[float, float]:
         """Calculate TBV values for a newborn calf."""
-        tbv_fat_top_semen = AnimalConfig.top_listing_semen["estimated_fat"][birth_year_month]
-        tbv_protein_top_semen = AnimalConfig.top_listing_semen["estimated_protein"][birth_year_month]
+        try:
+            tbv_fat_top_semen = AnimalConfig.top_listing_semen["estimated_fat"][birth_year_month]
+            tbv_protein_top_semen = AnimalConfig.top_listing_semen["estimated_protein"][birth_year_month]
+        except KeyError as key_error:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._calculate_newborn_calf_tbv_values.__name__,
+            }
+            earliest_top_semen_date = min(AnimalConfig.top_listing_semen["estimated_fat"])
+            latest_top_semen_date = max(AnimalConfig.top_listing_semen["estimated_fat"])
+            if birth_year_month < earliest_top_semen_date:
+                tbv_fat_top_semen = AnimalConfig.top_listing_semen["estimated_fat"][earliest_top_semen_date]
+                tbv_protein_top_semen = AnimalConfig.top_listing_semen["estimated_protein"][earliest_top_semen_date]
+                if not Genetics.top_semen_too_early_warning:
+                    om = OutputManager()
+                    om.add_warning(
+                        "Animal born before the earliest available Top Listing Semen data",
+                        f"All animals born before {earliest_top_semen_date} will have use values "
+                        f"{tbv_fat_top_semen=} and {tbv_protein_top_semen=} "
+                        f"from the earliest available date of {earliest_top_semen_date}.",
+                        info_map,
+                    )
+                    Genetics.set_top_semen_too_early_warning_raised(True)
+            elif birth_year_month > latest_top_semen_date:
+                tbv_fat_top_semen = AnimalConfig.top_listing_semen["estimated_fat"][latest_top_semen_date]
+                tbv_protein_top_semen = AnimalConfig.top_listing_semen["estimated_protein"][latest_top_semen_date]
+                if not Genetics.top_semen_too_recent_warning:
+                    om = OutputManager()
+                    om.add_warning(
+                        "Animal born after the latest available Top Listing Semen data",
+                        f"All animals born after {latest_top_semen_date} will have use values "
+                        f"{tbv_fat_top_semen=} and {tbv_protein_top_semen=} "
+                        f"from the earliest available date of {earliest_top_semen_date}.",
+                        info_map,
+                    )
+                    Genetics.set_birthdate_too_recent_warning_raised(True)
+
+            else:
+                raise key_error
         std_tbv_fat_national_average, std_tbv_protein_national_average = TBV_FAT_STD, TBV_PROTEIN_STD
 
         mean_tbv_fat = (tbv_fat_top_semen + dam_tbv_fat) / 2
@@ -184,8 +228,44 @@ class Genetics:
 
     def _calculate_phenotype_values(self, birth_year: int) -> tuple[float, float]:
         """Calculate phenotype values."""
-        mean_fat = AnimalConfig.average_phenotype["fat_kg"][birth_year]
-        mean_protein = AnimalConfig.average_phenotype["protein_kg"][birth_year]
+        try:
+            mean_fat = AnimalConfig.average_phenotype["fat_kg"][birth_year]
+            mean_protein = AnimalConfig.average_phenotype["protein_kg"][birth_year]
+        except KeyError as key_error:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._calculate_newborn_calf_tbv_values.__name__,
+            }
+            earliest_phenotype_date = min(AnimalConfig.average_phenotype["fat_kg"])
+            latest_phenotype_date = max(AnimalConfig.average_phenotype["fat_kg"])
+            if birth_year < earliest_phenotype_date:
+                mean_fat = AnimalConfig.average_phenotype["fat_kg"][earliest_phenotype_date]
+                mean_protein = AnimalConfig.average_phenotype["protein_kg"][earliest_phenotype_date]
+                if not Genetics.phenotype_too_early_warning:
+                    om = OutputManager()
+                    om.add_warning(
+                        "Animal born before the earliest available Average Phenotype data",
+                        f"All animals born before {earliest_phenotype_date} will have use values {mean_fat=} and "
+                        f"{mean_protein=} from the earliest available year of {earliest_phenotype_date}.",
+                        info_map,
+                    )
+                    Genetics.set_phenotype_too_early_warning_raised(True)
+            elif birth_year > latest_phenotype_date:
+                mean_fat = AnimalConfig.average_phenotype["fat_kg"][latest_phenotype_date]
+                mean_protein = AnimalConfig.average_phenotype["protein_kg"][latest_phenotype_date]
+                if not Genetics.phenotype_too_recent_warning:
+                    om = OutputManager()
+                    om.add_warning(
+                        "Animal born after the latest available Average Phenotype data",
+                        f"All animals born after {latest_phenotype_date} will have use values "
+                        f"{mean_fat=} and {mean_protein=} "
+                        f"from the earliest available date of {latest_phenotype_date}.",
+                        info_map,
+                    )
+                    Genetics.set_phenotype_too_recent_warning_raised(True)
+
+            else:
+                raise key_error
         phenotype_fat = mean_fat + self.TBV_fat + self.E_permanent_fat + self.E_temporary_fat
         phenotype_protein = mean_protein + self.TBV_protein + self.E_permanent_protein + self.E_temporary_protein
         return phenotype_fat, phenotype_protein
@@ -276,3 +356,55 @@ class Genetics:
             "EBV_protein": self.EBV_protein,
             "ranking_index": self.ranking_index,
         }
+
+    @classmethod
+    def set_top_semen_too_early_warning_raised(cls, birthdate_too_early_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born before
+        the earliest available top semen listing data.
+
+        Parameters
+        ----------
+        birthdate_too_early_warning_raised : bool
+            True if the birthdate too early warning for top semen has been raised, False otherwise.
+        """
+        cls.top_semen_too_early_warning = birthdate_too_early_warning_raised
+
+    @classmethod
+    def set_birthdate_too_recent_warning_raised(cls, birthdate_too_recent_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born after
+        the latest available top semen listing data.
+
+        Parameters
+        ----------
+        birthdate_too_recent_warning_raised : bool
+            True if the birthdate too recent warning for top semen has been raised, False otherwise.
+        """
+        cls.top_semen_too_recent_warning = birthdate_too_recent_warning_raised
+
+    @classmethod
+    def set_phenotype_too_early_warning_raised(cls, birthdate_too_early_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born before
+        the earliest available average phenotype data.
+
+        Parameters
+        ----------
+        birthdate_too_early_warning_raised : bool
+            True if the birthdate too early warning for phenotype has been raised, False otherwise.
+        """
+        cls.phenotype_too_early_warning = birthdate_too_early_warning_raised
+
+    @classmethod
+    def set_phenotype_too_recent_warning_raised(cls, birthdate_too_recent_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born after
+        the latest available average phenotype data.
+
+        Parameters
+        ----------
+        birthdate_too_recent_warning_raised : bool
+            True if the birthdate too recent warning for phenotype has been raised, False otherwise.
+        """
+        cls.phenotype_too_recent_warning = birthdate_too_recent_warning_raised
