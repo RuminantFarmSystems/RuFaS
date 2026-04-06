@@ -6,6 +6,7 @@
 	"heiferIII_num_springers": 5,
 	"cow_num": 100,
 	"replace_num": 500,
+	"herd_num_constrain?": "",
 	"herd_num": 100,
 	"breed": "HO",
 	"parity_fractions": {
@@ -41,6 +42,7 @@
         "male_calf_rate_sexed_semen": 0.1,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
+        "wean_day < breeding_start_day_h": "",
         "wean_day": 60,
         "wean_length": 7,
         "milk_type": "whole"
@@ -86,6 +88,7 @@
 		},
 		"from_literature": {
 			"repro": {
+				"preg_check_day_1 < preg_check_day_2 < preg_check_day_3": 32,
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 60,
@@ -228,7 +231,7 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 88,
 			"housing_type": "open air barn",
-			"pen_type": "freestall",
+			"pen_type": "open_lot",
 			"max_stocking_density": 1.2,
 			"minutes_away_for_milking": 180,
 			"first_parlor_processor": "parlor_cleaning_handler",
