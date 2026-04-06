@@ -2178,7 +2178,7 @@ class CrossValidator:
             self._event_logs.append(
                 {
                     "error": "Invalid data length validation",
-                    "message": f"Both data have to be list type to validate their length.",
+                    "message": "Both data have to be list type to validate their length.",
                     "info_map": {
                         "class": self.__class__.__name__,
                         "function": self._evaluate_equal_data_length.__name__,
