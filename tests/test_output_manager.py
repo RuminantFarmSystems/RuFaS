@@ -1040,28 +1040,28 @@ def test_add_variable_infomap_simulation_day(
     """
     # Setup
     om = OutputManager()
-    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
-    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(om, attribute = "variables_pool", new = {})  # mock an empty pool
+    rt = RufasTime(datetime(year = 1992, month = 1, day = 1), datetime(year = 2026, month = 1, day = 1))
     mocker.patch.object(
-        RufasTime,
-        "simulation_day",
-        new_callable=PropertyMock,
-        return_value=current_simulation_day,
+        object = RufasTime,
+        attribute = "simulation_day",
+        new_callable = PropertyMock,
+        return_value = current_simulation_day,
     )
 
     if current_simulation_day is not None:
         # with time reference (simulate setup with SimulationEngine)
-        mocker.patch.object(om, attribute="time", new=rt)
+        mocker.patch.object(om, attribute = "time", new = rt)
     else:
         # no time reference (simulate default initialization)
-        mocker.patch.object(om, attribute="time", new=None)
+        mocker.patch.object(om, attribute = "time", new = None)
 
     # Calculations
     om.add_variable(
-        name="test_variable",
-        value="hello, friends",
-        info_map=info_map,
-        overwrite_simulation_day=overwrite_simulation_day,
+        name = "test_variable",
+        value = "hello, friends",
+        info_map = info_map,
+        overwrite_simulation_day = overwrite_simulation_day,
     )
 
     # Assertions
