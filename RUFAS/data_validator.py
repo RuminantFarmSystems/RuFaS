@@ -1709,7 +1709,6 @@ class DataValidator:
         >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         'straw'
         """
-
         for key in variable_path:
             if isinstance(data, list) and 0 <= int(key) < len(data):
                 data = data[int(key)]
@@ -1748,6 +1747,9 @@ class CrossValidator:
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
             "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
             "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right),
+            "is_equal_length": lambda left, right, _eager_termination: self._evaluate_equal_data_length(
+                left, right, _eager_termination
+            ),
         }
 
     def cross_validate_data(
@@ -2170,6 +2172,25 @@ class CrossValidator:
         else:
             return True
 
+    def _evaluate_equal_data_length(self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool) -> bool:
+        """Evaluates if data lengths matches."""
+        if not (isinstance(left_hand_value, list) and isinstance(right_hand_value, list)):
+            self._event_logs.append(
+                {
+                    "error": "Invalid data length validation",
+                    "message": "Both data have to be list type to validate their length.",
+                    "info_map": {
+                        "class": self.__class__.__name__,
+                        "function": self._evaluate_equal_data_length.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Cross-validation error: Invalid type comparison.")
+            return False
+        else:
+            return len(left_hand_value) == len(right_hand_value)
+
     def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """Evaluates equal condition."""
         return bool(left_hand_value == right_hand_value)
@@ -2184,7 +2205,6 @@ class CrossValidator:
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
-        # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
         if not isinstance(data_type[0], str):
             self._event_logs.append(
                 {
