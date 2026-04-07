@@ -1780,7 +1780,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     ## TODO: prevent previous tests from leaking (parameters from test_bulk_add_variable_infomap_simulation_day
     ##  and test_add_variable_infomap_simulation_day are present in the calls)
 
-    mocker.patch.object(output_manager, "variables_pool", {}) # didn't work
+    mocker.patch.object(output_manager, "variables_pool", {})  # didn't work
 
     patch_for_generate_file_name = mocker.patch.object(
         output_manager, "generate_file_name", return_value=expected_file_name
