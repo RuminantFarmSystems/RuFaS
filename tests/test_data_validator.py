@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Dict, Any, List, Union, Optional, Type
 
@@ -2951,7 +2952,7 @@ def test_evaluate_expression_apply_to_group(
 
 @pytest.mark.parametrize(
     "relationship",
-    ["equal", "greater", "greater_or_equal_to", "not_equal", "is_of_type", "regex"],
+    ["equal", "greater", "greater_or_equal_to", "not_equal", "is_of_type", "regex", "is_equal_length"],
 )
 @pytest.mark.parametrize("eager_termination", [True, False])
 def test_validate_relationship_valid_values(relationship: str, eager_termination: bool) -> None:
@@ -3121,6 +3122,63 @@ def test_evaluate_regex_fullmatch(text: str, pattern: str, expected: bool) -> No
     """
     cv = CrossValidator()
     assert cv._evaluate_regex(text, pattern) is expected
+
+
+@pytest.mark.parametrize(
+    "left,right,expected",
+    [
+        ([1], [2], True),
+        ([1, 2], [3], False),
+        ([], [], True),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_equal_data_length_with_lists(
+    left: list[Any], right: list[Any], expected: bool, eager_termination: bool
+) -> None:
+    """List lengths are compared directly with no event log on valid inputs."""
+    cv = CrossValidator()
+
+    assert cv._evaluate_equal_data_length(left, right, eager_termination) is expected
+    assert cv._event_logs == []
+
+
+@pytest.mark.parametrize(
+    "left,right",
+    [
+        ("abc", [1, 2, 3]),
+        ([1, 2], {"a": 1}),
+        (1, 2),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_equal_data_length_invalid_types(left: Any, right: Any, eager_termination: bool) -> None:
+    """Non-list inputs should log and optionally raise."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
+            cv._evaluate_equal_data_length(left, right, eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        assert cv._evaluate_equal_data_length(left, right, eager_termination=False) is False
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_equal_length_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_equal_length' should dispatch to _evaluate_equal_data_length with eager flag preserved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[([1, 2], True), ([3, 4], True)])
+    mock_equal_length = mocker.patch.object(cv, "_evaluate_equal_data_length", return_value=True)
+
+    result = cv._evaluate_condition(
+        {"relationship": "is_equal_length", "left_hand": {}, "right_hand": {}}, eager_termination
+    )
+
+    assert result is True
+    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3349,3 +3407,40 @@ def test_log_missing_condition_clause_field_only() -> None:
     e = v._event_logs[0]
     assert e["error"] == "Missing required condition clause field"
     assert e["message"] == "Missing the left hand field in condition clause."
+
+
+def test_crop_and_soil_cross_validation_includes_crop_schedule_length_rules() -> None:
+    """The combined cross-validation file should enforce planting/harvest day-year length equality."""
+    cv_path = Path("input/metadata/cross_validation/crop_and_soil_cross_validation.json")
+
+    with cv_path.open() as file:
+        data = json.load(file)
+
+    blocks = data["cross-validation"]
+    schedule_blocks = [block for block in blocks if "crop schedules have equal planting" in block["description"]]
+
+    assert len(schedule_blocks) == 8
+
+    expected_paths = {
+        "Corn-Alf-Silage.crop_schedules.0",
+        "Corn-Alf-Silage.crop_schedules.1",
+        "Corn-Alf-Silage.crop_schedules.2",
+        "Corn-Alf-Silage.crop_schedules.3",
+        "CornGrain-AlfHay.crop_schedules.0",
+        "CornGrain-AlfHay.crop_schedules.1",
+        "CornGrain-AlfHay.crop_schedules.2",
+        "CornGrain-AlfHay.crop_schedules.3",
+    }
+
+    actual_paths = {
+        block["target_and_save"]["variables"]["planting_years"].rsplit(".planting_years", 1)[0]
+        for block in schedule_blocks
+    }
+    assert actual_paths == expected_paths
+
+    for block in schedule_blocks:
+        assert [rule["relationship"] for rule in block["rules"]] == ["is_equal_length", "is_equal_length"]
+        assert block["rules"][0]["left_hand"]["ordered_variables"] == ["planting_years"]
+        assert block["rules"][0]["right_hand"]["ordered_variables"] == ["planting_days"]
+        assert block["rules"][1]["left_hand"]["ordered_variables"] == ["harvest_years"]
+        assert block["rules"][1]["right_hand"]["ordered_variables"] == ["harvest_days"]
