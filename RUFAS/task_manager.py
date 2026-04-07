@@ -1,3 +1,4 @@
+from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
@@ -222,6 +223,7 @@ class TaskManager:
                 "suppress_log_files": suppress_log_files,
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
+                "run_eee": False,
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -868,13 +870,6 @@ class TaskManager:
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
-        if args.get("run_eee", False):
-            pass
-            # TODO update path to `RUFAS.EEE.EEE_manager` when EEE is finalized and moved in either PR #2524 or #1299
-            # TODO update to be able to run EEE once farmgrown feed emissions are finalized #2580
-            # eee_manager_module = import_module("RUFAS.routines.EEE.EEE_manager")
-            # eee_manager_module.EEEManager.estimate_all()
-
         if export_input_data_to_csv:
             output_manager.create_directory(args["input_data_csv_export_path"])
             Utility.combine_saved_input_csv(
@@ -899,6 +894,10 @@ class TaskManager:
             output_manager.flush_pools()
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
+
+        if args.get("run_eee", False):
+            eee_manager_module = import_module("RUFAS.EEE.EEE_manager")
+            eee_manager_module.EEEManager.estimate_all()
 
         output_manager.print_errors_warnings_logs_counts(task_id)
         if should_flush_im_pool:

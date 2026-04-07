@@ -144,7 +144,7 @@
         "run_eee": {
           "type": "bool",
           "description": "Run the emissions, energy, and economics estimators prior to post-processing.",
-          "default": false
+          "default": true
         },
         "load_saved_output_pools": {
           "type": "bool",
