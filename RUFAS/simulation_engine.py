@@ -180,7 +180,7 @@ class SimulationEngine:
             self.herd_manager.heiferII_events_by_id,
             self.herd_manager.cow_events_by_id,
         )
-        EEEManager.estimate_all()
+        # EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
