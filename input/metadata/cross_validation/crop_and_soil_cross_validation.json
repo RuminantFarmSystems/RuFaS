@@ -1,0 +1,1534 @@
+{
+  "cross-validation": [
+    {
+      "description": "alfalfa_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "alfalfa_silage_minimum_temperature": "crop_configurations.crop_configurations.0.minimum_temperature",
+          "alfalfa_silage_optimal_temperature": "crop_configurations.crop_configurations.0.optimal_temperature",
+          "alfalfa_silage_minimum_harvest_index": "crop_configurations.crop_configurations.0.minimum_harvest_index",
+          "alfalfa_silage_optimal_harvest_index": "crop_configurations.crop_configurations.0.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "alfalfa_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "alfalfa_baleage_minimum_temperature": "crop_configurations.crop_configurations.1.minimum_temperature",
+          "alfalfa_baleage_optimal_temperature": "crop_configurations.crop_configurations.1.optimal_temperature",
+          "alfalfa_baleage_minimum_harvest_index": "crop_configurations.crop_configurations.1.minimum_harvest_index",
+          "alfalfa_baleage_optimal_harvest_index": "crop_configurations.crop_configurations.1.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_baleage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_baleage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_baleage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_baleage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "alfalfa_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "alfalfa_hay_minimum_temperature": "crop_configurations.crop_configurations.2.minimum_temperature",
+          "alfalfa_hay_optimal_temperature": "crop_configurations.crop_configurations.2.optimal_temperature",
+          "alfalfa_hay_minimum_harvest_index": "crop_configurations.crop_configurations.2.minimum_harvest_index",
+          "alfalfa_hay_optimal_harvest_index": "crop_configurations.crop_configurations.2.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "alfalfa_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "alfalfa_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "cereal_rye_grain_minimum_temperature": "crop_configurations.crop_configurations.3.minimum_temperature",
+          "cereal_rye_grain_optimal_temperature": "crop_configurations.crop_configurations.3.optimal_temperature",
+          "cereal_rye_grain_minimum_harvest_index": "crop_configurations.crop_configurations.3.minimum_harvest_index",
+          "cereal_rye_grain_optimal_harvest_index": "crop_configurations.crop_configurations.3.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_grain_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_grain_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_grain_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_grain_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "cereal_rye_silage_minimum_temperature": "crop_configurations.crop_configurations.4.minimum_temperature",
+          "cereal_rye_silage_optimal_temperature": "crop_configurations.crop_configurations.4.optimal_temperature",
+          "cereal_rye_silage_minimum_harvest_index": "crop_configurations.crop_configurations.4.minimum_harvest_index",
+          "cereal_rye_silage_optimal_harvest_index": "crop_configurations.crop_configurations.4.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "cereal_rye_baleage_minimum_temperature": "crop_configurations.crop_configurations.5.minimum_temperature",
+          "cereal_rye_baleage_optimal_temperature": "crop_configurations.crop_configurations.5.optimal_temperature",
+          "cereal_rye_baleage_minimum_harvest_index": "crop_configurations.crop_configurations.5.minimum_harvest_index",
+          "cereal_rye_baleage_optimal_harvest_index": "crop_configurations.crop_configurations.5.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_baleage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_baleage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_baleage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_baleage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "cereal_rye_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "cereal_rye_hay_minimum_temperature": "crop_configurations.crop_configurations.6.minimum_temperature",
+          "cereal_rye_hay_optimal_temperature": "crop_configurations.crop_configurations.6.optimal_temperature",
+          "cereal_rye_hay_minimum_harvest_index": "crop_configurations.crop_configurations.6.minimum_harvest_index",
+          "cereal_rye_hay_optimal_harvest_index": "crop_configurations.crop_configurations.6.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "cereal_rye_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "cereal_rye_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "corn_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "corn_grain_minimum_temperature": "crop_configurations.crop_configurations.7.minimum_temperature",
+          "corn_grain_optimal_temperature": "crop_configurations.crop_configurations.7.optimal_temperature",
+          "corn_grain_minimum_harvest_index": "crop_configurations.crop_configurations.7.minimum_harvest_index",
+          "corn_grain_optimal_harvest_index": "crop_configurations.crop_configurations.7.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "corn_grain_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "corn_grain_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "corn_grain_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "corn_grain_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "corn_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "corn_silage_minimum_temperature": "crop_configurations.crop_configurations.8.minimum_temperature",
+          "corn_silage_optimal_temperature": "crop_configurations.crop_configurations.8.optimal_temperature",
+          "corn_silage_minimum_harvest_index": "crop_configurations.crop_configurations.8.minimum_harvest_index",
+          "corn_silage_optimal_harvest_index": "crop_configurations.crop_configurations.8.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "corn_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "corn_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "corn_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "corn_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soybean_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "soybean_grain_minimum_temperature": "crop_configurations.crop_configurations.9.minimum_temperature",
+          "soybean_grain_optimal_temperature": "crop_configurations.crop_configurations.9.optimal_temperature",
+          "soybean_grain_minimum_harvest_index": "crop_configurations.crop_configurations.9.minimum_harvest_index",
+          "soybean_grain_optimal_harvest_index": "crop_configurations.crop_configurations.9.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "soybean_grain_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "soybean_grain_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "soybean_grain_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "soybean_grain_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soybean_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "soybean_hay_minimum_temperature": "crop_configurations.crop_configurations.10.minimum_temperature",
+          "soybean_hay_optimal_temperature": "crop_configurations.crop_configurations.10.optimal_temperature",
+          "soybean_hay_minimum_harvest_index": "crop_configurations.crop_configurations.10.minimum_harvest_index",
+          "soybean_hay_optimal_harvest_index": "crop_configurations.crop_configurations.10.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "soybean_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "soybean_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "soybean_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "soybean_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "tall_fescue_silage_minimum_temperature": "crop_configurations.crop_configurations.11.minimum_temperature",
+          "tall_fescue_silage_optimal_temperature": "crop_configurations.crop_configurations.11.optimal_temperature",
+          "tall_fescue_silage_minimum_harvest_index": "crop_configurations.crop_configurations.11.minimum_harvest_index",
+          "tall_fescue_silage_optimal_harvest_index": "crop_configurations.crop_configurations.11.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "tall_fescue_baleage_minimum_temperature": "crop_configurations.crop_configurations.12.minimum_temperature",
+          "tall_fescue_baleage_optimal_temperature": "crop_configurations.crop_configurations.12.optimal_temperature",
+          "tall_fescue_baleage_minimum_harvest_index": "crop_configurations.crop_configurations.12.minimum_harvest_index",
+          "tall_fescue_baleage_optimal_harvest_index": "crop_configurations.crop_configurations.12.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_baleage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_baleage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_baleage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_baleage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "tall_fescue_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "tall_fescue_hay_minimum_temperature": "crop_configurations.crop_configurations.13.minimum_temperature",
+          "tall_fescue_hay_optimal_temperature": "crop_configurations.crop_configurations.13.optimal_temperature",
+          "tall_fescue_hay_minimum_harvest_index": "crop_configurations.crop_configurations.13.minimum_harvest_index",
+          "tall_fescue_hay_optimal_harvest_index": "crop_configurations.crop_configurations.13.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "tall_fescue_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "tall_fescue_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "triticale_grain_minimum_temperature": "crop_configurations.crop_configurations.14.minimum_temperature",
+          "triticale_grain_optimal_temperature": "crop_configurations.crop_configurations.14.optimal_temperature",
+          "triticale_grain_minimum_harvest_index": "crop_configurations.crop_configurations.14.minimum_harvest_index",
+          "triticale_grain_optimal_harvest_index": "crop_configurations.crop_configurations.14.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_grain_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_grain_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_grain_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_grain_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "triticale_silage_minimum_temperature": "crop_configurations.crop_configurations.15.minimum_temperature",
+          "triticale_silage_optimal_temperature": "crop_configurations.crop_configurations.15.optimal_temperature",
+          "triticale_silage_minimum_harvest_index": "crop_configurations.crop_configurations.15.minimum_harvest_index",
+          "triticale_silage_optimal_harvest_index": "crop_configurations.crop_configurations.15.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "triticale_baleage_minimum_temperature": "crop_configurations.crop_configurations.16.minimum_temperature",
+          "triticale_baleage_optimal_temperature": "crop_configurations.crop_configurations.16.optimal_temperature",
+          "triticale_baleage_minimum_harvest_index": "crop_configurations.crop_configurations.16.minimum_harvest_index",
+          "triticale_baleage_optimal_harvest_index": "crop_configurations.crop_configurations.16.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_baleage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_baleage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_baleage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_baleage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "triticale_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "triticale_hay_minimum_temperature": "crop_configurations.crop_configurations.17.minimum_temperature",
+          "triticale_hay_optimal_temperature": "crop_configurations.crop_configurations.17.optimal_temperature",
+          "triticale_hay_minimum_harvest_index": "crop_configurations.crop_configurations.17.minimum_harvest_index",
+          "triticale_hay_optimal_harvest_index": "crop_configurations.crop_configurations.17.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "triticale_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "triticale_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_grain temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "winter_wheat_grain_minimum_temperature": "crop_configurations.crop_configurations.18.minimum_temperature",
+          "winter_wheat_grain_optimal_temperature": "crop_configurations.crop_configurations.18.optimal_temperature",
+          "winter_wheat_grain_minimum_harvest_index": "crop_configurations.crop_configurations.18.minimum_harvest_index",
+          "winter_wheat_grain_optimal_harvest_index": "crop_configurations.crop_configurations.18.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_grain_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_grain_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_grain_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_grain_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_silage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "winter_wheat_silage_minimum_temperature": "crop_configurations.crop_configurations.19.minimum_temperature",
+          "winter_wheat_silage_optimal_temperature": "crop_configurations.crop_configurations.19.optimal_temperature",
+          "winter_wheat_silage_minimum_harvest_index": "crop_configurations.crop_configurations.19.minimum_harvest_index",
+          "winter_wheat_silage_optimal_harvest_index": "crop_configurations.crop_configurations.19.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_silage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_silage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_silage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_silage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_baleage temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "winter_wheat_baleage_minimum_temperature": "crop_configurations.crop_configurations.20.minimum_temperature",
+          "winter_wheat_baleage_optimal_temperature": "crop_configurations.crop_configurations.20.optimal_temperature",
+          "winter_wheat_baleage_minimum_harvest_index": "crop_configurations.crop_configurations.20.minimum_harvest_index",
+          "winter_wheat_baleage_optimal_harvest_index": "crop_configurations.crop_configurations.20.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_baleage_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_baleage_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_baleage_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_baleage_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "winter_wheat_hay temperature and harvest index bounds",
+      "target_and_save": {
+        "variables": {
+          "winter_wheat_hay_minimum_temperature": "crop_configurations.crop_configurations.21.minimum_temperature",
+          "winter_wheat_hay_optimal_temperature": "crop_configurations.crop_configurations.21.optimal_temperature",
+          "winter_wheat_hay_minimum_harvest_index": "crop_configurations.crop_configurations.21.minimum_harvest_index",
+          "winter_wheat_hay_optimal_harvest_index": "crop_configurations.crop_configurations.21.optimal_harvest_index"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_hay_optimal_temperature"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_hay_minimum_temperature"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "winter_wheat_hay_optimal_harvest_index"
+            ]
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "winter_wheat_hay_minimum_harvest_index"
+            ]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "Corn-Alf-Silage_schedule_0_planting_years": "Corn-Alf-Silage.crop_schedules.0.planting_years",
+          "Corn-Alf-Silage_schedule_0_planting_days": "Corn-Alf-Silage.crop_schedules.0.planting_days",
+          "Corn-Alf-Silage_schedule_0_harvest_years": "Corn-Alf-Silage.crop_schedules.0.harvest_years",
+          "Corn-Alf-Silage_schedule_0_harvest_days": "Corn-Alf-Silage.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_0_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_0_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_0_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_0_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "Corn-Alf-Silage_schedule_1_planting_years": "Corn-Alf-Silage.crop_schedules.1.planting_years",
+          "Corn-Alf-Silage_schedule_1_planting_days": "Corn-Alf-Silage.crop_schedules.1.planting_days",
+          "Corn-Alf-Silage_schedule_1_harvest_years": "Corn-Alf-Silage.crop_schedules.1.harvest_years",
+          "Corn-Alf-Silage_schedule_1_harvest_days": "Corn-Alf-Silage.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_1_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_1_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_1_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_1_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "Corn-Alf-Silage_schedule_2_planting_years": "Corn-Alf-Silage.crop_schedules.2.planting_years",
+          "Corn-Alf-Silage_schedule_2_planting_days": "Corn-Alf-Silage.crop_schedules.2.planting_days",
+          "Corn-Alf-Silage_schedule_2_harvest_years": "Corn-Alf-Silage.crop_schedules.2.harvest_years",
+          "Corn-Alf-Silage_schedule_2_harvest_days": "Corn-Alf-Silage.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_2_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_2_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_2_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_2_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "Corn-Alf-Silage_schedule_3_planting_years": "Corn-Alf-Silage.crop_schedules.3.planting_years",
+          "Corn-Alf-Silage_schedule_3_planting_days": "Corn-Alf-Silage.crop_schedules.3.planting_days",
+          "Corn-Alf-Silage_schedule_3_harvest_years": "Corn-Alf-Silage.crop_schedules.3.harvest_years",
+          "Corn-Alf-Silage_schedule_3_harvest_days": "Corn-Alf-Silage.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_3_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_3_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_3_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "Corn-Alf-Silage_schedule_3_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "CornGrain-AlfHay_schedule_0_planting_years": "CornGrain-AlfHay.crop_schedules.0.planting_years",
+          "CornGrain-AlfHay_schedule_0_planting_days": "CornGrain-AlfHay.crop_schedules.0.planting_days",
+          "CornGrain-AlfHay_schedule_0_harvest_years": "CornGrain-AlfHay.crop_schedules.0.harvest_years",
+          "CornGrain-AlfHay_schedule_0_harvest_days": "CornGrain-AlfHay.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_0_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_0_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_0_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_0_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "CornGrain-AlfHay_schedule_1_planting_years": "CornGrain-AlfHay.crop_schedules.1.planting_years",
+          "CornGrain-AlfHay_schedule_1_planting_days": "CornGrain-AlfHay.crop_schedules.1.planting_days",
+          "CornGrain-AlfHay_schedule_1_harvest_years": "CornGrain-AlfHay.crop_schedules.1.harvest_years",
+          "CornGrain-AlfHay_schedule_1_harvest_days": "CornGrain-AlfHay.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_1_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_1_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_1_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_1_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "CornGrain-AlfHay_schedule_2_planting_years": "CornGrain-AlfHay.crop_schedules.2.planting_years",
+          "CornGrain-AlfHay_schedule_2_planting_days": "CornGrain-AlfHay.crop_schedules.2.planting_days",
+          "CornGrain-AlfHay_schedule_2_harvest_years": "CornGrain-AlfHay.crop_schedules.2.harvest_years",
+          "CornGrain-AlfHay_schedule_2_harvest_days": "CornGrain-AlfHay.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_2_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_2_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_2_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_2_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay crop schedules have equal planting and harvesting year/day lengths",
+      "target_and_save": {
+        "variables": {
+          "CornGrain-AlfHay_schedule_3_planting_years": "CornGrain-AlfHay.crop_schedules.3.planting_years",
+          "CornGrain-AlfHay_schedule_3_planting_days": "CornGrain-AlfHay.crop_schedules.3.planting_days",
+          "CornGrain-AlfHay_schedule_3_harvest_years": "CornGrain-AlfHay.crop_schedules.3.harvest_years",
+          "CornGrain-AlfHay_schedule_3_harvest_days": "CornGrain-AlfHay.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_3_planting_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_3_planting_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_3_harvest_years"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "CornGrain-AlfHay_schedule_3_harvest_days"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering amount must be zero when watering interval is zero",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering interval must be greater than zero when watering amount is positive",
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering amount must be zero when watering interval is zero",
+      "target_and_save": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering interval must be greater than zero when watering amount is positive",
+      "apply_when": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_amount_in_liters"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["watering_interval"]
+          },
+          "right_hand": {
+            "ordered_variables": ["zero"]
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 0 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.0.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.0.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.0.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 1 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.1.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.1.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.1.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_1 layer 2 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_1.soil_layers.2.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_1.soil_layers.2.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_1.soil_layers.2.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 0 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.0.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.0.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.0.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 1 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.1.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.1.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.1.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 2 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.2.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.2.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.2.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "soil_2 layer 3 water concentrations are ordered",
+      "target_and_save": {
+        "variables": {
+          "wilting_point_water_concentration": "soil_2.soil_layers.3.wilting_point_water_concentration",
+          "field_capacity_water_concentration": "soil_2.soil_layers.3.field_capacity_water_concentration",
+          "saturation_point_water_concentration": "soil_2.soil_layers.3.saturation_point_water_concentration"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["wilting_point_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": ["saturation_point_water_concentration"]
+          },
+          "right_hand": {
+            "ordered_variables": ["field_capacity_water_concentration"]
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    }
+  ]
+}
