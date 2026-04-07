@@ -195,7 +195,7 @@ class ReportGenerator:
             Returns the logs from GraphGenerator.generate_graph()
         """
 
-        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
+        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"], time=self.time)
         graph_details = {
             **filter_content["graph_details"],
             "title": filter_content["name"],
