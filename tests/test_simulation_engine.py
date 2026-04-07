@@ -41,6 +41,8 @@ def test_simulation_type_enum_values() -> None:
     """Unit test for SimulationType enum values."""
     assert SimulationType.FULL_FARM.value == "full_farm"
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
+    assert SimulationType.FIELD_ONLY.value == "field_only"
+    assert SimulationType.FIELD_WITH_STORAGE.value == "field_with_storage"
 
 
 @pytest.mark.parametrize(
@@ -48,6 +50,8 @@ def test_simulation_type_enum_values() -> None:
     [
         (SimulationType.FULL_FARM, True),
         (SimulationType.FIELD_AND_FEED, False),
+        (SimulationType.FIELD_ONLY, False),
+        (SimulationType.FIELD_WITH_STORAGE, False),
     ],
 )
 def test_simulate_animals(
@@ -60,7 +64,11 @@ def test_simulate_animals(
 
 def test_non_animal_simulation_types() -> None:
     """Unit test for SimulationType._non_animal_simulation_types."""
-    assert SimulationType._non_animal_simulation_types() == {SimulationType.FIELD_AND_FEED}
+    assert SimulationType._non_animal_simulation_types() == {
+        SimulationType.FIELD_AND_FEED,
+        SimulationType.FIELD_ONLY,
+        SimulationType.FIELD_WITH_STORAGE,
+    }
 
 
 @pytest.mark.parametrize(
@@ -68,6 +76,8 @@ def test_non_animal_simulation_types() -> None:
     [
         ("full_farm", SimulationType.FULL_FARM),
         ("field_and_feed", SimulationType.FIELD_AND_FEED),
+        ("field_only", SimulationType.FIELD_ONLY),
+        ("field_with_storage", SimulationType.FIELD_WITH_STORAGE),
     ],
 )
 def test_get_simulation_type_valid(
@@ -81,10 +91,11 @@ def test_get_simulation_type_valid(
 def test_get_simulation_type_invalid() -> None:
     """Unit test for SimulationType.get_simulation_type with an invalid value."""
     invalid_simulation_type = "not_a_real_simulation"
+    valid_simulation_types = ", ".join(simulation_type.value for simulation_type in SimulationType)
 
     with pytest.raises(
         ValueError,
-        match=("Unknown simulation type: not_a_real_simulation. " "Expected one of: full_farm, field_and_feed."),
+        match=(f"Unknown simulation type: {invalid_simulation_type}. " f"Expected one of: {valid_simulation_types}."),
     ):
         SimulationType.get_simulation_type(invalid_simulation_type)
 
@@ -191,7 +202,7 @@ def test_execute_full_farm_daily_simulation(
 
     mock_execute_daily_field_operations = mocker.patch.object(
         simulation_engine,
-        "_execute_daily_field_operations",
+        "_execute_daily_field_with_storage_operations",
         return_value=daily_harvested_crops,
     )
     mock_build_harvest_schedule = mocker.patch.object(
@@ -243,7 +254,7 @@ def test_execute_field_and_feed_daily_simulation(
     parent.attach_mock(
         mocker.patch.object(
             simulation_engine,
-            "_execute_daily_field_operations",
+            "_execute_daily_field_with_storage_operations",
             return_value=daily_harvested_crops,
         ),
         "execute_daily_field_operations",
@@ -327,7 +338,7 @@ def test_execute_daily_field_operations(
     simulation_engine.feed_manager = MagicMock()
 
     # Act
-    result = simulation_engine._execute_daily_field_operations()
+    result = simulation_engine._execute_daily_field_with_storage_operations()
 
     # Assert
     mock_generate_daily_manure_applications.assert_called_once_with()
@@ -371,7 +382,7 @@ def test_execute_daily_field_operations_no_harvested_crops(
     simulation_engine.feed_manager = MagicMock()
 
     # Act
-    result = simulation_engine._execute_daily_field_operations()
+    result = simulation_engine._execute_daily_field_with_storage_operations()
 
     # Assert
     mock_generate_daily_manure_applications.assert_called_once_with()
@@ -382,6 +393,105 @@ def test_execute_daily_field_operations_no_harvested_crops(
     )
     simulation_engine.feed_manager.receive_crop.assert_not_called()
     assert result == harvested_crops
+
+
+def test_execute_daily_field_only_operations(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_daily_field_only_operations
+    in file RUFAS/simulation_engine.py
+    """
+    manure_applications = [MagicMock(), MagicMock()]
+    harvested_crops = [MagicMock(), MagicMock()]
+
+    mock_generate_daily_manure_applications = mocker.patch.object(
+        simulation_engine,
+        "generate_daily_manure_applications",
+        return_value=manure_applications,
+    )
+
+    simulation_engine.weather = MagicMock()
+    simulation_engine.time = MagicMock()
+    simulation_engine.field_manager = MagicMock()
+    simulation_engine.field_manager.daily_update_routine.return_value = harvested_crops
+    simulation_engine.feed_manager = MagicMock()
+
+    result = simulation_engine._execute_daily_field_only_operations()
+
+    mock_generate_daily_manure_applications.assert_called_once_with()
+    simulation_engine.field_manager.daily_update_routine.assert_called_once_with(
+        simulation_engine.weather,
+        simulation_engine.time,
+        manure_applications,
+    )
+    simulation_engine.feed_manager.receive_crop.assert_not_called()
+    assert result == harvested_crops
+
+
+def test_execute_field_only_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_field_only_simulation
+    in file RUFAS/simulation_engine.py
+    """
+    parent = MagicMock()
+
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_daily_field_only_operations"),
+        "execute_daily_field_only_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    simulation_engine._execute_field_only_simulation()
+
+    assert parent.mock_calls == [
+        call.execute_daily_field_only_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
+
+
+def test_execute_field_with_storage_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_field_with_storage_simulation
+    in file RUFAS/simulation_engine.py
+    """
+    parent = MagicMock()
+
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_daily_field_with_storage_operations"),
+        "execute_daily_field_with_storage_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    simulation_engine._execute_field_with_storage_simulation()
+
+    assert parent.mock_calls == [
+        call.execute_daily_field_with_storage_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
 
 
 def test_build_harvest_schedule_no_feed_recalculation(
