@@ -60,8 +60,8 @@ v1.0.0
 - [2921](https://github.com/RuminantFarmSystems/RuFaS/pull/2921) - [minor change] [OutputManager][NoInputChange] [NoOutputChange] Override incorrect fill type for complex data structure data padding.
 - [2924](https://github.com/RuminantFarmSystems/RuFaS/pull/2924) - [minor change] [NoInputChange] [NoOutputChange] Updated advance purchase allowance to prevent excessive warnings for example run.
 - [2929](https://github.com/RuminantFarmSystems/RuFaS/pull/2929) - [minor change] [GraphGenerator] [NoInputChange] [NoOutputChange] Sanitizes non-numerical data sent to graph generator to allow graphing to occur despite.
+- [2932](https://github.com/RuminantFarmSystems/RuFaS/pull/2932) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Enabled Field only and Field with storage simulation.
 - [2925](https://github.com/RuminantFarmSystems/RuFaS/pull/2925) - [minor change] [NoInputChange] [NoOutputChange] Fix the `graph_and_report` option in report_generation.py.
-
 
 ### v1.0.0
 
