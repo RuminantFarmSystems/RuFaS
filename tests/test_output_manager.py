@@ -1414,6 +1414,7 @@ def test_bulk_add_variable_infomap_simulation_day(
     # Setup
     om = OutputManager()
     mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    mocker.patch.object(om, "chunkification", False)
     rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
     mocker.patch.object(
         target=RufasTime,
