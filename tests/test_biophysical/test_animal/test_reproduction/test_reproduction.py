@@ -1388,7 +1388,8 @@ def test_update_ed_days(
 
 
 @pytest.mark.parametrize(
-    "repro_state, days_born, estrus_day, expected_simulate_estrus, expected_enter_waiting_full, expected_handle_estrus_day",
+    "repro_state, days_born, estrus_day, expected_simulate_estrus, expected_enter_waiting_full,"
+    "expected_handle_estrus_day",
     [
         (ReproStateEnum.ENTER_HERD_FROM_INIT, 450, 400, True, True, False),
         (ReproStateEnum.ENTER_HERD_FROM_INIT, 350, 400, False, True, False),
