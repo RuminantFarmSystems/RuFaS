@@ -16,18 +16,22 @@
       "apply_when": [
         {
           "left_hand": {
-            "operation": "no_op",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_animal_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "apply_to": "group",
+              "ordered_variables": [
+                "pen_animal_type"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "no_op",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "calf_pen_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "apply_to": "individual",
+              "ordered_variables": [
+                "calf_pen_type"
+              ]
+            }
           },
           "relationship": "equal"
         }
@@ -35,19 +39,23 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "apply_to": "group",
+              "ordered_variables": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_calves",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "apply_to": "individual",
+              "ordered_variables": [
+                "number_of_calves",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "min_num_stalls"
           },
           "relationship": "greater_or_equal_to"
@@ -71,18 +79,22 @@
       "apply_when": [
         {
           "left_hand": {
-            "operation": "no_op",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_animal_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "apply_to": "group",
+              "ordered_variables": [
+                "pen_animal_type"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "no_op",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "growing_pen_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "apply_to": "individual",
+              "ordered_variables": [
+                "growing_pen_type"
+              ]
+            }
           },
           "relationship": "equal"
         }
@@ -90,38 +102,46 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "apply_to": "group",
+              "ordered_variables": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_heifer1s",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "apply_to": "individual",
+              "ordered_variables": [
+                "number_of_heifer1s",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "min_num_stalls"
           },
           "relationship": "greater_or_equal_to"
         },
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "apply_to": "group",
+              "ordered_variables": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_heifer2s",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "apply_to": "individual",
+              "ordered_variables": [
+                "number_of_heifer2s",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "max_num_stalls"
           },
           "relationship": "greater_or_equal_to"
@@ -145,20 +165,59 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "ordered_variables": [
-              "p1",
-              "p2",
-              "p3",
-              "p4",
-              "p5"
-            ],
+            "aggregation": {
+              "operation": "sum",
+              "ordered_variables": [
+                "p1",
+                "p2",
+                "p3",
+                "p4",
+                "p5"
+              ]
+            },
             "save_as": "sum"
           },
           "right_hand": {
-            "ordered_variables": [
-              "summed_parity_fractions"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "ordered_variables": [
+                "summed_parity_fractions"
+              ]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Example: iterate_array_of_dicts usage",
+      "target_and_save": {
+        "variables": {
+          "alias_name_to_array_of_dicts_variable": "path.to.array_of_dicts"
+        },
+        "constants": {
+          "alias_name_of_comparison_value": "some_constant_value",
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "iterate_array_of_dicts": {
+              "filter_array": false,
+              "variable_name": "alias_name_to_array_of_dicts_variable",
+              "attribute_of_interest": "attribute_name",
+              "comparison_value": "alias_name_of_comparison_value",
+              "relationship": "equal"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "ordered_variables": [
+                "true_constant"
+              ]
+            }
           },
           "relationship": "equal"
         }
