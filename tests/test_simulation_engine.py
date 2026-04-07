@@ -95,10 +95,7 @@ def test_get_simulation_type_invalid() -> None:
 
     with pytest.raises(
         ValueError,
-        match=(
-            f"Unknown simulation type: {invalid_simulation_type}. "
-            f"Expected one of: {valid_simulation_types}."
-        ),
+        match=(f"Unknown simulation type: {invalid_simulation_type}. " f"Expected one of: {valid_simulation_types}."),
     ):
         SimulationType.get_simulation_type(invalid_simulation_type)
 
