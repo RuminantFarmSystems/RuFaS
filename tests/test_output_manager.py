@@ -3,8 +3,9 @@ import os
 import sys
 from collections import Counter
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Sequence, Type, Union, cast
+from typing import Any, Sequence, Type, Union, cast, Dict
 
 import pandas as pd
 import psutil
@@ -19,6 +20,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import LogVerbosity, OriginLabel, OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
+from build.lib.RUFAS.rufas_time import RufasTime
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -955,6 +957,241 @@ def test_add_variable(
 
 
 @pytest.mark.parametrize(
+    "info_map, current_simulation_day, overwrite_simulation_day, expected_day_value",
+    [
+        # No simulation day provided, overwrite_simulation_day = False
+        ({"class": "testClass", "function": "test_function", "units": MeasurementUnits.UNITLESS}, 0, False, 0),
+        ({"class": "testClass", "function": "test_function", "units": MeasurementUnits.UNITLESS}, 135, False, 135),
+        # No simulation day provided, overwrite_simulation_day = True
+        ({"class": "testClass", "function": "test_function", "units": MeasurementUnits.UNITLESS}, 0, True, 0),
+        ({"class": "testClass", "function": "test_function", "units": MeasurementUnits.UNITLESS}, 135, True, 135),
+        # Simulation day provided, overwrite_simulation_day = False
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "simulation_day": 0,
+                "units": MeasurementUnits.UNITLESS,
+            },
+            135,
+            False,
+            0,
+        ),
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "simulation_day": 220,
+                "units": MeasurementUnits.UNITLESS,
+            },
+            135,
+            False,
+            220,
+        ),
+        # Simulation_day provided, overwrite_simulation_day = True
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "simulation_day": 0,
+                "units": MeasurementUnits.UNITLESS,
+            },
+            135,
+            True,
+            135,
+        ),
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "simulation_day": 220,
+                "units": MeasurementUnits.UNITLESS,
+            },
+            135,
+            True,
+            135,
+        ),
+        # No RufasTime reference attached to output manager
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "units": MeasurementUnits.UNITLESS,
+            },
+            None,
+            True,
+            None,
+        ),
+        # No RufasTime reference attached to output manager, simulation_day specified
+        (
+            {
+                "class": "testClass",
+                "function": "test_function",
+                "simulation_day": 220,
+                "units": MeasurementUnits.UNITLESS,
+            },
+            None,
+            True,
+            220,
+        ),
+        ({"class": "testClass", "function": "test_function", "units": MeasurementUnits.UNITLESS}, None, True, None),
+        # TODO: handle provided time argument...
+    ],
+)
+def test_add_variable_infomap_simulation_day(
+    info_map: dict,
+    current_simulation_day: int,
+    overwrite_simulation_day: bool,
+    expected_day_value: int,
+    mocker: MockerFixture,
+):
+    """
+    Test that add_variable properly adds simulation_day to the info map and respects previously specified
+    simulation_day value, unless the overwrite_simulation_day option is used.
+    """
+    # Setup
+    om = OutputManager()
+    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(
+        target=RufasTime,
+        attribute="simulation_day",
+        new_callable=PropertyMock,
+        return_value=current_simulation_day,
+    )
+
+    if current_simulation_day is not None:
+        # with time reference (simulate setup with SimulationEngine)
+        mocker.patch.object(om, "time", rt)
+    else:
+        # no time reference (simulate default initialization)
+        mocker.patch.object(om, "time", None)
+
+    # Calculations
+    om.add_variable(
+        name="test_variable",
+        value="hello, friends",
+        info_map=info_map,
+        overwrite_simulation_day=overwrite_simulation_day,
+    )
+
+    saved_info_map = [val for val in om.variables_pool.values()][0].get("info_maps")[0]
+    observed_day = saved_info_map.get("simulation_day")
+
+    # Assertions
+
+    ## conditional
+    if expected_day_value is None:
+        assert om.time is None
+    else:
+        assert "simulation_day" in saved_info_map  # simulation day in every info map
+        assert info_map.get("simulation_day") == expected_day_value  # original info map correct(ed)
+
+    ## universal
+    assert observed_day == expected_day_value
+
+
+def construct_bulk_variables_list(
+    var_and_day_list=list[tuple[Any, int | None]]
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """constructs the variables list for OutputManager.add_variable_bulk() for testing
+
+    Arguments
+    ---------
+    var_and_day_list : list[tuple[Any, dict]]
+        A simplified list from which to construct the more complex results. Each element is a tuple with two values:
+        1) the value of variable and 2) an [optional] corresponding simulation_day to include in the info_map.
+    """
+    var_values = [item[0] for item in var_and_day_list]
+    var_names = ["var_" + str(var_values.index(x)) for x in var_values]
+    var_dicts = [{k: v} for k, v in zip(var_names, var_values)]
+    days = [item[1] for item in var_and_day_list]
+
+    maps = []
+    for i in range(len(var_and_day_list)):
+        # construct an info map
+        info_map = {
+            "class": "testClass",
+            "function": "test_function",
+            "units": MeasurementUnits.UNITLESS,
+        }
+        # add simulation days if present
+        if days[i] is not None:
+            info_map["simulation_day"] = days[i]
+        maps.append(info_map)
+
+    list_of_variable_tuples = [(var, imap) for var, imap in zip(var_dicts, maps)]
+
+    return list_of_variable_tuples
+
+
+@pytest.mark.parametrize(
+    "var_day_pairs, record_day",
+    [
+        # case 1 - included simulation day matches the current (recording) day
+        ([(212.6, 132), (200.01, 132), (198.6, 132)], 132),
+        # case 2 - no day provided in info map
+        ([(212.6, None), (200.01, None), (198.6, None)], 132),
+        # case 3 - provided days different & don't match recording day
+        ([(212.6, 25), (200.01, 200), (198.6, 365)], 366),
+        # case 4 - different and complex data types
+        (
+            [
+                ([1, 2, 3, 4, 5], 115),  # list variable
+                ((1, 2, 3), 120),  # tuple variable
+                ("hello!", 100),  # string
+                ({"speak": "woof"}, 118),  # simple dict
+                ({"x": 235, "y": (1, 2), "z": [10, 9, 8]}, 45),  # complex dict
+            ],
+            132,
+        ),
+    ],
+)
+@pytest.mark.parametrize("overwrite", [True, False])
+def test_bulk_add_variable_infomap_simulation_day(
+    var_day_pairs: list,
+    record_day: int,
+    overwrite: bool,
+    mocker: MockerFixture,
+) -> None:
+    # Setup
+    om = OutputManager()
+    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    mocker.patch.object(om, "chunkification", False)
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(om, "time", rt)
+    mocker.patch.object(
+        target=RufasTime,
+        attribute="simulation_day",
+        new_callable=PropertyMock,
+        return_value=record_day,
+    )
+
+    # Calculations
+    variables = construct_bulk_variables_list(var_day_pairs)  # use helper function to expand the parameters
+    om.add_variable_bulk(
+        variables=variables,
+        first_info_map_only=False,
+        overwrite_simulation_day=overwrite,
+    )
+
+    og_mapped_days = [x[1] for x in var_day_pairs]  # extract the provided day
+
+    if overwrite:
+        # all mapped simulation_day values equal to the recording day
+        expectation = [record_day] * len(variables)
+    else:
+        # mapped simulation days are retained where provided, otherwise recording day is filled in
+        expectation = [mapped_day if mapped_day is not None else record_day for mapped_day in og_mapped_days]
+
+    imaps = [val["info_maps"][0] for val in om.variables_pool.values()]  # extract info maps from variables pool
+    observed = [imap["simulation_day"] for imap in imaps]  # extract simulation day from info maps
+
+    # Assertions
+    assert observed == expectation
+
+
+@pytest.mark.parametrize(
     "name, value, info_map, first_map",
     [
         # Case 1: Everything correct, no exception should be raised
@@ -1147,6 +1384,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
 
     # Arrange
     output_manager = OutputManager()
+    ## TODO: Mock these values instead? This test is leaking to other tests.
     output_manager.chunkification = True
     output_manager.current_pool_size = 1024
     output_manager.average_add_variable_call_addition = 1024
@@ -1218,7 +1456,7 @@ def test_add_variable_bulk(
     om.add_variable_bulk(inputs, first_info_map_only)
 
     assert mock_add_variable.call_args_list == [
-        call(name, value, info_maps[index], first_info_map_only)
+        call(name, value, info_maps[index], first_info_map_only, False)
         for index, (name, value) in enumerate(variables.items())
     ]
 
@@ -1533,12 +1771,17 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     """
     Unit test for report_variables_usage_counts() method in OutputManager class.
     """
-
     # Arrange
     path = Path("/fake/directory")
     expected_file_name = "variables_usage_counts.csv"
     expected_full_path = Path(path, expected_file_name)
     output_manager = OutputManager()
+    output_manager._variables_usage_counter = Counter()
+
+    ## TODO: prevent previous tests from leaking (parameters from test_bulk_add_variable_infomap_simulation_day
+    ##  and test_add_variable_infomap_simulation_day are present in the calls)
+
+    mocker.patch.object(output_manager, "variables_pool", {})  # didn't work
 
     patch_for_generate_file_name = mocker.patch.object(
         output_manager, "generate_file_name", return_value=expected_file_name
@@ -1555,6 +1798,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     # Assert
     patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
     patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
+    output_manager._variables_usage_counter = Counter()
 
 
 @pytest.mark.parametrize(
