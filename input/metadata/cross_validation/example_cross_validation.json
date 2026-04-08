@@ -39,7 +39,10 @@
             "apply_to": "group",
             "ordered_variables": [
               "pen_stall_num"
-            ]
+            ],
+            "reverse_lookup_info": {
+
+            }
           },
           "right_hand": {
             "operation": "division",
