@@ -2,6 +2,7 @@ import sys
 from dataclasses import asdict
 from typing import Any
 
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
@@ -1225,7 +1226,8 @@ class AnimalModuleReporter:
 
         AnimalModuleReporter._record_heiferIIs_conception_rate(herd_reproduction_statistics)
         AnimalModuleReporter._record_cows_conception_rate(herd_reproduction_statistics)
-        AnimalModuleReporter._report_all_animals_genetic_history(all_animals_genetic_history)
+        if AnimalConfig.simulate_genetics:
+            AnimalModuleReporter._report_all_animals_genetic_history(all_animals_genetic_history)
 
     @classmethod
     def _record_animal_events(cls, animal_events_by_id: dict[str, AnimalEvents], simulation_day: int) -> None:
