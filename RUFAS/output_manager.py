@@ -332,7 +332,14 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False) -> None:
+    def add_variable(
+        self,
+        name: str,
+        value: Any,
+        info_map: dict[str, Any],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
+    ) -> None:
         """
         Adds a variable to the pool.
 
@@ -374,6 +381,12 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
+        # add simulation day to input maps (needed for data padding to work)
+        # TODO: add option to manually provide a RufasTime reference to the function call.
+        needs_sim_day = overwrite_simulation_day or "simulation_day" not in info_map.keys()
+        if self.time is not None and needs_sim_day:
+            info_map["simulation_day"] = self.time.simulation_day
+
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
 
@@ -394,7 +407,10 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-        self, variables: list[tuple[dict[str, Any], dict[str, Any]]], first_info_map_only: bool = False
+        self,
+        variables: list[tuple[dict[str, Any], dict[str, Any]]],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Iterate through all variables and call add_variable() on each of them.
@@ -406,10 +422,12 @@ class OutputManager(object):
             being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
             If true, records only the first info_map passed for each variable.
+        overwrite_simulation_day: bool, default False
+            Passed to add_variable(). If true, any simulation_day value provided in the info_maps is overwritten.
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
-            self.add_variable(name, value, info_map, first_info_map_only)
+            self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
     def _save_current_variable_pool(self) -> None:
         """
