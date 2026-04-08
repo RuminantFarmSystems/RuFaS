@@ -29,10 +29,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e ".[dev]"
 
       - name: Get all added or modified files
         run: |
@@ -108,15 +108,14 @@ jobs:
           )
           unauthorized_changes=false
           unauthorized_paths=""
-          
-          # Check if any of the protected paths have been changed
+
           for path in "${paths_to_protect[@]}"; do
             if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
           done
-          
+
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
@@ -143,8 +142,8 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
           black ${{ env.FILES }}
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Apply Black Formatting" --allow-empty
           COMMIT_HASH=$(git rev-parse HEAD)
@@ -152,8 +151,8 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
-          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
-        
+          echo "COMMIT_HASH=$COMMIT_HASH" >> "$GITHUB_ENV"
+
       - name: Capture the commit hash
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         id: capture_commit_sha
@@ -188,18 +187,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e ".[dev]"
 
       - name: Lint with flake8
         id: flake8
-        run: |
-          flake8 .
+        run: flake8 .
         continue-on-error: true
 
-      - name: Test coverage
+      - name: Run tests with coverage
         id: coverage
         run: |
           coverage run --rcfile=.github/.coveragerc
