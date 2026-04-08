@@ -313,7 +313,7 @@ def test_execute_daily_field_operations(
 
     mock_generate_daily_manure_applications = mocker.patch.object(
         simulation_engine,
-        "generate_daily_manure_applications",
+        "_generate_daily_manure_applications",
         return_value=manure_applications,
     )
 
@@ -357,7 +357,7 @@ def test_execute_daily_field_operations_no_harvested_crops(
 
     mock_generate_daily_manure_applications = mocker.patch.object(
         simulation_engine,
-        "generate_daily_manure_applications",
+        "_generate_daily_manure_applications",
         return_value=manure_applications,
     )
 
@@ -993,7 +993,7 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
         simulation_engine.manure_manager, "request_nutrients", return_value=mock_nutrient_request_result
     )
 
-    result = simulation_engine.generate_daily_manure_applications()
+    result = simulation_engine._generate_daily_manure_applications()
 
     assert result == [
         ManureEventNutrientRequestResults("Field 1", mock_event_1, mock_nutrient_request_result),

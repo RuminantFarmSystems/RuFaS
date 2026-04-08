@@ -1031,7 +1031,6 @@ class Pen:
         temperature: float,
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1047,8 +1046,6 @@ class Pen:
             Maximum amounts of each feed type that may be fed per animal per day.
         advance_purchase_allowance : AdvancePurchaseAllowance
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
-        total_inventory : TotalInventory
-            Amounts of feeds currently held in storage.
         simulation_day : int
             Day of simulation.
 
