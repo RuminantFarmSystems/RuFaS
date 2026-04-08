@@ -339,6 +339,7 @@ class OutputManager(object):
         info_map: dict[str, Any],
         first_info_map_only: bool = False,
         overwrite_simulation_day: bool = False,
+        time = None, # TODO: test this argument
     ) -> None:
         """
         Adds a variable to the pool.
@@ -365,6 +366,12 @@ class OutputManager(object):
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        overwrite_simulation_day: bool, default False
+            if true, the variable's info map is automatically updated with the current simulation_day, otherwise the
+            simulation_day specified within the info_map is used if avaialble.
+        time: RufasTime, optional
+            if present, simulation_day will be taken from this time object. This option is provided to allow variables
+            created outside the main simulation loop (i.e., herd initialization) to be padded.
 
         Raises
         ------
@@ -381,11 +388,12 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
+        time_to_use = time or self.time
+
         # add simulation day to input maps (needed for data padding to work)
-        # TODO: add option to manually provide a RufasTime reference to the function call.
         needs_sim_day = overwrite_simulation_day or "simulation_day" not in info_map.keys()
-        if self.time is not None and needs_sim_day:
-            info_map["simulation_day"] = self.time.simulation_day
+        if time_to_use is not None and needs_sim_day:
+            info_map["simulation_day"] = time_to_use.simulation_day
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
