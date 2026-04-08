@@ -1094,7 +1094,7 @@ def test_add_variable_infomap_simulation_day(
 def construct_bulk_variables_list(
     var_and_day_list=list[tuple[Any, int | None]]
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
-    """constructs the variables list for OutputManager.add_variable_bulk() for testing
+    """Helper function that constructs the variables list for OutputManager.add_variable_bulk() for testing
 
     Arguments
     ---------
