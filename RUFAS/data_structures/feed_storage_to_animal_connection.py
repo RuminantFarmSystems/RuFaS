@@ -416,7 +416,6 @@ class AvailableFeedsBuilder:
         return processed_feed_library
 
 
-
 @dataclass
 class TotalInventory:
     """
@@ -496,9 +495,7 @@ class FeedFulfillmentResults:
     farmgrown: dict[RUFAS_ID, float] = field(default_factory=dict)
 
     @classmethod
-    def fulfill_feed_request_as_purchased(
-        cls, requested_feed: RequestedFeed
-    ) -> "FeedFulfillmentResults":
+    def fulfill_feed_request_as_purchased(cls, requested_feed: RequestedFeed) -> "FeedFulfillmentResults":
         """
         Create a fulfillment result where all requested feed is satisfied by purchased sources.
 

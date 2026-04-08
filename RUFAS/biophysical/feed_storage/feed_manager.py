@@ -862,5 +862,3 @@ class FeedManager:
             if feed_id in valid_feed_ids:
                 farmgrown_ids.add(feed_id)
         return farmgrown_ids
-
-    

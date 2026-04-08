@@ -501,21 +501,18 @@ class HerdManager:
         simulation_day: int,
     ) -> None:
         """Call the corresponding functions to update the herd structure and reassign animals to new pens."""
-        self._handle_graduated_animals(
-            graduated_animals, available_feeds, current_day_conditions, simulation_day
-        )
-        self._handle_newly_added_animals(
-            newborn_calves, available_feeds, current_day_conditions, simulation_day
-        )
-        self._handle_newly_added_animals(
-            newly_added_animals, available_feeds, current_day_conditions, simulation_day
-        )
+        self._handle_graduated_animals(graduated_animals, available_feeds, current_day_conditions, simulation_day)
+        self._handle_newly_added_animals(newborn_calves, available_feeds, current_day_conditions, simulation_day)
+        self._handle_newly_added_animals(newly_added_animals, available_feeds, current_day_conditions, simulation_day)
 
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
     def daily_routines(
-        self, available_feeds: list[Feed], time: RufasTime, weather: Weather,
+        self,
+        available_feeds: list[Feed],
+        time: RufasTime,
+        weather: Weather,
     ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
@@ -838,9 +835,7 @@ class HerdManager:
         for animal in graduated_animals:
             self._remove_animal_from_pen_and_id_map(animal)
             self._update_animal_array(animal)
-            self._add_animal_to_pen_and_id_map(
-                animal, available_feeds, current_day_conditions, simulation_day
-            )
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, simulation_day)
 
     def _handle_newly_added_animals(
         self,
@@ -865,9 +860,7 @@ class HerdManager:
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(
-                animal, available_feeds, current_day_conditions, simulation_day
-            )
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, simulation_day)
             self._add_animal_to_new_array(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -1429,9 +1422,7 @@ class HerdManager:
             else:
                 ration_feed_ids = RationManager.get_ration_feeds(pen.animal_combination)
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, ration_feed_ids)
-            self._reformulate_ration_single_pen(
-                pen, pen_available_feeds, current_temperature, simulation_day
-            )
+            self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, simulation_day)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
 
