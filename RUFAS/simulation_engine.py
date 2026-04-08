@@ -11,7 +11,12 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
-from RUFAS.data_structures.feed_storage_to_animal_connection import AvailableFeedsBuilder, FeedFulfillmentResults, IdealFeeds, NutrientStandard, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    AvailableFeedsBuilder,
+    FeedFulfillmentResults,
+    IdealFeeds,
+    NutrientStandard,
+)
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -19,6 +24,9 @@ from RUFAS.biophysical.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
+
+
+DEFAULT_FEED_DEGRADATIONS_PROCESSING_INTERVAL = 30
 
 
 class SimulationType(Enum):
@@ -187,6 +195,8 @@ class SimulationEngine:
                 days=round(365 / max_daily_feed_recalculations_per_year)
             )
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
+            self.feed_degradations_interval_length = timedelta(days=DEFAULT_FEED_DEGRADATIONS_PROCESSING_INTERVAL)
+            self.next_degredations_processing = self.time.current_date.date()
 
         if self.simulate_animals:
             ration_config = self.im.get_data("animal.ration")
@@ -291,8 +301,6 @@ class SimulationEngine:
 
         harvest_schedule = self._build_harvest_schedule(daily_harvested_crops)
         self._execute_feed_planning(harvest_schedule)
-
-        self._execute_ration_planning()
 
         self._report_daily_records()
 
@@ -401,19 +409,25 @@ class SimulationEngine:
         self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")
         self.feed_manager.report_cumulative_purchased_feeds(self.time.simulation_day)
 
+        if self._is_time_to_process_feed_degredations:
+            self.next_degredations_processing = (self.time.current_date + self.feed_degradations_interval_length).date()
+            self.feed_manager.process_degradations(self.weather, self.time)
+
+    @property
+    def _is_time_to_process_feed_degredations(self) -> bool:
+        """Checks if it's time to process feed degredations"""
+        return self.time.current_date.date() >= self.next_degredations_processing
+
     def _execute_ration_planning(self) -> None:
         """Checks if it's time to reformulate the ration and executes ration formulation if needed."""
         if self._is_time_to_reformulate_ration:
-            if self.simulate_feed:
-                self.feed_manager.process_degradations(self.weather, self.time)
             self.next_ration_reformulation = (self.time.current_date + self.ration_formulation_interval_length).date()
             self._formulate_ration()
 
     @property
     def _is_time_to_reformulate_ration(self) -> bool:
         """Checks if it's time to reformulate the ration based on the user-defined interval."""
-        return self.time.current_date.date() >= self.next_ration_reformulation \
-            if self.next_ration_reformulation else False
+        return self.time.current_date.date() >= self.next_ration_reformulation
 
     def _execute_daily_animal_operations(self) -> tuple[dict[str, ManureStream], dict[int, float]]:
         """
