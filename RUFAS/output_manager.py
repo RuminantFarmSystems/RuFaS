@@ -339,7 +339,7 @@ class OutputManager(object):
         info_map: dict[str, Any],
         first_info_map_only: bool = False,
         overwrite_simulation_day: bool = False,
-        time = None, # TODO: test this argument
+        time=None,  # TODO: test this argument
     ) -> None:
         """
         Adds a variable to the pool.
