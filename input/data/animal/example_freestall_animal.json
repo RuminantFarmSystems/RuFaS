@@ -75,6 +75,37 @@
             }
         },
         "cows": {
+			"When 'cow_repro_method' is 'ED'": [
+				"'voluntary_waiting_period' is not null (or >0)",
+				"'estrus_detection_rate' is not null (or >0)",
+				"'ED_conception_rate' is not null (or >0)",
+				"'presynch_program' is null",
+				"'presynch_program_start_day' is null",
+				"'ovsynch_program' is null",
+				"'ovsynch_program_start_day' is null",
+				"'resynch_program' is null"
+			],
+			"When 'cow_repro_method' is 'TAI'": [
+				"'ovsynch_program' is not null",
+				"'ovsynch_program_start_day' is not null (or >0)",
+				"'ovsynch_program_conception_rate' is not null (or >0)?",
+				{
+					"if 'resynch_program' is in ['PGFatPD', 'none']": [
+						"'presynch_program' is not null",
+						"'presynch_program_start_day' is not null (or >0)",
+						"'estrus_detection_rate' is not null (or >0)",
+						"'ED_conception_rate' is not null (or >0)"
+					]
+				}
+			],
+			"When 'cow_repro_method' is 'ED-TAI'": [
+				"'voluntary_waiting_period' is not null (or >0)",
+				"'estrus_detection_rate' is not null (or >0)",
+				"'ED_conception_rate' is not null (or >0)",
+				"'ovsynch_program' is not null",
+				"'ovsynch_program_start_day' is not null (or >0)",
+				"'ovsynch_program_conception_rate' is not null (or >0)"
+			],
 			"double-check the cow-repro sub-protocol": "xv",
             "estrus_detection_rate": 0.6,
             "ED_conception_rate": 0.5,
