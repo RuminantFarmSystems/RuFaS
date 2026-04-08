@@ -19,6 +19,7 @@ jobs:
     - name: Fails in order to indicate that PR needs to be marked as ready to review and other checks passed.
       run: exit 1 # don't run other jobs
   format_code:
+    needs: fail_if_pull_request_is_draft
     runs-on: ubuntu-latest
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
