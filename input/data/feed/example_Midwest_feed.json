@@ -186,7 +186,7 @@
     ],
     "tolerance": 0.1
   },
-  "lac_cow_dry_matter_intake": 200,
+  "lac_cow_dry_matter_intake": 27,
   "max_daily_feed_recalculations_per_year": 4,
   "allowances": [
     {
