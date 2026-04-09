@@ -339,7 +339,7 @@ class OutputManager(object):
         info_map: dict[str, Any],
         first_info_map_only: bool = False,
         overwrite_simulation_day: bool = False,
-        time: "RufasTime | None" = None,  # TODO: test this argument
+        simulation_day: int | None = None, # TODO: test argument
     ) -> None:
         """
         Adds a variable to the pool.
@@ -368,10 +368,11 @@ class OutputManager(object):
             for that variable.
         overwrite_simulation_day: bool, default False
             if true, the variable's info map is automatically updated with the current simulation_day, otherwise the
-            simulation_day specified within the info_map is used if avaialble.
-        time: RufasTime, optional
-            if present, simulation_day will be taken from this time object. This option is provided to allow variables
-            created outside the main simulation loop (i.e., herd initialization) to be padded.
+            simulation_day specified within the info_map is used if available.
+        simulation_day: optional
+            if present, this simulation_day will be used, otherwise the simulation_day will be taken from the time
+            attribute, if present. This option is provided to allow variables created outside the main simulation
+            loop (i.e., herd initialization) to be padded.
 
         Raises
         ------
@@ -388,12 +389,13 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
-        time_to_use = time or self.time
+        day_to_use = simulation_day if simulation_day is not None else self.time.simulation_day \
+            if hasattr(self.time, "simulation_day") else None
 
         # add simulation day to input maps (needed for data padding to work)
-        needs_sim_day = overwrite_simulation_day or "simulation_day" not in info_map.keys()
-        if time_to_use is not None and needs_sim_day:
-            info_map["simulation_day"] = time_to_use.simulation_day
+        should_add_sim_day = overwrite_simulation_day or "simulation_day" not in info_map.keys()
+        if day_to_use is not None and should_add_sim_day:
+            info_map["simulation_day"] = day_to_use
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)

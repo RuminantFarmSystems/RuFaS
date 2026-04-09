@@ -1038,12 +1038,14 @@ def test_add_variable(
         # TODO: handle provided time argument...
     ],
 )
+@pytest.mark.parametrize("manual_day", [None, 15])
 def test_add_variable_infomap_simulation_day(
     info_map: dict,
     current_simulation_day: int,
     overwrite_simulation_day: bool,
     expected_day_value: int,
     mocker: MockerFixture,
+    manual_day: int
 ):
     """
     Test that add_variable properly adds simulation_day to the info map and respects previously specified
@@ -1073,21 +1075,24 @@ def test_add_variable_infomap_simulation_day(
         value="hello, friends",
         info_map=info_map,
         overwrite_simulation_day=overwrite_simulation_day,
+        simulation_day = manual_day
     )
 
     saved_info_map = [val for val in om.variables_pool.values()][0].get("info_maps")[0]
     observed_day = saved_info_map.get("simulation_day")
 
-    # Assertions
+    # Assertions (conditional)
 
-    # conditional
+    if manual_day is not None and overwrite_simulation_day:
+        assert observed_day == manual_day
+        return
+
     if expected_day_value is None:
         assert om.time is None
     else:
         assert "simulation_day" in saved_info_map  # simulation day in every info map
         assert info_map.get("simulation_day") == expected_day_value  # original info map correct(ed)
 
-    # universal
     assert observed_day == expected_day_value
 
 
