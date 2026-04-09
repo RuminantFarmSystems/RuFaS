@@ -4285,7 +4285,6 @@
             "type": "number",
             "description": "Calf Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 155
           },
           "ration_percentage": {
@@ -4305,7 +4304,6 @@
             "type": "number",
             "description": "Growing Heifers Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4325,7 +4323,6 @@
             "type": "number",
             "description": "Close UP Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4345,7 +4342,6 @@
             "type": "number",
             "description": "Lactating Cow Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4377,8 +4373,7 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "minimum": 1,
-          "maximum": 306
+          "minimum": 1
         },
         "runtime_purchase_allowance": {
           "type": "number",
