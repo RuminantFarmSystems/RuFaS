@@ -1,0 +1,98 @@
+{
+  "cross-validation": [
+    {
+      "description": "weather high, low, and average temperature arrays have equal lengths",
+      "target_and_save": {
+        "variables": {
+          "weather_high": "weather.high",
+          "weather_low": "weather.low",
+          "weather_avg": "weather.avg"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "weather_high"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "weather_low"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "weather_high"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "weather_avg"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "weather daily high temperatures are greater than or equal to daily averages",
+      "target_and_save": {
+        "variables": {
+          "weather_high": "weather.high",
+          "weather_avg": "weather.avg"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "weather_high"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "weather_avg"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "weather daily average temperatures are greater than or equal to daily lows",
+      "target_and_save": {
+        "variables": {
+          "weather_avg": "weather.avg",
+          "weather_low": "weather.low"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "ordered_variables": [
+              "weather_avg"
+            ],
+            "apply_to": "individual"
+          },
+          "right_hand": {
+            "ordered_variables": [
+              "weather_low"
+            ],
+            "apply_to": "individual"
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    }
+  ]
+}
