@@ -1752,8 +1752,8 @@ class CrossValidator:
                 left, right, eager_termination
             ),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
-            "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
-            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right),
+            "is_null": lambda left, _right, eager_termination: self._evaluate_is_null(left),
+            "regex": lambda left, right, eager_termination: self._evaluate_regex(left, right),
             "is_equal_length": lambda left, right, eager_termination: self._evaluate_equal_data_length(
                 left, right, eager_termination
             ),
