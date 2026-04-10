@@ -1,0 +1,80 @@
+# New Version Updates
+
+Each version of the RuFaS model is designed to improve the accuracy and precision of the predictive power of the model. This section aims to outline the changes made ... 
+
+## Animal Module
+
+### Changed Inputs
+Here you should include any 
+
+### Changed Methodology
+Text, equations, and references
+
+### Output Updates
+Expectations
+
+
+
+
+
+## Manure Module
+
+### Changed Inputs
+Here you should include any 
+
+### Changed Methodology
+Text, equations, and references
+
+### Output Updates
+Expectations
+
+
+
+
+
+## Feed Storage Module
+
+### Changed Inputs
+Here you should include any 
+
+### Changed Methodology
+Text, equations, and references
+
+### Output Updates
+Expectations
+
+
+
+
+
+## Crop and Soil Module
+
+### Changed Inputs
+Here you should include any 
+
+### Changed Methodology
+Text, equations, and references
+
+### Output Updates
+Expectations
+
+
+
+
+
+## Connections Documents
+
+### Changed Inputs
+Here you should include any 
+
+### Changed Methodology
+Text, equations, and references
+
+### Output Updates
+Expectations
+
+
+
+
+
+

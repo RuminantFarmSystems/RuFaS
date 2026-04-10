@@ -9,6 +9,7 @@ book:
   page-navigation: true
   chapters:
     - index.qmd
+    - versionupdates.qmd
     - example_structures.qmd
     - animal.qmd
     - manure.qmd
