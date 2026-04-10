@@ -13,13 +13,15 @@ env:
 
 jobs:
   fail_if_pull_request_is_draft:
-    if: github.event.pull_request.draft == true
+    name: Draft PR Chek
+    if: ${{ github.event.pull_request.draft == true }}
     runs-on: ubuntu-latest
     steps:
     - name: Fails in order to indicate that PR needs to be marked as ready to review and other checks passed.
       run: exit 1 # don't run other jobs
   format_code:
-    if: github.event.pull_request.draft == false
+    name: Format Code
+    if: ${{ github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
@@ -176,7 +178,7 @@ jobs:
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     needs: format_code
     runs-on: ubuntu-latest
     steps:
