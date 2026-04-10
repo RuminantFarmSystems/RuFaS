@@ -124,7 +124,7 @@ class TaskManager:
         """
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
-            verbosity=verbosity,
+            verbosity=LogVerbosity.ERRORS if verbosity is None else verbosity,
             exclude_info_maps=exclude_info_maps,
             output_directory=output_directory,
             clear_output_directory=clear_output_directory,
@@ -519,7 +519,7 @@ class TaskManager:
         workers: int,
         metadata_path: Path,
         output_directory: Path,
-        verbosity: LogVerbosity,
+        verbosity: LogVerbosity | None,
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -566,7 +566,7 @@ class TaskManager:
         metadata_depth_limit: int | None,
         metadata_path: Path,
         output_directory: Path,
-        verbosity: LogVerbosity,
+        verbosity: LogVerbosity | None,
     ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
@@ -598,7 +598,7 @@ class TaskManager:
                 False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
             )
             output_manager.run_startup_sequence(
-                verbosity=verbosity,
+                verbosity=LogVerbosity(args["log_verbosity"]) if verbosity is None else verbosity,
                 exclude_info_maps=args["exclude_info_maps"],
                 output_directory=output_directory,
                 clear_output_directory=False,
