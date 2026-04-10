@@ -2709,12 +2709,42 @@ def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_ter
 @pytest.mark.parametrize(
     "expression_block, eager_termination",
     [
-        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
-        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
-        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
+        (
+            {"aggregation": {"operation": "add", "ordered_variables": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {"aggregation": {"operation": "add", "ordered_variables": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
     ],
 )
 def test_evaluate_expression_unknown_operation(
@@ -2739,12 +2769,12 @@ def test_evaluate_expression_unknown_operation(
 @pytest.mark.parametrize(
     "expression_block, eager_termination",
     [
-        ({"operation": "add", "save_as": "alias_2"}, True),
-        ({"operation": "subtract", "save_as": "alias_2"}, True),
-        ({"operation": "multiply", "ordered_variables": [], "save_as": "alias_2"}, True),
-        ({"operation": "add", "save_as": "alias_2"}, False),
-        ({"operation": "subtract", "save_as": "alias_2"}, False),
-        ({"operation": "multiply", "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "multiply", "ordered_variables": []}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "multiply"}, "save_as": "alias_2"}, False),
     ],
 )
 def test_evaluate_expression_no_ordered_variables(
@@ -2873,21 +2903,31 @@ def test_validate_expression_block_with_complex_variable_values_unknown_apply_to
 @pytest.mark.parametrize(
     "expression_block, selected_variables, expected_result",
     [
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[1, 2, 3]], [1, 2, 3]),
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[]], []),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "abc"},
+            {"aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}},
+            [[1, 2, 3]],
+            [1, 2, 3],
+        ),
+        ({"aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}}, [[]], []),
+        (
+            {
+                "aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+                "save_as": "abc",
+            },
             [{"a": 1, "b": 2, "c": 3}],
             [1, 2, 3],
         ),
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [{}], []),
+        ({"aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}}, [{}], []),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "def"},
+            {
+                "aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+                "save_as": "def",
+            },
             [{"a": [], "b": []}],
             [[], []],
         ),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+            {"aggregation": {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}},
             [[{}, {}, {}]],
             [{}, {}, {}],
         ),
@@ -2917,17 +2957,36 @@ def test_evaluate_expression_apply_to_individual(
 @pytest.mark.parametrize(
     "expression_block, selected_variables, expected_result",
     [
-        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[1, 2, 3]], [6]),
-        ({"operation": "difference", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[]], [None]),
         (
-            {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group", "save_as": "abc"},
+            {"aggregation": {"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "group"}},
+            [[1, 2, 3]],
+            [6],
+        ),
+        (
+            {"aggregation": {"operation": "difference", "ordered_variables": ["alias_0"], "apply_to": "group"}},
+            [[]],
+            [None],
+        ),
+        (
+            {
+                "aggregation": {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group"},
+                "save_as": "abc",
+            },
             [{"a": 1, "b": 2, "c": 3}],
             [6],
         ),
-        ({"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"}, [{}], [None]),
-        ({"operation": "no_op", "ordered_variables": ["a", "b", "c"], "save_as": "def"}, [2, 5, 8], [2, 5, 8]),
         (
-            {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]},
+            {"aggregation": {"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"}},
+            [{}],
+            [None],
+        ),
+        (
+            {"aggregation": {"operation": "no_op", "ordered_variables": ["a", "b", "c"]}, "save_as": "def"},
+            [2, 5, 8],
+            [2, 5, 8],
+        ),
+        (
+            {"aggregation": {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]}},
             [8, 7, 6, 5, 4, 3, 2, 1],
             [4.5],
         ),
@@ -3349,3 +3408,142 @@ def test_log_missing_condition_clause_field_only() -> None:
     e = v._event_logs[0]
     assert e["error"] == "Missing required condition clause field"
     assert e["message"] == "Missing the left hand field in condition clause."
+
+
+# ---------------------------------------------------------------------------
+# Tests for _evaluate_iterate_array_of_dicts
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "iter_block, alias_values, expected_result",
+    [
+        # filter_array=True: keep entries where attribute == comparison_value
+        (
+            {
+                "filter_array": True,
+                "variable_name": "items",
+                "attribute_of_interest": "type",
+                "comparison_value": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "A", "val": 1}, {"type": "B", "val": 2}, {"type": "A", "val": 3}],
+                "A",
+            ],
+            [{"type": "A", "val": 1}, {"type": "A", "val": 3}],
+        ),
+        # filter_array=True: no entries match
+        (
+            {
+                "filter_array": True,
+                "variable_name": "items",
+                "attribute_of_interest": "type",
+                "comparison_value": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "X"}, {"type": "Y"}],
+                "Z",
+            ],
+            [],
+        ),
+        # filter_array=False: all entries satisfy → [True]
+        (
+            {
+                "filter_array": False,
+                "variable_name": "items",
+                "attribute_of_interest": "status",
+                "comparison_value": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "ok"}],
+                "ok",
+            ],
+            [True],
+        ),
+        # filter_array=False: not all entries satisfy → [False]
+        (
+            {
+                "filter_array": False,
+                "variable_name": "items",
+                "attribute_of_interest": "status",
+                "comparison_value": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "fail"}],
+                "ok",
+            ],
+            [False],
+        ),
+    ],
+)
+def test_evaluate_iterate_array_of_dicts_success(
+    iter_block: dict[str, Any], alias_values: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    """_evaluate_iterate_array_of_dicts returns correct filtered/enforced result."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", side_effect=alias_values)
+
+    result, status = cv._evaluate_iterate_array_of_dicts(
+        iter_block, eager_termination=False, outer_relationship="equal"
+    )
+    assert status is True
+    assert result == expected_result
+
+
+def test_evaluate_iterate_array_of_dicts_unknown_relationship_no_eager() -> None:
+    """Unknown relationship returns (None, False) when not eager."""
+    cv = CrossValidator()
+    iter_block = {
+        "filter_array": True,
+        "variable_name": "items",
+        "attribute_of_interest": "x",
+        "comparison_value": "cmp",
+        "relationship": "unknown_rel",
+    }
+    result, status = cv._evaluate_iterate_array_of_dicts(
+        iter_block, eager_termination=False, outer_relationship="equal"
+    )
+    assert result is None
+    assert status is False
+    assert len(cv._event_logs) == 1
+
+
+def test_evaluate_iterate_array_of_dicts_unknown_relationship_eager() -> None:
+    """Unknown relationship raises ValueError when eager."""
+    cv = CrossValidator()
+    iter_block = {
+        "filter_array": True,
+        "variable_name": "items",
+        "attribute_of_interest": "x",
+        "comparison_value": "cmp",
+        "relationship": "unknown_rel",
+    }
+    with pytest.raises(ValueError, match="Unknown relationship"):
+        cv._evaluate_iterate_array_of_dicts(iter_block, eager_termination=True, outer_relationship="equal")
+
+
+def test_evaluate_expression_with_iterate_array_of_dicts_and_save_as(mocker: MockerFixture) -> None:
+    """save_as at the expression_block level is applied when using iterate_array_of_dicts."""
+    cv = CrossValidator()
+    expression_block = {
+        "iterate_array_of_dicts": {
+            "filter_array": True,
+            "variable_name": "items",
+            "attribute_of_interest": "type",
+            "comparison_value": "cmp",
+            "relationship": "equal",
+        },
+        "save_as": "filtered_items",
+    }
+    array_data = [{"type": "A"}, {"type": "B"}]
+    mocker.patch.object(cv, "_get_alias_value", side_effect=[array_data, "A"])
+    mock_save = mocker.patch.object(cv, "_save_to_alias_pool")
+
+    result, status = cv._evaluate_expression(expression_block, eager_termination=False, relationship="equal")
+    assert status is True
+    assert result == [{"type": "A"}]
+    mock_save.assert_called_once_with(alias_name="filtered_items", value=[{"type": "A"}])
