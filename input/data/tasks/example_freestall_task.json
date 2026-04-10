@@ -9,7 +9,7 @@
       "random_seed": 42,
       "exclude_info_maps": false,
       "cross_validation_file_paths": [
-        "input/metadata/cross_validation/example_cross_validation.json"
+        "input/metadata/cross_validation/weather_cross_validation.json"
       ]
     }
 ]
