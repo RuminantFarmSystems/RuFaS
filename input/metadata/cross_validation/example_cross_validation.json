@@ -203,25 +203,26 @@
       "rules": [
         {
           "left_hand": {
-            "iterate_array_of_dicts": {
-              "filter_array": false,
-              "variable_name": "alias_name_to_array_of_dicts_variable",
-              "attribute_of_interest": "attribute1_name",
-              "target_attribute": "Optional[attribute2_name]",
-              "comparison_value": "Optional[alias_name_of_comparison_value]",
-              "relationship": "equal"
+            "for_each": {
+              "mode": "filter | enforce",
+              "in": "alias_name_to_array_of_dicts_variable",
+              "field": "attribute1_name",
+              "compare_field": "Optional[attribute2_name]",
+              "compare_value": "Optional[alias_name_of_comparison_value]",
+              "operator": "equal"
             },
             "save_as": "save_as_alias_name"
           },
           "right_hand": {
             "aggregation": {
-              "operation": "no_op",
-              "ordered_variables": [
+              "function": "no_op",
+              "operands": [
                 "true_constant"
-              ]
+              ],
+              "mode": "element_wise (individual) | aggregate (group)"
             }
           },
-          "relationship": "equal"
+          "operator": "equal"
         }
       ]
     }
