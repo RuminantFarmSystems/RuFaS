@@ -22,7 +22,7 @@ def main() -> None:
         task_manager = TaskManager()
         task_manager.start(
             metadata_path=Path(cmd_arguments.path_to_metadata),
-            verbosity=LogVerbosity(cmd_arguments.verbose),
+            verbosity=LogVerbosity(cmd_arguments.verbose) if cmd_arguments.verbose is not None else None,
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),
             logs_directory=Path(cmd_arguments.logs_dir),
@@ -78,8 +78,8 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
         "-v",
         "--verbose",
         choices=["errors", "warnings", "logs", "credits", "none"],
-        default="credits",
-        help="Specifies the log type to be printed",
+        default=None,
+        help="Temporarily override the verbosity setting for this run",
     )
     parser.add_argument(
         "-c",

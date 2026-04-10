@@ -99,8 +99,8 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-v",
             "--verbose",
             choices=["errors", "warnings", "logs", "credits", "none"],
-            default="credits",
-            help="Specifies the log type to be printed",
+            default=None,
+            help="Temporarily override the verbosity setting for this run"
         ),
         mocker.call(
             "-c",
