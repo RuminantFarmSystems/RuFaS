@@ -1745,9 +1745,8 @@ class CrossValidator:
             "greater": lambda left, right, eager_termination: self._evaluate_greater_condition(
                 left, right, eager_termination
             ),
-            "greater_or_equal_to": lambda left, right, _eager_termination: (
-                self._evaluate_greater_condition(left, right, _eager_termination)
-                or self._evaluate_equal_condition(left, right, _eager_termination)
+            "greater_or_equal_to": lambda left, right, eager_termination: self._evaluate_greater_or_equal_condition(
+                left, right, eager_termination
             ),
             "not_equal": lambda left, right, eager_termination: not self._evaluate_equal_condition(
                 left, right, eager_termination
@@ -2241,6 +2240,16 @@ class CrossValidator:
         return bool(
             self._evaluate_pairwise_condition(
                 left_hand_value, right_hand_value, lambda left, right: left > right, eager_termination
+            )
+        )
+
+    def _evaluate_greater_or_equal_condition(
+        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False
+    ) -> bool:
+        """Evaluates greater than or equal to condition."""
+        return bool(
+            self._evaluate_pairwise_condition(
+                left_hand_value, right_hand_value, lambda left, right: left >= right, eager_termination
             )
         )
 

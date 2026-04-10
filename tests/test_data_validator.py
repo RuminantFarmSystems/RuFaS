@@ -3241,41 +3241,35 @@ def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination:
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
-def test_evaluate_condition_greater_or_equal_short_circuit(mocker: MockerFixture, eager_termination: bool) -> None:
-    """When 'greater_or_equal_to', greater=True should short-circuit (no equality call)."""
+def test_evaluate_condition_greater_or_equal_path(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Dispatch to the dedicated greater-or-equal evaluator."""
     cv = CrossValidator()
     mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[(5, True), (2, True)])
-    mock_gt = mocker.patch.object(cv, "_evaluate_greater_condition", return_value=True)
-    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=False)
+    mock_ge = mocker.patch.object(cv, "_evaluate_greater_or_equal_condition", return_value=True)
 
     valid = cv._evaluate_condition(
         {"relationship": "greater_or_equal_to", "left_hand": {}, "right_hand": {}}, eager_termination
     )
 
     assert valid
-    mock_gt.assert_called_once_with(5, 2, eager_termination)
-    mock_eq.assert_not_called()
+    mock_ge.assert_called_once_with(5, 2, eager_termination)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
-def test_evaluate_condition_greater_or_equal_falls_back_to_equal(
-    mocker: MockerFixture, eager_termination: bool
-) -> None:
-    """When 'greater_or_equal_to', if greater=False, equality result is used."""
+def test_evaluate_greater_or_equal_condition(eager_termination: bool) -> None:
+    """Greater-or-equal should be true for both equal and greater scalar values."""
     cv = CrossValidator()
-    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
-    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(2, True), (2, True)])
-    mock_gt = mocker.patch.object(cv, "_evaluate_greater_condition", return_value=False)
-    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=True)
+    assert cv._evaluate_greater_or_equal_condition(2, 2, eager_termination) is True
+    assert cv._evaluate_greater_or_equal_condition(3, 2, eager_termination) is True
+    assert cv._evaluate_greater_or_equal_condition(1, 2, eager_termination) is False
 
-    valid = cv._evaluate_condition(
-        {"relationship": "greater_or_equal_to", "left_hand": {}, "right_hand": {}}, eager_termination
-    )
 
-    assert valid
-    mock_gt.assert_called_once_with(2, 2, eager_termination)
-    mock_eq.assert_called_once_with(2, 2, eager_termination)
+def test_evaluate_greater_or_equal_condition_pairwise_lists() -> None:
+    """Greater-or-equal should compare lists elementwise."""
+    cv = CrossValidator()
+    assert cv._evaluate_greater_or_equal_condition([3, 5, 7], [3, 4, 7]) is True
+    assert cv._evaluate_greater_or_equal_condition([3, 5, 7], [3, 6, 7]) is False
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
