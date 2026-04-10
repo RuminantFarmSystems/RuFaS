@@ -79,7 +79,7 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
         "--verbose",
         choices=["errors", "warnings", "logs", "credits", "none"],
         default=None,
-        help="Temporarily override the metadata/input verbosity setting for this run.",
+        help="Temporarily override the verbosity setting for this run",
     )
     parser.add_argument(
         "-c",
