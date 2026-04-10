@@ -190,13 +190,7 @@ class TaskManager:
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         self._run_tasks(
-            runnable_args,
-            produce_graphics,
-            metadata_depth_limit,
-            workers,
-            metadata_path,
-            output_directory,
-            verbosity
+            runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory, verbosity
         )
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
@@ -529,7 +523,7 @@ class TaskManager:
             workers=workers,
             metadata_path=metadata_path,
             output_directory=output_directory,
-            verbosity=verbosity
+            verbosity=verbosity,
         )
         if self.pool is not None:
             results = self.pool.map(task_with_args, single_run_args)

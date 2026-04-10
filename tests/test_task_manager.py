@@ -210,7 +210,7 @@ def test_task_manager_start(
             workers,
             Path("metadata/path"),
             Path("output/directory"),
-            verbosity
+            verbosity,
         )
         mock_summarize.assert_not_called()
     elif is_end_to_end_test_task:
@@ -739,8 +739,13 @@ def test_task(
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
     task_manager.task(
-        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"),
-        output_directory=Path("output/"), verbosity=LogVerbosity.LOGS
+        args,
+        produce_graphics,
+        2,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
     mock_im_init.assert_called_once_with(10)
 
@@ -785,8 +790,13 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
     }
     produce_graphics = False
     result = task_manager.task(
-        args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"),
-        output_directory=Path("output/"), verbosity=LogVerbosity.LOGS
+        args,
+        produce_graphics,
+        1,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
 
     assert result is None
@@ -843,8 +853,13 @@ def test_task_failed(task_manager: TaskManager) -> None:
     }
     produce_graphics = False
     result = task_manager.task(
-        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"),
-        output_directory=Path("output/"), verbosity=LogVerbosity.LOGS
+        args,
+        produce_graphics,
+        2,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
     assert result == "test (1)"
 
@@ -1819,7 +1834,7 @@ def test_run_tasks_fail(
         workers=1,
         metadata_path=Path("metadata/path"),
         output_directory=Path("output"),
-        verbosity=verbosity
+        verbosity=verbosity,
     )
 
     mock_om_init.assert_called_once()
