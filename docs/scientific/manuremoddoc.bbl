@@ -1,0 +1,1072 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{1}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{AguirreVillegas2019}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=c93a22a7a1d4478a5f20770b788f3ae2}{%
+           family={Aguirre-Villegas},
+           familyi={A\bibinithyphendelim V\bibinitperiod},
+           given={H.\bibnamedelimi A.},
+           giveni={H\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=1,uniquepart=given,hash=4ad12251f1aba7b7d13054081dd14f91}{%
+           family={Larson},
+           familyi={L\bibinitperiod},
+           given={R.\bibnamedelimi A.},
+           giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=b0479a0286329986df34522da7b46034}{%
+           family={Sharara},
+           familyi={S\bibinitperiod},
+           given={M.\bibnamedelimi A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \strng{fullhash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \strng{bibnamehash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \strng{authorbibnamehash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \strng{authornamehash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \strng{authorfullhash}{3f706d7f536fe9b2f2f50ba2001ab49c}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science of The Total Environment}
+      \field{title}{Anaerobic digestion, solid-liquid separation, and drying of dairy manure: Measuring constituents and modeling emission}
+      \field{volume}{696}
+      \field{year}{2019}
+      \field{pages}{134059}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/J.SCITOTENV.2019.134059
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1016/J.SCITOTENV.2019.134059
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1016/J.SCITOTENV.2019.134059
+      \endverb
+    \endentry
+    \entry{bonifacio2017a}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=2ddb1b41556e6c9ab42634e093b78ae2}{%
+           family={Bonifacio},
+           familyi={B\bibinitperiod},
+           given={H.\bibnamedelimi F.},
+           giveni={H\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=671322781f92056fc27b16ad1757f430}{%
+           family={Rotz},
+           familyi={R\bibinitperiod},
+           given={C.\bibnamedelimi A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ead6a8ce21f03d4bc3f448b2928b5eb8}{%
+           family={Richard},
+           familyi={R\bibinitperiod},
+           given={T.\bibnamedelimi L.},
+           giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{fullhash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{bibnamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authorbibnamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authornamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authorfullhash}{c170dd06eb410415abb1284a01fbb539}
+      \field{extraname}{1}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradate}{1}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Transactions of the ASABE}
+      \field{number}{3}
+      \field{title}{A Process-Based Model for Cattle Manure Compost Windrows: Part 1. Model Description}
+      \field{volume}{60}
+      \field{year}{2017}
+      \field{pages}{877\bibrangedash 892}
+      \range{pages}{16}
+    \endentry
+    \entry{bonifacio2017b}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=2ddb1b41556e6c9ab42634e093b78ae2}{%
+           family={Bonifacio},
+           familyi={B\bibinitperiod},
+           given={H.\bibnamedelimi F.},
+           giveni={H\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=671322781f92056fc27b16ad1757f430}{%
+           family={Rotz},
+           familyi={R\bibinitperiod},
+           given={C.\bibnamedelimi A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ead6a8ce21f03d4bc3f448b2928b5eb8}{%
+           family={Richard},
+           familyi={R\bibinitperiod},
+           given={T.\bibnamedelimi L.},
+           giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{fullhash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{bibnamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authorbibnamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authornamehash}{c170dd06eb410415abb1284a01fbb539}
+      \strng{authorfullhash}{c170dd06eb410415abb1284a01fbb539}
+      \field{extraname}{2}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradate}{2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Transactions of the ASABE}
+      \field{number}{3}
+      \field{title}{A Process-Based Model for Cattle Manure Compost Windrows: Part 2. Model Performance and Application}
+      \field{volume}{60}
+      \field{year}{2017}
+      \field{pages}{893\bibrangedash 913}
+      \range{pages}{21}
+    \endentry
+    \entry{Bucklin2009}{article}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=1a68f675dfecf59ba940dccd93ca16d7}{%
+           family={Bucklin},
+           familyi={B\bibinitperiod},
+           given={R.\bibnamedelimi A.},
+           giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1ede1f15c5e825b88e909845c0230aa9}{%
+           family={Bray},
+           familyi={B\bibinitperiod},
+           given={D.\bibnamedelimi R.},
+           giveni={D\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5f518ce43bbeec2fe86f034b00abe59e}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={J.\bibnamedelimi G.},
+           giveni={J\bibinitperiod\bibinitdelim G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b389a0b4e144462fad5d874fa4376611}{%
+           family={Carlos},
+           familyi={C\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8c5450936ddb74d5387107872dfb063e}{%
+           family={Carvalho},
+           familyi={C\bibinitperiod},
+           given={V.},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{6927eeaf719db0c9bb4313596e64968a}
+      \strng{fullhash}{1a31d7d711ebf319dd5d576726ce96b7}
+      \strng{bibnamehash}{6927eeaf719db0c9bb4313596e64968a}
+      \strng{authorbibnamehash}{6927eeaf719db0c9bb4313596e64968a}
+      \strng{authornamehash}{6927eeaf719db0c9bb4313596e64968a}
+      \strng{authorfullhash}{1a31d7d711ebf319dd5d576726ce96b7}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Applied Engineering in Agriculture}
+      \field{number}{5}
+      \field{title}{Environmental Temperatures in Florida Dairy Housing}
+      \field{volume}{25}
+      \field{year}{2009}
+      \field{pages}{727\bibrangedash 735}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.13031/2013.28851
+      \endverb
+    \endentry
+    \entry{Chianese2009a}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=8769f8c7f0af5e978c986042db9f7ff7}{%
+           family={Chianese},
+           familyi={C\bibinitperiod},
+           given={D.\bibnamedelimi S.},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=671322781f92056fc27b16ad1757f430}{%
+           family={Rotz},
+           familyi={R\bibinitperiod},
+           given={C.\bibnamedelimi A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ead6a8ce21f03d4bc3f448b2928b5eb8}{%
+           family={Richard},
+           familyi={R\bibinitperiod},
+           given={T.\bibnamedelimi L.},
+           giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \strng{fullhash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \strng{bibnamehash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \strng{authorbibnamehash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \strng{authornamehash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \strng{authorfullhash}{68cb677d5fb3a0ae770e1fab030cc06c}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Transactions of the ASABE}
+      \field{number}{4}
+      \field{title}{Simulation of methane emissions from dairy farms to assess greenhouse gas reduction strategies}
+      \field{volume}{52}
+      \field{year}{2009}
+      \field{pages}{1313\bibrangedash 1323}
+      \range{pages}{11}
+      \verb{urlraw}
+      \verb https://elibrary.asabe.org/abstract.asp?aid=27781
+      \endverb
+      \verb{url}
+      \verb https://elibrary.asabe.org/abstract.asp?aid=27781
+      \endverb
+    \endentry
+    \entry{Elsgaard2016}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=3e86451f4170dcfd4cbda91eb02af522}{%
+           family={Elsgaard},
+           familyi={E\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e4f99f908f2ad14cb17bcc63aa2a01d9}{%
+           family={Olsen},
+           familyi={O\bibinitperiod},
+           given={A.\bibnamedelimi B.},
+           giveni={A\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f10952d81d8d2c363347c8fef628b54e}{%
+           family={Petersen},
+           familyi={P\bibinitperiod},
+           given={S.\bibnamedelimi O.},
+           giveni={S\bibinitperiod\bibinitdelim O\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{67ea29a91bc391c16c2a917798549a4f}
+      \strng{fullhash}{67ea29a91bc391c16c2a917798549a4f}
+      \strng{bibnamehash}{67ea29a91bc391c16c2a917798549a4f}
+      \strng{authorbibnamehash}{67ea29a91bc391c16c2a917798549a4f}
+      \strng{authornamehash}{67ea29a91bc391c16c2a917798549a4f}
+      \strng{authorfullhash}{67ea29a91bc391c16c2a917798549a4f}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science of The Total Environment}
+      \field{title}{Temperature response of methane production in liquid manures and co-digestates}
+      \field{volume}{539}
+      \field{year}{2016}
+      \field{pages}{78\bibrangedash 84}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.1016/j.scitotenv.2015.07.145
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0048969715304861
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0048969715304861
+      \endverb
+    \endentry
+    \entry{Fernandez2015}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=461a014f76cd5fc55c8d18116fd97501}{%
+           family={Fernández},
+           familyi={F\bibinitperiod},
+           given={Y.\bibnamedelimi B.},
+           giveni={Y\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=2f52bf8ed35221c3c58a63aa13b2498a}{%
+           family={Green},
+           familyi={G\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=118ba4e4786e452eea9a396bd32490dc}{%
+           family={Schuler},
+           familyi={S\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c177a761165e33dfc7115748e840034e}{%
+           family={Soares},
+           familyi={S\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=43faad865b1c57f0a2aae4749b8e36d4}{%
+           family={Vale},
+           familyi={V\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c62a75353a89182505dc9dd3bd47cd10}{%
+           family={Alibardi},
+           familyi={A\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3cdc704cbcf97aeb973f3a6252dabaae}
+      \strng{fullhash}{7dbc06a2c83173d6adaba57acec4a7dc}
+      \strng{bibnamehash}{3cdc704cbcf97aeb973f3a6252dabaae}
+      \strng{authorbibnamehash}{3cdc704cbcf97aeb973f3a6252dabaae}
+      \strng{authornamehash}{3cdc704cbcf97aeb973f3a6252dabaae}
+      \strng{authorfullhash}{7dbc06a2c83173d6adaba57acec4a7dc}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Water Research}
+      \field{title}{Biological carbon dioxide utilisation in food waste anaerobic digesters}
+      \field{volume}{87}
+      \field{year}{2015}
+      \field{pages}{467\bibrangedash 475}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1016/j.watres.2015.06.011
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1016/j.watres.2015.06.011
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1016/j.watres.2015.06.011
+      \endverb
+    \endentry
+    \entry{Fournel2019}{article}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=941092636ab1507f9cab117271622c3d}{%
+           family={Fournel},
+           familyi={F\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=791f12c06eda0c3e874c65ec512c1523}{%
+           family={Godbout},
+           familyi={G\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4e54ce1efe1acb1a01ac15288ff88141}{%
+           family={Lagüe},
+           familyi={L\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b7d83f9fe3a1c68cf9ee6aa30bd5d554}{%
+           family={Baril},
+           familyi={B\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3a07ad8d67e219e7c662159719d0d7b1}{%
+           family={Lemay},
+           familyi={L\bibinitperiod},
+           given={S.\bibnamedelimi P.},
+           giveni={S\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c140d95e5d6d5efc39dbec706a108d79}
+      \strng{fullhash}{6ce811d70a78a8bfd44c05b49af07fee}
+      \strng{bibnamehash}{c140d95e5d6d5efc39dbec706a108d79}
+      \strng{authorbibnamehash}{c140d95e5d6d5efc39dbec706a108d79}
+      \strng{authornamehash}{c140d95e5d6d5efc39dbec706a108d79}
+      \strng{authorfullhash}{6ce811d70a78a8bfd44c05b49af07fee}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Dairy Science}
+      \field{title}{Production of recycled manure solids for bedding in Canadian dairy farms: I. Solid–liquid separation}
+      \field{volume}{102}
+      \field{year}{2019}
+      \field{pages}{1832\bibrangedash 1846}
+      \range{pages}{15}
+      \verb{doi}
+      \verb 10.3168/jds.2018-15330
+      \endverb
+    \endentry
+    \entry{Hanson2024}{book}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=35e0ba836b7e802e2dc667e54f37c852}{%
+           family={Hanson},
+           familyi={H\bibinitperiod},
+           given={W.\bibnamedelimi L.},
+           giveni={W\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c10d57accad17fb6705cfbd3dc4598f5}{%
+           family={Itle},
+           familyi={I\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=53dc2e22f018c80b383008e95e7fc870}{%
+           family={Edquist},
+           familyi={E\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {USDA or relevant institution}%
+      }
+      \strng{namehash}{bd66932f699665f7f17ec408c0785681}
+      \strng{fullhash}{bd66932f699665f7f17ec408c0785681}
+      \strng{bibnamehash}{bd66932f699665f7f17ec408c0785681}
+      \strng{authorbibnamehash}{bd66932f699665f7f17ec408c0785681}
+      \strng{authornamehash}{bd66932f699665f7f17ec408c0785681}
+      \strng{authorfullhash}{bd66932f699665f7f17ec408c0785681}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Forthcoming or gray literature if no publisher listed}
+      \field{title}{Quantifying Greenhouse Gas Fluxes in Agriculture and Forestry: Methods for Entity-Scale Inventory}
+      \field{year}{2024}
+    \endentry
+    \entry{Hegg1981}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=6c0e5d2f176ca8ebeeacf8576d935b35}{%
+           family={Hegg},
+           familyi={H\bibinitperiod},
+           given={R.\bibnamedelimi O.},
+           giveni={R\bibinitperiod\bibinitdelim O\bibinitperiod},
+           givenun=0}}%
+        {{un=1,uniquepart=given,hash=f11d9f4d0e41886769d13d2ea4594595}{%
+           family={Larson},
+           familyi={L\bibinitperiod},
+           given={R.\bibnamedelimi E.},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=c40bb8b8204268dce641492d655a98d3}{%
+           family={Moore},
+           familyi={M\bibinitperiod},
+           given={J.\bibnamedelimi A.},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{503d1fde573ccccd1d286559fb361049}
+      \strng{fullhash}{503d1fde573ccccd1d286559fb361049}
+      \strng{bibnamehash}{503d1fde573ccccd1d286559fb361049}
+      \strng{authorbibnamehash}{503d1fde573ccccd1d286559fb361049}
+      \strng{authornamehash}{503d1fde573ccccd1d286559fb361049}
+      \strng{authorfullhash}{503d1fde573ccccd1d286559fb361049}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Transactions of the ASAE}
+      \field{number}{1}
+      \field{title}{Mechanical liquid-solid separation in beef, dairy and swine waste slurries}
+      \field{volume}{24}
+      \field{year}{1981}
+      \field{pages}{159\bibrangedash 163}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.13031/2013.34204
+      \endverb
+    \endentry
+    \entry{IPCC2019}{misc}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=92bb724b0d9a20cee031d94d110d683a}{%
+           family={{Intergovernmental Panel on Climate Change}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{92bb724b0d9a20cee031d94d110d683a}
+      \strng{fullhash}{92bb724b0d9a20cee031d94d110d683a}
+      \strng{bibnamehash}{92bb724b0d9a20cee031d94d110d683a}
+      \strng{authorbibnamehash}{92bb724b0d9a20cee031d94d110d683a}
+      \strng{authornamehash}{92bb724b0d9a20cee031d94d110d683a}
+      \strng{authorfullhash}{92bb724b0d9a20cee031d94d110d683a}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 2024-05-17}
+      \field{title}{2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories}
+      \field{year}{2019}
+      \verb{urlraw}
+      \verb https://www.ipcc-nggip.iges.or.jp/public/2019rf/index.html
+      \endverb
+      \verb{url}
+      \verb https://www.ipcc-nggip.iges.or.jp/public/2019rf/index.html
+      \endverb
+    \endentry
+    \entry{IPCC2006}{misc}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=676f7b9b8e5bb30500c01e2385e59174}{%
+           family={{IPCC}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{676f7b9b8e5bb30500c01e2385e59174}
+      \strng{fullhash}{676f7b9b8e5bb30500c01e2385e59174}
+      \strng{bibnamehash}{676f7b9b8e5bb30500c01e2385e59174}
+      \strng{authorbibnamehash}{676f7b9b8e5bb30500c01e2385e59174}
+      \strng{authornamehash}{676f7b9b8e5bb30500c01e2385e59174}
+      \strng{authorfullhash}{676f7b9b8e5bb30500c01e2385e59174}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.ipcc-nggip.iges.or.jp/public/2006gl/}}
+      \field{note}{Accessed 2025-04-17}
+      \field{title}{Guidelines for National Greenhouse Gas Inventories}
+      \field{year}{2006}
+    \endentry
+    \entry{Jorgensen2009}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=ed110bed7af8fb53d47c4c35dc728acd}{%
+           family={Jørgensen},
+           familyi={J\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=aa40718c095161b53e6c07b64116df3b}{%
+           family={Jensen},
+           familyi={J\bibinitperiod},
+           given={L.\bibnamedelimi S.},
+           giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3b86e03c39673eb04e57d3c34ec47989}
+      \strng{fullhash}{3b86e03c39673eb04e57d3c34ec47989}
+      \strng{bibnamehash}{3b86e03c39673eb04e57d3c34ec47989}
+      \strng{authorbibnamehash}{3b86e03c39673eb04e57d3c34ec47989}
+      \strng{authornamehash}{3b86e03c39673eb04e57d3c34ec47989}
+      \strng{authorfullhash}{3b86e03c39673eb04e57d3c34ec47989}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Bioresource Technology}
+      \field{title}{Chemical and biochemical variation in animal manure solids separated using different commercial separation technologies}
+      \field{volume}{100}
+      \field{year}{2009}
+      \field{pages}{3088\bibrangedash 3096}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1016/j.biortech.2009.01.056
+      \endverb
+    \endentry
+    \entry{larney2011}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=ccea0a334f0c3e7cc27c859c15a81e76}{%
+           family={Larney},
+           familyi={L\bibinitperiod},
+           given={F.\bibnamedelimi J.},
+           giveni={F\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6e1aa5f900618485d66cbcd89975389e}{%
+           family={Ellert},
+           familyi={E\bibinitperiod},
+           given={B.\bibnamedelimi H.},
+           giveni={B\bibinitperiod\bibinitdelim H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e5492582a5ddd1ce1d8aede5b019f061}{%
+           family={Olson},
+           familyi={O\bibinitperiod},
+           given={A.\bibnamedelimi F.},
+           giveni={A\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{50e6caadc107d096bf5458afb07df224}
+      \strng{fullhash}{50e6caadc107d096bf5458afb07df224}
+      \strng{bibnamehash}{50e6caadc107d096bf5458afb07df224}
+      \strng{authorbibnamehash}{50e6caadc107d096bf5458afb07df224}
+      \strng{authornamehash}{50e6caadc107d096bf5458afb07df224}
+      \strng{authorfullhash}{50e6caadc107d096bf5458afb07df224}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Canadian Journal of Soil Science}
+      \field{title}{Carbon, ash and organic matter relationships for feedlot manures and composts}
+      \field{volume}{85}
+      \field{year}{2011}
+      \field{pages}{261\bibrangedash 264}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.4141/S04-060
+      \endverb
+    \endentry
+    \entry{Mukhtar1999}{report}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=a30e1280a6a0f232d14a729dd02a58dc}{%
+           family={Mukhtar},
+           familyi={M\bibinitperiod},
+           given={Saqib},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=237f5657d5bc7e813c16c60ef75cb315}{%
+           family={Sweeten},
+           familyi={S\bibinitperiod},
+           given={John\bibnamedelima M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=2e749c51b848a2a4d9b545ac5a039d72}{%
+           family={Auvermann},
+           familyi={A\bibinitperiod},
+           given={Brent\bibnamedelima W.},
+           giveni={B\bibinitperiod\bibinitdelim W\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{institution}{1}{%
+        {Texas A\&M AgriLife Extension Service}%
+      }
+      \strng{namehash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \strng{fullhash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \strng{bibnamehash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \strng{authorbibnamehash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \strng{authornamehash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \strng{authorfullhash}{cbdf3154760ef6df370c1f570f9ef0e4}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Publication L-5340}
+      \field{title}{Solid-liquid separation of animal manure and wastewater}
+      \field{type}{techreport}
+      \field{year}{1999}
+    \endentry
+    \entry{NRCS2017}{misc}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=6502d0d6c39ef680aeee2ac35a88c7f5}{%
+           family={{Natural Resources Conservation Service (NRCS)}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \strng{fullhash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \strng{bibnamehash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \strng{authorbibnamehash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \strng{authornamehash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \strng{authorfullhash}{6502d0d6c39ef680aeee2ac35a88c7f5}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 2024-05-17}
+      \field{title}{Conservation Practice Standard Code 359: Waste Treatment Lagoon}
+      \field{year}{2017}
+      \verb{urlraw}
+      \verb https://www.nrcs.usda.gov/sites/default/files/2022-10/Waste_Treatment_Lagoon_359_CPS_Oct_2017.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.nrcs.usda.gov/sites/default/files/2022-10/Waste_Treatment_Lagoon_359_CPS_Oct_2017.pdf
+      \endverb
+    \endentry
+    \entry{Petersen2024}{article}{}
+      \name{author}{11}{}{%
+        {{un=0,uniquepart=base,hash=f10952d81d8d2c363347c8fef628b54e}{%
+           family={Petersen},
+           familyi={P\bibinitperiod},
+           given={S.\bibnamedelimi O.},
+           giveni={S\bibinitperiod\bibinitdelim O\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=59fc68fb715a5e16a8e1c5bfc38e4b9a}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=23b76d9b603bbd7a886892a6765974d3}{%
+           family={Hilgert},
+           familyi={H\bibinitperiod},
+           given={J.\bibnamedelimi E.},
+           giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=127d32450ca20be0fb82a6f46da89c7d}{%
+           family={Mjöfors},
+           familyi={M\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=275ec96e68a3c6b4e644e2530be961cc}{%
+           family={Sefeedpari},
+           familyi={S\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e83f7f38ec0743075105546dbdeba43f}{%
+           family={Amon},
+           familyi={A\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7a7ac5b68dbaadbab2746fd163d8666b}{%
+           family={Aarnink},
+           familyi={A\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3020db660dace6f04c17f7a2416edfcb}{%
+           family={Francó},
+           familyi={F\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0ef7e74e2aedb598eea8fc2ef17b946c}{%
+           family={Dragoni},
+           familyi={D\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d6c2c61762032b35e0216d806c3865c3}{%
+           family={Groenestein},
+           familyi={G\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7f5284a282710595db3e6237346456a9}{%
+           family={Gyldenkærne},
+           familyi={G\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{aa59ecbf80bce65ec5c8533420f76cf3}
+      \strng{fullhash}{38a8b178a753477dde3d94e4a4f3d67f}
+      \strng{bibnamehash}{aa59ecbf80bce65ec5c8533420f76cf3}
+      \strng{authorbibnamehash}{aa59ecbf80bce65ec5c8533420f76cf3}
+      \strng{authornamehash}{aa59ecbf80bce65ec5c8533420f76cf3}
+      \strng{authorfullhash}{38a8b178a753477dde3d94e4a4f3d67f}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Environmental Management}
+      \field{title}{In-vitro method and model to estimate methane emissions from liquid manure management on pig and dairy farms in four countries}
+      \field{volume}{353}
+      \field{year}{2024}
+      \field{pages}{120233}
+      \range{pages}{1}
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0301479724002196
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0301479724002196
+      \endverb
+    \endentry
+    \entry{Rotz2023}{report}{}
+      \name{author}{7}{ul=2}{%
+        {{un=0,uniquepart=base,hash=671322781f92056fc27b16ad1757f430}{%
+           family={Rotz},
+           familyi={R\bibinitperiod},
+           given={C.\bibnamedelimi A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=2096ac2d9407493947cdf80707a080cd}{%
+           family={Corson},
+           familyi={C\bibinitperiod},
+           given={M.\bibnamedelimi S.},
+           giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8769f8c7f0af5e978c986042db9f7ff7}{%
+           family={Chianese},
+           familyi={C\bibinitperiod},
+           given={D.\bibnamedelimi S.},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8569ea0732502518adcf24b174793a4e}{%
+           family={Montes},
+           familyi={M\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=532cf2b701cec655b2bb0bae43830a13}{%
+           family={Hafner},
+           familyi={H\bibinitperiod},
+           given={S.\bibnamedelimi D.},
+           giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8775d7650d2c4ef94babf832aa194bbe}{%
+           family={Bonaficio},
+           familyi={B\bibinitperiod},
+           given={H.\bibnamedelimi F.},
+           giveni={H\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=54619624f04fecca484f44aac25ed2d0}{%
+           family={Coiner},
+           familyi={C\bibinitperiod},
+           given={C.\bibnamedelimi U.},
+           giveni={C\bibinitperiod\bibinitdelim U\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{institution}{2}{%
+        {Pasture Systems}%
+        {Watershed Management Research Unit, USDA-ARS}%
+      }
+      \strng{namehash}{e734e68da4451fe5a5cae09fa18d0e52}
+      \strng{fullhash}{48c257e4237da46f1c6547e3e8901bd1}
+      \strng{bibnamehash}{e734e68da4451fe5a5cae09fa18d0e52}
+      \strng{authorbibnamehash}{e734e68da4451fe5a5cae09fa18d0e52}
+      \strng{authornamehash}{e734e68da4451fe5a5cae09fa18d0e52}
+      \strng{authorfullhash}{48c257e4237da46f1c6547e3e8901bd1}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{The Integrated Farm System Model. Reference Manual, Version 4.7}
+      \field{type}{techreport}
+      \field{year}{2023}
+    \endentry
+    \entry{Rotz2006}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=671322781f92056fc27b16ad1757f430}{%
+           family={Rotz},
+           familyi={R\bibinitperiod},
+           given={C.\bibnamedelimi A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=bde0c90ee70986af22a327a0e76acf22}{%
+           family={Oenema},
+           familyi={O\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{bce699c596f397954035e6ae3aa1d1ca}
+      \strng{fullhash}{bce699c596f397954035e6ae3aa1d1ca}
+      \strng{bibnamehash}{bce699c596f397954035e6ae3aa1d1ca}
+      \strng{authorbibnamehash}{bce699c596f397954035e6ae3aa1d1ca}
+      \strng{authornamehash}{bce699c596f397954035e6ae3aa1d1ca}
+      \strng{authorfullhash}{bce699c596f397954035e6ae3aa1d1ca}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Transactions of the ASABE}
+      \field{number}{4}
+      \field{title}{Predicting management effects on ammonia emissions from dairy and beef farms}
+      \field{volume}{49}
+      \field{year}{2006}
+      \field{pages}{1139\bibrangedash 1149}
+      \range{pages}{11}
+      \verb{urlraw}
+      \verb https://elibrary.asabe.org/abstract.asp?aid=21731&t=2&redir=&redirType=
+      \endverb
+      \verb{url}
+      \verb https://elibrary.asabe.org/abstract.asp?aid=21731&t=2&redir=&redirType=
+      \endverb
+    \endentry
+    \entry{Sommer2022}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=54e1b143f51177387dff580bea44dd12}{%
+           family={Sommer},
+           familyi={S\bibinitperiod},
+           given={S.\bibnamedelimi G.},
+           giveni={S\bibinitperiod\bibinitdelim G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \strng{fullhash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \strng{bibnamehash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \strng{authorbibnamehash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \strng{authornamehash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \strng{authorfullhash}{ee4a7c95e24c930b39421ceaa75e5ffd}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Biosystems Engineering}
+      \field{title}{Model for calculating ammonia emission from stored animal liquid manure}
+      \field{volume}{223}
+      \field{year}{2022}
+      \field{pages}{41\bibrangedash 55}
+      \range{pages}{15}
+    \endentry
+    \entry{Sommer2004}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=54e1b143f51177387dff580bea44dd12}{%
+           family={Sommer},
+           familyi={S\bibinitperiod},
+           given={S.\bibnamedelimi G.},
+           giveni={S\bibinitperiod\bibinitdelim G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f10952d81d8d2c363347c8fef628b54e}{%
+           family={Petersen},
+           familyi={P\bibinitperiod},
+           given={S.\bibnamedelimi O.},
+           giveni={S\bibinitperiod\bibinitdelim O\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7b8a3599351768b7a5ecf1eaff667c1b}{%
+           family={Moller},
+           familyi={M\bibinitperiod},
+           given={H.\bibnamedelimi B.},
+           giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{dc7191ebf5d102792dd701e584ef1d67}
+      \strng{fullhash}{dc7191ebf5d102792dd701e584ef1d67}
+      \strng{bibnamehash}{dc7191ebf5d102792dd701e584ef1d67}
+      \strng{authorbibnamehash}{dc7191ebf5d102792dd701e584ef1d67}
+      \strng{authornamehash}{dc7191ebf5d102792dd701e584ef1d67}
+      \strng{authorfullhash}{dc7191ebf5d102792dd701e584ef1d67}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nutrient Cycling in Agroecosystems}
+      \field{title}{Algorithms for calculating methane and nitrous oxide emissions from manure management}
+      \field{volume}{69}
+      \field{year}{2004}
+      \field{pages}{143\bibrangedash 154}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1023/B:FRES.0000029678.25083.fa
+      \endverb
+      \verb{urlraw}
+      \verb https://link.springer.com/article/10.1023/b:fres.0000029678.25083.fa
+      \endverb
+      \verb{url}
+      \verb https://link.springer.com/article/10.1023/b:fres.0000029678.25083.fa
+      \endverb
+    \endentry
+    \entry{Varma2021}{article}{}
+      \name{author}{7}{}{%
+        {{un=0,uniquepart=base,hash=2977d3dcdc482ea90ed6ada112789899}{%
+           family={Varma},
+           familyi={V\bibinitperiod},
+           given={V.\bibnamedelimi S.},
+           giveni={V\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6976a7ffd506801c968638492f4e57bc}{%
+           family={Parajuli},
+           familyi={P\bibinitperiod},
+           given={R.},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=97ce73b2158cf3124a26c2aecd10e62a}{%
+           family={Scott},
+           familyi={S\bibinitperiod},
+           given={E.},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fd0f7725df667dfc063c378efcd2f10d}{%
+           family={Canter},
+           familyi={C\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=556c7cda743bf8929e2de9238f1d366c}{%
+           family={Lim},
+           familyi={L\bibinitperiod},
+           given={T.\bibnamedelimi T.},
+           giveni={T\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f1b2d867b4a7be197974ecf7e893c469}{%
+           family={Popp},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e57ec1976a64f31b8a6b46dbb46a64c2}{%
+           family={Thoma},
+           familyi={T\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{b326b50bb8e6e6fc5ee722fdb6772a72}
+      \strng{fullhash}{f67d6f76bc005b4b7f7de13fa7ea0184}
+      \strng{bibnamehash}{b326b50bb8e6e6fc5ee722fdb6772a72}
+      \strng{authorbibnamehash}{b326b50bb8e6e6fc5ee722fdb6772a72}
+      \strng{authornamehash}{b326b50bb8e6e6fc5ee722fdb6772a72}
+      \strng{authorfullhash}{f67d6f76bc005b4b7f7de13fa7ea0184}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science of The Total Environment}
+      \field{title}{Dairy and swine manure management–Challenges and perspectives for sustainable treatment technology}
+      \field{volume}{778}
+      \field{year}{2021}
+      \field{pages}{146319}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.scitotenv.2021.146319
+      \endverb
+    \endentry
+  \enddatalist
+  \missing{endres2007behavior}
+  \missing{espejo2007herd}
+  \missing{gomez2010time}
+  \missing{jewell2019prevalence}
+  \missing{meyer2019contract}
+  \missing{wallaceDMI}
+\endrefsection
+\endinput
+
