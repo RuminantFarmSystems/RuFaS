@@ -41,15 +41,12 @@ Before Merging ``dev`` to ``test``
 ^^^^^^^^^^^^^^^^^^
 
 Patch updates do not require a full project. Bug fixes required in the patch should be collected 
-as sub-issues under a **Patch version update parent issue**.
+as sub-issues under a Patch parent/tracker issue.
 
 
 After ``test`` is updated
 -------------------------
-- During the testing phase, SME Maintainers will evaluate integrated model performance. 
-(link to Scientific Evaluation Process). 
-- When the model performance has been verified by at least one SME Maintainer per Module, 
-the Scientific Director will prepare a Scientific Report summarizing the model performance and changes in scientific methodology. 
+- During the testing phase, SME Maintainers will evaluate integrated model performance. (link to Scientific Evaluation Process). 
+- When the model performance has been verified by at least one SME Maintainer per Module, the Scientific Director will prepare a Scientific Report summarizing the model performance and changes in scientific methodology. 
 - The Director of Software Engineering will lead preparation of a set of Release Notes to summarize model updates. 
-- When the testing phase is complete, both the Scientific Report and Release notes are added to the project documentation on GitHub
-and shared with the PML for approval.
+- When the testing phase is complete, both the Scientific Report and Release notes are added to the project documentation on GitHub and shared with the PML for approval.
