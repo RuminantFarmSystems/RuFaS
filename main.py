@@ -23,7 +23,7 @@ def main() -> None:
         task_manager = TaskManager()
         task_manager.start(
             metadata_path=Path(cmd_arguments.path_to_metadata),
-            verbosity=LogVerbosity(cmd_arguments.verbose) if cmd_arguments.verbose is not None else None,
+            verbosity=LogVerbosity(cmd_arguments.verbosity) if cmd_arguments.verbosity is not None else None,
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),
             logs_directory=Path(cmd_arguments.logs_dir),

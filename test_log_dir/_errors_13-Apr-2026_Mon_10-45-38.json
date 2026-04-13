@@ -1,0 +1,13 @@
+{
+  "DISCLAIMER": "Under construction, use the results with caution.",
+  "No caller class.main.Dumping all logs from main.py because of error ''Namespace' object has no attribute 'verbose''": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-45-38.179854"
+      }
+    ],
+    "values": [
+      "This terminal error occurred during runtime. Traceback (most recent call last):\n  File \"/Users/niko/Desktop/RuFaS/main.py\", line 26, in main\n    verbosity=LogVerbosity(cmd_arguments.verbose) if cmd_arguments.verbose is not None else None,\n                                                     ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'Namespace' object has no attribute 'verbose'. Did you mean: 'verbosity'?\n"
+    ]
+  }
+}

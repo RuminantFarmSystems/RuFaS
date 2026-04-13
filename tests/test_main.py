@@ -97,7 +97,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-v",
-            "--verbose",
+            "--verbosity",
             choices=["errors", "warnings", "logs", "credits", "none"],
             default=None,
             help="Temporarily override the verbosity setting for this run",
