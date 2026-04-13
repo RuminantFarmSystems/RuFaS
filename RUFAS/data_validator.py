@@ -2183,10 +2183,30 @@ class CrossValidator:
         self,
         left_hand_value: Any,
         right_hand_value: Any,
-        predicate: Callable[[Any, Any], bool],
+        comparison_function: Callable[[Any, Any], bool],
         eager_termination: bool,
     ) -> bool:
-        """Evaluates a condition pairwise when both inputs are lists, otherwise evaluates once."""
+        """Evaluate a comparison for two values.
+
+        When both inputs are lists, compare their values pairwise and require every comparison to pass. Otherwise,
+        compare the two input values directly.
+
+        Parameters
+        ----------
+        left_hand_value : Any
+            Value on the left side of the comparison.
+        right_hand_value : Any
+            Value on the right side of the comparison.
+        comparison_function : Callable[[Any, Any], bool]
+            Function that evaluates the relationship between two values.
+        eager_termination : bool
+            Whether to raise an error immediately when pairwise list lengths differ.
+
+        Returns
+        -------
+        bool
+            True when the direct comparison passes, or when all pairwise comparisons pass.
+        """
         if isinstance(left_hand_value, list) and isinstance(right_hand_value, list):
             if len(left_hand_value) != len(right_hand_value):
                 self._event_logs.append(
@@ -2202,8 +2222,8 @@ class CrossValidator:
                 if eager_termination:
                     raise ValueError("Cross-validation error: Lists must have equal length for pairwise comparison.")
                 return False
-            return all(predicate(left, right) for left, right in zip(left_hand_value, right_hand_value))
-        return predicate(left_hand_value, right_hand_value)
+            return all(comparison_function(left, right) for left, right in zip(left_hand_value, right_hand_value))
+        return comparison_function(left_hand_value, right_hand_value)
 
     def _evaluate_equal_data_length(self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool) -> bool:
         """Evaluates if two lists have the same length."""
