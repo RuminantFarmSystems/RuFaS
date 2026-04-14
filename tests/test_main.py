@@ -28,10 +28,13 @@ def test_main_success(
 
     test_args = [
         "program_name",
-        "-v", "errors",
-        "-o", str(output_dir),
+        "-v",
+        "errors",
+        "-o",
+        str(output_dir),
         "-s",
-        "-l", str(logs_dir),
+        "-l",
+        str(logs_dir),
     ]
     monkeypatch.setattr(sys, "argv", test_args)
 
