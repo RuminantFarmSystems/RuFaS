@@ -12,13 +12,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  fail_if_pull_request_is_draft:
-    name: Draft PR Chek
-    if: ${{ github.event.pull_request.draft == true }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Fails in order to indicate that PR needs to be marked as ready to review and other checks passed.
-      run: exit 1 # don't run other jobs
   format_code:
     name: Format Code
     if: ${{ github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
