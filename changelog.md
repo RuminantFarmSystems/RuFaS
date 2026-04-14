@@ -63,6 +63,7 @@ v1.0.0
 - [2925](https://github.com/RuminantFarmSystems/RuFaS/pull/2925) - [minor change] [NoInputChange] [NoOutputChange] Fix the `graph_and_report` option in report_generation.py.
 - [2907](https://github.com/RuminantFarmSystems/RuFaS/pull/2907) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions unit issue. The mirror issue of [Fix FarmGrownFeed Emissions Unit on test #2908](https://github.com/RuminantFarmSystems/MASM/pull/2908) to update `dev`.
 - [2934](https://github.com/RuminantFarmSystems/RuFaS/pull/2934) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Refactor `Reproduction.execute_cow_ed_protocol()`.
+- [2949](https://github.com/RuminantFarmSystems/RuFaS/pull/2949) - [minor change] [NoInputChange] [NoOutputChange] [Verbosity] Updates CLI verbosity arg to override verbosity of full run including task manager verbosity.
 - [2947](https://github.com/RuminantFarmSystems/RuFaS/pull/2947) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Created weather data cross validation rules.
 - [2948](https://github.com/RuminantFarmSystems/RuFaS/pull/2948) - [minor change] [Feeds][NoInputChange] [NoOutputChange] Removes feed id maximums in metadata properties.
 
