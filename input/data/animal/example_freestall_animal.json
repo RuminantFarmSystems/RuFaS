@@ -16,7 +16,8 @@
 		"5": 0.09
     },
 	"milking_cow_fraction": 0.8356,
-    "annual_milk_yield": null
+    "annual_milk_yield": null,
+    "simulate_genetics": false
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -34,8 +35,7 @@
       "cull_milk_production": 30,
       "cow_times_milked_per_day": 3,
 	    "milk_fat_percent": 4,
-	    "milk_protein_percent": 3.2,
-		"simulate_genetics": true
+	    "milk_protein_percent": 3.2
     },
     "farm_level": {
       "calf": {

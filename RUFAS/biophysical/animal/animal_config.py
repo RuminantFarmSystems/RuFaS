@@ -549,4 +549,4 @@ class AnimalConfig:
             for trait, values in top_listing_semen.items()
             if trait != "year_month"
         }
-        cls.simulate_genetics = animal_config_data["management_decisions"]["simulate_genetics"]
+        cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
