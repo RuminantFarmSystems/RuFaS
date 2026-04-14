@@ -377,6 +377,9 @@ class SoilData:
 
         This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
 
+        `deepcopy()` is necessary here because `self.soil_layers[0]` is a mutable object.
+        A shallow copy would mean that modifying `new_top_layer`'s attributes would also
+        affect the original layer still in `self.soil_layers`.
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20

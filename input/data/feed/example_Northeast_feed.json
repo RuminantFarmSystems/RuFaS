@@ -226,7 +226,7 @@
       },
       {
         "feed_type": 303,
-        "ration_percentage": 22.34
+        "ration_percentage": 22.33
       }
     ],
     "tolerance": 0.1
@@ -236,61 +236,61 @@
     {
       "purchased_feed": 44,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 10000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 51,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 10000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 94,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 10000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 100,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 110,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 176,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 301,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 303,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 202,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     },
     {
       "purchased_feed": 216,
       "runtime_purchase_allowance": 1000.0,
-      "advance_purchase_allowance": 1000.0,
+      "advance_purchase_allowance": 1000000.0,
       "planning_cycle_allowance": 1000.0
     }
   ]

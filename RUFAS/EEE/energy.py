@@ -12,6 +12,115 @@ from RUFAS.util import Utility
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.EEE.tractor_implement import TractorImplement
 
+EEE_TO_OM_KEY_MAPPING = {
+    FieldOperationEvent.PLANTING: {
+        "crop_type": "crop",
+        "clay_percent": "average_clay_percent",
+        "field_production_size": "field_size",
+        "operation_year": "year",
+        "operation_day": "day",
+        "field_name": "field_name",
+    },
+    FieldOperationEvent.HARVEST: {
+        "crop_type": "crop",
+        "crop_yield": "dry_yield",
+        "field_production_size": "field_size",
+        "operation_year": "harvest_year",
+        "operation_day": "harvest_day",
+        "field_name": "field_name",
+        "harvest_type": "harvest_type",
+    },
+    FieldOperationEvent.MANURE_APPLICATION: {
+        "mass": "dry_matter_mass",
+        "dry_matter_fraction": "dry_matter_fraction",
+        "application_depth": "application_depth",
+        "field_production_size": "field_size",
+        "clay_percent": "average_clay_percent",
+        "operation_year": "year",
+        "operation_day": "day",
+        "field_name": "field_name",
+    },
+    FieldOperationEvent.TILLING: {
+        "application_depth": "tillage_depth",
+        "tillage_implement": "implement",
+        "field_production_size": "field_size",
+        "clay_percent": "average_clay_percent",
+        "operation_year": "year",
+        "operation_day": "day",
+        "field_name": "field_name",
+    },
+    FieldOperationEvent.FERTILIZER_APPLICATION: {
+        "mass": "mass",
+        "application_depth": "application_depth",
+        "field_production_size": "field_size",
+        "clay_percent": "average_clay_percent",
+        "operation_year": "year",
+        "operation_day": "day",
+        "field_name": "field_name",
+    },
+}
+
+CROP_AND_SOIL_FILTERS: list[dict[str, Any]] = [
+    {
+        "name": FieldOperationEvent.FERTILIZER_APPLICATION,
+        "filters": ["Field._record_fertilizer_application.fertilizer_application.field='.*'"],
+        "variables": [
+            "mass",
+            "application_depth",
+            "field_size",
+            "average_clay_percent",
+            "year",
+            "day",
+            "field_name",
+        ],
+    },
+    {
+        "name": FieldOperationEvent.TILLING,
+        "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
+        "variables": [
+            "tillage_depth",
+            "implement",
+            "field_size",
+            "average_clay_percent",
+            "year",
+            "day",
+            "field_name",
+        ],
+    },
+    {
+        "name": FieldOperationEvent.MANURE_APPLICATION,
+        "filters": ["Field._record_manure_application.manure_application.field='.*'"],
+        "variables": [
+            "dry_matter_mass",
+            "dry_matter_fraction",
+            "application_depth",
+            "field_size",
+            "average_clay_percent",
+            "year",
+            "day",
+            "field_name",
+        ],
+    },
+    {
+        "name": FieldOperationEvent.HARVEST,
+        "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
+        "variables": [
+            "dry_yield",
+            "crop",
+            "field_size",
+            "harvest_year",
+            "harvest_day",
+            "field_name",
+            "harvest_type",
+        ],
+    },
+    {
+        "name": FieldOperationEvent.PLANTING,
+        "filters": ["Field._record_planting.crop_planting.field='.*'"],
+        "variables": ["crop", "field_size", "average_clay_percent", "year", "day", "field_name"],
+    },
+]
+
 im = InputManager()
 om = OutputManager()
 
@@ -29,7 +138,7 @@ class EnergyEstimator:
         }
         estimator = EnergyEstimator()
         diesel_consumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
-        total_diesel_consumption_tractor_implement_liter_per_ha = 0
+        total_diesel_consumption_tractor_implement_liter_per_ha: float = 0.0
         herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_consumption_data_list:
             harvest_type: HarvestOperation | None = None
@@ -41,7 +150,7 @@ class EnergyEstimator:
                 herd_size=herd_size,
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
-                harvest_type=harvest_type
+                harvest_type=harvest_type,
             )
 
             diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
@@ -88,7 +197,7 @@ class EnergyEstimator:
         """
         base_info_map = {
             "class": EnergyEstimator.__name__,
-            "function": EnergyEstimator.estimate_all.__name__,
+            "function": EnergyEstimator.report_diesel_consumption.__name__,
         }
         operation_event: FieldOperationEvent = diesel_consumption_data["operation_event"]
         operation_event_str: str = (
@@ -133,23 +242,18 @@ class EnergyEstimator:
                 diesel_consumption_data.get("application_depth"),
                 {**base_info_map, **{"units": MeasurementUnits.CENTIMETERS}},
             )
-        if operation_event in [
-            FieldOperationEvent.MANURE_APPLICATION,
-            FieldOperationEvent.FERTILIZER_APPLICATION
-        ]:
+        if operation_event in [FieldOperationEvent.MANURE_APPLICATION, FieldOperationEvent.FERTILIZER_APPLICATION]:
             om.add_variable(
                 f"application_mass_{suffix}",
                 diesel_consumption_data.get("mass"),
                 {**base_info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}},
             )
         if operation_event == FieldOperationEvent.TILLING:
+            tillage_implement_enum = diesel_consumption_data.get("tillage_implement")
+            tillage_implement = tillage_implement_enum.value if tillage_implement_enum is not None else None
             om.add_variable(
                 f"tillage_implement_for_{suffix}",
-                (
-                    diesel_consumption_data.get("tillage_implement").value
-                    if diesel_consumption_data.get("tillage_implement")
-                    else diesel_consumption_data.get("tillage_implement")
-                ),
+                tillage_implement,
                 {**base_info_map, **{"units": MeasurementUnits.UNITLESS}},
             )
         om.add_variable(
@@ -162,132 +266,57 @@ class EnergyEstimator:
         """
         Parses the OutputManager variables pool for diesel consumption calculation.
         """
-        crop_and_soil_filters = [
-            {
-                "name": FieldOperationEvent.FERTILIZER_APPLICATION,
-                "use_name": True,
-                "filters": ["Field._record_fertilizer_application.fertilizer_application.field='.*'"],
-                "variables": [
-                    "mass",
-                    "application_depth",
-                    "field_size",
-                    "average_clay_percent",
-                    "year",
-                    "day",
-                    "field_name",
-                ],
-            },
-            {
-                "name": FieldOperationEvent.TILLING,
-                "use_name": True,
-                "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
-                "variables": [
-                    "tillage_depth",
-                    "implement",
-                    "field_size",
-                    "average_clay_percent",
-                    "year",
-                    "day",
-                    "field_name",
-                ],
-            },
-            {
-                "name": FieldOperationEvent.MANURE_APPLICATION,
-                "use_name": True,
-                "filters": ["Field._record_manure_application.manure_application.field='.*'"],
-                "variables": [
-                    "dry_matter_mass",
-                    "dry_matter_fraction",
-                    "application_depth",
-                    "field_size",
-                    "average_clay_percent",
-                    "year",
-                    "day",
-                    "field_name",
-                ],
-            },
-            {
-                "name": FieldOperationEvent.HARVEST,
-                "use_name": True,
-                "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-                "variables": [
-                    "dry_yield", "crop", "field_size", "harvest_year", "harvest_day", "field_name", "harvest_type"
-                ],
-            },
-            {
-                "name": FieldOperationEvent.PLANTING,
-                "use_name": True,
-                "filters": ["Field._record_planting.crop_planting.field='.*'"],
-                "variables": ["crop", "field_size", "average_clay_percent", "year", "day", "field_name"],
-            },
-        ]
         result: list[dict[str, Any]] = []
-        eee_to_om_key_mapping = {
-            FieldOperationEvent.PLANTING: {
-                "crop_type": "crop",
-                "clay_percent": "average_clay_percent",
-                "field_production_size": "field_size",
-                "operation_year": "year",
-                "operation_day": "day",
-                "field_name": "field_name",
-            },
-            FieldOperationEvent.HARVEST: {
-                "crop_type": "crop",
-                "crop_yield": "dry_yield",
-                "field_production_size": "field_size",
-                "operation_year": "harvest_year",
-                "operation_day": "harvest_day",
-                "field_name": "field_name",
-                "harvest_type": "harvest_type"
-            },
-            FieldOperationEvent.MANURE_APPLICATION: {
-                "mass": "dry_matter_mass",
-                "dry_matter_fraction": "dry_matter_fraction",
-                "application_depth": "application_depth",
-                "field_production_size": "field_size",
-                "clay_percent": "average_clay_percent",
-                "operation_year": "year",
-                "operation_day": "day",
-                "field_name": "field_name",
-            },
-            FieldOperationEvent.TILLING: {
-                "application_depth": "tillage_depth",
-                "tillage_implement": "implement",
-                "field_production_size": "field_size",
-                "clay_percent": "average_clay_percent",
-                "operation_year": "year",
-                "operation_day": "day",
-                "field_name": "field_name",
-            },
-            FieldOperationEvent.FERTILIZER_APPLICATION: {
-                "mass": "mass",
-                "application_depth": "application_depth",
-                "field_production_size": "field_size",
-                "clay_percent": "average_clay_percent",
-                "operation_year": "year",
-                "operation_day": "day",
-                "field_name": "field_name",
-            },
-        }
-        for filter in crop_and_soil_filters:
-            filtered_pool = om.filter_variables_pool(filter)
-            max_index = Utility.find_max_index_from_keys(filtered_pool)
-            if max_index is None or max_index < 0:
+
+        for filter_config in CROP_AND_SOIL_FILTERS:
+            filtered_pool = om.filter_variables_pool(filter_config)
+            if not filtered_pool:
                 continue
-            first_key_in_pool = next(iter(filtered_pool.keys()))
-            for event_type, key_mappings in eee_to_om_key_mapping.items():
-                if first_key_in_pool.startswith(event_type.value):
-                    for index in range(max_index + 1):
-                        key_prefix = f"{event_type}_{index}"
-                        _, first_om_key_in_the_map = next(iter(key_mappings.items()))
-                        length = len(filtered_pool[f"{key_prefix}.{first_om_key_in_the_map}"]["values"])
-                        for i in range(length):
-                            event_data = {
-                                eee_key: filtered_pool[f"{key_prefix}.{om_key_suffix}"]["values"][i]
-                                for eee_key, om_key_suffix in key_mappings.items()
-                            }
-                            event_data["operation_event"] = event_type
-                            result.append(event_data)
+
+            event_type = filter_config["name"]
+            key_mappings = EEE_TO_OM_KEY_MAPPING[event_type]
+            required_suffixes = set(key_mappings.values())
+
+            group_prefixes = Utility.find_group_prefixes_from_keys(
+                data=filtered_pool,
+                required_suffixes=required_suffixes,
+            )
+            if not group_prefixes:
+                continue
+
+            first_required_suffix = next(iter(key_mappings.values()))
+
+            for key_prefix in group_prefixes:
+                first_key = f"{key_prefix}.{first_required_suffix}"
+                if first_key not in filtered_pool:
+                    continue
+
+                values = filtered_pool[first_key].get("values", [])
+                length = len(values)
+
+                for i in range(length):
+                    event_data: dict[str, Any] = {}
+
+                    for eee_key, om_key_suffix in key_mappings.items():
+                        full_key = f"{key_prefix}.{om_key_suffix}"
+                        if full_key not in filtered_pool:
+                            raise KeyError(
+                                f"Expected key '{full_key}' not found in filtered pool for "
+                                f"event type '{event_type.value}'."
+                            )
+
+                        field_values = filtered_pool[full_key].get("values", [])
+                        if i >= len(field_values):
+                            raise IndexError(
+                                f"Index {i} out of range for key '{full_key}' while building "
+                                f"diesel consumption event data."
+                            )
+
+                        event_data[eee_key] = field_values[i]
+
+                    event_data["operation_event"] = event_type
+                    result.append(event_data)
+
         return result
 
     def calculate_diesel_consumption(
@@ -297,7 +326,7 @@ class EnergyEstimator:
         tractor: Tractor,
         clay_percent: float,
         application_mass: float | None = None,
-        application_dm_content: float | None = None
+        application_dm_content: float | None = None,
     ) -> float:
         """
         General estimate of diesel fuel consumption for a given attachment type and tractor size.
@@ -328,8 +357,9 @@ class EnergyEstimator:
         for implement in tractor.implements:
             crop_yield_ton_ha = crop_yield * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
             if application_mass and application_dm_content:
-                application_mass_per_ha = (application_mass * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS
-                                           / application_dm_content) / field_production_size
+                application_mass_per_ha = (
+                    application_mass * GeneralConstants.KILOGRAMS_TO_MEGAGRAMS / application_dm_content
+                ) / field_production_size
             else:
                 application_mass_per_ha = None
 

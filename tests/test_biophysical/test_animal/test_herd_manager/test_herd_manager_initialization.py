@@ -95,7 +95,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mocker.patch.object(HerdManager, "set_milk_type_in_calf_ration_manager", return_value=None)
 
     config_data: dict[str, Any] = {
-        "simulate_animals": False,
+        "simulation_type": "field_and_feed",
         "nutrient_standard": {"dummy": "ns"},
     }
 
@@ -108,7 +108,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     }
 
     feed_data = {"some": "feed-config"}
-    allowances_data = {"allowance": "dummy"}
+    allowances_data = [{"purchased_feed": 1}, {"purchased_feed": 2}, {"purchased_feed": 3}]
 
     def get_data_side_effect(key: str) -> Any:
         if key == "config":
@@ -133,6 +133,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
         time=time,
         is_ration_defined_by_user=False,
         available_feeds=available_feeds,
+        simulate_animals=False,
     )
 
     mock_set_ration_feeds.assert_called_once_with(feed_data)

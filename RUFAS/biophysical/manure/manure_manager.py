@@ -83,7 +83,7 @@ class ManureManager:
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
-        self._processing_order = self._traverse_adjacency_matrix()  # noqa
+        self._processing_order = self._traverse_adjacency_matrix()
 
     def run_daily_update(
         self, manure_streams: dict[str, ManureStream], time: RufasTime, current_day_conditions: CurrentDayConditions
@@ -300,6 +300,10 @@ class ManureManager:
         ValueError
             If a destination receives output from both solid and liquid separator streams.
 
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here because the method needs to modify the adjacency matrix
+        (merging and deleting rows/keys) without mutating the original `self._adjacency_matrix`.
         """
         matrix_to_return = deepcopy(self._adjacency_matrix)
         for separator_name in self._all_separators.keys():
