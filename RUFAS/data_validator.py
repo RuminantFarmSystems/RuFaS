@@ -1739,15 +1739,24 @@ class CrossValidator:
         self._alias_pool: dict[str, Any] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
         self.relation_mapping: dict[str, Callable[[object, object, bool], bool]] = {
-            "equal": lambda left, right, _eager_termination: self._evaluate_equal_condition(left, right),
-            "greater": lambda left, right, _eager_termination: self._evaluate_greater_condition(left, right),
-            "greater_or_equal_to": lambda left, right, _eager_termination: (
-                self._evaluate_greater_condition(left, right) or self._evaluate_equal_condition(left, right)
+            "equal": lambda left, right, eager_termination: self._evaluate_equal_condition(
+                left, right, eager_termination
             ),
-            "not_equal": lambda left, right, _eager_termination: not self._evaluate_equal_condition(left, right),
+            "greater": lambda left, right, eager_termination: self._evaluate_greater_condition(
+                left, right, eager_termination
+            ),
+            "greater_or_equal_to": lambda left, right, eager_termination: self._evaluate_greater_or_equal_condition(
+                left, right, eager_termination
+            ),
+            "not_equal": lambda left, right, eager_termination: not self._evaluate_equal_condition(
+                left, right, eager_termination
+            ),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
-            "is_null": lambda left, _right, _eager_termination: self._evaluate_is_null(left),
-            "regex": lambda left, right, _eager_termination: self._evaluate_regex(left, right),
+            "is_null": lambda left, _right, eager_termination: self._evaluate_is_null(left),
+            "regex": lambda left, right, eager_termination: self._evaluate_regex(left, right),
+            "is_equal_length": lambda left, right, eager_termination: self._evaluate_equal_data_length(
+                left, right, eager_termination
+            ),
         }
 
     def cross_validate_data(
@@ -2170,13 +2179,99 @@ class CrossValidator:
         else:
             return True
 
-    def _evaluate_equal_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
-        """Evaluates equal condition."""
-        return bool(left_hand_value == right_hand_value)
+    def _evaluate_pairwise_condition(
+        self,
+        left_hand_value: Any,
+        right_hand_value: Any,
+        comparison_function: Callable[[Any, Any], bool],
+        eager_termination: bool,
+    ) -> bool:
+        """Evaluate a comparison for two values.
 
-    def _evaluate_greater_condition(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        When both inputs are lists, compare their values pairwise and require every comparison to pass. Otherwise,
+        compare the two input values directly.
+
+        Parameters
+        ----------
+        left_hand_value : Any
+            Value on the left side of the comparison.
+        right_hand_value : Any
+            Value on the right side of the comparison.
+        comparison_function : Callable[[Any, Any], bool]
+            Function that evaluates the relationship between two values.
+        eager_termination : bool
+            Whether to raise an error immediately when pairwise list lengths differ.
+
+        Returns
+        -------
+        bool
+            True when the direct comparison passes, or when all pairwise comparisons pass.
+        """
+        if isinstance(left_hand_value, list) and isinstance(right_hand_value, list):
+            if len(left_hand_value) != len(right_hand_value):
+                self._event_logs.append(
+                    {
+                        "error": "Unequal list lengths for pairwise comparison",
+                        "message": "Both lists must have equal length for pairwise comparison.",
+                        "info_map": {
+                            "class": self.__class__.__name__,
+                            "function": self._evaluate_pairwise_condition.__name__,
+                        },
+                    }
+                )
+                if eager_termination:
+                    raise ValueError("Cross-validation error: Lists must have equal length for pairwise comparison.")
+                return False
+            return all(comparison_function(left, right) for left, right in zip(left_hand_value, right_hand_value))
+        return comparison_function(left_hand_value, right_hand_value)
+
+    def _evaluate_equal_data_length(self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool) -> bool:
+        """Evaluates if two lists have the same length."""
+        if not (isinstance(left_hand_value, list) and isinstance(right_hand_value, list)):
+            self._event_logs.append(
+                {
+                    "error": "Invalid data length validation",
+                    "message": "Both data have to be list type to validate their length.",
+                    "info_map": {
+                        "class": self.__class__.__name__,
+                        "function": self._evaluate_equal_data_length.__name__,
+                    },
+                }
+            )
+            if eager_termination:
+                raise ValueError("Cross-validation error: Invalid type comparison.")
+            return False
+        return len(left_hand_value) == len(right_hand_value)
+
+    def _evaluate_equal_condition(
+        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False
+    ) -> bool:
+        """Evaluates equal condition."""
+        return bool(
+            self._evaluate_pairwise_condition(
+                left_hand_value, right_hand_value, lambda left, right: left == right, eager_termination
+            )
+        )
+
+    def _evaluate_greater_condition(
+        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False
+    ) -> bool:
         """Evaluates greater than condition"""
-        return bool(left_hand_value > right_hand_value)
+        return bool(
+            self._evaluate_pairwise_condition(
+                left_hand_value, right_hand_value, lambda left, right: left > right, eager_termination
+            )
+        )
+
+    def _evaluate_greater_or_equal_condition(
+        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False
+    ) -> bool:
+        """Evaluates greater than or equal to condition."""
+        return bool(
+            self._evaluate_pairwise_condition(
+                left_hand_value, right_hand_value, lambda left, right: left >= right, eager_termination
+            )
+        )
 
     def _evaluate_is_null(self, left_hand_value: Any) -> bool:
         """Evaluates is null condition."""
