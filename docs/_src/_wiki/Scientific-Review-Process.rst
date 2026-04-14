@@ -17,7 +17,7 @@ These steps may begin as soon as a new version release has been initiated and be
 Update Evaluation Farm Dataset
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Update evaluation farm datasets to ensure they run without error on ``dev`` or ``test`` after merging ``dev`` to ``test``.
+- Ensure the evaluation farm input files are up to date and run without error on ``dev`` or on ``test`` after merging ``dev`` to ``test``.
 
 Update Desired Outputs
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -31,7 +31,7 @@ Update all outputs required for evaluation, including:
 Update Benchmarks
 ^^^^^^^^^^^^^^^^^
 
-- Update benchmark datasets and expectations as needed.
+- Review and update benchmark datasets and expectations as needed.
 - Ensure benchmarks reflect current model scope and scientific understanding.
 
 Post-Merge Evaluation
@@ -43,15 +43,9 @@ Run Model Simulations
 ^^^^^^^^^^^^^^^^^^^^^
 
 - Run evaluation farms using the updated model.
+- Compile summarized results including comparison with previous results and benchmarks. 
 - Responsibility: Scientific Director
 
-Evaluate Results
-^^^^^^^^^^^^^^^^
-
-- Compare model outputs against:
-
-  - Previous results
-  - Benchmarks
 
 Review Results Summary
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +57,7 @@ Iterate
 ^^^^^^^
 
 - Repeat simulation and evaluation steps until results are acceptable.
-- Typical iteration: 4–6 cycles.
+
 
 Reporting and Review
 --------------------
@@ -80,7 +74,7 @@ Prepare Report
 Review Report
 ^^^^^^^^^^^^^
 
-- Require at least one SME from each module.
+- Similar to above, at least one SME from each module should review the report.
 - Additional review from external or Contributor SMEs is recommended.
 
 Approval Criteria
