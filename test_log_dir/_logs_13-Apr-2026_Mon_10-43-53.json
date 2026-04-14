@@ -1,0 +1,71 @@
+{
+  "DISCLAIMER": "Under construction, use the results with caution.",
+  "OutputManager.__init__.init_log": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-52.913054"
+      }
+    ],
+    "values": [
+      "Output Manager instantiated."
+    ]
+  },
+  "OutputManager.create_directory.Attempting to create a new directory.": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055313"
+      },
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055545"
+      }
+    ],
+    "values": [
+      "Attempting to create a new directory at test_log_dir.",
+      "Attempting to create a new directory at test_log_dir."
+    ]
+  },
+  "OutputManager.create_directory.Directory successfully created.": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055513"
+      },
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055577"
+      }
+    ],
+    "values": [
+      "Created a new directory at test_log_dir.",
+      "Created a new directory at test_log_dir."
+    ]
+  },
+  "OutputManager._list_to_file_txt.save_txt_file_try": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055616"
+      }
+    ],
+    "values": [
+      "Attempting to save to test_log_dir/_variable_names_13-Apr-2026_Mon_10-43-53.txt."
+    ]
+  },
+  "OutputManager._list_to_file_txt.save_txt_file_success": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055726"
+      }
+    ],
+    "values": [
+      "Successfully saved to test_log_dir/_variable_names_13-Apr-2026_Mon_10-43-53.txt."
+    ]
+  },
+  "OutputManager.dict_to_file_json.save_dict_file_try": {
+    "info_maps": [
+      {
+        "timestamp": "13-Apr-2026_Mon_10-43-53.055875"
+      }
+    ],
+    "values": [
+      "Attempting to save to test_log_dir/_logs_13-Apr-2026_Mon_10-43-53.json."
+    ]
+  }
+}
