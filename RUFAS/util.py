@@ -111,40 +111,60 @@ class Utility:
         return nested_structure
 
     @staticmethod
-    def find_max_index_from_keys(data: dict[str, Any]) -> int | None:
+    def find_group_prefixes_from_keys(
+        data: dict[str, Any],
+        required_suffixes: set[str] | None = None,
+    ) -> list[str]:
         """
-        Extracts and returns the maximum index (n) from the keys of the given dictionary.
-        Assumes keys follow the format `<prefix>_<number>.<suffix>` and number >= 0.
+        Extracts unique group prefixes from flattened keys of the form:
+
+            <group_prefix>.<suffix>
+
+        For example:
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'.year
+
+        would yield the group prefix:
+            Field._record_fertilizer_application.fertilizer_application.field='field_1'
 
         Parameters
         ----------
-        data: Dict[str, Any]
-            The dictionary whose keys will be analyzed.
+        data : dict[str, Any]
+            Dictionary whose keys are flattened variable names.
+        required_suffixes : set[str] | None, default None
+            If provided, only prefixes that have at least one matching suffix from this set
+            will be included.
 
         Returns
         -------
-        int | None
-            The maximum index found among the keys, or None if no numeric index is found.
+        list[str]
+            Sorted list of unique group prefixes.
         """
-        pattern = re.compile(r"_([0-9]+)\.")
-        max_number = -1
+        prefixes: set[str] = set()
 
-        for key in data.keys():
-            match = pattern.search(key)
-            if match:
-                number = int(match.group(1))
-                if number > max_number:
-                    max_number = number
+        for key in data:
+            if "." not in key:
+                continue
 
-        return max_number if max_number != -1 else None
+            prefix, suffix = key.rsplit(".", 1)
+
+            if required_suffixes is not None and suffix not in required_suffixes:
+                continue
+
+            prefixes.add(prefix)
+
+        return sorted(prefixes)
 
     @staticmethod
     def expand_data_temporally(
         data_to_expand: dict[str, dict[str, list[Any]]],
+        simulation_length: int,
         fill_value: Any = np.nan,
+        use_fill_value_before_start: bool = True,
         use_fill_value_in_gaps: bool = True,
         use_fill_value_at_end: bool = True,
-    ) -> dict[str, dict[str, list[Any]]]:
+        expand_data_to_observed_range: bool = False,
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
         recorded, so that values are present for all days in a certain range.
@@ -154,20 +174,27 @@ class Utility:
         data_to_expand : dict[str, dict[str, list[Any]]]
             The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
             contains the keys "values" and optionally "info_maps".
+        simulation_length : int
+            Total number of simulation days.
         fill_value : Any, default numpy.nan
-            Value that is used to pad the front of the data values, and optionally the values in between original values
-            and after the last original value.
+            Value used when a region is configured to use fill values.
+        use_fill_value_before_start : bool, default True
+            If true, days before the first known datapoint are filled with `fill_value`. If false, they are filled with
+            the first known value.
         use_fill_value_in_gaps : bool, default True
-            If false, values between known data points are expanded with the last known value from the data set. If
-            true, values between known data points are filled with `fill_value`.
+            If true, days between known datapoints are filled with `fill_value`. If false, they are filled with the last
+            known value.
         use_fill_value_at_end : bool, default True
-            If false, values after last known data point are padded with the last known value from the data set. If
-            true, values after the last known data point are filled with `fill_value`.
+            If true, days after the last known datapoint are filled with `fill_value`. If false, they are filled
+            with the last known value.
+        expand_data_to_observed_range : bool, default False
+            If false, expands data from simulation day 1 through `simulation_length`. If true, expands only
+            from the first simulation day present in the dataset through the last simulation day present in the dataset.
 
         Returns
         -------
-        dict[str, dict[str, list[Any]]]
-            The filled data, so that gaps in the data are filled in with the last known value or `fill_value`.
+        tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
+            A tuple of the expanded data and the logs generated from the expansion process.
 
         Raises
         ------
@@ -177,58 +204,136 @@ class Utility:
             If there is no data to be filled.
             If the number of info maps does not match the number of values for a variable.
             If a value for "simulation_day" is not present in every info map.
-
-        Notes
-        -----
-        This method assumes there will never be multiple values recorded for a single variable on a single simulation
-        day.
-
         """
         if not data_to_expand:
-            raise ValueError("Cannot fill empty dataset.")
+            raise ValueError("Data Expansion error: Cannot fill empty dataset.")
 
-        all_simulation_days = []
-        for key, value in data_to_expand.items():
-            info_maps = value.get("info_maps")
-            if info_maps is None:
-                raise TypeError(f"Variable '{key}' has no info maps.")
-            if len(info_maps) != len(value["values"]):
-                raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
-            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
-                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
-            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
-
+        all_simulation_days = Utility._gather_data_sim_days(data_to_expand)
         filtered_simulation_days = sorted(set(all_simulation_days))
-        first_day = filtered_simulation_days[0]
-        last_day = filtered_simulation_days[-1]
 
+        first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 0
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length - 1
+
+        log_pool: list[dict[str, str | dict[str, str]]] = []
         expanded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_expand.items():
             expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
             original_units = data["info_maps"][0]["units"]
-            zipped_data = zip(data["values"], data["info_maps"])
-            indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
+
+            start_fill = use_fill_value_before_start
+            gap_fill = use_fill_value_in_gaps
+            end_fill = use_fill_value_at_end
+
+            if data["values"]:
+                first_value = data["values"][0]
+
+                if isinstance(first_value, (dict, list, tuple)) and not isinstance(fill_value, type(first_value)):
+                    start_fill = False
+                    gap_fill = False
+                    end_fill = False
+                    fill_warning: dict[str, str | dict[str, str]] = {
+                        "warning": "Data expansion fill warning",
+                        "message": f"User-provided fill value type {type(fill_value)} does not match "
+                        f"type of data to be expanded {type(first_value)}, "
+                        "filling with last reported value.",
+                        "info_map": {
+                            "class": Utility.__name__,
+                            "function": Utility.expand_data_temporally.__name__,
+                        },
+                    }
+                    log_pool.append(fill_warning)
+
+            indexed_data = {
+                info_map["simulation_day"]: (value, info_map)
+                for value, info_map in zip(data["values"], data["info_maps"])
+            }
+
+            first_day_of_original_data = min(indexed_data.keys())
             last_day_of_original_data = max(indexed_data.keys())
-            last_value = (fill_value, {"simulation_day": 0, "units": original_units})
-            for day in range(first_day, last_day_of_original_data + 1):
-                if day in indexed_data.keys():
-                    last_value = indexed_data[day] if not use_fill_value_in_gaps else (fill_value, indexed_data[day][1])
-                    expanded_variable_data["values"].append(indexed_data[day][0])
-                    expanded_variable_data["info_maps"].append(indexed_data[day][1])
-                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
-                else:
-                    expanded_variable_data["values"].append(last_value[0])
-                    expanded_variable_data["info_maps"].append(last_value[1].copy())
+
+            first_known_value, first_known_info_map = indexed_data[first_day_of_original_data]
+            last_known_value = fill_value
+            last_known_info_map = {"simulation_day": 0, "units": original_units}
+
+            for day in range(first_day, last_day + 1):
+                if day in indexed_data:
+                    value, info_map = indexed_data[day]
+                    expanded_variable_data["values"].append(value)
+                    expanded_variable_data["info_maps"].append(info_map.copy())
                     expanded_variable_data["info_maps"][-1]["simulation_day"] = day
 
-            tail_fill_value = indexed_data[last_day_of_original_data][0] if not use_fill_value_at_end else fill_value
-            for day in range(last_day_of_original_data + 1, last_day + 1):
-                expanded_variable_data["values"].append(tail_fill_value)
-                expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
+                    last_known_value = value
+                    last_known_info_map = info_map.copy()
+
+                elif day < first_day_of_original_data:
+                    value_to_add = fill_value if start_fill else first_known_value
+                    info_map_to_add = first_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                elif day < last_day_of_original_data:
+                    value_to_add = fill_value if gap_fill else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                else:
+                    value_to_add = fill_value if end_fill else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
 
             expanded_data[key] = expanded_variable_data
 
-        return expanded_data
+        return expanded_data, log_pool
+
+    @staticmethod
+    def _gather_data_sim_days(data_to_expand: dict[str, dict[str, list[Any]]]) -> list[int]:
+        """
+        Helper function for `expand_data_temporally()`.
+        Validates the data structure and gathers the simulations days from the accompanying info maps.
+
+        Parameters
+        ----------
+        data_to_expand : dict[str, dict[str, list[Any]]]
+            The data to be expanded.
+
+        Returns
+        -------
+        list[int]
+            A list of simulation days from the info maps of the data_to_expand.
+
+        Raises
+        ------
+        TypeError
+            If info_maps are not present in the data_to_expand.
+        ValueError
+            If the lists of info_maps and values are not the same length.
+        ValueError
+            If `simulation_day` has not been reported in every info_maps instance.
+        """
+        all_simulation_days = []
+        for key, value in data_to_expand.items():
+            info_maps = value.get("info_maps")
+            if info_maps is None:
+                raise TypeError(f"Data Expansion error: Variable '{key}' has no info maps.")
+            if len(info_maps) != len(value["values"]):
+                raise ValueError(
+                    f"Data Expansion error: Variable '{key}' does not have matching number of values and " "info maps."
+                )
+            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
+                raise ValueError(
+                    f"Data Expansion error: Variable '{key}' does not have simulation day value in every " "info map."
+                )
+            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
+
+        return all_simulation_days
 
     @staticmethod
     def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
@@ -616,7 +721,10 @@ class Utility:
 
         """
         if starting_offset > ending_offset:
-            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+            raise ValueError(
+                "Time Series Generation error: "
+                f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=})."
+            )
 
         time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
 
@@ -634,7 +742,10 @@ class Utility:
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
         if not 1 <= day <= maximum_day:
-            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+            raise ValueError(
+                "Error converting ordinal date: "
+                f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}."
+            )
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
 
     @staticmethod
@@ -739,6 +850,11 @@ class Utility:
             1: {"value": 2, "other_keys": "other values"},
             3: {"value": 4, "other_keys": "other values"}
         }
+
+        Notes
+        -----
+        The use `deepcopy` is necessary here because `dict_.pop('ID')` mutates `list_of_dicts` in place.
+        To avoid side effects, we use `deepcopy` to make a copy before mutating the original list.
         """
         result = {}
         for dict_ in deepcopy(list_of_dicts):
@@ -746,7 +862,7 @@ class Utility:
                 id_value = dict_.pop(id_key)
                 result[id_value] = dict_
             else:
-                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+                raise KeyError(f"List to dict conversion error: Key '{id_key}' not found in dictionary.")
 
         return result
 
@@ -819,7 +935,7 @@ class Utility:
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
     @staticmethod
-    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+    def round_numeric_values_in_dict(data: dict[str, Any], significant_digits: int) -> dict[str, Any]:
         """
         Rounds all numeric values in a dictionary to the specified number of significant digits.
 

@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable
 
 import pandas as pd
 from deepdiff import DeepDiff
@@ -47,9 +47,13 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "user_feeds",
     "tractor_dataset",
     "EEE_constants",
-    "properties",
     "feed_storage_configurations",
     "feed_storage_instances",
+}
+PRROPERTIES_FILE_PATHS: dict[str, Path] = {
+    "default": Path("input/metadata/properties/default.json"),
+    "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
+    "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
 }
 
 
@@ -80,27 +84,32 @@ class InputManager:
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
-    def meta_data(self) -> Dict[str, Any]:
+    def meta_data(self) -> dict[str, Any]:
         """The getter method for __metadata"""
         return self.__metadata
 
     @meta_data.setter
-    def meta_data(self, incoming_metadata: Dict[str, Any]) -> None:
+    def meta_data(self, incoming_metadata: dict[str, Any]) -> None:
         """The setter method for __metadata"""
         self.__metadata = incoming_metadata
 
     @property
-    def pool(self) -> Dict[str, Any]:
+    def pool(self) -> dict[str, Any]:
         """The getter method for __pool"""
         return self.__pool
 
     @pool.setter
-    def pool(self, incoming_pool: Dict[str, Any]) -> None:
+    def pool(self, incoming_pool: dict[str, Any]) -> None:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
     def start_data_processing(
-        self, metadata_path: Path, input_root: Path, task_id: Any, eager_termination: bool = True
+        self,
+        metadata_path: Path,
+        input_root: Path,
+        task_id: Any,
+        cross_validation_file_paths: list[str] | None,
+        eager_termination: bool = True,
     ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -113,9 +122,19 @@ class InputManager:
             Root directory for all input files.
         task_id : Any
             Task ID for the current process.
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation files.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data.
+
+        Raises
+        ------
+        ValueError
+            - If the metadata is missing required file blobs
+            - If the metadata fails validation
+            - If the properties fail validation
+            - If any cross-validation rules fail
 
         Returns
         -------
@@ -137,33 +156,60 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
+        is_input_data_valid = (
+            self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
+        )
+        self.om.route_logs(self.data_validator.event_logs)
+        return is_input_data_valid
+
+    def _cross_validate_data(self, cross_validation_file_paths: list[str] | None, eager_termination: bool) -> bool:
+        """
+        Validates data against cross-validation rules and reports any failures.
+
+        Parameters
+        ----------
+        cross_validation_file_paths : list[str] | None
+            A list of file paths to cross-validation rules.
+        eager_termination : bool
+            If True, the validation process stops after the first cross-validation
+            failure. Otherwise, it continues validating all the rules.
+
+        Returns
+        -------
+        bool
+            Returns True if all cross-validation rules pass. Returns False if one
+            or more rules fail.
+        """
         failing_cross_validation_blocks: list[str] = []
-        cross_validation_blocks = self.__metadata.get("cross-validation", [])
-        if cross_validation_blocks:
-            for block in cross_validation_blocks:
-                target_and_save_block = block.get("target_and_save", {})
-                target_and_save_result = self._extract_target_and_save_block(target_and_save_block, eager_termination)
-                is_cross_validation_successful = self.cross_validator.cross_validate_data(
-                    target_and_save_result,
-                    block,
-                    eager_termination,
-                )
-                if not is_cross_validation_successful:
-                    failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
-                    if eager_termination:
-                        break
+        cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
+        if cross_validation_rules is not None and len(cross_validation_rules) > 0:
+            for cross_validation_ruleset in cross_validation_rules:
+                cross_validation_blocks = cross_validation_ruleset.get("cross-validation", [])
+                for block in cross_validation_blocks:
+                    target_and_save_block = block.get("target_and_save", {})
+                    target_and_save_result = self._extract_target_and_save_block(
+                        target_and_save_block, eager_termination
+                    )
+                    is_cross_validation_successful = self.cross_validator.cross_validate_data(
+                        target_and_save_result,
+                        block,
+                        eager_termination,
+                    )
+                    if not is_cross_validation_successful:
+                        failing_cross_validation_blocks.append(block.get("description", "unnamed block"))
+                        if eager_termination:
+                            break
         if len(failing_cross_validation_blocks) > 0:
             self.om.add_error(
                 "Cross Validation Failure",
                 "One or more cross-validation rules failed: " f"{', '.join(failing_cross_validation_blocks)}",
                 {
                     "class": self.__class__.__name__,
-                    "function": self.start_data_processing.__name__,
+                    "function": self._cross_validate_data.__name__,
                 },
             )
-            is_input_data_valid = False
-        self.om.route_logs(self.data_validator.event_logs)
-        return is_input_data_valid
+            return False
+        return True
 
     def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
         """Validates that all required file blobs are present in the metadata."""
@@ -179,7 +225,7 @@ class InputManager:
                 f"Please add all missing file blobs to metadata.",
                 info_map,
             )
-            raise ValueError(f"Missing required file blobs: {list(missing_blobs)}")
+            raise ValueError(f"Input Manager Error: Missing required file blobs: {list(missing_blobs)}")
         else:
             self.om.add_log(
                 "Required Metadata File Blob Validation",
@@ -253,13 +299,13 @@ class InputManager:
 
         return all(results) if results else True
 
-    def _runtime_metadata_guard_failure(self, reason: str, info_map: Dict[str, Any]) -> bool:
+    def _runtime_metadata_guard_failure(self, reason: str, info_map: dict[str, Any]) -> bool:
         self.om.add_error("Runtime metadata load failure", reason, info_map)
         return False
 
     def _resolve_runtime_metadata_files(
-        self, runtime_metadata_map: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
-    ) -> Dict[str, Any] | None:
+        self, runtime_metadata_map: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
+    ) -> dict[str, Any] | None:
         metadata_reference = self._get_runtime_metadata_reference(runtime_metadata_map, metadata_key, info_map)
         if metadata_reference is None:
             self._runtime_metadata_guard_failure(
@@ -301,7 +347,7 @@ class InputManager:
 
         return runtime_files
 
-    def _is_metadata_loaded(self, info_map: Dict[str, Any]) -> bool:
+    def _is_metadata_loaded(self, info_map: dict[str, Any]) -> bool:
         if self.__metadata:
             return True
         self.om.add_error(
@@ -311,7 +357,7 @@ class InputManager:
         )
         return False
 
-    def _get_runtime_metadata_map(self, info_map: Dict[str, Any]) -> Dict[str, Any] | None:
+    def _get_runtime_metadata_map(self, info_map: dict[str, Any]) -> dict[str, Any] | None:
         try:
             return self.get_metadata("runtime_metadata")
         except KeyError:
@@ -323,8 +369,8 @@ class InputManager:
             return None
 
     def _get_runtime_metadata_reference(
-        self, runtime_metadata_map: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
-    ) -> Dict[str, Any] | None:
+        self, runtime_metadata_map: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
+    ) -> dict[str, Any] | None:
         metadata_reference = runtime_metadata_map.get(metadata_key)
         if metadata_reference is None:
             self.om.add_error(
@@ -336,7 +382,7 @@ class InputManager:
         return metadata_reference
 
     def _get_runtime_metadata_path(
-        self, metadata_reference: Dict[str, Any], metadata_key: str, info_map: Dict[str, Any]
+        self, metadata_reference: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
     ) -> Path | None:
         metadata_path_value = metadata_reference.get("path")
         if metadata_path_value is None:
@@ -348,7 +394,7 @@ class InputManager:
             return None
         return Path(metadata_path_value)
 
-    def _load_runtime_metadata_contents(self, metadata_path: Path, info_map: Dict[str, Any]) -> Dict[str, Any] | None:
+    def _load_runtime_metadata_contents(self, metadata_path: Path, info_map: dict[str, Any]) -> dict[str, Any] | None:
         try:
             return self._load_runtime_metadata_document(metadata_path)
         except Exception as exc:
@@ -359,7 +405,7 @@ class InputManager:
             )
             return None
 
-    def _validate_runtime_metadata(self, runtime_metadata: Dict[str, Any], info_map: Dict[str, Any]) -> bool:
+    def _validate_runtime_metadata(self, runtime_metadata: dict[str, Any], info_map: dict[str, Any]) -> bool:
         is_valid, message = self.data_validator.validate_metadata(
             runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, self.input_root
         )
@@ -370,8 +416,8 @@ class InputManager:
         return False
 
     def _extract_runtime_files(
-        self, runtime_metadata: Dict[str, Any], metadata_path: Path, info_map: Dict[str, Any]
-    ) -> Dict[str, Any] | None:
+        self, runtime_metadata: dict[str, Any], metadata_path: Path, info_map: dict[str, Any]
+    ) -> dict[str, Any] | None:
         runtime_files = runtime_metadata.get(ADDRESS_TO_INPUTS, {})
         if isinstance(runtime_files, dict):
             return runtime_files
@@ -383,7 +429,7 @@ class InputManager:
         self.om.route_logs(self.data_validator.event_logs)
         return None
 
-    def _runtime_data_loader_map(self) -> Dict[str, Callable[[Path], Dict[str, Any]]]:
+    def _runtime_data_loader_map(self) -> dict[str, Callable[[Path], dict[str, Any]]]:
         return {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
@@ -392,10 +438,10 @@ class InputManager:
     def _process_runtime_file(
         self,
         variable_name: str,
-        file_details: Dict[str, Any],
-        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]],
+        file_details: dict[str, Any],
+        data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]],
         eager_termination: bool,
-        info_map: Dict[str, Any],
+        info_map: dict[str, Any],
     ) -> bool:
         properties_blob_key = file_details.get("properties")
         if not properties_blob_key:
@@ -457,8 +503,9 @@ class InputManager:
 
         return is_runtime_data_added
 
-    def _load_runtime_metadata_document(self, metadata_path: Path) -> Dict[str, Any]:
-        """Load a runtime metadata document without disturbing the active metadata state.
+    def _load_runtime_metadata_document(self, metadata_path: Path) -> dict[str, Any]:
+        """
+        Load a runtime metadata document without disturbing the active metadata state.
 
         Parameters
         ----------
@@ -467,13 +514,16 @@ class InputManager:
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             Parsed metadata content from ``metadata_path``.
 
         Notes
         -----
         The active metadata is restored after loading so callers retain their previously parsed
         metadata tree.
+        The use of `deepcopy()` here is necessary because `self.__metadata` is a mutable object,
+        so a shallow assignment would only copy the reference, causing both snapshots to reflect
+        the same underlying data.
         """
 
         original_metadata = deepcopy(self.__metadata)
@@ -518,7 +568,71 @@ class InputManager:
                     info_map,
                 )
         except Exception as e:
-            raise e
+            raise type(e)(f"Input Manager Error: {e}") from e
+
+    def _load_cross_validation(
+        self, cross_validation_paths: list[str] | None
+    ) -> list[dict[str, list[dict[str, Any]]]] | None:
+        """
+        Loads cross-validation rules from a list of file paths. Each file is expected to contain
+        JSON-encoded data representing cross-validation configurations. If no paths are provided,
+        the method returns `None`.
+
+        Parameters
+        ----------
+        cross_validation_paths : list of str or None
+            A list of file paths to JSON-formatted cross-validation files. If `None` is provided,
+            the method returns `None`.
+
+        Returns
+        -------
+        list of dict or None
+            A list of dictionaries containing the loaded cross-validation configuration data from
+            the JSON files. Returns `None` if `cross_validation_paths` is `None`.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a specified file cannot be found at the provided path.
+
+        json.JSONDecodeError
+            If a file is not properly formatted as JSON.
+
+        Exception
+            If an unexpected error occurs during the file loading process.
+        """
+        if cross_validation_paths is None:
+            return None
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_cross_validation.__name__,
+        }
+        cross_validation_rules: list[dict[str, list[dict[str, Any]]]] = []
+        for cross_validation_path in cross_validation_paths:
+            self.om.add_log(
+                "load_cross_validation_attempt",
+                f"Attempting to load cross validation data from {cross_validation_path}.",
+                info_map,
+            )
+            try:
+                with open(Path(cross_validation_path)) as cross_validation_file:
+                    self.om.add_log(
+                        "load_metadata_success",
+                        f"Successfully loaded metadata from {cross_validation_path}",
+                        info_map,
+                    )
+                    cross_validation_rules.append(json.load(cross_validation_file))
+            except FileNotFoundError as fnfe:
+                self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+                raise
+            except json.JSONDecodeError as jde:
+                self.om.add_error("load_properties_json_error", str(jde), info_map)
+                raise
+            except Exception as e:
+                self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+                raise
+        return cross_validation_rules
 
     def _load_properties(self) -> None:
         """
@@ -542,51 +656,37 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_metadata = self.__metadata["files"]["properties"]
-            properties_paths = properties_metadata.get("paths") or properties_metadata.get("path")
-
-            if isinstance(properties_paths, str):
-                properties_paths = [properties_paths]
-            if not isinstance(properties_paths, list) or len(properties_paths) == 0:
-                raise ValueError("Properties paths must be a non-empty string or list of strings")
-
-            if not all(isinstance(path, str) and path for path in properties_paths):
-                raise ValueError("Each properties path must be a non-empty string")
-
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {properties_paths}",
+                f"Attempting to load properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
             combined_properties: dict[str, Any] = {}
-            for properties_path_str in properties_paths:
-                properties_path = Path(properties_path_str)
+            for properties_path in PRROPERTIES_FILE_PATHS.values():
                 if not properties_path.exists():
-                    raise FileNotFoundError(f"Properties file not found at {properties_path}")
+                    raise FileNotFoundError(f"Input Manager Error: Properties file not found at {properties_path}")
                 loaded_properties = self._load_data_from_json(properties_path)
                 combined_properties.update(loaded_properties)
-
-            del self.__metadata["files"]["properties"]
 
             self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {properties_paths}",
+                f"Successfully loaded properties from {PRROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
         except FileNotFoundError as fnfe:
-            self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            self.om.add_error("File at path not found", str(fnfe), info_map)
             raise
         except json.JSONDecodeError as jde:
-            self.om.add_error("load_properties_json_error", str(jde), info_map)
+            self.om.add_error("JSON decode error in file at path", str(jde), info_map)
             raise
         except Exception as e:
-            self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            self.om.add_error("Unexpected error when loading file at path: {e}", str(e), info_map)
             raise
 
-    def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
+    def _load_data_from_json(self, file_path: Path) -> dict[str, Any]:
         """
         Loads data from input json file.
 
@@ -597,7 +697,7 @@ class InputManager:
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             The data dictionary loaded from the json file.
 
         Raises
@@ -613,17 +713,24 @@ class InputManager:
         self.om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path) as json_file:
-                data: Dict[str, Any] = json.load(json_file)
+                data: dict[str, Any] = json.load(json_file)
                 self.om.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {file_path}.",
                     info_map,
                 )
                 return data
+        except FileNotFoundError as fnfe:
+            self.om.add_error(f"File at path {file_path} not found", str(fnfe), info_map)
+            raise
+        except json.JSONDecodeError as jde:
+            self.om.add_error(f"JSON decode error in file at path {file_path}", str(jde), info_map)
+            raise
         except Exception as e:
-            raise e
+            self.om.add_error(f"Unexpected error when loading file at path {file_path}: {e}", str(e), info_map)
+            raise
 
-    def _load_data_from_csv(self, file_path: Path) -> Dict[str, Any]:
+    def _load_data_from_csv(self, file_path: Path) -> dict[str, Any]:
         """
         Loads data from input csv file.
 
@@ -634,13 +741,17 @@ class InputManager:
 
         Returns
         -------
-        Dict[str, Any]
-            The data dictionary loaded from the json file.
+        dict[str, Any]
+            The data dictionary loaded from the csv file.
 
         Raises
         ------
         FileNotFoundError
             If the CSV file does not exist at the specified path.
+        pd.errors.EmptyDataError
+            If the CSV file is empty.
+        pd.errors.ParserError
+            If there is a parse error in the CSV file.
         Exception
             For any other unexpected errors during CSV file loading.
 
@@ -661,8 +772,18 @@ class InputManager:
                         info_map,
                     )
                 return data_dict
+        except FileNotFoundError as fnfe:
+            self.om.add_error(f"File at path {file_path} not found", str(fnfe), info_map)
+            raise
+        except pd.errors.EmptyDataError as ede:
+            self.om.add_error(f"CSV file at path {file_path} is empty", str(ede), info_map)
+            raise
+        except pd.errors.ParserError as pe:
+            self.om.add_error(f"CSV parse error in file at path {file_path}", str(pe), info_map)
+            raise
         except Exception as e:
-            raise e
+            self.om.add_error(f"Unexpected error when loading file at path {file_path}: {e}", str(e), info_map)
+            raise
 
     def _populate_pool(self, input_root: Path, eager_termination: bool) -> bool:
         """
@@ -705,7 +826,8 @@ class InputManager:
                 input_data = data_loader(file_path)
             except KeyError:
                 raise KeyError(
-                    f"Faulty data type in {file_blob_key}," f"supported types are: {data_type_to_loader_map.keys()}"
+                    f"Input Manager Error: Faulty data type in {file_blob_key},"
+                    f"supported types are: {data_type_to_loader_map.keys()}"
                 )
 
             properties_blob_key = file_details["properties"]
@@ -739,7 +861,7 @@ class InputManager:
 
         return valid_data
 
-    def _get_variable_modifiability(self, variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+    def _get_variable_modifiability(self, variable_name: str, variable_properties: dict[str, Any]) -> Modifiability:
         """
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
@@ -755,7 +877,7 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable for which the modifiability status is being determined. Used for error logging.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing the properties of the variable, containing the desired 'modifiability' property.
 
         Returns
@@ -788,7 +910,7 @@ class InputManager:
             )
             return Modifiability.__getitem__("_".join(default.strip().upper().split()))
 
-    def _is_input_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+    def _is_input_required_upon_initialization(self, variable_name: str, variable_properties: dict[str, Any]) -> bool:
         """
         Determines whether a variable requires an input value upon initialization based on its modifiability status.
 
@@ -801,7 +923,7 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable being evaluated for its initialization requirements.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing the properties of the variable, which should include its modifiability status among
             others.
 
@@ -816,7 +938,7 @@ class InputManager:
         )
         return variable_modifiability in Modifiability.get_required_during_initialization()
 
-    def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+    def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: dict[str, Any]) -> bool:
         """
         Checks if a variable can be modified during runtime based on its modifiability status.
 
@@ -829,7 +951,7 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable to check for runtime modifiability.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing the properties of the variable, including details that determine its modifiability.
 
         Returns
@@ -843,7 +965,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+        self, variable_properties: dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -851,7 +973,7 @@ class InputManager:
 
         Parameters
         ----------
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             Properties of the variable, potentially including its modifiability status.
         var_name : str
             The name of the variable with missing data.
@@ -936,6 +1058,11 @@ class InputManager:
         If the requested data does not exist, the method will return None:
         >>> input_manager.get_data('animal.herd_information.nonexistent_property')
         None
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here to prevent callers from accidentally
+        mutating the internal pool data by modifying the returned value.
         """
 
         info_map = {
@@ -1033,6 +1160,11 @@ class InputManager:
         "maximum": 1.0,
         "default": 0.16
         }
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here to prevent callers from accidentally
+        mutating the internal metadata pool by modifying the returned value.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1074,7 +1206,7 @@ class InputManager:
         Returns
         -------
         list[str]
-            List of keys which point to data within the Input Manager's data pool that adhere to the target metadata
+            list of keys which point to data within the Input Manager's data pool that adhere to the target metadata
             properties.
 
         Examples
@@ -1109,7 +1241,7 @@ class InputManager:
         If no keys have the specified property, the method returns an empty list.
 
         """
-        data_keys: List[str] = []
+        data_keys: list[str] = []
 
         info_map = {
             "class": self.__class__.__name__,
@@ -1249,7 +1381,7 @@ class InputManager:
     def _add_variable_to_pool(
         self,
         variable_name: str,
-        input_data: Dict[str, Any],
+        input_data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
     ) -> bool:
@@ -1268,7 +1400,7 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable to be added to the pool.
-        input_data : Dict[str, Any]
+        input_data : dict[str, Any]
             The data associated with the variable that needs validation and addition to the pool.
         properties_blob_key : str
             The key in the metadata properties against which the data is validated.
@@ -1326,7 +1458,7 @@ class InputManager:
 
     def _prepare_data(
         self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
-    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
 
@@ -1334,14 +1466,14 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable to be added to the pool.
-        input_data : Dict[str, Any]
+        input_data : dict[str, Any]
             The data associated with the variable that needs validation and addition to the pool.
         properties_blob_key : str
             The key in the metadata properties against which the data is validated.
 
         Returns
         -------
-        Tuple[List[str], Dict[str, Any], Dict[str, Any]]
+        tuple[list[str], dict[str, Any], dict[str, Any]]
             Prepared element hierarchy, data, and metadata properties.
 
         """
@@ -1349,7 +1481,7 @@ class InputManager:
         metadata_root = self.__metadata["properties"][properties_blob_key]
         if len(element_hierarchy) > 1:
             flat_key_data = {variable_name.split(".", 1)[1]: input_data}
-            metadata_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
+            metadata_hierarchy = element_hierarchy if isinstance(input_data, dict) else element_hierarchy[:-1]
             nested_data = Utility.flatten_keys_to_nested_structure(flat_key_data)
 
             metadata_properties = metadata_root
@@ -1500,7 +1632,7 @@ class InputManager:
     def add_runtime_variable_to_pool(
         self,
         variable_name: str,
-        data: Dict[str, Any],
+        data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
     ) -> bool:
@@ -1516,7 +1648,7 @@ class InputManager:
         ----------
         variable_name: str
             The name of the dictionary variable to be added.
-        data : Dict[str, Any]
+        data : dict[str, Any]
             The data of the variable, structured as a dictionary.
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
@@ -1533,20 +1665,22 @@ class InputManager:
         Raises
         ------
         TypeError
-            If `data` is not the expected type of Dict[str, Any].
+            If `data` is not the expected type of dict[str, Any].
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.add_runtime_variable_to_pool.__name__,
         }
-        if not (isinstance(data, Dict)):
+        if not (isinstance(data, dict)):
             self.om.add_error(
                 "Incorrect variable type",
                 f"Variable {variable_name} has type {type(data)}, does not match "
-                f"the expected type of `Dict[str, Any]`.",
+                f"the expected type of `dict[str, Any]`.",
                 info_map,
             )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
+            raise TypeError(
+                "Add Runtime Variable Error: Incorrect variable type. " "Expected types: `data: dict[str, Any]`."
+            )
 
         metadata_properties_exist = self._metadata_properties_exist(
             variable_name=variable_name, properties_blob_key=properties_blob_key
@@ -1626,25 +1760,33 @@ class InputManager:
             df.to_csv(path_to_save, index=False)
             self.om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
         except FileNotFoundError as fnfe:
-            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
-            raise fnfe
+            self.om.add_error(
+                "Metadata Properties Save CSV failure.",
+                f"Unable to save to {path_to_save} because of {fnfe}.",
+                info_map,
+            )
+            raise FileNotFoundError(f"Metadata Properties Save CSV failure: {fnfe}") from fnfe
         except PermissionError as pe:
-            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
-            raise pe
+            self.om.add_error(
+                "Metadata Properties Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map
+            )
+            raise PermissionError(f"Metadata Properties Save CSV failure: {pe}") from pe
         except OSError as e:
-            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
-            raise e
+            self.om.add_error(
+                "Metadata Properties Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map
+            )
+            raise OSError(f"Metadata Properties Save CSV failure: {e}") from e
 
     def _parse_metadata_properties(
-        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
-    ) -> List[Dict[str, Any]]:
+        self, data: dict[str, Any], prefix: str = "", sep: str = "_"
+    ) -> list[dict[str, Any]]:
         """
         Recursively traverse through the metadata properties dictionary
         to flatten it by creating a record for each entry.
 
         Parameters
         ----------
-        data : Dict[str, Any]
+        data : dict[str, Any]
             The metadata properties data to be parsed.
         prefix : str, optional
             The data record prefix, by default ''.
@@ -1653,7 +1795,7 @@ class InputManager:
 
         Returns
         -------
-        List[Dict[str, Any]]
+        list[dict[str, Any]]
             A list of flattened data entries from the json file.
         """
         records = []
@@ -1691,7 +1833,7 @@ class InputManager:
 
         return records
 
-    def _check_property_type_primitive(self, property: Dict[str, Any]) -> bool:
+    def _check_property_type_primitive(self, property: dict[str, Any]) -> bool:
         """Checks whether the property's "type" is primitive or an array of primitive types."""
         if property.get("type") in ["bool", "string", "number"]:
             return True
@@ -1700,19 +1842,19 @@ class InputManager:
                 return True
         return False
 
-    def _create_record(self, data_entry: Dict[str, Any], name: str) -> Dict[str, Any]:
+    def _create_record(self, data_entry: dict[str, Any], name: str) -> dict[str, Any]:
         """Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.
 
         Parameters
         ----------
-        data_entry : Dict[str, Any]
+        data_entry : dict[str, Any]
             The data entry from the json file to be converted into the record format.
         name : str
             The name to be used for the record.
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             A dictionary of the data entry converted to the record format.
         """
         properties_index = name.find("_properties") + len("_properties")
@@ -1734,6 +1876,10 @@ class InputManager:
     ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary to avoid modifying the original data structures.
         """
         info_map = {
             "class": self.__class__.__name__,

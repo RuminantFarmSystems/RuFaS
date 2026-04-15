@@ -3,9 +3,9 @@
 # ignore text files
 *.txt
 *.txt#
-!requirements.txt
 *.doc
 *.docx
+!constraints-release.txt
 
 # ignore log files
 *.log

@@ -3,6 +3,10 @@ from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import numpy as np
 import pytest
+from pytest import approx
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.general_constants import GeneralConstants
 from pytest_mock import MockerFixture
 from scipy.optimize import OptimizeResult
 
@@ -122,6 +126,7 @@ def animals_in_pen() -> dict[int, Animal]:
 
 @pytest.fixture
 def pen(mocker: MockerFixture) -> Pen:
+    RationManager.maximum_ration_reformulation_attempts = 250
     im = InputManager()
     mocker.patch.object(
         im,
@@ -923,6 +928,458 @@ def test_get_manure_streams(
             assert call.kwargs["stream_type"] == StreamType.GENERAL
             assert pytest.approx(call.kwargs["split_ratio"]) == pytest.approx(proportion)
             assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(proportion)
+
+
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, stream_config, total_stream, expected_result",
+    [
+        (
+            1.0,
+            None,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+        ),
+        (
+            0.8,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=8.0,
+                ammoniacal_nitrogen=8.0,
+                nitrogen=8.0,
+                phosphorus=8.0,
+                potassium=8.0,
+                ash=8.0,
+                non_degradable_volatile_solids=8.0,
+                degradable_volatile_solids=8.0,
+                total_solids=80.0,
+                volume=80.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=8.0,
+            ),
+        ),
+        (
+            0.3,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=3.0,
+                ammoniacal_nitrogen=3.0,
+                nitrogen=3.0,
+                phosphorus=3.0,
+                potassium=3.0,
+                ash=3.0,
+                non_degradable_volatile_solids=3.0,
+                degradable_volatile_solids=3.0,
+                total_solids=30.0,
+                volume=30.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=3.0,
+            ),
+        ),
+    ],
+)
+def test_split_general_manure_stream(
+    general_stream_proportion: float,
+    parlor_stream_proportion: Any | None,
+    stream_config: dict[str, str | float],
+    total_stream: ManureStream,
+    expected_result: ManureStream,
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+) -> None:
+    """Tests the split_general_manure_stream method."""
+    result = pen._split_general_manure_stream(
+        general_stream_proportion,
+        parlor_stream_proportion,
+        stream_config,
+        total_stream,
+    )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, parlor_stream, assertion_error_expected",
+    [
+        (1.0, None, None, False),
+        (0.5, None, None, True),
+        (1.0, 0.5, None, True),
+        (0.5, 0.5, None, True),
+        (0.5, None, MagicMock(spec=ManureStream), True),
+        (0.5, 0.5, MagicMock(spec=ManureStream), False),
+    ],
+)
+def test_validate_parlor_stream_proportion(
+    general_stream_proportion: float,
+    parlor_stream_proportion: Any | None,
+    parlor_stream: ManureStream,
+    assertion_error_expected: bool,
+    pen: Pen,
+) -> None:
+    """Tests the validate_parlor_stream_proportion method."""
+    if assertion_error_expected:
+        with pytest.raises(AssertionError):
+            pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+    else:
+        pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+
+
+def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> None:
+    """Tests the calculation of total pen manure stream."""
+    excretions = AnimalManureExcretions(
+        urine=120.0,
+        manure_total_ammoniacal_nitrogen=3.5,
+        urine_nitrogen=2.0,
+        manure_nitrogen=4.0,
+        manure_mass=200.0,
+        total_solids=40.0,
+        degradable_volatile_solids=25.0,
+        non_degradable_volatile_solids=10.0,
+        phosphorus=500.0,
+        potassium=800.0,
+    )
+    methane_potential = 0.25
+    surface_area = 150.0
+
+    mocker.patch.object(Pen, "total_manure_excretion", new_callable=PropertyMock, return_value=excretions)
+    mocker.patch.object(pen, "_calculate_methane_production_potential", return_value=methane_potential)
+    mocker.patch.object(pen, "_calculate_manure_surface_area", return_value=surface_area)
+
+    stream = pen._calculate_total_pen_manure_stream()
+
+    assert isinstance(stream, ManureStream)
+    assert stream.water == approx(excretions.manure_mass - excretions.total_solids)  # 160.0
+    assert stream.ammoniacal_nitrogen == approx(excretions.manure_total_ammoniacal_nitrogen)  # 3.5
+    assert stream.nitrogen == approx(excretions.manure_nitrogen)  # 4.0
+    assert stream.phosphorus == approx(excretions.phosphorus * GeneralConstants.GRAMS_TO_KG)  # 0.5
+    assert stream.potassium == approx(excretions.potassium * GeneralConstants.GRAMS_TO_KG)  # 0.8
+    assert stream.ash == approx(0)
+    assert stream.non_degradable_volatile_solids == approx(excretions.non_degradable_volatile_solids)
+    assert stream.degradable_volatile_solids == approx(excretions.degradable_volatile_solids)
+    assert stream.total_solids == approx(excretions.total_solids)
+    assert stream.volume == approx(excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY)
+    assert stream.methane_production_potential == approx(methane_potential)
+    assert stream.bedding_non_degradable_volatile_solids == approx(0.0)
+
+    assert stream.pen_manure_data is not None
+    pmd = stream.pen_manure_data
+    assert pmd.num_animals == len(pen.animals_in_pen)
+    assert pmd.manure_deposition_surface_area == approx(surface_area)
+    assert pmd.animal_combination == pen.animal_combination
+    assert pmd.pen_type == pen.pen_type
+    assert pmd.manure_urine_mass == approx(excretions.urine)
+    assert pmd.manure_urine_nitrogen == approx(excretions.urine_nitrogen)
+    assert pmd.stream_type == StreamType.GENERAL
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_mixed(pen: Pen, mocker: MockerFixture) -> None:
+    """Mixed GROWING_AND_CLOSE_UP pen: weighted average of 0.17 (growing) and 0.24 (close-up)."""
+    growing_animal = mocker.MagicMock(auto_spec=Animal)
+    growing_animal.animal_type = AnimalType.HEIFER_I
+
+    close_up_animal = mocker.MagicMock(auto_spec=Animal)
+    close_up_animal.animal_type = AnimalType.DRY_COW
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: growing_animal, 2: close_up_animal}
+
+    result = pen._calculate_methane_production_potential()
+
+    # 1 growing out of 2 total → 0.17 * 0.5 + 0.24 * 0.5
+    assert result == approx(0.17 * 0.5 + 0.24 * 0.5)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_empty(pen: Pen, mocker: MockerFixture) -> None:
+    """GROWING_AND_CLOSE_UP pen with no animals returns 0.0."""
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.0)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_all_growing(
+    pen: Pen, mocker: MockerFixture
+) -> None:
+    """GROWING_AND_CLOSE_UP pen with only growing animals (HeiferI, HeiferII) returns 0.17."""
+    heifer_i = mocker.MagicMock(auto_spec=Animal)
+    heifer_i.animal_type = AnimalType.HEIFER_I
+    heifer_ii = mocker.MagicMock(auto_spec=Animal)
+    heifer_ii.animal_type = AnimalType.HEIFER_II
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: heifer_i, 2: heifer_ii}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_all_close_up(
+    pen: Pen, mocker: MockerFixture
+) -> None:
+    """GROWING_AND_CLOSE_UP pen with only close-up animals (HeiferIII, DryCow) returns 0.24."""
+    heifer_iii = mocker.MagicMock(auto_spec=Animal)
+    heifer_iii.animal_type = AnimalType.HEIFER_III
+    dry_cow = mocker.MagicMock(auto_spec=Animal)
+    dry_cow.animal_type = AnimalType.DRY_COW
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: heifer_iii, 2: dry_cow}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.24)
+
+
+def test_calculate_methane_production_potential_calf(pen: Pen, mocker: MockerFixture) -> None:
+    """CALF combination always returns 0.17."""
+    pen.animal_combination = AnimalCombination.CALF
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+def test_calculate_methane_production_potential_growing(pen: Pen, mocker: MockerFixture) -> None:
+    """GROWING combination always returns 0.17."""
+    pen.animal_combination = AnimalCombination.GROWING
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+@pytest.mark.parametrize("combination", [AnimalCombination.LAC_COW, AnimalCombination.CLOSE_UP])
+def test_calculate_methane_production_potential_other_combinations(
+    pen: Pen, mocker: MockerFixture, combination: AnimalCombination
+) -> None:
+    """LAC_COW and CLOSE_UP combinations return 0.24."""
+    pen.animal_combination = combination
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.24)
+
+
+def test_handle_parlor_stream_lac_cow_splits_and_sets_processor(pen: Pen) -> None:
+    """
+    For a LAC_COW pen, the parlor stream is split using the milking-time proportion,
+    the remaining general stream proportion is 1 - parlor_proportion,
+    and first_processor is set on the parlor stream's pen_manure_data.
+    """
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=PenManureData(
+            num_animals=5,
+            manure_deposition_surface_area=100.0,
+            animal_combination=AnimalCombination.LAC_COW,
+            pen_type="freestall",
+            manure_urine_mass=120.0,
+            manure_urine_nitrogen=2.0,
+            stream_type=StreamType.GENERAL,
+        ),
+    )
+
+    expected_parlor_proportion = 7 / 1440
+
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_proportion == approx(expected_parlor_proportion)
+    assert general_proportion == approx(1 - expected_parlor_proportion)
+
+    assert parlor_stream is not None
+    assert parlor_stream.water == approx(total_stream.water * expected_parlor_proportion)
+    assert parlor_stream.nitrogen == approx(total_stream.nitrogen * expected_parlor_proportion)
+    assert parlor_stream.volume == approx(total_stream.volume * expected_parlor_proportion)
+    assert parlor_stream.methane_production_potential == approx(total_stream.methane_production_potential)
+
+    assert parlor_stream.pen_manure_data is not None
+    assert parlor_stream.pen_manure_data.stream_type == StreamType.PARLOR
+    assert parlor_stream.pen_manure_data.first_processor == "stream_a"
+    assert parlor_stream.pen_manure_data.manure_deposition_surface_area == approx(0.0)
+
+
+def test_handle_parlor_stream_lac_cow_no_first_processor(pen: Pen, mocker: MockerFixture) -> None:
+    """
+    When first_parlor_processor is None the parlor stream is still split correctly
+    but first_processor is NOT set (remains None).
+    """
+    mocker.patch.object(pen, "first_parlor_processor", None)
+
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=PenManureData(
+            num_animals=5,
+            manure_deposition_surface_area=100.0,
+            animal_combination=AnimalCombination.LAC_COW,
+            pen_type="freestall",
+            manure_urine_mass=120.0,
+            manure_urine_nitrogen=2.0,
+            stream_type=StreamType.GENERAL,
+        ),
+    )
+
+    _, _, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_stream is not None
+    assert parlor_stream.pen_manure_data is not None
+    assert parlor_stream.pen_manure_data.first_processor is None
+
+
+def test_handle_parlor_stream_lac_cow_no_pen_manure_data(pen: Pen) -> None:
+    """
+    When the total stream carries no pen_manure_data, the split still happens
+    but the parlor stream also has no pen_manure_data (set_first_processor is not called).
+    """
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=None,
+    )
+
+    expected_parlor_proportion = 7 / 1440
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_proportion == approx(expected_parlor_proportion)
+    assert general_proportion == approx(1 - expected_parlor_proportion)
+    assert parlor_stream is not None
+    assert parlor_stream.pen_manure_data is None
+
+
+@pytest.mark.parametrize(
+    "combination",
+    [
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.CLOSE_UP,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+    ],
+)
+def test_handle_parlor_stream_non_lac_cow_returns_no_split(
+    pen: Pen, mocker: MockerFixture, combination: AnimalCombination
+) -> None:
+    """
+    For any non-LAC_COW combination the stream is not split:
+    general_proportion == 1.0, parlor_proportion and parlor_stream are None.
+    """
+    pen.animal_combination = combination
+
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=None,
+    )
+
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert general_proportion == approx(1.0)
+    assert parlor_proportion is None
+    assert parlor_stream is None
 
 
 @pytest.mark.parametrize(
