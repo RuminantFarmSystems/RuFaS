@@ -39,14 +39,14 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Fertilizer Applications",
         "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-        "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "year", "day"],
+        "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
     },
     "manure_applications": {
         "name": "Manure Applications",
         "description": "Collects all manure applications that occurred in the simulation.",
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-        "variables": ["nitrogen", "field_name", "year", "day"],
+        "variables": ["nitrogen", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
     },
     "crop_received": {
@@ -255,8 +255,25 @@ class EmissionsEstimator:
 
     def _parse_farmgrown_feeds_emission_data(self) -> dict[str, dict[str, dict[int, float]]]:
         """
-        Parses farmgrown feeds emission data from the OutputManager and returns a dictionary with emission data for
-        each field on every simulation day.
+        Parses farmgrown feeds emission data from the OutputManager and returns a
+        dictionary with emission data for each field on every simulation day.
+
+        Emission values across all soil layers for a given field are aggregated by
+        summing layer-level values for each simulation day.
+
+        Returns
+        -------
+        dict[str, dict[str, dict[int, float]]]
+            A nested dictionary structured as
+            ``{emission_type: {field_name: {simulation_day: total_emission}}}``,
+            where emission types are ``"nitrous_oxide_emissions"`` and
+            ``"ammonia_emissions"``. Emission values are in kg/ha.
+
+        Raises
+        ------
+        ValueError
+            If a variable in the filtered data does not match the expected field
+            and layer naming pattern.
         """
         emission_data: dict[str, dict[str, dict[int, float]]] = defaultdict(dict)
         for filter_key in ["nitrous_oxide_emissions", "ammonia_emissions"]:
@@ -289,8 +306,22 @@ class EmissionsEstimator:
         simulation_start_date: datetime,
     ) -> dict[str, dict[str, dict[int, dict[str, float]]]]:
         """
-        Parses manure and fertilizer application data from the OutputManager and returns a dictionary with
-        application data for each field by simulation day.
+        Parses manure and fertilizer application data from the OutputManager and
+        returns a dictionary with application data for each field by simulation day.
+
+        Parameters
+        ----------
+        simulation_start_date : datetime
+            The start date of the simulation, used to convert event dates to
+            simulation day offsets.
+
+        Returns
+        -------
+        dict[str, dict[str, dict[int, dict[str, float]]]]
+            A nested dictionary structured as
+            ``{application_type: {field_name: {simulation_day: {variable: value}}}}``,
+            where application types are ``"manure_applications"`` and
+            ``"fertilizer_applications"``. Application values are in kg/ha.
         """
         resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = defaultdict(dict)
         for filter_key in ["manure_applications", "fertilizer_applications"]:
@@ -321,12 +352,13 @@ class EmissionsEstimator:
                 )
                 simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
                 for i, simulation_day in enumerate(simulation_days):
+                    field_size: float = field_data["field_size"][i]
                     if field_name not in resource_data[filter_key]:
                         resource_data[filter_key][field_name] = {}
                     resource_data[filter_key][field_name][simulation_day] = {
-                        variable: field_data[variable][i]
+                        variable: field_data[variable][i] / field_size
                         for variable in field_data
-                        if variable not in [year_key, day_key, "field_name", "DISCLAIMER"]
+                        if variable not in [year_key, day_key, "field_name", "field_size", "DISCLAIMER"]
                     }
 
         return resource_data
@@ -335,7 +367,33 @@ class EmissionsEstimator:
         self,
         all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, float]]:
-        """Parses farmgrown feed deductions data by feed_id and simulation day from the simulation OutputManager."""
+        """
+        Parses farmgrown feed deductions data by feed ID and simulation day from
+        the simulation OutputManager.
+
+        For simulation days with no recorded deduction, a value of ``0.0`` is
+        used to ensure all days are represented in the output.
+
+        Parameters
+        ----------
+        all_simulation_days : list[int]
+            The complete list of simulation days to include in the output,
+            used to fill missing days with a default value of ``0.0``.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[int, float]]
+            A dictionary structured as ``{feed_id: {simulation_day: amount}}``,
+            where each feed ID maps to a day-indexed record of deducted feed amounts.
+
+
+        Raises
+        ------
+        ValueError
+            If a variable name in the filtered data does not match the expected
+            feed ID naming pattern.
+        """
+
         filtered_data = self.om.filter_variables_pool(
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_deductions"]
         )
@@ -357,7 +415,16 @@ class EmissionsEstimator:
         return feed_deduction_by_feed_id
 
     def _parse_crop_to_feed_id_mapping(self) -> dict[tuple[str, str], RUFAS_ID]:
-        """Parses the mapping of crop names and field names to RUFAS feed IDs."""
+        """
+        Parses the mapping of crop names and field names to RUFAS feed IDs.
+
+        Returns
+        -------
+        dict[tuple[str, str], RUFAS_ID]
+            A dictionary mapping ``(field_name, crop_name)`` tuples to their
+            corresponding RUFAS feed IDs.
+        """
+
         raw_received_crop_data = self.om.filter_variables_pool(
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["crop_received"]
         )
@@ -382,7 +449,28 @@ class EmissionsEstimator:
     def _parse_harvest_data(
         self, crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID], simulation_start_date: datetime
     ) -> dict[str, dict[int, dict[str, Any]]]:
-        """Parses harvest data by field name and simulation day from the simulation OutputManager."""
+        """
+        Parses harvest data by field name and simulation day from the simulation
+        OutputManager.
+
+        Parameters
+        ----------
+        crop_to_feed_id_mapping : dict[tuple[str, str], RUFAS_ID]
+            A mapping of ``(field_name, crop_name)`` tuples to their corresponding
+            RUFAS feed IDs, used to associate each harvest event with a feed ID.
+        simulation_start_date : datetime
+            The start date of the simulation, used to convert harvest dates to
+            simulation day offsets.
+
+        Returns
+        -------
+        dict[str, dict[int, dict[str, Any]]]
+            A nested dictionary structured as
+            ``{field_name: {simulation_day: {harvest_attribute: value}}}``.
+            Each harvest record contains the field name, crop name, feed ID,
+            harvest type, and dry yield in kg/ha.
+        """
+
         harvest_data: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
 
         harvest_filter = FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
@@ -430,7 +518,37 @@ class EmissionsEstimator:
         harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]],
         all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
-        """Calculates daily emissions and resources used for farmgrown feeds production."""
+        """
+        Calculates daily emissions and resources used for farmgrown feeds production.
+
+        For each field, emissions and resource inputs are accumulated between harvest
+        events and normalized by the cumulative dry yield to produce per-unit values.
+        These normalized values are then assigned to each simulation day within the
+        corresponding harvest window. Days with no associated harvest data are assigned
+        zero values for all tracked variables.
+
+        Parameters
+        ----------
+        emission_data : dict[str, dict[str, dict[int, float]]]
+            Nitrous oxide and ammonia emission data for farmgrown feeds, keyed by
+            emission type, field name, and simulation day (kg/ha).
+        resource_data : dict[str, dict[str, dict[int, dict[str, float]]]]
+            Manure and fertilizer application data for farmgrown feeds, keyed by
+            application type, field name, simulation day, and nutrient variable (kg/ha).
+        harvest_yield_by_field : dict[str, dict[int, dict[str, Any]]]
+            Harvest dry yield data for farmgrown feeds, keyed by field name and
+            simulation day (kg/ha).
+        all_simulation_days : list[int]
+            A list of all simulation days in the simulation.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[int, dict[str, float]]]
+            A nested dictionary structured as
+            ``{feed_id: {simulation_day: {variable: value}}}``, where each record
+            contains the per-unit nitrous oxide emissions, ammonia emissions,
+            fertilizer N, fertilizer P, fertilizer K, and manure N for that day.
+        """
 
         total_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[str, float]] = defaultdict(dict)
         total_harvest_dry_yield_by_feed_id: dict[RUFAS_ID, float] = defaultdict(float)
@@ -572,7 +690,32 @@ class EmissionsEstimator:
         return daily_farmgrown_feed_emission_and_resource_by_feed_id
 
     def _gather_farmgrown_feed_inventory_data(self, all_simulation_days: list[int]) -> dict[RUFAS_ID, dict[int, float]]:
-        """Gathers farmgrown feed inventory data by feed_id and simulation day index."""
+        """
+        Gathers farmgrown feed inventory data by feed ID and simulation day from
+        the simulation OutputManager.
+
+        For simulation days with no recorded inventory, a value of ``0.0`` is
+        used to ensure all days are represented in the output.
+
+        Parameters
+        ----------
+        all_simulation_days : list[int]
+            The complete list of simulation days to include in the output,
+            used to fill missing days with a default value of ``0.0``.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[int, float]]
+            A dictionary structured as ``{feed_id: {simulation_day: amount}}``,
+            where each feed ID maps to a day-indexed record of inventory levels.
+
+        Raises
+        ------
+        ValueError
+            If a variable name in the filtered data does not match the expected
+            feed ID and storage level naming pattern.
+        """
+
         filtered_fgf_data = self.om.filter_variables_pool(
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["farmgrown_feed_inventory"]
         )
@@ -606,21 +749,21 @@ class EmissionsEstimator:
         self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
     ) -> dict[RUFAS_ID, list[int]]:
         """
-        Generates a mapping of feed IDs to their respective harvest dates based on the
-        harvest data of multiple fields.
+        Generates a mapping of feed IDs to their respective harvest dates based on
+        the harvest data of multiple fields.
 
         Parameters
         ----------
-        harvest_yield_by_field : dict: dict[str, dict[int, dict[str, Any]]]
-            A dictionary containing harvest data organized by field name. Each field
-            name maps to another dictionary where keys represent harvest dates, and
-            values are dictionaries containing details like "feed_id".
+        harvest_yield_by_field : dict[str, dict[int, dict[str, Any]]]
+            Harvest data organized by field name, where each field name maps to a
+            dictionary of harvest dates and their associated harvest attributes,
+            including ``"feed_id"``.
 
         Returns
         -------
-        dict: dict[RUFAS_ID, list[int]]
-            A dictionary where each key is a feed ID, and the value is a sorted list
-            of harvest dates associated with that feed ID.
+        dict[RUFAS_ID, list[int]]
+            A dictionary mapping each feed ID to a sorted list of harvest dates
+            associated with that feed ID.
         """
         all_feed_ids = set(
             harvest_yield_by_field[field_name][harvest_date]["feed_id"]
@@ -643,7 +786,35 @@ class EmissionsEstimator:
         feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
         all_simulation_days: list[int],
     ) -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
-        """Calculates daily farmgrown feed emissions and resources used for farmgrown feeds fed to the animals."""
+        """
+        Calculates daily farmgrown feed emissions and resources used for farmgrown
+        feeds fed to the animals.
+
+        Per-unit emission and resource values are scaled by the amount of feed
+        deducted on each simulation day to produce the total emissions and resources
+        attributable to the feed actually consumed.
+
+        Parameters
+        ----------
+        daily_farmgrown_feed_emissions_and_resources : dict[RUFAS_ID, dict[int, dict[str, float]]]
+            Per-unit daily emissions and resource values for each farmgrown feed,
+            keyed by feed ID, simulation day, and variable name.
+        feed_deductions_data : dict[RUFAS_ID, dict[int, float]]
+            Daily feed deduction amounts for each farmgrown feed, keyed by feed ID
+            and simulation day.
+        all_simulation_days : list[int]
+            A list of all simulation days in the simulation.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[int, dict[str, float]]]
+            A nested dictionary structured as
+            ``{feed_id: {simulation_day: {variable: value}}}``, where each record
+            contains the total nitrous oxide emissions, ammonia emissions,
+            fertilizer N, fertilizer P, fertilizer K, and manure N attributable
+            to the feed consumed on that day, (kg/day).
+        """
+
         daily_farmgrown_feed_fed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]] = defaultdict(
             dict
         )
