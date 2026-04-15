@@ -378,7 +378,7 @@ class AnimalConfig:
 
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
-    simulate_genetics: bool = True
+    simulate_genetics: bool = False
 
     @classmethod
     def initialize_animal_config(cls) -> None:

@@ -1286,9 +1286,8 @@ class Animal:
 
         """
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
-        # heifer_reproduction_program: HeiferReproductionProtocol | None = None
-        heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None = None
 
+        heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None = None
         heifer_reproduction_program: HeiferReproductionProtocol | None = (
             None
             if heifer_reproduction_program_string == "N/A"
