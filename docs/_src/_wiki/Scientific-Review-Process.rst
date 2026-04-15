@@ -3,12 +3,12 @@ Model Review Process
 
 This document defines the process for reviewing the RuFaS model prior to a new version release. It complements the branching strategy, versioning policy, and maintainer workflow documentation.
 
-The process consists of two phases:
+There are two main phases of the model review process:
 
-- Pre-merge preparation
-- Post-merge evaluation
+- Preparation and Methodology Review
+- Evaluation and Reporting
 
-Pre-Merge Preparation
+Preparation and Methodology Review
 ---------------------
 
 These steps may begin as soon as a new version release has been initiated and before merging development changes into the ``test`` branch.
@@ -34,7 +34,7 @@ Update Benchmarks
 - Review and update benchmark datasets and expectations as needed.
 - Ensure benchmarks reflect current model scope and scientific understanding.
 
-Post-Merge Evaluation
+Evaluation and Reporting
 ---------------------
 
 These steps occur after merging into the ``test`` branch.
