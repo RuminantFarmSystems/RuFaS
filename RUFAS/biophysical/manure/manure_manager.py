@@ -147,7 +147,7 @@ class ManureManager:
         Build the pool for aggregated storage type.
         """
         for name, processor in self.all_processors.items():
-            if isinstance(processor, Storage):
+            if isinstance(processor, Storage) and not isinstance(processor, DailySpread):
                 manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 nutrients = ManureNutrients(
                     manure_type=manure_type,
@@ -856,12 +856,55 @@ class ManureManager:
 
         """
         if simulate_animals:
-            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
-                request
-            )
-            self._record_manure_request_results(request_result, "on_farm_manure", time)
-            if request_result is not None:
-                self._remove_nutrients_from_storage(request_result, request.manure_type)
+            if request.use_daily_spread_source:
+                request_result, is_nutrient_request_fulfilled = self._handle_nutrient_request_for_storage_subset(
+                    request=request,
+                    include_daily_spread=True,
+                )
+                if request_result is not None:
+                    self._remove_nutrients_from_storage(
+                        request_result,
+                        request.manure_type,
+                        include_daily_spread=True,
+                        update_nutrient_manager_pool=False,
+                    )
+            else:
+                request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
+                    request
+                )
+                if request_result is not None:
+                    self._remove_nutrients_from_storage(
+                        request_result,
+                        request.manure_type,
+                        include_daily_spread=False,
+                    )
+
+            combined_on_farm_result = request_result
+            if (
+                request.use_daily_spread_source
+                and not is_nutrient_request_fulfilled
+                and request.use_supplemental_manure
+            ):
+                supplemental_request = self._calculate_supplemental_manure_needed(combined_on_farm_result, request)
+                supplemental_request_result, supplemental_fulfilled = self._handle_nutrient_request_for_storage_subset(
+                    request=supplemental_request,
+                    include_daily_spread=False,
+                )
+                if supplemental_request_result is not None:
+                    self._remove_nutrients_from_storage(
+                        supplemental_request_result,
+                        request.manure_type,
+                        include_daily_spread=False,
+                    )
+                    if combined_on_farm_result is None:
+                        combined_on_farm_result = supplemental_request_result
+                    else:
+                        combined_on_farm_result = combined_on_farm_result + supplemental_request_result
+                is_nutrient_request_fulfilled = supplemental_fulfilled or self._is_request_fulfilled(
+                    request, combined_on_farm_result
+                )
+
+            self._record_manure_request_results(combined_on_farm_result, "on_farm_manure", time)
 
             if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
                 self._om.add_log(
@@ -869,17 +912,25 @@ class ManureManager:
                     "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
                     {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
                 )
-                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
+                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(
+                    combined_on_farm_result, request
+                )
                 supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
                 self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
-                if request_result is None:
+                if combined_on_farm_result is None:
                     return supplemental_manure
-                return request_result + supplemental_manure
-            return request_result
+                return combined_on_farm_result + supplemental_manure
+            return combined_on_farm_result
         else:
             return FieldManureSupplier.request_nutrients(request)
 
-    def _remove_nutrients_from_storage(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
+    def _remove_nutrients_from_storage(
+        self,
+        results: NutrientRequestResults,
+        manure_type: ManureType,
+        include_daily_spread: bool,
+        update_nutrient_manager_pool: bool = True,
+    ) -> None:
         """
         Remove nutrients from the storage based on the results of a nutrient request by manure type.
 
@@ -889,7 +940,10 @@ class ManureManager:
             The results of a nutrient request. See :class:`NutrientsRequestResults` for details.
 
         """
-        nutrient_pool = self._manure_nutrient_manager.nutrients_by_manure_category[manure_type]
+        storage_processors = self._get_storage_processors_by_daily_spread_type(include_daily_spread)
+        nutrient_pool = self._build_nutrient_pool_for_storages(storage_processors, manure_type)
+        if math.isclose(nutrient_pool.total_manure_mass, 0.0, abs_tol=1e-5):
+            return
         is_nitrogen_limiting_nutrient = self._determine_limiting_nutrient(
             results.nitrogen,
             nutrient_pool.nitrogen_composition,
@@ -918,16 +972,73 @@ class ManureManager:
             "bedding_non_degradable_volatile_solids",
         ]
 
-        for name, processor in self.all_processors.items():
-            if isinstance(processor, Storage):
-                processor.stored_manure, removal_details = self._compute_stream_after_removal(
-                    stored_manure=processor.stored_manure,
-                    nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
-                    is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
-                    non_limiting_fields=non_limiting_fields.copy(),
-                )
-                removal_details["manure_type"] = STORAGE_CLASS_TO_TYPE.get(type(processor))
+        for processor in storage_processors:
+            storage_manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
+            if storage_manure_type != manure_type:
+                continue
+            processor.stored_manure, removal_details = self._compute_stream_after_removal(
+                stored_manure=processor.stored_manure,
+                nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
+                is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
+                non_limiting_fields=non_limiting_fields.copy(),
+            )
+            if update_nutrient_manager_pool:
+                removal_details["manure_type"] = storage_manure_type
                 self._manure_nutrient_manager.remove_nutrients(removal_details)
+
+    def _get_storage_processors_by_daily_spread_type(self, include_daily_spread: bool) -> list[Storage]:
+        """Return storages filtered by whether they are DailySpread processors."""
+        return [
+            processor
+            for processor in self.all_processors.values()
+            if isinstance(processor, Storage) and isinstance(processor, DailySpread) == include_daily_spread
+        ]
+
+    def _build_nutrient_pool_for_storages(self, storages: list[Storage], manure_type: ManureType) -> ManureNutrients:
+        """Build an aggregated nutrient pool for a subset of storages and a manure type."""
+        nitrogen = 0.0
+        phosphorus = 0.0
+        potassium = 0.0
+        total_manure_mass = 0.0
+        dry_matter = 0.0
+        for storage in storages:
+            storage_manure_type = STORAGE_CLASS_TO_TYPE.get(type(storage))
+            if storage_manure_type != manure_type:
+                continue
+            stored_manure = storage.stored_manure
+            nitrogen += stored_manure.nitrogen
+            phosphorus += stored_manure.phosphorus
+            potassium += stored_manure.potassium
+            total_manure_mass += stored_manure.mass
+            dry_matter += stored_manure.total_solids
+        return ManureNutrients(
+            manure_type=manure_type,
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            potassium=potassium,
+            total_manure_mass=total_manure_mass,
+            dry_matter=dry_matter,
+        )
+
+    def _handle_nutrient_request_for_storage_subset(
+        self, request: NutrientRequest, include_daily_spread: bool
+    ) -> tuple[NutrientRequestResults | None, bool]:
+        """Handle a nutrient request for a subset of storages filtered by DailySpread type."""
+        storages = self._get_storage_processors_by_daily_spread_type(include_daily_spread)
+        nutrient_pool = self._build_nutrient_pool_for_storages(storages, request.manure_type)
+        subset_manager = ManureNutrientManager()
+        subset_manager.reset_nutrient_pools()
+        subset_manager.add_nutrients(nutrient_pool)
+        return subset_manager.handle_nutrient_request(request)
+
+    @staticmethod
+    def _is_request_fulfilled(request: NutrientRequest, result: NutrientRequestResults | None) -> bool:
+        """Return True if requested nutrients are met by the supplied result."""
+        if result is None:
+            return False
+        return math.isclose(result.nitrogen, request.nitrogen, abs_tol=1e-5) and math.isclose(
+            result.phosphorus, request.phosphorus, abs_tol=1e-5
+        )
 
     @staticmethod
     def _compute_stream_after_removal(
