@@ -1,22 +1,78 @@
 # Example Inserts
 
-## Introduction
+## Sectioning and Structure
 
-This is a section that should be included in all modules. 
+There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
 
-## Methodology
+These should be referred to in a consistent manner throughout the document to inform tables of contents, indices, and auditing materials. 
 
-This is a section that should be included in all modules. 
-Below is correct subsection structure outlining templates for Figures, Tables, and Equations with proper tagging templates.
+```markdown
+# Module Name --> section title and only appears once
+
+## Module Introduciton --> subsection header
+
+## Each Section Title --> subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations
+
+### Section Introduction --> subsubsection header to introduce the concept
+
+### Methodology --> subsubsection header used to start descriptions
+
+**Relevant Inputs or Relevant Outputs** --> emphasized headers should be used to report the inputs and outputs of the relevant subsection. These usually include tables and bulleted lists. Tables of inputs should include: 
+- Variable
+- Definition
+- Default
+- Min
+- Max
+
+If there is no application for one of these (default, min, or max particularly), do not leave the table cell blank. Please include "--" or "NA" depending on what makes the most sense. 
+
+*Alternate Headers* alternate headers may be used at the discretion of the author
+
+```
+
+There may be expanded uses for subsubsection headers and emphasized headers. The ones outlined above are only the expected uses. Feel free to use more at the discretion of the author. 
+
+## Images, Figures, and Tables
 
 ### Example of a Figure 
 
-This is a great example of how to set up a module. 
+All figures and images must be uploaded in the "references." When you upload your fig/img, you may name the file (best to keep it short and sweet)...
 
 <!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
+
+```markdown
+![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+
+-->[Caption for the image or figure]
+--> #fig-animal-icon = #indicates the type of file-label-for-auditing
+--> width=35% = sizing adjusted as needed
+
+```
+
+The output is below : 
+
+
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
 
 ### Example of a Table
+
+
+```markdown
+| Variable | Definition |
+|---|---|
+| heiferI_num | Number of Heifer I animals |
+
+: Example animal inputs {#tbl-animal-inputs}
+
+
+--> The top row of text is your headers and will appear centered and bolded unless otherwise commanded.
+--> The  next row of actual text is what appears in the row with the associated column. Quarto will autowrap to ensure all text fits and is legible. 
+--> Be sure to include ..... for between each row
+
+--> ": Example animal inputs" will appear as the caption. Be as descriptive as possible so that the reader could understand the contents of the table without reading any further text. 
+--> #tbl-animal-inputs = #indicates the type of file-label-for-auditing. Though you may label it whatever you want, but be sure that the first part of the label (following the file type) is the module name (e.g. animal, manure, feed, or soilcrop).
+```
+The above markdown text will appear as it does below: 
 
 | Variable | Definition |
 |---|---|
@@ -24,7 +80,9 @@ This is a great example of how to set up a module.
 
 : Example animal inputs {#tbl-animal-inputs}
 
-### Examples of Equations
+
+
+## Equation Templates and ID Logic
 
 $$
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
@@ -36,9 +94,83 @@ $$ {#eq-an-nrc-6}
 
 See @eq-an-nrc-2.
 
-## Key Inputs
+## Callouts, Recommendations, or Notes
+
+You may want to emphasize specific notes and annotations. Here is a helpful tool to do so correctly.
+
+```markdown
+::: {.callout-note}
+Callout text goes here
+:::
+```
+
+Your callout will appear the way it does below:
+
+::: {.callout-note}
+Note: if only interested in a PDF version of the documentation (no website version), then the original LaTeX code
+can still be used and processed by quarto. For example, the bullet points works as the original LaTeX or translated
+into markdown syntax:
+
+```{{latex}}
+\begin{itemize}
+    \item first bullet point
+    \item second bullet point
+    \item ...
+\end{itemize}
+```
+
+```{{markdown}}
+* first bullet point
+* second bullet point
+* ...
+```
+
+* first bullet point
+* second bullet point
+* ...
+
+but only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).
+:::
+
 
 ## References
+
+Before adding a new reference to "rufas.bib," check the file to ensure it has not already been added. All references should be listed alphabetically and then by year (most recent at the top). 
+
+If you do need to add a bibliography, the correct structure is below. Pay special attention to the green text, this formatting is important to maintain consistentcy because it helps us with our auditing report and allows us to properly cite in-text.
+
+```bibtex
+Journal Articles
+@article{LASTNAME_YEAR,
+  author = {LASTNAME, FIRSTNAME},
+  title = {Title of the article in proper formatting},
+  journal = {Journal Title with proper NCBI Abbreviations},
+  year = {YEAR PUBLISHED},
+  volume = {VOLUME NUMBER},
+  pages = {PAGES}
+}
+
+Books 
+
+@book{LASTNAME_YEAR,
+  author = {FIRSTNAME LASTNAME},
+  title = {Title of Book Referenced},
+  publisher = {Publisher},
+  year = {YEAR PUBLISHED},
+  isbn = {978-3-319-24277-4}
+}
+
+Online, Misc, Website (RARE USAGE)
+
+@online{quarto2024,
+  author = {Posit},
+  title = {Quarto Citations Guide},
+  year = {2024},
+  url = {https://quarto.org/docs/authoring/citations.html}
+}
+
+```
+If there are 2 articles with the same author and same year, add the recommended "a" or "b" (e.g. ```bibtex @LASTNAME_YEARa vs @LASTNAME_YEARb```) as they are referenced.
 
 # Equation examples (from Animal Documentation)
 

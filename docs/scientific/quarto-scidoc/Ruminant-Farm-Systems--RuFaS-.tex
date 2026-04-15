@@ -140,6 +140,39 @@
   \usepackage{soul}
 \fi
 
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 
 
@@ -353,50 +386,6 @@ one by one. This daily check includes updates on the following areas:
   herd and removed from the farm records.
 \end{itemize}
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
-
-Note: if only interested in a PDF version of the documentation (no
-website version), then the original LaTeX code can still be used and
-processed by quarto. For example, the bullet points works as the
-original LaTeX or translated into markdown syntax:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{latex\}}
-\InformationTok{\textbackslash{}begin\{itemize\}}
-\InformationTok{    \textbackslash{}item first bullet point}
-\InformationTok{    \textbackslash{}item second bullet point}
-\InformationTok{    \textbackslash{}item ...}
-\InformationTok{\textbackslash{}end\{itemize\}}
-\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
-\SpecialStringTok{* }\NormalTok{first bullet point}
-\SpecialStringTok{* }\NormalTok{second bullet point}
-\SpecialStringTok{* }\NormalTok{...}
-\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{itemize}
-\tightlist
-\item
-  first bullet point
-\item
-  second bullet point
-\item
-  \ldots{}
-\end{itemize}
-
-but only the markdown works for all document types (html, pdf, word
-document, presentations, e-books, etc.).
-
-\end{tcolorbox}
-
 \textbf{Output Reporting} At day's end, Joe and Julie review the updated
 HerdReproductionStatistics on the whiteboard. Joe then compiles a
 concise report summarizing the day's herd stats. He forwards this
@@ -455,21 +444,146 @@ running efficiently and sustainably.
 
 \bookmarksetup{startatroot}
 
+\chapter{New Version Updates}\label{new-version-updates}
+
+Each version of the RuFaS model is designed to improve the accuracy and
+precision of the predictive power of the model. This section aims to
+outline the changes made \ldots{}
+
+\section{Animal Module}\label{animal-module}
+
+\subsection{Changed Inputs}\label{changed-inputs}
+
+Here you should include any
+
+\subsection{Changed Methodology}\label{changed-methodology}
+
+Text, equations, and references
+
+\subsection{Output Updates}\label{output-updates}
+
+Expectations
+
+\section{Manure Module}\label{manure-module}
+
+\subsection{Changed Inputs}\label{changed-inputs-1}
+
+Here you should include any
+
+\subsection{Changed Methodology}\label{changed-methodology-1}
+
+Text, equations, and references
+
+\subsection{Output Updates}\label{output-updates-1}
+
+Expectations
+
+\section{Feed Storage Module}\label{feed-storage-module}
+
+\subsection{Changed Inputs}\label{changed-inputs-2}
+
+Here you should include any
+
+\subsection{Changed Methodology}\label{changed-methodology-2}
+
+Text, equations, and references
+
+\subsection{Output Updates}\label{output-updates-2}
+
+Expectations
+
+\section{Crop and Soil Module}\label{crop-and-soil-module}
+
+\subsection{Changed Inputs}\label{changed-inputs-3}
+
+Here you should include any
+
+\subsection{Changed Methodology}\label{changed-methodology-3}
+
+Text, equations, and references
+
+\subsection{Output Updates}\label{output-updates-3}
+
+Expectations
+
+\section{Connections Documents}\label{connections-documents}
+
+\subsection{Changed Inputs}\label{changed-inputs-4}
+
+Here you should include any
+
+\subsection{Changed Methodology}\label{changed-methodology-4}
+
+Text, equations, and references
+
+\subsection{Output Updates}\label{output-updates-4}
+
+Expectations
+
+\bookmarksetup{startatroot}
+
 \chapter{Example Inserts}\label{example-inserts}
 
-\section{Introduction}\label{introduction}
+\section{Sectioning and Structure}\label{sectioning-and-structure}
 
-This is a section that should be included in all modules.
+There is some variation between modules and documentation bassed on
+structure and needs of the model. However there are some materials, or
+ingredients if you will, that will remain consistent between modules.
+These include: Module Header, module introduction, sections representing
+components of module, section introductions, methodologies, relevant
+inputs, and relevant outputs.
 
-\section{Methodology}\label{methodology}
+These should be referred to in a consistent manner throughout the
+document to inform tables of contents, indices, and auditing materials.
 
-This is a section that should be included in all modules. Below is
-correct subsection structure outlining templates for Figures, Tables,
-and Equations with proper tagging templates.
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\# Module Name {-}{-}\textgreater{} section title and only appears once}
+
+\FunctionTok{\#\# Module Introduciton {-}{-}\textgreater{} subsection header}
+
+\FunctionTok{\#\# Each Section Title {-}{-}\textgreater{} subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations}
+
+\FunctionTok{\#\#\# Section Introduction {-}{-}\textgreater{} subsubsection header to introduce the concept}
+
+\FunctionTok{\#\#\# Methodology {-}{-}\textgreater{} subsubsection header used to start descriptions}
+
+\NormalTok{**Relevant Inputs or Relevant Outputs** {-}{-}\textgreater{} emphasized headers should be used to report the inputs and outputs of the relevant subsection. These usually include tables and bulleted lists. Tables of inputs should include: }
+\SpecialStringTok{{-} }\NormalTok{Variable}
+\SpecialStringTok{{-} }\NormalTok{Definition}
+\SpecialStringTok{{-} }\NormalTok{Default}
+\SpecialStringTok{{-} }\NormalTok{Min}
+\SpecialStringTok{{-} }\NormalTok{Max}
+
+\NormalTok{If there is no application for one of these (default, min, or max particularly), do not leave the table cell blank. Please include "{-}{-}" or "NA" depending on what makes the most sense. }
+
+\NormalTok{*Alternate Headers* alternate headers may be used at the discretion of the author}
+\end{Highlighting}
+\end{Shaded}
+
+There may be expanded uses for subsubsection headers and emphasized
+headers. The ones outlined above are only the expected uses. Feel free
+to use more at the discretion of the author.
+
+\section{Images, Figures, and Tables}\label{images-figures-and-tables}
 
 \subsection{Example of a Figure}\label{example-of-a-figure}
 
-This is a great example of how to set up a module.
+All figures and images must be uploaded in the ``references.'' When you
+upload your fig/img, you may name the file (best to keep it short and
+sweet)\ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AlertTok{![Animal module icon](resources/animal.png)}\NormalTok{\{\#fig{-}animal{-}icon width=35\%\}}
+
+\NormalTok{{-}{-}\textgreater{}}\CommentTok{[}\OtherTok{Caption for the image or figure}\CommentTok{]}
+\NormalTok{{-}{-}\textgreater{} \#fig{-}animal{-}icon = \#indicates the type of file{-}label{-}for{-}auditing}
+\NormalTok{{-}{-}\textgreater{} width=35\% = sizing adjusted as needed}
+\end{Highlighting}
+\end{Shaded}
+
+The output is below :
 
 \begin{figure}
 
@@ -484,6 +598,26 @@ This is a great example of how to set up a module.
 \end{figure}%
 
 \subsection{Example of a Table}\label{example-of-a-table}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\PreprocessorTok{|}\NormalTok{ Variable }\PreprocessorTok{|}\NormalTok{ Definition }\PreprocessorTok{|}
+\PreprocessorTok{|{-}{-}{-}|{-}{-}{-}|}
+\PreprocessorTok{|}\NormalTok{ heiferI\_num }\PreprocessorTok{|}\NormalTok{ Number of Heifer I animals }\PreprocessorTok{|}
+
+\NormalTok{: Example animal inputs \{\#tbl{-}animal{-}inputs\}}
+
+
+\NormalTok{{-}{-}\textgreater{} The top row of text is your headers and will appear centered and bolded unless otherwise commanded.}
+\NormalTok{{-}{-}\textgreater{} The  next row of actual text is what appears in the row with the associated column. Quarto will autowrap to ensure all text fits and is legible. }
+\NormalTok{{-}{-}\textgreater{} Be sure to include ..... for between each row}
+
+\NormalTok{{-}{-}\textgreater{} ": Example animal inputs" will appear as the caption. Be as descriptive as possible so that the reader could understand the contents of the table without reading any further text. }
+\NormalTok{{-}{-}\textgreater{} \#tbl{-}animal{-}inputs = \#indicates the type of file{-}label{-}for{-}auditing. Though you may label it whatever you want, but be sure that the first part of the label (following the file type) is the module name (e.g. animal, manure, feed, or soilcrop).}
+\end{Highlighting}
+\end{Shaded}
+
+The above markdown text will appear as it does below:
 
 \begin{longtable}[]{@{}ll@{}}
 \caption{Example animal inputs}\label{tbl-animal-inputs}\tabularnewline
@@ -500,7 +634,8 @@ Variable & Definition \\
 heiferI\_num & Number of Heifer I animals \\
 \end{longtable}
 
-\subsection{Examples of Equations}\label{examples-of-equations}
+\section{Equation Templates and ID
+Logic}\label{equation-templates-and-id-logic}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
@@ -512,9 +647,114 @@ CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
 
 See Equation~\ref{eq-an-nrc-2}.
 
-\section{Key Inputs}\label{key-inputs}
+\section{Callouts, Recommendations, or
+Notes}\label{callouts-recommendations-or-notes}
+
+You may want to emphasize specific notes and annotations. Here is a
+helpful tool to do so correctly.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{::: \{.callout{-}note\}}
+\NormalTok{Callout text goes here}
+\NormalTok{:::}
+\end{Highlighting}
+\end{Shaded}
+
+Your callout will appear the way it does below:
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+Note: if only interested in a PDF version of the documentation (no
+website version), then the original LaTeX code can still be used and
+processed by quarto. For example, the bullet points works as the
+original LaTeX or translated into markdown syntax:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{latex\}}
+\InformationTok{\textbackslash{}begin\{itemize\}}
+\InformationTok{    \textbackslash{}item first bullet point}
+\InformationTok{    \textbackslash{}item second bullet point}
+\InformationTok{    \textbackslash{}item ...}
+\InformationTok{\textbackslash{}end\{itemize\}}
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+\SpecialStringTok{* }\NormalTok{first bullet point}
+\SpecialStringTok{* }\NormalTok{second bullet point}
+\SpecialStringTok{* }\NormalTok{...}
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  first bullet point
+\item
+  second bullet point
+\item
+  \ldots{}
+\end{itemize}
+
+but only the markdown works for all document types (html, pdf, word
+document, presentations, e-books, etc.).
+
+\end{tcolorbox}
 
 \section{References}\label{references}
+
+Before adding a new reference to ``rufas.bib,'' check the file to ensure
+it has not already been added. All references should be listed
+alphabetically and then by year (most recent at the top).
+
+If you do need to add a bibliography, the correct structure is below.
+Pay special attention to the green text, this formatting is important to
+maintain consistentcy because it helps us with our auditing report and
+allows us to properly cite in-text.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{Journal Articles}
+\VariableTok{@article}\NormalTok{\{}\OtherTok{LASTNAME\_YEAR}\NormalTok{,}
+  \DataTypeTok{author}\NormalTok{ = \{LASTNAME, FIRSTNAME\},}
+  \DataTypeTok{title}\NormalTok{ = \{Title of the article in proper formatting\},}
+  \DataTypeTok{journal}\NormalTok{ = \{Journal Title with proper NCBI Abbreviations\},}
+  \DataTypeTok{year}\NormalTok{ = \{YEAR PUBLISHED\},}
+  \DataTypeTok{volume}\NormalTok{ = \{VOLUME NUMBER\},}
+  \DataTypeTok{pages}\NormalTok{ = \{PAGES\}}
+\NormalTok{\}}
+
+\CommentTok{Books }
+
+\VariableTok{@book}\NormalTok{\{}\OtherTok{LASTNAME\_YEAR}\NormalTok{,}
+  \DataTypeTok{author}\NormalTok{ = \{FIRSTNAME LASTNAME\},}
+  \DataTypeTok{title}\NormalTok{ = \{Title of Book Referenced\},}
+  \DataTypeTok{publisher}\NormalTok{ = \{Publisher\},}
+  \DataTypeTok{year}\NormalTok{ = \{YEAR PUBLISHED\},}
+  \DataTypeTok{isbn}\NormalTok{ = \{978{-}3{-}319{-}24277{-}4\}}
+\NormalTok{\}}
+
+\CommentTok{Online, Misc, Website (RARE USAGE)}
+
+\VariableTok{@online}\NormalTok{\{}\OtherTok{quarto2024}\NormalTok{,}
+  \DataTypeTok{author}\NormalTok{ = \{Posit\},}
+  \DataTypeTok{title}\NormalTok{ = \{Quarto Citations Guide\},}
+  \DataTypeTok{year}\NormalTok{ = \{2024\},}
+  \DataTypeTok{url}\NormalTok{ = \{https://quarto.org/docs/authoring/citations.html\}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+If there are 2 articles with the same author and same year, add the
+recommended ``a'' or ``b''
+(e.g.~\texttt{bibtex\ @LASTNAME\_YEARa\ vs\ @LASTNAME\_YEARb}) as they
+are referenced.
 
 \bookmarksetup{startatroot}
 
@@ -592,44 +832,439 @@ See Equation Equation~\ref{eq-energy}.
 
 \bookmarksetup{startatroot}
 
-\chapter{Animal Module}\label{animal-module}
+\chapter{Animal Module}\label{animal-module-1}
 
-\section{Introduction}\label{introduction-1}
+\begin{figure}[H]
 
-\subsection{Example of a Figure}\label{example-of-a-figure-1}
-
-This is a great example of how to set up a module.
-
-\begin{figure}
-
-\centering{
-
-\includegraphics[width=0.35\linewidth,height=\textheight,keepaspectratio]{resources/animal.png}
+{\centering \includegraphics[width=0.35\linewidth,height=\textheight,keepaspectratio]{resources/animal.png}
 
 }
 
-\caption{\label{fig-animal-icon}Animal module icon}
+\caption{Animal module icon}
 
 \end{figure}%
 
-\subsection{Example of a Table}\label{example-of-a-table-1}
+\section{Introduction}\label{introduction}
 
-\begin{longtable}[]{@{}ll@{}}
-\caption{Example animal inputs}\label{tbl-animal-inputs}\tabularnewline
+The Animal Module simulates individual animals on a daily basis
+throughout each stage of life from birth until removal from the herd. In
+addition to the dynamic Monte-Carlo models that determine the occurrence
+of events throughout each animal's life, the Animal Module uses
+process-based, dynamic models to simulate the following processes:
+
+\begin{itemize}
+\tightlist
+\item
+  Individual animal growth
+\item
+  Gestation and milk production
+\item
+  Estimation of nutrient requirements and feed intake
+\item
+  Enteric emission and manure excretion
+\end{itemize}
+
+\subsection{Animal Life Cycle}\label{animal-life-cycle}
+
+The animal life cycle is driven by Monte Carlo stochastic processes that
+simulate the growth, production, reproduction, and culling of individual
+dairy cattle animals and shares aggregated outcomes with the herd
+management sub-module to manage herd dynamics on a daily basis.
+
+The life cycle module represents the variation in animal performance
+through the use of Monte Carlo Simulation methods {[}Reuven and Kroese
+(2017)\}. Monte Carlo simulation relies on random draws from probability
+distributions rather than assigning fixed values. In this model, two
+main strategies are used:
+
+\begin{itemize}
+\tightlist
+\item
+  Event-based, in which a random draw from a uniform distribution
+  (U(0,1)) is compared to the probability of an event occurring to
+  simulate if that event occurs, and
+\item
+  Population-based, in which a random draw from a known distribution of
+  attribute values is assigned to an animal at instantiation.
+  Probability distributions used for that purpose are Normal Gaussian or
+  Empirical.
+\end{itemize}
+
+Each animal within the RuFaS herd progresses through five main life
+stages (calf, Heifer I, Heifer II, Heifer III, and Cow) as illustrated
+in the figure below.
+
+\begin{itemize}
+\tightlist
+\item
+  Calves progress to Heifer I when their age reaches the user-defined
+  input for weaning day
+\item
+  Heifer I progresses to Heifer II when their age reaches the
+  user-defined input for breeding start day
+\item
+  Heifer II animals that successfully conceive become Heifer III's when
+  the number of days left in their pregnancy is equal to the
+  user-defined input for prefresh days (default 21)
+\item
+  When a Heifer III calves, she becomes a Cow for the rest of her life
+  on the RuFaS farm
+\item
+  Cows cycle through lactating and non-lactating phases until they are
+  removed from the herd due to a failure to conceive or a user-provided
+  probability for sale or death within each parity (lactation).
+\end{itemize}
+
+When a HeiferIII or Cow reaches full gestation length, they start
+lactating and a new calf object is created. The calf is assigned a
+birthweight according to a user-informed random distribution. All male
+calves are recorded and removed from the farm on day 1 of their life.
+Female calves either remain on the farm or are sold on day 1, determined
+by an event-based Monte Carlo method informed by the user-defined
+percent of female calves that are kept.
+
+\section{Herd-level Processes and
+Management}\label{herd-level-processes-and-management}
+
+\section{Herd Initialization}\label{herd-initialization}
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+In RuFaS code, the term ``herd initialization'' is used to refer to both
+the process of generating an animal population file and of selecting
+from that population to create a specific herd at the start of a
+simulation. In this doc, those two processes will be differentiated by
+calling them ``Generation'' and ``Selection'', respectively.
+
+``Animal population'' can refer to both groups of animals (the pool of
+animals generated, and the herd of animals selected). In the code, the
+population is sometimes referred to as ``pre\_animal\_population'' and
+``post\_animal\_population'' to differentiate whether the specified
+group of animals exists before or after the random selection of
+individuals to create a herd.
+
+\end{tcolorbox}
+
+\subsection{Introduction to Herd
+Initialization}\label{introduction-to-herd-initialization}
+
+Every simulation begins with a herd consisting of calves, heifers, and
+dry and lactating cows. This herd comes to be through a two-step
+process:
+
+\begin{itemize}
+\tightlist
+\item
+  A population of animals is generated through simulation or loaded from
+  data (pre-animal-population). The animals in that herd should reflect
+  the attributes of animals in the herd to be modeled.
+\item
+  Animals are randomly selected with replacement from the
+  pre-animal-population to be in the initial herd, based on group
+  numbers and characteristics that reflect the distribution of animals
+  within the herd being modeled. Note that the animals in the herd on
+  day one will have attributes of the pre-animal-population and may
+  deviate from the desired herd to be modeled.
+\end{itemize}
+
+For the rest of the simulation, animals enter the herd through birth as
+newborn calves or purchased replacements (heiferIII's).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2875}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3500}}@{}}
+\caption{Overview of the distinct phases by which animals are created
+and introduced to the herd.}\label{tbl-animal-simulation}\tabularnewline
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Before Simulation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Simulation Initiation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+During the Simulation
+\end{minipage} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Before Simulation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Simulation Initiation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+During the Simulation
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-heiferI\_num & Number of Heifer I animals \\
+Generate (simulate) or load an Animal Population file (pre-animal-
+population).
+
+The animals present at the start of the simulation, and those available
+in the replacement market, are drawn from this file. & Herd is
+established by random selection of animals from the Animal Population to
+match the user-specified group sizes and age/stage distribution (post-
+animal-population).
+
+Management attributes, including lactation- curve parameters, are
+assigned as each animal enters the herd. & New animals enter via (a)
+birth or (b) purchase\textbar{} of heifers from the \textbar{}
+replacement market.
+
+Purchased animals inherit\textbar{} two attributes from the \textbar{}
+population file, \textbar{} - Breed \textbar{} - Mature bodyweight
+\textbar{} \\
 \end{longtable}
 
-\subsection{Examples of Equations}\label{examples-of-equations-1}
+\textbf{Relevant Inputs}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{User inputs in the animal input file that influence the
+generation of the Animal Population (pre-animal-population). The inputs
+of this table are found in the Herd Initialization
+Section.}\label{tbl-animal-herd-inputs}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Initial\_animal\_num & The initial number of animals that serve as a
+starting point for the population generation simulation & 10000 & 0 &
+- \\
+Simulation\_days & The number of days to simulate for the population
+generation simulation & 5000 & 0 & - \\
+Calf\_num & Number of Calves (head) -- The initial number of pre-weaned
+calves & 8 & 2 & -- \\
+HeiferI\_num & Number of HeiferI animals (head) -- The initial number of
+heifers that are weaned but not yet bred & 44 & 2 & -- \\
+HeiferII\_num & Number of HeiferII animals (head) -- The initial number
+of heifers that are either eligible for breeding (based on user-inputted
+Breeding Start Day for heifers), or in early pregnancy & 38 & 2 & -- \\
+HeiferIII\_num\_springers & Number of HeiferIII animals (head) -- The
+initial number of close-up heifers (within the user-defined close-up
+period, e.g., Prefresh Day) & 5 & 2 & -- \\
+Cow\_num & Number of Cows (head) -- The initial number of dry and
+lactating cows & 100 & 6 & -- \\
+Replace\_num & replacements (head) -- Number of replacement animals
+available in the replacement market & 5000 & 50 & -- \\
+Lactating\_fraction & Fraction of cows that are lactating. Used during
+herd initialization & 0.8356 & 0 & 1 \\
+Parity\_fractions: 1, 2, 3, 4, 5 & Fractions of the milking animal
+population that are parity 1, 2, 3, 4, and 5+. The sum must equal 1.0 &
+0.36, 0.26, 0.18, 0.11, 0.09 & 0 & 1 \\
+\end{longtable}
+
+\textbf{Relevant Outputs}
+
+After the animals have been selected from the animal population to
+create the initial herd, a summary of the Population (pre-selection
+pool, aka pre-animal-population) and of the Initial herd (selected
+animals, aka post-animal-population) is provided to the output manager.
+
+Class and function:
+AnimalModuleReporter.report\_animal\_population\_statistics
+
+Output variables: - .population\_\{\ldots\} - .initial\_\{\ldots\}
+
+\{\ldots\} includes: breed, number of animals of each class (calf,
+heiferI, heiferII, heiferIII, cow), number of cows by parity and
+lactation status, average age of animals within each class, distribution
+of age of animals within each class, average body weight of animals
+within each class, average cow days in milk, days in preg, parity, and
+calving interval.
+
+\subsection{Methodology}\label{methodology}
+
+When a simulation begins, the HerdFactory class generates or loads the
+pre-animal-population, from which it selects and compiles the
+post-animal-population with an appropriate distribution of animal ages
+and stages to serve as the starting herd for simulation.
+
+\textbf{Designation of an Animal Population}
+
+\begin{itemize}
+\tightlist
+\item
+  Option 1: Creating a new Animal Population An animal population can be
+  generated as a stand-alone simulation task that creates and saves a
+  pre-animal-population file as the output based on the user Animal
+  Module inputs. Or, the animal population can be generated as the first
+  step of a regular simulation task which then uses that generated
+  pre-animal-population to select from and create the
+  post-animal-population to use for the subsequent herd simulation. See
+  the documentation about Task Manager for more information about how to
+  generate a new pre-animal-population.
+\end{itemize}
+
+The \_generate\_animals() method creates the pre\_animal\_population,
+with the option to save those animals to file at the end of the
+generation process.
+
+Calves are created according to the number specified by the user
+(initial\_animal\_num), some are sold based on user inputs, and those
+remaining proceed through select daily updates (growth, reproduction,
+milk, and transition through the appropriate life stages) for the
+user-specified number of days (simulation\_days). The simulation occurs
+similarly to the regular life cycle simulation process, but with an
+extended period and large number of animals. There are a few notable
+distinctions:
+
+\begin{verbatim}
+- After 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
+- If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). 
+\end{verbatim}
+
+After the simulation\_days number of days, the full herd contains a
+mixture of calves, heifers, cows, and replacements. The core status
+information and life history of each animal are either saved to file or
+passed for random sampling to create the post-animal-population.
+
+\begin{itemize}
+\tightlist
+\item
+  Option 2: Point to an existing Animal Population Alternatively, the
+  pre-animal-population will be loaded from a specified Animal
+  Population input file consisting of calf, heifer, cow, and replacement
+  objects.
+\end{itemize}
+
+\emph{Herd Selection} The \_random\_sample\_with\_replacement() method
+selects animals from each of the following groups: calf, heiferI,
+heiferII, heiferIII, replacement, lactating cows by parity for parities
+1-5, and dry cows by parity for parities 1-5.
+
+Animals are sampled randomly with replacement from the
+pre-animal-population according to the numbers, parity fractions, and
+milking cow fraction specified in the animal input file. The resulting
+list of animals is returned as the post-animal-population and summaries
+of the pre- and post-animal-populations are reported to the output
+manager.
+
+\section{Pens and Animal Grouping}\label{pens-and-animal-grouping}
+
+\subsection{Introduction to Grouping}\label{introduction-to-grouping}
+
+All animals in RuFaS are assigned to a pen which is used to summarize
+nutrient requirements for diet formulation and feeding, aggregate
+enteric methane and manure excretions for reporting and passage to the
+Manure Module. Each pen tracks and updates daily a list of animals in
+the pen, the stocking density, the average nutrient requirement of the
+animals in the pen, the ration being fed to that pen, the manure
+excreted, and the methane emitted. In addition, constant attributes of
+each pen include the type of pen it is (freestall, tiestall, open lot,
+compost bedded pack barn), the type of animals that can be in that pen,
+the number stalls, the manure management practices associated with that
+pen, and the distance to the milking parlor for lactating cows. Each day
+after the HerdManager has updated the status of each animal and
+determined which animals need to be bought or sold, the animals are
+added and removed from pens as needed.
+
+\textbf{Relevant Inputs}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+Variable & Definition & Default & Min & Max \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+id & The index of the pen & NA & 0 & NA \\
+\end{longtable}
+}
+
+pen\_name \textbar{} The name or identifier of a given pen \textbar{} NA
+\textbar{} \textbar{} \textbar{}
+
+animal\_combination \textbar{} The valid combinations of animal types
+that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's;
+CLOSE\_UP = HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows
+\textbar{} \textbar{} CALF, GROWING CLOSE\_UP, LAC\_COW \textbar{}
+
+vertical\_dist\_to\_milking\_parlor \textbar{} The elevation gain (in
+meters) between the pen and the milking parlor \textbar{} 0.1 \textbar{}
+0 \textbar{} NA \textbar{}
+
+horizontal\_dist\_to\_milking\_parlor \textbar{} The distance (in
+meters) between the pen and the milking parlor \textbar{} 10 \textbar{}
+0 \textbar{} NA \textbar{}
+
+number\_of\_stalls \textbar{} The number of stalls in the pen \textbar{}
+1000 \textbar{} 0 \textbar{} NA \textbar{}
+
+pen\_type \textbar{} The type of pen (freestall, tiestall, open lot,
+compost bedded pack barn) \textbar{} freestall \textbar{} freestall,
+tiestall, open lot, compost bedded pack barn \textbar{}
+
+max\_stocking\_density \textbar{} The maximum ratio of the number of
+animals in the pen to the number of stalls in the pen \textbar{} 1.2
+\textbar{} 0.5 \textbar{} 5 \textbar{}
+
+manure\_management\_scenario\_id \textbar{} The ID number of the manure
+management practices that are used for this pen (scenarios are defined
+in manure management schema) \textbar{} 0 \textbar{} 0 \textbar{} NA
+\textbar{}
+
+: User inputs in the animal input file that influence pen grouping. The
+user must define at least 3 pens and for each pen, key inputs are
+outlined here. \{\#tbl-animal-grp-inputs\}
+
+\textbf{Relevant Outputs}
+
+\begin{itemize}
+\tightlist
+\item
+  number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}
+  reports the number of animals in each pen each day.
+\item
+  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]} -
+  reports average dry matter intake of an animal in the pen at the time
+  of the ration formulation.
+\item
+  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}
+  - reports the amount of each feed that is delivered per animal in the
+  pen
+\item
+  ration\_nutrient\_amount\_for\_pen\_\_{[}AnimalCombination{]}.{[}nutrient{]}
+  - is reporting the amount of each of the following nutrients that is
+  provided by the ration per animal in the pen (all reported in
+  kilograms unless otherwise indicated)
+\end{itemize}
+
+\subsection{Methodology}\label{methodology-1}
+
+\subsection{Examples of Equations}\label{examples-of-equations}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
@@ -659,17 +1294,17 @@ See Equation~\ref{eq-an-nrc-2}.
 
 \bookmarksetup{startatroot}
 
-\chapter{Manure Module}\label{manure-module}
+\chapter{Manure Module}\label{manure-module-1}
 
 \includegraphics[width=1.45833in,height=\textheight,keepaspectratio]{resources/manure.png}
 
-\section{Introduction}\label{introduction-2}
+\section{Introduction}\label{introduction-1}
 
-\subsection{Example of a Figure}\label{example-of-a-figure-2}
+\subsection{Example of a Figure}\label{example-of-a-figure-1}
 
 \includegraphics[width=0.5\linewidth,height=\textheight,keepaspectratio]{resources/manure.png}
 
-\subsection{Example of a Table}\label{example-of-a-table-2}
+\subsection{Example of a Table}\label{example-of-a-table-1}
 
 \begin{longtable}[]{@{}ll@{}}
 \caption{Example animal inputs}\label{tbl-animal-inputs}\tabularnewline
@@ -685,6 +1320,15 @@ Variable & Definition \\
 \endlastfoot
 heiferI\_num & Number of Heifer I animals \\
 \end{longtable}
+
+\protect\phantomsection\label{refs}
+\begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-reuven_2017}
+Reuven, Y. R., and D. P. Kroese. 2017. \emph{Simulation and the Monte
+Carlo Method. In: Wiley Series in Probability and Statistics}. John
+Wiley; Sons Inc.
+
+\end{CSLReferences}
 
 
 \backmatter

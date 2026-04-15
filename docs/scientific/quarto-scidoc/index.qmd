@@ -74,31 +74,6 @@ or newborn animals are guided to suitable pens, while animals marked for
 removal (sold or deceased) are taken out of the herd and removed from the farm
 records.
 
-::: {.callout-note}
-Note: if only interested in a PDF version of the documentation (no website version), then the original LaTeX code
-can still be used and processed by quarto. For example, the bullet points works as the original LaTeX or translated
-into markdown syntax:
-
-```{{latex}}
-\begin{itemize}
-    \item first bullet point
-    \item second bullet point
-    \item ...
-\end{itemize}
-```
-
-```{{markdown}}
-* first bullet point
-* second bullet point
-* ...
-```
-
-* first bullet point
-* second bullet point
-* ...
-
-but only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).
-:::
 
 **Output Reporting** At day’s end, Joe and Julie review the updated
 HerdReproductionStatistics on the whiteboard. Joe then compiles a concise
