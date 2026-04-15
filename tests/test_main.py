@@ -15,12 +15,27 @@ def mock_task_manager(mocker: MockerFixture) -> MagicMock:
     return mocker.patch("main.TaskManager", autospec=True)
 
 
-def test_main_success(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_success(
+    mock_task_manager: MagicMock,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     mock_instance = mock_task_manager.return_value
     mock_instance.start.return_value = None
 
-    # Simulating command line arguments
-    test_args = ["program_name", "-v", "errors", "-o", "output/", "-s", "-l", "test_log_dir"]
+    output_dir = tmp_path / "output"
+    logs_dir = tmp_path / "test_log_dir"
+
+    test_args = [
+        "program_name",
+        "-v",
+        "errors",
+        "-o",
+        str(output_dir),
+        "-s",
+        "-l",
+        str(logs_dir),
+    ]
     monkeypatch.setattr(sys, "argv", test_args)
 
     main()
@@ -29,8 +44,8 @@ def test_main_success(mock_task_manager: MagicMock, monkeypatch: pytest.MonkeyPa
         metadata_path=Path("input/task_manager_metadata.json"),
         verbosity=LogVerbosity.ERRORS,
         exclude_info_maps=False,
-        output_directory=Path("output"),
-        logs_directory=Path("test_log_dir"),
+        output_directory=output_dir,
+        logs_directory=logs_dir,
         clear_output_directory=False,
         produce_graphics=True,
         suppress_log_files=True,
@@ -97,10 +112,10 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-v",
-            "--verbose",
+            "--verbosity",
             choices=["errors", "warnings", "logs", "credits", "none"],
-            default="credits",
-            help="Specifies the log type to be printed",
+            default=None,
+            help="Sets the log verbosity level for this run",
         ),
         mocker.call(
             "-c",
