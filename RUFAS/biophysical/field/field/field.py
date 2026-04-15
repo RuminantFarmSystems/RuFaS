@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Dict, List, Optional, Sequence, TypeVar
+from typing import Dict, List, Optional, Sequence, TypeVar, Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
