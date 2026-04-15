@@ -1028,7 +1028,9 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
     daily_result = NutrientRequestResults(nitrogen=3.0, phosphorus=2.0, total_manure_mass=10.0)
     off_farm_result = NutrientRequestResults(nitrogen=7.0, phosphorus=3.0, total_manure_mass=20.0)
 
-    mock_split = mocker.patch.object(manure_manager, "_split_storages_by_daily_spread", return_value=([MagicMock(DailySpread)], []))
+    mock_split = mocker.patch.object(
+        manure_manager, "_split_storages_by_daily_spread", return_value=([MagicMock(DailySpread)], [])
+    )
     mock_daily_request = mocker.patch.object(
         manure_manager, "_handle_nutrient_request_for_storages", return_value=(daily_result, False)
     )

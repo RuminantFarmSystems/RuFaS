@@ -873,9 +873,7 @@ class ManureManager:
                     "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
                     {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
                 )
-                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(
-                    request_result, request
-                )
+                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
                 supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
                 self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
                 if request_result is None:
@@ -962,7 +960,9 @@ class ManureManager:
             if storage_manure_type != manure_type:
                 continue
             source_stream = (
-                processor.available_for_field_application if isinstance(processor, DailySpread) else processor.stored_manure
+                processor.available_for_field_application
+                if isinstance(processor, DailySpread)
+                else processor.stored_manure
             )
             updated_stream, removal_details = self._compute_stream_after_removal(
                 stored_manure=source_stream,
