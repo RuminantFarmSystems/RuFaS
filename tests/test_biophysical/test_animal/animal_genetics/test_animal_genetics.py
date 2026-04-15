@@ -19,7 +19,6 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import (
     E_TEMPORARY_CORRELATION,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture

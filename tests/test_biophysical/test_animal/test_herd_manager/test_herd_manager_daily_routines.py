@@ -761,11 +761,6 @@ def test_handle_newly_added_animals(
     ]
 
 
-# ---------------------------------------------------------------------------
-# _update_genetic_values_at_lactation_start
-# ---------------------------------------------------------------------------
-
-
 def test_update_genetic_values_at_lactation_start_disabled(herd_manager: HerdManager) -> None:
     """simulate_genetics=False → early return, recalculate never called."""
     AnimalConfig.simulate_genetics = False
@@ -802,15 +797,10 @@ def test_update_genetic_values_at_lactation_start_enabled(herd_manager: HerdMana
     )
 
 
-# ---------------------------------------------------------------------------
-# _calculate_and_report_average_genetics
-# ---------------------------------------------------------------------------
-
-
 def test_calculate_and_report_average_genetics_disabled(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """simulate_genetics=False → early return, no reporting."""
     AnimalConfig.simulate_genetics = False
-    mock_report = mocker.patch.object(
+    mocker.patch.object(
         herd_manager.__class__,
         "_calculate_and_report_average_genetics",
         wraps=herd_manager._calculate_and_report_average_genetics,
@@ -854,11 +844,6 @@ def test_calculate_and_report_average_genetics_enabled(
     assert mock_report.call_count == 6
     reported_groups = {c.args[1] for c in mock_report.call_args_list}
     assert reported_groups == {"herd", "calves", "heiferI", "heiferII", "heiferIII", "cow"}
-
-
-# ---------------------------------------------------------------------------
-# _create_newborn_calf — genetics branches
-# ---------------------------------------------------------------------------
 
 
 def test_create_newborn_calf_genetics_enabled(herd_manager: HerdManager, mocker: MockerFixture) -> None:
@@ -920,11 +905,6 @@ def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker
     herd_manager._create_newborn_calf(newborn_calf_config, mock_time)
 
     mock_calculate_avg_tbv.assert_not_called()
-
-
-# ---------------------------------------------------------------------------
-# _update_replacement_animal_genetics
-# ---------------------------------------------------------------------------
 
 
 def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
