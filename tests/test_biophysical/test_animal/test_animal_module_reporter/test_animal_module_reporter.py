@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -84,6 +85,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=3.4,
             milk_lactose=5.6,
             parity=1,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
         MilkProductionStatistics(
             cow_id=2,
@@ -94,6 +109,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=73,
             milk_lactose=7.9,
             parity=5,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
         MilkProductionStatistics(
             cow_id=12345,
@@ -104,6 +133,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=0,
             milk_lactose=0,
             parity=2,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
     ]
 
@@ -127,6 +170,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "parity": 1,
                 "is_milking": True,
                 "simulation_day": simulation_day,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -143,6 +200,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "parity": 5,
                 "is_milking": True,
                 "simulation_day": simulation_day,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -159,6 +230,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "parity": 2,
                 "is_milking": False,
                 "simulation_day": simulation_day,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -778,6 +863,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=2,
@@ -787,6 +873,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=3,
@@ -796,6 +883,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_heiferIIs_info = [
@@ -807,6 +895,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=5,
@@ -816,6 +905,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=6,
@@ -825,6 +915,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_heiferIIIs_info = [
@@ -836,6 +927,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=8,
@@ -845,6 +937,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=9,
@@ -854,6 +947,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_and_died_cows_info = [
@@ -865,6 +959,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.UDDER_CULL,
             days_in_milk=18,
             parity=2,
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=11,
@@ -874,6 +969,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.DEATH_CULL,
             days_in_milk=88,
             parity=1,
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=12,
@@ -883,11 +979,12 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.LAMENESS_CULL,
             days_in_milk=0,
             parity=3,
+            genetic_history="",
         ),
     ]
 
     AnimalModuleReporter.report_sold_animal_information(herd_statistics)
-    assert mock_om_add_variable.call_count == 11 * 7
+    assert mock_om_add_variable.call_count == 11 * 8
 
 
 def test_report_stillborn_calves_information(mocker: MockerFixture) -> None:
@@ -1074,6 +1171,7 @@ def test_report_end_of_simulation_empty_sold_animal_info(mocker: MockerFixture) 
         mock_time := MagicMock(auto_spec=RufasTime),
         {},
         {},
+        {},
     )
 
     mock_report_sold_animal_information.assert_called_once_with(herd_statistics)
@@ -1164,6 +1262,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
         herd_statistics,
         herd_reproduction_statistics := HerdReproductionStatistics(),
         mock_time := MagicMock(auto_spec=RufasTime),
+        {},
         {},
         {},
     )
