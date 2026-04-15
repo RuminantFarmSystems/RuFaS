@@ -1518,6 +1518,4 @@ def test_update_genetic_values_enabled(mock_herd_factory: HerdFactory, mocker: M
     mock_herd_factory._update_genetic_values(animals)
 
     for a in animals:
-        a.genetics.calculate_ebv_and_ranking_index.assert_called_once_with(
-            a.animal_type, 10.0, 20.0, a.calves
-        )
+        a.genetics.calculate_ebv_and_ranking_index.assert_called_once_with(a.animal_type, 10.0, 20.0, a.calves)

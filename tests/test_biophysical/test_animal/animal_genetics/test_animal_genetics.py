@@ -394,11 +394,16 @@ def test_calculate_average_genetic_values_empty_list() -> None:
     result = Genetics.calculate_average_genetic_values([])
     assert all(v is None for v in result.values())
     assert set(result.keys()) == {
-        "TBV_fat", "TBV_protein",
-        "E_permanent_fat", "E_permanent_protein",
-        "E_temporary_fat", "E_temporary_protein",
-        "phenotype_fat", "phenotype_protein",
-        "EBV_fat", "EBV_protein",
+        "TBV_fat",
+        "TBV_protein",
+        "E_permanent_fat",
+        "E_permanent_protein",
+        "E_temporary_fat",
+        "E_temporary_protein",
+        "phenotype_fat",
+        "phenotype_protein",
+        "EBV_fat",
+        "EBV_protein",
         "ranking_index",
     }
 
@@ -470,7 +475,11 @@ def test_calculate_newborn_calf_tbv_values_too_early(genetics: Genetics, mocker:
     expected_mean_fat = (50.0 + 10.0) / 2
     expected_mean_protein = (25.0 + 20.0) / 2
     mock_generate.assert_called_once_with(
-        expected_mean_fat, expected_mean_protein, pytest.approx(18.243354954612926), pytest.approx(9.475230867899738), TBV_CORRELATION
+        expected_mean_fat,
+        expected_mean_protein,
+        pytest.approx(18.243354954612926),
+        pytest.approx(9.475230867899738),
+        TBV_CORRELATION,
     )
     mock_om.return_value.add_warning.assert_called_once()
 
@@ -489,7 +498,11 @@ def test_calculate_newborn_calf_tbv_values_too_late(genetics: Genetics, mocker: 
     expected_mean_fat = (80.0 + 10.0) / 2
     expected_mean_protein = (40.0 + 20.0) / 2
     mock_generate.assert_called_once_with(
-        expected_mean_fat, expected_mean_protein, pytest.approx(18.243354954612926), pytest.approx(9.475230867899738), TBV_CORRELATION
+        expected_mean_fat,
+        expected_mean_protein,
+        pytest.approx(18.243354954612926),
+        pytest.approx(9.475230867899738),
+        TBV_CORRELATION,
     )
     mock_om.return_value.add_warning.assert_called_once()
 

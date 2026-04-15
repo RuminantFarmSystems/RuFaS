@@ -811,7 +811,9 @@ def test_calculate_and_report_average_genetics_disabled(herd_manager: HerdManage
     """simulate_genetics=False → early return, no reporting."""
     AnimalConfig.simulate_genetics = False
     mock_report = mocker.patch.object(
-        herd_manager.__class__, "_calculate_and_report_average_genetics", wraps=herd_manager._calculate_and_report_average_genetics
+        herd_manager.__class__,
+        "_calculate_and_report_average_genetics",
+        wraps=herd_manager._calculate_and_report_average_genetics,
     )
     mock_genetics_avg = mocker.patch.object(Genetics, "calculate_average_genetic_values")
     mock_reporter = mocker.patch("RUFAS.biophysical.animal.herd_manager.AnimalModuleReporter")
@@ -834,7 +836,13 @@ def test_calculate_and_report_average_genetics_enabled(
     herd_manager.heiferIIIs = mock_herd["heiferIIIs"]
     herd_manager.cows = mock_herd["lac_cows"] + mock_herd["dry_cows"]
 
-    for animal in herd_manager.calves + herd_manager.heiferIs + herd_manager.heiferIIs + herd_manager.heiferIIIs + herd_manager.cows:
+    for animal in (
+        herd_manager.calves
+        + herd_manager.heiferIs
+        + herd_manager.heiferIIs
+        + herd_manager.heiferIIIs
+        + herd_manager.cows
+    ):
         animal.genetics = MagicMock(spec=Genetics)
 
     fake_avg = {"TBV_fat": 1.0, "TBV_protein": 2.0}
@@ -882,9 +890,7 @@ def test_create_newborn_calf_genetics_enabled(herd_manager: HerdManager, mocker:
 
     herd_manager._create_newborn_calf(newborn_calf_config, mock_time)
 
-    calf.genetics.calculate_ebv_and_ranking_index.assert_called_once_with(
-        calf.animal_type, 8.0, 16.0, calf.calves
-    )
+    calf.genetics.calculate_ebv_and_ranking_index.assert_called_once_with(calf.animal_type, 8.0, 16.0, calf.calves)
 
 
 def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker: MockerFixture) -> None:
