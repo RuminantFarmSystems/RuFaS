@@ -35,7 +35,6 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
     )
 
 
@@ -67,12 +66,15 @@ def test_process_manure(
     mock_time.simulation_day = 50
     daily_spread_instance._received_manure = received_manure
     mock_report = mocker.patch.object(Processor, "_report_manure_stream")
-    mock_process = mocker.patch.object(Storage, "process_manure")
+    available_stream = received_manure
+    mock_process = mocker.patch.object(Storage, "process_manure", return_value={"manure": available_stream})
 
     daily_spread_instance.process_manure(mock_conditions, mock_time)
 
-    mock_report.assert_called_once_with(received_manure, "received", 50)
+    mock_report.assert_any_call(received_manure, "received", 50)
+    mock_report.assert_any_call(available_stream, "available_for_application", 50)
     mock_process.assert_called_once_with(mock_conditions, mock_time)
+    assert daily_spread_instance.available_for_field_application == available_stream
 
 
 def test_receive_manure(received_manure: ManureStream, daily_spread_instance: DailySpread) -> None:
