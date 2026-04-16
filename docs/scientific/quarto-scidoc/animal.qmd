@@ -115,8 +115,8 @@ The _generate_animals() method creates the pre_animal_population, with the optio
 
 Calves are created according to the number specified by the user (initial_animal_num), some are sold based on user inputs, and those remaining proceed through select daily updates (growth, reproduction, milk, and transition through the appropriate life stages) for the user-specified number of days (simulation_days). The simulation occurs similarly to the regular life cycle simulation process, but with an extended period and large number of animals. There are a few notable distinctions:  
 
-    - After 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
-    - If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). 
+- After 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
+- If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). 
 
 After the simulation_days number of days, the full herd contains a mixture of calves, heifers, cows, and replacements. The core status information and life history of each animal are either saved to file or passed for random sampling to create the post-animal-population. 
 
@@ -141,32 +141,26 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 | Variable | Definition | Default | Min | Max |
 |---|---|---|---|---|
 | id | The index of the pen | NA | 0  | NA | 
-
 | pen_name | The name or identifier of a given pen | NA |    |    | 
-
 | animal_combination | The valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows |   |  CALF, GROWING CLOSE_UP, LAC_COW | 
-
-| vertical_dist_to_milking_parlor | The elevation gain (in meters) between the pen and the milking parlor | 0.1 | 0 | NA  | 
-
+| vertical_dist_to_milking_parlor | The elevation gain (in meters) between the pen and the milking parlor | 0.1 | 0 | NA  |
 | horizontal_dist_to_milking_parlor | The distance (in meters) between the pen and the milking parlor | 10 | 0 | NA | 
-
 | number_of_stalls | The number of stalls in the pen | 1000 | 0 | NA | 
-
 | pen_type | The type of pen (freestall, tiestall, open lot, compost bedded pack barn) | freestall | freestall, tiestall, open lot, compost bedded pack barn | 
-
 | max_stocking_density | The maximum ratio of the number of animals in the pen to the number of stalls in the pen | 1.2 | 0.5 | 5 | 
-
 | manure_management_scenario_id | The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema) | 0 | 0 | NA | 
-
 : User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here. {#tbl-animal-grp-inputs}
 
 
 **Relevant Outputs**
 
-- number_of_animals_in_pen_[id]_[AnimalCombination] reports the number of animals in each pen each day.
-- ration_per_animals_for_pen_[id]_[AnimalCombination] - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
-- ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id] - reports the amount of each feed that is delivered per animal in the pen
-- ration_nutrient_amount_for_pen__[AnimalCombination].[nutrient] - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated)
+- **number_of_animals_in_pen_[id]_[AnimalCombination]** - reports the number of animals in each pen each day.
+
+- **ration_per_animals_for_pen_[id]_[AnimalCombination]** - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
+
+- **ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]** - reports the amount of each feed that is delivered per animal in the pen
+
+- **ration_nutrient_amount_for_pen__[AnimalCombination].[nutrient]** - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated)
 
 
 
@@ -188,16 +182,15 @@ To translate from the AnimalTypes needed to track an animal’s life stages and 
 Currently there are only two options for assigning AnimalCombinations to pens. 
 
 - *Option 1* The first and most commonly used option for grouping animals is to assign one AnimalCombination to each pen such that there is at least one pen for the 4 AnimalCombinations: CALF, GROWING, CLOSE_UP, and LAC_COW. 
+
 - *Option 2* In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both GROWING and CLOSE_UP animals such that the there is at least one pen with each of the 3 AnimalCombination inputs: CALF, GROWING_AND_CLOSE_UP, and LAC_COW. 
 
 
-Pen Sizing: 
-Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120\% of the expected number of animals in each pen. 
+Pen Sizing: Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120\% of the expected number of animals in each pen. 
 
-Class:
-*Pens* are inare initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
+Class: *Pens* are inare initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
-::: {.callout-Noteworthy Functions}
+::: {.callout-note}
 **Remove_animals_by_ids** - This function is called when the HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map. It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
 **_add_new_animals** - This function is called by Pen.update\_animals which is in turn called by HerdManager.**_add_animal_to_pen_and_id_map** - Thus, when HerdManager initiates addition of animals to each pen, this function executes the addition of those animals. 
 **_animal_nutritional_requirements**
@@ -217,7 +210,7 @@ Regardless of whether or not a user chooses to provide their own ration or have 
 If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that meets the nutritional requirements of the animal class and is cost-optimized. 
 
 
-::: {.callout-Note}
+::: {.callout-note}
 For the time being, only one set of feeds and ration formula can be provided for each animal class. 
 :::
 

@@ -872,8 +872,8 @@ dairy cattle animals and shares aggregated outcomes with the herd
 management sub-module to manage herd dynamics on a daily basis.
 
 The life cycle module represents the variation in animal performance
-through the use of Monte Carlo Simulation methods {[}Reuven and Kroese
-(2017)\}. Monte Carlo simulation relies on random draws from probability
+through the use of Monte Carlo Simulation methods (Reuven and Kroese
+2017). Monte Carlo simulation relies on random draws from probability
 distributions rather than assigning fixed values. In this model, two
 main strategies are used:
 
@@ -1140,10 +1140,20 @@ similarly to the regular life cycle simulation process, but with an
 extended period and large number of animals. There are a few notable
 distinctions:
 
-\begin{verbatim}
-- After 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
-- If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). 
-\end{verbatim}
+\begin{itemize}
+\tightlist
+\item
+  After 3000 days of simulation (specified in animal\_constants), a copy
+  of each heiferIII is saved to the replacement herd. The copy is made
+  on the day when she is ready to transition to a lactating cow (ready
+  to give birth), so that when the copy enters the herd as a purchased
+  heiferIII during the actual simulation, she will give birth the very
+  next day.
+\item
+  If a cow has made it to parity six without being culled, she is
+  removed from the herd. (The maximum parity of cows kept in the
+  generated herd is five).
+\end{itemize}
 
 After the simulation\_days number of days, the full herd contains a
 mixture of calves, heifers, cows, and replacements. The core status
@@ -1192,77 +1202,211 @@ added and removed from pens as needed.
 
 \textbf{Relevant Inputs}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}lllll@{}}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{User inputs in the animal input file that influence pen
+grouping. The user must define at least 3 pens and for each pen, key
+inputs are outlined here.}\label{tbl-animal-grp-inputs}\tabularnewline
 \toprule\noalign{}
-Variable & Definition & Default & Min & Max \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
 id & The index of the pen & NA & 0 & NA \\
-\end{longtable}
-}
-
-pen\_name \textbar{} The name or identifier of a given pen \textbar{} NA
-\textbar{} \textbar{} \textbar{}
-
-animal\_combination \textbar{} The valid combinations of animal types
-that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's;
-CLOSE\_UP = HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows
-\textbar{} \textbar{} CALF, GROWING CLOSE\_UP, LAC\_COW \textbar{}
-
-vertical\_dist\_to\_milking\_parlor \textbar{} The elevation gain (in
-meters) between the pen and the milking parlor \textbar{} 0.1 \textbar{}
-0 \textbar{} NA \textbar{}
-
-horizontal\_dist\_to\_milking\_parlor \textbar{} The distance (in
-meters) between the pen and the milking parlor \textbar{} 10 \textbar{}
-0 \textbar{} NA \textbar{}
-
-number\_of\_stalls \textbar{} The number of stalls in the pen \textbar{}
-1000 \textbar{} 0 \textbar{} NA \textbar{}
-
-pen\_type \textbar{} The type of pen (freestall, tiestall, open lot,
-compost bedded pack barn) \textbar{} freestall \textbar{} freestall,
-tiestall, open lot, compost bedded pack barn \textbar{}
-
-max\_stocking\_density \textbar{} The maximum ratio of the number of
-animals in the pen to the number of stalls in the pen \textbar{} 1.2
-\textbar{} 0.5 \textbar{} 5 \textbar{}
-
-manure\_management\_scenario\_id \textbar{} The ID number of the manure
+pen\_name & The name or identifier of a given pen & NA & & \\
+animal\_combination & The valid combinations of animal types that can be
+in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE\_UP =
+HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows & & CALF, GROWING
+CLOSE\_UP, LAC\_COW & \\
+vertical\_dist\_to\_milking\_parlor & The elevation gain (in meters)
+between the pen and the milking parlor & 0.1 & 0 & NA \\
+horizontal\_dist\_to\_milking\_parlor & The distance (in meters) between
+the pen and the milking parlor & 10 & 0 & NA \\
+number\_of\_stalls & The number of stalls in the pen & 1000 & 0 & NA \\
+pen\_type & The type of pen (freestall, tiestall, open lot, compost
+bedded pack barn) & freestall & freestall, tiestall, open lot, compost
+bedded pack barn & \\
+max\_stocking\_density & The maximum ratio of the number of animals in
+the pen to the number of stalls in the pen & 1.2 & 0.5 & 5 \\
+manure\_management\_scenario\_id & The ID number of the manure
 management practices that are used for this pen (scenarios are defined
-in manure management schema) \textbar{} 0 \textbar{} 0 \textbar{} NA
-\textbar{}
-
-: User inputs in the animal input file that influence pen grouping. The
-user must define at least 3 pens and for each pen, key inputs are
-outlined here. \{\#tbl-animal-grp-inputs\}
+in manure management schema) & 0 & 0 & NA \\
+\end{longtable}
 
 \textbf{Relevant Outputs}
 
 \begin{itemize}
-\tightlist
 \item
-  number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}
+  **number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}** -
   reports the number of animals in each pen each day.
 \item
-  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]} -
-  reports average dry matter intake of an animal in the pen at the time
-  of the ration formulation.
+  **ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}**
+  - reports average dry matter intake of an animal in the pen at the
+  time of the ration formulation.
 \item
-  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}
+  **ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}**
   - reports the amount of each feed that is delivered per animal in the
   pen
 \item
-  ration\_nutrient\_amount\_for\_pen\_\_{[}AnimalCombination{]}.{[}nutrient{]}
+  **ration\_nutrient\_amount\_for\_pen\_\_{[}AnimalCombination{]}.{[}nutrient{]}**
   - is reporting the amount of each of the following nutrients that is
   provided by the ration per animal in the pen (all reported in
   kilograms unless otherwise indicated)
 \end{itemize}
 
 \subsection{Methodology}\label{methodology-1}
+
+\textbf{Animal Grouping} To translate from the AnimalTypes needed to
+track an animal's life stages and the combinations of animals that are
+allowed to be grouped into a single pen, a new variable called
+AnimalCombination is created that combines some AnimalTypes to
+facilitate sorting into pens. The AnimalCombination class is defined in
+enums.py and includes the following mapping from AnimalTypes to
+AnimalCombinations:
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Summary of animal types and their grouping included in this
+module.}\label{tbl-animal-grp-inputs}\tabularnewline
+\toprule\noalign{}
+Animal Combination & Animal Type \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Animal Combination & Animal Type \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CALF & Calves \\
+GROWING & Heifer I and Heifer II \\
+CLOSE\_UP & Heifer III and Non-lactating Cows \\
+LAC\_COW & Lactating Cows \\
+\end{longtable}
+
+Currently there are only two options for assigning AnimalCombinations to
+pens.
+
+\begin{itemize}
+\item
+  \emph{Option 1} The first and most commonly used option for grouping
+  animals is to assign one AnimalCombination to each pen such that there
+  is at least one pen for the 4 AnimalCombinations: CALF, GROWING,
+  CLOSE\_UP, and LAC\_COW.
+\item
+  \emph{Option 2} In some cases, and especially in very small farms, a
+  user might wish to represent a scenario where all growing animals,
+  pregnant heifers, and non-lactating cows are housed together. In this
+  case, there is an option to have a pen that houses both GROWING and
+  CLOSE\_UP animals such that the there is at least one pen with each of
+  the 3 AnimalCombination inputs: CALF, GROWING\_AND\_CLOSE\_UP, and
+  LAC\_COW.
+\end{itemize}
+
+Pen Sizing: Due to oscillations in the exact number of animals in each
+animal type, it is strongly recommended that the stocking density is at
+least 120\% of the expected number of animals in each pen.
+
+Class: \emph{Pens} are inare initiated from the Pen class by the
+HerdManager at the beginning of the simulation and, if needed, an
+additional pen is created to accommodate animals if the animal numbers
+have exceeded the max stocking density.
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+\textbf{Remove\_animals\_by\_ids} - This function is called when the
+HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map. It is
+pen specific and removes the animal from the pen and the animal ID from
+the animal ID map that tracks the animals in the pen.
+**\_add\_new\_animals** - This function is called by Pen.update\_animals
+which is in turn called by
+HerdManager.**\_add\_animal\_to\_pen\_and\_id\_map** - Thus, when
+HerdManager initiates addition of animals to each pen, this function
+executes the addition of those animals.
+**\_animal\_nutritional\_requirements**
+
+\end{tcolorbox}
+
+\section{Ration Formulation}\label{ration-formulation}
+
+The diet recipes in RuFaS are either formulated through least-cost
+formulation (Li et al. 2022) or provided by the user for each of 4
+animal categories (calves, growing heifers, dry and close-up cows, and
+lactating cows). The composition of the available feeds are provided by
+a feed library that was adapted from the (National Academies of
+Sciences, Engineering, and Medicine 2021). The amount of feed required
+by the farm is tracked by pen and multiple pens of each animal category
+can be simulated; however, at this time, the RuFaS model can only accept
+1 user-defined diet per animal category even if there are multiple
+simulated pens for that animal category.
+
+In practice, animal feeding on dairy farms is a constantly evolving
+process that responds to fluctuations in feed availability, animal
+requirements and responses, and management goals. Although the feed
+delivery algorithms will make small modifications to the diet recipe in
+response to animal nutrient requirements and adjust the total amount of
+feed delivered based on the number of animals and their requirements,
+the diversity and degree of fluctuation in the diets is less than what
+is expected on a commercial dairy. The RuFaS feed library can also be
+modified or expanded on by changing the compositions of the existing
+feeds or by adding new feeds.
+
+Regardless of whether or not a user chooses to provide their own ration
+or have RuFaS build and feed a ration optimized for least-cost, RuFaS
+needs a set of ingredients to work from. The RuFaS feed library should
+be consulted for the full list of ingredients and ingredients that are
+in both the NASEM and NRC libraries can be used. Users interested in
+feeding a ration that they define, need to provide a list of ingredients
+and their relative \% dry matter intake for each animal class
+(pre-weaned calves, growing heifers, close-up animals, and lactating
+cows).
+
+If a user would like RuFaS to use the list of ingredients to formulate a
+least-cost ration, it is imperative that proper costs are inputted for
+each ingredient listed, but the \% dry matter intake in the user defined
+ration percentages does not need to be included. Feed costs need to be
+entered in kg/DM. RuFaS will then use all the ingredients available
+(based on costs and inventory available if the feed is homegrown) to
+create a ration that meets the nutritional requirements of the animal
+class and is cost-optimized.
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+For the time being, only one set of feeds and ration formula can be
+provided for each animal class.
+
+\end{tcolorbox}
+
+\subsection{Energy and Nutrition
+Requirements}\label{energy-and-nutrition-requirements}
 
 \subsection{Examples of Equations}\label{examples-of-equations}
 
@@ -1323,6 +1467,17 @@ heiferI\_num & Number of Heifer I animals \\
 
 \protect\phantomsection\label{refs}
 \begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-Li_2022}
+Li, M., G. J. M. Rosa, K. F. Reed, and V. E. Cabrera. 2022.
+{``Investigating the Effect of Temporal, Geographic, and Management
+Factors on US Holstein Lactation Curve Parameters.''} \emph{J Dairy Sci}
+105 (9): 7525--38.
+
+\bibitem[\citeproctext]{ref-nrc_2021}
+National Academies of Sciences, Engineering, and Medicine. 2021.
+\emph{Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}.
+The National Academies Press.
+
 \bibitem[\citeproctext]{ref-reuven_2017}
 Reuven, Y. R., and D. P. Kroese. 2017. \emph{Simulation and the Monte
 Carlo Method. In: Wiley Series in Probability and Statistics}. John
