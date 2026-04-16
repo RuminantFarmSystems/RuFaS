@@ -2070,3 +2070,7 @@ class HerdManager:
                     self.herd_statistics.total_enteric_methane[animal_type] = {
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
+
+    def update_milk_305_day_yield_predictions(self) -> None:
+        for cow in self.cows:
+            cow.update_mature_equivalent_305_days_milk_production()
