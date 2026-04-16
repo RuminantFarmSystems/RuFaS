@@ -639,39 +639,94 @@ The output is below :
 
 \subsection{Example of a Table}\label{example-of-a-table}
 
+Our documentation include quite a few tables with long, detailed
+definitions and extended variable names. It is important that these are
+all legible and consistently formated for readability. This requires
+precise alignment of gridlines-- which can get tedious. Additionally,
+any updates to variables or defaults may make this process more time
+consuming in the future.
+
+Instead, we have four excel files that correspond to each existing
+module. In each file, sheets are named by their label id (see next
+section for more on id logic). That way, you can auto-generate a .txt
+file with your table properly sized and formated using the
+make\_grid\_table.py (quarto-scidoc\textgreater scripts). The .txt file
+output will show up in
+quarto-scidoc\textgreater output\textgreater tables.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\PreprocessorTok{|}\NormalTok{ Variable }\PreprocessorTok{|}\NormalTok{ Definition }\PreprocessorTok{|}
-\PreprocessorTok{|{-}{-}{-}|{-}{-}{-}|}
-\PreprocessorTok{|}\NormalTok{ heiferI\_num }\PreprocessorTok{|}\NormalTok{ Number of Heifer I animals }\PreprocessorTok{|}
-
-\NormalTok{: Example animal inputs \{\#tbl{-}animal{-}inputs\}}
+\NormalTok{After you create your excel sheet in the module file of the data folder (in this example it is animal.xslx).}
 
 
-\NormalTok{{-}{-}\textgreater{} The top row of text is your headers and will appear centered and bolded unless otherwise commanded.}
-\NormalTok{{-}{-}\textgreater{} The  next row of actual text is what appears in the row with the associated column. Quarto will autowrap to ensure all text fits and is legible. }
-\NormalTok{{-}{-}\textgreater{} Be sure to include ..... for between each row}
+\NormalTok{python scripts\textbackslash{}make\_grid\_table.py data\textbackslash{}animal.xlsx {-}{-}sheet "EXAMPLE" {-}{-}widths "32,55,10,6,24" {-}{-}caption "This is an example caption." {-}{-}label "tbl{-}example{-}inputs" {-}{-}output output\textbackslash{}tables\textbackslash{}example\_table\_file.txt}
 
-\NormalTok{{-}{-}\textgreater{} ": Example animal inputs" will appear as the caption. Be as descriptive as possible so that the reader could understand the contents of the table without reading any further text. }
-\NormalTok{{-}{-}\textgreater{} \#tbl{-}animal{-}inputs = \#indicates the type of file{-}label{-}for{-}auditing. Though you may label it whatever you want, but be sure that the first part of the label (following the file type) is the module name (e.g. animal, manure, feed, or soilcrop).}
+\NormalTok{Remember, you will need to update }
+\NormalTok{{-}{-}sheet (the sheet name should match the label)}
+\NormalTok{{-}{-}caption (to relevant description)}
+\NormalTok{{-}{-}label (follow label structure in next section)}
+\NormalTok{{-}{-}output (file name only)}
+
+
 \end{Highlighting}
 \end{Shaded}
 
 The above markdown text will appear as it does below:
 
-\begin{longtable}[]{@{}ll@{}}
-\caption{Example animal inputs}\label{tbl-animal-inputs}\tabularnewline
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2414}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0897}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0621}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1862}}@{}}
+\caption{This is an example
+caption.}\label{tbl-example-inputs}\tabularnewline
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-heiferI\_num & Number of Heifer I animals \\
+id & The index of the pen & & 0 & \\
+pen\_name & The name or identifier of a given pen & & & \\
+animal\_combination & The valid combinations of animal types that can be
+in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE\_UP =
+HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\tightlist
+\item
+\end{itemize}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\tightlist
+\item
+\end{itemize}
+\end{minipage} & CALF, GROWING, CLOSE\_UP, LAC\_COWS \\
 \end{longtable}
 
 \section{Equation Templates and ID
@@ -682,19 +737,30 @@ the ID logic that has been described \ldots{}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{$$}
-\NormalTok{CBW = MW * 0.06275 \textbackslash{}qquad \textbackslash{}text\{(AN.NRC.2)\}}
-\NormalTok{$$ \{\#eq{-}an{-}nrc{-}2\}}
+\NormalTok{The audit label and crosslinking is tracked by \#eq{-}an{-}nrc{-}2026. It is important to follow the custom label structure even for the invisible reference to make tracking easier. }
 
-\NormalTok{See }\CommentTok{[}\OtherTok{AN.NRC.2}\CommentTok{](\#eq{-}an{-}nrc{-}2)\textless{}!{-}{-} @eq{-}an{-}nrc{-}2 {-}{-}\textgreater{}}\NormalTok{.}
+\NormalTok{The actual custom labeling is written as \textbackslash{}text}
+
+\NormalTok{::: \{\#eq{-}an{-}nrc{-}2026\} }
+\NormalTok{$$}
+\NormalTok{CBW = MW * 0.06275 \textbackslash{}qquad \textbackslash{}text\{(AN.NRC.2026)\}}
+\NormalTok{$$}
+\NormalTok{:::}
+
+\NormalTok{Below is how the equation can be linked in other parts of the text: }
+
+\NormalTok{See }\CommentTok{[}\OtherTok{AN.NRC.2026}\CommentTok{](\#eq{-}an{-}nrc{-}2026)\textless{}!{-}{-} @eq{-}an{-}nrc{-}2026 {-}{-}\textgreater{}}\NormalTok{.}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.50)}
-}\end{equation}
+This is how your equation and the linking should appear.
 
-See \hyperref[eq-an-nrc-50]{AN.NRC.2}.
+\protect\phantomsection\label{eq-an-nrc-2026}
+\[
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\]
+
+See \hyperref[eq-an-nrc-2026]{AN.NRC.2026}.
 
 \section{Callouts, Recommendations, or
 Notes}\label{callouts-recommendations-or-notes}
@@ -1535,36 +1601,72 @@ age and reproductive status.
 \textbf{Energy Requirements} For details about the variables included in
 each calculation, please refer to tbl-energy-req for a full list.
 
-\emph{Maintenance}The maintenance requirement is calculated based on
+\emph{Maintenance} The maintenance requirement is calculated based on
 metabolic body weight (body weight\(^{0.75}\)).
 
-\subsection{Examples of Equations}\label{examples-of-equations}
+\begin{itemize}
+\tightlist
+\item
+  Lactating and Dry Cows ::: \{\#eq-an-nrc-1\} \[
+  CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
+  \] :::
+\end{itemize}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-}\end{equation}
+\protect\phantomsection\label{eq-an-nrc-2}
+\[
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+\]
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-3}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.3)}
-}\end{equation}
+\emph{Otherwise}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-4}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.4)}
-}\end{equation}
+\protect\phantomsection\label{eq-an-nrc-3}
+\[
+NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
+\]
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-5}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.5)}
-}\end{equation}
+\begin{itemize}
+\tightlist
+\item
+  Heifers : The maintenance requirement is calculated based on metabolic
+  body weight (body weight(\^{}\{0.75\})), body condition score, and the
+  previous month's temperatures.
+\end{itemize}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-1}{
+\protect\phantomsection\label{eq-an-nrc-1}
+\[
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
-}\end{equation}
+\]
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-}\end{equation}
+\protect\phantomsection\label{eq-an-nrc-2}
+\[
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+\]
 
-See \ref{eq-an-nrc-2}.
+\emph{Otherwise}
+
+\protect\phantomsection\label{eq-an-nrc-6}
+\[
+BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
+\]
+
+\protect\phantomsection\label{eq-an-nrc-7}
+\[
+NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
+\]
+
+\emph{Activity} Activity requirement is proportional to body weight and
+daily walking distance. A grazing system and hilly topography will cost
+additional energy.
+
+\begin{itemize}
+\tightlist
+\item
+  Lactating and Dry Cows ::: \{\#eq-an-nrc-8\} \[
+  NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+  \] :::
+\end{itemize}
 
 \bookmarksetup{startatroot}
 
