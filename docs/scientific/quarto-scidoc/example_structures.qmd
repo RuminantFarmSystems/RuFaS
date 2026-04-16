@@ -7,24 +7,32 @@ There is some variation between modules and documentation bassed on structure an
 These should be referred to in a consistent manner throughout the document to inform tables of contents, indices, and auditing materials. 
 
 ```markdown
-# Module Name --> section title and only appears once
+# Module Name
+section title and only appears once
 
-## Module Introduciton --> subsection header
+## Module Introduciton
+- subsection header
 
-## Each Section Title --> subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations
+## Section Title 
+- subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations
 
-### Section Introduction --> subsubsection header to introduce the concept
+### Section Introduction 
+- subsubsection header to introduce the concept
 
-### Methodology --> subsubsection header used to start descriptions
+### Methodology 
+- subsubsection header used to start descriptions
 
-**Relevant Inputs or Relevant Outputs** --> emphasized headers should be used to report the inputs and outputs of the relevant subsection. These usually include tables and bulleted lists. Tables of inputs should include: 
+**Relevant Inputs or Relevant Outputs** 
+emphasized headers should be used to report the inputs and outputs of the relevant subsection. 
+These usually include tables and bulleted lists. Tables of inputs should include: 
 - Variable
 - Definition
 - Default
 - Min
 - Max
 
-If there is no application for one of these (default, min, or max particularly), do not leave the table cell blank. Please include "--" or "NA" depending on what makes the most sense. 
+If there is no application for one of these (default, min, or max particularly), 
+do not leave the table cell blank. Please include "--" or "NA" depending on what makes the most sense. 
 
 *Alternate Headers* alternate headers may be used at the discretion of the author
 
@@ -33,6 +41,31 @@ If there is no application for one of these (default, min, or max particularly),
 There may be expanded uses for subsubsection headers and emphasized headers. The ones outlined above are only the expected uses. Feel free to use more at the discretion of the author. 
 
 ## Images, Figures, and Tables
+
+### Linking - Internal and External
+
+This is an important feature of the scientific documentation. A document this large can be difficult to navigate, so anything that improves the users ability to find what they need efficiently should be optimized. 
+
+```markdown
+
+There are 3 main structures to "label" parts of the document: 
+- #sec (sections)
+- #tbl (tables)
+- #fig (figures)
+
+Naming is important for tracking and should appear with hyphens, not spaces. There is no formal process to inform how you name, but it is recommended that it is descriptive of the item you are labeling and it is concise to make referencing easier.
+
+There is more information about where these labels go in the respective tables and figures relative to captions etc. the following sections.
+
+
+
+
+
+
+```
+
+Linking internally and externally is the first step, however it can be hard to keep track of labels and how they have been used and referenced. That is the main reason we have the auditing tool. If you are creating new labels or new reference links, **be sure to check the auditor to make sure that there is no repeat labels or incorrect references**
+
 
 ### Example of a Figure 
 
@@ -83,16 +116,36 @@ The above markdown text will appear as it does below:
 
 
 ## Equation Templates and ID Logic
+If you are adding equations, it is important that you continue to use the ID logic that has been described ... 
 
+
+```markdown
+The audit label and crosslinking is tracked by #eq-an-nrc-2026. It is important to follow the custom label structure even for the invisible reference to make tracking easier. 
+
+The actual custom labeling is written as \text
+
+::: {#eq-an-nrc-2026} 
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-$$ {#eq-an-nrc-2}
-
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-$$ {#eq-an-nrc-6}
+:::
 
-See @eq-an-nrc-2.
+Below is how the equation can be linked in other parts of the text: 
+
+See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+
+```
+
+This is how your equation and the linking should appear.
+
+::: {#eq-an-nrc-2026}
+$$
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+$$
+:::
+
+See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+
 
 ## Callouts, Recommendations, or Notes
 
@@ -236,3 +289,32 @@ $$
 1
 \right)
 $$ {#eq-nutrient-proportion}
+
+
+
+::: {.callout-note}
+## Previews and Audits
+
+*For preview html*
+
+```{{markdown}}
+
+quarto preview
+
+```
+*For preview pdf*
+
+```{{markdown}}
+
+quarto render --to pdf
+
+```
+*For audit review*
+You can find the output in the quarto-scidoc folder.
+
+```{{markdown}}
+
+python quarto_audit.py
+
+```
+:::

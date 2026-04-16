@@ -538,24 +538,32 @@ document to inform tables of contents, indices, and auditing materials.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{\# Module Name {-}{-}\textgreater{} section title and only appears once}
+\FunctionTok{\# Module Name}
+\NormalTok{section title and only appears once}
 
-\FunctionTok{\#\# Module Introduciton {-}{-}\textgreater{} subsection header}
+\FunctionTok{\#\# Module Introduciton}
+\SpecialStringTok{{-} }\NormalTok{subsection header}
 
-\FunctionTok{\#\# Each Section Title {-}{-}\textgreater{} subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations}
+\FunctionTok{\#\# Section Title }
+\SpecialStringTok{{-} }\NormalTok{subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations}
 
-\FunctionTok{\#\#\# Section Introduction {-}{-}\textgreater{} subsubsection header to introduce the concept}
+\FunctionTok{\#\#\# Section Introduction }
+\SpecialStringTok{{-} }\NormalTok{subsubsection header to introduce the concept}
 
-\FunctionTok{\#\#\# Methodology {-}{-}\textgreater{} subsubsection header used to start descriptions}
+\FunctionTok{\#\#\# Methodology }
+\SpecialStringTok{{-} }\NormalTok{subsubsection header used to start descriptions}
 
-\NormalTok{**Relevant Inputs or Relevant Outputs** {-}{-}\textgreater{} emphasized headers should be used to report the inputs and outputs of the relevant subsection. These usually include tables and bulleted lists. Tables of inputs should include: }
+\NormalTok{**Relevant Inputs or Relevant Outputs** }
+\NormalTok{emphasized headers should be used to report the inputs and outputs of the relevant subsection. }
+\NormalTok{These usually include tables and bulleted lists. Tables of inputs should include: }
 \SpecialStringTok{{-} }\NormalTok{Variable}
 \SpecialStringTok{{-} }\NormalTok{Definition}
 \SpecialStringTok{{-} }\NormalTok{Default}
 \SpecialStringTok{{-} }\NormalTok{Min}
 \SpecialStringTok{{-} }\NormalTok{Max}
 
-\NormalTok{If there is no application for one of these (default, min, or max particularly), do not leave the table cell blank. Please include "{-}{-}" or "NA" depending on what makes the most sense. }
+\NormalTok{If there is no application for one of these (default, min, or max particularly), }
+\NormalTok{do not leave the table cell blank. Please include "{-}{-}" or "NA" depending on what makes the most sense. }
 
 \NormalTok{*Alternate Headers* alternate headers may be used at the discretion of the author}
 \end{Highlighting}
@@ -566,6 +574,38 @@ headers. The ones outlined above are only the expected uses. Feel free
 to use more at the discretion of the author.
 
 \section{Images, Figures, and Tables}\label{images-figures-and-tables}
+
+\subsection{Linking - Internal and
+External}\label{linking---internal-and-external}
+
+This is an important feature of the scientific documentation. A document
+this large can be difficult to navigate, so anything that improves the
+users ability to find what they need efficiently should be optimized.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{There are 3 main structures to "label" parts of the document: }
+\SpecialStringTok{{-} }\NormalTok{\#sec (sections)}
+\SpecialStringTok{{-} }\NormalTok{\#tbl (tables)}
+\SpecialStringTok{{-} }\NormalTok{\#fig (figures)}
+
+\NormalTok{Naming is important for tracking and should appear with hyphens, not spaces. There is no formal process to inform how you name, but it is recommended that it is descriptive of the item you are labeling and it is concise to make referencing easier.}
+
+\NormalTok{There is more information about where these labels go in the respective tables and figures relative to captions etc. the following sections.}
+
+
+
+
+
+\end{Highlighting}
+\end{Shaded}
+
+Linking internally and externally is the first step, however it can be
+hard to keep track of labels and how they have been used and referenced.
+That is the main reason we have the auditing tool. If you are creating
+new labels or new reference links, \textbf{be sure to check the auditor
+to make sure that there is no repeat labels or incorrect references}
 
 \subsection{Example of a Figure}\label{example-of-a-figure}
 
@@ -637,15 +677,24 @@ heiferI\_num & Number of Heifer I animals \\
 \section{Equation Templates and ID
 Logic}\label{equation-templates-and-id-logic}
 
+If you are adding equations, it is important that you continue to use
+the ID logic that has been described \ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{$$}
+\NormalTok{CBW = MW * 0.06275 \textbackslash{}qquad \textbackslash{}text\{(AN.NRC.2)\}}
+\NormalTok{$$ \{\#eq{-}an{-}nrc{-}2\}}
+
+\NormalTok{See }\CommentTok{[}\OtherTok{AN.NRC.2}\CommentTok{](\#eq{-}an{-}nrc{-}2)\textless{}!{-}{-} @eq{-}an{-}nrc{-}2 {-}{-}\textgreater{}}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.50)}
 }\end{equation}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-}\end{equation}
-
-See Equation~\ref{eq-an-nrc-2}.
+See \hyperref[eq-an-nrc-50]{AN.NRC.2}.
 
 \section{Callouts, Recommendations, or
 Notes}\label{callouts-recommendations-or-notes}
@@ -791,7 +840,7 @@ each calculation, please refer to the
 
 \section{Reformatted equations}\label{reformatted-equations}
 
-Equation~\ref{eq-nrc-cbw} may be visually improved by using the
+\ref{eq-nrc-cbw} may be visually improved by using the
 \texttt{\textbackslash{}times} LaTeX command:
 
 \begin{equation}\protect\phantomsection\label{eq-nrc-cbw-times}{
@@ -810,7 +859,7 @@ standard Quarto equation ID.
 CBW = MW * 0.06275 \tag{AN.NRC.2}
 }\end{equation}
 
-See Equation~\ref{eq-an-nrc-2-tagged}.
+See \ref{eq-an-nrc-2-tagged}.
 
 \section{Other equation Templates}\label{other-equation-templates}
 
@@ -820,7 +869,7 @@ The energy balance is \(E = mc^2\).
 E = mc^2
 }\end{equation}
 
-See Equation Equation~\ref{eq-energy}.
+See Equation \ref{eq-energy}.
 
 \begin{equation}\protect\phantomsection\label{eq-nutrient-proportion}{
 \text{nutrient\_proportion\_to\_be\_removed} =
@@ -829,6 +878,47 @@ See Equation Equation~\ref{eq-energy}.
 1
 \right)
 }\end{equation}
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Previews and Audits}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+\emph{For preview html}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{quarto preview}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{For preview pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{quarto render {-}{-}to pdf}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{For audit review} You can find the output in the quarto-scidoc
+folder.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{python quarto\_audit.py}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\end{tcolorbox}
 
 \bookmarksetup{startatroot}
 
@@ -1203,11 +1293,11 @@ added and removed from pens as needed.
 \textbf{Relevant Inputs}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3839}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0982}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0625}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1429}}@{}}
 \caption{User inputs in the animal input file that influence pen
 grouping. The user must define at least 3 pens and for each pen, key
 inputs are outlined here.}\label{tbl-animal-grp-inputs}\tabularnewline
@@ -1245,19 +1335,19 @@ id & The index of the pen & NA & 0 & NA \\
 pen\_name & The name or identifier of a given pen & NA & & \\
 animal\_combination & The valid combinations of animal types that can be
 in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE\_UP =
-HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows & & CALF, GROWING
-CLOSE\_UP, LAC\_COW & \\
-vertical\_dist\_to\_milking\_parlor & The elevation gain (in meters)
+HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows & & & CALF,
+GROWING, CLOSE\_UP, LAC\_COWS \\
+vertical\_dist\_to\_milking\_ parlor & The elevation gain (in meters)
 between the pen and the milking parlor & 0.1 & 0 & NA \\
-horizontal\_dist\_to\_milking\_parlor & The distance (in meters) between
-the pen and the milking parlor & 10 & 0 & NA \\
+horizontal\_dist\_to\_milking\_ parlor & The distance (in meters)
+between the pen and the milking parlor & 10 & 0 & NA \\
 number\_of\_stalls & The number of stalls in the pen & 1000 & 0 & NA \\
 pen\_type & The type of pen (freestall, tiestall, open lot, compost
-bedded pack barn) & freestall & freestall, tiestall, open lot, compost
-bedded pack barn & \\
+bedded pack barn) & freestall & & freestall, tiestall, open lot, compost
+bedded pack barn \\
 max\_stocking\_density & The maximum ratio of the number of animals in
 the pen to the number of stalls in the pen & 1.2 & 0.5 & 5 \\
-manure\_management\_scenario\_id & The ID number of the manure
+manure\_management\_ scenario\_id & The ID number of the manure
 management practices that are used for this pen (scenarios are defined
 in manure management schema) & 0 & 0 & NA \\
 \end{longtable}
@@ -1266,18 +1356,22 @@ in manure management schema) & 0 & 0 & NA \\
 
 \begin{itemize}
 \item
-  **number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}** -
-  reports the number of animals in each pen each day.
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}}
+    - reports the number of animals in each pen each day.
+  \end{itemize}
 \item
-  **ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}**
+  \textbf{ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}}
   - reports average dry matter intake of an animal in the pen at the
   time of the ration formulation.
 \item
-  **ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}**
+  \textbf{ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}}
   - reports the amount of each feed that is delivered per animal in the
   pen
 \item
-  **ration\_nutrient\_amount\_for\_pen\_\_{[}AnimalCombination{]}.{[}nutrient{]}**
+  \textbf{ration\_nutrient\_amount\_for\_pen\_{[}AnimalCombination{]}.{[}nutrient{]}}
   - is reporting the amount of each of the following nutrients that is
   provided by the ration per animal in the pen (all reported in
   kilograms unless otherwise indicated)
@@ -1343,15 +1437,16 @@ have exceeded the max stocking density.
 \begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
 
 \textbf{Remove\_animals\_by\_ids} - This function is called when the
-HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map. It is
-pen specific and removes the animal from the pen and the animal ID from
-the animal ID map that tracks the animals in the pen.
+HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map.
+
+It is pen specific and removes the animal from the pen and the animal ID
+from the animal ID map that tracks the animals in the pen.
+
 **\_add\_new\_animals** - This function is called by Pen.update\_animals
 which is in turn called by
-HerdManager.**\_add\_animal\_to\_pen\_and\_id\_map** - Thus, when
-HerdManager initiates addition of animals to each pen, this function
-executes the addition of those animals.
-**\_animal\_nutritional\_requirements**
+HerdManager.\_add\_animal\_to\_pen\_and\_id\_map. Thus, when HerdManager
+initiates addition of animals to each pen, this function executes the
+addition of those animals \_animal\_nutritional\_requirements
 
 \end{tcolorbox}
 
@@ -1408,6 +1503,41 @@ provided for each animal class.
 \subsection{Energy and Nutrition
 Requirements}\label{energy-and-nutrition-requirements}
 
+\textbf{NRC: Calculating Nutrient Requirements of Dairy Cattle}
+
+Below are the calculations utilized based on the energy and nutrient
+requirements of dairy cattle as reported by the NRC and more recently
+the NASEM National Research Council (2001), National Academies of
+Sciences, Engineering, and Medicine (2021).
+
+Calculations are included for the following requirement categories:
+
+\begin{itemize}
+\tightlist
+\item
+  Energy (Maintenance, Activity, Growth, Pregnancy, Lactation)
+\item
+  Protein (Maintenance, Growth, Pregnancy, Lactation)
+\item
+  Minerals (Maintenance, Growth, Pregnancy, Lactation)
+\item
+  Dry Matter Intake
+\item
+  Amino Acids (NASEM only)
+\end{itemize}
+
+Where appropriate, requirement calculations are differentiated by animal
+age and reproductive status.
+
+\subsection{Nutrient Requirements of Dairy Cattle
+(NRC)}\label{nutrient-requirements-of-dairy-cattle-nrc}
+
+\textbf{Energy Requirements} For details about the variables included in
+each calculation, please refer to tbl-energy-req for a full list.
+
+\emph{Maintenance}The maintenance requirement is calculated based on
+metabolic body weight (body weight\(^{0.75}\)).
+
 \subsection{Examples of Equations}\label{examples-of-equations}
 
 \begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
@@ -1434,7 +1564,7 @@ CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
 }\end{equation}
 
-See Equation~\ref{eq-an-nrc-2}.
+See \ref{eq-an-nrc-2}.
 
 \bookmarksetup{startatroot}
 
@@ -1477,6 +1607,10 @@ Factors on US Holstein Lactation Curve Parameters.''} \emph{J Dairy Sci}
 National Academies of Sciences, Engineering, and Medicine. 2021.
 \emph{Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}.
 The National Academies Press.
+
+\bibitem[\citeproctext]{ref-nrc_2001}
+National Research Council. 2001. \emph{Nutrient Requirements of Dairy
+Cattle}. National Academies Press.
 
 \bibitem[\citeproctext]{ref-reuven_2017}
 Reuven, Y. R., and D. P. Kroese. 2017. \emph{Simulation and the Monte

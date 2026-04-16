@@ -138,29 +138,54 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 
 **Relevant Inputs**
 
-| Variable | Definition | Default | Min | Max |
-|---|---|---|---|---|
-| id | The index of the pen | NA | 0  | NA | 
-| pen_name | The name or identifier of a given pen | NA |    |    | 
-| animal_combination | The valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows |   |  CALF, GROWING CLOSE_UP, LAC_COW | 
-| vertical_dist_to_milking_parlor | The elevation gain (in meters) between the pen and the milking parlor | 0.1 | 0 | NA  |
-| horizontal_dist_to_milking_parlor | The distance (in meters) between the pen and the milking parlor | 10 | 0 | NA | 
-| number_of_stalls | The number of stalls in the pen | 1000 | 0 | NA | 
-| pen_type | The type of pen (freestall, tiestall, open lot, compost bedded pack barn) | freestall | freestall, tiestall, open lot, compost bedded pack barn | 
-| max_stocking_density | The maximum ratio of the number of animals in the pen to the number of stalls in the pen | 1.2 | 0.5 | 5 | 
-| manure_management_scenario_id | The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema) | 0 | 0 | NA | 
-: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here. {#tbl-animal-grp-inputs}
++-------------------------------+------------------------------------------+----------+------+---------------+
+| Variable                      | Definition                               | Default  | Min  | Max           |
++===============================+==========================================+==========+======+===============+
+| id                            | The index of the pen                     | NA       | 0    | NA            |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| pen_name                      | The name or identifier of a given pen    | NA       |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| animal_combination            | The valid combinations of animal types   |          |      | CALF,         |
+|                               | that can be in a pen. CALF = Calves;     |          |      | GROWING,      |
+|                               | GROWING = HeiferI's and HeiferII's;      |          |      | CLOSE_UP,     |
+|                               | CLOSE_UP = HeiferIII's and Dry Cows;     |          |      | LAC_COWS      |
+|                               | LAC_COWS = Lactating Cows                |          |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| vertical_dist_to_milking_     | The elevation gain (in meters) between   | 0.1      | 0    | NA            |
+| parlor                        | the pen and the milking parlor           |          |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| horizontal_dist_to_milking_   | The distance (in meters) between the pen | 10       | 0    | NA            |
+| parlor                        | and the milking parlor                   |          |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| number_of_stalls              | The number of stalls in the pen          | 1000     | 0    | NA            |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| pen_type                      | The type of pen (freestall, tiestall,    | freestall|      |freestall,     |
+|                               | open lot, compost bedded pack barn)      |          |      | tiestall,     |
+|                               |                                          |          |      | open lot,     |
+|                               |                                          |          |      | compost bedded|
+|                               |                                          |          |      | pack barn     |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| max_stocking_density          | The maximum ratio of the number of       | 1.2      | 0.5  | 5             |
+|                               | animals in the pen to the number of      |          |      |               |
+|                               | stalls in the pen                        |          |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
+| manure_management_ scenario_id| The ID number of the manure management   | 0        | 0    | NA            |
+|                               | practices that are used for this pen     |          |      |               |
+|                               | (scenarios are defined in manure         |          |      |               |
+|                               | management schema)                       |          |      |               |
++-------------------------------+------------------------------------------+----------+------+---------------+
 
+: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here. {#tbl-animal-grp-inputs}
 
 **Relevant Outputs**
 
-- **number_of_animals_in_pen_[id]_[AnimalCombination]** - reports the number of animals in each pen each day.
+- - **number\_of_animals\_in\_pen\_[id]\_[AnimalCombination]** - reports the number of animals in each pen each day.
 
-- **ration_per_animals_for_pen_[id]_[AnimalCombination]** - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
+- **ration\_per\_animals\_for\_pen\_[id]\_[AnimalCombination]** - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
 
-- **ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]** - reports the amount of each feed that is delivered per animal in the pen
+- **ration\_per\_animals\_for\_pen\_[id]\_[AnimalCombination].[RUFAS\_feed\_id]** - reports the amount of each feed that is delivered per animal in the pen
 
-- **ration_nutrient_amount_for_pen__[AnimalCombination].[nutrient]** - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated)
+- **ration\_nutrient\_amount\_for\_pen\_[AnimalCombination].[nutrient]** - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated)
 
 
 
@@ -191,9 +216,11 @@ Pen Sizing: Due to oscillations in the exact number of animals in each animal ty
 Class: *Pens* are inare initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
 ::: {.callout-note}
-**Remove_animals_by_ids** - This function is called when the HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map. It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
-**_add_new_animals** - This function is called by Pen.update\_animals which is in turn called by HerdManager.**_add_animal_to_pen_and_id_map** - Thus, when HerdManager initiates addition of animals to each pen, this function executes the addition of those animals. 
-**_animal_nutritional_requirements**
+**Remove_animals_by_ids** - This function is called when the HerdManager calls for: remove_animal_from_pen_and_id_map. 
+
+It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
+
+**_add_new_animals** - This function is called by Pen.update_animals which is in turn called by HerdManager._add_animal_to_pen_and_id_map. Thus, when HerdManager initiates addition of animals to each pen, this function executes the addition of those animals _animal_nutritional_requirements
 
 :::
 
@@ -216,37 +243,87 @@ For the time being, only one set of feeds and ration formula can be provided for
 
 ### Energy and Nutrition Requirements
 
+**NRC: Calculating Nutrient Requirements of Dairy Cattle**
 
+Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by the NRC and more recently the NASEM @nrc_2001, @nrc_2021.
 
+Calculations are included for the following requirement categories:
 
+- Energy (Maintenance, Activity, Growth, Pregnancy, Lactation)
+- Protein (Maintenance, Growth, Pregnancy, Lactation)
+- Minerals (Maintenance, Growth, Pregnancy, Lactation)
+- Dry Matter Intake
+- Amino Acids (NASEM only) 
 
+Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 
+### Nutrient Requirements of Dairy Cattle (NRC)
 
+**Energy Requirements**
+For details about the variables included in each calculation, please refer to tbl-energy-req for a full list.
 
-### Examples of Equations
+*Maintenance* The maintenance requirement is calculated based on metabolic body weight (body weight$^{0.75}$).
 
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-$$ {#eq-an-nrc-2}
-
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.3)}
-$$ {#eq-an-nrc-3}
-
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.4)}
-$$ {#eq-an-nrc-4}
-
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.5)}
-$$ {#eq-an-nrc-5}
-
+* Lactating and Dry Cows
+::: {#eq-an-nrc-1}
 $$
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
-$$ {#eq-an-nrc-1}
-
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-$$ {#eq-an-nrc-6}
+:::
 
-See @eq-an-nrc-2.
+
+
+::: {#eq-an-nrc-2}
+$$
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+$$
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-3}
+$$
+NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
+$$
+:::
+
+* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight\(^{0.75}\)), body condition score, and the previous month's temperatures.
+
+::: {#eq-an-nrc-1}
+$$
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
+$$
+:::
+
+
+
+::: {#eq-an-nrc-2}
+$$
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+$$
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-6}
+$$
+BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
+$$
+:::
+
+::: {#eq-an-nrc-7}
+$$
+NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
+$$
+:::
+
+*Activity* Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
+
+* Lactating and Dry Cows
+::: {#eq-an-nrc-8}
+$$
+NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+$$
+:::

@@ -1,0 +1,252 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ruminant Farm Systems (RuFaS)",
+    "section": "",
+    "text": "1 Preface: A Day in the Life on a RuFaS Farm\n\nThis document provides a high-level overview of the daily operations of a ruminant farm, as modeled by RuFaS. The overview will be through the eyes of Dr. Rue Fas. One day, Dr. Rue woke up and decided the life of a computer scientist wasn’t for her. So she bought a dairy farm, and this is how she operates it every day.\nFeeding the Animals Second thing in the morning, after coffee, Dr. Rue checks the calendar to see if it’s time to formulate a new ration for her animals.\nIf a new ration needs to be formulated, Dr. Rue heads over to the barn where she keeps all her forages and feed. While there, she checks how well all the forages are holding up. After considering the feeds available, the quality of each one, and how much each one costs, she decides on how productive she wants her animals to be. It is a difficult balancing act, but eventually a ration recipe is found that will keep the animals happy while keeping costs low and sustainability high until the calendar says the ration recipe needs to be reformulated.\nWhen Dr. Rue doesn’t need to formulate a new ration, she takes the last ration recipe she made and grabs all the feed and forage the animals need for the day out of the feed barn. If there isn’t enough for the animals, then a new ration is formulated using the steps above.\nTaking Care of the Animals After making sure all the animals’ feed is taken care of, Dr. Rue moves on to taking care of all the other animal tasks. This includes milking the animals, making sure they’re healthy, getting them pregnant, and numerous other tasks.\nAs dawn breaks on the RuFaS farm, the animals awaken after a restful night. Joe, the farm master, prepares a large whiteboard to track HerdReproductionStatistics, ensuring he has all the data he needs for the day’s activities.\nDaily Routine - After leaving their pens, each animal lines up in front of the barn. Julie, the diligent farm veterinarian, examines them one by one. This daily check includes updates on the following areas:\n\nNutrients: Each animal begins its day with a quick phosphorus requirement assessment. Julie records these details and updates the animal’s phosphorus-related metrics.\nDigestive System: With nutrient information in hand, Julie shifts focus to each animal’s digestive system, estimating manure output and enteric methane production for that day.\nMilk Production: All milking cows are assessed to gauge daily milk yield and milk component content (fat and protein). Any necessary adjustments are noted.\nAnimal Growth: Around midday, Julie returns to each animal to evaluate daily weight changes. She updates each animal’s body weight accordingly.\nReproduction: HeiferII and Cow stage animals undergo a reproduction check. Julie closely monitors their reproductive progress and updates the HerdReproductionStatistics details on Joe’s whiteboard.\nLife Stage Evaluation: Once the daily routines are complete, Julie determines if any animal is ready to progress to the next life stage. Graduating animals are marked as “graduated” to be moved to their new pens. Animals that must leave the herd—due to health, productivity, or other issues—are labeled as “sold” or “dead” to be removed from the farm population.\nHerd Size Maintenance: After every animal has been evaluated, Joe counts the herd to ensure it remains at a healthy size. If it is too large, he arranges the sale of some animals. If the herd is too small, he may opt to purchase additional heiferIIIs to keep numbers at the ideal level.\nHerd Structure Management: Joe also manages pen assignments. Newly graduated or newborn animals are guided to suitable pens, while animals marked for removal (sold or deceased) are taken out of the herd and removed from the farm records.\n\nOutput Reporting At day’s end, Joe and Julie review the updated HerdReproductionStatistics on the whiteboard. Joe then compiles a concise report summarizing the day’s herd stats. He forwards this information to the OutputManager before wrapping up another successful day on the RuFaS farm.\nDealing with the Manure Once all the animal chores are finished, Dr. Rue moves on to handling the manure. There are a lot of different ways that manure is collected from the animals: it is flushed out of the milking parlor with water, some of the pens need to have it shoveled out along with the bedding in the pen, and some pens have grates that allow the manure to go straight into a pit beneath the barn.\nThere are a lot of different places where manure is processed and stored on the farm. Dr. Rue goes from place to place on the farm, moving the manure from one place to the next. The manure chores are finished after moving all of the manure into her lagoons, compost piles, and other storages. As this final manure chore is completed, she writes down all the information about how much manure is in all these storages, and some information about what that manure is made of. How much water, nitrogen, phosphorus, other solids, etc. are in each storage.\nManaging the Fields Now that Dr. Rue is done making sure all the manure has been handled and stored properly, she can take care of all the field tasks. She has a lot of fields on her farm, each with its own unique schedule. Her field management routine starts with checking each field’s schedule to see if any of them are due to have manure applied, and if so, how much they should have applied. After noting all the manure that is supposed to go onto her fields, these amounts are checked against the amounts of manure that are in her manure storage. Dr. Rue then applies manure to each field on the schedule that day, trying to match the amount applied to the amount on the schedule as best she can.\nAfter making sure every manure item on each farm’s schedule has been taken care of for the day, the schedule for each field is rechecked, one field at a time. In each schedule she checks to see if that field needs to be tilled, if any chemical fertilizer needs to be applied, and if any crops need to be planted or harvested. After all these activities are taken care of, Mother Nature goes to work. The sun shines and rain falls, providing the field with water and energy that grows crops and soaks the soil. After taking care of each field one by one, Dr. Rue drives back to the main farm with all of the crops that she harvested on that day.\nStoring the Feeds Now that she is back at the barns, all the crops that were just harvested can be stored. Fortunately she is very organized, so all her harvested crops are separate from one another and each has a label, indicating where it will be stored inside the feed barn. As each feed is stored, it is labeled with the current date. Dr. Rue is exhausted from another long day. She goes back to the farmhouse and rests up, preparing to do the whole thing over again tomorrow. Her daily routine might seem repetitive, but each day is a crucial part of the larger, continuous process that keeps her farm running efficiently and sustainably.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Preface: A Day in the Life on a RuFaS Farm</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html",
+    "href": "versionupdates.html",
+    "title": "2  New Version Updates",
+    "section": "",
+    "text": "2.1 Animal Module\nEach version of the RuFaS model is designed to improve the accuracy and precision of the predictive power of the model. This section aims to outline the changes made …",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html#animal-module",
+    "href": "versionupdates.html#animal-module",
+    "title": "2  New Version Updates",
+    "section": "",
+    "text": "2.1.1 Changed Inputs\nHere you should include any\n\n\n2.1.2 Changed Methodology\nText, equations, and references\n\n\n2.1.3 Output Updates\nExpectations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html#manure-module",
+    "href": "versionupdates.html#manure-module",
+    "title": "2  New Version Updates",
+    "section": "2.2 Manure Module",
+    "text": "2.2 Manure Module\n\n2.2.1 Changed Inputs\nHere you should include any\n\n\n2.2.2 Changed Methodology\nText, equations, and references\n\n\n2.2.3 Output Updates\nExpectations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html#feed-storage-module",
+    "href": "versionupdates.html#feed-storage-module",
+    "title": "2  New Version Updates",
+    "section": "2.3 Feed Storage Module",
+    "text": "2.3 Feed Storage Module\n\n2.3.1 Changed Inputs\nHere you should include any\n\n\n2.3.2 Changed Methodology\nText, equations, and references\n\n\n2.3.3 Output Updates\nExpectations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html#crop-and-soil-module",
+    "href": "versionupdates.html#crop-and-soil-module",
+    "title": "2  New Version Updates",
+    "section": "2.4 Crop and Soil Module",
+    "text": "2.4 Crop and Soil Module\n\n2.4.1 Changed Inputs\nHere you should include any\n\n\n2.4.2 Changed Methodology\nText, equations, and references\n\n\n2.4.3 Output Updates\nExpectations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "versionupdates.html#connections-documents",
+    "href": "versionupdates.html#connections-documents",
+    "title": "2  New Version Updates",
+    "section": "2.5 Connections Documents",
+    "text": "2.5 Connections Documents\n\n2.5.1 Changed Inputs\nHere you should include any\n\n\n2.5.2 Changed Methodology\nText, equations, and references\n\n\n2.5.3 Output Updates\nExpectations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>New Version Updates</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html",
+    "href": "example_structures.html",
+    "title": "3  Example Inserts",
+    "section": "",
+    "text": "3.1 Sectioning and Structure\nThere is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.\nThese should be referred to in a consistent manner throughout the document to inform tables of contents, indices, and auditing materials.\nThere may be expanded uses for subsubsection headers and emphasized headers. The ones outlined above are only the expected uses. Feel free to use more at the discretion of the author.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#sectioning-and-structure",
+    "href": "example_structures.html#sectioning-and-structure",
+    "title": "3  Example Inserts",
+    "section": "",
+    "text": "# Module Name\nsection title and only appears once\n\n## Module Introduciton\n- subsection header\n\n## Section Title \n- subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations\n\n### Section Introduction \n- subsubsection header to introduce the concept\n\n### Methodology \n- subsubsection header used to start descriptions\n\n**Relevant Inputs or Relevant Outputs** \nemphasized headers should be used to report the inputs and outputs of the relevant subsection. \nThese usually include tables and bulleted lists. Tables of inputs should include: \n- Variable\n- Definition\n- Default\n- Min\n- Max\n\nIf there is no application for one of these (default, min, or max particularly), \ndo not leave the table cell blank. Please include \"--\" or \"NA\" depending on what makes the most sense. \n\n*Alternate Headers* alternate headers may be used at the discretion of the author",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#images-figures-and-tables",
+    "href": "example_structures.html#images-figures-and-tables",
+    "title": "3  Example Inserts",
+    "section": "3.2 Images, Figures, and Tables",
+    "text": "3.2 Images, Figures, and Tables\n\n3.2.1 Linking - Internal and External\nThis is an important feature of the scientific documentation. A document this large can be difficult to navigate, so anything that improves the users ability to find what they need efficiently should be optimized.\n\nThere are 3 main structures to \"label\" parts of the document: \n- #sec (sections)\n- #tbl (tables)\n- #fig (figures)\n\nNaming is important for tracking and should appear with hyphens, not spaces. There is no formal process to inform how you name, but it is recommended that it is descriptive of the item you are labeling and it is concise to make referencing easier.\n\nThere is more information about where these labels go in the respective tables and figures relative to captions etc. the following sections.\n\n\n\n\n\nLinking internally and externally is the first step, however it can be hard to keep track of labels and how they have been used and referenced. That is the main reason we have the auditing tool. If you are creating new labels or new reference links, be sure to check the auditor to make sure that there is no repeat labels or incorrect references\n\n\n3.2.2 Example of a Figure\nAll figures and images must be uploaded in the “references.” When you upload your fig/img, you may name the file (best to keep it short and sweet)…\n\n![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}\n\n--&gt;[Caption for the image or figure]\n--&gt; #fig-animal-icon = #indicates the type of file-label-for-auditing\n--&gt; width=35% = sizing adjusted as needed\nThe output is below :\n\n\n\n\n\n\nFigure 3.1: Animal module icon\n\n\n\n\n\n3.2.3 Example of a Table\n| Variable | Definition |\n|---|---|\n| heiferI_num | Number of Heifer I animals |\n\n: Example animal inputs {#tbl-animal-inputs}\n\n\n--&gt; The top row of text is your headers and will appear centered and bolded unless otherwise commanded.\n--&gt; The  next row of actual text is what appears in the row with the associated column. Quarto will autowrap to ensure all text fits and is legible. \n--&gt; Be sure to include ..... for between each row\n\n--&gt; \": Example animal inputs\" will appear as the caption. Be as descriptive as possible so that the reader could understand the contents of the table without reading any further text. \n--&gt; #tbl-animal-inputs = #indicates the type of file-label-for-auditing. Though you may label it whatever you want, but be sure that the first part of the label (following the file type) is the module name (e.g. animal, manure, feed, or soilcrop).\nThe above markdown text will appear as it does below:\n\n\n\nTable 3.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#equation-templates-and-id-logic",
+    "href": "example_structures.html#equation-templates-and-id-logic",
+    "title": "3  Example Inserts",
+    "section": "3.3 Equation Templates and ID Logic",
+    "text": "3.3 Equation Templates and ID Logic\nIf you are adding equations, it is important that you continue to use the ID logic that has been described …\n$$\nCBW = MW * 0.06275 \\qquad \\text{(AN.NRC.2026)}\n$$ {#eq-an-nrc-2026}\n\nSee [AN.NRC.2026](#eq-an-nrc-2026)&lt;!-- @eq-an-nrc-=2026 --&gt;.\nThis is how your equation and the linking should appear.\n\n\\[\nCBW = MW * 0.06275 \\qquad \\text{(AN.NRC.2026)}\n\\]\n\nSee AN.NRC.2026.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#callouts-recommendations-or-notes",
+    "href": "example_structures.html#callouts-recommendations-or-notes",
+    "title": "3  Example Inserts",
+    "section": "3.4 Callouts, Recommendations, or Notes",
+    "text": "3.4 Callouts, Recommendations, or Notes\nYou may want to emphasize specific notes and annotations. Here is a helpful tool to do so correctly.\n::: {.callout-note}\nCallout text goes here\n:::\nYour callout will appear the way it does below:\n\n\n\n\n\n\nNote\n\n\n\nNote: if only interested in a PDF version of the documentation (no website version), then the original LaTeX code can still be used and processed by quarto. For example, the bullet points works as the original LaTeX or translated into markdown syntax:\n```{latex}\n\\begin{itemize}\n    \\item first bullet point\n    \\item second bullet point\n    \\item ...\n\\end{itemize}\n```\n```{markdown}\n* first bullet point\n* second bullet point\n* ...\n```\n\nfirst bullet point\nsecond bullet point\n…\n\nbut only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#references",
+    "href": "example_structures.html#references",
+    "title": "3  Example Inserts",
+    "section": "3.5 References",
+    "text": "3.5 References\nBefore adding a new reference to “rufas.bib,” check the file to ensure it has not already been added. All references should be listed alphabetically and then by year (most recent at the top).\nIf you do need to add a bibliography, the correct structure is below. Pay special attention to the green text, this formatting is important to maintain consistentcy because it helps us with our auditing report and allows us to properly cite in-text.\nJournal Articles\n@article{LASTNAME_YEAR,\n  author = {LASTNAME, FIRSTNAME},\n  title = {Title of the article in proper formatting},\n  journal = {Journal Title with proper NCBI Abbreviations},\n  year = {YEAR PUBLISHED},\n  volume = {VOLUME NUMBER},\n  pages = {PAGES}\n}\n\nBooks \n\n@book{LASTNAME_YEAR,\n  author = {FIRSTNAME LASTNAME},\n  title = {Title of Book Referenced},\n  publisher = {Publisher},\n  year = {YEAR PUBLISHED},\n  isbn = {978-3-319-24277-4}\n}\n\nOnline, Misc, Website (RARE USAGE)\n\n@online{quarto2024,\n  author = {Posit},\n  title = {Quarto Citations Guide},\n  year = {2024},\n  url = {https://quarto.org/docs/authoring/citations.html}\n}\nIf there are 2 articles with the same author and same year, add the recommended “a” or “b” (e.g. bibtex @LASTNAME_YEARa vs @LASTNAME_YEARb) as they are referenced.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#sec-nrc",
+    "href": "example_structures.html#sec-nrc",
+    "title": "3  Example Inserts",
+    "section": "4.1 Nutrient Requirements of Dairy Cattle (NRC)",
+    "text": "4.1 Nutrient Requirements of Dairy Cattle (NRC)\nEnergy Requirements For details about the variables included in each calculation, please refer to the energykey.\n\nMaintenance - The maintenance requirement is calculated based on metabolic body weight (body weight\\(^{0.75}\\)).\nLactating and Dry Cows\n\\[\nCBW = MW * 0.06275\n\\tag{4.1}\\]\n\\[\nCW = {(18 + (DOP - 190) * 0.665) * \\left(\\frac{CBW}{45}\\right), \\text{if } DOP &gt; 190.0}\n\\tag{4.2}\\]\nOtherwise\n\\[\nNEmaint = 0.08 \\times (BW - CW)^{0.75}\n\\tag{4.3}\\]",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#reformatted-equations",
+    "href": "example_structures.html#reformatted-equations",
+    "title": "3  Example Inserts",
+    "section": "4.2 Reformatted equations",
+    "text": "4.2 Reformatted equations\n4.1 may be visually improved by using the \\times LaTeX command:\n\\[\nCBW = MW \\times 0.06275\n\\tag{4.4}\\]",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#use-alphanumeric-equation-labels",
+    "href": "example_structures.html#use-alphanumeric-equation-labels",
+    "title": "3  Example Inserts",
+    "section": "4.3 Use alphanumeric equation labels",
+    "text": "4.3 Use alphanumeric equation labels\nThough Quarto does not allow custom cross-reference labels, you can include your own non-CR label with the \\tag LaTeX command. The equation can still be cross-referenceable using a standard Quarto equation ID.\n\\[\nCBW = MW * 0.06275 \\tag{AN.NRC.2}\n\\tag{4.5}\\]\nSee 4.5.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "example_structures.html#other-equation-templates",
+    "href": "example_structures.html#other-equation-templates",
+    "title": "3  Example Inserts",
+    "section": "4.4 Other equation Templates",
+    "text": "4.4 Other equation Templates\nThe energy balance is \\(E = mc^2\\).\n\\[\nE = mc^2\n\\tag{4.6}\\]\nSee Equation 4.6.\n\\[\n\\text{nutrient\\_proportion\\_to\\_be\\_removed} =\n\\min\\left(\n\\frac{\\text{mass\\_requested\\_nutrient}}{\\text{manure\\_nutrient\\_available}},\n1\n\\right)\n\\tag{4.7}\\]\n\n\n\n\n\n\nNotePreviews and Audits\n\n\n\nFor preview html\n```{markdown}\n\nquarto preview\n\n```\nFor preview pdf\n```{markdown}\n\nquarto render --to pdf\n\n```\nFor audit review You can find the output in the quarto-scidoc folder.\n```{markdown}\n\npython quarto_audit.py\n\n```",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Example Inserts</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html",
+    "href": "animal.html",
+    "title": "4  Animal Module",
+    "section": "",
+    "text": "4.1 Introduction\nThe Animal Module simulates individual animals on a daily basis throughout each stage of life from birth until removal from the herd. In addition to the dynamic Monte-Carlo models that determine the occurrence of events throughout each animal’s life, the Animal Module uses process-based, dynamic models to simulate the following processes:",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#introduction",
+    "href": "animal.html#introduction",
+    "title": "4  Animal Module",
+    "section": "",
+    "text": "Individual animal growth\nGestation and milk production\nEstimation of nutrient requirements and feed intake\nEnteric emission and manure excretion\n\n\n4.1.1 Animal Life Cycle\nThe animal life cycle is driven by Monte Carlo stochastic processes that simulate the growth, production, reproduction, and culling of individual dairy cattle animals and shares aggregated outcomes with the herd management sub-module to manage herd dynamics on a daily basis.\nThe life cycle module represents the variation in animal performance through the use of Monte Carlo Simulation methods (Reuven and Kroese 2017). Monte Carlo simulation relies on random draws from probability distributions rather than assigning fixed values. In this model, two main strategies are used:\n\nEvent-based, in which a random draw from a uniform distribution (U(0,1)) is compared to the probability of an event occurring to simulate if that event occurs, and\nPopulation-based, in which a random draw from a known distribution of attribute values is assigned to an animal at instantiation. Probability distributions used for that purpose are Normal Gaussian or Empirical.\n\nEach animal within the RuFaS herd progresses through five main life stages (calf, Heifer I, Heifer II, Heifer III, and Cow) as illustrated in the figure below.\n\nCalves progress to Heifer I when their age reaches the user-defined input for weaning day\nHeifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day\nHeifer II animals that successfully conceive become Heifer III’s when the number of days left in their pregnancy is equal to the user-defined input for prefresh days (default 21)\nWhen a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm\nCows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to conceive or a user-provided probability for sale or death within each parity (lactation).\n\nWhen a HeiferIII or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf is assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed from the farm on day 1 of their life. Female calves either remain on the farm or are sold on day 1, determined by an event-based Monte Carlo method informed by the user-defined percent of female calves that are kept.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#herd-level-processes-and-management",
+    "href": "animal.html#herd-level-processes-and-management",
+    "title": "4  Animal Module",
+    "section": "4.2 Herd-level Processes and Management",
+    "text": "4.2 Herd-level Processes and Management",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#herd-initialization",
+    "href": "animal.html#herd-initialization",
+    "title": "4  Animal Module",
+    "section": "4.3 Herd Initialization",
+    "text": "4.3 Herd Initialization\n\n\n\n\n\n\nNote\n\n\n\nIn RuFaS code, the term “herd initialization” is used to refer to both the process of generating an animal population file and of selecting from that population to create a specific herd at the start of a simulation. In this doc, those two processes will be differentiated by calling them “Generation” and “Selection”, respectively.\n“Animal population” can refer to both groups of animals (the pool of animals generated, and the herd of animals selected). In the code, the population is sometimes referred to as “pre_animal_population” and “post_animal_population” to differentiate whether the specified group of animals exists before or after the random selection of individuals to create a herd.\n\n\n\n4.3.1 Introduction to Herd Initialization\nEvery simulation begins with a herd consisting of calves, heifers, and dry and lactating cows. This herd comes to be through a two-step process:\n\nA population of animals is generated through simulation or loaded from data (pre-animal-population). The animals in that herd should reflect the attributes of animals in the herd to be modeled.\nAnimals are randomly selected with replacement from the pre-animal-population to be in the initial herd, based on group numbers and characteristics that reflect the distribution of animals within the herd being modeled. Note that the animals in the herd on day one will have attributes of the pre-animal-population and may deviate from the desired herd to be modeled.\n\nFor the rest of the simulation, animals enter the herd through birth as newborn calves or purchased replacements (heiferIII’s).\n\n\n\nTable 4.1: Overview of the distinct phases by which animals are created and introduced to the herd.\n\n\n\n\n\n\n\n\n\n\nBefore Simulation\nSimulation Initiation\nDuring the Simulation\n\n\n\n\nGenerate (simulate) or load an Animal Population file (pre-animal- population).\nThe animals present at the start of the simulation, and those available in the replacement market, are drawn from this file.\nHerd is established by random selection of animals from the Animal Population to match the user-specified group sizes and age/stage distribution (post- animal-population).\nManagement attributes, including lactation- curve parameters, are assigned as each animal enters the herd.\nNew animals enter via (a) birth or (b) purchase| of heifers from the | replacement market.\nPurchased animals inherit| two attributes from the | population file, | - Breed | - Mature bodyweight |\n\n\n\n\n\n\nRelevant Inputs\n\n\n\nTable 4.2: User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.\n\n\n\n\n\n\n\n\n\n\n\n\nVariable\nDefinition\nDefault\nMin\nMax\n\n\n\n\nInitial_animal_num\nThe initial number of animals that serve as a starting point for the population generation simulation\n10000\n0\n-\n\n\nSimulation_days\nThe number of days to simulate for the population generation simulation\n5000\n0\n-\n\n\nCalf_num\nNumber of Calves (head) – The initial number of pre-weaned calves\n8\n2\n–\n\n\nHeiferI_num\nNumber of HeiferI animals (head) – The initial number of heifers that are weaned but not yet bred\n44\n2\n–\n\n\nHeiferII_num\nNumber of HeiferII animals (head) – The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy\n38\n2\n–\n\n\nHeiferIII_num_springers\nNumber of HeiferIII animals (head) – The initial number of close-up heifers (within the user-defined close-up period, e.g., Prefresh Day)\n5\n2\n–\n\n\nCow_num\nNumber of Cows (head) – The initial number of dry and lactating cows\n100\n6\n–\n\n\nReplace_num\nreplacements (head) – Number of replacement animals available in the replacement market\n5000\n50\n–\n\n\nLactating_fraction\nFraction of cows that are lactating. Used during herd initialization\n0.8356\n0\n1\n\n\nParity_fractions: 1, 2, 3, 4, 5\nFractions of the milking animal population that are parity 1, 2, 3, 4, and 5+. The sum must equal 1.0\n0.36, 0.26, 0.18, 0.11, 0.09\n0\n1\n\n\n\n\n\n\nRelevant Outputs\nAfter the animals have been selected from the animal population to create the initial herd, a summary of the Population (pre-selection pool, aka pre-animal-population) and of the Initial herd (selected animals, aka post-animal-population) is provided to the output manager.\nClass and function: AnimalModuleReporter.report_animal_population_statistics\nOutput variables: - .population_{…} - .initial_{…}\n{…} includes: breed, number of animals of each class (calf, heiferI, heiferII, heiferIII, cow), number of cows by parity and lactation status, average age of animals within each class, distribution of age of animals within each class, average body weight of animals within each class, average cow days in milk, days in preg, parity, and calving interval.\n\n\n4.3.2 Methodology\nWhen a simulation begins, the HerdFactory class generates or loads the pre-animal-population, from which it selects and compiles the post-animal-population with an appropriate distribution of animal ages and stages to serve as the starting herd for simulation.\nDesignation of an Animal Population\n\nOption 1: Creating a new Animal Population An animal population can be generated as a stand-alone simulation task that creates and saves a pre-animal-population file as the output based on the user Animal Module inputs. Or, the animal population can be generated as the first step of a regular simulation task which then uses that generated pre-animal-population to select from and create the post-animal-population to use for the subsequent herd simulation. See the documentation about Task Manager for more information about how to generate a new pre-animal-population.\n\nThe _generate_animals() method creates the pre_animal_population, with the option to save those animals to file at the end of the generation process.\nCalves are created according to the number specified by the user (initial_animal_num), some are sold based on user inputs, and those remaining proceed through select daily updates (growth, reproduction, milk, and transition through the appropriate life stages) for the user-specified number of days (simulation_days). The simulation occurs similarly to the regular life cycle simulation process, but with an extended period and large number of animals. There are a few notable distinctions:\n\nAfter 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day.\nIf a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five).\n\nAfter the simulation_days number of days, the full herd contains a mixture of calves, heifers, cows, and replacements. The core status information and life history of each animal are either saved to file or passed for random sampling to create the post-animal-population.\n\nOption 2: Point to an existing Animal Population Alternatively, the pre-animal-population will be loaded from a specified Animal Population input file consisting of calf, heifer, cow, and replacement objects.\n\nHerd Selection The _random_sample_with_replacement() method selects animals from each of the following groups: calf, heiferI, heiferII, heiferIII, replacement, lactating cows by parity for parities 1-5, and dry cows by parity for parities 1-5.\nAnimals are sampled randomly with replacement from the pre-animal-population according to the numbers, parity fractions, and milking cow fraction specified in the animal input file. The resulting list of animals is returned as the post-animal-population and summaries of the pre- and post-animal-populations are reported to the output manager.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#pens-and-animal-grouping",
+    "href": "animal.html#pens-and-animal-grouping",
+    "title": "4  Animal Module",
+    "section": "4.4 Pens and Animal Grouping",
+    "text": "4.4 Pens and Animal Grouping\n\n4.4.1 Introduction to Grouping\nAll animals in RuFaS are assigned to a pen which is used to summarize nutrient requirements for diet formulation and feeding, aggregate enteric methane and manure excretions for reporting and passage to the Manure Module. Each pen tracks and updates daily a list of animals in the pen, the stocking density, the average nutrient requirement of the animals in the pen, the ration being fed to that pen, the manure excreted, and the methane emitted. In addition, constant attributes of each pen include the type of pen it is (freestall, tiestall, open lot, compost bedded pack barn), the type of animals that can be in that pen, the number stalls, the manure management practices associated with that pen, and the distance to the milking parlor for lactating cows. Each day after the HerdManager has updated the status of each animal and determined which animals need to be bought or sold, the animals are added and removed from pens as needed.\nRelevant Inputs\n\n\n\nTable 4.3: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here.\n\n\n\n\n\n\n\n\n\n\n\n\nVariable\nDefinition\nDefault\nMin\nMax\n\n\n\n\nid\nThe index of the pen\nNA\n0\nNA\n\n\npen_name\nThe name or identifier of a given pen\nNA\n\n\n\n\nanimal_combination\nThe valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI’s and HeiferII’s; CLOSE_UP = HeiferIII’s and Dry Cows; LAC_COWS = Lactating Cows\n\n\nCALF, GROWING, CLOSE_UP, LAC_COWS\n\n\nvertical_dist_to_milking_ parlor\nThe elevation gain (in meters) between the pen and the milking parlor\n0.1\n0\nNA\n\n\nhorizontal_dist_to_milking_ parlor\nThe distance (in meters) between the pen and the milking parlor\n10\n0\nNA\n\n\nnumber_of_stalls\nThe number of stalls in the pen\n1000\n0\nNA\n\n\npen_type\nThe type of pen (freestall, tiestall, open lot, compost bedded pack barn)\nfreestall\n\nfreestall, tiestall, open lot, compost bedded pack barn\n\n\nmax_stocking_density\nThe maximum ratio of the number of animals in the pen to the number of stalls in the pen\n1.2\n0.5\n5\n\n\nmanure_management_ scenario_id\nThe ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)\n0\n0\nNA\n\n\n\n\n\n\nRelevant Outputs\n\n\nnumber_of_animals_in_pen_[id]_[AnimalCombination] - reports the number of animals in each pen each day.\n\nration_per_animals_for_pen_[id]_[AnimalCombination] - reports average dry matter intake of an animal in the pen at the time of the ration formulation.\nration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id] - reports the amount of each feed that is delivered per animal in the pen\nration_nutrient_amount_for_pen_[AnimalCombination].[nutrient] - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated)\n\n\n\n4.4.2 Methodology\nAnimal Grouping To translate from the AnimalTypes needed to track an animal’s life stages and the combinations of animals that are allowed to be grouped into a single pen, a new variable called AnimalCombination is created that combines some AnimalTypes to facilitate sorting into pens. The AnimalCombination class is defined in enums.py and includes the following mapping from AnimalTypes to AnimalCombinations:\n\n\n\nTable 4.4: Summary of animal types and their grouping included in this module.\n\n\n\n\n\nAnimal Combination\nAnimal Type\n\n\n\n\nCALF\nCalves\n\n\nGROWING\nHeifer I and Heifer II\n\n\nCLOSE_UP\nHeifer III and Non-lactating Cows\n\n\nLAC_COW\nLactating Cows\n\n\n\n\n\n\nCurrently there are only two options for assigning AnimalCombinations to pens.\n\nOption 1 The first and most commonly used option for grouping animals is to assign one AnimalCombination to each pen such that there is at least one pen for the 4 AnimalCombinations: CALF, GROWING, CLOSE_UP, and LAC_COW.\nOption 2 In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both GROWING and CLOSE_UP animals such that the there is at least one pen with each of the 3 AnimalCombination inputs: CALF, GROWING_AND_CLOSE_UP, and LAC_COW.\n\nPen Sizing: Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120% of the expected number of animals in each pen.\nClass: Pens are inare initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density.\n\n\n\n\n\n\nNote\n\n\n\nRemove_animals_by_ids - This function is called when the HerdManager calls for: remove_animal_from_pen_and_id_map.\nIt is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen.\n**_add_new_animals** - This function is called by Pen.update_animals which is in turn called by HerdManager._add_animal_to_pen_and_id_map. Thus, when HerdManager initiates addition of animals to each pen, this function executes the addition of those animals _animal_nutritional_requirements",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "animal.html#ration-formulation",
+    "href": "animal.html#ration-formulation",
+    "title": "4  Animal Module",
+    "section": "4.5 Ration Formulation",
+    "text": "4.5 Ration Formulation\nThe diet recipes in RuFaS are either formulated through least-cost formulation (Li et al. 2022) or provided by the user for each of 4 animal categories (calves, growing heifers, dry and close-up cows, and lactating cows). The composition of the available feeds are provided by a feed library that was adapted from the (National Academies of Sciences, Engineering, and Medicine 2021). The amount of feed required by the farm is tracked by pen and multiple pens of each animal category can be simulated; however, at this time, the RuFaS model can only accept 1 user-defined diet per animal category even if there are multiple simulated pens for that animal category.\nIn practice, animal feeding on dairy farms is a constantly evolving process that responds to fluctuations in feed availability, animal requirements and responses, and management goals. Although the feed delivery algorithms will make small modifications to the diet recipe in response to animal nutrient requirements and adjust the total amount of feed delivered based on the number of animals and their requirements, the diversity and degree of fluctuation in the diets is less than what is expected on a commercial dairy. The RuFaS feed library can also be modified or expanded on by changing the compositions of the existing feeds or by adding new feeds.\nRegardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows).\nIf a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that meets the nutritional requirements of the animal class and is cost-optimized.\n\n\n\n\n\n\nNote\n\n\n\nFor the time being, only one set of feeds and ration formula can be provided for each animal class.\n\n\n\n4.5.1 Energy and Nutrition Requirements\nNRC: Calculating Nutrient Requirements of Dairy Cattle\nBelow are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by the NRC and more recently the NASEM National Research Council (2001), National Academies of Sciences, Engineering, and Medicine (2021).\nCalculations are included for the following requirement categories:\n\nEnergy (Maintenance, Activity, Growth, Pregnancy, Lactation)\nProtein (Maintenance, Growth, Pregnancy, Lactation)\nMinerals (Maintenance, Growth, Pregnancy, Lactation)\nDry Matter Intake\nAmino Acids (NASEM only)\n\nWhere appropriate, requirement calculations are differentiated by animal age and reproductive status.\n\n\n4.5.2 Nutrient Requirements of Dairy Cattle (NRC)\nEnergy Requirements For details about the variables included in each calculation, please refer to tbl-energy-req for a full list.\nMaintenance The maintenance requirement is calculated based on metabolic body weight (body weight\\(^{0.75}\\)).\n\nLactating and Dry Cows ::: {#eq-an-nrc-1} \\[\nCBW = MW * 0.06275 \\qquad \\text{(AN.NRC.1)}\n\\] :::\n\n\n\\[\nCW = (18 + (DOP - 190)\\cdot 0.665)\\left(\\frac{CBW}{45}\\right), \\text{ if } DOP &gt; 190.0\n\\qquad \\text{(AN.NRC.2)}\n\\]\n\nOtherwise\n\n\\[\nNEmaint = 0.08\\cdot (BW - CW)^{0.75} \\qquad \\text{(AN.NRC.3)}\n\\]\n\n\nHeifers : The maintenance requirement is calculated based on metabolic body weight (body weight(^{0.75})), body condition score, and the previous month’s temperatures.\n\n\n\\[\nCBW = MW * 0.06275 \\qquad \\text{(AN.NRC.1)}\n\\]\n\n\n\\[\nCW = (18 + (DOP - 190)\\cdot 0.665)\\left(\\frac{CBW}{45}\\right), \\text{ if } DOP &gt; 190.0\n\\qquad \\text{(AN.NRC.2)}\n\\]\n\nOtherwise\n\n\\[\nBCS9 = (BCS5 - 1) * 2 + 1 \\qquad \\text{(AN.NRC.6)}\n\\]\n\n\n\\[\nNEmaint = (BW - CW)^{0.75}\\cdot (0.086\\cdot (0.8 + (BCS9 - 5)\\cdot 0.05) + 0.0007 (20 - PrevTemp)) \\qquad \\text{(AN.NRC.7)}\n\\]\n\nActivity Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy.\n\nLactating and Dry Cows ::: {#eq-an-nrc-8} \\[\nNEa1 = 0.0012\\cdot BW \\qquad \\text{(AN.NRC.8)}\n\\] :::\n\n\n\n\n\nLi, M., G. J. M. Rosa, K. F. Reed, and V. E. Cabrera. 2022. “Investigating the Effect of Temporal, Geographic, and Management Factors on US Holstein Lactation Curve Parameters.” J Dairy Sci 105 (9): 7525–38.\n\n\nNational Academies of Sciences, Engineering, and Medicine. 2021. Nutrient Requirements of Dairy Cattle: Eighth Revised Edition. The National Academies Press.\n\n\nNational Research Council. 2001. Nutrient Requirements of Dairy Cattle. National Academies Press.\n\n\nReuven, Y. R., and D. P. Kroese. 2017. Simulation and the Monte Carlo Method. In: Wiley Series in Probability and Statistics. John Wiley; Sons Inc.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Animal Module</span>"
+    ]
+  },
+  {
+    "objectID": "manure.html",
+    "href": "manure.html",
+    "title": "5  Manure Module",
+    "section": "",
+    "text": "5.1 Introduction",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Manure Module</span>"
+    ]
+  },
+  {
+    "objectID": "manure.html#introduction",
+    "href": "manure.html#introduction",
+    "title": "5  Manure Module",
+    "section": "",
+    "text": "5.1.1 Example of a Figure\n\n\n\n\n\n\n5.1.2 Example of a Table\n\n\n\nTable 5.1: Example animal inputs\n\n\n\n\n\nVariable\nDefinition\n\n\n\n\nheiferI_num\nNumber of Heifer I animals",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Manure Module</span>"
+    ]
+  }
+]
