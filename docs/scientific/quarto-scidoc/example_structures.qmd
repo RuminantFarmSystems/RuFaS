@@ -14,7 +14,8 @@ section title and only appears once
 - subsection header
 
 ## Section Title 
-- subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations
+- subsection header that introduces distinct portions of each module that 
+require separate methodological descriptions and equations
 
 ### Section Introduction 
 - subsubsection header to introduce the concept
@@ -23,8 +24,10 @@ section title and only appears once
 - subsubsection header used to start descriptions
 
 **Relevant Inputs or Relevant Outputs** 
-emphasized headers should be used to report the inputs and outputs of the relevant subsection. 
-These usually include tables and bulleted lists. Tables of inputs should include: 
+emphasized headers should be used to report the inputs and outputs of the 
+relevant subsection. These usually include tables and bulleted lists. Tables 
+of inputs should include: 
+
 - Variable
 - Definition
 - Default
@@ -32,9 +35,10 @@ These usually include tables and bulleted lists. Tables of inputs should include
 - Max
 
 If there is no application for one of these (default, min, or max particularly), 
-do not leave the table cell blank. Please include "--" or "NA" depending on what makes the most sense. 
+do not leave the table cell blank. Please include "--" or "NA" depending on 
+what makes the most sense. 
 
-*Alternate Headers* alternate headers may be used at the discretion of the author
+*Alternate Headers* alternate headers may be used at the discretion of the author.
 
 ```
 
@@ -53,14 +57,13 @@ There are 3 main structures to "label" parts of the document:
 - #tbl (tables)
 - #fig (figures)
 
-Naming is important for tracking and should appear with hyphens, not spaces. There is no formal process to inform how you name, but it is recommended that it is descriptive of the item you are labeling and it is concise to make referencing easier.
+Naming is important for tracking and should appear with hyphens, not spaces. 
+There is no formal process to inform how you name, but it is recommended that 
+it is descriptive of the item you are labeling and it is concise to make 
+referencing easier.
 
-There is more information about where these labels go in the respective tables and figures relative to captions etc. the following sections.
-
-
-
-
-
+There is more information about where these labels go in the respective tables 
+and figures relative to captions etc. the following sections.
 
 ```
 
@@ -74,6 +77,7 @@ All figures and images must be uploaded in the "references." When you upload you
 <!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
 
 ```markdown
+
 ![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
 
 -->[Caption for the image or figure]
@@ -94,10 +98,41 @@ Our documentation include quite a few tables with long, detailed definitions and
 Instead, we have four excel files that correspond to each existing module. In each file, sheets are named by their label id (see next section for more on id logic). That way, you can auto-generate a .txt file with your table properly sized and formated using the make_grid_table.py (quarto-scidoc>scripts). The .txt file output will show up in quarto-scidoc>output>tables.
 
 ```markdown
-After you create your excel sheet in the module file of the data folder (in this example it is animal.xslx).
+After you create your excel sheet in the module file of the data folder 
+(in this example it is animal.xslx).
 
 
-python scripts\make_grid_table.py data\animal.xlsx --sheet "EXAMPLE" --widths "32,55,10,6,24" --caption "This is an example caption." --label "tbl-example-inputs" --output output\tables\example_table_file.txt
+
+
+python scripts\make_grid_table.py data\animal.xlsx `
+--sheet "EXAMPLE" `
+--widths "24,40,4,6,12" `
+--caption "This is an example caption." `
+--label "tbl-example-inputs" `
+--output output\tables\example_table_file.txt
+
+
+The text file will generate something similar to what you see below:
+
++--------------------------+------------------------------------------+------+--------+--------------+
+| Variable                 | Definition                               | Defa | Min    | Max          |
+|                          |                                          | ult  |        |              |
++==========================+==========================================+======+========+==============+
+| id                       | The index of the pen                     |      | 0.0    |              |
++--------------------------+------------------------------------------+------+--------+--------------+
+| pen_name                 | The name or identifier of a given pen    |      |        |              |
++--------------------------+------------------------------------------+------+--------+--------------+
+| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
+|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
+|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
+|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
+|                          | LAC_COWS = Lactating Cows                |      |        |              |
++--------------------------+------------------------------------------+------+--------+--------------+
+
+: This is an example caption. {#tbl-example-inputs}
+
+: This is an example caption. {#tbl-example-inputs}
+
 
 Remember, you will need to update 
 --sheet (the sheet name should match the label)
@@ -106,26 +141,34 @@ Remember, you will need to update
 --output (file name only)
 
 Optional: 
---widths is preset to recommended sizing for the table. If it does not work for your table, feel free to adjust as needed. 
+--widths is preset to recommended sizing for the table. If it does not 
+work for your table, feel free to adjust as needed. 
+
+
 
 ```
-The above markdown text will appear as it does below: 
 
-+----------------------------------+---------------------------------------------------------+------------+--------+--------------------------+
-| Variable                         | Definition                                              | Default    | Min    | Max                      |
-+==================================+=========================================================+============+========+==========================+
-| id                               | The index of the pen                                    |            | 0      |                          |
-+----------------------------------+---------------------------------------------------------+------------+--------+--------------------------+
-| pen_name                         | The name or identifier of a given pen                   |            |        |                          |
-+----------------------------------+---------------------------------------------------------+------------+--------+--------------------------+
-| animal_combination               | The valid combinations of animal types that can be in a | -          | -      | CALF, GROWING, CLOSE_UP, |
-|                                  | pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; |            |        | LAC_COWS                 |
-|                                  | CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS =         |            |        |                          |
-|                                  | Lactating Cows                                          |            |        |                          |
-+----------------------------------+---------------------------------------------------------+------------+--------+--------------------------+
+
+
+After you copy and paste the table from the .txt file into your .qmd, this is what your table would look like.
+
+
++--------------------------+------------------------------------------+------+--------+--------------+
+| Variable                 | Definition                               | Defa | Min    | Max          |
+|                          |                                          | ult  |        |              |
++==========================+==========================================+======+========+==============+
+| id                       | The index of the pen                     |      | 0.0    |              |
++--------------------------+------------------------------------------+------+--------+--------------+
+| pen_name                 | The name or identifier of a given pen    |      |        |              |
++--------------------------+------------------------------------------+------+--------+--------------+
+| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
+|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
+|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
+|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
+|                          | LAC_COWS = Lactating Cows                |      |        |              |
++--------------------------+------------------------------------------+------+--------+--------------+
 
 : This is an example caption. {#tbl-example-inputs}
-
 
 
 
@@ -134,7 +177,9 @@ If you are adding equations, it is important that you continue to use the ID log
 
 
 ```markdown
-The audit label and crosslinking is tracked by #eq-an-nrc-2026. It is important to follow the custom label structure even for the invisible reference to make tracking easier. 
+The audit label and crosslinking is tracked by #eq-an-nrc-2026. 
+It is important to follow the custom label structure even for 
+the invisible reference to make tracking easier. 
 
 The actual custom labeling is written as \text
 
