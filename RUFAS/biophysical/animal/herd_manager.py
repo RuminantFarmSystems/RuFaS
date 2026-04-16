@@ -722,7 +722,26 @@ class HerdManager:
         if not eligible_indices:
             return None
 
-        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+        return min(eligible_indices, key=lambda i: self.cows[i].mature_equivalent_milking_prediction_305_day)
+
+    def _record_sold_cow_stats(self, removed_cow: Animal, simulation_day: int) -> None:
+        """Updates herd statistics and metadata for a sold cow."""
+        removed_cow.sold_at_day = simulation_day
+        self.herd_statistics.sold_cows_info.append(
+            SoldAnimalTypedDict(
+                id=removed_cow.id,
+                animal_type=removed_cow.animal_type.value,
+                sold_at_day=removed_cow.sold_at_day,
+                body_weight=removed_cow.body_weight,
+                cull_reason="NA",
+                days_in_milk=removed_cow.days_in_milk,
+                parity="NA",
+            )
+        )
+        self.herd_statistics.cow_num -= 1
+        self.herd_statistics.sold_cow_oversupply_num += 1
+        self.herd_statistics.cow_herd_exit_num -= 1
+        self.herd_statistics.sold_cow_num += 1
 
     def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
         """Checks if surplus cows need to be sold based on herd size."""
