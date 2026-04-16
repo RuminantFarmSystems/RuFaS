@@ -162,21 +162,38 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-            "units": MilkProductionStatistics.UNITS,
+            "units": (MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS) if AnimalConfig.simulate_genetics else MilkProductionStatistics.UNITS,
         }
 
         for milk_stats in milk_reports:
-            updated_milk_data: dict[str, int | float | str] = asdict(milk_stats)
-            updated_milk_data["is_milking"] = milk_stats.is_milking
-            updated_milk_data["estimated_daily_milk_produced"] = milk_stats.estimated_daily_milk_produced
-            updated_milk_data["milk_protein"] = milk_stats.milk_protein
-            updated_milk_data["milk_fat"] = milk_stats.milk_fat
-            updated_milk_data["milk_lactose"] = milk_stats.milk_lactose
-            updated_milk_data["parity"] = milk_stats.parity
-            updated_milk_data["cow_id"] = milk_stats.cow_id
-            updated_milk_data["pen_id"] = milk_stats.pen_id
-            updated_milk_data["simulation_day"] = simulation_day
-            updated_milk_data["animal_type"] = milk_stats.animal_type.name
+            updated_milk_data: dict[str, int | float | str] = {
+                "cow_id": milk_stats.cow_id,
+                "pen_id": milk_stats.pen_id,
+                "is_milking": milk_stats.is_milking,
+                "days_in_milk": milk_stats.days_in_milk,
+                "estimated_daily_milk_produced": milk_stats.estimated_daily_milk_produced,
+                "milk_protein": milk_stats.milk_protein,
+                "milk_fat": milk_stats.milk_fat,
+                "milk_lactose": milk_stats.milk_lactose,
+                "parity": milk_stats.parity,
+                "simulation_day": simulation_day
+            }
+            if AnimalConfig.simulate_genetics:
+                updated_milk_data["days_born"] = milk_stats.days_born
+                updated_milk_data["days_in_pregnancy"] = milk_stats.days_in_pregnancy
+                updated_milk_data["animal_type"] = milk_stats.animal_type.name
+                updated_milk_data["TBV_fat"] = milk_stats.TBV_fat
+                updated_milk_data["TBV_protein"] = milk_stats.TBV_protein
+                updated_milk_data["E_permanent_fat"] = milk_stats.E_permanent_fat
+                updated_milk_data["E_permanent_protein"] = milk_stats.E_permanent_protein
+                updated_milk_data["E_temporary_fat"] = milk_stats.E_temporary_fat
+                updated_milk_data["E_temporary_protein"] = milk_stats.E_temporary_protein
+                updated_milk_data["phenotype_fat"] = milk_stats.phenotype_fat
+                updated_milk_data["phenotype_protein"] = milk_stats.phenotype_protein
+                updated_milk_data["EBV_fat"] = milk_stats.EBV_fat
+                updated_milk_data["EBV_protein"] = milk_stats.EBV_protein
+                updated_milk_data["ranking_index"] = milk_stats.ranking_index
+
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
 
     @classmethod

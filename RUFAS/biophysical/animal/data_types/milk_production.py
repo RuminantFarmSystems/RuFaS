@@ -143,6 +143,8 @@ class MilkProductionStatistics:
         "parity": MeasurementUnits.UNITLESS,
         "is_milking": MeasurementUnits.UNITLESS,
         "simulation_day": MeasurementUnits.SIMULATION_DAY,
+    }
+    GENETIC_UNITS = {
         "days_born": MeasurementUnits.DAYS,
         "days_in_pregnancy": MeasurementUnits.DAYS,
         "animal_type": MeasurementUnits.UNITLESS,

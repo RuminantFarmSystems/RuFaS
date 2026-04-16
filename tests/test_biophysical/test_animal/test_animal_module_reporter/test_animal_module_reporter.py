@@ -5,6 +5,7 @@ from pytest_mock import MockerFixture
 import pytest
 
 from RUFAS.biophysical.animal import animal_constants
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
@@ -74,6 +75,7 @@ def test_data_padder(
 def test_report_milk(mocker: MockerFixture) -> None:
     """Unit test for report_milk()"""
     simulation_day = 10
+    AnimalConfig.simulate_genetics = True
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
     milk_reports = [
@@ -155,7 +157,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
         "class": AnimalModuleReporter.__name__,
         "function": AnimalModuleReporter.report_milk.__name__,
         "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-        "units": MilkProductionStatistics.UNITS,
+        "units": MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS,
     }
     expected_add_variable_calls = [
         call(
@@ -163,16 +165,16 @@ def test_report_milk(mocker: MockerFixture) -> None:
             {
                 "cow_id": 1,
                 "pen_id": 1,
+                "is_milking": True,
                 "days_in_milk": 10,
                 "estimated_daily_milk_produced": 88.8,
                 "milk_protein": 12.3,
                 "milk_fat": 3.4,
                 "milk_lactose": 5.6,
                 "parity": 1,
-                "is_milking": True,
-                "simulation_day": simulation_day,
                 "days_born": 10,
                 "days_in_pregnancy": 10,
+                "simulation_day": simulation_day,
                 "animal_type": AnimalType.LAC_COW.name,
                 "TBV_fat": 10.0,
                 "TBV_protein": 10.0,
