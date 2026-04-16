@@ -622,7 +622,14 @@ def herd_manager(
 @pytest.fixture
 def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
-        id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
+        id=0,
+        animal_type="",
+        sold_at_day=0,
+        body_weight=0.0,
+        cull_reason="NA",
+        days_in_milk="NA",
+        parity="NA",
+        genetic_history="",
     )
 
 
