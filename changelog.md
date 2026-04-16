@@ -358,6 +358,7 @@ v1.0.0
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2881](https://github.com/RuminantFarmSystems/RuFaS/pull/2881) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
+- [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
 
 
 ### v0.9.2
