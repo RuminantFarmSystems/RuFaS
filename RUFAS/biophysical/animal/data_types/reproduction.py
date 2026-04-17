@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -329,3 +330,10 @@ class ReproductionDataStream:
     @property
     def is_milking(self) -> bool:
         return self.days_in_milk > 0
+
+
+class SemenType(Enum):
+    SEXED_BEEF = "sexed_beef"
+    CONVENTIONAL_BEEF = "conventional_beef"
+    SEXED_DAIRY = "sexed_dairy"
+    CONVENTIONAL_DAIRY = "conventional_dairy"

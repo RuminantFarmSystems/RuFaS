@@ -1219,7 +1219,7 @@ class Animal:
             The current day in the simulation, used for event logging and status evaluation.
 
         """
-        self._assign_sex_to_newborn_calf()
+        self.sex = args["sex"]
 
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day
