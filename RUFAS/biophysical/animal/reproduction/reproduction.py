@@ -27,7 +27,8 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionInputs,
     ReproductionDataStream,
     AnimalReproductionStatistics,
-    HerdReproductionStatistics, SemenType,
+    HerdReproductionStatistics,
+    SemenType,
 )
 
 from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import HormoneDeliverySchedule

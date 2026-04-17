@@ -546,15 +546,19 @@ class HerdManager:
         cow.reproduction.semen_type = semen_type
 
     def _find_semen_type(self, population_ranking_index: list[float], animal_ranking_index: float) -> SemenType:
-        animal_ranking_index_percentile: float = np.mean(
-            np.array(population_ranking_index) <= animal_ranking_index) * 100
+        animal_ranking_index_percentile: float = (
+            np.mean(np.array(population_ranking_index) <= animal_ranking_index) * 100
+        )
         for allocation in sorted(AnimalConfig.semen_allocation, key=lambda x: x["lower_percentage"]):
             lower = allocation["lower_percentage"]
             upper = allocation["upper_percentage"]
-            if lower <= animal_ranking_index_percentile < upper or (upper == 100 and animal_ranking_index_percentile == 100):
+            if lower <= animal_ranking_index_percentile < upper or (
+                upper == 100 and animal_ranking_index_percentile == 100
+            ):
                 return SemenType(allocation["semen_type"])
         self.om.add_error("", "", {})
         raise ValueError()
+
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
         """
         Updates the genetic values of an animal at the start of a new lactation.
