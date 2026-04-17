@@ -47,6 +47,189 @@ class PartialBudget:
             "reduced_revenue": zero.copy(),
         }
 
+    @staticmethod
+    def _pick_scenario(scenario_names: set[str], candidates: list[str]) -> str | None:
+        """Pick a scenario name by case-insensitive matching against candidates."""
+        for candidate in candidates:
+            for name in scenario_names:
+                if name.lower() == candidate:
+                    return name
+        return None
+
+    @staticmethod
+    def _coerce_finite(value: Any) -> float:
+        """Convert to float and coerce non-finite/invalid values to 0."""
+        try:
+            coerced = float(value)
+        except (TypeError, ValueError):
+            return 0.0
+        return coerced if math.isfinite(coerced) else 0.0
+
+    def _summarize_single_scenario(
+        self,
+        scenario: str,
+        items: list[tuple[str | None, Dict[str, Any], Dict[str, float]]],
+    ) -> Dict[str, Any]:
+        """Aggregate one-scenario partial budget totals."""
+        revenue_total = 0.0
+        cost_total = 0.0
+        for flow_type, _, line_items in items:
+            normalized_flow_type = flow_type or "cost"
+            if normalized_flow_type not in {"revenue", "cost"}:
+                continue
+            value = self._coerce_finite(line_items.get(scenario, 0.0))
+            if normalized_flow_type == "revenue":
+                revenue_total += value
+            else:
+                cost_total += value
+
+        return {
+            "mode": "single",
+            "scenario": scenario,
+            "revenue_total": revenue_total,
+            "cost_total": cost_total,
+            "net_annual_cash_flow": revenue_total - cost_total,
+        }
+
+    def _accumulate_delta_components(
+        self,
+        items: list[tuple[str | None, Dict[str, Any], Dict[str, float]]],
+        baseline: str,
+        alternative: str,
+        info_map: Dict[str, str],
+    ) -> Dict[str, float]:
+        """Accumulate delta-mode partial budget buckets."""
+        additional_revenue = 0.0
+        reduced_revenue = 0.0
+        additional_costs = 0.0
+        reduced_costs = 0.0
+
+        for flow_type, _, line_items in items:
+            normalized_flow_type = flow_type or "cost"
+            if normalized_flow_type not in {"revenue", "cost"}:
+                continue
+            if baseline not in line_items or alternative not in line_items:
+                self.om.add_warning(
+                    "MissingScenarioData",
+                    f"Partial budget line item missing scenario values for '{baseline}' or '{alternative}'.",
+                    info_map,
+                )
+            value_a = self._coerce_finite(line_items.get(baseline, 0.0) or 0.0)
+            value_b = self._coerce_finite(line_items.get(alternative, 0.0) or 0.0)
+            delta = value_b - value_a
+
+            if normalized_flow_type == "revenue":
+                if delta > 0:
+                    additional_revenue += delta
+                elif delta < 0:
+                    reduced_revenue += abs(delta)
+            else:
+                if delta > 0:
+                    additional_costs += delta
+                elif delta < 0:
+                    reduced_costs += abs(delta)
+
+        return {
+            "additional_revenue": additional_revenue,
+            "reduced_revenue": reduced_revenue,
+            "additional_costs": additional_costs,
+            "reduced_costs": reduced_costs,
+        }
+
+    def _publish_delta_outputs(self, info_map: Dict[str, str], derived_inputs: Dict[str, Any]) -> None:
+        inputs = {
+            key: self._to_array(derived_inputs[key])
+            for key in ("additional_revenue", "reduced_costs", "additional_costs", "reduced_revenue")
+        }
+        net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
+            inputs["additional_costs"] + inputs["reduced_revenue"]
+        )
+        cumulative_change = np.cumsum(net_change)
+        horizon = net_change.size
+
+        result_df = pd.DataFrame(
+            {
+                "Period": np.arange(1, horizon + 1),
+                "AdditionalRevenue": inputs["additional_revenue"],
+                "ReducedCosts": inputs["reduced_costs"],
+                "AdditionalCosts": inputs["additional_costs"],
+                "ReducedRevenue": inputs["reduced_revenue"],
+                "NetChange": net_change,
+                "CumulativeNetChange": cumulative_change,
+            }
+        )
+
+        self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
+        self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+
+    def _publish_single_outputs(self, info_map: Dict[str, str], derived_inputs: Dict[str, Any]) -> None:
+        net_annual_cash_flow = self._to_array(derived_inputs.get("net_annual_cash_flow", 0.0))
+        revenue_total = self._to_array(derived_inputs.get("revenue_total", 0.0))
+        cost_total = self._to_array(derived_inputs.get("cost_total", 0.0))
+        inputs = {
+            "additional_revenue": self._to_array(0.0),
+            "reduced_costs": self._to_array(0.0),
+            "additional_costs": self._to_array(0.0),
+            "reduced_revenue": self._to_array(0.0),
+        }
+        horizon = net_annual_cash_flow.size
+        result_df = pd.DataFrame(
+            {
+                "Period": np.arange(1, horizon + 1),
+                "RevenueTotal": revenue_total,
+                "CostTotal": cost_total,
+                "NetAnnualCashFlow": net_annual_cash_flow,
+            }
+        )
+        self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_revenue_total", revenue_total.tolist(), info_map)
+        self.om.add_variable("econ_pba_cost_total", cost_total.tolist(), info_map)
+        self.om.add_variable("econ_pba_net_annual_cash_flow", net_annual_cash_flow.tolist(), info_map)
+        self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
+        self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+
+    def _publish_fallback_outputs(self, info_map: Dict[str, str]) -> None:
+        self.om.add_warning(
+            "MissingPartialBudgetData",
+            "No scenario-aware economics data was available to derive partial budget inputs.",
+            info_map,
+        )
+        inputs = self._load_inputs()
+        net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
+            inputs["additional_costs"] + inputs["reduced_revenue"]
+        )
+        cumulative_change = np.cumsum(net_change)
+        horizon = net_change.size
+
+        result_df = pd.DataFrame(
+            {
+                "Period": np.arange(1, horizon + 1),
+                "AdditionalRevenue": inputs["additional_revenue"],
+                "ReducedCosts": inputs["reduced_costs"],
+                "AdditionalCosts": inputs["additional_costs"],
+                "ReducedRevenue": inputs["reduced_revenue"],
+                "NetChange": net_change,
+                "CumulativeNetChange": cumulative_change,
+            }
+        )
+        self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
+        self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
+        self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
+        self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
+        self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+
     # Supporting multi-year scenarios will require accumulating results across
     # scenarios as outlined in `Documentation of Economic Data and Analytical
     # Methods (2).pdf`.
@@ -77,53 +260,13 @@ class PartialBudget:
                     items.append((item.get("flow_type"), item, line_items))
 
         if len(scenario_names) == 1:
-            scenario = next(iter(scenario_names))
-
-            revenue_total = 0.0
-            cost_total = 0.0
-
-            for flow_type, item, line_items in items:
-                flow_type = flow_type or "cost"
-                if flow_type not in {"revenue", "cost"}:
-                    continue
-
-                raw = line_items.get(scenario, 0.0)
-
-                try:
-                    value = float(raw)
-                except (TypeError, ValueError):
-                    value = 0.0
-
-                if not math.isfinite(value):
-                    value = 0.0
-
-                if flow_type == "revenue":
-                    revenue_total += value
-                else:
-                    cost_total += value
-
-            net_annual_cash_flow = revenue_total - cost_total
-
-            return {
-                "mode": "single",
-                "scenario": scenario,
-                "revenue_total": revenue_total,
-                "cost_total": cost_total,
-                "net_annual_cash_flow": net_annual_cash_flow,
-            }
+            return self._summarize_single_scenario(next(iter(scenario_names)), items)
 
         if len(scenario_names) < 2:
             return None
 
-        def _pick_scenario(candidates: list[str]) -> str | None:
-            for candidate in candidates:
-                for name in scenario_names:
-                    if name.lower() == candidate:
-                        return name
-            return None
-
-        baseline = _pick_scenario(["baseline", "base", "scenario_a", "a"])
-        alternative = _pick_scenario(["alternative", "scenario", "scenario_b", "b", "alt"])
+        baseline = self._pick_scenario(scenario_names, ["baseline", "base", "scenario_a", "a"])
+        alternative = self._pick_scenario(scenario_names, ["alternative", "scenario", "scenario_b", "b", "alt"])
         if baseline is None:
             baseline = sorted(scenario_names)[0]
         if alternative is None:
@@ -131,47 +274,16 @@ class PartialBudget:
 
         info_map = {"class": __name__, "function": self._calculate_from_preprocessed.__name__}
 
-        additional_revenue = 0.0
-        reduced_revenue = 0.0
-        additional_costs = 0.0
-        reduced_costs = 0.0
+        delta_components = self._accumulate_delta_components(items, baseline, alternative, info_map)
 
-        for flow_type, item, line_items in items:
-            flow_type = flow_type or "cost"
-            if flow_type not in {"revenue", "cost"}:
-                continue
-            if baseline not in line_items or alternative not in line_items:
-                self.om.add_warning(
-                    "MissingScenarioData",
-                    f"Partial budget line item missing scenario values for '{baseline}' or '{alternative}'.",
-                    info_map,
-                )
-            value_a = float(line_items.get(baseline, 0.0) or 0.0)
-            value_b = float(line_items.get(alternative, 0.0) or 0.0)
-            delta = value_b - value_a
-
-            if flow_type == "revenue":
-                if delta > 0:
-                    additional_revenue += delta
-                elif delta < 0:
-                    reduced_revenue += abs(delta)
-            if flow_type == "cost":
-                if delta > 0:
-                    additional_costs += delta
-                elif delta < 0:
-                    reduced_costs += abs(delta)
-
-        if not any([additional_revenue, reduced_revenue, additional_costs, reduced_costs]):
+        if not any(delta_components.values()):
             return None
 
         return {
             "mode": "delta",
             "baseline": baseline,
             "alternative": alternative,
-            "additional_revenue": additional_revenue,
-            "reduced_revenue": reduced_revenue,
-            "additional_costs": additional_costs,
-            "reduced_costs": reduced_costs,
+            **delta_components,
         }
 
     def calculate_partial_budget(self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None) -> None:
@@ -184,101 +296,14 @@ class PartialBudget:
         }
         derived_inputs = self._calculate_from_preprocessed(preprocessed_data)
         if derived_inputs and derived_inputs.get("mode") == "delta":
-            inputs = {
-                key: self._to_array(derived_inputs[key])
-                for key in ("additional_revenue", "reduced_costs", "additional_costs", "reduced_revenue")
-            }
-            net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
-                inputs["additional_costs"] + inputs["reduced_revenue"]
-            )
-            cumulative_change = np.cumsum(net_change)
-            horizon = net_change.size
-
-            result_df = pd.DataFrame(
-                {
-                    "Period": np.arange(1, horizon + 1),
-                    "AdditionalRevenue": inputs["additional_revenue"],
-                    "ReducedCosts": inputs["reduced_costs"],
-                    "AdditionalCosts": inputs["additional_costs"],
-                    "ReducedRevenue": inputs["reduced_revenue"],
-                    "NetChange": net_change,
-                    "CumulativeNetChange": cumulative_change,
-                }
-            )
-
-            self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-            self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-            self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-            self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-            self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
-            self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
-            self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
-            self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+            self._publish_delta_outputs(info_map, derived_inputs)
             return
 
         if derived_inputs and derived_inputs.get("mode") == "single":
-            net_annual_cash_flow = self._to_array(derived_inputs.get("net_annual_cash_flow", 0.0))
-            revenue_total = self._to_array(derived_inputs.get("revenue_total", 0.0))
-            cost_total = self._to_array(derived_inputs.get("cost_total", 0.0))
-            inputs = {
-                "additional_revenue": self._to_array(0.0),
-                "reduced_costs": self._to_array(0.0),
-                "additional_costs": self._to_array(0.0),
-                "reduced_revenue": self._to_array(0.0),
-            }
-            horizon = net_annual_cash_flow.size
-            result_df = pd.DataFrame(
-                {
-                    "Period": np.arange(1, horizon + 1),
-                    "RevenueTotal": revenue_total,
-                    "CostTotal": cost_total,
-                    "NetAnnualCashFlow": net_annual_cash_flow,
-                }
-            )
-            self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-            self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-            self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-            self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-            self.om.add_variable("econ_pba_revenue_total", revenue_total.tolist(), info_map)
-            self.om.add_variable("econ_pba_cost_total", cost_total.tolist(), info_map)
-            self.om.add_variable("econ_pba_net_annual_cash_flow", net_annual_cash_flow.tolist(), info_map)
-            self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
-            self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+            self._publish_single_outputs(info_map, derived_inputs)
             return
 
-        else:
-            self.om.add_warning(
-                "MissingPartialBudgetData",
-                "No scenario-aware economics data was available to derive partial budget inputs.",
-                info_map,
-            )
-            inputs = self._load_inputs()
-        net_change = (inputs["additional_revenue"] + inputs["reduced_costs"]) - (
-            inputs["additional_costs"] + inputs["reduced_revenue"]
-        )
-        cumulative_change = np.cumsum(net_change)
-        horizon = net_change.size
-
-        result_df = pd.DataFrame(
-            {
-                "Period": np.arange(1, horizon + 1),
-                "AdditionalRevenue": inputs["additional_revenue"],
-                "ReducedCosts": inputs["reduced_costs"],
-                "AdditionalCosts": inputs["additional_costs"],
-                "ReducedRevenue": inputs["reduced_revenue"],
-                "NetChange": net_change,
-                "CumulativeNetChange": cumulative_change,
-            }
-        )
-
-        self.om.add_variable("econ_pba_additional_revenue", inputs["additional_revenue"].tolist(), info_map)
-        self.om.add_variable("econ_pba_reduced_costs", inputs["reduced_costs"].tolist(), info_map)
-        self.om.add_variable("econ_pba_additional_costs", inputs["additional_costs"].tolist(), info_map)
-        self.om.add_variable("econ_pba_reduced_revenue", inputs["reduced_revenue"].tolist(), info_map)
-        self.om.add_variable("econ_pba_net_change", net_change.tolist(), info_map)
-        self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
-        self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
-        self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+        self._publish_fallback_outputs(info_map)
 
     def has_partial_budget_activity(
         self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None

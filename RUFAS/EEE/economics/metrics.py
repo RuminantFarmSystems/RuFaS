@@ -52,3 +52,32 @@ class EconomicMetrics:
         """Return ``NaN`` because MPSP is solved via the DCFROR goal-seek workflow."""
 
         return float("nan")
+
+
+def calculate_roi(benefits: float, costs: float) -> float:
+    """Compatibility wrapper for ROI metric."""
+    return EconomicMetrics.calculate_roi(benefits, costs)
+
+
+def calculate_payback_period(cash_flows: Iterable[float]) -> float:
+    """Compatibility wrapper for payback period metric."""
+    return EconomicMetrics.calculate_payback_period(cash_flows)
+
+
+def calculate_net_annual_cash_flow(revenue: Iterable[float], costs: Iterable[float]) -> np.ndarray:
+    """Compatibility wrapper for net annual cash flow metric."""
+    return EconomicMetrics.calculate_net_annual_cash_flow(revenue, costs)
+
+
+def calculate_mpsp(total_cost: float, total_output: float) -> float:
+    """Compatibility wrapper for MPSP metric."""
+    return EconomicMetrics.calculate_mpsp(total_cost, total_output)
+
+
+__all__ = [
+    "EconomicMetrics",
+    "calculate_roi",
+    "calculate_payback_period",
+    "calculate_net_annual_cash_flow",
+    "calculate_mpsp",
+]

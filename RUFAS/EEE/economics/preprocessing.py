@@ -307,37 +307,52 @@ class EconomicPreprocessor:
             self._append_from_payload(values, data)
         return values
 
+    def _load_geo_context(self) -> tuple[int, int, int]:
+        """Load year range and FIPS context for geography-indexed price tables."""
+        start_year = int(self.im.get_data("config.start_date").split(":")[0])
+        end_year = int(self.im.get_data("config.end_date").split(":")[0])
+        fips_code = int(self.im.get_data("config.FIPS_county_code"))
+        return start_year, end_year, fips_code
+
     def _extract_price_values(self, price_data: Any) -> List[float]:
         """Extract numeric price values from pricing payloads."""
 
         info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
-        start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
-        end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
-        fips_code: int = self.im.get_data("config.FIPS_county_code")
+        if not price_data:
+            return []
         values: List[float] = []
+        geo_context: tuple[int, int, int] | None = None
+
         for key, value in price_data.items():
+            if isinstance(value, dict) and "cost" in value:
+                self._append_numeric(values, value.get("cost"))
+                continue
+
+            if geo_context is None:
+                geo_context = self._load_geo_context()
+            year_start, year_end, county_fips = geo_context
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
                 self.om.add_warning(
                     "MissingPriceData",
-                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
+                    f"Price data missing for key: {key}, FIPS: '{county_fips}' is not in expected format."
                     "Using fallback price.",
                     info_map,
                 )
-                values.extend(self._get_fallback_price(start_year, end_year, key))
+                values.extend(self._get_fallback_price(year_start, year_end, key))
                 continue
-            fips_idx = value["fips"].index(fips_code)
-            for year in range(start_year, end_year + 1):
+            fips_idx = value["fips"].index(county_fips)
+            for year in range(year_start, year_end + 1):
                 try:
                     price = value[f"{year}"][fips_idx]
                     values.append(price)
                 except (KeyError, IndexError):
                     self.om.add_warning(
                         "MissingPriceData",
-                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
+                        f"Price data missing for year '{year}' and FIPS '{county_fips}' in '{key}'."
                         "Using fallback price.",
                         info_map,
                     )
-                    values.extend(self._get_fallback_price(start_year, end_year, key))
+                    values.extend(self._get_fallback_price(year_start, year_end, key))
                     continue
         return values
 
@@ -393,6 +408,76 @@ class EconomicPreprocessor:
             return "cost"
         return None
 
+    def _collect_all_pricing_options(self, economics_files: dict[str, Any], info_map: Dict[str, str]) -> Dict[str, Any]:
+        """Load all concrete pricing file options declared in a selector map."""
+        prices: Dict[str, Any] = {}
+        for option, file_key in economics_files.items():
+            if option == "input_manager_location":
+                continue
+            if not isinstance(file_key, str):
+                continue
+            price_data = self._get_data_with_handling(file_key, info_map)
+            if price_data is not None:
+                prices[file_key] = price_data
+        return prices
+
+    def _fetch_selector_prices(
+        self,
+        economics_files: dict[str, Any],
+        selector_path: str,
+        info_map: Dict[str, str],
+    ) -> Dict[str, Any]:
+        """Resolve selector-based commodity pricing entries."""
+        selection = self._get_data_with_handling(selector_path, info_map)
+        if selection is None:
+            self.om.add_warning(
+                "MissingSelection",
+                f"Selector value not found at '{selector_path}'",
+                info_map,
+            )
+            prices = self._collect_all_pricing_options(economics_files, info_map)
+            if prices:
+                self.om.add_warning(
+                    "MissingSelectionFallback",
+                    f"No selector match; using all available pricing options for '{selector_path}'.",
+                    info_map,
+                )
+            return prices
+
+        selection_key = str(selection).lower()
+        selected_file = None
+        for option, file_key in economics_files.items():
+            if option == "input_manager_location":
+                continue
+            if option.lower() == selection_key:
+                selected_file = file_key
+                break
+
+        if selected_file is None:
+            self.om.add_warning(
+                "UnknownSelection",
+                f"No price file matched selection '{selection}' at '{selector_path}'",
+                info_map,
+            )
+            prices = self._collect_all_pricing_options(economics_files, info_map)
+            if prices:
+                self.om.add_warning(
+                    "UnknownSelectionFallback",
+                    f"No matching selection; using all available pricing options for '{selector_path}'.",
+                    info_map,
+                )
+            return prices
+
+        price_data = self._get_data_with_handling(selected_file, info_map)
+        if price_data is None:
+            self.om.add_warning(
+                "MissingEconomicsFile",
+                f"Commodity pricing '{selected_file}' not found in InputManager",
+                info_map,
+            )
+            return {}
+        return {selected_file: price_data}
+
     def _fetch_prices(self, economics_files: Any) -> Dict[str, Any]:
         """Collect commodity pricing using the InputManager."""
 
@@ -420,67 +505,7 @@ class EconomicPreprocessor:
 
         selector_path = economics_files.get("input_manager_location")
         if selector_path:
-            selection = self._get_data_with_handling(selector_path, info_map)
-            if selection is None:
-                self.om.add_warning(
-                    "MissingSelection",
-                    f"Selector value not found at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "MissingSelectionFallback",
-                        f"No selector match; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            selection_key = str(selection).lower()
-            selected_file = None
-            for option, file_key in economics_files.items():
-                if option == "input_manager_location":
-                    continue
-                if option.lower() == selection_key:
-                    selected_file = file_key
-                    break
-            if selected_file is None:
-                self.om.add_warning(
-                    "UnknownSelection",
-                    f"No price file matched selection '{selection}' at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "UnknownSelectionFallback",
-                        f"No matching selection; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            price_data = self._get_data_with_handling(selected_file, info_map)
-            if price_data is None:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{selected_file}' not found in InputManager",
-                    info_map,
-                )
-                return prices
-            prices[selected_file] = price_data
-            return prices
+            return self._fetch_selector_prices(economics_files, selector_path, info_map)
 
         for label, file_key in economics_files.items():
             if not isinstance(file_key, str):
@@ -495,6 +520,125 @@ class EconomicPreprocessor:
                 continue
             prices[label] = price_data
         return prices
+
+    def _aggregate_by_scenario(
+        self, values_by_scenario: Dict[str, List[float]], preprocessing: str | None
+    ) -> Dict[str, float | None]:
+        """Aggregate scenario values with preprocessing fallback to sum."""
+        aggregates_by_scenario: Dict[str, float | None] = {}
+        for scenario, scenario_values in values_by_scenario.items():
+            scenario_aggregate = self._aggregate(scenario_values, preprocessing or "")
+            if scenario_aggregate is None and scenario_values:
+                scenario_aggregate = Aggregator.sum(scenario_values)
+            aggregates_by_scenario[scenario] = scenario_aggregate
+        return aggregates_by_scenario
+
+    def _line_item_values_from_price(
+        self,
+        item: EconomicItem,
+        aggregated_value: float | None,
+        aggregates_by_scenario: Dict[str, float | None],
+        price_aggregate: float | None,
+        info_map: Dict[str, str],
+    ) -> Dict[str, float]:
+        """Build line item values by scenario from aggregates and optional price."""
+        line_item_values_by_scenario: Dict[str, float] = {}
+        if price_aggregate is not None:
+            for scenario, aggregate_value in aggregates_by_scenario.items():
+                if aggregate_value is None:
+                    continue
+                line_item_values_by_scenario[scenario] = aggregate_value * price_aggregate
+            return line_item_values_by_scenario
+
+        for scenario, aggregate_value in aggregates_by_scenario.items():
+            if aggregate_value is None:
+                continue
+            line_item_values_by_scenario[scenario] = aggregate_value
+        if line_item_values_by_scenario:
+            self.om.add_warning(
+                "MissingPriceForLineItem",
+                f"No price found for '{item.name}'. Using aggregated values as totals.",
+                info_map,
+            )
+        if not line_item_values_by_scenario and aggregated_value is not None:
+            fallback_flow_type = self._infer_flow_type(item) or "cost"
+            fallback_price = ECONOMIC_PRICE_FALLBACK.get(fallback_flow_type, 1.0)
+            line_item_values_by_scenario["baseline"] = aggregated_value * fallback_price
+        return line_item_values_by_scenario
+
+    def _resolve_biophysical_values(
+        self, values_by_scenario: Dict[str, List[float]], input_values: List[float]
+    ) -> Dict[str, List[float]]:
+        """Resolve scenario values using simulation values, inputs, or fallbacks."""
+        if values_by_scenario:
+            for scenario, biophysical_values in values_by_scenario.items():
+                if not biophysical_values and input_values:
+                    values_by_scenario[scenario] = list(input_values)
+            return values_by_scenario
+        if input_values:
+            return {"baseline": list(input_values)}
+        return {"baseline": [ECONOMIC_QUANTITY_FALLBACK]}
+
+    def _build_line_item_payload(
+        self,
+        item: EconomicItem,
+        values_by_scenario: Dict[str, List[float]],
+        input_values: List[float],
+        info_map: Dict[str, str],
+    ) -> Dict[str, Any]:
+        """Build one preprocessed line-item payload."""
+        biophysical_values: List[float] = []
+        for scenario_values in values_by_scenario.values():
+            biophysical_values.extend(scenario_values)
+
+        aggregated_value = self._aggregate(biophysical_values, item.preprocessing or "")
+        if aggregated_value is None and biophysical_values:
+            aggregated_value = Aggregator.sum(biophysical_values)
+        if not biophysical_values and not input_values:
+            self.om.add_warning(
+                "MissingBiophysicalData",
+                "No values found for "
+                f"'{item.name}' using patterns {item.biophysical_simulation} "
+                f"and input paths {item.input_manager}",
+                info_map,
+            )
+
+        price_data = self._fetch_prices(item.economics_files)
+        if item.economics_files and not price_data:
+            self.om.add_warning(
+                "MissingEconomicsFile",
+                f"No commodity pricing retrieved for '{item.name}'",
+                info_map,
+            )
+
+        price_values = self._extract_price_values(price_data)
+        price_aggregate = self._aggregate(price_values, "average")
+        if price_aggregate is None and item.economics_files:
+            flow_type = self._infer_flow_type(item) or "cost"
+            if flow_type in ECONOMIC_PRICE_FALLBACK:
+                price_aggregate = ECONOMIC_PRICE_FALLBACK[flow_type]
+
+        aggregates_by_scenario = self._aggregate_by_scenario(values_by_scenario, item.preprocessing)
+        line_item_values_by_scenario = self._line_item_values_from_price(
+            item,
+            aggregated_value,
+            aggregates_by_scenario,
+            price_aggregate,
+            info_map,
+        )
+
+        flow_type = self._infer_flow_type(item) or "cost"
+        return {
+            "biophysical_values": biophysical_values,
+            "biophysical_aggregate": aggregated_value,
+            "biophysical_values_by_scenario": values_by_scenario,
+            "biophysical_aggregate_by_scenario": aggregates_by_scenario,
+            "price_data": price_data,
+            "price_values": price_values,
+            "price_aggregate": price_aggregate,
+            "line_item_values_by_scenario": line_item_values_by_scenario,
+            "flow_type": flow_type,
+        }
 
     def _aggregate(self, values: List[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
@@ -528,88 +672,17 @@ class EconomicPreprocessor:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
 
-            values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             input_values = self._fetch_input_values(item.input_manager)
-
-            if values_by_scenario:
-                for scenario, biophysical_values in values_by_scenario.items():
-                    if not biophysical_values and input_values:
-                        values_by_scenario[scenario] = list(input_values)
-            elif input_values:
-                values_by_scenario = {"baseline": list(input_values)}
-            else:
-                values_by_scenario = {"baseline": [ECONOMIC_QUANTITY_FALLBACK]}
-
-            biophysical_values: List[float] = []
-            for scenario_values in values_by_scenario.values():
-                biophysical_values.extend(scenario_values)
-
-            aggregated_value = self._aggregate(biophysical_values, item.preprocessing or "")
-            if aggregated_value is None and biophysical_values:
-                aggregated_value = Aggregator.sum(biophysical_values)
-            if not biophysical_values and not input_values:
-                self.om.add_warning(
-                    "MissingBiophysicalData",
-                    "No values found for "
-                    f"'{item.name}' using patterns {item.biophysical_simulation} "
-                    f"and input paths {item.input_manager}",
-                    info_map,
-                )
-
-            price_data = self._fetch_prices(item.economics_files)
-            if item.economics_files and not price_data:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"No commodity pricing retrieved for '{item.name}'",
-                    info_map,
-                )
-
-            price_values = self._extract_price_values(price_data)
-            price_aggregate = self._aggregate(price_values, "average")
-            if price_aggregate is None:
-                flow_type = self._infer_flow_type(item) or "cost"
-                if flow_type in ECONOMIC_PRICE_FALLBACK:
-                    price_aggregate = ECONOMIC_PRICE_FALLBACK[flow_type]
-            aggregates_by_scenario: Dict[str, float | None] = {}
-            for scenario, scenario_values in values_by_scenario.items():
-                scenario_aggregate = self._aggregate(scenario_values, item.preprocessing or "")
-                if scenario_aggregate is None and scenario_values:
-                    scenario_aggregate = Aggregator.sum(scenario_values)
-                aggregates_by_scenario[scenario] = scenario_aggregate
-            line_item_values_by_scenario: Dict[str, float] = {}
-            if price_aggregate is not None:
-                for scenario, aggregate_value in aggregates_by_scenario.items():
-                    if aggregate_value is None:
-                        continue
-                    line_item_values_by_scenario[scenario] = aggregate_value * price_aggregate
-            else:
-                for scenario, aggregate_value in aggregates_by_scenario.items():
-                    if aggregate_value is None:
-                        continue
-                    line_item_values_by_scenario[scenario] = aggregate_value
-                if line_item_values_by_scenario:
-                    self.om.add_warning(
-                        "MissingPriceForLineItem",
-                        f"No price found for '{item.name}'. Using aggregated values as totals.",
-                        info_map,
-                    )
-            if not line_item_values_by_scenario and aggregated_value is not None:
-                fallback_flow_type = self._infer_flow_type(item) or "cost"
-                fallback_price = ECONOMIC_PRICE_FALLBACK.get(fallback_flow_type, 1.0)
-                line_item_values_by_scenario["baseline"] = aggregated_value * fallback_price
-
-            flow_type = self._infer_flow_type(item) or "cost"
-            category_data[item.name] = {
-                "biophysical_values": biophysical_values,
-                "biophysical_aggregate": aggregated_value,
-                "biophysical_values_by_scenario": values_by_scenario,
-                "biophysical_aggregate_by_scenario": aggregates_by_scenario,
-                "price_data": price_data,
-                "price_values": price_values,
-                "price_aggregate": price_aggregate,
-                "line_item_values_by_scenario": line_item_values_by_scenario,
-                "flow_type": flow_type,
-            }
+            values_by_scenario = self._resolve_biophysical_values(
+                self._fetch_values_by_scenario(item.biophysical_simulation),
+                input_values,
+            )
+            category_data[item.name] = self._build_line_item_payload(
+                item=item,
+                values_by_scenario=values_by_scenario,
+                input_values=input_values,
+                info_map=info_map,
+            )
 
         # Store aggregated results back into the InputManager
         self.im.add_runtime_variable_to_pool(

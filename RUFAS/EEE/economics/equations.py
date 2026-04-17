@@ -134,11 +134,11 @@ class EconomicEquations:
     def loss_carry_forward(prev_taxable: float, prev_loss: float) -> float:
         """Loss carry forward using Equation 21."""
         return prev_taxable + prev_loss if prev_taxable < 0 else prev_loss
-
+    
     @staticmethod
     def max_loss_utilized(net_rev: float, carried_loss: float) -> float:
         """Maximum loss utilization using Equation 22."""
-        carry_forward_limit = 0.8
+        carry_forward_limit = 0.8 
         return min(abs(carried_loss), net_rev * carry_forward_limit)
 
     @staticmethod
@@ -166,3 +166,115 @@ class EconomicEquations:
     def net_present_value(apv: np.ndarray, capital_interest_pv: np.ndarray) -> float:
         """Net present value using Equation 28."""
         return apv.sum() - capital_interest_pv.sum()
+
+
+def construct_timeline(construction_years: int, loan_term: int, project_term: int | None = None) -> np.ndarray:
+    return EconomicEquations.construct_timeline(construction_years, loan_term, project_term)
+
+
+def discount_factor(irr: float, year: int | float) -> float:
+    return EconomicEquations.discount_factor(irr, year)
+
+
+def annual_capital_spent(total_capital: float, construction_rate_per_year: list[float] | np.ndarray) -> np.ndarray:
+    return EconomicEquations.annual_capital_spent(total_capital, construction_rate_per_year)
+
+
+def equity_contribution(
+    total_capital: float,
+    construction_rate_per_year: list[float] | np.ndarray,
+    equity_amount: float,
+) -> np.ndarray:
+    return EconomicEquations.equity_contribution(total_capital, construction_rate_per_year, equity_amount)
+
+
+def loan_principal(
+    total_capital: float | np.ndarray,
+    construction_rate_per_year: list[float] | np.ndarray,
+    loan_fraction: float | None = None,
+) -> np.ndarray:
+    return EconomicEquations.loan_principal(total_capital, construction_rate_per_year, loan_fraction)
+
+
+def construction_interest(loan_principal: np.ndarray, interest_rate: float) -> np.ndarray:
+    return EconomicEquations.construction_interest(loan_principal, interest_rate)
+
+
+def npv_capital_plus_interest(capital: np.ndarray, interest: np.ndarray, irr: float, years: np.ndarray) -> np.ndarray:
+    return EconomicEquations.npv_capital_plus_interest(capital, interest, irr, years)
+
+
+def annual_loan_payment(total_cost: float, rate: float, term: int, loan_fraction: float) -> float:
+    return EconomicEquations.annual_loan_payment(total_cost, rate, term, loan_fraction)
+
+
+def interest_payment(previous_principal: float, rate: float) -> float:
+    return EconomicEquations.interest_payment(previous_principal, rate)
+
+
+def principal_after_payment(previous_principal: float, payment: float, interest: float) -> float:
+    return EconomicEquations.principal_after_payment(previous_principal, payment, interest)
+
+
+def depreciation_schedule(total_cost: float, depreciation_rates: np.ndarray) -> np.ndarray:
+    return EconomicEquations.depreciation_schedule(total_cost, depreciation_rates)
+
+
+def net_revenue(revenue: float, operating_cost: float, interest: float, depreciation: float) -> float:
+    return EconomicEquations.net_revenue(revenue, operating_cost, interest, depreciation)
+
+
+def loss_carry_forward(prev_taxable: float, prev_loss: float = 0.0) -> float:
+    return EconomicEquations.loss_carry_forward(prev_taxable, prev_loss)
+
+
+def max_loss_utilized(net_rev: float, carried_loss: float) -> float:
+    return EconomicEquations.max_loss_utilized(net_rev, carried_loss)
+
+
+def taxable_income(net_rev: float, used_loss: float) -> float:
+    # Backward-compatible module-level behavior:
+    # older callers passed negative carry-forward losses directly.
+    if used_loss < 0:
+        return net_rev + used_loss
+    return EconomicEquations.taxable_income(net_rev, used_loss)
+
+
+def income_tax(taxable: float, tax_rate: float) -> float:
+    return EconomicEquations.income_tax(taxable, tax_rate)
+
+
+def annual_cash_income(revenue: float, operating_cost: float, loan_payment: float, tax_pay: float) -> float:
+    return EconomicEquations.annual_cash_income(revenue, operating_cost, loan_payment, tax_pay)
+
+
+def present_value(cash_income: float, discount: float) -> float:
+    return EconomicEquations.present_value(cash_income, discount)
+
+
+def net_present_value(apv: np.ndarray, capital_interest_pv: np.ndarray) -> float:
+    return EconomicEquations.net_present_value(apv, capital_interest_pv)
+
+
+__all__ = [
+    "EconomicEquations",
+    "construct_timeline",
+    "discount_factor",
+    "annual_capital_spent",
+    "equity_contribution",
+    "loan_principal",
+    "construction_interest",
+    "npv_capital_plus_interest",
+    "annual_loan_payment",
+    "interest_payment",
+    "principal_after_payment",
+    "depreciation_schedule",
+    "net_revenue",
+    "loss_carry_forward",
+    "max_loss_utilized",
+    "taxable_income",
+    "income_tax",
+    "annual_cash_income",
+    "present_value",
+    "net_present_value",
+]

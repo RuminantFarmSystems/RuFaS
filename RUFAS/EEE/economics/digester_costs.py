@@ -273,3 +273,74 @@ class DigesterCostCalculator:
         """Estimate the RNG trucking and injection cost for the herd size."""
 
         return cls._TRANSPORT_COST.evaluate(cows)
+
+
+def calculate_digester_capital_cost(*args, **kwargs) -> float:
+    """Compatibility wrapper for digester capital cost equation."""
+    return DigesterCostCalculator.calculate_digester_capital_cost(*args, **kwargs)
+
+
+def capital_recovery_factor(rate: float, periods: int) -> float:
+    """Compatibility wrapper for capital recovery factor."""
+    return DigesterCostCalculator.capital_recovery_factor(rate, periods)
+
+
+def scale_installed_cost(base_cost: float, volume: float, base_volume: float, install_factor: float) -> float:
+    """Compatibility wrapper for equipment scaling equation."""
+    return DigesterCostCalculator.scale_installed_cost(base_cost, volume, base_volume, install_factor)
+
+
+def calculate_digester_capex(afc_ij: float, crf: float) -> float:
+    """Compatibility wrapper for digester CAPEX equation."""
+    return DigesterCostCalculator.calculate_digester_capex(afc_ij, crf)
+
+
+def calculate_digester_operational_cost(
+    use_cost_function: bool,
+    animal_units: float,
+    farm_type_flag: float,
+    below_ground_flag: float,
+    concrete_flag: float,
+    steel_flag: float,
+    **kwargs,
+) -> float:
+    """Compatibility wrapper for digester operational cost equation."""
+    return DigesterCostCalculator.calculate_digester_operational_cost(
+        use_cost_function,
+        animal_units,
+        farm_type_flag,
+        below_ground_flag,
+        concrete_flag,
+        steel_flag,
+        **kwargs,
+    )
+
+
+def get_digester_cost_profile(system: str) -> DigesterSystemCostProfile:
+    """Compatibility wrapper for digester profile lookup."""
+    return DigesterCostCalculator.get_digester_cost_profile(system)
+
+
+def estimate_digester_costs(system: str, cows: float) -> Dict[str, object]:
+    """Compatibility wrapper for digester CAPEX/OPEX estimate."""
+    return DigesterCostCalculator.estimate_digester_costs(system, cows)
+
+
+def estimate_digester_trucking_cost(cows: float) -> float:
+    """Compatibility wrapper for trucking and injection cost estimate."""
+    return DigesterCostCalculator.estimate_digester_trucking_cost(cows)
+
+
+__all__ = [
+    "LinearCostEquation",
+    "DigesterSystemCostProfile",
+    "DigesterCostCalculator",
+    "calculate_digester_capital_cost",
+    "capital_recovery_factor",
+    "scale_installed_cost",
+    "calculate_digester_capex",
+    "calculate_digester_operational_cost",
+    "estimate_digester_costs",
+    "estimate_digester_trucking_cost",
+    "get_digester_cost_profile",
+]
