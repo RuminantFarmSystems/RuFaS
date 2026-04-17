@@ -1,4 +1,4 @@
-from unittest.mock import call
+from unittest.mock import call, MagicMock
 
 import numpy
 import pytest
@@ -25,19 +25,19 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 def genetics() -> Genetics:
     AnimalConfig.average_phenotype["fat_kg"] = {2020: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {2020: 20.0}
-    genetics = Genetics(animal_type=AnimalType.LAC_COW, birth_year=2020, parity=3)
+    genetics = Genetics(animal_type=AnimalType.LAC_COW, birth_year=2020)
     return genetics
 
 
 @pytest.mark.parametrize(
     "animal_type, birth_year, birth_month, parity, initialize_new_born_calf, dam_tbv_fat, dam_tbv_protein",
     [
-        (AnimalType.CALF, 2020, None, False, None, None, None),
-        (AnimalType.HEIFER_I, 2020, None, None, None, None, None),
-        (AnimalType.HEIFER_II, 2020, None, None, None, None, None),
-        (AnimalType.HEIFER_III, 2020, None, 0, None, None, None),
-        (AnimalType.LAC_COW, 2020, None, 1, None, None, None),
-        (AnimalType.DRY_COW, 2020, None, 5, None, None, None),
+        (AnimalType.CALF, 2020, None, False, False, None, None),
+        (AnimalType.HEIFER_I, 2020, None, None, False, None, None),
+        (AnimalType.HEIFER_II, 2020, None, None, False, None, None),
+        (AnimalType.HEIFER_III, 2020, None, 0, False, None, None),
+        (AnimalType.LAC_COW, 2020, None, 1, False, None, None),
+        (AnimalType.DRY_COW, 2020, None, 5, False, None, None),
         (AnimalType.CALF, 2020, 1, 1, True, 10.0, 20.0),
     ],
 )
@@ -46,7 +46,7 @@ def test_animal_genetics_init(
     birth_year: int,
     birth_month: int | None,
     parity: int | None,
-    initialize_new_born_calf: bool | None,
+    initialize_new_born_calf: bool,
     dam_tbv_fat: float | None,
     dam_tbv_protein: float | None,
     mocker: MockerFixture,
@@ -85,7 +85,6 @@ def test_animal_genetics_init(
         animal_type=animal_type,
         birth_year=birth_year,
         birth_month=birth_month,
-        parity=parity,
         initialize_new_born_calf=initialize_new_born_calf,
         dam_tbv_fat=dam_tbv_fat,
         dam_tbv_protein=dam_tbv_protein,
@@ -331,3 +330,214 @@ def test_calculate_ranking_index(
     genetics.EBV_protein = ebv_protein
     ranking_index = genetics._calculate_ranking_index()
     assert ranking_index == pytest.approx(expected_ranking_index)
+
+
+def test_calculate_ebv_and_ranking_index(genetics: Genetics, mocker: MockerFixture) -> None:
+    """Unit test for calculate_ebv_and_ranking_index()"""
+    mock_calculate_ebv_values = mocker.patch.object(genetics, "_calculate_ebv_values", return_value=(5.0, 10.0))
+    mock_calculate_ranking_index = mocker.patch.object(genetics, "_calculate_ranking_index", return_value=2.89)
+
+    genetics.calculate_ebv_and_ranking_index(
+        animal_type=AnimalType.LAC_COW,
+        group_specific_TBV_fat_mean=1.0,
+        group_specific_TBV_protein_mean=2.0,
+        parity=2,
+    )
+
+    mock_calculate_ebv_values.assert_called_once_with(
+        animal_type=AnimalType.LAC_COW,
+        group_specific_TBV_fat_mean=1.0,
+        group_specific_TBV_protein_mean=2.0,
+        parity=2,
+    )
+    mock_calculate_ranking_index.assert_called_once_with()
+    assert genetics.EBV_fat == 5.0
+    assert genetics.EBV_protein == 10.0
+    assert genetics.ranking_index == 2.89
+
+
+def test_dict_representation(genetics: Genetics) -> None:
+    """Unit test for dict_representation property"""
+    genetics.TBV_fat = 1.1
+    genetics.TBV_protein = 2.2
+    genetics.E_permanent_fat = 3.3
+    genetics.E_permanent_protein = 4.4
+    genetics.E_temporary_fat = 5.5
+    genetics.E_temporary_protein = 6.6
+    genetics.phenotype_fat = 7.7
+    genetics.phenotype_protein = 8.8
+    genetics.EBV_fat = 9.9
+    genetics.EBV_protein = 10.0
+    genetics.ranking_index = 11.11
+
+    result = genetics.dict_representation
+
+    assert result == {
+        "TBV_fat": 1.1,
+        "TBV_protein": 2.2,
+        "E_permanent_fat": 3.3,
+        "E_permanent_protein": 4.4,
+        "E_temporary_fat": 5.5,
+        "E_temporary_protein": 6.6,
+        "phenotype_fat": 7.7,
+        "phenotype_protein": 8.8,
+        "EBV_fat": 9.9,
+        "EBV_protein": 10.0,
+        "ranking_index": 11.11,
+    }
+
+
+def test_calculate_average_genetic_values_empty_list() -> None:
+    """calculate_average_genetic_values returns None for all keys when list is empty."""
+    result = Genetics.calculate_average_genetic_values([])
+    assert all(v is None for v in result.values())
+    assert set(result.keys()) == {
+        "TBV_fat",
+        "TBV_protein",
+        "E_permanent_fat",
+        "E_permanent_protein",
+        "E_temporary_fat",
+        "E_temporary_protein",
+        "phenotype_fat",
+        "phenotype_protein",
+        "EBV_fat",
+        "EBV_protein",
+        "ranking_index",
+    }
+
+
+def test_calculate_average_genetic_values_nonempty(genetics: Genetics) -> None:
+    """calculate_average_genetic_values returns mean of each attribute."""
+    g1 = MagicMock(spec=Genetics)
+    g1.TBV_fat, g1.TBV_protein = 10.0, 20.0
+    g1.E_permanent_fat, g1.E_permanent_protein = 1.0, 2.0
+    g1.E_temporary_fat, g1.E_temporary_protein = 3.0, 4.0
+    g1.phenotype_fat, g1.phenotype_protein = 5.0, 6.0
+    g1.EBV_fat, g1.EBV_protein = 7.0, 8.0
+    g1.ranking_index = 9.0
+
+    g2 = MagicMock(spec=Genetics)
+    g2.TBV_fat, g2.TBV_protein = 20.0, 40.0
+    g2.E_permanent_fat, g2.E_permanent_protein = 3.0, 6.0
+    g2.E_temporary_fat, g2.E_temporary_protein = 7.0, 8.0
+    g2.phenotype_fat, g2.phenotype_protein = 9.0, 10.0
+    g2.EBV_fat, g2.EBV_protein = 11.0, 12.0
+    g2.ranking_index = 13.0
+
+    result = Genetics.calculate_average_genetic_values([g1, g2])
+
+    assert result["TBV_fat"] == pytest.approx(15.0)
+    assert result["TBV_protein"] == pytest.approx(30.0)
+    assert result["E_permanent_fat"] == pytest.approx(2.0)
+    assert result["E_permanent_protein"] == pytest.approx(4.0)
+    assert result["E_temporary_fat"] == pytest.approx(5.0)
+    assert result["E_temporary_protein"] == pytest.approx(6.0)
+    assert result["phenotype_fat"] == pytest.approx(7.0)
+    assert result["phenotype_protein"] == pytest.approx(8.0)
+    assert result["EBV_fat"] == pytest.approx(9.0)
+    assert result["EBV_protein"] == pytest.approx(10.0)
+    assert result["ranking_index"] == pytest.approx(11.0)
+
+
+def test_calculate_average_tbv_empty_list() -> None:
+    """calculate_average_tbv returns (0.0, 0.0) for empty list."""
+    fat, protein = Genetics.calculate_average_tbv([])
+    assert fat == 0.0
+    assert protein == 0.0
+
+
+def test_calculate_average_tbv_nonempty() -> None:
+    """calculate_average_tbv returns mean TBV_fat and TBV_protein."""
+    g1 = MagicMock(spec=Genetics)
+    g1.TBV_fat, g1.TBV_protein = 10.0, 20.0
+    g2 = MagicMock(spec=Genetics)
+    g2.TBV_fat, g2.TBV_protein = 30.0, 60.0
+
+    fat, protein = Genetics.calculate_average_tbv([g1, g2])
+
+    assert fat == pytest.approx(20.0)
+    assert protein == pytest.approx(40.0)
+
+
+def test_calculate_newborn_calf_tbv_values_too_early(genetics: Genetics, mocker: MockerFixture) -> None:
+    """Out-of-range early birth date falls back to earliest semen date with warning."""
+    AnimalConfig.top_listing_semen["estimated_fat"] = {"2010-01": 50.0, "2020-01": 80.0}
+    AnimalConfig.top_listing_semen["estimated_protein"] = {"2010-01": 25.0, "2020-01": 40.0}
+    mock_add_warning = mocker.patch.object(genetics.om, "add_warning")
+    mock_generate = mocker.patch.object(Utility, "generate_bivariate_random_numbers", return_value=(1.0, 2.0))
+    Genetics.set_top_semen_too_early_warning_raised(False)
+
+    genetics._calculate_newborn_calf_tbv_values(10.0, 20.0, "2005-06")
+
+    expected_mean_fat = (50.0 + 10.0) / 2
+    expected_mean_protein = (25.0 + 20.0) / 2
+    mock_generate.assert_called_once_with(
+        expected_mean_fat,
+        expected_mean_protein,
+        pytest.approx(18.243354954612926),
+        pytest.approx(9.475230867899738),
+        TBV_CORRELATION,
+    )
+    mock_add_warning.assert_called_once()
+
+
+def test_calculate_newborn_calf_tbv_values_too_late(genetics: Genetics, mocker: MockerFixture) -> None:
+    """Out-of-range late birth date falls back to latest semen date with warning."""
+    AnimalConfig.top_listing_semen["estimated_fat"] = {"2010-01": 50.0, "2020-01": 80.0}
+    AnimalConfig.top_listing_semen["estimated_protein"] = {"2010-01": 25.0, "2020-01": 40.0}
+    mock_add_warning = mocker.patch.object(genetics.om, "add_warning")
+    mock_generate = mocker.patch.object(Utility, "generate_bivariate_random_numbers", return_value=(1.0, 2.0))
+    Genetics.set_birthdate_too_recent_warning_raised(False)
+
+    genetics._calculate_newborn_calf_tbv_values(10.0, 20.0, "2025-03")
+
+    expected_mean_fat = (80.0 + 10.0) / 2
+    expected_mean_protein = (40.0 + 20.0) / 2
+    mock_generate.assert_called_once_with(
+        expected_mean_fat,
+        expected_mean_protein,
+        pytest.approx(18.243354954612926),
+        pytest.approx(9.475230867899738),
+        TBV_CORRELATION,
+    )
+    mock_add_warning.assert_called_once()
+
+
+def test_calculate_phenotype_values_too_early(genetics: Genetics, mocker: MockerFixture) -> None:
+    """Birth year before phenotype data range falls back to earliest year with warning."""
+    AnimalConfig.average_phenotype["fat_kg"] = {2010: 300.0, 2020: 500.0}
+    AnimalConfig.average_phenotype["protein_kg"] = {2010: 200.0, 2020: 400.0}
+    mock_add_warning = mocker.patch.object(genetics.om, "add_warning")
+    genetics.TBV_fat = 0.0
+    genetics.TBV_protein = 0.0
+    genetics.E_permanent_fat = 0.0
+    genetics.E_permanent_protein = 0.0
+    genetics.E_temporary_fat = 0.0
+    genetics.E_temporary_protein = 0.0
+    Genetics.set_phenotype_too_early_warning_raised(False)
+
+    fat, protein = genetics._calculate_phenotype_values(birth_year=2000)
+
+    assert fat == pytest.approx(300.0)
+    assert protein == pytest.approx(200.0)
+    mock_add_warning.assert_called_once()
+
+
+def test_calculate_phenotype_values_too_late(genetics: Genetics, mocker: MockerFixture) -> None:
+    """Birth year after phenotype data range falls back to latest year with warning."""
+    AnimalConfig.average_phenotype["fat_kg"] = {2010: 300.0, 2020: 500.0}
+    AnimalConfig.average_phenotype["protein_kg"] = {2010: 200.0, 2020: 400.0}
+    mock_add_warning = mocker.patch.object(genetics.om, "add_warning")
+    genetics.TBV_fat = 0.0
+    genetics.TBV_protein = 0.0
+    genetics.E_permanent_fat = 0.0
+    genetics.E_permanent_protein = 0.0
+    genetics.E_temporary_fat = 0.0
+    genetics.E_temporary_protein = 0.0
+    Genetics.set_phenotype_too_recent_warning_raised(False)
+
+    fat, protein = genetics._calculate_phenotype_values(birth_year=2030)
+
+    assert fat == pytest.approx(500.0)
+    assert protein == pytest.approx(400.0)
+    mock_add_warning.assert_called_once()

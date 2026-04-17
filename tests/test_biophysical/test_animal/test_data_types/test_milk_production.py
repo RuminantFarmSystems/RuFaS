@@ -181,4 +181,4 @@ def test_statistics_units_mapping_is_consistent() -> None:
         "simulation_day": MeasurementUnits.SIMULATION_DAY,
     }
 
-    assert MilkProductionStatistics.UNITS == expected_units
+    assert (MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS) == expected_units

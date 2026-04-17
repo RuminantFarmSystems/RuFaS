@@ -186,6 +186,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             "methane_mitigation_method": "None",
             "methane_mitigation_additive_amount": 0.0,
         },
+        "herd_information": {"simulate_genetics": False},
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -347,6 +348,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "methane_mitigation_method": "None",
             "methane_mitigation_additive_amount": 0.0,
         },
+        "herd_information": {"simulate_genetics": False},
     }
 
     def get_data_side_effect(key: str) -> Any:

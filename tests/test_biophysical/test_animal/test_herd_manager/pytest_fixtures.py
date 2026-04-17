@@ -43,6 +43,9 @@ def config_json() -> dict[str, Any]:
 def animal_json() -> dict[str, Any]:
     return {
         "herd_information": {
+            "herd_size_adjustment_period": 30,
+            "herd_size_sell_threshold": 103,
+            "herd_size_buy_threshold": 101,
             "calf_num": 8,
             "heiferI_num": 44,
             "heiferII_num": 38,
@@ -461,6 +464,7 @@ def mock_herd_manager(
     mock_weather = MagicMock(auto_spec=Weather)
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_available_feeds: list[Feed] = [mock_feed] * 8
+    mock_simulate_animals = True
 
     im = InputManager()
     mock_get_data: MagicMock = mocker.patch.object(im, "get_data", side_effect=mock_get_data_side_effect)
@@ -489,7 +493,7 @@ def mock_herd_manager(
         )
     )
 
-    herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
+    herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds, mock_simulate_animals)
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
@@ -618,7 +622,14 @@ def herd_manager(
 @pytest.fixture
 def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
-        id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
+        id=0,
+        animal_type="",
+        sold_at_day=0,
+        body_weight=0.0,
+        cull_reason="NA",
+        days_in_milk="NA",
+        parity="NA",
+        genetic_history="",
     )
 
 

@@ -171,11 +171,6 @@ class GraphGenerator:
         log_pool : list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
-
-        Raises
-        ------
-        Exception
-            Generic exception raised by utility functions.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -208,6 +203,11 @@ class GraphGenerator:
                 )
                 graph_details["variables"] = list(updated_pool.keys())
             prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
+            sanitized_data: dict[str, list[int | float]] = {}
+            for key, value in prepared_data.items():
+                sanitized_data[key] = [
+                    0.0 if (item is None or not isinstance(item, (int, float))) else float(item) for item in value
+                ]
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
             all_logs = non_numeric_data_logs + var_units_logs
 
@@ -231,7 +231,7 @@ class GraphGenerator:
             if graph_details.get("legend", False):
                 legend_mapping = {
                     k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False)
-                    for k in prepared_data.keys()
+                    for k in sanitized_data.keys()
                 }
                 sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
                 all_logs.append(
@@ -241,7 +241,7 @@ class GraphGenerator:
                         "info_map": info_map,
                     }
                 )
-                prepared_data = {key: prepared_data[key] for key in sorted_keys}
+                sanitized_data = {key: sanitized_data[key] for key in sorted_keys}
             else:
                 all_logs.append(
                     {
@@ -250,11 +250,11 @@ class GraphGenerator:
                         "info_map": info_map,
                     }
                 )
-                graph_details = self._set_graph_legend(graph_details, prepared_data)
+                graph_details = self._set_graph_legend(graph_details, sanitized_data)
             self._draw_graph(
                 graph_details["type"],
-                prepared_data,
-                list(prepared_data.keys()),
+                sanitized_data,
+                list(sanitized_data.keys()),
                 ax,
                 mask_values,
                 use_calendar_dates,
@@ -450,7 +450,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        filtered_pool : dict[str, pool_element_type]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The filtered pool of variables that the user wants to graph.
         graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
@@ -467,28 +467,35 @@ class GraphGenerator:
         title = graph_details.get("title")
         log_pool: list[dict[str, str | dict[str, str]]] = []
         for key, value in filtered_pool.items():
-            if isinstance(value["values"], list):
-                if non_numerical_data := [item for item in value["values"] if not isinstance(item, (int, float))]:
-                    non_numerical_data_types = set(
-                        [type(non_numerical_item) for non_numerical_item in non_numerical_data]
-                    )
+            values = value["values"]
+            if isinstance(values, list):
+                bad_items = [(index, item) for index, item in enumerate(values) if not isinstance(item, (int, float))]
+                if bad_items:
+                    bad_types = {type(item) for _, item in bad_items}
+                    bad_locations = [f"index {index}: {repr(item)}" for index, item in bad_items]
+
                     log_pool.append(
                         {
-                            "error": f"Can't plot {title} data set",
-                            "message": f"{key} key contains non-numerical data that are {non_numerical_data_types} "
-                            "and can't be graphed.",
+                            "warning": f"Bad data found in {title} data set",
+                            "message": (
+                                f"{key} key contains non-numerical data of type(s) {bad_types} at "
+                                f"{', '.join(bad_locations)} and will be sanitized for graphing."
+                            ),
                             "info_map": info_map,
                         }
                     )
-            elif not isinstance(value["values"], (int, float)):
+            elif not isinstance(values, (int, float)):
                 log_pool.append(
                     {
-                        "error": f"Can't plot {title} data set",
-                        "message": f"{key} key contains non-numerical data that are {type(value['values'])} "
-                        "and can't be graphed.",
+                        "warning": f"Bad data found in {title} data set",
+                        "message": (
+                            f"{key} key contains non-numerical data of type {type(values)} "
+                            "and will be sanitized for graphing."
+                        ),
                         "info_map": info_map,
                     }
                 )
+
         return log_pool
 
     def _draw_graph(
@@ -534,7 +541,7 @@ class GraphGenerator:
             if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
-            raise ValueError(f"Unsupported graph type: {graph_type}")
+            raise ValueError(f"Graph Generation error: Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         max_data_length = max(len(v) for v in data.values())
         if slice_start is not None:

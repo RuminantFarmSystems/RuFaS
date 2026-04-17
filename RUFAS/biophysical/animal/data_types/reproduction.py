@@ -41,9 +41,9 @@ class ReproductionInputs:
     days_born: int
     days_in_pregnancy: int
     days_in_milk: int
-    dam_tbv_fat: float
-    dam_tbv_protein: float
     phosphorus_for_gestation_required_for_calf: float
+    dam_tbv_fat: float | None = None
+    dam_tbv_protein: float | None = None
 
     @property
     def is_pregnant(self) -> bool:
@@ -295,10 +295,10 @@ class ReproductionDataStream:
         The current number of days the animal has been milking, (simulation days).
     events : AnimalEvents
         Associated events relevant to the animal’s lifecycle and reproduction.
-    dam_tbv_fat : float
-        The True Breeding Value for fat of the animal, (kg).
-    dam_tbv_protein : float
-        The True Breeding Value for protein of the animal, (kg).
+    dam_tbv_fat : float or None
+        The True Breeding Value for fat of the animal, (kg). Defaults to None.
+    dam_tbv_protein : float or None
+        The True Breeding Value for protein of the animal, (kg). Defaults to None.
     phosphorus_for_gestation_required_for_calf : float
         The phosphorus needed for gestation, specifically for the growth of the calf, (kg).
         individual animal.
@@ -316,12 +316,12 @@ class ReproductionDataStream:
     days_in_pregnancy: int
     days_in_milk: int
     events: AnimalEvents
-    dam_tbv_fat: float
-    dam_tbv_protein: float
     phosphorus_for_gestation_required_for_calf: float
 
     herd_reproduction_statistics: HerdReproductionStatistics
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
+    dam_tbv_fat: float | None = None
+    dam_tbv_protein: float | None = None
 
     @property
     def is_pregnant(self) -> bool:

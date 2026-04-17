@@ -150,9 +150,12 @@ class E2ETestResultsHandler:
                 "The conversion table CSV should have both 'Original' and 'New' columns.",
                 info_map,
             )
-            raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
+            raise KeyError("E2E testing error: The conversion table CSV should have both 'Original' and 'New' columns.")
         if E2ETestResultsHandler._duplicate_mappings_exist(df_conversion_lookup_table):
-            raise ValueError("Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings.")
+            raise ValueError(
+                "E2E testing error: Duplicate Mapping Error: The conversion table CSV should not contain "
+                "duplicate mappings."
+            )
         conversion_lookup_table: dict[str, str] = df_conversion_lookup_table.set_index("Original")["New"].to_dict()
         for key, value in expected_results.items():
             if key in list(conversion_lookup_table.keys()):
@@ -423,14 +426,17 @@ class E2ETestResultsHandler:
                 expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
                 E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
             except (IOError, json.JSONDecodeError) as e:
+                error_message = (
+                    f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
+                    " Restoring backup."
+                )
                 om.add_error(
                     "End-to-end testing expected results update failure.",
-                    f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
-                    " Restoring backup.",
+                    error_message,
                     info_map,
                 )
                 shutil.move(backup_path, path_set.expected_results_path)
-                raise e
+                raise
             finally:
                 if backup_path.exists():
                     backup_path.unlink()
@@ -472,6 +478,11 @@ class E2ETestResultsHandler:
             The path to the JSON file.
         data : dict
             The data to write to the JSON file.
+
+        Raises
+        ------
+        ValueError
+            If the input data is missing required keys.
         """
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
         missing_keys = [key for key in key_order if key not in data]
@@ -485,7 +496,7 @@ class E2ETestResultsHandler:
                     "function": E2ETestResultsHandler._write_formatted_json.__name__,
                 },
             )
-            raise ValueError(f"Missing required keys in data: {missing_keys}")
+            raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
 
         ordered_data = {key: data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))

@@ -1,0 +1,40 @@
+\babel@toc {english}{}\relax 
+\contentsline {table}{\numberline {1}{\ignorespaces Examples of processor types by class.}}{6}{table.caption.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces List of Python classes for Animal to Manure Module connection.}}{9}{table.caption.4}%
+\contentsline {table}{\numberline {3}{\ignorespaces User inputs for Stream Formation and Bedding sections.}}{10}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Recommended minutes\_away\_for\_milking by pen type based on published literature. Remember, this does not necessarily reflect the model defaults. }}{15}{table.caption.6}%
+\contentsline {table}{\numberline {5}{\ignorespaces Proportions of differnt streams for different animal classes.}}{15}{table.caption.7}%
+\contentsline {table}{\numberline {6}{\ignorespaces Calculated manure and bedding characteristics}}{17}{table.caption.8}%
+\contentsline {table}{\numberline {7}{\ignorespaces The classes of handlers that are used in this module.}}{19}{table.caption.9}%
+\contentsline {table}{\numberline {8}{\ignorespaces Required inputs for the Manure Handler (refreshed\_manure\_management.json)}}{19}{table.caption.10}%
+\contentsline {table}{\numberline {9}{\ignorespaces The surface area per stall that is covered with manure is a function of the pen type and type of animal housed.}}{23}{table.caption.11}%
+\contentsline {table}{\numberline {10}{\ignorespaces Calculated manure storage variables and their units}}{26}{table.caption.12}%
+\contentsline {table}{\numberline {11}{\ignorespaces List of Python classes for solid liquid separators.}}{27}{table.caption.13}%
+\contentsline {table}{\numberline {12}{\ignorespaces The required inputs of this section.}}{27}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces The default, minimums, and maximums for various separation efficiencies.}}{30}{table.caption.14}%
+\contentsline {table}{\numberline {14}{\ignorespaces Solids and liquid fraction calculations for separated manure components}}{31}{table.14}%
+\contentsline {table}{\numberline {15}{\ignorespaces List of Python classes for anaerobic digestors.}}{34}{table.caption.15}%
+\contentsline {table}{\numberline {16}{\ignorespaces Required inputs for this section.}}{34}{table.caption.16}%
+\contentsline {table}{\numberline {17}{\ignorespaces Calculated anaerobic digestion outputs.}}{40}{table.17}%
+\contentsline {table}{\numberline {18}{\ignorespaces Key differences for two options of slurry storage.}}{41}{table.caption.17}%
+\contentsline {table}{\numberline {19}{\ignorespaces Required inputs for the slurry storage section.}}{42}{table.caption.19}%
+\contentsline {table}{\numberline {20}{\ignorespaces Manure storage variable calculations}}{50}{table.20}%
+\contentsline {table}{\numberline {21}{\ignorespaces List of Python classes for anaerobic lagoon.}}{52}{table.caption.20}%
+\contentsline {table}{\numberline {22}{\ignorespaces Required inputs for the anaerobic lagoon section (refreshed\_manure\_management.json)}}{52}{table.caption.21}%
+\contentsline {table}{\numberline {23}{\ignorespaces Manure storage variable calculations}}{61}{table.23}%
+\contentsline {table}{\numberline {24}{\ignorespaces List of classes for bedded pack.}}{63}{table.caption.22}%
+\contentsline {table}{\numberline {25}{\ignorespaces Required inputs for the bedded pack section (refreshed\_manure\_management.json)}}{63}{table.caption.23}%
+\contentsline {table}{\numberline {26}{\ignorespaces Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.}}{64}{table.caption.24}%
+\contentsline {table}{\numberline {27}{\ignorespaces Calculated manure storage variables and their units}}{70}{table.27}%
+\contentsline {table}{\numberline {28}{\ignorespaces Classes available in open lots.}}{73}{table.caption.25}%
+\contentsline {table}{\numberline {29}{\ignorespaces Required inputs for the open lots section}}{73}{table.caption.26}%
+\contentsline {table}{\numberline {30}{\ignorespaces Calculated manure storage variables and their units}}{80}{table.30}%
+\contentsline {table}{\numberline {31}{\ignorespaces Classes available in composting.}}{82}{table.caption.27}%
+\contentsline {table}{\numberline {32}{\ignorespaces Required inputs for the composting section (refreshed\_manure\_management.json)}}{83}{table.caption.28}%
+\contentsline {table}{\numberline {33}{\ignorespaces Methane conversion factor values for compost pens, based on composting method and average annual air temperature.}}{84}{table.caption.29}%
+\contentsline {table}{\numberline {34}{\ignorespaces NH\textsubscript {3}-N emission factors for compost by composting method.}}{88}{table.caption.30}%
+\contentsline {table}{\numberline {35}{\ignorespaces N\textsubscript {2}O-N emission factors for compost by composting method.}}{89}{table.caption.32}%
+\contentsline {table}{\numberline {36}{\ignorespaces Manure storage variable calculations}}{90}{table.36}%
+\contentsline {table}{\numberline {37}{\ignorespaces List of classes for daily spread.}}{92}{table.caption.33}%
+\contentsline {table}{\numberline {38}{\ignorespaces Required inputs for the daily spread section (refreshed\_manure\_management.json)}}{92}{table.caption.34}%
+\contentsline {table}{\numberline {39}{\ignorespaces The key constants for all equations in the Manure Module}}{98}{table.39}%

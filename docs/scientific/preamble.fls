@@ -1,0 +1,5 @@
+PWD c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific
+INPUT C:\Users\gmg228\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
+INPUT c:\Users\gmg228\Documents\RuFaS\RuFaS\docs\scientific\preamble.tex
+OUTPUT preamble.log
+INPUT C:\Users\gmg228\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm

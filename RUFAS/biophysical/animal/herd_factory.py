@@ -54,7 +54,7 @@ class HerdFactory:
         after random sampling with replacement.
     """
 
-    post_animal_population: AnimalPopulation = None
+    post_animal_population: AnimalPopulation | None = None
 
     def __init__(
         self,
@@ -332,7 +332,16 @@ class HerdFactory:
             self.pre_animal_population.calves.append(calf)
 
     def _heiferIIIs_update(self, day: int) -> None:
-        """HeiferIIIs update for generating herd simulation"""
+        """
+        HeiferIIIs update for generating herd simulation
+
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here because the graduated `heiferIII`s are
+        subsequently mutated by `transition_heiferIII_to_cow()` and appended to `cows`,
+        so without it the snapshot saved to the `replacement` array would reflect the cow
+        state rather than the heiferIII state.
+        """
         remaining_heiferIIIs: list[Animal] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
             heiferIII_daily_routines_output: DailyRoutinesOutput = self._heiferIII_update(heiferIII)
@@ -475,8 +484,13 @@ class HerdFactory:
         animals: list[Animal],
     ) -> None:
         """Function to update EBV and ranking index values of a specific group of animals."""
-        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv([animal.genetics for animal in animals])
+        if not AnimalConfig.simulate_genetics:
+            return
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in animals if animal.genetics is not None]
+        )
         for animal in animals:
+            assert animal.genetics is not None
             animal.genetics.calculate_ebv_and_ranking_index(
                 animal.animal_type, mean_tbv_fat, mean_tbv_protein, animal.calves
             )
@@ -532,7 +546,16 @@ class HerdFactory:
         )
 
     def _random_sample_with_replacement_by_type(self, animal_type: str) -> list[Animal]:
-        """Function to randomly sample a specific animal type with replacement"""
+        """
+        Function to randomly sample a specific animal type with replacement
+
+        Notes
+        -----
+        The use of `deepcopy` is necessary here because the same animal may be
+        randomly selected multiple times, and without it all duplicate entries
+        in `post_animals` would share the same object, meaning mutations to
+        one would affect all others.
+        """
         PRE_ANIMAL_DATA: dict[str, list[Animal]] = {
             "calf": self.pre_animal_population.calves,
             "heiferI": self.pre_animal_population.heiferIs,

@@ -13,10 +13,11 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
-    "simulate_animals": {
-      "type": "bool",
-      "description": "Whether or not to simulate animals during the simulation",
-      "default": true
+    "simulation_type": {
+      "type": "string",
+      "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
+      "default": "full_farm",
+      "pattern": "^(full_farm|field_and_feed)$"
     },
     "nutrient_standard": {
       "type": "string",
@@ -83,6 +84,22 @@
         "default": 100,
         "minimum": 6
       },
+      "herd_size_adjustment_period": {
+        "type": "number",
+        "description": "The period between each check to adjust the herd's size.",
+        "default": 30,
+        "minimum": 1
+      },
+      "herd_size_sell_threshold": {
+        "type": "number",
+        "description": "The threshold that should sell animals to maintain herd size.",
+        "minimum": 1
+      },
+      "herd_size_buy_threshold": {
+        "type": "number",
+        "description": "The threshold that should buy animals to maintain herd size.",
+        "minimum": 0
+      },
       "breed": {
         "type": "string",
         "default": "HO",
@@ -136,6 +153,11 @@
         "minimum": 0,
         "nullable": true,
         "default": null
+      },
+      "simulate_genetics": {
+        "type": "bool",
+        "description": "Whether or not to simulate genetics for animals",
+        "default": false
       }
     },
     "herd_initialization": {
@@ -223,12 +245,6 @@
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
           "default": 185,
-          "minimum": 0
-        },
-        "cull_milk_production": {
-          "type": "number",
-          "description": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below",
-          "default": 30,
           "minimum": 0
         },
         "cow_times_milked_per_day": {
@@ -838,7 +854,7 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false). This variable is default to true and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
         "type": "bool",
         "default": true
       },
@@ -2708,7 +2724,7 @@
         },
         "dry_matter_percentage": {
           "type": "number",
-          "description": "Percentage of fresh yield that is dry matter (unitless).",
+          "description": "Percentage of fresh yield at harvest that is dry matter (unitless).",
           "minimum": 0.0,
           "maximum": 100.0
         },
@@ -4233,7 +4249,6 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 306,
         "default": 155
       }
     },
@@ -4242,8 +4257,7 @@
       "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
       "properties": {
         "type": "number",
-        "minimum": 1,
-        "maximum": 306
+        "minimum": 1
       }
     },
     "close_up_feeds": {
@@ -4251,8 +4265,7 @@
       "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
       "properties": {
         "type": "number",
-        "minimum": 1,
-        "maximum": 306
+        "minimum": 1
       }
     },
     "lac_cow_feeds": {
@@ -4260,8 +4273,7 @@
       "description": "Lactating Cow Feeds",
       "properties": {
         "type": "number",
-        "minimum": 1,
-        "maximum": 306
+        "minimum": 1
       }
     },
     "purchased_feeds": {
@@ -4271,8 +4283,7 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "minimum": 1,
-          "maximum": 306
+          "minimum": 1
         },
         "purchased_feed_cost": {
           "type": "number",
@@ -4306,7 +4317,6 @@
             "type": "number",
             "description": "Calf Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 155
           },
           "ration_percentage": {
@@ -4326,7 +4336,6 @@
             "type": "number",
             "description": "Growing Heifers Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4346,7 +4355,6 @@
             "type": "number",
             "description": "Close UP Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4366,7 +4374,6 @@
             "type": "number",
             "description": "Lactating Cow Feed",
             "minimum": 1,
-            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4379,7 +4386,7 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
+        "description": "Tolerance -- Allowable +/- fraction variance for each of the defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
@@ -4398,8 +4405,7 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "minimum": 1,
-          "maximum": 306
+          "minimum": 1
         },
         "runtime_purchase_allowance": {
           "type": "number",
@@ -4410,8 +4416,7 @@
         "advance_purchase_allowance": {
           "type": "number",
           "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
-          "minimum": 0,
-          "maximum": 10000.0
+          "minimum": 0
         },
         "planning_cycle_allowance": {
           "type": "number",
@@ -6354,7 +6359,7 @@
           }
         }
       },
-      "no_animal_e2e": {
+      "field_and_feed_e2e": {
         "type": "array",
         "properties": {
           "type": "object",
