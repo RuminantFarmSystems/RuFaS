@@ -358,9 +358,34 @@ def test_calculate_daily_milk_production(
         (0.3, 0.4, 0.5, quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(0.3, 0.4, 0.5))[0]),
     ],
 )
-def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
-    """Test the calc_305_day_milk_yield method of the MilkProduction class."""
-    assert MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param) == pytest.approx(expected, rel=1e-6)
+def test_calculate_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
+    """Test the calculate_305_day_milk_yield method of the MilkProduction class."""
+    assert MilkProduction.calculate_305_day_milk_yield(l_param, m_param, n_param, None) == pytest.approx(
+        expected, rel=1e-6
+    )
+
+
+def test_calculate_305_day_milk_yield_uses_available_history() -> None:
+    """Test that partial 305-day milk yield projections include recorded production history."""
+    milk_production_history = [
+        {"simulation_day": 1, "days_in_milk": 1, "milk_production": 100.0, "days_born": 1000},
+        {"simulation_day": 2, "days_in_milk": 2, "milk_production": 100.0, "days_born": 1001},
+        {"simulation_day": 3, "days_in_milk": 0, "milk_production": 0.0, "days_born": 1002},
+        {"simulation_day": 4, "days_in_milk": 1, "milk_production": 10.0, "days_born": 1003},
+        {"simulation_day": 5, "days_in_milk": 2, "milk_production": 20.0, "days_born": 1004},
+    ]
+    l_param = 0.1
+    m_param = 0.2
+    n_param = 0.3
+    expected_projected_yield = quad(
+        MilkProduction.calculate_daily_milk_production, 3, 305, args=(l_param, m_param, n_param)
+    )[0]
+
+    result = MilkProduction.calculate_305_day_milk_yield(
+        l_param, m_param, n_param, milk_production_history, days_in_milk=2
+    )
+
+    assert result == pytest.approx(200.0 + expected_projected_yield, rel=1e-6)
 
 
 @pytest.mark.parametrize(

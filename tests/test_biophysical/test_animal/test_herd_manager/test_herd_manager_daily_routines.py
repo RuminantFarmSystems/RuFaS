@@ -514,6 +514,7 @@ def _create_sortable_mock_cow(
 
     cow.milk_production = MagicMock()
     cow.milk_production.daily_milk_produced = daily_milk
+    cow.mature_equivalent_milking_prediction_305_day = daily_milk
 
     cow.days_in_milk = days_in_milk
     cow.days_in_pregnancy = days_in_pregnancy
