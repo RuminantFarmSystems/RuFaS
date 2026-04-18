@@ -352,6 +352,7 @@ class SimulationEngine:
         """Checks if it's time to reformulate the ration and executes ration formulation if needed."""
         if self._is_time_to_reformulate_ration:
             self._formulate_ration()
+            self.herd_manager.update_milk_305_day_yield_predictions()
 
     @property
     def _is_time_to_reformulate_ration(self) -> bool:

@@ -812,7 +812,7 @@ class HerdManager:
         if not eligible_indices:
             return None
 
-        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+        return min(eligible_indices, key=lambda i: self.cows[i].mature_equivalent_milking_prediction_305_day)
 
     def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
         """Checks if surplus cows need to be sold based on herd size."""
