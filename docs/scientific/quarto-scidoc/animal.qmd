@@ -29,7 +29,7 @@ When a HeiferIII or Cow reaches full gestation length, they start lactating and 
 
 ## Herd-level Processes and Management
 
-## Herd Initialization
+### Herd Initialization
 
 ::: {.callout-note}
 
@@ -39,7 +39,7 @@ In RuFaS code, the term “herd initialization” is used to refer to both the p
 
 :::
 
-### Introduction to Herd Initialization
+#### Introduction to Herd Initialization
 
 Every simulation begins with a herd consisting of calves, heifers, and dry and lactating cows. This herd comes to be through a two-step process: 
 
@@ -102,7 +102,7 @@ Output variables:
 {...} includes: breed, number of animals of each class (calf, heiferI, heiferII, heiferIII, cow), number of cows by parity and lactation status, average age of animals within each class, distribution of age of animals within each class, average body weight of animals within each class, average cow days in milk, days in preg, parity, and calving interval. 
 
 
-### Methodology
+#### Methodology
 
 When a simulation begins, the HerdFactory class generates or loads the pre-animal-population, from which it selects and compiles the post-animal-population with an appropriate distribution of animal ages and stages to serve as the starting herd for simulation. 
 
@@ -128,11 +128,9 @@ The _random_sample_with_replacement() method selects animals from each of the fo
 
 Animals are sampled randomly with replacement from the pre-animal-population according to the numbers, parity fractions, and milking cow fraction specified in the animal input file. The resulting list of animals is returned as the post-animal-population and summaries of the pre- and post-animal-populations are reported to the output manager.
 
+### Pens and Animal Grouping
 
-
-## Pens and Animal Grouping
-
-### Introduction to Grouping
+#### Introduction to Grouping
 
 All animals in RuFaS are assigned to a pen which is used to summarize nutrient requirements for diet formulation and feeding, aggregate enteric methane and manure excretions for reporting and passage to the Manure Module. Each pen tracks and updates daily a list of animals in the pen, the stocking density, the average nutrient requirement of the animals in the pen, the ration being fed to that pen, the manure excreted, and the methane emitted. In addition, constant attributes of each pen include the type of pen it is (freestall, tiestall, open lot, compost bedded pack barn), the type of animals that can be in that pen, the number stalls, the manure management practices associated with that pen, and the distance to the milking parlor for lactating cows.  Each day after the HerdManager has updated the status of each animal and determined which animals need to be bought or sold, the animals are added and removed from pens as needed. 
 
@@ -190,7 +188,7 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 
 
 
-### Methodology
+#### Methodology
 
 **Animal Grouping**
 To translate from the AnimalTypes needed to track an animal’s life stages and the combinations of animals that are allowed to be grouped into a single pen, a new variable called AnimalCombination is created that combines some AnimalTypes to facilitate sorting into pens. The AnimalCombination class is defined in enums.py and includes the following mapping from AnimalTypes to AnimalCombinations:
@@ -224,8 +222,7 @@ It is pen specific and removes the animal from the pen and the animal ID from th
 
 :::
 
-
-## Ration Formulation
+### Ration Formulation
 
 The diet recipes in RuFaS are either formulated through least-cost formulation [@Li_2022] or provided by the user for each of 4 animal categories (calves, growing heifers, dry and close-up cows, and lactating cows). The composition of the available feeds are provided by a feed library that was adapted from the [@nrc_2021]. The amount of feed required by the farm is tracked by pen and multiple pens of each animal category can be simulated; however, at this time, the RuFaS model can only accept 1 user-defined diet per animal category even if there are multiple simulated pens for that animal category.  
 
@@ -241,7 +238,7 @@ If a user would like RuFaS to use the list of ingredients to formulate a least-c
 For the time being, only one set of feeds and ration formula can be provided for each animal class. 
 :::
 
-### Energy and Nutrition Requirements
+#### Energy and Nutrition Requirements
 
 **NRC: Calculating Nutrient Requirements of Dairy Cattle**
 
@@ -257,7 +254,7 @@ Calculations are included for the following requirement categories:
 
 Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 
-### Nutrient Requirements of Dairy Cattle (NRC)
+#### Nutrient Requirements of Dairy Cattle (NRC)
 
 **Energy Requirements**
 For details about the variables included in each calculation, please refer to tbl-energy-req for a full list.
@@ -266,8 +263,6 @@ For details about the variables included in each calculation, please refer to tb
 
 * Lactating and Dry Cows
 ::: {#eq-an-nrc-1}
-
-
 
 ## Methane Emission and Manure Excretion
 
@@ -568,7 +563,6 @@ All references may be found at the end of this document or are based on expert c
 
 :::
 
-
 ### Enteric Methane Emission
 
 **Introduction**
@@ -604,8 +598,6 @@ All references may be found at the end of this document or are based on expert c
 
 
 **6. Methane Mitigation**
-
-
 
 ### Enteric Methane Mitigation
 
