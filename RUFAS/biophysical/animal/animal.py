@@ -1600,7 +1600,7 @@ class Animal:
                 dam_tbv_protein=self.genetics.TBV_protein,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
                 population_ranking_indexes=population_ranking_indexes,
-                animal_ranking_index=self.genetics.ranking_index
+                animal_ranking_index=self.genetics.ranking_index,
             )
         else:
             reproduction_inputs = ReproductionInputs(
@@ -1612,7 +1612,7 @@ class Animal:
                 days_in_milk=self.days_in_milk,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
                 population_ranking_indexes=population_ranking_indexes,
-                animal_ranking_index=self.genetics.ranking_index
+                animal_ranking_index=self.genetics.ranking_index,
             )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
@@ -1675,8 +1675,7 @@ class Animal:
         self.daily_growth_update(time)
 
         newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(
-            time,
-            population_ranking_indexes
+            time, population_ranking_indexes
         )
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
@@ -2521,9 +2520,9 @@ class Animal:
             return not self.is_pregnant
         elif self.animal_type.is_cow:
             return (
-                    not self.is_pregnant
-                    and self.days_in_milk > AnimalConfig.voluntary_waiting_period
-                    and not self.reproduction.do_not_breed
+                not self.is_pregnant
+                and self.days_in_milk > AnimalConfig.voluntary_waiting_period
+                and not self.reproduction.do_not_breed
             )
         else:
             return False
