@@ -955,27 +955,28 @@ def test_add_variable(
             for k in value.keys():
                 assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
 
+
 @pytest.mark.parametrize(
     "manual_day, map_day, time_day, overwrite, expected",
     [
-        (100, 80, 50, True, 100), # case 1 - overwrite with manual entry
-        (100, 80, 50, False, 80), # case 2 - keep what's in the map
-        (100, None, 50, True, 100), # case 3 - use manual entry
-        (100, None, 50, False, 100), # case 4 - still use manual entry
-        (None, None, 50, True, 50), # case 5 - use time
-        (None, None, 50, False, 50), # case 6 - still use time
-        (None, 80, 50, True, 50), # case 7 - overwrite with time
-        (None, 80, 50, False, 80), # case 8 - don't overwrite with time
-        (None, None, None, True, None), # No time for this
-    ]
+        (100, 80, 50, True, 100),  # case 1 - overwrite with manual entry
+        (100, 80, 50, False, 80),  # case 2 - keep what's in the map
+        (100, None, 50, True, 100),  # case 3 - use manual entry
+        (100, None, 50, False, 100),  # case 4 - still use manual entry
+        (None, None, 50, True, 50),  # case 5 - use time
+        (None, None, 50, False, 50),  # case 6 - still use time
+        (None, 80, 50, True, 50),  # case 7 - overwrite with time
+        (None, 80, 50, False, 80),  # case 8 - don't overwrite with time
+        (None, None, None, True, None),  # No time for this
+    ],
 )
 def test_map_simulation_day(
-        manual_day: int | None,
-        map_day: int | None,
-        time_day: int | None,
-        overwrite: bool,
-        expected: int | None,
-        mocker: MockerFixture
+    manual_day: int | None,
+    map_day: int | None,
+    time_day: int | None,
+    overwrite: bool,
+    expected: int | None,
+    mocker: MockerFixture,
 ):
     # Arrange
     om = OutputManager()
@@ -994,17 +995,14 @@ def test_map_simulation_day(
     # Assert
     assert observed == expected
 
+
 # fully factorial parameterization:
 @pytest.mark.parametrize("manual_day", [100, None])
 @pytest.mark.parametrize("map_day", [80, None])
 @pytest.mark.parametrize("time_day", [50, None])
 @pytest.mark.parametrize("overwrite", [True, False])
 def test_add_variable_infomap_simulation_day(
-    manual_day: int | None,
-    map_day: int | None,
-    time_day: int | None,
-    overwrite: bool,
-    mocker: MockerFixture
+    manual_day: int | None, map_day: int | None, time_day: int | None, overwrite: bool, mocker: MockerFixture
 ):
     """
     Test that add_variable properly adds simulation_day to the info map and respects previously specified

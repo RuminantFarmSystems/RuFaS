@@ -333,7 +333,7 @@ class OutputManager(object):
             pool[key]["values"].append(deepcopy(value))
 
     def _map_simulation_day(
-            self, info_map: dict[str, Any], overwrite: bool = False, simday: int | None = None
+        self, info_map: dict[str, Any], overwrite: bool = False, simday: int | None = None
     ) -> dict[str, Any]:
         """
         Create an update info map that include simulation_day
