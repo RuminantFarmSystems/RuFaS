@@ -225,6 +225,356 @@ For the time being, only one set of feeds and ration formula can be provided for
 
 
 
+## Methane Emission and Manure Excretion
+
+### Manure Excretion
+
+**Introduction**
+The Manure Excretion Calculator module computes manure excretion for different animal categories, including calves, growing heifers, lactating cows, and dry cows. It calculates the quantities of total mass and nutrient composition in manure. The implementation is designed for flexibility, enabling integration with other RuFaS modules for modeling farm management scenarios. This module includes:
+
+- *Classes:* ManureExcretionCalculator
+- *Key Methods:*
+  - calculate_calf_manure
+  - calculate_heifer_manure
+  - calculate_cow_manure
+  - _calculate_lactating_cow_manure
+  - _calculate_dry_cow_manure
+  - _calculate_phosphorus_excretion_values
+
+This module integrates with the process_digestion method in the DigestiveSystem class to calculate manure excretion on a daily and per-animal basis. It plays a critical role in linking animal-level digestion processes with downstream environmental and nutrient management models.
+
+The module takes inputs that include general animal properties (e.g., body weight, nutrient intake, and nutrient compositions), milk production characteristics (e.g., fat and protein content), specific nutrient properties (e.g., urine phosphorus requirements), and animal categories (e.g., CALF, HEIFER, COW). The outputs from this module are detailed manure excretion metrics, such as total manure mass, nutrient content, and volatile solids. In addition, an animal-class specific methane potential is assigned to manure upon excretion. These outputs are used by the Manure Module for downstream calculations, including manure methane (CH<sub>4</sub>) emissions and nutrient balance tracking.
+
+**Required User Inputs**
+The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are drawn from pen ration files and animal module constants. They are organized into the following groups:
+
+1. General Animal Inputs
+2. Cow Specific Inputs
+3. Phosphorus Specific Inputs
+
+**General Animal Inputs**
+
+| Variable | Definition | Units |
+|---|---|---|
+| body_weight | Body weight of the current animal | kg |
+| dry_matter_intake | Dry matter intake from pen ration | kg |
+| dry_matter_concentration | Dry matter intake from pen ration | kg |
+| crude_protein_conc | Crude protein concentration in the diet | % |
+| potassium_concentration | Potassium concentration in the diet | % |
+| ash_diet_content | Ash content in the diet | % |
+| neutral_detergent_fiber_concentration | Neutral detergent fiber concentration | % |
+| acid_detergent_fiber_concentrations | Acid detergent concentration | % |
+| nutrient_concentrations | Nutrient concentrations (e.g., CP, NDF, ADF, ash) | % |
+
+: General animal and diet inputs used to calculate nutrient intake and manure production. {#tbl-animal-general-inputs-manure-excretrion}
+
+**Cow Specific Inputs**
+
+| Variable | Definition | Units | Default |
+|---|---|---|---|
+| is_lactating | Indicates the cow's lactating status | Boolean | NA |
+| days_in_milk | Days post-parturition; for lactating cows only; Intermediate model output | days | NA |
+| milk_protein | Milk protein content; for lactating cows only | % | 3.2 |
+| daily_milk_production | Daily milk production; for lactating cows only | kg | NA |
+| body_weight | Body weight of the cow | kg | NA |
+| milk_fat | Milk fat content | % | 3.5 |
+| metabolizable_energy_intake | Metabolizable energy intake per kg DM | Mcal/kg DM | NA |
+
+: Cow related inputs, particularly relevant for lactating animals. {#tbl-animal-cow-inputs-manure-excretion}
+
+**Phosphorus Specific Inputs**
+
+| Variable | Definition | Units |
+|---|---|---|
+| fecal_phosphorus | Amount of fecal phosphorus excreted by the current animal; Intermediate model output | g |
+|urine_phosphorus_required | Phosphorus required for urine production; Intermediate model output | g |
+| total_manure_excreted | Total manure excreted by the animal; Intermediate model output | kg |
+
+: Phosphorus related inputs relevant to lactating cows {#tbl-animal-p-inputs-manure-excretion}
+
+**Expected Outputs**
+The outputs from the Manure Excretion Calculator are organized into two main categories: manure excretion values and manure nutrient composition. These outputs are consistently generated across animal categories.
+
+| Category | Parameter | Definition | Units |
+|---|---|---|---|
+| Manure Excretion | urea | Concentration of urea in the urine | g/L |
+|--| Urine | Amount of urine excreted | kg |
+|--| Manure Mass | Total mass of manure excreted | kg |
+|--| Total solids | Dry matter content of the manure | kg |
+|--| Degradable volatile solids | Portion of the volatile solids that is degradable | kg |
+|--| Non-degradable volatile solids | Portion of the volatile solids that is non-degradable | kg |
+| Manure Nutrient Composition | Manure methane potential | The maximum methane producing capacity of volatile solids from manure | m^3^ CH<sub>4</sub>/kg VS |
+|--| Manure total ammoniacal nitrogen | Total ammoniacal nitrogen excreted in the manure | kg |
+|--| Urine nitrogen | Amount of nitrogen excreted via urine | kg |
+|--| Manure nitrogen | Total nitrogen excreted in manure | kg |
+|--| Inorganic phosphorus fraction | Fraction of manure phosphorus that is inorganic |--|
+|--| Organic phosphorus fraction | Fraction of manure phosphorus that is organic |--|
+|--| Non-water inorganic phosphorus fraction| Portion of inorganic phosphorus not water-extractable |--|
+|--| Non-water organic phosphorus not water-extractable | Portion of organic phosphorus not water-extractable |--|
+|--| Total phosphorus excreted | Total amount of phosphorus excreted by the animal | g |
+|--| Phosphorus fraction | Overall fraction of phosphorus in the manure |--|
+|--| Potassium | Amount of potassium excreted in the manure | g |
+
+: Expected outputs from the manure excretion calculator. {#tbl-animal-outputs-manure-excretion}
+
+**Methodology**
+
+
+**1. Calf Manure Excretion (calculate_calf_manure)**
+
+
+**Manure excretions**
+
+- Manure: amount of feces and urine excreted daily by a calf (kg/d)
+$$
+\text{total\_manure\_excreted} = 3.45 \times \text{dry\_matter\_intake} \qquad \text{(AN.EXC.1)}
+$$ 
+
+- Urine: amount of urine in kg, this is an assumption.
+$$
+\text{urine} = 2.0 \qquad \text{(AN.EXC.2)}
+$$ 
+
+- Manure total solids: amount of dry material excreted by the calf (kg/d).
+$$
+\text{total\_solids} = 0.393 \times \text{dry\_matter\_intake} \qquad \text{(AN.EXC.3)}
+$$
+
+- Total volatile solids (kg/d)
+$$
+\text{total\_volatile\_solids} = 0.0023 \times \text{body\_weight} \qquad \text{(AN.EXC.4)}
+$$
+
+- Degradable volatile solids exretion (kg/d)
+$$
+\text{degradable\_volatile\_solids} = 0.9 \times \text{total\_volatile\_solids} \qquad \text{(AN.EXC.5)}
+$$
+
+- Non-degradable volatile solids excretion (kg/d)
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{(AN.EXC.6)}
+$$
+
+
+**Manure nutrient composition**
+
+- Manure N excretion (kg/d)
+$$
+\text{manure\_nitrogen} = \frac{\left(112.55 \times \text{dry\_matter\_intake} \times \frac{\text{crude\_protein}}{100}\right)}{1000} \qquad \text{(AN.EXC.7)}
+$$
+
+
+- Urine N excretion (kg/d)
+$$
+\text{urine\_nitrogen} = 0.45 \times \text{manure\_nitrogen} \qquad \text{(AN.EXC.8)}
+$$
+
+- Manure total ammoniacal N (kg/d)
+$$
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{(ANC.EXC.9)}
+$$
+
+
+**2. Heifer Manure Excretion (calculate_heifer_manure)**
+
+**Manure excretions**
+
+- Urine excretion (kg/d)
+$$
+\text{urine} = 9.0 \qquad \text{(AN.EXC.10)}
+$$
+
+- Total manure excretion (kg/d)
+$$
+\text{total\_manure\_excreted} = (4.158 \times \text{dry\_matter\_intake}) - (0.246 \times \text{body\_weight}) \qquad \text{(AN.EXC.11)}
+$$ {#eq-an-exc-11}
+
+Because the equations that predict total manure excreted and total solids excreted rely on different inputs, in some extreme cases, the total mass of manure excreted can be predicted to be very close to the predicted total solids excreted which is unrealistically dry. For this reason, we set a maximum manure dry matter content of 20\% for heifers and dry cows. If the mass predicted by equation @eq-an-exc-11 is not greater than (total solids/minimum dry matter) then, 
+$$
+\text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}} \qquad \text{(AN.EXC.12)}
+$$ 
+
+- Total solids excretion (kg/d) - this is the same equation that is used for dry cows
+$$
+\text{total\_solids} = 0.178 \times \text{dry\_matter\_intake} + 2.733 \qquad
+$$
+
+- Total volatile solids excretion (kg/d)
+$$
+\text{total\_volatile\_solids} = 0.0071 \times \text{body\_weight} \qquad
+$$
+
+- Degradable volatile solids excretion (kg/d)
+$$
+\text{degradable\_volatile\_solids} = 0.9 \times \text{total\_volatile\_solids} \qquad
+$$
+
+- Non-degradable volatile solids excretion (kg/d)
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad
+$$
+
+- Manure K excretion (g/d)
+$$
+\text{potassium} = 1000 \times \text{dry\_matter\_intake} \times \frac{\text{potassium\_concentration}}{100} \qquad
+$$
+
+**Manure nutrient composition**
+
+- Manure N excretion (kg/d)
+$$
+\text{manure\_nitrogen} = 15.1 + 8.83 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000} \qquad
+$$
+
+- Fecal N excretion (kg/d)
+$$
+\text{fecal\_nitrogen} = 0.345 + 0.317 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000} \qquad
+$$
+
+- Urine N excretion (kg/d)
+$$
+\text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}} \qquad
+$$
+
+- Manure total ammoniacal N (kg/d)
+$$
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad
+$$
+
+
+**3. Lactating Cow Manure Excretion (\_calculate\_lactating\_cow\_manure)**
+
+**Manure exretions**
+
+- Fecal water (kg/d): Calculate the amount of fecal wter excreted (kg/d)
+
+- Total solids/Fecal dry matter (kg/d): Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids.
+
+- Urine (kg/d)
+
+- Total manure exretion (kg/d)
+
+- Organic matter intake (kg/d)
+
+- Degradable volatile solids (kg/d)
+
+- Total volatile solids exreted by a lactating cow (kg/d)
+
+- Non-degradable volatile solids excretion (kg/d)
+
+**Manure nutrient composition**
+
+- Total manure nitrogen (kg/d)
+
+- Fecal nitrogen (kg/d)
+
+- Urine N excretion (kg/d)
+
+- Manure total ammoniacal nitrogen (kg/d)
+
+- Manure K exrection (g/d)
+
+
+
+
+**4. Dry Cow Manure Excretion (\_calculate\_dry\_cow\_manure)**
+
+**Manure excretions**
+
+Urine excretion (kg/d): Amoutn of urine excreted in kg with the assumption that 1.038 kg of urine is approximately 1 L. Due to lack of information, average excretion rate from dry cows is assumed.
+
+Total manure excretion (kg/d): Amount of feces and urine excreted daily by dry cows (kg/d).
+
+Because the equations that predict total manure excreted and total solids excreted rely on different inputs, in some extreme cases, the total mass of manure excreted can be predicted to be very close to the predicted total solids excreted which is unrealistically dry. For this reason, we set a maximum manure dry content of 20% for heifers and dry cows. If the mass predicted by equation @eq-an-exc-11 is not great than (total solids/maximum manure dry matter content) then,
+
+Total solids exretion (kg/d) - this is the same equation used for lactating cows.
+
+Organic matter intake (kg/d)
+
+Degradable volatile solids (kg/d)
+
+Total volatile solids excreted by a dry cow (kg/d)
+
+Non-degradable volatile solids excretion (kg/d)
+
+
+
+**5. Manure Phosporus Excretion (\_calulate\_phosphorus\_excretion\_manure)**
+
+Total phosphorus fraction of feces
+
+Inorganic phosphorus fraction
+
+Organic phosphorus fraction
+
+Milk phosphorus
+
+Manure P excreted by a cow (g/d)
+
+Total P excrete by a cow (g/d)
+
+
+**6. Manure Methane Potential**
+
+The methane potential of the manure volatile solids are set by the **get_manure_streams()** method based on the Animal Combination of the pen. If the Animal Combination is CALVES or GROWING, the methan potential is set to 0.17. If the Animal Combination is LAC_COW or CLOSE_UP, the methane potential is set to 0.24 [@Hanson2024].
+
+::: {.callout-note}
+
+All references may be found at the end of this document or are based on expert communication with V. Sempali from 2023 to 2024.
+
+:::
+
+
+### Enteric Methane Emission
+
+**Introduction**
+
+
+**Required User General Inputs**
+
+
+**Cow Specific Inputs**
+
+
+**Methane Model-Specific and Mitigation Inputs**
+
+
+**Expected Outputs**
+
+
+**Methodology**
+
+**1. Required Diet Composition Inputs**
+
+
+**2. Calf Methane Emissions (calculate_calf_methane)**
+
+
+**3. Heifer Methane Emissions (calculate_heifer_methane)**
+
+
+**4. Lactating Cow Methane Emissions (calculate_cow_methane)**
+
+
+**5. Dry Cow Methane Emissions (_calculate_dry_cow_manure)**
+
+
+**6. Methane Mitigation**
+
+
+
+### Enteric Methane Mitigation
+
+**Introduction**
+
+
+**Required User Inputs**
+
+
+**Expected Outputs**
+
+
+**Methodology**
 
 
 
