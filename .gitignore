@@ -52,6 +52,10 @@ dist/
 *.egg-info/
 build/
 
+# ignore Quarto build output
+docs/scientific/quarto-scidoc/_book/
+docs/scientific/quarto-scidoc/.quarto/
+
 # ignore .DS_store
 .DS_store
 
