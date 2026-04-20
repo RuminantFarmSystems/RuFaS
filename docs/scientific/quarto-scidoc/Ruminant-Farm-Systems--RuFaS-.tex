@@ -538,24 +538,32 @@ document to inform tables of contents, indices, and auditing materials.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{\# Module Name {-}{-}\textgreater{} section title and only appears once}
+\FunctionTok{\# Module Name}
+\NormalTok{section title and only appears once}
 
-\FunctionTok{\#\# Module Introduciton {-}{-}\textgreater{} subsection header}
+\FunctionTok{\#\# Module Introduciton}
+\SpecialStringTok{{-} }\NormalTok{subsection header}
 
-\FunctionTok{\#\# Each Section Title {-}{-}\textgreater{} subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations}
+\FunctionTok{\#\# Section Title }
+\SpecialStringTok{{-} }\NormalTok{subsection header that introduces distinct portions of each module that require separate methodological descriptions and equations}
 
-\FunctionTok{\#\#\# Section Introduction {-}{-}\textgreater{} subsubsection header to introduce the concept}
+\FunctionTok{\#\#\# Section Introduction }
+\SpecialStringTok{{-} }\NormalTok{subsubsection header to introduce the concept}
 
-\FunctionTok{\#\#\# Methodology {-}{-}\textgreater{} subsubsection header used to start descriptions}
+\FunctionTok{\#\#\# Methodology }
+\SpecialStringTok{{-} }\NormalTok{subsubsection header used to start descriptions}
 
-\NormalTok{**Relevant Inputs or Relevant Outputs** {-}{-}\textgreater{} emphasized headers should be used to report the inputs and outputs of the relevant subsection. These usually include tables and bulleted lists. Tables of inputs should include: }
+\NormalTok{**Relevant Inputs or Relevant Outputs** }
+\NormalTok{emphasized headers should be used to report the inputs and outputs of the relevant subsection. }
+\NormalTok{These usually include tables and bulleted lists. Tables of inputs should include: }
 \SpecialStringTok{{-} }\NormalTok{Variable}
 \SpecialStringTok{{-} }\NormalTok{Definition}
 \SpecialStringTok{{-} }\NormalTok{Default}
 \SpecialStringTok{{-} }\NormalTok{Min}
 \SpecialStringTok{{-} }\NormalTok{Max}
 
-\NormalTok{If there is no application for one of these (default, min, or max particularly), do not leave the table cell blank. Please include "{-}{-}" or "NA" depending on what makes the most sense. }
+\NormalTok{If there is no application for one of these (default, min, or max particularly), }
+\NormalTok{do not leave the table cell blank. Please include "{-}{-}" or "NA" depending on what makes the most sense. }
 
 \NormalTok{*Alternate Headers* alternate headers may be used at the discretion of the author}
 \end{Highlighting}
@@ -566,6 +574,38 @@ headers. The ones outlined above are only the expected uses. Feel free
 to use more at the discretion of the author.
 
 \section{Images, Figures, and Tables}\label{images-figures-and-tables}
+
+\subsection{Linking - Internal and
+External}\label{linking---internal-and-external}
+
+This is an important feature of the scientific documentation. A document
+this large can be difficult to navigate, so anything that improves the
+users ability to find what they need efficiently should be optimized.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{There are 3 main structures to "label" parts of the document: }
+\SpecialStringTok{{-} }\NormalTok{\#sec (sections)}
+\SpecialStringTok{{-} }\NormalTok{\#tbl (tables)}
+\SpecialStringTok{{-} }\NormalTok{\#fig (figures)}
+
+\NormalTok{Naming is important for tracking and should appear with hyphens, not spaces. There is no formal process to inform how you name, but it is recommended that it is descriptive of the item you are labeling and it is concise to make referencing easier.}
+
+\NormalTok{There is more information about where these labels go in the respective tables and figures relative to captions etc. the following sections.}
+
+
+
+
+
+\end{Highlighting}
+\end{Shaded}
+
+Linking internally and externally is the first step, however it can be
+hard to keep track of labels and how they have been used and referenced.
+That is the main reason we have the auditing tool. If you are creating
+new labels or new reference links, \textbf{be sure to check the auditor
+to make sure that there is no repeat labels or incorrect references}
 
 \subsection{Example of a Figure}\label{example-of-a-figure}
 
@@ -599,53 +639,128 @@ The output is below :
 
 \subsection{Example of a Table}\label{example-of-a-table}
 
+Our documentation include quite a few tables with long, detailed
+definitions and extended variable names. It is important that these are
+all legible and consistently formated for readability. This requires
+precise alignment of gridlines-- which can get tedious. Additionally,
+any updates to variables or defaults may make this process more time
+consuming in the future.
+
+Instead, we have four excel files that correspond to each existing
+module. In each file, sheets are named by their label id (see next
+section for more on id logic). That way, you can auto-generate a .txt
+file with your table properly sized and formated using the
+make\_grid\_table.py (quarto-scidoc\textgreater scripts). The .txt file
+output will show up in
+quarto-scidoc\textgreater output\textgreater tables.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\PreprocessorTok{|}\NormalTok{ Variable }\PreprocessorTok{|}\NormalTok{ Definition }\PreprocessorTok{|}
-\PreprocessorTok{|{-}{-}{-}|{-}{-}{-}|}
-\PreprocessorTok{|}\NormalTok{ heiferI\_num }\PreprocessorTok{|}\NormalTok{ Number of Heifer I animals }\PreprocessorTok{|}
-
-\NormalTok{: Example animal inputs \{\#tbl{-}animal{-}inputs\}}
+\NormalTok{After you create your excel sheet in the module file of the data folder (in this example it is animal.xslx).}
 
 
-\NormalTok{{-}{-}\textgreater{} The top row of text is your headers and will appear centered and bolded unless otherwise commanded.}
-\NormalTok{{-}{-}\textgreater{} The  next row of actual text is what appears in the row with the associated column. Quarto will autowrap to ensure all text fits and is legible. }
-\NormalTok{{-}{-}\textgreater{} Be sure to include ..... for between each row}
+\NormalTok{python scripts\textbackslash{}make\_grid\_table.py data\textbackslash{}animal.xlsx {-}{-}sheet "EXAMPLE" {-}{-}widths "32,55,10,6,24" {-}{-}caption "This is an example caption." {-}{-}label "tbl{-}example{-}inputs" {-}{-}output output\textbackslash{}tables\textbackslash{}example\_table\_file.txt}
 
-\NormalTok{{-}{-}\textgreater{} ": Example animal inputs" will appear as the caption. Be as descriptive as possible so that the reader could understand the contents of the table without reading any further text. }
-\NormalTok{{-}{-}\textgreater{} \#tbl{-}animal{-}inputs = \#indicates the type of file{-}label{-}for{-}auditing. Though you may label it whatever you want, but be sure that the first part of the label (following the file type) is the module name (e.g. animal, manure, feed, or soilcrop).}
+\NormalTok{Remember, you will need to update }
+\NormalTok{{-}{-}sheet (the sheet name should match the label)}
+\NormalTok{{-}{-}caption (to relevant description)}
+\NormalTok{{-}{-}label (follow label structure in next section)}
+\NormalTok{{-}{-}output (file name only)}
+
+
 \end{Highlighting}
 \end{Shaded}
 
 The above markdown text will appear as it does below:
 
-\begin{longtable}[]{@{}ll@{}}
-\caption{Example animal inputs}\label{tbl-animal-inputs}\tabularnewline
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2414}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0897}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0621}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1862}}@{}}
+\caption{This is an example
+caption.}\label{tbl-example-inputs}\tabularnewline
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-Variable & Definition \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-heiferI\_num & Number of Heifer I animals \\
+id & The index of the pen & & 0 & \\
+pen\_name & The name or identifier of a given pen & & & \\
+animal\_combination & The valid combinations of animal types that can be
+in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE\_UP =
+HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\tightlist
+\item
+\end{itemize}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\tightlist
+\item
+\end{itemize}
+\end{minipage} & CALF, GROWING, CLOSE\_UP, LAC\_COWS \\
 \end{longtable}
 
 \section{Equation Templates and ID
 Logic}\label{equation-templates-and-id-logic}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-}\end{equation}
+If you are adding equations, it is important that you continue to use
+the ID logic that has been described \ldots{}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-}\end{equation}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{The audit label and crosslinking is tracked by \#eq{-}an{-}nrc{-}2026. It is important to follow the custom label structure even for the invisible reference to make tracking easier. }
 
-See Equation~\ref{eq-an-nrc-2}.
+\NormalTok{The actual custom labeling is written as \textbackslash{}text}
+
+\NormalTok{::: \{\#eq{-}an{-}nrc{-}2026\} }
+\NormalTok{$$}
+\NormalTok{CBW = MW * 0.06275 \textbackslash{}qquad \textbackslash{}text\{(AN.NRC.2026)\}}
+\NormalTok{$$}
+\NormalTok{:::}
+
+\NormalTok{Below is how the equation can be linked in other parts of the text: }
+
+\NormalTok{See }\CommentTok{[}\OtherTok{AN.NRC.2026}\CommentTok{](\#eq{-}an{-}nrc{-}2026)\textless{}!{-}{-} @eq{-}an{-}nrc{-}2026 {-}{-}\textgreater{}}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
+This is how your equation and the linking should appear.
+
+\protect\phantomsection\label{eq-an-nrc-2026}
+\[
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\]
+
+See \hyperref[eq-an-nrc-2026]{AN.NRC.2026}.
 
 \section{Callouts, Recommendations, or
 Notes}\label{callouts-recommendations-or-notes}
@@ -791,7 +906,7 @@ each calculation, please refer to the
 
 \section{Reformatted equations}\label{reformatted-equations}
 
-Equation~\ref{eq-nrc-cbw} may be visually improved by using the
+\ref{eq-nrc-cbw} may be visually improved by using the
 \texttt{\textbackslash{}times} LaTeX command:
 
 \begin{equation}\protect\phantomsection\label{eq-nrc-cbw-times}{
@@ -810,7 +925,7 @@ standard Quarto equation ID.
 CBW = MW * 0.06275 \tag{AN.NRC.2}
 }\end{equation}
 
-See Equation~\ref{eq-an-nrc-2-tagged}.
+See \ref{eq-an-nrc-2-tagged}.
 
 \section{Other equation Templates}\label{other-equation-templates}
 
@@ -820,7 +935,7 @@ The energy balance is \(E = mc^2\).
 E = mc^2
 }\end{equation}
 
-See Equation Equation~\ref{eq-energy}.
+See Equation \ref{eq-energy}.
 
 \begin{equation}\protect\phantomsection\label{eq-nutrient-proportion}{
 \text{nutrient\_proportion\_to\_be\_removed} =
@@ -829,6 +944,47 @@ See Equation Equation~\ref{eq-energy}.
 1
 \right)
 }\end{equation}
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Previews and Audits}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+\emph{For preview html}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{quarto preview}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{For preview pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{quarto render {-}{-}to pdf}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{For audit review} You can find the output in the quarto-scidoc
+folder.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}\{markdown\}}
+
+\NormalTok{python quarto\_audit.py}
+
+\InformationTok{\textasciigrave{}\textasciigrave{}\textasciigrave{}}
+\end{Highlighting}
+\end{Shaded}
+
+\end{tcolorbox}
 
 \bookmarksetup{startatroot}
 
@@ -872,8 +1028,8 @@ dairy cattle animals and shares aggregated outcomes with the herd
 management sub-module to manage herd dynamics on a daily basis.
 
 The life cycle module represents the variation in animal performance
-through the use of Monte Carlo Simulation methods {[}Reuven and Kroese
-(2017)\}. Monte Carlo simulation relies on random draws from probability
+through the use of Monte Carlo Simulation methods (Reuven and Kroese
+2017). Monte Carlo simulation relies on random draws from probability
 distributions rather than assigning fixed values. In this model, two
 main strategies are used:
 
@@ -1140,10 +1296,20 @@ similarly to the regular life cycle simulation process, but with an
 extended period and large number of animals. There are a few notable
 distinctions:
 
-\begin{verbatim}
-- After 3000 days of simulation (specified in animal_constants), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
-- If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). 
-\end{verbatim}
+\begin{itemize}
+\tightlist
+\item
+  After 3000 days of simulation (specified in animal\_constants), a copy
+  of each heiferIII is saved to the replacement herd. The copy is made
+  on the day when she is ready to transition to a lactating cow (ready
+  to give birth), so that when the copy enters the herd as a purchased
+  heiferIII during the actual simulation, she will give birth the very
+  next day.
+\item
+  If a cow has made it to parity six without being culled, she is
+  removed from the herd. (The maximum parity of cows kept in the
+  generated herd is five).
+\end{itemize}
 
 After the simulation\_days number of days, the full herd contains a
 mixture of calves, heifers, cows, and replacements. The core status
@@ -1192,71 +1358,86 @@ added and removed from pens as needed.
 
 \textbf{Relevant Inputs}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}lllll@{}}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3839}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0982}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0625}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1429}}@{}}
+\caption{User inputs in the animal input file that influence pen
+grouping. The user must define at least 3 pens and for each pen, key
+inputs are outlined here.}\label{tbl-animal-grp-inputs}\tabularnewline
 \toprule\noalign{}
-Variable & Definition & Default & Min & Max \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
 id & The index of the pen & NA & 0 & NA \\
-\end{longtable}
-}
-
-pen\_name \textbar{} The name or identifier of a given pen \textbar{} NA
-\textbar{} \textbar{} \textbar{}
-
-animal\_combination \textbar{} The valid combinations of animal types
-that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's;
-CLOSE\_UP = HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows
-\textbar{} \textbar{} CALF, GROWING CLOSE\_UP, LAC\_COW \textbar{}
-
-vertical\_dist\_to\_milking\_parlor \textbar{} The elevation gain (in
-meters) between the pen and the milking parlor \textbar{} 0.1 \textbar{}
-0 \textbar{} NA \textbar{}
-
-horizontal\_dist\_to\_milking\_parlor \textbar{} The distance (in
-meters) between the pen and the milking parlor \textbar{} 10 \textbar{}
-0 \textbar{} NA \textbar{}
-
-number\_of\_stalls \textbar{} The number of stalls in the pen \textbar{}
-1000 \textbar{} 0 \textbar{} NA \textbar{}
-
-pen\_type \textbar{} The type of pen (freestall, tiestall, open lot,
-compost bedded pack barn) \textbar{} freestall \textbar{} freestall,
-tiestall, open lot, compost bedded pack barn \textbar{}
-
-max\_stocking\_density \textbar{} The maximum ratio of the number of
-animals in the pen to the number of stalls in the pen \textbar{} 1.2
-\textbar{} 0.5 \textbar{} 5 \textbar{}
-
-manure\_management\_scenario\_id \textbar{} The ID number of the manure
+pen\_name & The name or identifier of a given pen & NA & & \\
+animal\_combination & The valid combinations of animal types that can be
+in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE\_UP =
+HeiferIII's and Dry Cows; LAC\_COWS = Lactating Cows & & & CALF,
+GROWING, CLOSE\_UP, LAC\_COWS \\
+vertical\_dist\_to\_milking\_ parlor & The elevation gain (in meters)
+between the pen and the milking parlor & 0.1 & 0 & NA \\
+horizontal\_dist\_to\_milking\_ parlor & The distance (in meters)
+between the pen and the milking parlor & 10 & 0 & NA \\
+number\_of\_stalls & The number of stalls in the pen & 1000 & 0 & NA \\
+pen\_type & The type of pen (freestall, tiestall, open lot, compost
+bedded pack barn) & freestall & & freestall, tiestall, open lot, compost
+bedded pack barn \\
+max\_stocking\_density & The maximum ratio of the number of animals in
+the pen to the number of stalls in the pen & 1.2 & 0.5 & 5 \\
+manure\_management\_ scenario\_id & The ID number of the manure
 management practices that are used for this pen (scenarios are defined
-in manure management schema) \textbar{} 0 \textbar{} 0 \textbar{} NA
-\textbar{}
-
-: User inputs in the animal input file that influence pen grouping. The
-user must define at least 3 pens and for each pen, key inputs are
-outlined here. \{\#tbl-animal-grp-inputs\}
+in manure management schema) & 0 & 0 & NA \\
+\end{longtable}
 
 \textbf{Relevant Outputs}
 
 \begin{itemize}
-\tightlist
 \item
-  number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}
-  reports the number of animals in each pen each day.
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{number\_of\_animals\_in\_pen\_{[}id{]}\_{[}AnimalCombination{]}}
+    - reports the number of animals in each pen each day.
+  \end{itemize}
 \item
-  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]} -
-  reports average dry matter intake of an animal in the pen at the time
-  of the ration formulation.
+  \textbf{ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}}
+  - reports average dry matter intake of an animal in the pen at the
+  time of the ration formulation.
 \item
-  ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}
+  \textbf{ration\_per\_animals\_for\_pen\_{[}id{]}\_{[}AnimalCombination{]}.{[}RUFAS\_feed\_id{]}}
   - reports the amount of each feed that is delivered per animal in the
   pen
 \item
-  ration\_nutrient\_amount\_for\_pen\_\_{[}AnimalCombination{]}.{[}nutrient{]}
+  \textbf{ration\_nutrient\_amount\_for\_pen\_{[}AnimalCombination{]}.{[}nutrient{]}}
   - is reporting the amount of each of the following nutrients that is
   provided by the ration per animal in the pen (all reported in
   kilograms unless otherwise indicated)
@@ -1264,33 +1445,228 @@ outlined here. \{\#tbl-animal-grp-inputs\}
 
 \subsection{Methodology}\label{methodology-1}
 
-\subsection{Examples of Equations}\label{examples-of-equations}
+\textbf{Animal Grouping} To translate from the AnimalTypes needed to
+track an animal's life stages and the combinations of animals that are
+allowed to be grouped into a single pen, a new variable called
+AnimalCombination is created that combines some AnimalTypes to
+facilitate sorting into pens. The AnimalCombination class is defined in
+enums.py and includes the following mapping from AnimalTypes to
+AnimalCombinations:
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-2}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-}\end{equation}
+\begin{longtable}[]{@{}ll@{}}
+\caption{Summary of animal types and their grouping included in this
+module.}\label{tbl-animal-grp-inputs}\tabularnewline
+\toprule\noalign{}
+Animal Combination & Animal Type \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Animal Combination & Animal Type \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CALF & Calves \\
+GROWING & Heifer I and Heifer II \\
+CLOSE\_UP & Heifer III and Non-lactating Cows \\
+LAC\_COW & Lactating Cows \\
+\end{longtable}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-3}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.3)}
-}\end{equation}
+Currently there are only two options for assigning AnimalCombinations to
+pens.
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-4}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.4)}
-}\end{equation}
+\begin{itemize}
+\item
+  \emph{Option 1} The first and most commonly used option for grouping
+  animals is to assign one AnimalCombination to each pen such that there
+  is at least one pen for the 4 AnimalCombinations: CALF, GROWING,
+  CLOSE\_UP, and LAC\_COW.
+\item
+  \emph{Option 2} In some cases, and especially in very small farms, a
+  user might wish to represent a scenario where all growing animals,
+  pregnant heifers, and non-lactating cows are housed together. In this
+  case, there is an option to have a pen that houses both GROWING and
+  CLOSE\_UP animals such that the there is at least one pen with each of
+  the 3 AnimalCombination inputs: CALF, GROWING\_AND\_CLOSE\_UP, and
+  LAC\_COW.
+\end{itemize}
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-5}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.5)}
-}\end{equation}
+Pen Sizing: Due to oscillations in the exact number of animals in each
+animal type, it is strongly recommended that the stocking density is at
+least 120\% of the expected number of animals in each pen.
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-1}{
+Class: \emph{Pens} are inare initiated from the Pen class by the
+HerdManager at the beginning of the simulation and, if needed, an
+additional pen is created to accommodate animals if the animal numbers
+have exceeded the max stocking density.
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+\textbf{Remove\_animals\_by\_ids} - This function is called when the
+HerdManager calls for: remove\_animal\_from\_pen\_and\_id\_map.
+
+It is pen specific and removes the animal from the pen and the animal ID
+from the animal ID map that tracks the animals in the pen.
+
+**\_add\_new\_animals** - This function is called by Pen.update\_animals
+which is in turn called by
+HerdManager.\_add\_animal\_to\_pen\_and\_id\_map. Thus, when HerdManager
+initiates addition of animals to each pen, this function executes the
+addition of those animals \_animal\_nutritional\_requirements
+
+\end{tcolorbox}
+
+\section{Ration Formulation}\label{ration-formulation}
+
+The diet recipes in RuFaS are either formulated through least-cost
+formulation (Li et al. 2022) or provided by the user for each of 4
+animal categories (calves, growing heifers, dry and close-up cows, and
+lactating cows). The composition of the available feeds are provided by
+a feed library that was adapted from the (National Academies of
+Sciences, Engineering, and Medicine 2021). The amount of feed required
+by the farm is tracked by pen and multiple pens of each animal category
+can be simulated; however, at this time, the RuFaS model can only accept
+1 user-defined diet per animal category even if there are multiple
+simulated pens for that animal category.
+
+In practice, animal feeding on dairy farms is a constantly evolving
+process that responds to fluctuations in feed availability, animal
+requirements and responses, and management goals. Although the feed
+delivery algorithms will make small modifications to the diet recipe in
+response to animal nutrient requirements and adjust the total amount of
+feed delivered based on the number of animals and their requirements,
+the diversity and degree of fluctuation in the diets is less than what
+is expected on a commercial dairy. The RuFaS feed library can also be
+modified or expanded on by changing the compositions of the existing
+feeds or by adding new feeds.
+
+Regardless of whether or not a user chooses to provide their own ration
+or have RuFaS build and feed a ration optimized for least-cost, RuFaS
+needs a set of ingredients to work from. The RuFaS feed library should
+be consulted for the full list of ingredients and ingredients that are
+in both the NASEM and NRC libraries can be used. Users interested in
+feeding a ration that they define, need to provide a list of ingredients
+and their relative \% dry matter intake for each animal class
+(pre-weaned calves, growing heifers, close-up animals, and lactating
+cows).
+
+If a user would like RuFaS to use the list of ingredients to formulate a
+least-cost ration, it is imperative that proper costs are inputted for
+each ingredient listed, but the \% dry matter intake in the user defined
+ration percentages does not need to be included. Feed costs need to be
+entered in kg/DM. RuFaS will then use all the ingredients available
+(based on costs and inventory available if the feed is homegrown) to
+create a ration that meets the nutritional requirements of the animal
+class and is cost-optimized.
+
+\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+
+For the time being, only one set of feeds and ration formula can be
+provided for each animal class.
+
+\end{tcolorbox}
+
+\subsection{Energy and Nutrition
+Requirements}\label{energy-and-nutrition-requirements}
+
+\textbf{NRC: Calculating Nutrient Requirements of Dairy Cattle}
+
+Below are the calculations utilized based on the energy and nutrient
+requirements of dairy cattle as reported by the NRC and more recently
+the NASEM National Research Council (2001), National Academies of
+Sciences, Engineering, and Medicine (2021).
+
+Calculations are included for the following requirement categories:
+
+\begin{itemize}
+\tightlist
+\item
+  Energy (Maintenance, Activity, Growth, Pregnancy, Lactation)
+\item
+  Protein (Maintenance, Growth, Pregnancy, Lactation)
+\item
+  Minerals (Maintenance, Growth, Pregnancy, Lactation)
+\item
+  Dry Matter Intake
+\item
+  Amino Acids (NASEM only)
+\end{itemize}
+
+Where appropriate, requirement calculations are differentiated by animal
+age and reproductive status.
+
+\subsection{Nutrient Requirements of Dairy Cattle
+(NRC)}\label{nutrient-requirements-of-dairy-cattle-nrc}
+
+\textbf{Energy Requirements} For details about the variables included in
+each calculation, please refer to tbl-energy-req for a full list.
+
+\emph{Maintenance} The maintenance requirement is calculated based on
+metabolic body weight (body weight\(^{0.75}\)).
+
+\begin{itemize}
+\tightlist
+\item
+  Lactating and Dry Cows ::: \{\#eq-an-nrc-1\} \[
+  CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
+  \] :::
+\end{itemize}
+
+\protect\phantomsection\label{eq-an-nrc-2}
+\[
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+\]
+
+\emph{Otherwise}
+
+\protect\phantomsection\label{eq-an-nrc-3}
+\[
+NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  Heifers : The maintenance requirement is calculated based on metabolic
+  body weight (body weight(\^{}\{0.75\})), body condition score, and the
+  previous month's temperatures.
+\end{itemize}
+
+\protect\phantomsection\label{eq-an-nrc-1}
+\[
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
-}\end{equation}
+\]
 
-\begin{equation}\protect\phantomsection\label{eq-an-nrc-6}{
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.6)}
-}\end{equation}
+\protect\phantomsection\label{eq-an-nrc-2}
+\[
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+\]
 
-See Equation~\ref{eq-an-nrc-2}.
+\emph{Otherwise}
+
+\protect\phantomsection\label{eq-an-nrc-6}
+\[
+BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
+\]
+
+\protect\phantomsection\label{eq-an-nrc-7}
+\[
+NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
+\]
+
+\emph{Activity} Activity requirement is proportional to body weight and
+daily walking distance. A grazing system and hilly topography will cost
+additional energy.
+
+\begin{itemize}
+\tightlist
+\item
+  Lactating and Dry Cows ::: \{\#eq-an-nrc-8\} \[
+  NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+  \] :::
+\end{itemize}
 
 \bookmarksetup{startatroot}
 
@@ -1323,6 +1699,21 @@ heiferI\_num & Number of Heifer I animals \\
 
 \protect\phantomsection\label{refs}
 \begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-Li_2022}
+Li, M., G. J. M. Rosa, K. F. Reed, and V. E. Cabrera. 2022.
+{``Investigating the Effect of Temporal, Geographic, and Management
+Factors on US Holstein Lactation Curve Parameters.''} \emph{J Dairy Sci}
+105 (9): 7525--38.
+
+\bibitem[\citeproctext]{ref-nrc_2021}
+National Academies of Sciences, Engineering, and Medicine. 2021.
+\emph{Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}.
+The National Academies Press.
+
+\bibitem[\citeproctext]{ref-nrc_2001}
+National Research Council. 2001. \emph{Nutrient Requirements of Dairy
+Cattle}. National Academies Press.
+
 \bibitem[\citeproctext]{ref-reuven_2017}
 Reuven, Y. R., and D. P. Kroese. 2017. \emph{Simulation and the Monte
 Carlo Method. In: Wiley Series in Probability and Statistics}. John

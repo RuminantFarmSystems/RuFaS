@@ -21,10 +21,14 @@ bibliography: rufas.bib
 format:
   html:
     theme: cosmo
+    crossref:
+      eq-prefix: ""
     css: styles.css
   pdf:
     pdf-engine: xelatex
     documentclass: scrbook
+    crossref:
+      eq-prefix: ""
     classoption:
       - oneside
       - openany
