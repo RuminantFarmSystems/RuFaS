@@ -4,6 +4,7 @@ import random
 from math import floor
 from typing import Callable, Union, Any, Optional
 
+import numpy as np
 from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
@@ -190,6 +191,8 @@ class Reproduction:
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None,
+            population_ranking_indexes=reproduction_inputs.population_ranking_indexes,
+            animal_ranking_index=reproduction_inputs.animal_ranking_index,
         )
         self.reproduction_statistics.reset_daily_statistics()
 
@@ -470,6 +473,8 @@ class Reproduction:
             dam_tbv_fat=reproduction_data_stream.dam_tbv_fat,
             dam_tbv_protein=reproduction_data_stream.dam_tbv_protein,
         )
+        self.semen_type = None
+        self.embryo_sex = None
 
         return reproduction_data_stream
 
@@ -1012,6 +1017,11 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Perform artificial insemination (AI) on the animal."""
+        self.assign_semen_type(
+            population_ranking_index=reproduction_data_stream.population_ranking_indexes,
+            animal_ranking_index=reproduction_data_stream.animal_ranking_index,
+            animal_type=reproduction_data_stream.animal_type,
+        )
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             simulation_day,
@@ -1044,6 +1054,7 @@ class Reproduction:
                 reproduction_data_stream = self._increment_successful_cow_conceptions(reproduction_data_stream)
             self.embryo_sex = self._determine_embryo_sex(simulation_day)
         else:
+            self.semen_type = None
             if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
                 reproduction_data_stream = self._handle_failed_heifer_conception(
                     reproduction_data_stream, simulation_day
@@ -1055,9 +1066,11 @@ class Reproduction:
 
     def _determine_embryo_sex(self, simulation_day) -> Sex:
         # TODO: put male calf rate into Animal Constant
-        if self.semen_type in [SemenType.CONVENTIONAL_DAIRY, SemenType.CONVENTIONAL_BEEF]:
+        if self.semen_type == SemenType.CONVENTIONAL_DAIRY:
             male_calf_rate = 0.5
-        elif self.semen_type in [SemenType.SEXED_DAIRY, SemenType.SEXED_BEEF]:
+        elif self.semen_type == SemenType.SEXED_DAIRY:
+            male_calf_rate = 0.9
+        elif self.semen_type == SemenType.BEEF:
             male_calf_rate = 0.9
         else:
             print(simulation_day, self.semen_type)
@@ -1144,6 +1157,7 @@ class Reproduction:
             std_estrus_cycle,
         )
         # TODO: set sex to None when animal loses preg
+        self.semen_type = None
         self.embryo_sex = None
         return reproduction_data_stream
 
@@ -2011,6 +2025,7 @@ class Reproduction:
                         simulation_day,
                         f"Current repro state(s): {self.repro_state_manager}",
                     )
+        self.semen_type = None
         self.embryo_sex = None
         return reproduction_data_stream
 
@@ -2217,3 +2232,23 @@ class Reproduction:
             f" {AnimalConfig.cow_ovsynch_method}",
         )
         return reproduction_data_stream
+
+    def assign_semen_type(
+        self, population_ranking_index: list[float], animal_ranking_index: float, animal_type: AnimalType
+    ) -> None:
+        animal_ranking_index_percentile: float = (
+            np.mean(np.array(population_ranking_index) <= animal_ranking_index) * 100
+        )
+        semen_allocation_proportions = (
+            AnimalConfig.heiferII_semen_allocation_proportions
+            if animal_type == AnimalType.HEIFER_II
+            else AnimalConfig.cow_semen_allocation_proportions
+        )
+        if animal_ranking_index_percentile > (1 - semen_allocation_proportions["sexed_dairy"]):
+            self.semen_type = SemenType.SEXED_DAIRY
+        elif animal_ranking_index_percentile > (
+            1 - semen_allocation_proportions["sexed_dairy"] - semen_allocation_proportions["conventional_dairy"]
+        ):
+            self.semen_type = SemenType.CONVENTIONAL_DAIRY
+        else:
+            self.semen_type = SemenType.BEEF

@@ -195,28 +195,16 @@ class AnimalConfig:
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
     male_calf_rate_sexed_semen: float = 0.10
-    semen_allocation: list[dict[str, float | str]] = [
-        {
-            "lower_percentage": 0,
-            "upper_percentage": 25,
-            "semen_type": "conventional_beef",
-        },
-        {
-            "lower_percentage": 25,
-            "upper_percentage": 50,
-            "semen_type": "sexed_beef",
-        },
-        {
-            "lower_percentage": 50,
-            "upper_percentage": 75,
-            "semen_type": "conventional_dairy",
-        },
-        {
-            "lower_percentage": 75,
-            "upper_percentage": 100,
-            "semen_type": "sexed_dairy",
-        },
-    ]
+    heiferII_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    cow_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
     keep_female_calf_rate: float = 1
     still_birth_rate: float = 0.065
     average_gestation_length: int = 276

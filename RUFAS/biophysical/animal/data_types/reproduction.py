@@ -42,6 +42,8 @@ class ReproductionInputs:
     days_in_pregnancy: int
     days_in_milk: int
     phosphorus_for_gestation_required_for_calf: float
+    population_ranking_indexes: list[float]
+    animal_ranking_index: float
     dam_tbv_fat: float | None = None
     dam_tbv_protein: float | None = None
 
@@ -319,6 +321,8 @@ class ReproductionDataStream:
     phosphorus_for_gestation_required_for_calf: float
 
     herd_reproduction_statistics: HerdReproductionStatistics
+    population_ranking_indexes: list[float]
+    animal_ranking_index: float
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
     dam_tbv_fat: float | None = None
     dam_tbv_protein: float | None = None
@@ -333,7 +337,6 @@ class ReproductionDataStream:
 
 
 class SemenType(Enum):
-    SEXED_BEEF = "sexed_beef"
-    CONVENTIONAL_BEEF = "conventional_beef"
+    BEEF = "beef"
     SEXED_DAIRY = "sexed_dairy"
     CONVENTIONAL_DAIRY = "conventional_dairy"

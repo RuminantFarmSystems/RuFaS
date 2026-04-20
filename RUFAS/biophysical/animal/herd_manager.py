@@ -175,8 +175,8 @@ class HerdManager:
                 herd_population.cows,
                 herd_population.replacement,
             )
-            self._assign_semen_type_for_new_heiferIIs(self.heiferIIs)
-            self._assign_semen_type_for_cows(self.cows)
+            # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
+
             self.allocate_animals_to_pens(time.simulation_day)
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -491,8 +491,14 @@ class HerdManager:
         sold_newborn_calves: list[Animal] = []
         newborn_calves: list[Animal] = []
 
+        animal_ranking_indexes: list[float] | None = None
+        if all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals]):
+            animal_ranking_indexes: list[float] | None = [
+                animal.genetics.ranking_index for animal in animals if animal.is_eligible_for_breeding
+            ]
+
         for animal in animals:
-            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time, animal_ranking_indexes)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
                 self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
@@ -508,56 +514,11 @@ class HerdManager:
                         sold_newborn_calves.append(newborn_calf)
                     else:
                         newborn_calves.append(newborn_calf)
-                    birth_year = Utility.back_track_birth_date(animal.days_born, time.current_date).year
-                    mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
-                        [animal.genetics for animal in self.cows]
-                    )
-                    animal.genetics.recalculate_values_at_lactation_start(
-                        birth_year=birth_year,
-                        animal_type=animal.animal_type,
-                        parity=animal.calves,
-                        group_specific_TBV_fat_mean=mean_tbv_fat,
-                        group_specific_TBV_protein_mean=mean_tbv_protein,
-                    )
-                    self._assign_semen_type_for_cow_giving_birth(animal)
                     self._update_genetic_values_at_lactation_start(animal, time)
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
             animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
-
-    def _assign_semen_type_for_new_heiferIIs(self, new_heiferIIs: list[Animal]) -> None:
-        heiferII_ranking_indexes: list[float] = [heifer_II.genetics.ranking_index for heifer_II in self.heiferIIs]
-        for heiferII in new_heiferIIs:
-            ranking_index = heiferII.genetics.ranking_index
-            semen_type = self._find_semen_type(heiferII_ranking_indexes, ranking_index)
-            heiferII.reproduction.semen_type = semen_type
-
-    def _assign_semen_type_for_cows(self, cows: list[Animal]) -> None:
-        cow_ranking_indexes: list[float] = [cow.genetics.ranking_index for cow in self.cows]
-        for cow in cows:
-            ranking_index = cow.genetics.ranking_index
-            semen_type = self._find_semen_type(cow_ranking_indexes, ranking_index)
-            cow.reproduction.semen_type = semen_type
-
-    def _assign_semen_type_for_cow_giving_birth(self, cow: Animal) -> None:
-        cow_ranking_indexes: list[float] = [cow.genetics.ranking_index for cow in self.cows]
-        semen_type = self._find_semen_type(cow_ranking_indexes, cow.genetics.ranking_index)
-        cow.reproduction.semen_type = semen_type
-
-    def _find_semen_type(self, population_ranking_index: list[float], animal_ranking_index: float) -> SemenType:
-        animal_ranking_index_percentile: float = (
-            np.mean(np.array(population_ranking_index) <= animal_ranking_index) * 100
-        )
-        for allocation in sorted(AnimalConfig.semen_allocation, key=lambda x: x["lower_percentage"]):
-            lower = allocation["lower_percentage"]
-            upper = allocation["upper_percentage"]
-            if lower <= animal_ranking_index_percentile < upper or (
-                upper == 100 and animal_ranking_index_percentile == 100
-            ):
-                return SemenType(allocation["semen_type"])
-        self.om.add_error("", "", {})
-        raise ValueError()
 
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
         """
@@ -660,7 +621,6 @@ class HerdManager:
         graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIs)
         graduated_animals += graduated_heiferIs
         removed_animals += sold_heiferIs
-        self._assign_semen_type_for_new_heiferIIs(graduated_heiferIs)
 
         graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIIs)
         graduated_animals += graduated_heiferIIs
