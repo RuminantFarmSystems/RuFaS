@@ -59,7 +59,7 @@ class ManureManager:
         A list defining the execution order of processors.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, intercept_mean_temp: float, phase_shift: float, amplitude: float) -> None:
         self._om = OutputManager()
         self._manure_nutrient_manager = ManureNutrientManager()
 
