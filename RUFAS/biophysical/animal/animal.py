@@ -1219,7 +1219,7 @@ class Animal:
             The current day in the simulation, used for event logging and status evaluation.
 
         """
-        self._assign_sex_to_newborn_calf()
+        self.sex = args["sex"]
 
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day
@@ -1562,7 +1562,9 @@ class Animal:
             raise ValueError("Unexpected days in milk value")
 
     def daily_reproduction_update(
-        self, time: RufasTime
+        self,
+        time: RufasTime,
+        population_ranking_indexes: list[float] | None = None,
     ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
@@ -1597,6 +1599,8 @@ class Animal:
                 dam_tbv_fat=self.genetics.TBV_fat,
                 dam_tbv_protein=self.genetics.TBV_protein,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=population_ranking_indexes,
+                animal_ranking_index=self.genetics.ranking_index
             )
         else:
             reproduction_inputs = ReproductionInputs(
@@ -1607,6 +1611,8 @@ class Animal:
                 days_in_pregnancy=self.days_in_pregnancy,
                 days_in_milk=self.days_in_milk,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=population_ranking_indexes,
+                animal_ranking_index=self.genetics.ranking_index
             )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
@@ -1638,7 +1644,7 @@ class Animal:
 
         return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
-    def daily_routines(self, time: RufasTime) -> DailyRoutinesOutput:
+    def daily_routines(self, time: RufasTime, population_ranking_indexes: list[float] | None) -> DailyRoutinesOutput:
         """
         Perform daily routines for the animal, updating its status and outputs.
 
@@ -1668,7 +1674,10 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
+        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(
+            time,
+            population_ranking_indexes
+        )
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
             time
@@ -2505,3 +2514,16 @@ class Animal:
                 self.genetic_history[-1]["end_day"] = simulation_day
         else:
             return
+
+    @property
+    def is_eligible_for_breeding(self) -> bool:
+        if self.animal_type is AnimalType.HEIFER_II:
+            return not self.is_pregnant
+        elif self.animal_type.is_cow:
+            return (
+                    not self.is_pregnant
+                    and self.days_in_milk > AnimalConfig.voluntary_waiting_period
+                    and not self.reproduction.do_not_breed
+            )
+        else:
+            return False
