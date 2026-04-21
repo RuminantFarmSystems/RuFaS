@@ -2092,7 +2092,7 @@ class CrossValidator:
 
         """
         if not self._validate_condition_clause(condition_clause, eager_termination):
-            return False
+            # return False
         relationship = condition_clause.get("relationship", "")
         left_hand, left_evaluated = self._evaluate_expression(
             condition_clause["left_hand"], eager_termination, relationship
