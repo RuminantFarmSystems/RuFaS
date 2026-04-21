@@ -30,7 +30,7 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "config",
     "animal",
     "animal_population",
-    "animal_net_merit",
+    "animal_mean_phenotype",
     "animal_top_listing_semen",
     "lactation",
     "economy",

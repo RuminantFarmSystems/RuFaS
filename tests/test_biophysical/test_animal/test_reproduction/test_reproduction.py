@@ -1,4 +1,5 @@
 import math
+import sys
 from datetime import datetime
 from typing import Optional, Any
 from unittest.mock import MagicMock, call
@@ -47,8 +48,9 @@ def mock_reproduction_inputs(
     days_born: int = 0,
     days_in_pregnancy: int = 0,
     days_in_milk: int = 0,
-    net_merit: float = 0.0,
     phosphorus_for_gestation_required_for_calf: float = 0.0,
+    dam_tbv_fat: float = 0.0,
+    dam_tbv_protein: float = 0.0,
 ) -> ReproductionInputs:
     return ReproductionInputs(
         animal_type=animal_type,
@@ -57,8 +59,9 @@ def mock_reproduction_inputs(
         days_born=days_born,
         days_in_pregnancy=days_in_pregnancy,
         days_in_milk=days_in_milk,
-        net_merit=net_merit,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf,
+        dam_tbv_fat=dam_tbv_fat,
+        dam_tbv_protein=dam_tbv_protein,
     )
 
 
@@ -88,7 +91,6 @@ def mock_reproduction_data_stream(
     days_born: int = 0,
     days_in_pregnancy: int = 0,
     days_in_milk: int = 0,
-    net_merit: float = 0.0,
     phosphorus_for_gestation_required_for_calf: float = 0.0,
     events: AnimalEvents = AnimalEvents(),
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None,
@@ -101,10 +103,11 @@ def mock_reproduction_data_stream(
         days_in_pregnancy=days_in_pregnancy,
         days_in_milk=days_in_milk,
         events=events,
-        net_merit=net_merit,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf,
         herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=newborn_calf_config,
+        dam_tbv_fat=0.0,
+        dam_tbv_protein=0.0,
     )
 
 
@@ -378,10 +381,11 @@ def test_reproduction_update(animal_type: AnimalType, mock_reproduction: Reprodu
         days_in_pregnancy=mock_inputs.days_in_pregnancy,
         days_in_milk=mock_inputs.days_in_milk,
         events=AnimalEvents(),
-        net_merit=mock_inputs.net_merit,
         phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
         herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,
+        dam_tbv_fat=0.0,
+        dam_tbv_protein=0.0,
     )
 
     expected_outputs = mock_reproduction_outputs(
@@ -434,10 +438,11 @@ def test_reproduction_update_type_error(
         days_in_pregnancy=mock_inputs.days_in_pregnancy,
         days_in_milk=mock_inputs.days_in_milk,
         events=AnimalEvents(),
-        net_merit=mock_inputs.net_merit,
         phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
         herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,
+        dam_tbv_fat=0.0,
+        dam_tbv_protein=0.0,
     )
 
     mocker.patch(
@@ -639,7 +644,6 @@ def test_cow_reproduction_update(
             days_born=0,
             birth_weight=10.8,
             initial_phosphorus=18.8,
-            net_merit=8.8,
         ),
     )
 
@@ -707,7 +711,6 @@ def test_cow_give_birth(calves: int, mocker: MockerFixture) -> None:
         days_in_pregnancy=reproduction.gestation_length,
         days_in_milk=150,
         phosphorus_for_gestation_required_for_calf=18.8,
-        net_merit=23.3,
     )
 
     mock_reset_repro_state = mocker.patch.object(reproduction.repro_state_manager, "reset")
@@ -719,9 +722,6 @@ def test_cow_give_birth(calves: int, mocker: MockerFixture) -> None:
     )
     mock_simulate_estrus_if_eligible = mocker.patch.object(
         reproduction, "_simulate_estrus_if_eligible", return_value=mock_outputs
-    )
-    mock_net_merit_assignment = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.assign_net_merit_value_to_newborn_calf"
     )
 
     result = reproduction.cow_give_birth(mock_outputs, mock_time)
@@ -738,7 +738,6 @@ def test_cow_give_birth(calves: int, mocker: MockerFixture) -> None:
         mock_outputs, mock_time.simulation_day
     )
     mock_simulate_estrus_if_eligible.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-    mock_net_merit_assignment.assert_called_once_with(mock_time, mock_outputs.breed, mock_outputs.net_merit)
 
 
 @pytest.mark.parametrize(
@@ -1176,14 +1175,14 @@ def test_set_cow_reproduction_program(
 @pytest.mark.parametrize(
     "avg_estrus_cycle, max_cycle_length, estrus_cycle_value, expected_estrus_day",
     [
-        (21, math.inf, 1, 501),
+        (21, sys.maxsize, 1, 501),
         (21, 25, 24, 524),
         (21, 23, 24, 522),
     ],
 )
 def test_simulate_first_estrus(
     avg_estrus_cycle: int,
-    max_cycle_length: float,
+    max_cycle_length: int,
     estrus_cycle_value: int,
     expected_estrus_day: int,
     mocker: MockerFixture,
@@ -3772,10 +3771,9 @@ def test_increment_cow_ai_counts_increments_program_specific_counters(
 
 def test_increment_successful_cow_conceptions() -> None:
     reproduction = Reproduction()
-    reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
     reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
 
-    initial_conception_count = reproduction.herd_reproduction_statistics.cow_num_successful_conceptions
+    initial_conception_count = reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions
     result = reproduction._increment_successful_cow_conceptions(reproduction_data_stream)
 
     assert result.herd_reproduction_statistics.cow_num_successful_conceptions == initial_conception_count + 1

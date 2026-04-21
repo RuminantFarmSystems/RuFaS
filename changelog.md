@@ -47,6 +47,7 @@ v1.0.0
 - [2848](https://github.com/RuminantFarmSystems/MASM/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
 - [2843](https://github.com/RuminantFarmSystems/MASM/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
 - [2852](https://github.com/RuminantFarmSystems/MASM/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
+- [2622](https://github.com/RuminantFarmSystems/MASM/pull/2622) - [minor change] [InputChange][OutputChange] Update culling logic to respond to number of available heifers.
 - [2866](https://github.com/RuminantFarmSystems/MASM/pull/2866) - [minor change] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field_manager.py.
 - [2863](https://github.com/RuminantFarmSystems/MASM/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
 - [2867](https://github.com/RuminantFarmSystems/MASM/pull/2867) - [minor change] [NoInputChange] [NoOutputChange] Updates expand_data_temporally() util function to offer options of full simulation expansion and front-padding data.
@@ -63,7 +64,11 @@ v1.0.0
 - [2925](https://github.com/RuminantFarmSystems/RuFaS/pull/2925) - [minor change] [NoInputChange] [NoOutputChange] Fix the `graph_and_report` option in report_generation.py.
 - [2907](https://github.com/RuminantFarmSystems/RuFaS/pull/2907) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions unit issue. The mirror issue of [Fix FarmGrownFeed Emissions Unit on test #2908](https://github.com/RuminantFarmSystems/MASM/pull/2908) to update `dev`.
 - [2934](https://github.com/RuminantFarmSystems/RuFaS/pull/2934) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Refactor `Reproduction.execute_cow_ed_protocol()`.
-
+- [2949](https://github.com/RuminantFarmSystems/RuFaS/pull/2949) - [minor change] [NoInputChange] [NoOutputChange] [Verbosity] Updates CLI verbosity arg to override verbosity of full run including task manager verbosity.
+- [2947](https://github.com/RuminantFarmSystems/RuFaS/pull/2947) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Created weather data cross validation rules.
+- [2948](https://github.com/RuminantFarmSystems/RuFaS/pull/2948) - [minor change] [Feeds][NoInputChange] [NoOutputChange] Removes feed id maximums in metadata properties.
+- [2960](https://github.com/RuminantFarmSystems/RuFaS/pull/2960) - [minor change] [Docs][NoInputChange] [NoOutputChange] Adds SME evaluation report for v1.0.
+- [2734](https://github.com/RuminantFarmSystems/MASM/pull/2734) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
 
 ### v1.0.0
 
@@ -354,6 +359,8 @@ v1.0.0
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2881](https://github.com/RuminantFarmSystems/RuFaS/pull/2881) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
+- [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
+
 
 ### v0.9.2
 

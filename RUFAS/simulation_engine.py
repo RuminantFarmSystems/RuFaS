@@ -228,12 +228,13 @@ class SimulationEngine:
 
         if self.simulate_animals:
             AnimalModuleReporter.report_end_of_simulation(
-                self.herd_manager.herd_statistics,
-                self.herd_manager.herd_reproduction_statistics,
-                self.time,
-                self.herd_manager.heiferII_events_by_id,
-                self.herd_manager.cow_events_by_id,
-            )
+              self.herd_manager.herd_statistics,
+              self.herd_manager.herd_reproduction_statistics,
+              self.time,
+              self.herd_manager.heiferII_events_by_id,
+              self.herd_manager.cow_events_by_id,
+              self.herd_manager.animal_genetic_history_by_id,
+          )
 
         if self.simulate_manure:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
