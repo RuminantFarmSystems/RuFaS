@@ -35,7 +35,9 @@ pip install tabulate
 
 # Markdown tables with python
 
-Next, we'll generating an example table with python and saving it to "out.csv". 
+Next, we'll generate an example table with python and saving it to "out.csv". 
+In most cases, tables will be manually created by users, but I do it with code
+for this example to demonstrate what data were included.
 For this table, I've intentionally given one of the cells a very long string 
 value to demonstrate how line breaks are done automatically:
 
