@@ -47,8 +47,8 @@ class HerdStatistics:
         Number of stillborn calves during a specific period, (unitless).
     sold_calf_num : int
         Number of calves sold during a specific period, (unitless).
-    sold_heiferIII_oversupply_num : int
-        Number of surplus "Heifer III" animals sold, (unitless).
+    sold_cow_oversupply_num : int
+        Number of surplus cow sold, (unitless).
     bought_heifer_num : int
         Number of heifers purchased during a specific period, (unitless).
     sold_heiferII_num : int
@@ -178,7 +178,7 @@ class HerdStatistics:
 
     stillborn_calf_num = 0
     sold_calf_num = 0
-    sold_heiferIII_oversupply_num = 0
+    sold_cow_oversupply_num = 0
     bought_heifer_num = 0
     sold_heiferII_num = 0
     cow_herd_exit_num = 0
@@ -256,7 +256,7 @@ class HerdStatistics:
         }
         self.cull_reason_stats = {
             animal_constants.DEATH_CULL: 0,
-            animal_constants.LOW_PROD_CULL: 0,
+            animal_constants.OVERSUPPLY_CULL: 0,
             animal_constants.LAMENESS_CULL: 0,
             animal_constants.INJURY_CULL: 0,
             animal_constants.MASTITIS_CULL: 0,
@@ -270,7 +270,7 @@ class HerdStatistics:
         self.avg_age_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
         self.cull_reason_stats_percent = {
             animal_constants.DEATH_CULL: 0.0,
-            animal_constants.LOW_PROD_CULL: 0.0,
+            animal_constants.OVERSUPPLY_CULL: 0.0,
             animal_constants.LAMENESS_CULL: 0.0,
             animal_constants.INJURY_CULL: 0.0,
             animal_constants.MASTITIS_CULL: 0.0,
@@ -313,7 +313,7 @@ class HerdStatistics:
 
         self.stillborn_calf_num = 0
         self.sold_calf_num = 0
-        self.sold_heiferIII_oversupply_num = 0
+        self.sold_cow_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.cow_herd_exit_num = 0
