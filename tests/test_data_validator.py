@@ -2747,23 +2747,19 @@ def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_ter
         ),
     ],
 )
-def test_evaluate_expression_unknown_operation(
-    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
+def test_validate_expression_block_unknown_function(
+    expression_block: dict[str, Any], eager_termination: bool
 ) -> None:
-    """Unit tests for _evaluate_expression() in CrossValidator"""
+    """Unknown aggregation function detected by _validate_expression_block."""
     cross_validator = CrossValidator()
-    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
-    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
+            cross_validator._validate_expression_block(expression_block, eager_termination)
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
-        assert result is None
-        assert status is False
-    mock_get_alias_value.assert_not_called()
-    mock_save_to_alias_pool.assert_not_called()
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
@@ -2777,23 +2773,19 @@ def test_evaluate_expression_unknown_operation(
         ({"aggregation": {"function": "multiply"}, "save_as": "alias_2"}, False),
     ],
 )
-def test_evaluate_expression_no_ordered_variables(
-    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
+def test_validate_expression_block_missing_operands(
+    expression_block: dict[str, Any], eager_termination: bool
 ) -> None:
-    """Test the behavior of _evaluate_expression when operands is missing or empty."""
+    """Missing or empty operands detected by _validate_expression_block."""
     cross_validator = CrossValidator()
-    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
-    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
+            cross_validator._validate_expression_block(expression_block, eager_termination)
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
-        assert result is None
-        assert status is False
-    mock_get_alias_value.assert_not_called()
-    mock_save_to_alias_pool.assert_not_called()
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
@@ -2873,31 +2865,25 @@ def test_validate_expression_block_with_complex_variable_values_no_apply_to(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, eager_termination",
+    "aggregation_block, eager_termination",
     [
-        ({"function": "sum", "operands": ["alias_0"], "mode": "unknown"}, [[]], True),
-        ({"function": "sum", "operands": ["alias_0"], "mode": "unknown"}, [[]], False),
+        ({"function": "sum", "operands": ["alias_0"], "mode": "unknown"}, True),
+        ({"function": "sum", "operands": ["alias_0"], "mode": "unknown"}, False),
     ],
 )
-def test_validate_expression_block_with_complex_variable_values_unknown_apply_to_value(
-    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
+def test_validate_aggregation_block_structure_unknown_mode(
+    aggregation_block: dict[str, Any], eager_termination: bool
 ) -> None:
-    """
-    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
-    when a complex variable is selected and the `mode` key is set to an unknown value.
-    """
+    """Unknown mode value detected by _validate_aggregation_block_structure."""
     cross_validator = CrossValidator()
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._validate_expression_block_with_complex_variable_values(
-                expression_block, selected_variables, eager_termination
-            )
+            cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
     else:
-        result = cross_validator._validate_expression_block_with_complex_variable_values(
-            expression_block, selected_variables, eager_termination
-        )
-        assert result is False
+        valid = cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
@@ -3334,11 +3320,12 @@ def test_evaluate_condition_clause_array_all_true(mocker: MockerFixture, eager_t
 
 
 def test_validate_condition_clause_ok(mocker: MockerFixture) -> None:
-    """True when relationship valid and both sides present."""
+    """True when relationship valid, both sides present, and expression blocks pass."""
     v = CrossValidator()
     mocker.patch.object(v, "_validate_relationship", return_value=True)
+    mocker.patch.object(v, "_validate_expression_block", return_value=True)
     log = mocker.patch.object(v, "_log_missing_condition_clause_field")
-    clause = {"left_hand": 1, "right_hand": 2, "operator": "equal"}
+    clause = {"left_hand": {"aggregation": {}}, "right_hand": {"aggregation": {}}, "operator": "equal"}
     result = v._validate_condition_clause(clause, eager_termination=False)
     assert result is True
     log.assert_not_called()
@@ -3487,43 +3474,40 @@ def test_evaluate_iterate_array_of_dicts_success(
     cv = CrossValidator()
     mocker.patch.object(cv, "_get_alias_value", side_effect=alias_values)
 
-    result, status = cv._evaluate_iterate_array_of_dicts(
+    result, status = cv._evaluate_for_each_block(
         iter_block, eager_termination=False, outer_relationship="equal"
     )
     assert status is True
     assert result == expected_result
 
 
-def test_evaluate_iterate_array_of_dicts_unknown_relationship_no_eager() -> None:
-    """Unknown relationship returns (None, False) when not eager."""
+def test_validate_for_each_block_unknown_operator_no_eager() -> None:
+    """Unknown operator returns False and logs error when not eager."""
     cv = CrossValidator()
-    iter_block = {
+    for_each_block = {
         "mode": "filter",
         "in": "items",
         "field": "x",
         "compare_value": "cmp",
         "operator": "unknown_rel",
     }
-    result, status = cv._evaluate_iterate_array_of_dicts(
-        iter_block, eager_termination=False, outer_relationship="equal"
-    )
-    assert result is None
-    assert status is False
+    valid = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+    assert valid is False
     assert len(cv._event_logs) == 1
 
 
-def test_evaluate_iterate_array_of_dicts_unknown_relationship_eager() -> None:
-    """Unknown relationship raises ValueError when eager."""
+def test_validate_for_each_block_unknown_operator_eager() -> None:
+    """Unknown operator raises ValueError when eager."""
     cv = CrossValidator()
-    iter_block = {
+    for_each_block = {
         "mode": "filter",
         "in": "items",
         "field": "x",
         "compare_value": "cmp",
         "operator": "unknown_rel",
     }
-    with pytest.raises(ValueError, match="Unknown operator"):
-        cv._evaluate_iterate_array_of_dicts(iter_block, eager_termination=True, outer_relationship="equal")
+    with pytest.raises(ValueError, match="Invalid operator"):
+        cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
 
 
 def test_evaluate_expression_with_iterate_array_of_dicts_and_save_as(mocker: MockerFixture) -> None:
