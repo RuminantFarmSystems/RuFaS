@@ -844,20 +844,3 @@ class FeedManager:
                 purchased_by_id[feed_id].append(stored_feed)
 
         return dict(farmgrown_by_id), dict(purchased_by_id)
-
-    def _gather_valid_farmgrown_feed_ids(self) -> set[RUFAS_ID]:
-        """
-        Gathers the ids of valid farm-grown feeds.
-
-        Returns
-        -------
-        set[RUFAS_ID]
-            A set of valid farm-grown feed ids.
-        """
-        farmgrown_ids: set[RUFAS_ID] = set()
-        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
-        for storage in self.active_storages.values():
-            feed_id: RUFAS_ID = storage.rufas_feed_id
-            if feed_id in valid_feed_ids:
-                farmgrown_ids.add(feed_id)
-        return farmgrown_ids
