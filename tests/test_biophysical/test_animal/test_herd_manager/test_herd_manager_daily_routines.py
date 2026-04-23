@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_manager import HerdManager
@@ -401,15 +402,7 @@ def test_collect_daily_herd_updates(
         ],
     )
 
-    (
-        actual_graduated_animals,
-        actual_newborn_calves,
-        actual_removed_animals,
-        actual_sold_newborn_calves,
-        actual_stillborn_newborn_calves,
-        actual_sold_heiferIIs,
-        actual_sold_and_died_cows,
-    ) = herd_manager._collect_daily_herd_updates(mock_time)
+    actual_daily_herd_updates = herd_manager._process_daily_herd_updates(mock_time)
 
     assert mock_perform_daily_routines_for_animals.call_args_list == [
         call(mock_time, herd_manager.calves),
@@ -418,15 +411,19 @@ def test_collect_daily_herd_updates(
         call(mock_time, herd_manager.heiferIIIs),
         call(mock_time, herd_manager.cows),
     ]
-    assert actual_graduated_animals == (
+    assert isinstance(actual_daily_herd_updates, DailyHerdUpdates)
+    assert actual_daily_herd_updates.graduated_animals == (
         graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs + graduated_cows
     )
-    assert actual_removed_animals == sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows
-    assert actual_newborn_calves == heiferIII_newborns + cow_newborns
-    assert actual_sold_newborn_calves == heiferIII_sold_newborns + cow_sold_newborns
-    assert actual_stillborn_newborn_calves == heiferIII_stillborns + cow_stillborns
-    assert actual_sold_heiferIIs == sold_heiferIIs
-    assert actual_sold_and_died_cows == sold_and_died_cows
+    assert (
+        actual_daily_herd_updates.removed_animals
+        == sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows
+    )
+    assert actual_daily_herd_updates.newborn_calves == heiferIII_newborns + cow_newborns
+    assert actual_daily_herd_updates.sold_newborn_calves == heiferIII_sold_newborns + cow_sold_newborns
+    assert actual_daily_herd_updates.stillborn_newborn_calves == heiferIII_stillborns + cow_stillborns
+    assert actual_daily_herd_updates.sold_heiferIIs == sold_heiferIIs
+    assert actual_daily_herd_updates.sold_and_died_cows == sold_and_died_cows
 
 
 @pytest.mark.parametrize("simulation_day, expect_adjustment", [(14, False), (15, True)])
@@ -554,7 +551,7 @@ def test_warn_when_lactating_cows_have_no_milk(herd_manager: HerdManager, mocker
         "There are 1 lactating cows with no milking production on simulation day 15.",
         info_map={
             "class": herd_manager.__class__.__name__,
-            "function": herd_manager.daily_routines.__name__,
+            "function": herd_manager.execute_daily_routines.__name__,
             "simulation_day": 15,
         },
     )
@@ -687,7 +684,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
-    herd_manager.daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
+    herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
 
     mock_reset_daily_statistics.assert_called_once_with()
     assert mock_perform_daily_routines_for_animals.call_count == 5

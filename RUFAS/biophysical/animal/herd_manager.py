@@ -21,6 +21,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
@@ -568,17 +569,9 @@ class HerdManager:
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
-    def _collect_daily_herd_updates(
-        self, time: RufasTime
-    ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]:
+    def _process_daily_herd_updates(self, time: RufasTime) -> DailyHerdUpdates:
         """Run daily routines for all animal groups and collect herd-level updates."""
-        graduated_animals: list[Animal] = []
-        newborn_calves: list[Animal] = []
-        removed_animals: list[Animal] = []
-        sold_newborn_calves: list[Animal] = []
-        stillborn_newborn_calves: list[Animal] = []
-        sold_heiferIIs: list[Animal] = []
-        sold_and_died_cows: list[Animal] = []
+        daily_herd_updates = DailyHerdUpdates()
         animal_groups = [
             ("calves", self.calves),
             ("heiferIs", self.heiferIs),
@@ -597,26 +590,18 @@ class HerdManager:
                 group_sold_newborn_calves,
             ) = self._perform_daily_routines_for_animals(time, animals)
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
-            graduated_animals += group_graduated_animals
-            removed_animals += sold_animals
+            daily_herd_updates.graduated_animals += group_graduated_animals
+            daily_herd_updates.removed_animals += sold_animals
             if collect_birth_results:
-                stillborn_newborn_calves += group_stillborn_newborn_calves
-                newborn_calves += group_newborn_calves
-                sold_newborn_calves += group_sold_newborn_calves
+                daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
+                daily_herd_updates.newborn_calves += group_newborn_calves
+                daily_herd_updates.sold_newborn_calves += group_sold_newborn_calves
             if animal_group_name == "heiferIIs":
-                sold_heiferIIs = sold_animals
+                daily_herd_updates.sold_heiferIIs = sold_animals
             elif animal_group_name == "cows":
-                sold_and_died_cows = sold_animals
+                daily_herd_updates.sold_and_died_cows = sold_animals
 
-        return (
-            graduated_animals,
-            newborn_calves,
-            removed_animals,
-            sold_newborn_calves,
-            stillborn_newborn_calves,
-            sold_heiferIIs,
-            sold_and_died_cows,
-        )
+        return daily_herd_updates
 
     def _apply_daily_herd_structure_updates(
         self,
@@ -681,7 +666,7 @@ class HerdManager:
                 f" day {time.simulation_day}.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self.daily_routines.__name__,
+                    "function": self.execute_daily_routines.__name__,
                     "simulation_day": time.simulation_day,
                 },
             )
@@ -704,7 +689,7 @@ class HerdManager:
         self._report_ration(simulation_day)
         self._calculate_and_report_average_genetics(simulation_day)
 
-    def daily_routines(
+    def execute_daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
     ) -> dict[str, ManureStream]:
         """
@@ -730,30 +715,44 @@ class HerdManager:
         dict[str, ManureStream]
             A list of dictionaries containing manure data for each pen in the herd.
 
+        Notes
+        -----
+        Daily Herd Routine Process:
+        1. Reset daily herd statistics and reproduction trackers.
+        2. Run per-animal daily routines for calves, heifer groups, and cows.
+        3. Collect herd-level updates from those routines, including graduations, removals, births, and sales.
+        4. Update sold-animal and stillborn-calf statistics.
+        5. Apply herd structure changes, including removals, additions, pen moves, and periodic replacement logic.
+        6. Record pen history and collect manure and enteric methane outputs by pen.
+        7. Recompute herd statistics and warn about lactating cows with no milk production.
+        8. Report daily herd outputs, including population, herd statistics, manure, milk, ration, and genetics.
+
         """
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
-        (
-            graduated_animals,
-            newborn_calves,
-            removed_animals,
-            sold_newborn_calves,
-            stillborn_newborn_calves,
-            sold_heiferIIs,
-            sold_and_died_cows,
-        ) = self._collect_daily_herd_updates(time)
-        self.herd_statistics.born_calf_num = len(stillborn_newborn_calves + sold_newborn_calves + newborn_calves)
-
-        self._update_sold_animal_statistics(
-            sold_newborn_calves=sold_newborn_calves,
-            sold_heiferIIs=sold_heiferIIs,
-            sold_and_died_cows=sold_and_died_cows,
+        daily_herd_updates = self._process_daily_herd_updates(time)
+        self.herd_statistics.born_calf_num = len(
+            daily_herd_updates.stillborn_newborn_calves
+            + daily_herd_updates.sold_newborn_calves
+            + daily_herd_updates.newborn_calves
         )
 
-        self._update_stillborn_calf_statistics(stillborn_newborn_calves)
+        self._update_sold_animal_statistics(
+            sold_newborn_calves=daily_herd_updates.sold_newborn_calves,
+            sold_heiferIIs=daily_herd_updates.sold_heiferIIs,
+            sold_and_died_cows=daily_herd_updates.sold_and_died_cows,
+        )
+
+        self._update_stillborn_calf_statistics(daily_herd_updates.stillborn_newborn_calves)
         self._apply_daily_herd_structure_updates(
-            graduated_animals, newborn_calves, removed_animals, available_feeds, time, weather, total_inventory
+            daily_herd_updates.graduated_animals,
+            daily_herd_updates.newborn_calves,
+            daily_herd_updates.removed_animals,
+            available_feeds,
+            time,
+            weather,
+            total_inventory,
         )
 
         self.record_pen_history(time.simulation_day)
