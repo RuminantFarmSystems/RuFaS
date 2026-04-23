@@ -184,9 +184,9 @@ class InputManager:
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
         if cross_validation_rules is not None and len(cross_validation_rules) > 0:
             for cross_validation_ruleset in cross_validation_rules:
-                cross_validation_blocks = cross_validation_ruleset.get("cross-validation", [])
+                cross_validation_blocks = cross_validation_ruleset.get("cross_validation", [])
                 for block in cross_validation_blocks:
-                    target_and_save_block = block.get("target_and_save", {})
+                    target_and_save_block = block.get("aliases", {})
                     target_and_save_result = self._extract_target_and_save_block(
                         target_and_save_block, eager_termination
                     )
