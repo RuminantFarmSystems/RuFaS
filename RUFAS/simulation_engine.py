@@ -356,6 +356,7 @@ class SimulationEngine:
             ]
             harvest_schedule_crops = harvest_schedule_crops.union(crops_to_get_next_harvest_dates)
             # TODO figure out where this goes and when it should happen in Animals-only simulation
+            # - also should this check on `_should_recalculate_feed_planning` be happening in this function at all?
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
     def _build_harvest_schedule(self, harvested_crops: list[HarvestedCrop]) -> dict[str, date | None]:
