@@ -69,6 +69,7 @@ v1.0.0
 - [2948](https://github.com/RuminantFarmSystems/RuFaS/pull/2948) - [minor change] [Feeds][NoInputChange] [NoOutputChange] Removes feed id maximums in metadata properties.
 - [2960](https://github.com/RuminantFarmSystems/RuFaS/pull/2960) - [minor change] [Docs][NoInputChange] [NoOutputChange] Adds SME evaluation report for v1.0.
 - [2734](https://github.com/RuminantFarmSystems/MASM/pull/2734) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
+- [2939](https://github.com/RuminantFarmSystems/MASM/pull/2939) - [minor change] [InputChange][OutputChange][SimulationEngine] Disentangles data sharing between biophysical modules in SimulationEngine.
 
 ### v1.0.0
 

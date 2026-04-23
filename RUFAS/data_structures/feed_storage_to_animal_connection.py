@@ -1,15 +1,21 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
+from typing import Any
 
+from RUFAS.input_manager import InputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 """
 Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
 other input files and the RuFaS codebase.
 """
 RUFAS_ID = int
+
+"""Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
+ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 
 class FeedCategorization(Enum):
@@ -324,6 +330,92 @@ class NRCFeed(Feed):
     PAF: float
 
 
+class AvailableFeedsBuilder:
+    """
+    Builds the list of feeds available for use in the simulation.
+
+    This class is responsible for loading feed composition data from the input
+    manager, translating it into simulation-friendly types, and constructing
+    the purchased feeds configured for the simulation.
+    """
+
+    @classmethod
+    def setup_available_feeds(
+        cls, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
+    ) -> list[Feed]:
+        """
+        Creates sorted list of feeds available for use in the simulation.
+
+        Parameters
+        ----------
+        feed_config : list[dict[str, Any]]
+            Mapping of the feeds available for purchase to the prices of those feeds.
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        list[Feed]
+            Nutrition and price information of feeds available in the simulation.
+
+        """
+        feed_library = cls._process_feed_library(nutrient_standard)
+
+        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
+        available_feeds: list[Feed] = []
+        feeds_to_parse = feed_config["purchased_feeds"]
+        for feed in feeds_to_parse:
+            rufas_id = feed["purchased_feed"]
+            price = feed["purchased_feed_cost"]
+            buffer = feed["buffer"]
+            try:
+                nutritive_properties = feed_library[rufas_id]
+            except KeyError:
+                raise KeyError(f"Feed with RUFAS ID '{rufas_id}' not found in the feed library.")
+            new_feed = feed_representation(
+                rufas_id=rufas_id,
+                amount_available=0.0,
+                on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
+                purchase_cost=price,
+                buffer=buffer,
+                **nutritive_properties,
+            )
+            available_feeds.append(new_feed)
+
+        return sorted(available_feeds, key=lambda feed: feed.rufas_id)
+
+    @staticmethod
+    def _process_feed_library(nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
+        """
+        Collects and processes the feed library input so that it can be translated into a simulation-friendly format.
+
+        Parameters
+        ----------
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[str, Any]]
+            Mapping of RuFaS feed IDs to the nutritional properties of those feeds.
+
+        """
+        im = InputManager()
+        feed_library: dict[str, list[Any]] = (
+            im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+        )
+
+        converted_feed_library = Utility.convert_dict_of_lists_to_list_of_dicts(feed_library)
+
+        processed_feed_library = {feed["rufas_id"]: feed for feed in converted_feed_library}
+        for feed in processed_feed_library.values():
+            del feed["rufas_id"]
+            feed["feed_type"] = FeedComponentType(feed["feed_type"])
+            feed["Fd_Category"] = FeedCategorization(feed["Fd_Category"])
+            feed["units"] = MeasurementUnits(feed["units"])
+        return processed_feed_library
+
+
 @dataclass
 class TotalInventory:
     """
@@ -393,6 +485,54 @@ class RequestedFeed:
 
     def __rmul__(self, multiplier: int | float) -> "RequestedFeed":
         return multiplier * self
+
+
+@dataclass
+class FeedFulfillmentResults:
+    """Tracks how much feed was deducted from purchased and farmgrown sources to fulfill a request."""
+
+    purchased: dict[RUFAS_ID, float] = field(default_factory=dict)
+    farmgrown: dict[RUFAS_ID, float] = field(default_factory=dict)
+
+    @classmethod
+    def fulfill_feed_request_as_purchased(cls, requested_feed: RequestedFeed) -> "FeedFulfillmentResults":
+        """
+        Create a fulfillment result where all requested feed is satisfied by purchased sources.
+
+        This is used when the feed module is not simulated.
+        """
+        return cls(
+            purchased=dict(requested_feed.requested_feed),
+            farmgrown={},
+        )
+
+    @classmethod
+    def empty(
+        cls,
+        *,
+        requested_feed_ids: list[RUFAS_ID] | None = None,
+        farmgrown_feed_ids: list[RUFAS_ID] | None = None,
+    ) -> "FeedFulfillmentResults":
+        """Create an empty results object with initialized keys."""
+        requested_feed_ids = requested_feed_ids or []
+        farmgrown_feed_ids = farmgrown_feed_ids or []
+
+        return cls(
+            purchased={feed_id: 0.0 for feed_id in requested_feed_ids},
+            farmgrown={feed_id: 0.0 for feed_id in farmgrown_feed_ids},
+        )
+
+    def add_purchased(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted purchased feed for a given feed ID."""
+        self.purchased[feed_id] = self.purchased.get(feed_id, 0.0) + amount
+
+    def add_farmgrown(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted farmgrown feed for a given feed ID."""
+        self.farmgrown[feed_id] = self.farmgrown.get(feed_id, 0.0) + amount
+
+    def total_deducted_for_feed(self, feed_id: RUFAS_ID) -> float:
+        """Return total deducted amount for a single feed ID across all sources."""
+        return self.purchased.get(feed_id, 0.0) + self.farmgrown.get(feed_id, 0.0)
 
 
 class PurchaseAllowance:
