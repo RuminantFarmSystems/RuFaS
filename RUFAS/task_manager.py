@@ -386,11 +386,15 @@ class TaskManager:
             input_task["json_output_directory"] = Path(input_task["json_output_directory"])
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
-            input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             saved_output_pools = []
             for saved_pool in input_task.get("saved_output_pools", []):
                 saved_output_pools.append({"prefix": saved_pool.get("prefix", None), "path": Path(saved_pool["path"])})
-            input_task["save_output_pool_to_file_path"] = Path(input_task["save_output_pool_to_file_path"]) if "save_output_pool_to_file_path" in input_task else None
+            input_task["saved_output_pools"] = saved_output_pools
+            input_task["save_output_pool_to_file_path"] = (
+                Path(input_task["save_output_pool_to_file_path"])
+                if "save_output_pool_to_file_path" in input_task
+                else None
+            )
             input_task["output_prefix"] = input_task["output_prefix"]
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
@@ -588,7 +592,7 @@ class TaskManager:
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
             should_flush_im_pool = (
-                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS, TaskType.POST_PROCESSING] else True
             )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
@@ -886,8 +890,6 @@ class TaskManager:
                 output_manager.flush_pools()
                 output_manager.load_multiple_variables_pools_from_files(saved_pools)
                 output_manager.set_metadata_prefix("reload")
-                if output_manager.is_first_post_processing:
-                    output_manager.time = RufasTime()
             else:
                 output_manager.add_warning(
                     "No saved pools provided",
@@ -905,6 +907,7 @@ class TaskManager:
         if args.get("task_type") == TaskType.POST_PROCESSING:
             save_results = True
             produce_graphics = True
+            output_manager.time = RufasTime()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -923,8 +926,11 @@ class TaskManager:
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )
         if args.get("save_output_pool_to_file", False):
-            output_manager.create_directory(args["save_output_pool_to_file_path"])
-            full_file_path = args["save_output_pool_to_file_path"].joinpath(output_manager.generate_file_name("saved_pool", "json"))
+            save_output_pool_to_file_path = Path(args["save_output_pool_to_file_path"])
+            output_manager.create_directory(save_output_pool_to_file_path)
+            full_file_path = save_output_pool_to_file_path.joinpath(
+                output_manager.generate_file_name("saved_pool", "json")
+            )
             output_manager.save_variable_pool_to_file(full_file_path)
 
     @staticmethod

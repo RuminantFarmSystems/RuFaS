@@ -4,7 +4,6 @@ from enum import Enum
 import time as timer
 from datetime import date, timedelta
 
-from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
@@ -180,7 +179,6 @@ class SimulationEngine:
             self.herd_manager.heiferII_events_by_id,
             self.herd_manager.cow_events_by_id,
         )
-        # EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)

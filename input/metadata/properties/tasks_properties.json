@@ -170,12 +170,6 @@
           },
           "nullable": true
         },
-        "output_pool_path": {
-          "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9._-]+[\\\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
-          "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
-          "default": ""
-        },
         "save_output_pool_to_file": {
           "type": "bool",
           "description": "If true, the Output Manager's pool will be saved to a JSON file.",
@@ -184,8 +178,8 @@
         },
         "save_output_pool_to_file_path": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9._-]+[\\\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
-          "description": "The path to save the Output Manager's pool to a JSON file.",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\. ]+[\\\\/])*[a-zA-Z0-9_\\-\\. ]*[\\\\/]?$",
+          "description": "The directory to save the Output Manager variable pool.",
           "default": "",
           "nullable": true
         },
