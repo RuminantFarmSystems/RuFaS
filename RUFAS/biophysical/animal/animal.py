@@ -2477,7 +2477,8 @@ class Animal:
             )
         else:
             self.milk_yield_305_day = sum(
-                history["milk_production"] for history in self.milk_production.milk_production_history)
+                history["milk_production"] for history in self.milk_production.milk_production_history
+            )
 
         # parity_factor = {1: 1.25, 2: 1.18}.get(self.calves, 1.0)
         #
