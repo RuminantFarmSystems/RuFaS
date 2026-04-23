@@ -1891,21 +1891,14 @@ class CrossValidator:
         self, expression_block: dict[str, Any], eager_termination: bool, relationship: str
     ) -> tuple[Any, bool]:
         """
-        Evaluates an expression based on the provided expression block. This function also
-        optionally adds to the alias pool if the `save_as` key is present in the expression block.
+        Evaluates an expression based on the provided expression block, optionally
+        saving the result to the alias pool if the ``save_as`` key is present.
 
         Parameters
         ----------
         expression_block : dict[str, Any]
-            A dictionary containing the expression block to be evaluated. Supports two mutually
-            exclusive sub-block forms plus an optional ``save_as`` key:
-
-            Aggregation form:
-            ``{"aggregation": {"function": "...", "operands": [...], "mode": "..."}, "save_as": "..."}``
-
-            Array-of-dicts form:
-            ``{"for_each": {"in": "...", "field": "...", "compare_value": "..." | "compare_field": "...",
-            "operator": "...", "mode": "filter" | "enforce"}, "save_as": "..."}``
+            Dictionary containing the expression block to evaluate, with an
+            optional ``save_as`` key.
         eager_termination : bool
             Whether to raise an error if the expression is not successfully evaluated.
         relationship : str
@@ -1914,13 +1907,25 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            The result of the expression evaluation and a boolean indicating whether the expression was
-            successfully evaluated.
+            Result of the expression evaluation and a boolean indicating whether
+            the expression was successfully evaluated.
 
         Raises
         ------
         ValueError
-            Raises the error when the expression block contains unknown operation or missing ordered variables.
+            If the expression block contains an unknown operation or missing
+            ordered variables.
+
+        Notes
+        -----
+        Two mutually exclusive sub-block forms are supported for the expression block:
+
+        Aggregation form:
+        ``{"aggregation": {"function": "...", "operands": [...], "mode": "..."}, "save_as": "..."}``
+
+        Array-of-dicts form:
+        ``{"for_each": {"in": "...", "field": "...", "compare_value": "..." | "compare_field": "...",
+        "operator": "...", "mode": "filter" | "enforce"}, "save_as": "..."}``
         """
         if "for_each" in expression_block:
             result, evaluated = self._evaluate_for_each_block(
@@ -1952,19 +1957,13 @@ class CrossValidator:
         self, aggregation_block: dict[str, Any], eager_termination: bool, relationship: str
     ) -> tuple[Any, bool]:
         """
-        Evaluates an aggregation block, resolving ordered variables from the alias pool and
-        applying the specified aggregation operation.
+        Evaluates an aggregation block, resolving ordered variables from the alias
+        pool and applying the specified aggregation operation.
 
         Parameters
         ----------
         aggregation_block : dict[str, Any]
-            A dictionary containing the aggregation block to be evaluated. Expected keys:
-
-            - ``function``: aggregation function name (e.g. ``"sum"``, ``"no_op"``). Defaults to
-              ``"no_op"`` when absent.
-            - ``operands``: list of alias names to resolve and aggregate.
-            - ``mode``: ``"element_wise"`` or ``"aggregate"`` — required when any resolved variable
-              is a list or dict. Defaults to ``"aggregate"`` for scalar variables.
+            Dictionary containing the aggregation block to evaluate.
         eager_termination : bool
             Whether to raise an error if evaluation fails.
         relationship : str
@@ -1973,13 +1972,44 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            The aggregated result and ``True`` on success, or ``(None, False)`` on error.
+            Aggregated result and ``True`` on success, or ``(None, False)`` on error.
 
         Raises
         ------
         ValueError
             If ``eager_termination`` is ``True`` and the operation is unknown or
-            ``ordered_variables`` is empty or missing.
+            ``operands`` is empty or missing.
+
+        Notes
+        -----
+        Expected keys in ``aggregation_block``:
+
+        - ``function``: aggregation function name (e.g. ``"sum"``, ``"no_op"``).
+          Defaults to ``"no_op"`` when absent.
+        - ``operands``: list of alias names to resolve and aggregate.
+        - ``mode``: ``"element_wise"`` or ``"aggregate"`` — required when any
+          resolved variable is a list or dict. Defaults to ``"aggregate"`` for
+          scalar variables.
+
+        Examples
+        --------
+        Sum two scalar aliases:
+
+        .. code-block:: python
+
+            {"function": "sum", "operands": ["alias_a", "alias_b"]}
+
+        Pass a single alias through without aggregation:
+
+        .. code-block:: python
+
+            {"function": "no_op", "operands": ["alias_a"]}
+
+        Element-wise operation on a list variable:
+
+        .. code-block:: python
+
+            {"operands": ["alias_list"], "mode": "element_wise"}
         """
         operation = aggregation_block.get("function", "no_op")
         aggregator = AGGREGATION_FUNCTIONS[operation]
@@ -2091,27 +2121,45 @@ class CrossValidator:
         Parameters
         ----------
         iter_block : dict[str, Any]
-            The block describing how to iterate the array. Expected keys:
-
-            - ``in``: alias for the ``list[dict]`` value in the alias pool.
-            - ``field``: key within each dict entry to evaluate.
-            - ``compare_value``: alias for a scalar comparison value. Mutually exclusive
-              with ``compare_field``.
-            - ``compare_field``: key within each dict entry used as the right-hand
-              comparand. Mutually exclusive with ``compare_value``.
-            - ``operator``: one of the supported operator strings (e.g. ``"equal"``).
-            - ``mode``: ``"filter"`` to return the matching subset; ``"enforce"`` to
-              return ``[True]`` when all entries satisfy, otherwise ``[False]``.
+            Dictionary describing how to iterate the array.
         eager_termination : bool
             Whether to raise on error.
         outer_relationship : str
-            The operator of the enclosing condition clause, used for alias-pool error
-            handling.
+            The operator of the enclosing condition clause, used for alias-pool
+            error handling.
 
         Returns
         -------
         tuple[Any, bool]
             ``(result, True)`` on success or ``(None, False)`` on error.
+
+        Notes
+        -----
+        Expected keys in ``iter_block``:
+
+        - ``in``: alias for the ``list[dict]`` value in the alias pool.
+        - ``field``: key within each dict entry to evaluate.
+        - ``compare_value``: alias for a scalar comparison value. Mutually
+          exclusive with ``compare_field``.
+        - ``compare_field``: key within each dict entry used as the right-hand
+          comparand. Mutually exclusive with ``compare_value``.
+        - ``operator``: one of the supported operator strings (e.g. ``"equal"``).
+        - ``mode``: ``"filter"`` to return the matching subset; ``"enforce"`` to
+          return ``[True]`` when all entries satisfy, otherwise ``[False]``.
+
+        Examples
+        --------
+        Filter entries where ``"status"`` equals a scalar alias:
+
+        .. code-block:: python
+
+            {"in": "alias_list", "field": "status", "compare_value": "alias_status", "operator": "equal", "mode": "filter"}
+
+        Enforce that all entries have ``"age"`` greater than a peer field:
+
+        .. code-block:: python
+
+            {"in": "alias_list", "field": "age", "compare_field": "min_age", "operator": "greater_than", "mode": "enforce"}
         """
         source_alias: str = iter_block["in"]
         field: str = iter_block["field"]
@@ -2213,14 +2261,13 @@ class CrossValidator:
         """
         Validates the structure of an expression block before evaluation.
 
-        Dispatches to the appropriate sub-validator based on which top-level key is present.
-        Exactly one of ``aggregation`` or ``for_each`` must exist.
+        Dispatches to the appropriate sub-validator based on which top-level key
+        is present.
 
         Parameters
         ----------
         expression_block : dict[str, Any]
-            The expression block to validate. Must contain either an ``aggregation`` or a
-            ``for_each`` sub-dict.
+            The expression block to validate.
         eager_termination : bool
             Whether to raise on the first error.
 
@@ -2233,6 +2280,14 @@ class CrossValidator:
         ------
         ValueError
             If ``eager_termination`` is ``True`` and a structural error is detected.
+
+        Notes
+        -----
+        The following rules are enforced:
+
+        - Exactly one of ``aggregation`` or ``for_each`` must be present:
+            - A block containing both keys is invalid.
+            - A block containing neither key is invalid.
         """
         if "aggregation" in expression_block and "for_each" not in expression_block:
             return self._validate_aggregation_block_structure(expression_block["aggregation"], eager_termination)
@@ -2254,18 +2309,10 @@ class CrossValidator:
         """
         Validates the structure of an aggregation block.
 
-        Checks operand list integrity, function applicability for multi-operand blocks,
-        and the validity of ``function`` and ``mode`` values when provided.
-
         Parameters
         ----------
         aggregation_block : dict[str, Any]
-            The ``aggregation`` sub-dict to validate. Expected keys:
-
-            - ``operands``: required non-empty list of alias name strings.
-            - ``function``: optional aggregation function name; required (and must not be
-              ``"no_op"``) when ``operands`` has more than one entry.
-            - ``mode``: optional; if present must be ``"element_wise"`` or ``"aggregate"``.
+            The ``aggregation`` sub-dict to validate.
         eager_termination : bool
             Whether to raise on the first error.
 
@@ -2278,10 +2325,19 @@ class CrossValidator:
         ------
         ValueError
             If ``eager_termination`` is ``True`` and a structural error is detected.
+
+        Notes
+        -----
+        The following rules are enforced:
+
+        - ``operands`` must be a non-empty list.
+        - When ``operands`` has more than one entry, ``function`` must be provided
+          and cannot be ``"no_op"``.
+        - ``function``, when provided, must be a known aggregation function.
+        - ``mode``, when provided, must be ``"element_wise"`` or ``"aggregate"``.
         """
         function_name = self._validate_aggregation_block_structure.__name__
 
-        # 1. operands: must be a non-empty list
         operands = aggregation_block.get("operands")
         if not isinstance(operands, list) or len(operands) == 0:
             self._log_cross_validation_error(
@@ -2293,7 +2349,6 @@ class CrossValidator:
                 raise ValueError("Cross-validation error: 'operands' must be a non-empty list in aggregation block.")
             return False
 
-        # 2. multi-operand blocks: function must be provided and must not be "no_op"
         function = aggregation_block.get("function")
         if len(operands) > 1:
             if not function or function == "no_op":
@@ -2309,7 +2364,6 @@ class CrossValidator:
                     )
                 return False
 
-        # 3. function value: must be a known aggregation function when provided
         if function is not None and function not in AGGREGATION_FUNCTIONS:
             self._log_cross_validation_error(
                 "Unknown aggregation function",
@@ -2321,7 +2375,6 @@ class CrossValidator:
                 raise ValueError(f"Cross-validation error: Unknown function '{function}' in aggregation block.")
             return False
 
-        # 4. mode value: must be a recognized mode when provided
         mode = aggregation_block.get("mode")
         if mode is not None and mode not in ("element_wise", "aggregate"):
             self._log_cross_validation_error(
@@ -2342,16 +2395,7 @@ class CrossValidator:
         Parameters
         ----------
         for_each_block : dict[str, Any]
-            The ``for_each`` sub-dict to validate. Expected keys:
-
-            - ``mode``: required; must be ``"enforce"`` or ``"filter"``.
-            - ``in``: required non-empty alias name for the ``list[dict]`` source.
-            - ``field``: required non-empty field name within each entry.
-            - ``compare_value``: optional alias for a comparison value. Mutually exclusive with
-              ``compare_field``.
-            - ``compare_field``: optional intra-entry field used as the right-hand comparand.
-              Mutually exclusive with ``compare_value``.
-            - ``operator``: required; must be one of the supported relation strings.
+            The ``for_each`` sub-dict to validate.
         eager_termination : bool
             Whether to raise on the first error.
 
@@ -2364,10 +2408,18 @@ class CrossValidator:
         ------
         ValueError
             If ``eager_termination`` is ``True`` and a structural error is detected.
+
+        Notes
+        -----
+        The following rules are enforced:
+
+        - ``mode`` must be present and be either ``"enforce"`` or ``"filter"``.
+        - ``in`` and ``field`` must both be present and non-empty.
+        - Exactly one of ``compare_value`` or ``compare_field`` must be provided.
+        - ``operator`` must be present and be a known relation string.
         """
         function_name = self._validate_for_each_block_structure.__name__
 
-        # 1. mode: must be present and be a recognised value
         mode = for_each_block.get("mode")
         if mode not in ("enforce", "filter"):
             self._log_cross_validation_error(
@@ -2379,7 +2431,6 @@ class CrossValidator:
                 raise ValueError("Cross-validation error: 'mode' must be 'enforce' or 'filter' in for_each block.")
             return False
 
-        # 2. required string keys: "in" and "field"
         missing = [key for key in ("in", "field") if not for_each_block.get(key)]
         if missing:
             self._log_cross_validation_error(
@@ -2391,7 +2442,6 @@ class CrossValidator:
                 raise ValueError(f"Cross-validation error: Missing required key(s) {missing} in for_each block.")
             return False
 
-        # 3. compare_value / compare_field: exactly one must be present
         has_compare_value = "compare_value" in for_each_block
         has_compare_field = "compare_field" in for_each_block
         if has_compare_value == has_compare_field:
@@ -2407,7 +2457,6 @@ class CrossValidator:
                 )
             return False
 
-        # 4. operator: must be present and be a known relation
         operator = for_each_block.get("operator")
         if operator not in self.relation_mapping:
             self._log_cross_validation_error(
@@ -2499,7 +2548,7 @@ class CrossValidator:
         )
 
     def _log_cross_validation_error(self, error: str, message: str, function_name: str) -> None:
-        """Append a standardised cross-validation error entry to the event log."""
+        """Append a standardized cross-validation error entry to the event log."""
         self._event_logs.append(
             {
                 "error": error,
