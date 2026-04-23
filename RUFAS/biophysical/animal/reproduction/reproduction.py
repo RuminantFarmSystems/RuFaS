@@ -1,3 +1,4 @@
+from sys import maxsize
 import math
 import random
 from math import floor
@@ -7,7 +8,6 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -180,7 +180,10 @@ class Reproduction:
             days_in_pregnancy=reproduction_inputs.days_in_pregnancy,
             days_in_milk=reproduction_inputs.days_in_milk,
             events=AnimalEvents(),
-            net_merit=reproduction_inputs.net_merit,
+            dam_tbv_fat=reproduction_inputs.dam_tbv_fat if reproduction_inputs.dam_tbv_fat is not None else None,
+            dam_tbv_protein=(
+                reproduction_inputs.dam_tbv_protein if reproduction_inputs.dam_tbv_protein is not None else None
+            ),
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None,
@@ -450,9 +453,6 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
-        newborn_calf_net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
-            time, reproduction_data_stream.breed, reproduction_data_stream.net_merit
-        )
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             animal_type=AnimalType.CALF.value,
@@ -460,7 +460,8 @@ class Reproduction:
             days_born=0,
             birth_weight=self.calf_birth_weight,
             initial_phosphorus=reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
-            net_merit=newborn_calf_net_merit,
+            dam_tbv_fat=reproduction_data_stream.dam_tbv_fat,
+            dam_tbv_protein=reproduction_data_stream.dam_tbv_protein,
         )
 
         return reproduction_data_stream
@@ -528,7 +529,7 @@ class Reproduction:
         simulation_day: int,
         estrus_note: str,
         avg_estrus_cycle: float,
-        max_cycle_length: float = math.inf,
+        max_cycle_length: int = maxsize,
     ) -> ReproductionDataStream:
         """
         Calculate and set first next estrus day for an heiferII.
@@ -543,7 +544,7 @@ class Reproduction:
             Note explaining the reason for estrus simulation.
         avg_estrus_cycle : float
             Average length of the estrus cycle.
-        max_cycle_length : float, optional
+        max_cycle_length : int, optional
             Maximum allowable length for the estrus cycle, by default inf.
 
         Returns
@@ -593,9 +594,11 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction datastream after estrus simulation.
         """
-        estrus_cycle = truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
+        estrus_cycle: float = float(
+            truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
+        )
         if abs(estrus_cycle) >= max_cycle_length:
-            estrus_cycle = max_cycle_length - 1
+            estrus_cycle = float(max_cycle_length - 1)
         self.estrus_day = int(start_day + abs(estrus_cycle))
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born, simulation_day, f"{estrus_note} on day {self.estrus_day}"
@@ -1313,74 +1316,93 @@ class Reproduction:
 
         self.conception_rate = max(0.0, self.conception_rate)
 
-    def execute_cow_ed_protocol(  # noqa
+    def execute_cow_ed_protocol(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Execute the estrus detection (ED) protocol for cows."""
-        if not reproduction_data_stream.is_pregnant:
-            self.reproduction_statistics.ED_days += 1
-        else:
-            self.reproduction_statistics.ED_days = 0
+        self._update_ed_days(reproduction_data_stream)
         if 1 <= reproduction_data_stream.days_in_milk <= AnimalConfig.voluntary_waiting_period:
             reproduction_data_stream = self._repeat_estrus_simulation_before_vwp(
                 reproduction_data_stream, simulation_day
             )
-
         elif reproduction_data_stream.days_in_milk > AnimalConfig.voluntary_waiting_period:
-            if (
-                self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                and reproduction_data_stream.days_born > self.estrus_day
-            ):
-                reproduction_data_stream = self._simulate_estrus(
-                    reproduction_data_stream,
-                    reproduction_data_stream.days_born,
-                    simulation_day,
-                    animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
-                    AnimalConfig.average_estrus_cycle_cow,
-                    AnimalConfig.std_estrus_cycle_cow,
-                )
+            reproduction_data_stream = self._handle_ed_after_vwp(reproduction_data_stream, simulation_day)
+        return reproduction_data_stream
 
-            if self.repro_state_manager.is_in_any({ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}):
-                self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+    def _update_ed_days(self, reproduction_data_stream: ReproductionDataStream) -> None:
+        """Update ED days statistic based on pregnancy status."""
+        if not reproduction_data_stream.is_pregnant:
+            self.reproduction_statistics.ED_days += 1
+        else:
+            self.reproduction_statistics.ED_days = 0
+
+    def _handle_ed_after_vwp(
+        self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
+    ) -> ReproductionDataStream:
+        """Handle ED protocol logic after the voluntary waiting period."""
+        if (
+            self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
+            and reproduction_data_stream.days_born > self.estrus_day
+        ):
+            reproduction_data_stream = self._simulate_estrus(
+                reproduction_data_stream,
+                reproduction_data_stream.days_born,
+                simulation_day,
+                animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
+                AnimalConfig.average_estrus_cycle_cow,
+                AnimalConfig.std_estrus_cycle_cow,
+            )
+
+        if self.repro_state_manager.is_in_any({ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}):
+            self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Current repro state(s): {self.repro_state_manager}",
+            )
+
+        if reproduction_data_stream.days_born == self.estrus_day:
+            reproduction_data_stream = self._handle_estrus_day_states(reproduction_data_stream, simulation_day)
+
+        return reproduction_data_stream
+
+    def _handle_estrus_day_states(
+        self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
+    ) -> ReproductionDataStream:
+        """Handle estrus detection state transitions on the scheduled estrus day."""
+        if self.repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
+            self.repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
+            reproduction_data_stream = self._handle_estrus_detection(
+                reproduction_data_stream,
+                simulation_day,
+                on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                on_estrus_not_detected=self._enter_ovsynch_repro_state,
+            )
+            if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
                 reproduction_data_stream.events.add_event(
                     reproduction_data_stream.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
 
-            if reproduction_data_stream.days_born == self.estrus_day:
-                if self.repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
-                    self.repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
-                    reproduction_data_stream = self._handle_estrus_detection(
-                        reproduction_data_stream,
-                        simulation_day,
-                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=self._enter_ovsynch_repro_state,
-                    )
-                    if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                        reproduction_data_stream.events.add_event(
-                            reproduction_data_stream.days_born,
-                            simulation_day,
-                            f"Current repro state(s): {self.repro_state_manager}",
-                        )
+        elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
+            self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+            reproduction_data_stream = self._handle_estrus_detection(
+                reproduction_data_stream,
+                simulation_day,
+                on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                on_estrus_not_detected=self._simulate_full_estrus_cycle,
+            )
 
-                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
-                    self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-                    reproduction_data_stream = self._handle_estrus_detection(
-                        reproduction_data_stream,
-                        simulation_day,
-                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=self._simulate_full_estrus_cycle,
-                    )
+        elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
+            self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
+            reproduction_data_stream = self._handle_estrus_detection(
+                reproduction_data_stream,
+                simulation_day,
+                on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                on_estrus_not_detected=self._simulate_full_estrus_cycle_before_ovsynch,
+            )
 
-                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
-                    self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
-                    reproduction_data_stream = self._handle_estrus_detection(
-                        reproduction_data_stream,
-                        simulation_day,
-                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=self._simulate_full_estrus_cycle_before_ovsynch,
-                    )
         return reproduction_data_stream
 
     def _enter_ovsynch_repro_state(

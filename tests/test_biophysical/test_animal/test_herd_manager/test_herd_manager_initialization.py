@@ -100,7 +100,12 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     }
 
     animal_data: dict[str, Any] = {
-        "herd_information": {"herd_num": 123},
+        "herd_information": {
+            "herd_num": 123,
+            "herd_size_adjustment_period": 30,
+            "herd_size_sell_threshold": 101,
+            "herd_size_buy_threshold": 106,
+        },
         "housing": "barn",
         "pasture_concentrate": 0,
         "ration": {"formulation_interval": 7, "maximum_ration_reformulation_attempts": 250},
