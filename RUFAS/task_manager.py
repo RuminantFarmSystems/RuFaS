@@ -597,10 +597,7 @@ class TaskManager:
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
             should_flush_im_pool = (
-                False
-                if task_type
-                in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS, TaskType.POST_PROCESSING]
-                else True
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
             )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]) if verbosity is None else verbosity,
@@ -734,6 +731,7 @@ class TaskManager:
         }
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
+        args["run_eee"] = True
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
             input_manager=input_manager,
@@ -751,6 +749,7 @@ class TaskManager:
             args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         )
 
+        args["run_eee"] = False
         TaskManager.handle_post_processing(
             args=args,
             input_manager=input_manager,
@@ -780,6 +779,7 @@ class TaskManager:
             "End-to-end testing", "Generating new set of end-to-end expected test results.", info_map
         )
 
+        args["run_eee"] = True
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
             input_manager=input_manager,
@@ -910,12 +910,12 @@ class TaskManager:
             eee_manager_module.EEEManager.estimate_all()
 
         output_manager.print_errors_warnings_logs_counts(task_id)
-        if should_flush_im_pool:
-            input_manager.flush_pool()
         if args.get("task_type") == TaskType.POST_PROCESSING:
             save_results = True
             produce_graphics = True
             output_manager.time = RufasTime()
+        if should_flush_im_pool:
+            input_manager.flush_pool()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
