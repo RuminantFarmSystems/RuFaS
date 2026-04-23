@@ -23,4 +23,3 @@ class EEEManager:
         om.add_log("Energy Processing", "Starting processing of energy.", info_map)
         EnergyEstimator.estimate_all()
         om.add_log("Energy Processing", "Completed processing of energy.", info_map)
-        print("EEE ran successfully.")
