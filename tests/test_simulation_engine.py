@@ -173,7 +173,6 @@ def test_simulate(
     )
 
 
-
 def test_execute_full_farm_daily_simulation(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
