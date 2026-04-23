@@ -757,9 +757,7 @@ def test_handle_graduated_animals(
     mock_feed = MagicMock(auto_spec=Feed)
     mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
 
-    herd_manager._handle_graduated_animals(
-        graduated_animals, [mock_feed], mock_current_day_conditions, 15
-    )
+    herd_manager._handle_graduated_animals(graduated_animals, [mock_feed], mock_current_day_conditions, 15)
 
     assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in graduated_animals]
     assert mock_update_animal_array.call_args_list == [call(animal) for animal in graduated_animals]
@@ -783,9 +781,7 @@ def test_handle_newly_added_animals(
     mock_feed = MagicMock(auto_spec=Feed)
     mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
 
-    herd_manager._handle_newly_added_animals(
-        new_animals, [mock_feed], mock_current_day_conditions, 15
-    )
+    herd_manager._handle_newly_added_animals(new_animals, [mock_feed], mock_current_day_conditions, 15)
 
     assert mock_add_animal_to_pen_and_id_map.call_args_list == [
         call(animal, [mock_feed], mock_current_day_conditions, 15) for animal in new_animals

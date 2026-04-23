@@ -246,9 +246,7 @@ def test_add_animal_to_pen_and_id_map(
 
     mock_feed = MagicMock(auto_spec=Feed)
     for animal in animals:
-        herd_manager._add_animal_to_pen_and_id_map(
-            animal, mock_feed, mock_current_day_conditions, 15
-        )
+        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, 15)
         mock_pen_update_animals.assert_called_with(
             [animal],
             herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal),

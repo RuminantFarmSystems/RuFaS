@@ -186,9 +186,7 @@ def test_update_all_max_daily_feeds_not_simulate_animals(
     """Unit test for update_all_max_daily_feeds()."""
     herd_manager.simulate_animals = False
     dummy_rufas_ids = list(range(randint(0, 50)))
-    dummy_next_harvest_dates = {
-        rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids
-    }
+    dummy_next_harvest_dates = {rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids}
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
     mock_time = MagicMock(auto_spec=RufasTime)
 
@@ -397,9 +395,7 @@ def test_reformulate_ration_single_pen(
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(
-        mock_pen, available_feeds, current_temperature, 15
-    )
+    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, 15)
 
     if use_user_defined_ration:
         mock_formulate_optimized_ration.assert_called_once_with(
