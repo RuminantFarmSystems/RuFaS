@@ -2,6 +2,8 @@ import sys
 from dataclasses import asdict
 from typing import Any
 
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -160,21 +162,76 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-            "units": MilkProductionStatistics.UNITS,
+            "units": (
+                (MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS)
+                if AnimalConfig.simulate_genetics
+                else MilkProductionStatistics.UNITS
+            ),
         }
 
         for milk_stats in milk_reports:
-            updated_milk_data: dict[str, int | float] = asdict(milk_stats)
-            updated_milk_data["is_milking"] = milk_stats.is_milking
-            updated_milk_data["estimated_daily_milk_produced"] = milk_stats.estimated_daily_milk_produced
-            updated_milk_data["milk_protein"] = milk_stats.milk_protein
-            updated_milk_data["milk_fat"] = milk_stats.milk_fat
-            updated_milk_data["milk_lactose"] = milk_stats.milk_lactose
-            updated_milk_data["parity"] = milk_stats.parity
-            updated_milk_data["cow_id"] = milk_stats.cow_id
-            updated_milk_data["pen_id"] = milk_stats.pen_id
-            updated_milk_data["simulation_day"] = simulation_day
+            updated_milk_data: dict[str, int | float | str] = {
+                "cow_id": milk_stats.cow_id,
+                "pen_id": milk_stats.pen_id,
+                "is_milking": milk_stats.is_milking,
+                "days_in_milk": milk_stats.days_in_milk,
+                "estimated_daily_milk_produced": milk_stats.estimated_daily_milk_produced,
+                "milk_protein": milk_stats.milk_protein,
+                "milk_fat": milk_stats.milk_fat,
+                "milk_lactose": milk_stats.milk_lactose,
+                "parity": milk_stats.parity,
+                "simulation_day": simulation_day,
+            }
+            if AnimalConfig.simulate_genetics:
+                updated_milk_data["days_born"] = milk_stats.days_born
+                updated_milk_data["days_in_pregnancy"] = milk_stats.days_in_pregnancy
+                updated_milk_data["animal_type"] = milk_stats.animal_type.name
+                updated_milk_data["TBV_fat"] = milk_stats.TBV_fat
+                updated_milk_data["TBV_protein"] = milk_stats.TBV_protein
+                updated_milk_data["E_permanent_fat"] = milk_stats.E_permanent_fat
+                updated_milk_data["E_permanent_protein"] = milk_stats.E_permanent_protein
+                updated_milk_data["E_temporary_fat"] = milk_stats.E_temporary_fat
+                updated_milk_data["E_temporary_protein"] = milk_stats.E_temporary_protein
+                updated_milk_data["phenotype_fat"] = milk_stats.phenotype_fat
+                updated_milk_data["phenotype_protein"] = milk_stats.phenotype_protein
+                updated_milk_data["EBV_fat"] = milk_stats.EBV_fat
+                updated_milk_data["EBV_protein"] = milk_stats.EBV_protein
+                updated_milk_data["ranking_index"] = milk_stats.ranking_index
+
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
+
+    @classmethod
+    def report_average_genetics(
+        cls, average_genetics: dict[str, float | None], variable_name_prefix: str, simulation_day: int
+    ) -> None:
+        """
+        Reports the average genetics data with associated simulation metadata. The
+        method adds the given genetics data to a managed output variable, using
+        a specific variable name prefix and simulation day.
+
+        Parameters
+        ----------
+        average_genetics : dict[str, float | None]
+            A dictionary containing genetic measurements, where the key is
+            the measurement name and the value is the averaged measurement.
+        variable_name_prefix : str
+            A prefix to be appended to the variable name for distinguishing
+            the reported data in the output.
+        simulation_day : int
+            The specific day in the simulation timeline, used to annotate the
+            reported data for temporal tracking.
+
+        Returns
+        -------
+        None
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_average_genetics.__name__,
+            "units": genetics_units,
+            "simulation_day": simulation_day,
+        }
+        om.add_variable(f"{variable_name_prefix}_average_genetics", average_genetics, info_map)
 
     @classmethod
     def report_ration_per_animal(
@@ -596,8 +653,8 @@ class AnimalModuleReporter:
             "data_origin": [("HerdManager", "daily_update")],
         }
         om.add_variable(
-            "sold_heiferIII_oversupply_num",
-            herd_statistics.sold_heiferIII_oversupply_num,
+            "sold_cow_oversupply_num",
+            herd_statistics.sold_cow_oversupply_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
@@ -841,7 +898,7 @@ class AnimalModuleReporter:
         )
         cull_reason_stats_units = {
             animal_constants.DEATH_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.LOW_PROD_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.OVERSUPPLY_CULL: MeasurementUnits.UNITLESS,
             animal_constants.LAMENESS_CULL: MeasurementUnits.UNITLESS,
             animal_constants.INJURY_CULL: MeasurementUnits.UNITLESS,
             animal_constants.MASTITIS_CULL: MeasurementUnits.UNITLESS,
@@ -929,6 +986,9 @@ class AnimalModuleReporter:
             )
             om.add_variable("days_in_milk", animal["days_in_milk"], dict(info_map, **{"units": MeasurementUnits.DAYS}))
             om.add_variable("parity", animal["parity"], dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+            om.add_variable(
+                "genetic_history", animal["genetic_history"], dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            )
 
     @classmethod
     def report_stillborn_calves_information(
@@ -1094,6 +1154,7 @@ class AnimalModuleReporter:
         time: RufasTime,
         heiferII_events_by_id: dict[str, AnimalEvents],
         cow_events_by_id: dict[str, AnimalEvents],
+        all_animals_genetic_history: dict[int, str],
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1110,8 +1171,21 @@ class AnimalModuleReporter:
             The dictionary of HeiferII events.
         cow_events_by_id : dict[str, AnimalEvents]
             The dictionary of Cow events.
+        all_animals_genetic_history : dict[int, str]
+            The dict of genetic histories for all animals in the herd by their IDs.
         """
-        empty_sold_animals: list[SoldAnimalTypedDict] = [{"sold_at_day": 0, "body_weight": 0}]
+        empty_sold_animals: list[SoldAnimalTypedDict] = [
+            {
+                "id": 0,
+                "animal_type": "",
+                "sold_at_day": 0,
+                "body_weight": 0.0,
+                "cull_reason": None,
+                "days_in_milk": 0,
+                "parity": 0,
+                "genetic_history": "",
+            }
+        ]
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
         if herd_statistics.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1184,15 +1258,17 @@ class AnimalModuleReporter:
 
         AnimalModuleReporter._record_heiferIIs_conception_rate(herd_reproduction_statistics)
         AnimalModuleReporter._record_cows_conception_rate(herd_reproduction_statistics)
+        if AnimalConfig.simulate_genetics:
+            AnimalModuleReporter._report_all_animals_genetic_history(all_animals_genetic_history)
 
     @classmethod
-    def _record_animal_events(cls, animal_events_by_id: dict[str, str], simulation_day: int) -> None:
+    def _record_animal_events(cls, animal_events_by_id: dict[str, AnimalEvents], simulation_day: int) -> None:
         """
         Record the events of the animals.
 
         Parameters
         ----------
-        animal_events_by_id : dict[str, str]
+        animal_events_by_id : dict[str, AnimalEvents]
             A dictionary of animal events, where the key is a string containing the animal id and the animal type,
             and the value is the string representation of the events of the animal.
         simulation_day : int
@@ -1307,6 +1383,16 @@ class AnimalModuleReporter:
             herd_reproduction_statistics.cow_conception_rate,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
+
+    @classmethod
+    def _report_all_animals_genetic_history(cls, all_animals_genetic_history: dict[int, str]) -> None:
+        """Report all animals genetic history."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter._report_all_animals_genetic_history.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        om.add_variable("animals_genetic_history", all_animals_genetic_history, info_map)
 
     @classmethod
     def report_animal_population_statistics(cls, prefix: str, herd_summary: AnimalPopulationStatistics) -> None:
