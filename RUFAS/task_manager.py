@@ -1,3 +1,4 @@
+from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
@@ -21,6 +22,7 @@ from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.rufas_time import RufasTime
 from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -224,6 +226,7 @@ class TaskManager:
                 "suppress_log_files": suppress_log_files,
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
+                "run_eee": False,
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -385,11 +388,16 @@ class TaskManager:
             input_task["json_output_directory"] = Path(input_task["json_output_directory"])
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
-            input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             saved_output_pools = []
             for saved_pool in input_task.get("saved_output_pools", []):
-                saved_output_pools.append({"name": saved_pool["name"], "path": Path(saved_pool["path"])})
+                saved_output_pools.append({"prefix": saved_pool.get("prefix", None), "path": Path(saved_pool["path"])})
             input_task["saved_output_pools"] = saved_output_pools
+            input_task["save_output_pool_to_file_path"] = (
+                Path(input_task["save_output_pool_to_file_path"])
+                if "save_output_pool_to_file_path" in input_task
+                else None
+            )
+            input_task["output_prefix"] = input_task["output_prefix"]
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
@@ -589,7 +597,7 @@ class TaskManager:
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
             should_flush_im_pool = (
-                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS, TaskType.POST_PROCESSING] else True
             )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]) if verbosity is None else verbosity,
@@ -873,13 +881,6 @@ class TaskManager:
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
-        if args.get("run_eee", False):
-            pass
-            # TODO update path to `RUFAS.EEE.EEE_manager` when EEE is finalized and moved in either PR #2524 or #1299
-            # TODO update to be able to run EEE once farmgrown feed emissions are finalized #2580
-            # eee_manager_module = import_module("RUFAS.routines.EEE.EEE_manager")
-            # eee_manager_module.EEEManager.estimate_all()
-
         if export_input_data_to_csv:
             output_manager.create_directory(args["input_data_csv_export_path"])
             Utility.combine_saved_input_csv(
@@ -900,10 +901,10 @@ class TaskManager:
                     "load_saved_output_pools was enabled, but no saved_output_pools were supplied.",
                     info_map,
                 )
-        elif load_pool_from_file:
-            output_manager.flush_pools()
-            output_manager.load_variables_pool_from_file(args["output_pool_path"])
-            output_manager.set_metadata_prefix("reload")
+
+        if args.get("run_eee", False):
+            eee_manager_module = import_module("RUFAS.EEE.EEE_manager")
+            eee_manager_module.EEEManager.estimate_all()
 
         output_manager.print_errors_warnings_logs_counts(task_id)
         if should_flush_im_pool:
@@ -911,6 +912,7 @@ class TaskManager:
         if args.get("task_type") == TaskType.POST_PROCESSING:
             save_results = True
             produce_graphics = True
+            output_manager.time = RufasTime()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -928,6 +930,13 @@ class TaskManager:
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )
+        if args.get("save_output_pool_to_file", False):
+            save_output_pool_to_file_path = Path(args["save_output_pool_to_file_path"])
+            output_manager.create_directory(save_output_pool_to_file_path)
+            full_file_path = save_output_pool_to_file_path.joinpath(
+                output_manager.generate_file_name("saved_pool", "json")
+            )
+            output_manager.save_variable_pool_to_file(full_file_path)
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
