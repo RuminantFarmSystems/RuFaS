@@ -597,7 +597,10 @@ class TaskManager:
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
             should_flush_im_pool = (
-                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS, TaskType.POST_PROCESSING] else True
+                False
+                if task_type
+                in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS, TaskType.POST_PROCESSING]
+                else True
             )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]) if verbosity is None else verbosity,
