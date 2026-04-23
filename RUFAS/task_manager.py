@@ -22,6 +22,7 @@ from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.rufas_time import RufasTime
 from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -388,8 +389,9 @@ class TaskManager:
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             saved_output_pools = []
             for saved_pool in input_task.get("saved_output_pools", []):
-                saved_output_pools.append({"name": saved_pool["name"], "path": Path(saved_pool["path"])})
-            input_task["saved_output_pools"] = saved_output_pools
+                saved_output_pools.append({"prefix": saved_pool.get("prefix", None), "path": Path(saved_pool["path"])})
+            input_task["save_output_pool_to_file_path"] = Path(input_task["save_output_pool_to_file_path"]) if "save_output_pool_to_file_path" in input_task else None
+            input_task["output_prefix"] = input_task["output_prefix"]
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
@@ -884,16 +886,14 @@ class TaskManager:
                 output_manager.flush_pools()
                 output_manager.load_multiple_variables_pools_from_files(saved_pools)
                 output_manager.set_metadata_prefix("reload")
+                if output_manager.is_first_post_processing:
+                    output_manager.time = RufasTime()
             else:
                 output_manager.add_warning(
                     "No saved pools provided",
                     "load_saved_output_pools was enabled, but no saved_output_pools were supplied.",
                     info_map,
                 )
-        elif load_pool_from_file:
-            output_manager.flush_pools()
-            output_manager.load_variables_pool_from_file(args["output_pool_path"])
-            output_manager.set_metadata_prefix("reload")
 
         if args.get("run_eee", False):
             eee_manager_module = import_module("RUFAS.EEE.EEE_manager")
@@ -922,6 +922,10 @@ class TaskManager:
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )
+        if args.get("save_output_pool_to_file", False):
+            output_manager.create_directory(args["save_output_pool_to_file_path"])
+            full_file_path = args["save_output_pool_to_file_path"].joinpath(output_manager.generate_file_name("saved_pool", "json"))
+            output_manager.save_variable_pool_to_file(full_file_path)
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:

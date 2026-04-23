@@ -8,8 +8,8 @@
       "log_verbosity": "errors",
       "random_seed": 42,
       "exclude_info_maps": false,
-      "chunkification": true,
-      "save_chunk_threshold_call_count": 100000000000,
+      "save_output_pool_to_file": true,
+      "save_output_pool_to_file_path": "output/saved_output_pools/",
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/example_cross_validation.json"
       ]

@@ -10,10 +10,8 @@
       "exclude_info_maps": false,
       "run_eee": true,
       "load_saved_output_pools": true,
-      "output_pool_path": "saved_pool/freestall_07-Apr-2026_Tue_10-22-37.412509/freestall_saved_pool_0_07-Apr-2026_Tue_10-23-10.json",
       "saved_output_pools": [
         {
-          "name": "freestall_saved_pool_0",
           "path": "saved_pool/freestall_07-Apr-2026_Tue_10-22-37.412509/freestall_saved_pool_0_07-Apr-2026_Tue_10-23-10.json"
         }
       ],
