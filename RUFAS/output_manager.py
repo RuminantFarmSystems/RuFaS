@@ -415,21 +415,26 @@ class OutputManager(object):
         """
         Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._save_current_variable_pool.__name__,
-        }
-
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
+        self.save_variable_pool_to_file(saved_pool_file_path)
+        self._set_variables_pool({})
+        self.saved_pool_chunks_num += 1
+
+    def save_variable_pool_to_file(self, saved_pool_file_path: Path) -> None:
+        """
+        Save the current variable pool into the JSON file at the provided path.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.save_variable_pool_to_file.__name__,
+        }
         self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
         self.add_log(
             "save_current_variable_pool",
             f"Saved the current variable pool to {saved_pool_file_path}",
             info_map,
         )
-        self._set_variables_pool({})
-        self.saved_pool_chunks_num += 1
 
     def _stringify_units(self, units: dict[str, Any] | MeasurementUnits) -> dict[str, Any] | str:
         """
@@ -2053,7 +2058,7 @@ class OutputManager(object):
         pools : Sequence[tuple[str, Path] | dict[str, Any]]
             An iterable of pool descriptors. Each descriptor must provide a pool name and the
             path to the JSON file containing the pool to load. When dicts are provided they
-            must include ``"name"`` and ``"path"`` keys.
+            must include ``"prefix"`` and ``"path"`` keys.
 
         """
 
@@ -2068,7 +2073,7 @@ class OutputManager(object):
             if isinstance(pool, tuple):
                 pool_name, pool_path = pool
             else:
-                pool_name = pool["name"]
+                pool_name = pool["prefix"]
                 pool_path = pool["path"]
             if not isinstance(pool_path, Path):
                 pool_path = Path(pool_path)
@@ -2077,7 +2082,12 @@ class OutputManager(object):
         for pool_name, pool_path in normalized_pools:
             pool_info_map = {**info_map_base, "pool_name": pool_name}
             loaded_pool = self._read_variables_pool_file(pool_path, pool_info_map)
-            separated_pools[pool_name] = loaded_pool
+            if pool_name in separated_pools:
+                separated_pools[pool_name].update(loaded_pool)
+            elif pool_name is None:
+                separated_pools.update(loaded_pool)
+            else:
+                separated_pools[pool_name] = loaded_pool
 
         self._set_variables_pool(separated_pools)
 
