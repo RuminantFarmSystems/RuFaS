@@ -5,6 +5,7 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
   workflow_dispatch:
 
 env:
@@ -12,6 +13,8 @@ env:
 
 jobs:
   format_code:
+    name: Format Code
+    if: ${{ github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
@@ -168,6 +171,7 @@ jobs:
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
+    if: ${{ always() && github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     needs: format_code
     runs-on: ubuntu-latest
     steps:

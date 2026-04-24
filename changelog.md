@@ -67,9 +67,11 @@ v1.0.0
 - [2949](https://github.com/RuminantFarmSystems/RuFaS/pull/2949) - [minor change] [NoInputChange] [NoOutputChange] [Verbosity] Updates CLI verbosity arg to override verbosity of full run including task manager verbosity.
 - [2947](https://github.com/RuminantFarmSystems/RuFaS/pull/2947) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Created weather data cross validation rules.
 - [2948](https://github.com/RuminantFarmSystems/RuFaS/pull/2948) - [minor change] [Feeds][NoInputChange] [NoOutputChange] Removes feed id maximums in metadata properties.
+- [2940](https://github.com/RuminantFarmSystems/RuFaS/pull/2940) - [minor change] [NoInputChange] [NoOutputChange] update github actions to hold automated checks until the PR is no longer a draft.
 - [2960](https://github.com/RuminantFarmSystems/RuFaS/pull/2960) - [minor change] [Docs][NoInputChange] [NoOutputChange] Adds SME evaluation report for v1.0.
 - [2734](https://github.com/RuminantFarmSystems/MASM/pull/2734) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
 - [2809](https://github.com/RuminantFarmSystems/RuFaS/pull/2809) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Reorders grouping of attributes in some HerdStatistics methods, updates docstrings.
+- [2940](https://github.com/RuminantFarmSystems/RuFaS/pull/2940) - [minor change] [NoInputChange] [NoOutputChange] update github actions to hold automated checks until the PR is no longer a draft.
 
 ### v1.0.0
 
