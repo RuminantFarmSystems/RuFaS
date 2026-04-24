@@ -1,6 +1,3 @@
-<!-- ::: {.module-header-row} // ::: {.module-header} -->
-<!-- NOTE: quarto gives a warning about the above comment since it contains ":::" -->
-
 ::: {.module-header-row}
 ![](resources/manure.png){width=140px}
 
