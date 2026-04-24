@@ -61,6 +61,53 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.rufas_time import RufasTime
 
 
+def _make_cow_for_305_day_milk_prediction(
+    days_in_milk: int, calves: int, current_lactation_305_day_milk_produced: float = 0.0
+) -> Animal:
+    cow = Animal.__new__(Animal)
+    cow.animal_type = AnimalType.LAC_COW
+    cow.days_in_milk = days_in_milk
+    cow.reproduction = MagicMock()
+    cow.reproduction.calves = calves
+    cow.milk_production = MagicMock()
+    cow.milk_production.wood_l = 1.0
+    cow.milk_production.wood_m = 2.0
+    cow.milk_production.wood_n = 3.0
+    cow.milk_production.milk_production_history = []
+    cow.milk_production.current_lactation_305_day_milk_produced = current_lactation_305_day_milk_produced
+    cow.mature_equivalent_milking_prediction_305_day = 0.0
+    return cow
+
+
+@pytest.mark.parametrize("calves, parity_factor", [(1, 1.25), (2, 1.18), (3, 1.0)])
+def test_update_mature_equivalent_305_days_milk_production_for_partial_lactation(
+    calves: int, parity_factor: float
+) -> None:
+    """Test mature-equivalent 305-day milk prediction for cows before day 305."""
+    cow = _make_cow_for_305_day_milk_prediction(days_in_milk=120, calves=calves)
+    cow.milk_production.calculate_305_day_milk_yield.return_value = 8000.0
+
+    cow.update_mature_305_days_milk_production()
+
+    cow.milk_production.calculate_305_day_milk_yield.assert_called_once_with(1.0, 2.0, 3.0, [], 120)
+    assert cow.mature_equivalent_milking_prediction_305_day == pytest.approx(8000.0 * parity_factor)
+
+
+@pytest.mark.parametrize("calves, parity_factor", [(1, 1.25), (2, 1.18), (3, 1.0)])
+def test_update_mature_equivalent_305_days_milk_production_for_completed_lactation(
+    calves: int, parity_factor: float
+) -> None:
+    """Test mature-equivalent 305-day milk prediction for cows at or after day 305."""
+    cow = _make_cow_for_305_day_milk_prediction(
+        days_in_milk=305, calves=calves, current_lactation_305_day_milk_produced=9000.0
+    )
+
+    cow.update_mature_305_days_milk_production()
+
+    cow.milk_production.calculate_305_day_milk_yield.assert_not_called()
+    assert cow.mature_equivalent_milking_prediction_305_day == pytest.approx(9000.0 * parity_factor)
+
+
 @pytest.fixture
 def mock_time() -> RufasTime:
     mock_time = MagicMock(spec=RufasTime)
