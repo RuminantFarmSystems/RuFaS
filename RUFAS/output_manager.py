@@ -332,37 +332,38 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def _map_simulation_day(
-        self, info_map: dict[str, Any], overwrite: bool = False, simday: int | None = None
+    def _add_simulation_day_to_info_map(
+            self, info_map: dict[str, Any],
+            overwrite: bool = False, simulation_day: int | None = None
     ) -> dict[str, Any]:
         """
-        Create an update info map that include simulation_day
+        Update an info_map to include simulation_day
 
         Parameters
         ----------
         info_map: dict[str, Any]
-            original infomap to check and/or update the simulation_day element
+            The original info_map to copy and optionally update
         overwrite: bool, default False
-            should simulation_day be overwritten if it already exists in info_map?
-        simday: optional int
-            the simulation day to add (or overwrite) to the infomap
+            Whether to overwrite an existing "simulation_day" entry
+        simulation_day: optional int
+            The simulation day to insert. If None, self.time.simulation_day is used when available.
 
         Returns
         -------
         the info map, updated to include simulation_day, if it is available.
         """
-        imap_copy = dict(info_map)
+        info_map_copy = dict(info_map)
 
         time_day = self.time.simulation_day if hasattr(self.time, "simulation_day") else None
 
-        day_to_use = simday if simday is not None else time_day
+        day_to_use = simulation_day if simulation_day is not None else time_day
 
-        should_add_sim_day = overwrite or "simulation_day" not in imap_copy.keys()
+        should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
 
         if day_to_use is not None and should_add_sim_day:
-            imap_copy["simulation_day"] = day_to_use
+            info_map_copy["simulation_day"] = day_to_use
 
-        return imap_copy
+        return info_map_copy
 
     def add_variable(
         self,
@@ -396,12 +397,13 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         first_info_map_only : bool, default False
-            If true, records only the first info map passed for that variable. If false, records all info maps passed
+            If True, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
         overwrite_simulation_day: bool, default False
-            if true, the variable's info map is automatically updated with the current simulation_day or
-            (self.time.simulation_day if 'simulation_day = None'), otherwise the simulation_day specified
-            within the info_map is used if available.
+            If True, an existing "simulation_day" value in the info_map will be replaced. The replacement value will
+            be the simulation_day argument provided to this function (if it is not None), if it is available;
+            Otherwise, `self.time.simulation_day` will be used, if available. If neither value is available, the
+            info_map is returned unchanged (no simulation_day is added or updated).
         simulation_day: optional int
             if present, this simulation_day will be used, otherwise the simulation_day will be taken from the time
             attribute, if present. This option is provided to allow variables created outside the main simulation
@@ -422,10 +424,12 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
-        updated_imap = self._map_simulation_day(info_map, overwrite_simulation_day, simulation_day)
+        updated_info_map = self._add_simulation_day_to_info_map(
+            info_map, overwrite_simulation_day, simulation_day
+        )
 
-        key = self._generate_key(name, updated_imap)
-        self._add_to_pool(self.variables_pool, key, value, {**updated_imap, "units": units}, first_info_map_only)
+        key = self._generate_key(name, updated_info_map)
+        self._add_to_pool(self.variables_pool, key, value, {**updated_info_map, "units": units}, first_info_map_only)
 
         if isinstance(value, dict):
             for k, v in value.items():

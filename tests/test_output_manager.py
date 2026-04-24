@@ -990,7 +990,7 @@ def test_map_simulation_day(
         imap["simulation_day"] = map_day
 
     # Act
-    imap_copy = om._map_simulation_day(imap, overwrite, manual_day)
+    imap_copy = om._add_simulation_day_to_info_map(imap, overwrite, manual_day)
     observed = imap_copy.get("simulation_day")
     # Assert
     assert observed == expected
