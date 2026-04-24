@@ -334,7 +334,8 @@ class OutputManager(object):
 
     def _add_simulation_day_to_info_map(
             self, info_map: dict[str, Any],
-            overwrite: bool = False, simulation_day: int | None = None
+            overwrite: bool = False, simulation_day: int | None = None,
+            name: str | None = None
     ) -> dict[str, Any]:
         """
         Update an info_map to include simulation_day
@@ -347,21 +348,45 @@ class OutputManager(object):
             Whether to overwrite an existing "simulation_day" entry
         simulation_day: optional int
             The simulation day to insert. If None, self.time.simulation_day is used when available.
+        name: optional str
+            The name of the variable for which simulation_day is added to the info_map (used for warnings)
 
         Returns
         -------
         the info map, updated to include simulation_day, if it is available.
+
+        Notes
+        -----
+        A warning is triggered if the resulting info_map has no "simulation_day" value (or a value of None)
         """
         info_map_copy = dict(info_map)
 
         time_day = self.time.simulation_day if hasattr(self.time, "simulation_day") else None
 
+        map_has_valid_day = info_map_copy.get("simulation_day") is not None
+
         day_to_use = simulation_day if simulation_day is not None else time_day
+
+        # Don't overwrite a valid simulation_day with None
+        if day_to_use is None and map_has_valid_day:
+            overwrite = False
 
         should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
 
         if day_to_use is not None and should_add_sim_day:
             info_map_copy["simulation_day"] = day_to_use
+
+        if day_to_use is None and not map_has_valid_day:
+            warning_info_map = {
+                "class": self.__class__.__name__,
+                "function": self._add_simulation_day_to_info_map.__name__,
+            }
+            self.add_warning(
+                name = f"no simulation_day available",
+                msg = f"no simulation day was available to add to the info_map for variable {name} " +
+                    f"(from {info_map_copy.get('class')}.{info_map_copy.get('function')})",
+                info_map = warning_info_map
+            )
 
         return info_map_copy
 
@@ -425,7 +450,7 @@ class OutputManager(object):
         units = self._stringify_units(units)
 
         updated_info_map = self._add_simulation_day_to_info_map(
-            info_map, overwrite_simulation_day, simulation_day
+            info_map, overwrite_simulation_day, simulation_day, name
         )
 
         key = self._generate_key(name, updated_info_map)

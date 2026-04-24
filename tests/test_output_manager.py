@@ -937,6 +937,9 @@ def test_add_variable(
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
     mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
 
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
+
     if expected_exception:
         with pytest.raises(expected_exception):
             output_manager.add_variable(name, value, info_map, first_map)
@@ -967,15 +970,16 @@ def test_add_variable(
         (None, None, 50, False, 50),  # case 6 - still use time
         (None, 80, 50, True, 50),  # case 7 - overwrite with time
         (None, 80, 50, False, 80),  # case 8 - don't overwrite with time
-        (None, None, None, True, None),  # No time for this
+        (None, 80, None, True, 80), # case 9 - don't overwrite valid day with None
+        (None, None, None, True, "warn"),  # No time for this
     ],
 )
-def test_map_simulation_day(
+def test_add_simulation_day_to_info_map(
     manual_day: int | None,
     map_day: int | None,
     time_day: int | None,
     overwrite: bool,
-    expected: int | None,
+    expected: int | str | None,
     mocker: MockerFixture,
 ):
     # Arrange
@@ -993,7 +997,11 @@ def test_map_simulation_day(
     imap_copy = om._add_simulation_day_to_info_map(imap, overwrite, manual_day)
     observed = imap_copy.get("simulation_day")
     # Assert
-    assert observed == expected
+    if expected == "warn":
+        assert observed is None
+        assert False # TODO: test that the warning was created
+    else:
+        assert observed == expected
 
 
 # fully factorial parameterization:
@@ -1191,6 +1199,9 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
 
     expected_pool_size = 1024 + 1024
 
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
+
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
     # Assert
@@ -1246,6 +1257,9 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1304,6 +1318,9 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
 
     expected_pool_size = 1024 + 1024
 
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
+
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
     # Assert
@@ -1360,6 +1377,9 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1591,7 +1611,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
         "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
-        "values": ["dummy_value"],
+        "values": ["dummy_value"]
     }
 
 
