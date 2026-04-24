@@ -1834,15 +1834,20 @@ class OutputManager(object):
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
         self._dict_to_file_csv(data_dict, file_path_csv)
 
+        daily_filename = self.generate_file_name("variables_reported_daily", "csv")
+        daily_file_path_csv = path / daily_filename
+        daily_data_dict = self._get_variables_reported_daily()
+        self._dict_to_file_csv(daily_data_dict, daily_file_path_csv)
+
         non_daily_filename = self.generate_file_name("variables_not_reported_daily", "csv")
         non_daily_file_path_csv = path / non_daily_filename
         non_daily_data_dict = self._get_variables_not_reported_daily()
         self._dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
 
-    def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
-        """Builds a CSV-ready dictionary describing variables not reported exactly once per simulation day."""
+    def _get_variables_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables reported daily."""
 
-        rows: list[dict[str, Any]] = []
+        variable_names: list[str] = []
         simulation_length = self._get_simulation_length_days()
 
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
@@ -1850,32 +1855,30 @@ class OutputManager(object):
             if not isinstance(values, list):
                 continue
 
-            report_days = self._get_reported_simulation_days(variable_data)
-            if self._is_reported_daily(values, report_days, simulation_length):
+            if not self._is_reported_daily(values, simulation_length):
                 continue
 
-            variable_names = self._get_reported_variable_names(variable_name, values)
-            intervals = self._get_report_intervals(report_days)
-            for reported_variable_name in variable_names:
-                rows.append(
-                    {
-                        "variable_name": reported_variable_name,
-                        "report_count": len(values),
-                        "simulation_days_reported": self._format_schedule_values(report_days),
-                        "observed_interval_days": self._format_schedule_values(intervals),
-                        "reporting_frequency": self._describe_reporting_frequency(
-                            len(values), report_days, intervals, simulation_length
-                        ),
-                    }
-                )
+            variable_names.extend(self._get_reported_variable_names(variable_name, values))
 
-        return {
-            "variable_name": {"values": [row["variable_name"] for row in rows]},
-            "report_count": {"values": [row["report_count"] for row in rows]},
-            "simulation_days_reported": {"values": [row["simulation_days_reported"] for row in rows]},
-            "observed_interval_days": {"values": [row["observed_interval_days"] for row in rows]},
-            "reporting_frequency": {"values": [row["reporting_frequency"] for row in rows]},
-        }
+        return {"variable_name": {"values": variable_names}}
+
+    def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables not reported daily."""
+
+        variable_names: list[str] = []
+        simulation_length = self._get_simulation_length_days()
+
+        for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
+            values = variable_data.get("values", [])
+            if not isinstance(values, list):
+                continue
+
+            if self._is_reported_daily(values, simulation_length):
+                continue
+
+            variable_names.extend(self._get_reported_variable_names(variable_name, values))
+
+        return {"variable_name": {"values": variable_names}}
 
     def _get_simulation_length_days(self) -> int | None:
         """Returns the simulation length in days if OutputManager has a time object with that value."""
@@ -1883,43 +1886,10 @@ class OutputManager(object):
         simulation_length = getattr(self.time, "simulation_length_days", None)
         return simulation_length if isinstance(simulation_length, int) and simulation_length > 0 else None
 
-    def _get_reported_simulation_days(self, variable_data: dict[str, Any]) -> list[int]:
-        """Returns sorted unique simulation days recorded in a variable's info maps."""
+    def _is_reported_daily(self, values: list[Any], simulation_length: int | None) -> bool:
+        """Determines whether a variable was reported once per simulation day by count alone."""
 
-        info_maps = variable_data.get("info_maps", [])
-        if not isinstance(info_maps, list):
-            return []
-
-        report_days = []
-        for info_map in info_maps:
-            if not isinstance(info_map, dict):
-                continue
-            simulation_day = info_map.get("simulation_day")
-            if isinstance(simulation_day, int):
-                report_days.append(simulation_day)
-
-        return sorted(set(report_days))
-
-    def _get_report_intervals(self, report_days: list[int]) -> list[int]:
-        """Returns the observed intervals between sorted report days."""
-
-        return [current_day - previous_day for previous_day, current_day in zip(report_days, report_days[1:])]
-
-    def _is_reported_daily(self, values: list[Any], report_days: list[int], simulation_length: int | None) -> bool:
-        """Determines whether a variable appears to have been reported once per simulation day."""
-
-        if simulation_length is None:
-            return bool(report_days) and all(interval == 1 for interval in self._get_report_intervals(report_days))
-
-        if len(values) != simulation_length:
-            return False
-
-        if not report_days:
-            return True
-
-        return len(report_days) == simulation_length and all(
-            interval == 1 for interval in self._get_report_intervals(report_days)
-        )
+        return simulation_length is not None and len(values) == simulation_length
 
     def _get_reported_variable_names(self, variable_name: str, values: list[Any]) -> list[str]:
         """Returns nested variable names for dictionary-valued variables, otherwise the variable name."""
@@ -1932,31 +1902,6 @@ class OutputManager(object):
             return [variable_name]
 
         return [f"{variable_name}.{nested_variable_name}" for nested_variable_name in nested_variable_names]
-
-    def _format_schedule_values(self, values: list[int]) -> str:
-        """Formats schedule values for compact CSV output."""
-
-        return ", ".join(str(value) for value in values) if values else "unknown"
-
-    def _describe_reporting_frequency(
-        self,
-        report_count: int,
-        report_days: list[int],
-        intervals: list[int],
-        simulation_length: int | None,
-    ) -> str:
-        """Summarizes a variable's observed reporting cadence."""
-
-        if report_days and intervals and len(set(intervals)) == 1:
-            interval = intervals[0]
-            return "daily over observed days" if interval == 1 else f"every {interval} days"
-        if report_days and not intervals:
-            return f"reported once on simulation day {report_days[0]}"
-        if report_days:
-            return "irregular"
-        if simulation_length is not None:
-            return f"{report_count} reports over {simulation_length} simulation days"
-        return f"{report_count} reports; simulation days unavailable"
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
