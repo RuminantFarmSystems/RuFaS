@@ -43,6 +43,9 @@ def config_json() -> dict[str, Any]:
 def animal_json() -> dict[str, Any]:
     return {
         "herd_information": {
+            "herd_size_adjustment_period": 30,
+            "herd_size_sell_threshold": 103,
+            "herd_size_buy_threshold": 101,
             "calf_num": 8,
             "heiferI_num": 44,
             "heiferII_num": 38,
@@ -619,7 +622,14 @@ def herd_manager(
 @pytest.fixture
 def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
-        id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
+        id=0,
+        animal_type="",
+        sold_at_day=0,
+        body_weight=0.0,
+        cull_reason="NA",
+        days_in_milk="NA",
+        parity="NA",
+        genetic_history="",
     )
 
 
