@@ -1,6 +1,6 @@
 from datetime import datetime
 from random import shuffle, randint
-from typing import Any
+from typing import Any, cast
 from unittest.mock import call, MagicMock, PropertyMock
 
 import pytest
@@ -15,10 +15,13 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
@@ -352,6 +355,253 @@ def test_update_herd_structure(
     assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in removed_animals]
 
 
+def test_collect_daily_herd_updates(
+    herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
+) -> None:
+    """Unit test for _collect_daily_herd_updates()."""
+    mock_time = MagicMock(auto_spec=RufasTime)
+
+    graduated_calves = mock_herd["calves"][:1]
+    sold_calves = [mock_animal(AnimalType.CALF, sold=True)]
+    ignored_calf_stillborns = [mock_animal(AnimalType.CALF, stillborn=True)]
+    ignored_calf_newborns = [mock_animal(AnimalType.CALF)]
+    ignored_calf_sold_newborns = [mock_animal(AnimalType.CALF, sold=True)]
+
+    graduated_heiferIs = mock_herd["heiferIs"][:1]
+    sold_heiferIs = [mock_animal(AnimalType.HEIFER_I, sold=True)]
+    graduated_heiferIIs = mock_herd["heiferIIs"][:1]
+    sold_heiferIIs = [mock_animal(AnimalType.HEIFER_II, sold=True)]
+
+    graduated_heiferIIIs = mock_herd["heiferIIIs"][:1]
+    sold_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=True)]
+    heiferIII_stillborns = [mock_animal(AnimalType.CALF, stillborn=True)]
+    heiferIII_newborns = [mock_animal(AnimalType.CALF)]
+    heiferIII_sold_newborns = [mock_animal(AnimalType.CALF, sold=True)]
+
+    graduated_cows = mock_herd["lac_cows"][:1]
+    sold_and_died_cows = [mock_animal(AnimalType.LAC_COW, sold=True)]
+    cow_stillborns = [mock_animal(AnimalType.CALF, stillborn=True)]
+    cow_newborns = [mock_animal(AnimalType.CALF)]
+    cow_sold_newborns = [mock_animal(AnimalType.CALF, sold=True)]
+
+    mock_perform_daily_routines_for_animals = mocker.patch.object(
+        herd_manager,
+        "_perform_daily_routines_for_animals",
+        side_effect=[
+            (graduated_calves, sold_calves, ignored_calf_stillborns, ignored_calf_newborns, ignored_calf_sold_newborns),
+            (graduated_heiferIs, sold_heiferIs, [], [], []),
+            (graduated_heiferIIs, sold_heiferIIs, [], [], []),
+            (
+                graduated_heiferIIIs,
+                sold_heiferIIIs,
+                heiferIII_stillborns,
+                heiferIII_newborns,
+                heiferIII_sold_newborns,
+            ),
+            (graduated_cows, sold_and_died_cows, cow_stillborns, cow_newborns, cow_sold_newborns),
+        ],
+    )
+
+    actual_daily_herd_updates = herd_manager._process_daily_herd_updates(mock_time)
+
+    assert mock_perform_daily_routines_for_animals.call_args_list == [
+        call(mock_time, herd_manager.calves),
+        call(mock_time, herd_manager.heiferIs),
+        call(mock_time, herd_manager.heiferIIs),
+        call(mock_time, herd_manager.heiferIIIs),
+        call(mock_time, herd_manager.cows),
+    ]
+    assert isinstance(actual_daily_herd_updates, DailyHerdUpdates)
+    assert actual_daily_herd_updates.graduated_animals == (
+        graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs + graduated_cows
+    )
+    assert (
+        actual_daily_herd_updates.removed_animals
+        == sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows
+    )
+    assert actual_daily_herd_updates.newborn_calves == heiferIII_newborns + cow_newborns
+    assert actual_daily_herd_updates.sold_newborn_calves == heiferIII_sold_newborns + cow_sold_newborns
+    assert actual_daily_herd_updates.stillborn_newborn_calves == heiferIII_stillborns + cow_stillborns
+    assert actual_daily_herd_updates.sold_heiferIIs == sold_heiferIIs
+    assert actual_daily_herd_updates.sold_and_died_cows == sold_and_died_cows
+
+
+@pytest.mark.parametrize("simulation_day, expect_adjustment", [(14, False), (15, True)])
+def test_apply_daily_herd_structure_updates(
+    simulation_day: int,
+    expect_adjustment: bool,
+    herd_manager: HerdManager,
+    mock_herd: dict[str, list[Animal]],
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for _apply_daily_herd_structure_updates()."""
+    graduated_animals = mock_herd["heiferIs"]
+    newborn_calves = mock_herd["calves"]
+    removed_animals = [mock_animal(AnimalType.LAC_COW, sold=True)]
+    sold_oversupply_cows = [mock_animal(AnimalType.LAC_COW, sold=True)]
+    replacement_heifers = [mock_animal(AnimalType.HEIFER_III)]
+    mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
+    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
+    mock_weather = MagicMock(auto_spec=Weather)
+    mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = simulation_day
+    herd_manager.adjustment_period = 15
+
+    mock_check_if_cows_need_to_be_sold = mocker.patch.object(
+        herd_manager, "_check_if_cows_need_to_be_sold", return_value=sold_oversupply_cows
+    )
+    mock_update_sold_and_died_cow_statistics = mocker.patch.object(herd_manager, "_update_sold_and_died_cow_statistics")
+    mock_check_if_replacement_heifers_needed = mocker.patch.object(
+        herd_manager, "_check_if_replacement_heifers_needed", return_value=replacement_heifers
+    )
+    mock_update_herd_structure = mocker.patch.object(herd_manager, "_update_herd_structure")
+
+    herd_manager._apply_daily_herd_structure_updates(
+        graduated_animals=graduated_animals,
+        newborn_calves=newborn_calves,
+        removed_animals=removed_animals,
+        available_feeds=mock_available_feeds,
+        time=mock_time,
+        weather=mock_weather,
+        total_inventory=mock_total_inventory,
+    )
+
+    if expect_adjustment:
+        mock_check_if_cows_need_to_be_sold.assert_called_once_with(
+            simulation_day=simulation_day, removed_animal=removed_animals
+        )
+        mock_update_sold_and_died_cow_statistics.assert_called_once_with(removed_animals)
+        mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
+        expected_removed_animals = removed_animals
+        expected_newly_added_animals = replacement_heifers
+    else:
+        mock_check_if_cows_need_to_be_sold.assert_not_called()
+        mock_update_sold_and_died_cow_statistics.assert_not_called()
+        mock_check_if_replacement_heifers_needed.assert_not_called()
+        expected_removed_animals = removed_animals
+        expected_newly_added_animals = []
+
+    mock_update_herd_structure.assert_called_once_with(
+        graduated_animals=graduated_animals,
+        newborn_calves=newborn_calves,
+        newly_added_animals=expected_newly_added_animals,
+        removed_animals=expected_removed_animals,
+        available_feeds=mock_available_feeds,
+        current_day_conditions=mock_current_day_conditions,
+        total_inventory=mock_total_inventory,
+        simulation_day=simulation_day,
+    )
+
+
+def test_collect_manure_outputs_by_pen(herd_manager: HerdManager) -> None:
+    """Unit test for _collect_manure_outputs_by_pen()."""
+    first_pen, second_pen = MagicMock(), MagicMock()
+    first_pen.id = 1
+    first_pen.animal_combination.name = "CALF"
+    first_pen.total_manure_excretion = MagicMock()
+    first_pen.total_enteric_methane = 1.5
+    first_pen.get_manure_streams.return_value = {"first_stream": MagicMock()}
+    second_pen.id = 2
+    second_pen.animal_combination.name = "LAC_COW"
+    second_pen.total_manure_excretion = MagicMock()
+    second_pen.total_enteric_methane = 2.5
+    second_pen.get_manure_streams.return_value = {"second_stream": MagicMock()}
+    herd_manager.all_pens = [first_pen, second_pen]
+
+    herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen = (
+        herd_manager._collect_manure_outputs_by_pen()
+    )
+
+    assert herd_manager_output == {
+        "first_stream": first_pen.get_manure_streams.return_value["first_stream"],
+        "second_stream": second_pen.get_manure_streams.return_value["second_stream"],
+    }
+    assert animal_manure_excretions_by_pen == {
+        "CALF_PEN_1": first_pen.total_manure_excretion,
+        "LAC_COW_PEN_2": second_pen.total_manure_excretion,
+    }
+    assert enteric_methane_emission_by_pen == {"CALF_PEN_1": 1.5, "LAC_COW_PEN_2": 2.5}
+
+
+def test_warn_when_lactating_cows_have_no_milk(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for _warn_when_lactating_cows_have_no_milk()."""
+    no_milk_cow = MagicMock()
+    no_milk_cow.milk_production.daily_milk_produced = 0
+    no_milk_cow.is_milking = True
+    no_milk_cow.days_in_milk = 2
+    milking_cow = MagicMock()
+    milking_cow.milk_production.daily_milk_produced = 10
+    milking_cow.is_milking = True
+    milking_cow.days_in_milk = 2
+    first_day_cow = MagicMock()
+    first_day_cow.milk_production.daily_milk_produced = 0
+    first_day_cow.is_milking = True
+    first_day_cow.days_in_milk = 1
+    herd_manager.cows = [no_milk_cow, milking_cow, first_day_cow]
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
+    mock_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
+
+    herd_manager._warn_when_lactating_cows_have_no_milk(mock_time)
+
+    mock_add_warning.assert_called_once_with(
+        "Warning: Lactating cows with no production.",
+        "There are 1 lactating cows with no milking production on simulation day 15.",
+        info_map={
+            "class": herd_manager.__class__.__name__,
+            "function": herd_manager.execute_daily_routines.__name__,
+            "simulation_day": 15,
+        },
+    )
+
+
+def test_report_daily_routine_outputs(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for _report_daily_routine_outputs()."""
+    herd_manager_output = {"stream": ManureStream.make_empty_manure_stream()}
+    animal_manure_excretions_by_pen = {"CALF_PEN_1": AnimalManureExcretions()}
+    enteric_methane_emission_by_pen = {"CALF_PEN_1": 1.0}
+    mocker.patch.object(HerdManager, "average_herd_305_days_milk_production", new_callable=PropertyMock)
+    mock_report_enteric_methane_emission = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_enteric_methane_emission"
+    )
+    mock_report_daily_animal_population = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population"
+    )
+    mock_report_herd_statistics_data = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_herd_statistics_data"
+    )
+    mock_report_manure_excretions = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
+    )
+    mock_report_manure_streams = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_streams"
+    )
+    mock_report_milk = mocker.patch("RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk")
+    mock_report_305d_milk = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk"
+    )
+    mock_report_ration = mocker.patch.object(herd_manager, "_report_ration")
+    mock_calculate_and_report_average_genetics = mocker.patch.object(
+        herd_manager, "_calculate_and_report_average_genetics"
+    )
+
+    herd_manager._report_daily_routine_outputs(
+        herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen, simulation_day=15
+    )
+
+    mock_report_enteric_methane_emission.assert_called_once_with(enteric_methane_emission_by_pen)
+    mock_report_daily_animal_population.assert_called_once_with(herd_manager.herd_statistics, 15)
+    mock_report_herd_statistics_data.assert_called_once_with(herd_manager.herd_statistics, 15)
+    mock_report_manure_excretions.assert_called_once_with(animal_manure_excretions_by_pen, 15)
+    mock_report_manure_streams.assert_called_once_with(herd_manager_output, 15)
+    mock_report_milk.assert_called_once_with(herd_manager.daily_milk_report, 15)
+    mock_report_305d_milk.assert_called_once()
+    mock_report_ration.assert_called_once_with(15)
+    mock_calculate_and_report_average_genetics.assert_called_once_with(15)
+
+
 def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture) -> None:
     """Unit test for daily_routines()"""
     mock_feed = MagicMock(auto_spec=Feed)
@@ -434,7 +684,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
-    herd_manager.daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
+    herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
 
     mock_reset_daily_statistics.assert_called_once_with()
     assert mock_perform_daily_routines_for_animals.call_count == 5
@@ -500,7 +750,7 @@ def test_create_newborn_calf(
 
 def _create_sortable_mock_cow(
     id_val: int, is_dnb: bool, daily_milk: float, days_in_milk: int, days_in_pregnancy: int
-) -> MagicMock:
+) -> Animal:
     """Helper to create a mock cow with specific sorting attributes."""
     cow = MagicMock(spec=Animal)
     cow.id = id_val
@@ -517,7 +767,7 @@ def _create_sortable_mock_cow(
 
     cow.days_in_milk = days_in_milk
     cow.days_in_pregnancy = days_in_pregnancy
-    return cow
+    return cast(Animal, cow)
 
 
 def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, mocker: MockerFixture) -> None:

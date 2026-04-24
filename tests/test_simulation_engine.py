@@ -746,7 +746,7 @@ def test_execute_daily_animal_operations(
     )
     mock_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
-        "daily_routines",
+        "execute_daily_routines",
         return_value=all_manure_data,
     )
 
