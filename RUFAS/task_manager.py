@@ -647,10 +647,10 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return None
-            return None
+            #     return None
+            # return None
 
-        except Exception as e:
+        # except Exception as e:
             output_prefix = args["output_prefix"]
             info_map.update(args)
             output_manager.add_error(
