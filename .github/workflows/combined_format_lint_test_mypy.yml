@@ -171,7 +171,7 @@ jobs:
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
-    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
+    if: ${{ always() && github.event.action == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     needs: format_code
     runs-on: ubuntu-latest
     steps:
