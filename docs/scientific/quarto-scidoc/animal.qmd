@@ -265,7 +265,80 @@ For details about the variables included in each calculation, please refer to tb
 *Maintenance* The maintenance requirement is calculated based on metabolic body weight (body weight$^{0.75}$).
 
 * Lactating and Dry Cows
+
 ::: {#eq-an-nrc-1}
+$$
+ CBW = MW * 0.06275
+$$
+:::
+
+
+::: {#eq-an-nrc-2}
+$$
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+$$
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-3}
+$$
+NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
+$$
+:::
+
+* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight\(^{0.75}\)), body condition score, and the previous month's temperatures.
+
+::: {#eq-an-nrc-1}
+$$
+CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
+$$
+:::
+
+
+
+::: {#eq-an-nrc-2}
+$$
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
+\qquad \text{(AN.NRC.2)}
+$$
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-6}
+$$
+BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
+$$
+:::
+
+::: {#eq-an-nrc-7}
+$$
+NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
+$$
+:::
+
+*Activity* Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
+
+* Lactating and Dry Cows
+::: {#eq-an-nrc-8}
+$$
+NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+$$
+:::
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -551,6 +624,33 @@ $$
 \text{fecal\_water} = \left(1.987 \times \text{dry\_matter\_intake}\right) + \left(0.348 \times \text{acid\_detergent\_fiber\_concentrations}\right) - \left(0.412 \times \text{crude\_protein\_concentration}\right) - \left(0.074 \times \text{dry\_matter\_concentration}\right) - \left(0.0057 \times \text{days\_in\_milk}\right) \qquad \text{[AN.EXC.18]}
 $$
 ::: 
+
+::: {#eq-an-exc-18}
+$$
+\begin{aligned}
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+\qquad \text{[AN.EXC.18]}
+\end{aligned}
+$$
+:::
+
+
+::: {#eq-an-exc-18}
+$$
+\begin{aligned}
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+\end{aligned}
+\tag*{[AN.EXC.18]}
+$$
+:::
 
 Total solids/Fecal dry matter (kg/d): Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids.
 
@@ -1016,95 +1116,5 @@ Then the adjusted methane production is calculated based on methane yield reduct
 ::: {#eq-an-met-11}
 $$
 \text{adjusted\_methane\_emission} = \text{methane\_yield} \times \left(1 + \frac{\text{methane\_yield\_reduction}}{100}\right) \times \text{dry\_matter\_intake} \qquad \text{[AN.MET.11]}
-$$
-:::
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Examples of Equations
-
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
-$$ {#eq-an-nrc-2}
-
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
-$$
-:::
-
-
-
-::: {#eq-an-nrc-2}
-$$
-CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
-\qquad \text{(AN.NRC.2)}
-$$
-:::
-
-*Otherwise*
-
-::: {#eq-an-nrc-3}
-$$
-NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
-$$
-:::
-
-* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight\(^{0.75}\)), body condition score, and the previous month's temperatures.
-
-::: {#eq-an-nrc-1}
-$$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
-$$
-:::
-
-
-
-::: {#eq-an-nrc-2}
-$$
-CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
-\qquad \text{(AN.NRC.2)}
-$$
-:::
-
-*Otherwise*
-
-::: {#eq-an-nrc-6}
-$$
-BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
-$$
-:::
-
-::: {#eq-an-nrc-7}
-$$
-NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
-$$
-:::
-
-*Activity* Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
-
-* Lactating and Dry Cows
-::: {#eq-an-nrc-8}
-$$
-NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
 $$
 :::
