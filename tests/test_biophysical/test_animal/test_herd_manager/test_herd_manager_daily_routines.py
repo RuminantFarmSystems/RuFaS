@@ -514,6 +514,8 @@ def _create_sortable_mock_cow(
 
     cow.milk_production = MagicMock()
     cow.milk_production.daily_milk_produced = daily_milk
+    cow.milk_yield_305_day = daily_milk
+    cow.mature_equivalent_milking_prediction_305_day = daily_milk
 
     cow.days_in_milk = days_in_milk
     cow.days_in_pregnancy = days_in_pregnancy
@@ -554,6 +556,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
         fillers.append(_create_sortable_mock_cow(10 + i, False, 100.0, 200, 20))
 
     fillers[0].milk_production.daily_milk_produced = 90.0
+    fillers[0].milk_yield_305_day = 90.0
 
     all_cows = [
         cow_dnb_low_milk,
