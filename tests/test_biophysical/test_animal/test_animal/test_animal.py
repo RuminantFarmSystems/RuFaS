@@ -82,11 +82,11 @@ def _make_cow_for_305_day_milk_prediction(
 def test_update_305_days_milk_production_for_partial_lactation() -> None:
     """Test 305-day milk prediction for cows before day 305."""
     cow = _make_cow_for_305_day_milk_prediction(days_in_milk=120, calves=1)
-    cow.milk_production.update_manure_305_day_milk_prediction.return_value = 8000.0
+    cow.milk_production.calculate_manure_305_day_milk_prediction.return_value = 8000.0
 
     cow.update_mature_305_days_milk_production()
 
-    cow.milk_production.update_manure_305_day_milk_prediction.assert_called_once_with(1.0, 2.0, 3.0, [], 120)
+    cow.milk_production.calculate_manure_305_day_milk_prediction.assert_called_once_with(1.0, 2.0, 3.0, [], 120)
     assert cow.milk_production.mature_305_day_prediction == pytest.approx(8000.0)
 
 
@@ -97,7 +97,7 @@ def test_update_305_days_milk_production_for_completed_lactation() -> None:
 
     cow.update_mature_305_days_milk_production()
 
-    cow.milk_production.update_manure_305_day_milk_prediction.assert_not_called()
+    cow.milk_production.calculate_manure_305_day_milk_prediction.assert_not_called()
     cow.milk_production.get_current_lactation_305_day_milk_produced.assert_called_once_with()
     assert cow.milk_production.mature_305_day_prediction == pytest.approx(9000.0)
 
@@ -109,7 +109,7 @@ def test_update_305_days_milk_production_retains_value_for_dry_cow() -> None:
 
     cow.update_mature_305_days_milk_production()
 
-    cow.milk_production.update_manure_305_day_milk_prediction.assert_not_called()
+    cow.milk_production.calculate_manure_305_day_milk_prediction.assert_not_called()
     cow.milk_production.get_current_lactation_305_day_milk_produced.assert_not_called()
     assert cow.milk_production.mature_305_day_prediction == pytest.approx(9100.0)
 

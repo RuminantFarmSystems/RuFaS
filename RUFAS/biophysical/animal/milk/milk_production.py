@@ -279,7 +279,7 @@ class MilkProduction:
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
     @staticmethod
-    def update_manure_305_day_milk_prediction(
+    def calculate_manure_305_day_milk_prediction(
         l_param: float,
         m_param: float,
         n_param: float,

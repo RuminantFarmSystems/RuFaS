@@ -360,7 +360,7 @@ def test_calculate_daily_milk_production(
 )
 def test_calculate_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
     """Test the calculate_305_day_milk_yield method of the MilkProduction class."""
-    assert MilkProduction.update_manure_305_day_milk_prediction(l_param, m_param, n_param, None) == pytest.approx(
+    assert MilkProduction.calculate_manure_305_day_milk_prediction(l_param, m_param, n_param, None) == pytest.approx(
         expected, rel=1e-6
     )
 
@@ -381,7 +381,7 @@ def test_calculate_305_day_milk_yield_uses_available_history() -> None:
         MilkProduction.calculate_daily_milk_production, 3, 305, args=(l_param, m_param, n_param)
     )[0]
 
-    result = MilkProduction.update_manure_305_day_milk_prediction(
+    result = MilkProduction.calculate_manure_305_day_milk_prediction(
         l_param, m_param, n_param, milk_production_history, days_in_milk=2
     )
 
