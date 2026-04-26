@@ -2470,12 +2470,14 @@ class Animal:
             return
 
         if self.days_in_milk < 305:
-            self.milk_production.mature_305_day_prediction = self.milk_production.calculate_mature_305_day_milk_prediction(
-                self.milk_production.wood_l,
-                self.milk_production.wood_m,
-                self.milk_production.wood_n,
-                self.milk_production.milk_production_history,
-                self.days_in_milk,
+            self.milk_production.mature_305_day_prediction = (
+                self.milk_production.calculate_mature_305_day_milk_prediction(
+                    self.milk_production.wood_l,
+                    self.milk_production.wood_m,
+                    self.milk_production.wood_n,
+                    self.milk_production.milk_production_history,
+                    self.days_in_milk,
+                )
             )
             return
 
