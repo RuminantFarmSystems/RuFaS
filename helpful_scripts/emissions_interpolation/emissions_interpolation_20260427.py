@@ -34,7 +34,6 @@ feed_source = pd.read_csv(
 fips_to_region = pd.read_csv(r"helpful_scripts\emissions_interpolation\fips_to_region.csv")
 
 
-
 def get_statecode(county_code):
     return str(county_code).zfill(5)[0:2]
 
@@ -144,38 +143,23 @@ county_codes = list(emissions_doc["county_code"])
 if use_wheat_regional_average:
     target_cols = [c for c in ["193"] if c in emissions_doc.columns]
     print(target_cols)
-    merged = emissions_doc.merge(
-        fips_to_region[['FIPS', 'Region']],
-        left_on='county_code',
-        right_on='FIPS',
-        how='left'
-        )
+    merged = emissions_doc.merge(fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left")
     print(merged)
 
-    merged[target_cols] = merged[target_cols].apply(
-        pd.to_numeric, errors="coerce"
-        )
-    
+    merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
+
     print("Target cols:", target_cols)
     print("Non-null count per col:")
     print(merged[target_cols].notna().sum())
     print("Dtypes:")
     print(merged[target_cols].dtypes)
 
-    region_means = (
-        merged
-        .groupby('Region')[target_cols]
-        .mean()
-        )
+    region_means = merged.groupby("Region")[target_cols].mean()
     print(region_means)
     region_means.to_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
 
 
-
 regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
-
-
-
 
 
 #####################
