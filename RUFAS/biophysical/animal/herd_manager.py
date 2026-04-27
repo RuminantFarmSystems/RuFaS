@@ -152,9 +152,20 @@ class HerdManager:
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
-        allowances = self.im.get_data("feed.allowances")
-        sorted_allowances = sorted(allowances, key=lambda x: x["purchased_feed"])
-        self.advance_purchase_allowance = AdvancePurchaseAllowance(sorted_allowances)
+        feeds: list[dict[str, int | float]] = self.im.get_data("feed.feeds")
+
+        purchase_allowances = [
+            {
+                "purchased_feed": feed["feed_type"],
+                "runtime_purchase_allowance": feed["runtime_purchase_allowance"],
+                "advance_purchase_allowance": feed["advance_purchase_allowance"],
+                "planning_cycle_allowance": feed["planning_cycle_allowance"],
+            }
+            for feed in feeds
+        ]
+
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
+        self.advance_purchase_allowance = AdvancePurchaseAllowance(sorted_purchased_allowances)
 
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
         nutrient_standard = NutrientStandard(config_data["nutrient_standard"])
