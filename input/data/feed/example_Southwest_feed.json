@@ -158,6 +158,10 @@
       "animal_group": "lac_cow",
       "feeds": [
         {
+          "feed_type": 44,
+          "ration_percentage": 19.71
+        },
+        {
           "feed_type": 51,
           "ration_percentage": 23.29
         },
@@ -168,10 +172,6 @@
         {
           "feed_type": 100,
           "ration_percentage": 5.5
-        },
-        {
-          "feed_type": 44,
-          "ration_percentage": 19.71
         },
         {
           "feed_type": 301,
