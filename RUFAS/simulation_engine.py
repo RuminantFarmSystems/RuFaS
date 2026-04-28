@@ -493,7 +493,7 @@ class SimulationEngine:
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
-        all_manure_data = self.herd_manager.daily_routines(
+        all_manure_data = self.herd_manager.execute_daily_routines(
             self.available_feeds,
             self.time,
             self.weather,

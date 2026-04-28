@@ -437,7 +437,6 @@ def test_apply_daily_herd_structure_updates(
     sold_oversupply_cows = [mock_animal(AnimalType.LAC_COW, sold=True)]
     replacement_heifers = [mock_animal(AnimalType.HEIFER_III)]
     mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
-    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
     mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
     mock_weather = MagicMock(auto_spec=Weather)
     mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
@@ -461,7 +460,6 @@ def test_apply_daily_herd_structure_updates(
         available_feeds=mock_available_feeds,
         time=mock_time,
         weather=mock_weather,
-        total_inventory=mock_total_inventory,
     )
 
     if expect_adjustment:
@@ -486,7 +484,6 @@ def test_apply_daily_herd_structure_updates(
         removed_animals=expected_removed_animals,
         available_feeds=mock_available_feeds,
         current_day_conditions=mock_current_day_conditions,
-        total_inventory=mock_total_inventory,
         simulation_day=simulation_day,
     )
 
@@ -679,7 +676,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
-    herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
+    herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather)
 
     mock_reset_daily_statistics.assert_called_once_with()
     assert mock_perform_daily_routines_for_animals.call_count == 5

@@ -40,8 +40,8 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     NutrientStandard,
     RUFAS_ID,
-    TotalInventory,
     AdvancePurchaseAllowance,
+    TotalInventory,
 )
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
@@ -604,7 +604,6 @@ class HerdManager:
         available_feeds: list[Feed],
         time: RufasTime,
         weather: Weather,
-        total_inventory: TotalInventory,
     ) -> None:
         """Apply animal additions, removals, and herd-size adjustments after daily routines run."""
         newly_added_animals: list[Animal] = []
@@ -623,7 +622,6 @@ class HerdManager:
             removed_animals=removed_animals,
             available_feeds=available_feeds,
             current_day_conditions=weather.get_current_day_conditions(time),
-            total_inventory=total_inventory,
             simulation_day=time.simulation_day,
         )
 
@@ -683,7 +681,7 @@ class HerdManager:
         self._calculate_and_report_average_genetics(simulation_day)
 
     def execute_daily_routines(
-        self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
+        self, available_feeds: list[Feed], time: RufasTime, weather: Weather,
     ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
@@ -743,7 +741,6 @@ class HerdManager:
             available_feeds,
             time,
             weather,
-            total_inventory,
         )
 
         self.record_pen_history(time.simulation_day)
