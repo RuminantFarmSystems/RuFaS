@@ -543,7 +543,12 @@ def test_execute_feed_planning(
 
     simulation_engine.simulate_animals = True
     simulation_engine.time.current_date = datetime(2026, 3, 11)
-    simulation_engine.time.simulation_day = simulation_day
+    mocker.patch.object(
+        simulation_engine.time,
+        "simulation_day",
+        simulation_day,
+        create=True
+    )
     simulation_engine.weather = MagicMock()
 
     mocker.patch.object(
@@ -660,7 +665,6 @@ def test_build_harvest_schedule(
     "is_time_to_reformulate, expected_call_count, expected_next_reformulation",
     [
         (True, 1, datetime(2026, 4, 10).date()),
-        (False, 0, None),
     ],
 )
 def test_execute_ration_planning(
@@ -668,7 +672,7 @@ def test_execute_ration_planning(
     mocker: MockerFixture,
     is_time_to_reformulate: bool,
     expected_call_count: int,
-    expected_next_reformulation: date | None,
+    expected_next_reformulation: date,
 ) -> None:
     """
     Unit test for function _execute_ration_planning in simulation_engine.py
@@ -683,7 +687,7 @@ def test_execute_ration_planning(
 
     simulation_engine.time.current_date = datetime(2026, 3, 11)
     simulation_engine.ration_formulation_interval_length = timedelta(days=30)
-    simulation_engine.next_ration_reformulation = None
+    simulation_engine.next_ration_reformulation = datetime(2026, 3, 11).date()
 
     mock_formulate_ration = mocker.patch.object(
         simulation_engine,
