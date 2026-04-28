@@ -106,7 +106,7 @@ def test_get_simulation_type_invalid() -> None:
 @pytest.fixture
 def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     mocker.patch("RUFAS.simulation_engine.RufasTime")
-    mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
+    mocker.patch("RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules")
     mock_simulation_type = SimulationType("full_farm")
 
     simulation_engine = SimulationEngine(mock_simulation_type)
@@ -126,7 +126,7 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     """
 
     # Arrange
-    mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
+    mock_setup_simulation_modules = mocker.patch.object(SimulationEngine, "_setup_simulation_modules")
     mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=mock_time)
     mock_simulation_type = SimulationType("full_farm")
@@ -135,7 +135,7 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     simulation_engine = SimulationEngine(mock_simulation_type)
 
     # Assert
-    mock_initialize_simulation.assert_called_once()
+    mock_setup_simulation_modules.assert_called_once()
     assert simulation_engine.time == mock_time
 
 
@@ -1031,9 +1031,9 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
     mock_request_nutrients.assert_called_once()
 
 
-def test_initialize_simulation(mocker: MockerFixture) -> None:
+def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     """
-    Unit test for function _initialize_simulation in simulation_engine.py
+    Unit test for function _setup_simulation_modules in simulation_engine.py
     """
     # Arrange
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
@@ -1131,7 +1131,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     )
 
     # Act
-    simulation_engine._initialize_simulation()
+    simulation_engine._setup_simulation_modules()
 
     # Assert
     assert mock_im_get_data.call_args_list == [

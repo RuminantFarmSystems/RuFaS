@@ -158,9 +158,9 @@ class SimulationEngine:
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
         }
 
-        self._initialize_simulation()
+        self._setup_simulation_modules()
 
-    def _initialize_simulation(self) -> None:
+    def _setup_simulation_modules(self) -> None:
         """
         Instantiates the requested biophysical modules based on simulation type.
         """
