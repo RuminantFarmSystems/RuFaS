@@ -371,7 +371,7 @@ class OutputManager(object):
 
         # Don't overwrite a valid simulation_day with None
         if day_to_use is None and map_has_valid_day:
-            overwrite = False
+            return info_map_copy
 
         should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
 
