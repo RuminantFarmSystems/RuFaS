@@ -681,7 +681,10 @@ class HerdManager:
         self._calculate_and_report_average_genetics(simulation_day)
 
     def execute_daily_routines(
-        self, available_feeds: list[Feed], time: RufasTime, weather: Weather,
+        self,
+        available_feeds: list[Feed],
+        time: RufasTime,
+        weather: Weather,
     ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
