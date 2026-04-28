@@ -21,6 +21,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
@@ -561,11 +562,128 @@ class HerdManager:
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
-    def daily_routines(
+    def _process_daily_herd_updates(self, time: RufasTime) -> DailyHerdUpdates:
+        """Run daily routines for all animal groups and collect herd-level updates."""
+        daily_herd_updates = DailyHerdUpdates()
+        animal_groups = [
+            ("calves", self.calves),
+            ("heiferIs", self.heiferIs),
+            ("heiferIIs", self.heiferIIs),
+            # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
+            ("heiferIIIs", self.heiferIIIs),
+            ("cows", self.cows),
+        ]
+
+        for animal_group_name, animals in animal_groups:
+            (
+                group_graduated_animals,
+                sold_animals,
+                group_stillborn_newborn_calves,
+                group_newborn_calves,
+                group_sold_newborn_calves,
+            ) = self._perform_daily_routines_for_animals(time, animals)
+            collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
+            daily_herd_updates.graduated_animals += group_graduated_animals
+            daily_herd_updates.removed_animals += sold_animals
+            if collect_birth_results:
+                daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
+                daily_herd_updates.newborn_calves += group_newborn_calves
+                daily_herd_updates.sold_newborn_calves += group_sold_newborn_calves
+            if animal_group_name == "heiferIIs":
+                daily_herd_updates.sold_heiferIIs = sold_animals
+            elif animal_group_name == "cows":
+                daily_herd_updates.sold_and_died_cows = sold_animals
+
+        return daily_herd_updates
+
+    def _apply_daily_herd_structure_updates(
         self,
+        graduated_animals: list[Animal],
+        newborn_calves: list[Animal],
+        removed_animals: list[Animal],
         available_feeds: list[Feed],
         time: RufasTime,
         weather: Weather,
+        total_inventory: TotalInventory,
+    ) -> None:
+        """Apply animal additions, removals, and herd-size adjustments after daily routines run."""
+        newly_added_animals: list[Animal] = []
+        adjust_herd_size: bool = time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0
+        if adjust_herd_size:
+            removed_animals += self._check_if_cows_need_to_be_sold(
+                simulation_day=time.simulation_day, removed_animal=removed_animals
+            )
+            self._update_sold_and_died_cow_statistics(removed_animals)
+            newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+
+        self._update_herd_structure(
+            graduated_animals=graduated_animals,
+            newborn_calves=newborn_calves,
+            newly_added_animals=newly_added_animals,
+            removed_animals=removed_animals,
+            available_feeds=available_feeds,
+            current_day_conditions=weather.get_current_day_conditions(time),
+            total_inventory=total_inventory,
+            simulation_day=time.simulation_day,
+        )
+
+    def _collect_manure_outputs_by_pen(
+        self,
+    ) -> tuple[dict[str, ManureStream], dict[str, AnimalManureExcretions], dict[str, float]]:
+        """Collect manure streams, manure excretions, and enteric methane emissions from all pens."""
+        enteric_methane_emission_by_pen: dict[str, float] = {}
+        animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
+        herd_manager_output: dict[str, ManureStream] = {}
+        for pen in self.all_pens:
+            pen_key = f"{pen.animal_combination.name}_PEN_{pen.id}"
+            animal_manure_excretions_by_pen[pen_key] = pen.total_manure_excretion
+            herd_manager_output.update(pen.get_manure_streams())
+            enteric_methane_emission_by_pen[pen_key] = pen.total_enteric_methane
+
+        return herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen
+
+    def _warn_when_lactating_cows_have_no_milk(self, time: RufasTime) -> None:
+        """Warn when lactating cows have no milk production after the first day in milk."""
+        no_milk_cow_num = len(
+            [
+                cow
+                for cow in self.cows
+                if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
+            ]
+        )
+
+        if no_milk_cow_num > 0:
+            self.om.add_warning(
+                "Warning: Lactating cows with no production.",
+                f"There are {no_milk_cow_num} lactating cows with no milking production on simulation"
+                f" day {time.simulation_day}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.execute_daily_routines.__name__,
+                    "simulation_day": time.simulation_day,
+                },
+            )
+
+    def _report_daily_routine_outputs(
+        self,
+        herd_manager_output: dict[str, ManureStream],
+        animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions],
+        enteric_methane_emission_by_pen: dict[str, float],
+        simulation_day: int,
+    ) -> None:
+        """Report the daily outputs generated by herd manager routines."""
+        AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
+        AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, simulation_day)
+        AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, simulation_day)
+        AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, simulation_day)
+        AnimalModuleReporter.report_manure_streams(herd_manager_output, simulation_day)
+        AnimalModuleReporter.report_milk(self.daily_milk_report, simulation_day)
+        AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
+        self._report_ration(simulation_day)
+        self._calculate_and_report_average_genetics(simulation_day)
+
+    def execute_daily_routines(
+        self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
     ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
@@ -588,133 +706,62 @@ class HerdManager:
         dict[str, ManureStream]
             A list of dictionaries containing manure data for each pen in the herd.
 
+        Notes
+        -----
+        Daily Herd Routine Process:
+        1. Reset daily herd statistics and reproduction trackers.
+        2. Run per-animal daily routines for calves, heifer groups, and cows.
+        3. Collect herd-level updates from those routines, including graduations, removals, births, and sales.
+        4. Update sold-animal and stillborn-calf statistics.
+        5. Apply herd structure changes, including removals, additions, pen moves, and periodic replacement logic.
+        6. Record pen history and collect manure and enteric methane outputs by pen.
+        7. Recompute herd statistics and warn about lactating cows with no milk production.
+        8. Report daily herd outputs, including population, herd statistics, manure, milk, ration, and genetics.
+
         """
-        graduated_animals: list[Animal] = []
-        newborn_calves: list[Animal] = []
-        removed_animals: list[Animal] = []
-
-        sold_newborn_calves: list[Animal] = []
-        stillborn_newborn_calves: list[Animal] = []
-
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
-        graduated_calves, sold_calves, _, _, _ = self._perform_daily_routines_for_animals(time, self.calves)
-        graduated_animals += graduated_calves
-        removed_animals += sold_calves
-
-        graduated_heiferIs, sold_heiferIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIs)
-        graduated_animals += graduated_heiferIs
-        removed_animals += sold_heiferIs
-
-        graduated_heiferIIs, sold_heiferIIs, _, _, _ = self._perform_daily_routines_for_animals(time, self.heiferIIs)
-        graduated_animals += graduated_heiferIIs
-        removed_animals += sold_heiferIIs
-
-        # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
-        (
-            graduated_heiferIIIs,
-            sold_heiferIIIs,
-            stillborn_newborn_calves_from_heiferIIIs,
-            newborn_calves_from_heiferIIIs,
-            sold_newborn_calves_from_heiferIIIs,
-        ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
-        graduated_animals += graduated_heiferIIIs
-        removed_animals += sold_heiferIIIs
-        stillborn_newborn_calves += stillborn_newborn_calves_from_heiferIIIs
-        sold_newborn_calves += sold_newborn_calves_from_heiferIIIs
-        newborn_calves += newborn_calves_from_heiferIIIs
-
-        (
-            graduated_cows,
-            sold_and_died_cows,
-            stillborn_newborn_calves_from_cows,
-            newborn_calves_from_cows,
-            sold_newborn_calves_from_cows,
-        ) = self._perform_daily_routines_for_animals(time, self.cows)
-        graduated_animals += graduated_cows
-        removed_animals += sold_and_died_cows
-        stillborn_newborn_calves += stillborn_newborn_calves_from_cows
-        sold_newborn_calves += sold_newborn_calves_from_cows
-        newborn_calves += newborn_calves_from_cows
-        born_calf_num = len(stillborn_newborn_calves + sold_newborn_calves + newborn_calves)
-        self.herd_statistics.born_calf_num = born_calf_num
+        daily_herd_updates = self._process_daily_herd_updates(time)
+        self.herd_statistics.born_calf_num = len(
+            daily_herd_updates.stillborn_newborn_calves
+            + daily_herd_updates.sold_newborn_calves
+            + daily_herd_updates.newborn_calves
+        )
 
         self._update_sold_animal_statistics(
-            sold_newborn_calves=sold_newborn_calves,
-            sold_heiferIIs=sold_heiferIIs,
-            sold_and_died_cows=sold_and_died_cows,
+            sold_newborn_calves=daily_herd_updates.sold_newborn_calves,
+            sold_heiferIIs=daily_herd_updates.sold_heiferIIs,
+            sold_and_died_cows=daily_herd_updates.sold_and_died_cows,
         )
 
-        self._update_stillborn_calf_statistics(stillborn_newborn_calves)
-
-        adjust_herd_size: bool = time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0
-        if adjust_herd_size:
-            removed_animals += self._check_if_cows_need_to_be_sold(
-                simulation_day=time.simulation_day, removed_animal=removed_animals
-            )
-            self._update_sold_and_died_cow_statistics(removed_animals)
-            newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-
-            self._update_herd_structure(
-                graduated_animals=graduated_animals,
-                newborn_calves=newborn_calves,
-                newly_added_animals=newly_added_animals,
-                removed_animals=removed_animals,
-                available_feeds=available_feeds,
-                current_day_conditions=weather.get_current_day_conditions(time),
-                simulation_day=time.simulation_day,
-            )
-        else:
-            self._update_herd_structure(
-                graduated_animals=graduated_animals,
-                newborn_calves=newborn_calves,
-                newly_added_animals=[],
-                removed_animals=removed_animals,
-                available_feeds=available_feeds,
-                current_day_conditions=weather.get_current_day_conditions(time),
-                simulation_day=time.simulation_day,
-            )
+        self._update_stillborn_calf_statistics(daily_herd_updates.stillborn_newborn_calves)
+        self._apply_daily_herd_structure_updates(
+            daily_herd_updates.graduated_animals,
+            daily_herd_updates.newborn_calves,
+            daily_herd_updates.removed_animals,
+            available_feeds,
+            time,
+            weather,
+            total_inventory,
+        )
 
         self.record_pen_history(time.simulation_day)
-        enteric_methane_emission_by_pen: dict[str, float] = {}
-        animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
-        herd_manager_output: dict[str, ManureStream] = {}
-        for pen in self.all_pens:
-            animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
-            herd_manager_output.update(pen.get_manure_streams())
-            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
+        (
+            herd_manager_output,
+            animal_manure_excretions_by_pen,
+            enteric_methane_emission_by_pen,
+        ) = self._collect_manure_outputs_by_pen()
 
         self.update_herd_statistics()
+        self._warn_when_lactating_cows_have_no_milk(time)
 
-        no_milk_cow_num = len(
-            [
-                cow
-                for cow in self.cows
-                if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
-            ]
+        self._report_daily_routine_outputs(
+            herd_manager_output,
+            animal_manure_excretions_by_pen,
+            enteric_methane_emission_by_pen,
+            time.simulation_day,
         )
-
-        if no_milk_cow_num > 0:
-            self.om.add_warning(
-                "Warning: Lactating cows with no production.",
-                f"There are {no_milk_cow_num} lactating cows with no milking production on simulation"
-                f" day {time.simulation_day}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.daily_routines.__name__,
-                    "simulation_day": time.simulation_day,
-                },
-            )
-        AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
-        AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, time.simulation_day)
-        AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, time.simulation_day)
-        AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
-        AnimalModuleReporter.report_manure_streams(herd_manager_output, time.simulation_day)
-        AnimalModuleReporter.report_milk(self.daily_milk_report, time.simulation_day)
-        AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
-        self._report_ration(time.simulation_day)
-        self._calculate_and_report_average_genetics(time.simulation_day)
 
         return herd_manager_output
 
