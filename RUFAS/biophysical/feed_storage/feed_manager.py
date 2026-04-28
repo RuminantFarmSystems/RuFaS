@@ -38,7 +38,7 @@ class FeedManager:
     ----------
     feed_config : dict[str, list[Any]]
         Configuration for the feeds available in the simulation.
-    available_feeds : AvailableFeedsBuilder
+    available_feeds : list[Feed]
         The list of feeds available for the simulation.
     crop_to_rufas_ids_mapping : dict[str, list[RUFAS_ID]]
         Mapping from crops to their corresponding RUFAS IDs.
@@ -688,7 +688,7 @@ class FeedManager:
         self._log_feed_deductions(
             deduction_results.purchased,
             deduction_results.farmgrown,
-            simulation_day,
+            simulation_day
         )
 
         return deduction_results
