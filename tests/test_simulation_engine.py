@@ -543,12 +543,7 @@ def test_execute_feed_planning(
 
     simulation_engine.simulate_animals = True
     simulation_engine.time.current_date = datetime(2026, 3, 11)
-    mocker.patch.object(
-        simulation_engine.time,
-        "simulation_day",
-        simulation_day,
-        create=True
-    )
+    mocker.patch.object(simulation_engine.time, "simulation_day", simulation_day, create=True)
     simulation_engine.weather = MagicMock()
 
     mocker.patch.object(
