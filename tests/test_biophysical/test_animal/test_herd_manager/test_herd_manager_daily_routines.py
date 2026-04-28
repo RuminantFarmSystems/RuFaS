@@ -22,7 +22,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
