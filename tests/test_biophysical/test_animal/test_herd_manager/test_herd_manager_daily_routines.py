@@ -312,10 +312,7 @@ def test_update_herd_structure(
 ) -> None:
     """Unit test for the _update_herd_structure() method."""
     mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
-    mock_current_day_conditions, mock_total_inventory = (
-        MagicMock(auto_spec=CurrentDayConditions),
-        MagicMock(auto_spec=TotalInventory),
-    )
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
 
     newborn_calves, graduated_animals, removed_animals, newly_added_animals = (
         mock_herd["calves"],
@@ -341,16 +338,15 @@ def test_update_herd_structure(
         newly_added_animals=newly_added_animals,
         available_feeds=mock_available_feeds,
         current_day_conditions=mock_current_day_conditions,
-        total_inventory=mock_total_inventory,
         simulation_day=15,
     )
 
     mock_handle_graduated_animals.assert_called_once_with(
-        graduated_animals, mock_available_feeds, mock_current_day_conditions, mock_total_inventory, 15
+        graduated_animals, mock_available_feeds, mock_current_day_conditions, 15
     )
     assert mock_handle_newly_added_animals.call_args_list == [
-        call(newborn_calves, mock_available_feeds, mock_current_day_conditions, mock_total_inventory, 15),
-        call(newly_added_animals, mock_available_feeds, mock_current_day_conditions, mock_total_inventory, 15),
+        call(newborn_calves, mock_available_feeds, mock_current_day_conditions, 15),
+        call(newly_added_animals, mock_available_feeds, mock_current_day_conditions, 15),
     ]
     assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in removed_animals]
 
@@ -608,7 +604,6 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_weather = MagicMock(auto_spec=Weather)
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 15
-    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     mocker.patch.object(HerdManager, "average_herd_305_days_milk_production", new_callable=PropertyMock)
 
@@ -1011,16 +1006,13 @@ def test_handle_graduated_animals(
     ]
     mock_feed = MagicMock(auto_spec=Feed)
     mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
-    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
-    herd_manager._handle_graduated_animals(
-        graduated_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory, 15
-    )
+    herd_manager._handle_graduated_animals(graduated_animals, [mock_feed], mock_current_day_conditions, 15)
 
     assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in graduated_animals]
     assert mock_update_animal_array.call_args_list == [call(animal) for animal in graduated_animals]
     assert mock_add_animal_to_pen_and_id_map.call_args_list == [
-        call(animal, [mock_feed], mock_current_day_conditions, mock_total_inventory, 15) for animal in graduated_animals
+        call(animal, [mock_feed], mock_current_day_conditions, 15) for animal in graduated_animals
     ]
 
 
@@ -1038,14 +1030,11 @@ def test_handle_newly_added_animals(
     ]
     mock_feed = MagicMock(auto_spec=Feed)
     mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
-    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
-    herd_manager._handle_newly_added_animals(
-        new_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory, 15
-    )
+    herd_manager._handle_newly_added_animals(new_animals, [mock_feed], mock_current_day_conditions, 15)
 
     assert mock_add_animal_to_pen_and_id_map.call_args_list == [
-        call(animal, [mock_feed], mock_current_day_conditions, mock_total_inventory, 15) for animal in new_animals
+        call(animal, [mock_feed], mock_current_day_conditions, 15) for animal in new_animals
     ]
 
 
