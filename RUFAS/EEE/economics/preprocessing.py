@@ -210,14 +210,12 @@ class EconomicPreprocessor:
 
         values: List[float] = []
         info_map = {"class": self.__class__.__name__, "function": self._fetch_values.__name__}
-        flat_pool = self.om._get_flat_variables_pool()
         for path in sim_paths:
-            pattern = re.compile(path)
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
             matched = False
-            for variable_name, payload in flat_pool.items():
-                if pattern.search(variable_name):
-                    matched = True
-                    self._append_from_payload(values, payload)
+            for payload in filtered_pool.values():
+                matched = True
+                self._append_from_payload(values, payload)
             if not matched:
                 fallback_values = BIOPHYSICAL_FALLBACKS.get(path)
                 if fallback_values:
@@ -233,8 +231,10 @@ class EconomicPreprocessor:
     def _fetch_values_by_scenario(self, sim_paths: Iterable[str]) -> Dict[str, List[float]]:
         """Collect values per scenario from the OutputManager."""
 
-        flat_pool = self.om._get_flat_variables_pool()
-        if not flat_pool:
+        filtered_by_path: Dict[str, Dict[str, Any]] = {
+            path: self.om.filter_variables_pool({"filters": [path]}) for path in sim_paths
+        }
+        if not any(filtered_by_path.values()):
             fallback_values = self._fallback_values_by_scenario(sim_paths)
             return fallback_values
 
@@ -252,11 +252,8 @@ class EconomicPreprocessor:
         info_map = {"class": self.__class__.__name__, "function": self._fetch_values_by_scenario.__name__}
 
         for path in sim_paths:
-            pattern = re.compile(path)
             matched = False
-            for variable_name, payload in flat_pool.items():
-                if not pattern.search(variable_name):
-                    continue
+            for variable_name, payload in filtered_by_path.get(path, {}).items():
                 matched = True
                 if scenario_names == ["baseline"]:
                     scenario_key = "baseline"
@@ -297,16 +294,13 @@ class EconomicPreprocessor:
     def _collect_biophysical_wildcards(self, sim_paths: Iterable[str]) -> List[tuple[str, ...]]:
         """Collect wildcard values from matched biophysical variable names."""
 
-        flat_pool = self.om._get_flat_variables_pool()
         captures: List[tuple[str, ...]] = []
         seen: Set[tuple[str, ...]] = set()
 
         for path in sim_paths:
-            pattern = re.compile(path)
             capture_pattern = re.compile(path.replace(".*", "(.*?)"))
-            for variable_name in flat_pool:
-                if pattern.search(variable_name) is None:
-                    continue
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
+            for variable_name in filtered_pool:
                 capture_match = capture_pattern.search(variable_name)
                 if capture_match is None:
                     continue

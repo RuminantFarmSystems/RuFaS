@@ -1,4 +1,5 @@
 import pytest
+import re
 
 from RUFAS.EEE.economics import preprocessing
 
@@ -11,6 +12,13 @@ class DummyOutputManager:
 
     def _get_flat_variables_pool(self):
         return self._pool
+
+    def filter_variables_pool(self, filter_content):
+        filters = filter_content.get("filters", [])
+        if not filters:
+            return {}
+        pattern = re.compile(filters[0])
+        return {name: data for name, data in self._pool.items() if pattern.search(name)}
 
     def add_warning(self, code, message, info):
         self.warnings.append((code, message, info))
