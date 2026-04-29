@@ -470,9 +470,9 @@ def test_cross_validate_data(
         cv_path = ["mock/cv/path"]
         cv_blocks = [
             {
-                "cross-validation": [
-                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                "cross_validation": [
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -481,9 +481,9 @@ def test_cross_validate_data(
         cv_path = ["mock/cv/path"]
         cv_blocks = [
             {
-                "cross-validation": [
-                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                "cross_validation": [
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -492,10 +492,10 @@ def test_cross_validate_data(
         cv_path = ["mock/cv/path"]
         cv_blocks = [
             {
-                "cross-validation": [
-                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
-                    {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+                "cross_validation": [
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             }
         ]
@@ -504,14 +504,14 @@ def test_cross_validate_data(
         cv_path = ["mock/cv/path1", "mock/cv/path2"]
         cv_blocks = [
             {
-                "cross-validation": [
-                    {"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "target_and_save": {"x": 2}, "rules": [{"r": 2}]},
+                "cross_validation": [
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             },
             {
-                "cross-validation": [
-                    {"description": "cv3", "target_and_save": {"x": 3}, "rules": [{"r": 3}]},
+                "cross_validation": [
+                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             },
         ]
@@ -535,7 +535,7 @@ def test_cross_validate_data(
     for idx, call_ in enumerate(cv_call.call_args_list[:expected_cv_calls]):
         args, kwargs = call_
         target_and_save_result, block, eager = args
-        assert "target_and_save" in block
+        assert "aliases" in block
         assert eager is eager_termination
         assert isinstance(target_and_save_result, dict)
 
