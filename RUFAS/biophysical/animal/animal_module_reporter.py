@@ -1,6 +1,5 @@
 import sys
 from dataclasses import asdict
-from typing import Any
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
@@ -550,8 +549,8 @@ class AnimalModuleReporter:
             "potassium": MeasurementUnits.GRAMS,
         }
         info_map = {
-            "class": (class_name := AnimalModuleReporter.__name__),
-            "function": (function_name := AnimalModuleReporter.report_manure_excretions.__name__),
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_manure_excretions.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
         }
