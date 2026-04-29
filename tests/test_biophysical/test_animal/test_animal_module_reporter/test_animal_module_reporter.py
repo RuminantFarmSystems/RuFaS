@@ -1,5 +1,4 @@
 from dataclasses import asdict
-from typing import Any
 from unittest.mock import MagicMock, call
 from pytest_mock import MockerFixture
 import pytest
