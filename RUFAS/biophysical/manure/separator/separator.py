@@ -98,6 +98,13 @@ class Separator(Processor):
             The manure to be processed.
 
         """
+        is_received_manure_valid = self.check_manure_stream_compatibility(manure)
+        if is_received_manure_valid is False:
+            raise ValueError(
+                f"Separator {self.name} was assigned as a first processor. "
+                "The first processor for each manure stream must be either a handler "
+                "or an appropriate storage (open lot, bedded pack, or daily spread)."
+            )
         if self.held_manure is None:
             self.held_manure = manure
         else:

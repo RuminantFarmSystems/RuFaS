@@ -76,6 +76,23 @@ def test_receive_manure_accumulation(
     assert mock_separator.held_manure == expected, f"Expected {expected}, got {mock_separator.held_manure}"
 
 
+def test_separator_receive_manure_invalid_stream_raises(
+    mock_separator: Separator,
+    mocker: MockerFixture,
+) -> None:
+    """Test that an invalid manure stream raises a ValueError."""
+    mocker.patch.object(
+        mock_separator,
+        "check_manure_stream_compatibility",
+        return_value=False,
+    )
+
+    manure = ManureStream(10, 2, 3, 4, 5, 6, 8, 7, 10, 9, 1.5, 0.24, None)
+
+    with pytest.raises(ValueError, match="first processor"):
+        mock_separator.receive_manure(manure)
+
+
 @pytest.fixture
 def mock_manure_stream() -> ManureStream:
     """ManureStream object for testing."""
