@@ -470,3 +470,20 @@ def test_preprocess_bedding_mapping_style_wildcard_input_price_match(monkeypatch
     assert results["Section"]["Category"]["Bedding requirements"]["biophysical_aggregate"] == 15.0
     price_data = results["Section"]["Category"]["Bedding requirements"]["price_data"]
     assert set(price_data.keys()) == {"sand", "straw"}
+
+
+def test_collect_biophysical_wildcards_does_not_return_empty_groups(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1": {"values": [1]},
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2": {"values": [1]},
+        }
+    )
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    preprocessor = preprocessing.EconomicPreprocessor()
+    captures = preprocessor._collect_biophysical_wildcards(
+        ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]
+    )
+    assert captures == [("1",), ("2",)]

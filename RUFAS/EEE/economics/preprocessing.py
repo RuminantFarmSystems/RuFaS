@@ -298,13 +298,14 @@ class EconomicPreprocessor:
         seen: Set[tuple[str, ...]] = set()
 
         for path in sim_paths:
-            capture_pattern = re.compile(path.replace(".*", "(.*?)"))
+            capture_pattern = re.compile(f"^{path.replace('.*', '(.+)')}$")
             filtered_pool = self.om.filter_variables_pool({"filters": [path]})
             for variable_name in filtered_pool:
-                capture_match = capture_pattern.search(variable_name)
+                capture_match = capture_pattern.fullmatch(variable_name)
                 if capture_match is None:
                     continue
                 groups = capture_match.groups()
+                groups = tuple(group for group in groups if group != "")
                 if not groups:
                     continue
                 if groups in seen:
