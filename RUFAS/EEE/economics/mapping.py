@@ -54,7 +54,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
                     "sand": "commodity_prices_bedding_sand_dollar_per_head",
                     "sawdust": "commodity_prices_bedding_sawdust_dollar_per_head",
-                    "staw": "commodity_prices_bedding_straw_dollar_per_head",
+                    "straw": "commodity_prices_bedding_straw_dollar_per_head",
                 },
                 "preprocessing": "dollar per "
                 "head is "
