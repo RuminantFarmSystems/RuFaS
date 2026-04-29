@@ -487,3 +487,44 @@ def test_collect_biophysical_wildcards_does_not_return_empty_groups(monkeypatch:
         ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]
     )
     assert captures == [("1",), ("2",)]
+
+
+def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager(
+        {
+            "economic_inputs.feed.A.cost": 5,
+            "economic_inputs.feed.B.cost": 6,
+            "economic_inputs.feed.C.cost": 7,
+        }
+    )
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_X_cost": {"values": [1]},
+            "FeedManager.purchase_feed.ration_interval_Y_cost": {"values": [1]},
+            "FeedManager.purchase_feed.ration_interval_Z_cost": {"values": [1]},
+        }
+    )
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Section": {
+                "Category": {
+                    "Item": {
+                        "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
+                        "input_manager": ["economic_inputs.feed.*.cost"],
+                        "wildcard_value_map": {"X": "A", "Y": "B", "Z": "C"},
+                    }
+                }
+            }
+        },
+    )
+    preprocessor = preprocessing.EconomicPreprocessor()
+    values, _ = preprocessor._fetch_input_values(
+        ["economic_inputs.feed.*.cost"],
+        [("X",), ("Y",), ("Z",)],
+        {"X": "A", "Y": "B", "Z": "C"},
+    )
+    assert values == [5.0, 6.0, 7.0]

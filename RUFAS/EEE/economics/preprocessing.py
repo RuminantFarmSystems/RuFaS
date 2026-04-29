@@ -41,6 +41,7 @@ class EconomicItem:
     input_manager: List[str]
     economics_files: Any
     match_source: str | None
+    wildcard_value_map: Dict[str, str] | None
     preprocessing: str | None
 
 
@@ -161,6 +162,7 @@ class EconomicPreprocessor:
                     preprocessing = details.get("preprocessing")
                     economics_files = details.get("economics_files")
                     match_source = details.get("match_source")
+                    wildcard_value_map = details.get("wildcard_value_map")
                     if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
@@ -176,6 +178,7 @@ class EconomicPreprocessor:
                             input_manager=list(input_manager),
                             economics_files=economics_files,
                             match_source=match_source,
+                            wildcard_value_map=wildcard_value_map if isinstance(wildcard_value_map, dict) else None,
                             preprocessing=preprocessing,
                         )
                     )
@@ -319,6 +322,7 @@ class EconomicPreprocessor:
         self,
         path: str,
         wildcard_values: Iterable[tuple[str, ...]],
+        wildcard_value_map: Dict[str, str] | None = None,
     ) -> List[str]:
         """Expand InputManager wildcard paths using biophysical wildcard matches."""
 
@@ -336,7 +340,8 @@ class EconomicPreprocessor:
             replacement_values = groups[:wildcard_count]
             expanded = path
             for replacement in replacement_values:
-                expanded = expanded.replace("*", replacement, 1)
+                mapped_replacement = wildcard_value_map.get(replacement, replacement) if wildcard_value_map else replacement
+                expanded = expanded.replace("*", mapped_replacement, 1)
 
             if expanded in seen:
                 continue
@@ -349,6 +354,7 @@ class EconomicPreprocessor:
         self,
         input_paths: Iterable[str],
         biophysical_wildcards: Iterable[tuple[str, ...]] | None = None,
+        wildcard_value_map: Dict[str, str] | None = None,
     ) -> tuple[List[float], List[str]]:
         """Collect values from the InputManager for the provided paths."""
 
@@ -360,7 +366,7 @@ class EconomicPreprocessor:
         for path in input_paths:
             candidate_paths = [path]
             if "*" in path:
-                expanded_paths = self._expand_input_path_with_wildcards(path, wildcard_values)
+                expanded_paths = self._expand_input_path_with_wildcards(path, wildcard_values, wildcard_value_map)
                 if expanded_paths:
                     candidate_paths = expanded_paths
                 else:
@@ -662,7 +668,11 @@ class EconomicPreprocessor:
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)
-            input_values, input_match_values = self._fetch_input_values(item.input_manager, wildcard_values)
+            input_values, input_match_values = self._fetch_input_values(
+                item.input_manager,
+                wildcard_values,
+                item.wildcard_value_map,
+            )
 
             if values_by_scenario:
                 for scenario, biophysical_values in values_by_scenario.items():

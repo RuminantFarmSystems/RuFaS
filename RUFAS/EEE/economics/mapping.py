@@ -50,6 +50,12 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
                 "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
                 "match_source": "input_manager",
+                "wildcard_value_map": {
+                    "0_CALF": "0",
+                    "1_GROWING": "1",
+                    "2_CLOSE_UP": "2",
+                    "3_LAC_COW": "3"
+                },
                 "economics_files": {
                     "CBPB": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head",
                     "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
