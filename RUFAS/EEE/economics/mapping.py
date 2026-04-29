@@ -48,26 +48,16 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Bedding requirements": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
+                "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
+                "match_source": "input_manager",
                 "economics_files": {
                     "CBPB": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head",
-                    "input_manager_location": "animal.pen_information.*.manure_streams.0.bedding_name",
                     "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
                     "sand": "commodity_prices_bedding_sand_dollar_per_head",
                     "sawdust": "commodity_prices_bedding_sawdust_dollar_per_head",
                     "straw": "commodity_prices_bedding_straw_dollar_per_head",
                 },
-                "preprocessing": "dollar per "
-                "head is "
-                "reported on "
-                "an annual "
-                "basis, Map "
-                "bedding price "
-                "to number of "
-                "animals for "
-                "each bedding "
-                "type, "
-                "depending on "
-                "their pen.",
+                "preprocessing": "average number of animals in each pen",
             },
             "Purchased heifers": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"],

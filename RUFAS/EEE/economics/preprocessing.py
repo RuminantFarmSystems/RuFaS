@@ -40,6 +40,7 @@ class EconomicItem:
     biophysical_simulation: List[str]
     input_manager: List[str]
     economics_files: Any
+    match_source: str | None
     preprocessing: str | None
 
 
@@ -159,6 +160,7 @@ class EconomicPreprocessor:
                     input_manager = details.get("input_manager") or []
                     preprocessing = details.get("preprocessing")
                     economics_files = details.get("economics_files")
+                    match_source = details.get("match_source")
                     if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
@@ -173,6 +175,7 @@ class EconomicPreprocessor:
                             biophysical_simulation=list(biophysical_simulation),
                             input_manager=list(input_manager),
                             economics_files=economics_files,
+                            match_source=match_source,
                             preprocessing=preprocessing,
                         )
                     )
@@ -290,22 +293,106 @@ class EconomicPreprocessor:
             return values_by_scenario
         return {}
 
-    def _fetch_input_values(self, input_paths: Iterable[str]) -> List[float]:
+
+    def _collect_biophysical_wildcards(self, sim_paths: Iterable[str]) -> List[tuple[str, ...]]:
+        """Collect wildcard values from matched biophysical variable names."""
+
+        flat_pool = self.om._get_flat_variables_pool()
+        captures: List[tuple[str, ...]] = []
+        seen: Set[tuple[str, ...]] = set()
+
+        for path in sim_paths:
+            pattern = re.compile(path)
+            capture_pattern = re.compile(path.replace(".*", "(.*?)"))
+            for variable_name in flat_pool:
+                if pattern.search(variable_name) is None:
+                    continue
+                capture_match = capture_pattern.search(variable_name)
+                if capture_match is None:
+                    continue
+                groups = capture_match.groups()
+                if not groups:
+                    continue
+                if groups in seen:
+                    continue
+                seen.add(groups)
+                captures.append(groups)
+
+        return captures
+
+    def _expand_input_path_with_wildcards(
+        self,
+        path: str,
+        wildcard_values: Iterable[tuple[str, ...]],
+    ) -> List[str]:
+        """Expand InputManager wildcard paths using biophysical wildcard matches."""
+
+        if "*" not in path:
+            return [path]
+
+        expanded_paths: List[str] = []
+        seen: Set[str] = set()
+        wildcard_count = path.count("*")
+
+        for groups in wildcard_values:
+            if len(groups) < wildcard_count:
+                continue
+
+            replacement_values = groups[:wildcard_count]
+            expanded = path
+            for replacement in replacement_values:
+                expanded = expanded.replace("*", replacement, 1)
+
+            if expanded in seen:
+                continue
+            seen.add(expanded)
+            expanded_paths.append(expanded)
+
+        return expanded_paths
+
+    def _fetch_input_values(
+        self,
+        input_paths: Iterable[str],
+        biophysical_wildcards: Iterable[tuple[str, ...]] | None = None,
+    ) -> tuple[List[float], List[str]]:
         """Collect values from the InputManager for the provided paths."""
 
         values: List[float] = []
+        exact_match_values: List[str] = []
         info_map = {"class": self.__class__.__name__, "function": self._fetch_input_values.__name__}
+        wildcard_values = list(biophysical_wildcards or [])
+
         for path in input_paths:
-            data = self.im.get_data(path)
-            if data is None:
-                self.om.add_warning(
-                    "MissingEconomicInput",
-                    f"No economic input found at '{path}'",
-                    info_map,
-                )
-                continue
-            self._append_from_payload(values, data)
-        return values
+            candidate_paths = [path]
+            if "*" in path:
+                expanded_paths = self._expand_input_path_with_wildcards(path, wildcard_values)
+                if expanded_paths:
+                    candidate_paths = expanded_paths
+                else:
+                    self.om.add_warning(
+                        "MissingEconomicInputWildcard",
+                        f"Could not expand wildcard path '{path}' from biophysical matches",
+                        info_map,
+                    )
+                    continue
+
+            for candidate_path in candidate_paths:
+                data = self.im.get_data(candidate_path)
+                if data is None:
+                    self.om.add_warning(
+                        "MissingEconomicInput",
+                        f"No economic input found at '{candidate_path}'",
+                        info_map,
+                    )
+                    continue
+                if isinstance(data, str):
+                    exact_match_values.append(data)
+                elif isinstance(data, (list, tuple, set)):
+                    for value in data:
+                        if isinstance(value, str):
+                            exact_match_values.append(value)
+                self._append_from_payload(values, data)
+        return values, exact_match_values
 
     def _extract_price_values(self, price_data: Any) -> List[float]:
         """Extract numeric price values from pricing payloads."""
@@ -496,6 +583,56 @@ class EconomicPreprocessor:
             prices[label] = price_data
         return prices
 
+    def _extract_selector_values(self, selection: Any) -> List[str]:
+        """Normalize selector values into lowercase keys."""
+
+        if selection is None:
+            return []
+        if isinstance(selection, dict):
+            values = list(selection.keys())
+        elif isinstance(selection, (list, tuple, set)):
+            values = list(selection)
+        else:
+            values = [selection]
+        return [str(value).lower() for value in values]
+
+    def _fetch_prices_with_exact_matches(
+        self,
+        economics_files: Any,
+        match_source: str | None = None,
+        input_match_values: Iterable[str] | None = None,
+        biophysical_match_values: Iterable[str] | None = None,
+    ) -> Dict[str, Any]:
+        """Collect pricing by exact key match against mapping options when requested."""
+
+        if not isinstance(economics_files, dict):
+            return self._fetch_prices(economics_files)
+
+        source = str(match_source or "").lower()
+        if source not in {"input_manager", "biophysical_simulation"}:
+            return self._fetch_prices(economics_files)
+
+        requested_values = (
+            list(input_match_values or [])
+            if source == "input_manager"
+            else list(biophysical_match_values or [])
+        )
+        requested = {str(value).lower() for value in requested_values if str(value).strip()}
+        if not requested:
+            return self._fetch_prices(economics_files)
+
+        info_map = {"class": self.__class__.__name__, "function": self._fetch_prices_with_exact_matches.__name__}
+        prices: Dict[str, Any] = {}
+        for option, file_key in economics_files.items():
+            if option in {"input_manager_location", "biophysical_simulation_location"}:
+                continue
+            if str(option).lower() not in requested or not isinstance(file_key, str):
+                continue
+            price_data = self._get_data_with_handling(file_key, info_map)
+            if price_data is not None:
+                prices[option] = price_data
+        return prices
+
     def _aggregate(self, values: List[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
         if not values:
@@ -529,7 +666,8 @@ class EconomicPreprocessor:
             category_data = section_data.setdefault(item.category, {})
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
-            input_values = self._fetch_input_values(item.input_manager)
+            wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)
+            input_values, input_match_values = self._fetch_input_values(item.input_manager, wildcard_values)
 
             if values_by_scenario:
                 for scenario, biophysical_values in values_by_scenario.items():
@@ -556,7 +694,13 @@ class EconomicPreprocessor:
                     info_map,
                 )
 
-            price_data = self._fetch_prices(item.economics_files)
+            biophysical_match_values = [groups[0] for groups in wildcard_values if groups]
+            price_data = self._fetch_prices_with_exact_matches(
+                item.economics_files,
+                match_source=item.match_source,
+                input_match_values=input_match_values,
+                biophysical_match_values=biophysical_match_values,
+            )
             if item.economics_files and not price_data:
                 self.om.add_warning(
                     "MissingEconomicsFile",
