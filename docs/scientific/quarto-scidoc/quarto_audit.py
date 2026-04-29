@@ -444,28 +444,15 @@ def add_sheet(wb: Workbook, title: str, headers: list[str], rows: list[dict]) ->
         ws.append([row.get(header, "") for header in headers])
     autofit_worksheet(ws)
 
-# ------------------------------------------------------------
-# Main
-# ------------------------------------------------------------
-
-def main() -> None:
-    if not PROJECT_ROOT.exists():
-        raise FileNotFoundError(f"Project root not found: {PROJECT_ROOT}")
-
-    qmd_files = iter_files(PROJECT_ROOT, TEXT_FILE_SUFFIXES)
-    bib_files = iter_files(PROJECT_ROOT, BIB_FILE_SUFFIXES)
-
-    labels: list[dict] = []
-    label_refs: list[dict] = []
-    bib_citations: list[dict] = []
-    bib_entries: list[dict] = []
-    hyperlinks: list[dict] = []
-    equations: list[dict] = []
-    declared_bib_paths: set[Path] = set()
+def collect_data(qmd_files, bib_files):
+    labels, label_refs, bib_citations = [], [], []
+    bib_entries, hyperlinks, equations = [], [], []
+    declared_bib_paths = set()
 
     for file_path in qmd_files:
         relpath = relative_str(file_path, PROJECT_ROOT)
         text = safe_read_text(file_path)
+
         labels.extend(extract_labels(text, relpath))
         label_refs.extend(extract_label_references(text, relpath))
         bib_citations.extend(extract_bib_citations(text, relpath))
@@ -478,27 +465,52 @@ def main() -> None:
         text = safe_read_text(bib_file)
         bib_entries.extend(extract_bib_entries(text, relpath))
 
+    return {
+        "labels": dedupe_rows(labels, ("label", "file", "line", "source")),
+        "label_refs": dedupe_rows(label_refs, ("reference", "file", "line", "syntax")),
+        "bib_citations": dedupe_rows(bib_citations, ("citation_key", "file", "line")),
+        "bib_entries": dedupe_rows(bib_entries, ("bib_key", "file", "line")),
+        "hyperlinks": dedupe_rows(hyperlinks, ("link_text", "target", "file", "line")),
+        "equations": equations,
+        "declared_bib_paths": declared_bib_paths,
+    }
+
+def group_by(rows: list[dict], key: str) -> dict[str, list[dict]]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        grouped[row[key]].append(row)
+    return grouped
+# ------------------------------------------------------------
+# Main
+# ------------------------------------------------------------
+
+def main() -> None:
+    if not PROJECT_ROOT.exists():
+        raise FileNotFoundError(f"Project root not found: {PROJECT_ROOT}")
+
+    qmd_files = iter_files(PROJECT_ROOT, TEXT_FILE_SUFFIXES)
+    bib_files = iter_files(PROJECT_ROOT, BIB_FILE_SUFFIXES)
+
+    audit = collect_data(qmd_files, bib_files)
+    
+    labels = audit["labels"]   
+    label_refs = audit["label_refs"]
+    bib_citations = audit["bib_citations"]
+    bib_entries = audit["bib_entries"]
+    hyperlinks = audit["hyperlinks"]
+    equations = audit["equations"]
+    declared_bib_paths = audit["declared_bib_paths"]
+
     labels = dedupe_rows(labels, ("label", "file", "line", "source"))
     label_refs = dedupe_rows(label_refs, ("reference", "file", "line", "syntax"))
     bib_citations = dedupe_rows(bib_citations, ("citation_key", "file", "line"))
     bib_entries = dedupe_rows(bib_entries, ("bib_key", "file", "line"))
     hyperlinks = dedupe_rows(hyperlinks, ("link_text", "target", "file", "line"))
 
-    label_to_rows: dict[str, list[dict]] = defaultdict(list)
-    for row in labels:
-        label_to_rows[row["label"]].append(row)
-
-    ref_to_rows: dict[str, list[dict]] = defaultdict(list)
-    for row in label_refs:
-        ref_to_rows[row["reference"]].append(row)
-
-    bibkey_to_rows: dict[str, list[dict]] = defaultdict(list)
-    for row in bib_entries:
-        bibkey_to_rows[row["bib_key"]].append(row)
-
-    citation_to_rows: dict[str, list[dict]] = defaultdict(list)
-    for row in bib_citations:
-        citation_to_rows[row["citation_key"]].append(row)
+    label_to_rows = group_by(labels, "label")
+    ref_to_rows = group_by(label_refs, "reference")
+    bibkey_to_rows = group_by(bib_entries, "bib_key")
+    citation_to_rows = group_by(bib_citations, "citation_key")
 
     all_label_names = set(label_to_rows)
     all_ref_names = set(ref_to_rows)
@@ -622,7 +634,7 @@ def main() -> None:
                 }
             )
 
-        eqid_to_rows: dict[str, list[dict]] = defaultdict(list)
+    eqid_to_rows: dict[str, list[dict]] = defaultdict(list)
     for row in equations:
         eqid_to_rows[row["eq_id"]].append(row)
 
@@ -736,7 +748,6 @@ def main() -> None:
     add_sheet(wb, "internal_links", ["link_text", "target", "link_type", "file", "line", "context"], internal_links)
     add_sheet(wb, "anchor_links", ["link_text", "target", "link_type", "file", "line", "context"], anchor_links)
     add_sheet(wb, "other_links", ["link_text", "target", "link_type", "file", "line", "context"], other_links)
-    add_sheet(wb, "broken_internal_links", ["link_text", "target", "resolved_path", "file", "line", "context"], broken_internal_links)
     add_sheet(wb, "broken_internal_links", ["link_text", "target", "resolved_path", "file", "line", "context"], broken_internal_links)
     add_sheet(
         wb,
