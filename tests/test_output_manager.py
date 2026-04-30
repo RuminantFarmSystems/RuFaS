@@ -1570,8 +1570,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
             call({"variable_name": {"values": []}}, expected_daily_full_path),
             call(
                 {
-                    "variable_name": {"values": []},
-                    "report_count": {"values": []},
+                    "variable_report_count": {"values": []},
                 },
                 expected_non_daily_full_path,
             ),
@@ -1658,10 +1657,13 @@ def test_get_variables_not_reported_daily() -> None:
     actual = output_manager._get_variables_not_reported_daily()
 
     assert actual == {
-        "variable_name": {
-            "values": ["every_other_day_variable", "irregular_nested_variable.a", "irregular_nested_variable.b"]
+        "variable_report_count": {
+            "values": [
+                '{"every_other_day_variable": 2}',
+                '{"irregular_nested_variable.a": 3}',
+                '{"irregular_nested_variable.b": 3}',
+            ]
         },
-        "report_count": {"values": [2, 3, 3]},
     }
 
 

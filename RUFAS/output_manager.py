@@ -1817,7 +1817,7 @@ class OutputManager(object):
         the simulation.
 
         The `variables_not_reported_daily` CSV lists variables that were not reported exactly once per simulation day
-        and records how many times each variable was reported.
+        and records each entry as a `{"variable_name": report_count}` mapping.
 
         Parameters
         ----------
@@ -1863,8 +1863,7 @@ class OutputManager(object):
 
     def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
         """Builds a CSV-ready dictionary listing variables not reported daily."""
-        variable_names: list[str] = []
-        report_counts: list[int] = []
+        variable_report_counts: list[str] = []
         simulation_length = self._get_simulation_length_days()
 
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
@@ -1876,15 +1875,9 @@ class OutputManager(object):
                 continue
 
             reported_variable_names = self._get_reported_variable_names(variable_name, values)
-            repeated_row_count = len(reported_variable_names)
+            variable_report_counts.extend([f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names])
 
-            variable_names.extend(reported_variable_names)
-            report_counts.extend([len(values)] * repeated_row_count)
-
-        return {
-            "variable_name": {"values": variable_names},
-            "report_count": {"values": report_counts},
-        }
+        return {"variable_report_count": {"values": variable_report_counts}}
 
     def _get_simulation_length_days(self) -> int | None:
         """Returns the simulation length in days if OutputManager has a time object with that value."""
