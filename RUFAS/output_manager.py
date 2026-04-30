@@ -130,10 +130,12 @@ class OutputManager(object):
         A RufasTime object used to track the simulation time
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
-    _variables_usage_filter_counter : Counter[str]
-        A Counter object used to keep track of the number of times a variable in the variables_pool is selected by
-        post-processing filters. This is filter usage, not the number of times the variable was reported to
-        OutputManager.
+    _filtered_variable_key_counter : Counter[str]
+        A Counter-like registry of filtered variable keys. Dictionary-valued variables pre-seed subkeys at 0, and
+        counts increase when post-processing filters select matching variables or subkeys. The pre-seeding exists
+        because dictionary-valued variables can later be filtered by subkey (for example `variable.min`), even though
+        those subkeys are not stored as standalone top-level variables in the pool. Non-dictionary variables are not
+        pre-seeded; they only appear here once a filter actually selects them.
     is_end_to_end_testing_run : bool, default False
         Indicates if end-to-end testing is being run.
     is_first_post_processing : bool, default True
@@ -216,7 +218,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
-            self._variables_usage_filter_counter: Counter[str] = collections.Counter()
+            self._filtered_variable_key_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.is_first_post_processing: bool = True
 
@@ -388,7 +390,7 @@ class OutputManager(object):
 
         if isinstance(value, dict):
             for k, v in value.items():
-                self._variables_usage_filter_counter[f"{key}.{k}"] = 0
+                self._filtered_variable_key_counter[f"{key}.{k}"] = 0
 
         if self.chunkification:
             self.current_pool_size += self.average_add_variable_call_addition
@@ -1422,7 +1424,7 @@ class OutputManager(object):
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
-                self._variables_usage_filter_counter.update([key])
+                self._filtered_variable_key_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -1442,7 +1444,7 @@ class OutputManager(object):
                         results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
                             "values": filtered_value
                         }
-                    self._variables_usage_filter_counter.update([f"{key}.{filtered_key}"])
+                    self._filtered_variable_key_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
@@ -1827,7 +1829,7 @@ class OutputManager(object):
 
         filename = self.generate_file_name("variables_usage_counts", "csv")
         file_path_csv = path / filename
-        sorted_variables_usage_counter_desc = self._variables_usage_filter_counter.most_common()
+        sorted_variables_usage_counter_desc = self._filtered_variable_key_counter.most_common()
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}

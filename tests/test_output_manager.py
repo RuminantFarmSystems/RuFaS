@@ -933,7 +933,7 @@ def test_add_variable(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_filter_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
 
     if expected_exception:
         with pytest.raises(expected_exception):
@@ -951,7 +951,7 @@ def test_add_variable(
         )
         if isinstance(value, dict):
             for k in value.keys():
-                assert output_manager._variables_usage_filter_counter[f"key_with_prefix.{k}"] == 0
+                assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
 
 @pytest.mark.parametrize(
@@ -986,7 +986,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_filter_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1003,7 +1003,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_filter_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1042,7 +1042,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_filter_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1059,7 +1059,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_filter_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 9
@@ -1099,7 +1099,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_filter_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1116,7 +1116,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_filter_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1156,7 +1156,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_filter_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1173,7 +1173,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_filter_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -2571,12 +2571,12 @@ def test_parse_filtered_variables(
     expected_counter: Counter[str],
 ) -> None:
     """Tests _parse_filtered_variables in the Output Manager."""
-    mock_output_manager._variables_usage_filter_counter = Counter()
+    mock_output_manager._filtered_variable_key_counter = Counter()
 
     actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", exclusion)
 
     assert actual == expected
-    assert mock_output_manager._variables_usage_filter_counter == expected_counter
+    assert mock_output_manager._filtered_variable_key_counter == expected_counter
 
 
 @pytest.mark.parametrize(
