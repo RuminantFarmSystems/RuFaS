@@ -332,7 +332,75 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False) -> None:
+    def _add_simulation_day_to_info_map(
+        self,
+        info_map: dict[str, Any],
+        overwrite: bool = False,
+        simulation_day: int | None = None,
+        name: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Update an info_map to include simulation_day
+
+        Parameters
+        ----------
+        info_map: dict[str, Any]
+            The original info_map to copy and optionally update
+        overwrite: bool, default False
+            Whether to overwrite an existing "simulation_day" entry
+        simulation_day: optional int
+            The simulation day to insert. If None, self.time.simulation_day is used when available.
+        name: optional str
+            The name of the variable for which simulation_day is added to the info_map (used for warnings)
+
+        Returns
+        -------
+        the info map, updated to include simulation_day, if it is available.
+
+        Notes
+        -----
+        A warning is triggered if the resulting info_map has no "simulation_day" value (or a value of None)
+        """
+        info_map_copy = dict(info_map)
+
+        time_day = self.time.simulation_day if hasattr(self.time, "simulation_day") else None
+
+        map_has_valid_day = info_map_copy.get("simulation_day") is not None
+
+        day_to_use = simulation_day if simulation_day is not None else time_day
+
+        # Don't overwrite a valid simulation_day with None
+        if day_to_use is None and map_has_valid_day:
+            return info_map_copy
+
+        should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
+
+        if day_to_use is not None and should_add_sim_day:
+            info_map_copy["simulation_day"] = day_to_use
+
+        if day_to_use is None and not map_has_valid_day:
+            warning_info_map = {
+                "class": self.__class__.__name__,
+                "function": self._add_simulation_day_to_info_map.__name__,
+            }
+            self.add_warning(
+                name="no simulation_day available",
+                msg=f"no simulation day was available to add to the info_map for variable {name} "
+                + f"(from {info_map_copy.get('class')}.{info_map_copy.get('function')})",
+                info_map=warning_info_map,
+            )
+
+        return info_map_copy
+
+    def add_variable(
+        self,
+        name: str,
+        value: Any,
+        info_map: dict[str, Any],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
+        simulation_day: int | None = None,
+    ) -> None:
         """
         Adds a variable to the pool.
 
@@ -356,8 +424,17 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         first_info_map_only : bool, default False
-            If true, records only the first info map passed for that variable. If false, records all info maps passed
+            If True, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        overwrite_simulation_day: bool, default False
+            If True, an existing "simulation_day" value in the info_map will be replaced. The replacement value will
+            be the simulation_day argument provided to this function (if it is not None), if it is available;
+            Otherwise, `self.time.simulation_day` will be used, if available. If neither value is available, the
+            info_map is returned unchanged (no simulation_day is added or updated).
+        simulation_day: optional int
+            if present, this simulation_day will be used, otherwise the simulation_day will be taken from the time
+            attribute, if present. This option is provided to allow variables created outside the main simulation
+            loop (i.e., herd initialization) to be padded.
 
         Raises
         ------
@@ -374,8 +451,12 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
-        key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
+        updated_info_map = self._add_simulation_day_to_info_map(
+            info_map, overwrite_simulation_day, simulation_day, name
+        )
+
+        key = self._generate_key(name, updated_info_map)
+        self._add_to_pool(self.variables_pool, key, value, {**updated_info_map, "units": units}, first_info_map_only)
 
         if isinstance(value, dict):
             for k, v in value.items():
@@ -394,7 +475,10 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-        self, variables: list[tuple[dict[str, Any], dict[str, Any]]], first_info_map_only: bool = False
+        self,
+        variables: list[tuple[dict[str, Any], dict[str, Any]]],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Iterate through all variables and call add_variable() on each of them.
@@ -406,10 +490,12 @@ class OutputManager(object):
             being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
             If true, records only the first info_map passed for each variable.
+        overwrite_simulation_day: bool, default False
+            Passed to add_variable(). If true, any simulation_day value provided in the info_maps is overwritten.
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
-            self.add_variable(name, value, info_map, first_info_map_only)
+            self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
     def _save_current_variable_pool(self) -> None:
         """
