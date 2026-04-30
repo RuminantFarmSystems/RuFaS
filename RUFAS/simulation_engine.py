@@ -140,7 +140,9 @@ class SimulationEngine:
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
         self.is_ration_defined_by_user = ration_config["user_input"]
-        max_daily_feed_recalculations_per_year: int = feeds_config["max_daily_feed_recalculations_per_year"]
+        max_daily_feed_recalculations_per_year: int = feeds_config["ration_formulation_parameters"][
+            "max_daily_feed_recalculations_per_year"
+        ]
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
