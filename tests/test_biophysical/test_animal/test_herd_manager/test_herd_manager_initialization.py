@@ -112,8 +112,29 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
         "pen_information": [],
     }
 
-    feed_data = {"some": "feed-config"}
-    allowances_data = [{"purchased_feed": 1}, {"purchased_feed": 2}, {"purchased_feed": 3}]
+    feed_data = {
+        "feeds": [
+            {
+                "feed_type": 1,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 2,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 3,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+        ]
+    }
+    feeds_data = feed_data["feeds"]
 
     def get_data_side_effect(key: str) -> Any:
         if key == "config":
@@ -122,8 +143,8 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
             return animal_data
         if key == "feed":
             return feed_data
-        if key == "feed.allowances":
-            return allowances_data
+        if key == "feed.feeds":
+            return feeds_data
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect

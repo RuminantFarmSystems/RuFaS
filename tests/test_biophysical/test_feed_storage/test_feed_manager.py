@@ -258,6 +258,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     """Test that Feed Manager is initialized correctly."""
     feed_1, feed_2 = MagicMock(auto_spec=Feed), MagicMock(auto_spec=Feed)
     feed_1.rufas_id, feed_2.rufas_id = 1, 2
+
     mock_setup_available_feeds = mocker.patch(
         "RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds",
         return_value=(mock_available_feeds := [feed_1, feed_2]),
@@ -265,6 +266,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     mock_planning_cycle_allowance_init = mocker.patch.object(PlanningCycleAllowance, "__init__", return_value=None)
     mock_runtime_purchase_allowance_init = mocker.patch.object(RuntimePurchaseAllowance, "__init__", return_value=None)
     mock_advance_purchase_allowance_init = mocker.patch.object(AdvancePurchaseAllowance, "__init__", return_value=None)
+
     mock_create_all_storages = mocker.patch.object(
         FeedManager,
         "_create_all_storages",
@@ -274,19 +276,30 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
         self, "active_storages", {"Test Storage": storage}
     )
 
-    feed_manager = FeedManager(
-        feed_config=(
-            mock_feed_config := {
-                "allowances": [
-                    {
-                        "purchased_feed": 1,
-                        "planning_cycle_allowance": 0.0,
-                        "runtime_purchase_allowance": 0.0,
-                        "advance_purchase_allowance": 0.0,
-                    }
-                ]
+    mock_feed_config = {
+        "feeds": [
+            {
+                "feed_type": 1,
+                "purchased_feed_cost": 0.0,
+                "buffer": 0.0,
+                "planning_cycle_allowance": 0.0,
+                "runtime_purchase_allowance": 0.0,
+                "advance_purchase_allowance": 0.0,
             }
-        ),
+        ]
+    }
+
+    expected_allowances = [
+        {
+            "purchased_feed": 1,
+            "planning_cycle_allowance": 0.0,
+            "runtime_purchase_allowance": 0.0,
+            "advance_purchase_allowance": 0.0,
+        }
+    ]
+
+    feed_manager = FeedManager(
+        feed_config=mock_feed_config,
         nutrient_standard=(mock_nutrient_standard := NutrientStandard.NASEM),
         feed_storage_configs={"type": "pile", "rufas_id": 1, "field_name": "field_1", "crop_name": "corn"},
         feed_storage_instances={"Test Storage": ["instance_1"]},
@@ -295,9 +308,11 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     assert feed_manager.active_storages == {"Test Storage": storage}
     mock_setup_available_feeds.assert_called_once_with(mock_feed_config, mock_nutrient_standard)
     assert feed_manager.available_feeds == mock_available_feeds
-    mock_planning_cycle_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
-    mock_runtime_purchase_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
-    mock_advance_purchase_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
+
+    mock_planning_cycle_allowance_init.assert_called_once_with(expected_allowances)
+    mock_runtime_purchase_allowance_init.assert_called_once_with(expected_allowances)
+    mock_advance_purchase_allowance_init.assert_called_once_with(expected_allowances)
+
     assert mock_create_all_storages.call_count == 1
     assert feed_manager.crop_to_rufas_id == {"corn_silage": 1}
 
@@ -1330,9 +1345,9 @@ def test_setup_available_feeds_using_real_feed_objects(
     mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
 
     feed_config = {
-        "purchased_feeds": [
-            {"purchased_feed": 2, "purchased_feed_cost": 2.0, "buffer": 0.0},
-            {"purchased_feed": 1, "purchased_feed_cost": 1.0, "buffer": 0.0},
+        "feeds": [
+            {"feed_type": 2, "purchased_feed_cost": 2.0, "buffer": 0.0},
+            {"feed_type": 1, "purchased_feed_cost": 1.0, "buffer": 0.0},
         ]
     }
 
