@@ -384,7 +384,7 @@ class SimulationEngine:
             self.time.current_date.date(), self.weather, self.time
         )
 
-        all_manure_data = self.herd_manager.daily_routines(
+        all_manure_data = self.herd_manager.execute_daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
 
