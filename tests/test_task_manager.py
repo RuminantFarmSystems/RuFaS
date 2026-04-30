@@ -350,6 +350,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "save_animals_directory": "/output/herd",
                 "logs_directory": "/output/logs",
                 "suppress_log_files": True,
+                "output_prefix": "herd_init",
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
                 "convert_variable_table_path": "dummy.csv",
@@ -367,6 +368,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "save_animals_directory": "/output/herd",
                 "logs_directory": "/output/logs",
                 "suppress_log_files": False,
+                "output_prefix": "sim_multi",
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
                 "convert_variable_table_path": "dummy.csv",
@@ -560,7 +562,11 @@ def test_handle_post_processing_load_pool(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
-    """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True."""
+    """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True.
+
+    The load_pool_from_file parameter is kept for backwards compatibility but no longer triggers
+    any pool-loading behaviour; loading is now driven by args["load_saved_output_pools"].
+    """
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
@@ -593,9 +599,9 @@ def test_handle_post_processing_load_pool(
         load_pool_from_file=True,
     )
 
-    mock_flush_pools.assert_called_once()
-    mock_load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
-    mock_set_metadata_prefix.assert_called_once_with("reload")
+    mock_flush_pools.assert_not_called()
+    mock_load_variables_pool_from_file.assert_not_called()
+    mock_set_metadata_prefix.assert_not_called()
 
 
 def test_handle_post_processing_save_result(
