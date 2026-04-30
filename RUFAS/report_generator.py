@@ -35,7 +35,7 @@ class ReportGenerator:
     ReportGenerator consumes variables selected from OutputManager by filters. To inspect whether source variables were
     reported to OutputManager daily or on another cadence, use OutputManager's `report_variables_usage_counts()` output:
     `variables_usage_counts` shows filter selection counts, and `variables_not_reported_daily` lists variables whose
-    observations were not recorded exactly once per simulation day.
+    observations were not recorded exactly once per simulation day, along with how many times they were reported.
     """
 
     def __init__(self, time=None) -> None:

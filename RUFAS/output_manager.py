@@ -130,7 +130,7 @@ class OutputManager(object):
         A RufasTime object used to track the simulation time
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
-    _variables_usage_counter : Counter[str]
+    _variables_usage_filter_counter : Counter[str]
         A Counter object used to keep track of the number of times a variable in the variables_pool is selected by
         post-processing filters. This is filter usage, not the number of times the variable was reported to
         OutputManager.
@@ -216,7 +216,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
-            self._variables_usage_counter: Counter[str] = collections.Counter()
+            self._variables_usage_filter_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.is_first_post_processing: bool = True
 
@@ -388,7 +388,7 @@ class OutputManager(object):
 
         if isinstance(value, dict):
             for k, v in value.items():
-                self._variables_usage_counter[f"{key}.{k}"] = 0
+                self._variables_usage_filter_counter[f"{key}.{k}"] = 0
 
         if self.chunkification:
             self.current_pool_size += self.average_add_variable_call_addition
@@ -1422,7 +1422,7 @@ class OutputManager(object):
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
-                self._variables_usage_counter.update([key])
+                self._variables_usage_filter_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -1442,7 +1442,7 @@ class OutputManager(object):
                         results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
                             "values": filtered_value
                         }
-                    self._variables_usage_counter.update([f"{key}.{filtered_key}"])
+                    self._variables_usage_filter_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
@@ -1810,15 +1810,14 @@ class OutputManager(object):
 
     def report_variables_usage_counts(self, path: Path) -> None:
         """
-        Reports variable filter usage and non-daily reporting schedules to CSV files.
+        Reports variable filter usage and non-daily reporting counts to CSV files.
 
         The `variables_usage_counts` CSV contains counts of how often each variable was used by OutputManager filters
         during post-processing. These counts do not represent how often a variable was reported to OutputManager during
         the simulation.
 
-        The `variables_not_reported_daily` CSV lists variables that were not reported exactly once per simulation day.
-        When reporters include `simulation_day` in their info maps, this file also includes the observed days and
-        intervals between reports.
+        The `variables_not_reported_daily` CSV lists variables that were not reported exactly once per simulation day
+        and records how many times each variable was reported.
 
         Parameters
         ----------
@@ -1828,7 +1827,7 @@ class OutputManager(object):
 
         filename = self.generate_file_name("variables_usage_counts", "csv")
         file_path_csv = path / filename
-        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        sorted_variables_usage_counter_desc = self._variables_usage_filter_counter.most_common()
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
@@ -1864,8 +1863,8 @@ class OutputManager(object):
 
     def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
         """Builds a CSV-ready dictionary listing variables not reported daily."""
-
         variable_names: list[str] = []
+        report_counts: list[int] = []
         simulation_length = self._get_simulation_length_days()
 
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
@@ -1876,9 +1875,16 @@ class OutputManager(object):
             if self._is_reported_daily(values, simulation_length):
                 continue
 
-            variable_names.extend(self._get_reported_variable_names(variable_name, values))
+            reported_variable_names = self._get_reported_variable_names(variable_name, values)
+            repeated_row_count = len(reported_variable_names)
 
-        return {"variable_name": {"values": variable_names}}
+            variable_names.extend(reported_variable_names)
+            report_counts.extend([len(values)] * repeated_row_count)
+
+        return {
+            "variable_name": {"values": variable_names},
+            "report_count": {"values": report_counts},
+        }
 
     def _get_simulation_length_days(self) -> int | None:
         """Returns the simulation length in days if OutputManager has a time object with that value."""
@@ -1887,7 +1893,7 @@ class OutputManager(object):
         return simulation_length if isinstance(simulation_length, int) and simulation_length > 0 else None
 
     def _is_reported_daily(self, values: list[Any], simulation_length: int | None) -> bool:
-        """Determines whether a variable was reported once per simulation day by count alone."""
+        """Determines whether a variable was reported once per simulation day by count."""
 
         return simulation_length is not None and len(values) == simulation_length
 
