@@ -334,7 +334,7 @@ class OutputManager(object):
             pool[key] = self._pool_element_factory()
             discard_info_map = False
 
-        if not self._exclude_info_maps_flag and not discard_info_map:
+        if not self._exclude_info_maps_flag and not discard_info_map: # Todo: Handle th info map info more frequency reporting before the exlude kicks in
             reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
             pool[key]["info_maps"].append(reduced_info_map)
 
