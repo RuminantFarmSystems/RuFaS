@@ -9,21 +9,21 @@ book:
   page-navigation: true
   chapters:
     - index.qmd
-    - versionupdates.qmd
-    - example_structures.qmd
-    - animal.qmd
-    - manure.qmd
+    - qmd/versionupdates.qmd
+    - qmd/example_structures.qmd
+    - qmd/animal.qmd
+    - qmd/manure.qmd
 
 
 
-bibliography: rufas.bib
+bibliography: resources/bib_files/rufas.bib
 
 format:
   html:
     theme: cosmo
     crossref:
       eq-prefix: ""
-    css: styles.css
+    css: resources/templates/styles.css
   pdf:
     pdf-engine: xelatex
     documentclass: scrbook
@@ -37,7 +37,7 @@ format:
     margin-bottom: 1in
     margin-left: 1in
     margin-right: 1in
-    include-in-header: preamble.tex
+    include-in-header: resources/templates/preamble.tex
     toc: true
     toc-depth: 2
     toc-title: "Contents"
