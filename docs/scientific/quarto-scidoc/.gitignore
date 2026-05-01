@@ -3,5 +3,10 @@
 **/*.quarto_ipynb
 site_libs/
 
+# rendered output (uncomment to exclude) - ignore local version, since rendered by GitHub Actions
+#_book/
+
 # raw LaTeX files
 *.tex
+
+/.quarto/
