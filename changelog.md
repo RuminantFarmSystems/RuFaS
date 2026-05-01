@@ -72,6 +72,7 @@ v1.0.0
 - [2971](https://github.com/RuminantFarmSystems/RuFaS/pull/2971) - [minor change] [InputChange][OutputChange][Feed] Reorganizes feed input structure and adapts feed input handling to accommodate new structure.
 - [2968](https://github.com/RuminantFarmSystems/RuFaS/pull/2968) - [minor change] [InputChange][OutputChange][Animal] Refactored HerdManager's daily_routine.
 - [2809](https://github.com/RuminantFarmSystems/RuFaS/pull/2809) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Reorders grouping of attributes in some HerdStatistics methods, updates docstrings.
+- [2984](https://github.com/RuminantFarmSystems/RuFaS/pull/2984) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds manure stream compatibility check to Separators to enforce that Separators cannot be first processors in a chain.
 - [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability 
 
 ### v1.0.0
