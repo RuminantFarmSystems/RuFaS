@@ -361,9 +361,9 @@ class AvailableFeedsBuilder:
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
         available_feeds: list[Feed] = []
-        feeds_to_parse = feed_config["purchased_feeds"]
+        feeds_to_parse = feed_config["feeds"]
         for feed in feeds_to_parse:
-            rufas_id = feed["purchased_feed"]
+            rufas_id = feed["feed_type"]
             price = feed["purchased_feed_cost"]
             buffer = feed["buffer"]
             try:
