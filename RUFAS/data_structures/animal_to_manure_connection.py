@@ -30,21 +30,21 @@ class PenManureData:
     Attributes
     ----------
     num_animals : int
-        The number of animals in this pen that created the manure.
+        The number of animals in this pen that created the manure (animals).
     manure_deposition_surface_area : float
         The surface area of the manure deposition area in the pen (m^2).
     animal_combination : AnimalCombination
-        The combination of animals in the pen.
+        The combination of animals in the pen (unitless).
     pen_type : str | None
-        The type of pen.
+        The type of pen (unitless).
     manure_urine_mass : float
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
     stream_type : StreamType
-        The type of manure stream in the pen.
+        The type of manure stream in the pen (unitless).
     first_processor : str
-        The name of the first processor to handle the manure stream.
+        The name of the first processor to handle the manure stream (unitless).
     total_bedding_mass: float
         The total mass of the bedding applied to the manure stream (kg).
     total_bedding_volume: float
@@ -80,9 +80,11 @@ class PenManureData:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
 
     def set_first_processor(self, processor_name: str) -> None:
+        "First-processor setter method."
         self.first_processor = processor_name
 
     def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
+        "Setter method for total_bedding_mass and total_bedding_volume"
         self.total_bedding_mass = bedding_mass
         self.total_bedding_volume = bedding_volume
 
@@ -103,7 +105,9 @@ class PenManureData:
         Raises
         ------
         ValueError
-            If the stream type is ManureStreamType.GENERAL or if the animal combinations do not match.
+            - If the stream type is ManureStreamType.GENERAL.
+            - If the animal combinations do not match.
+            - If the first processors are different.
 
         """
         if self.stream_type == StreamType.GENERAL or other.stream_type == StreamType.GENERAL:
@@ -147,10 +151,12 @@ class ManureStream:
         Mass of potassium in the manure stream (kg).
     ash : float
         Mass of ash in the manure stream (kg).
-    non_degradable_volatile_solids : float
-        Mass of non-degradable volatile solids in the manure stream (kg).
     degradable_volatile_solids : float
         Mass of degradable volatile solids in the manure stream (kg).
+    non_degradable_volatile_solids : float
+        Mass of non-degradable volatile solids in the manure stream (kg).
+    bedding_non_degradable_volatile_solids : float
+        Amount of bedding non-degradable volatile solids (kg).
     total_solids : float
         Mass of total solids in the manure stream (kg).
     volume : float
@@ -158,9 +164,7 @@ class ManureStream:
     methane_production_potential : float
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
-       Optional, more specific information about the manure and the pen or pens that produced it.
-    bedding_non_degradable_volatile_solids : float
-        Amount of bedding non-degradable volatile solids (kg).
+       Optional, more specific information about the manure and the pen or pens that produced it (unitless).
 
     Class Attributes
     ----------------
@@ -287,7 +291,7 @@ class ManureStream:
 
     @classmethod
     def make_empty_manure_stream(cls) -> "ManureStream":
-        """Factory method for making empty ManureStreams."""
+        """Factory method for making an empty ManureStreams."""
         return ManureStream(
             water=0.0,
             ammoniacal_nitrogen=0.0,

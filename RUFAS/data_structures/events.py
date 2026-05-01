@@ -1,13 +1,3 @@
-"""This module defines the various BaseFieldManagementEvent classes and helper functions
-
-Events are simple classes that will facilitate scheduling of different management operations. At their core, they
-are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
-the main `BaseFieldManagementEvent` class can extend the functionality by adding additional attributes specific to the
-type of management operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which
-specific harvest method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which
-crop that is presently growing in a field will be harvested.
-"""
-
 from datetime import date
 
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
@@ -19,7 +9,10 @@ from RUFAS.rufas_time import RufasTime
 
 class BaseFieldManagementEvent:
     """
-    Class that will facilitate scheduling of different management operations.
+    This module defines the various BaseFieldManagementEvent classes and helper functions.
+
+    Events will facilitate scheduling of different management operations. At their core, they
+    are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur.
 
     Parameters
     ----------
@@ -45,7 +38,7 @@ class BaseFieldManagementEvent:
         self.year = year
         self.day = day
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for BaseFieldManagementEvent objects."""
         if isinstance(other, BaseFieldManagementEvent):
             return other.year == self.year and other.day == self.day
@@ -89,7 +82,17 @@ class PlantingEvent(BaseFieldManagementEvent):
         Name of the crop to be planted in the ground.
     heat_scheduled_harvest : bool, default=False
         Flag indicating if the crop will be harvested when it has a certain amount of heat units.
+    year : int
+        The year in which the planting will occur.
+    day : int
+        The day on which the planting will occur.
 
+    Attributes
+    ----------
+    crop_reference : str
+        Name of the crop to be planted in the ground.
+    use_heat_scheduled_harvest : bool
+        Flag indicating if the crop will be harvested when it has a certain amount of heat units.
     """
 
     def __init__(
@@ -99,7 +102,7 @@ class PlantingEvent(BaseFieldManagementEvent):
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for PlantingEvent objects."""
         if isinstance(other, PlantingEvent):
             return (
@@ -125,7 +128,17 @@ class HarvestEvent(BaseFieldManagementEvent):
         Name of the crop to be harvested.
     operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
         A harvest operation from the Harvest Operations enum.
+    year : int
+        The year in which the harvest will occur.
+    day : int
+        The day on which the harvest will occur.
 
+    Attributes
+    ----------
+    crop_reference : str
+        Name of the crop to be harvested.
+    operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
+        A harvest operation from the Harvest Operations enum.
     """
 
     def __init__(
@@ -139,7 +152,7 @@ class HarvestEvent(BaseFieldManagementEvent):
         self.crop_reference = crop_reference
         self.operation = operation
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
             return (
@@ -169,6 +182,21 @@ class TillageEvent(BaseFieldManagementEvent):
         Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
     implement : TillageImplement
         Tillage implement that is being used to execute this tillage application.
+    year : int
+        The year in which the tillage event will occur.
+    day : int
+        The day on which the tillage event will occur.
+
+    Attributes
+    ----------
+    tillage_depth : float
+        The lowest depth the tilling implement reaches (mm).
+    incorporation_fraction : float
+        Fraction of soil surface pool incorporated into the soil profile (unitless).
+    mixing_fraction : float
+        Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
+    implement : TillageImplement
+        Tillage implement that is being used to execute this tillage application.
 
     """
 
@@ -187,7 +215,7 @@ class TillageEvent(BaseFieldManagementEvent):
         self.mixing_fraction = mixing_fraction
         self.implement = implement
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for TillageEvent objects."""
         if isinstance(other, TillageEvent):
             return (
@@ -213,10 +241,6 @@ class ManureEvent(BaseFieldManagementEvent):
 
     Parameters
     ----------
-    year : int
-        Year in which this manure application occurs.
-    day : int
-        Day in which this manure application occurs.
     nitrogen_mass : float
         Minimum mass of nitrogen that should be contained in this manure application (kg).
     phosphorus_mass : float
@@ -225,6 +249,27 @@ class ManureEvent(BaseFieldManagementEvent):
         The type of manure for which the application request will be made.
     manure_supplement_method : ManureSupplementMethod
         The method that the event will use to supplement nutrient deficiencies.
+    field_coverage : float
+        Fraction of the field covered by this manure application (unitless).
+    application_depth : float
+        Depth that manure is injected into the soil at (mm).
+    surface_remainder_fraction : float
+        Fraction of manure applied that remains on the soil surface (unitless).
+    year : int
+        Year in which this manure application occurs.
+    day : int
+        Day in which this manure application occurs.
+
+    Attributes
+    ----------
+    nitrogen_mass : float
+        Minimum mass of nitrogen that should be contained in this manure application (kg).
+    phosphorus_mass : float
+        Minimum mass of phosphorus that should be contained in this manure application (kg).
+    manure_type : ManureType
+        The type of manure for which the application request will be made (unitless).
+    manure_supplement_method : ManureSupplementMethod
+        The method that the event will use to supplement nutrient deficiencies (unitless).
     field_coverage : float
         Fraction of the field covered by this manure application (unitless).
     application_depth : float
@@ -255,7 +300,7 @@ class ManureEvent(BaseFieldManagementEvent):
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for ManureEvent objects."""
         if isinstance(other, ManureEvent):
             return (
@@ -293,11 +338,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
     Parameters
     ----------
     mix_name : str
-        Name of the fertilizer mix being used.
-    year : int
-        Year in which this application occurs.
-    day : int
-        Day on which this application occurs.
+        Name of the fertilizer mix being used (unitless).
     nitrogen_mass : float
         Minimum mass of nitrogen that should be in this application (kg).
     phosphorus_mass : float
@@ -305,9 +346,28 @@ class FertilizerEvent(BaseFieldManagementEvent):
     potassium_mass : float
         Minimum mass of potassium that should be in this application (kg).
     depth : float
-        Depth at which fertilizer is injected into the soil.
+        Depth at which fertilizer is injected into the soil (mm).
     surface_remainder_fraction : float
-        Fraction of fertilizer that remains on the soil surface after application.
+        Fraction of fertilizer that remains on the soil surface after application (unitless).
+    year : int
+        Year in which this application occurs.
+    day : int
+        Day on which this application occurs.
+
+    Attributes
+    ----------
+    mix_name : str
+        Name of the fertilizer mix being used (unitless).
+    nitrogen_mass : float
+        Minimum mass of nitrogen that should be in this application (kg).
+    phosphorus_mass : float
+        Minimum mass of phosphorus that should be in this application (kg).
+    potassium_mass : float
+        Minimum mass of potassium that should be in this application (kg).
+    depth : float
+        Depth at which fertilizer is injected into the soil (mm).
+    surface_remainder_fraction : float
+        Fraction of fertilizer that remains on the soil surface after application (unitless).
     """
 
     def __init__(
@@ -329,7 +389,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
         self.depth = depth
         self.surface_remainder_fraction = surface_remainder_fraction
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for FertilizerEvent objects."""
         if isinstance(other, FertilizerEvent):
             return (

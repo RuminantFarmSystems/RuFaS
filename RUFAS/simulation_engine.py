@@ -21,8 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     TotalInventory,
 )
-from RUFAS.data_structures.field_manure_supplier import FieldManureSupplier
-from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import FieldManureSupplier, ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
