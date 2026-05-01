@@ -1055,7 +1055,9 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     mock_weather_data = {"dummy": "weather data"}
     mock_feed_config = {
         "dummy": "feed config",
-        "max_daily_feed_recalculations_per_year": mock_max_daily_feed_recalculations_per_year,
+        "ration_formulation_parameters": {
+            "max_daily_feed_recalculations_per_year": mock_max_daily_feed_recalculations_per_year,
+        },
     }
     mock_config_nutrient_standard = "NASEM"
     mock_feed_storage_configs = {"dummy": "storage configs"}

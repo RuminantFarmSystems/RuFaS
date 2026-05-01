@@ -86,7 +86,18 @@ class FeedManager:
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
 
-        purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
+        feeds: list[dict[str, int | float]] = feed_config["feeds"]
+
+        purchase_allowances = [
+            {
+                "purchased_feed": feed["feed_type"],
+                "runtime_purchase_allowance": feed["runtime_purchase_allowance"],
+                "advance_purchase_allowance": feed["advance_purchase_allowance"],
+                "planning_cycle_allowance": feed["planning_cycle_allowance"],
+            }
+            for feed in feeds
+        ]
+
         sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(sorted_purchased_allowances)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
