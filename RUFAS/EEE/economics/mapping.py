@@ -85,29 +85,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
         },
         "Revenue": {
-            "Carbon credits from enteric emissions reduction": {
-                "biophysical_simulation": [
-                    "AnimalModuleReporter.report_enteric_methane_emission.enteric_methane_emission.*"
-                ],
-                "economics_files": ["commodity_prices_carbon_credits_enteric_dollar_per_tonne_CO2e"],
-                "notes": "Sum "
-                "across "
-                "all "
-                "pens "
-                "(e.g. "
-                "each "
-                "of "
-                "the "
-                "pens "
-                "captured "
-                "by "
-                ".*), "
-                "then "
-                "convert "
-                "enteric_methane_emission "
-                "to "
-                "tonnes",
-            },
+            
             "FPCM (Milk Production)": {
                 "biophysical_simulation": ["Economic_preprocessing.Animal.FPCM"],
                 "economics_files": ["commodity_prices_milk_retail_dollar_per_liter"],
@@ -144,7 +122,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Sold heifer IIs": {
                 "biophysical_simulation": [
-                    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferII_sold_weight"
+                    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferII_sold_count"
                 ],
                 "economics_files": ["commodity_prices_cow_dairy_heifer_open_dollar_per_animal"],
             },
