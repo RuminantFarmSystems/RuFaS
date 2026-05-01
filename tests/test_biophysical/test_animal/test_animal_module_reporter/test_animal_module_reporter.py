@@ -750,10 +750,6 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
     """Unit test for report_manure_excretions() without in-simulation padding."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    om.variables_pool = {
-        "AnimalModuleReporter.report_manure_excretions.0_CALF_urea": {"values": [1.0, 2.0, 3.0]},
-        "AnimalModuleReporter.report_manure_excretions.0_CALF_urine": {"values": [1.0, 2.0, 3.0]},
-    }
 
     dummy_manure_excretion_data = AnimalManureExcretions(
         urea=1.1,
