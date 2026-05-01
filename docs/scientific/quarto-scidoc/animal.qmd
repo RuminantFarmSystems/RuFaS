@@ -289,85 +289,21 @@ These methods are further described by @Li2023
 
 ```{python}
 #| label: tbl-animal-growth-req-inputs
-#| tbl-cap: Summary of the available inputs that are available and their definitions.
+#| tbl-cap: | 
+#|  Summary of the available inputs that are available and their definitions.
 #| echo: false
 import pandas as pd
-tbl = pd.read_csv("resources/tables/animal-growth_required-inputs.csv")
-display(tbl)
+from IPython.display import Markdown
+tbl = pd.read_csv(
+  "resources/tables/animal-growth_required-inputs.csv",
+  dtype = {"Default": str, "Min": str, "Max": str},
+  keep_default_na = False
+).to_markdown(
+  index = False,
+)
+Markdown(tbl)
 ```
 
-[//]: # ()
-[//]: # (\renewcommand{\arraystretch}{1.4})
-
-[//]: # (\begin{longtable}{@{} L{4cm} L{6.5cm} L{1.5cm} L{1cm} L{1cm} @{}})
-
-[//]: # (\caption{Below is a summary of the user inputs that are available and their definitions.} \\)
-
-[//]: # (\toprule)
-
-[//]: # ()
-[//]: # (\multicolumn{1}{c}{\textbf{Variable}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Definition &#40;units&#41;}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Default}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Min}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Max}} \\)
-
-[//]: # ()
-[//]: # (\midrule)
-
-[//]: # (\endfirsthead)
-
-[//]: # ()
-[//]: # (\toprule)
-
-[//]: # (\multicolumn{1}{c}{\textbf{Variable}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Definition &#40;units&#41;}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Default}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Min}} & )
-
-[//]: # (\multicolumn{1}{c}{\textbf{Max}} \\)
-
-[//]: # (\midrule)
-
-[//]: # (\endhead)
-
-[//]: # ()
-[//]: # (\bottomrule)
-
-[//]: # (\endfoot)
-
-[//]: # ()
-[//]: # (\bottomrule)
-
-[//]: # (\endlastfoot)
-
-[//]: # ()
-[//]: # (birth\_weight\_avg\_ho       & Average Holstein Birth Weight &#40;kg/head&#41;       & 42.9       & 1       & NA \\)
-
-[//]: # (birth\_weight\_std\_ho       & Holstein Birth Weight Standard Deviation &#40;kg/head&#41;       & 69       & 0       & NA \\)
-
-[//]: # (birth\_weight\_avg\_je       & Average Jersey Birth Weight &#40;kg/head&#41;       & 25.2       & 1       & NA \\)
-
-[//]: # (birth\_weight\_std\_je       & Jersey Birth Weight Standard Deviation &#40;kg/head&#41;       & 4.4       & 0       & NA \\)
-
-[//]: # (mature\_body\_weight\_avg       & The average mature body weight of cows &#40;kg/head&#41;      & 740.1       & 0       & NA \\)
-
-[//]: # (mature\_body\_weight\_std       & The standard deviation of mature body weight of cows  &#40;kg/head&#41;    & 73.5       & 0       & NA \\)
-
-[//]: # (wean\_day       &  The days of age at which calves are fully weaned from milk or milk replacer &#40;days&#41;     & 60       & 0       & NA \\)
-
-[//]: # (target\_heifer\_preg\_day       & The target age &#40;in days&#41; for heifers to become pregnant - for adjusting heifer body weight &#40;days&#41;      & 420       & NA      & NA \\)
-
-[//]: # (\end{longtable})
-
-[//]: # ()
 [//]: # (\textbf{Expected Outputs} )
 
 [//]: # (\begin{itemize})
