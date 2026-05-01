@@ -1,6 +1,6 @@
 import pytest
 
-from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
+from RUFAS.data_structures.field_manure_supplier import FieldManureSupplier
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
 
