@@ -221,7 +221,9 @@ class SimulationEngine:
             )
             feed_manager_available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
             self.emissions_estimator.check_available_purchased_feed_data(feed_manager_available_feed_ids)
-            max_daily_feed_recalculations_per_year: int = feeds_config["max_daily_feed_recalculations_per_year"]
+            max_daily_feed_recalculations_per_year: int = feeds_config["ration_formulation_parameters"][
+                "max_daily_feed_recalculations_per_year"
+            ]
             self.max_daily_feed_recalculation_interval = timedelta(
                 days=round(365 / max_daily_feed_recalculations_per_year)
             )

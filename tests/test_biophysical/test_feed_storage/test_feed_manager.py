@@ -291,9 +291,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
 
     feed_manager = FeedManager(
         feed_config={
-            "allowances": [
+            "feeds": [
                 {
-                    "purchased_feed": 1,
+                    "feed_type": 1,
                     "planning_cycle_allowance": 0.0,
                     "runtime_purchase_allowance": 0.0,
                     "advance_purchase_allowance": 0.0,
