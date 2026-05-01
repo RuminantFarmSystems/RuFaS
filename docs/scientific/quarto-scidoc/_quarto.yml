@@ -5,6 +5,7 @@ book:
   title: "Ruminant Farm Systems (RuFaS)"
   subtitle: "Scientific Documentation"
   date: "4/1/2026"
+  output-file: "rufas-scientific-documentation"
   search: true
   page-navigation: true
   chapters:

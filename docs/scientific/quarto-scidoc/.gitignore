@@ -1,2 +1,7 @@
+# some quarto files
 .quarto/
 **/*.quarto_ipynb
+site_libs/
+
+# raw LaTeX files
+*.tex
