@@ -8,12 +8,8 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
-    FeedCategorization,
-    FeedComponentType,
     RUFAS_ID,
-    NASEMFeed,
-    NRCFeed,
-    NutrientStandard,
+    FeedFulfillmentResults,
     PlanningCycleAllowance,
     RuntimePurchaseAllowance,
     RequestedFeed,
@@ -21,18 +17,13 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     IdealFeeds,
     AdvancePurchaseAllowance,
 )
-from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
-from RUFAS.util import Utility
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 
 from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
-
-"""Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
-ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
 
 """A type alias representing the context in which a feed purchase was initiated."""
 PurchaseType = Literal["daily_feed_request", "ration_interval", "planning_cycle"]
@@ -47,8 +38,8 @@ class FeedManager:
     ----------
     feed_config : dict[str, list[Any]]
         Configuration for the feeds available in the simulation.
-    nutrient_standard : NutrientStandard
-        Nutrient standard used in the simulation (NASEM or NRC).
+    available_feeds : list[Feed]
+        The list of feeds available for the simulation.
     crop_to_rufas_ids_mapping : dict[str, list[RUFAS_ID]]
         Mapping from crops to their corresponding RUFAS IDs.
     feed_storage_configs : dict[str, Any]
@@ -60,9 +51,6 @@ class FeedManager:
     ----------
     _om : OutputManager
         Output manager for reporting feed-related data.
-    _available_feeds : list[NASEMFeed | NRCFeed]
-        List of feeds available for purchase and feeding in the simulation, including their nutritional properties
-        and prices.
     active_storages : dict[StorageType, Storage]
         Contains the list of active farmgrown crop storage units in the simulation and their mapping from StorageType.
     purchased_feed_storage : PurchasedFeedStorage
@@ -87,12 +75,12 @@ class FeedManager:
     def __init__(
         self,
         feed_config: dict[str, list[Any]],
-        nutrient_standard: NutrientStandard,
+        available_feeds: list[Feed],
         feed_storage_configs: dict[str, Any],
         feed_storage_instances: dict[str, list[str]],
     ) -> None:
         self._om = OutputManager()
-        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self._available_feeds = available_feeds
         self.active_storages: dict[str, Storage] = {}
 
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
@@ -378,7 +366,7 @@ class FeedManager:
 
     def manage_daily_feed_request(
         self, requested_feed: RequestedFeed, time: RufasTime
-    ) -> tuple[bool, dict[str, dict[RUFAS_ID, float]]]:
+    ) -> tuple[bool, FeedFulfillmentResults]:
         """Manages the daily feed request by checking available inventory and purchasing additional feed if necessary.
 
         Parameters
@@ -390,10 +378,10 @@ class FeedManager:
 
         Returns
         -------
-        tuple[bool, dict[str, dict[RUFAS_ID, float]]]
+        tuple[bool, FeedFulfillmentResults]
             A tuple where the first element is True if the feed request can be fulfilled (False otherwise),
-            and the second element is a dictionary detailing the amounts of feed deducted from purchased and
-            farmgrown sources.
+            and the second element is a FeedFulfillmentResults object containing the amounts of feed deducted
+            from purchased and farmgrown sources.
         """
         current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
@@ -407,7 +395,7 @@ class FeedManager:
             ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
-                return False, {}
+                return False, FeedFulfillmentResults.empty()
             self._om.add_variable(
                 f"{feed_id}_requested_amount",
                 amount_requested,
@@ -639,7 +627,7 @@ class FeedManager:
 
     def _deduct_feeds_from_inventory(
         self, feeds_to_deduct: dict[RUFAS_ID, float], simulation_day: int
-    ) -> dict[str, dict[RUFAS_ID, float]]:
+    ) -> FeedFulfillmentResults:
         """
         Removes feeds by RuFaS ID. Feed is deducted from farmgrown storages first (FIFO by storage_time),
         then purchased.
@@ -653,10 +641,9 @@ class FeedManager:
 
         Returns
         -------
-        dict[str, dict[RUFAS_ID, float]]
-            A dictionary with two keys: 'purchased' and 'farmgrown'. Each key maps to another dictionary that contains
-            the RuFaS Feed IDs and the corresponding amounts of feed deducted (kg dry matter) from purchased and
-            farmgrown sources, respectively.
+        FeedFulfillmentResults
+            A data structure that tracks how much feed was deducted from purchased and farmgrown sources to fulfill
+            a request.
 
         Raises
         ------
@@ -672,12 +659,10 @@ class FeedManager:
 
         farmgrown_by_id, purchased_by_id = self._gather_available_feeds_by_id()
 
-        total_purchased_deducted: dict[RUFAS_ID, float] = {
-            purchased_feed_id: 0.0 for purchased_feed_id in feeds_to_deduct
-        }
-        total_farmgrown_deducted: dict[RUFAS_ID, float] = {
-            farmgrown_id: 0.0 for farmgrown_id in self._gather_valid_farmgrown_feed_ids()
-        }
+        deduction_results = FeedFulfillmentResults.empty(
+            requested_feed_ids=list(feeds_to_deduct.keys()),
+            farmgrown_feed_ids=list(self._gather_valid_farmgrown_feed_ids()),
+        )
 
         for feed_id, amount_needed in feeds_to_deduct.items():
             remaining_amount_needed = float(amount_needed)
@@ -688,15 +673,17 @@ class FeedManager:
                 farmgrown_by_id.get(feed_id, ()),
             )
             if farmgrown_deducted:
-                total_farmgrown_deducted[feed_id] = total_farmgrown_deducted.get(feed_id, 0.0) + farmgrown_deducted
+                deduction_results.add_farmgrown(feed_id, farmgrown_deducted)
                 remaining_amount_needed -= farmgrown_deducted
 
             if remaining_amount_needed > 1e-3:
                 purchased_deducted = self._deduct_from_storage(
-                    feed_id, remaining_amount_needed, purchased_by_id.get(feed_id, ())
+                    feed_id,
+                    remaining_amount_needed,
+                    purchased_by_id.get(feed_id, ()),
                 )
                 if purchased_deducted:
-                    total_purchased_deducted[feed_id] = total_purchased_deducted.get(feed_id, 0.0) + purchased_deducted
+                    deduction_results.add_purchased(feed_id, purchased_deducted)
                     remaining_amount_needed -= purchased_deducted
 
             if remaining_amount_needed > 1e-3:
@@ -709,9 +696,9 @@ class FeedManager:
                     f"Not adequate feed to deduct remaining {remaining_amount_needed:.3f} kg DM of feed {feed_id}."
                 )
 
-        self._log_feed_deductions(total_purchased_deducted, total_farmgrown_deducted, simulation_day)
+        self._log_feed_deductions(deduction_results.purchased, deduction_results.farmgrown, simulation_day)
 
-        return {"purchased": total_purchased_deducted, "farmgrown": total_farmgrown_deducted}
+        return deduction_results
 
     def _log_feed_deductions(
         self,
@@ -881,78 +868,3 @@ class FeedManager:
             if feed_id in valid_feed_ids:
                 farmgrown_ids.add(feed_id)
         return farmgrown_ids
-
-    def _setup_available_feeds(
-        self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
-    ) -> list[Feed]:
-        """
-        Creates list of feeds available for use in the simulation.
-
-        Parameters
-        ----------
-        feed_config : list[dict[str, Any]]
-            Mapping of the feeds available for purchase to the prices of those feeds.
-        nutrient_standard : NutrientStandard
-            Indicates whether the NASEM or NRC nutrient standards is being used.
-
-        Returns
-        -------
-        list[Feed]
-            Nutrition and price information of feeds available in the simulation.
-
-        """
-        feed_library = self._process_feed_library(nutrient_standard)
-
-        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
-        available_feeds: list[Feed] = []
-        feeds_to_parse = feed_config["feeds"]
-        for feed in feeds_to_parse:
-            rufas_id = feed["feed_type"]
-            price = feed["purchased_feed_cost"]
-            buffer = feed["buffer"]
-            try:
-                nutritive_properties = feed_library[rufas_id]
-            except KeyError:
-                raise KeyError(f"Feed with RUFAS ID '{rufas_id}' not found in the feed library.")
-            new_feed = feed_representation(
-                rufas_id=rufas_id,
-                amount_available=0.0,
-                on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
-                purchase_cost=price,
-                buffer=buffer,
-                **nutritive_properties,
-            )
-            available_feeds.append(new_feed)
-
-        sorted_available_feeds = sorted(available_feeds, key=lambda feed: feed.rufas_id)
-        return sorted_available_feeds
-
-    def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
-        """
-        Collects and processes the feed library input so that it can be translated into a simulation-friendly format.
-
-        Parameters
-        ----------
-        nutrient_standard : NutrientStandard
-            Indicates whether the NASEM or NRC nutrient standards is being used.
-
-        Returns
-        -------
-        dict[RUFAS_ID, dict[str, Any]]
-            Mapping of RuFaS feed IDs to the nutritional properties of those feeds.
-
-        """
-        im = InputManager()
-        feed_library = (
-            im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
-        )
-
-        feed_library = Utility.convert_dict_of_lists_to_list_of_dicts(feed_library)
-
-        feed_library = {feed["rufas_id"]: feed for feed in feed_library}
-        for feed in feed_library.values():
-            del feed["rufas_id"]
-            feed["feed_type"] = FeedComponentType(feed["feed_type"])
-            feed["Fd_Category"] = FeedCategorization(feed["Fd_Category"])
-            feed["units"] = MeasurementUnits(feed["units"])
-        return feed_library
