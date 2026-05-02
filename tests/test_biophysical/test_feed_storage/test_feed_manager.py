@@ -594,6 +594,7 @@ def test_report_feed_manager_balance(
         "class": "FeedManager",
         "function": "report_feed_manager_balance",
         "simulation_day": simulation_day,
+        "is_daily_variable": True,
         "units": MeasurementUnits.KILOGRAMS,
     }
 
