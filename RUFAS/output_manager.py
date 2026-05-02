@@ -111,7 +111,7 @@ class OutputManager(object):
 
     Class Attributes
     ----------------
-    pool_element_type : dict[str, list[Any]]
+    pool_element_type : dict[str, Any]
         Type alias for the pool elements
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
         Maximum depth for recursive serialization in JSON output files (default: 4)
@@ -164,12 +164,12 @@ class OutputManager(object):
     -----
     `report_variables_usage_counts()` writes two diagnostic CSVs for new users inspecting output behavior:
     `variables_usage_counts` reports how often variables were selected by configured filters, while
-    `variables_not_reported_daily` lists variables whose stored observations do not appear once per simulation day
-    and summarizes the observed report schedule.
+    `variables_not_reported_daily` lists variables marked as non-daily for reporting diagnostics and summarizes how
+    many times each variable was reported.
     """
 
     __instance = None
-    pool_element_type = dict[str, list[Any]]
+    pool_element_type = dict[str, Any]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __new__(cls) -> OutputManager:
@@ -334,8 +334,13 @@ class OutputManager(object):
             pool[key] = self._pool_element_factory()
             discard_info_map = False
 
-        if not self._exclude_info_maps_flag and not discard_info_map: # Todo: Handle th info map info more frequency reporting before the exlude kicks in
-            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+        is_daily_variable = info_map.get("is_daily_variable", False)
+        pool[key]["is_daily_variable"] = is_daily_variable if isinstance(is_daily_variable, bool) else False
+
+        if not self._exclude_info_maps_flag and not discard_info_map:
+            reduced_info_map = {
+                k: v for k, v in info_map.items() if k not in ["class", "function", "is_daily_variable"]
+            }
             pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
@@ -366,6 +371,9 @@ class OutputManager(object):
             Has no effect on manual prefix overrides.
         info_map["suffix"] : str, optional
             If present, gets appended to the key
+        info_map["is_daily_variable"] : bool, optional
+            If present, marks whether the variable should be treated as daily for reporting diagnostics. Defaults to
+            False, and is persisted on the stored variable entry before info_maps may be excluded.
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
@@ -1818,8 +1826,8 @@ class OutputManager(object):
         during post-processing. These counts do not represent how often a variable was reported to OutputManager during
         the simulation.
 
-        The `variables_not_reported_daily` CSV lists variables that were not reported exactly once per simulation day
-        and records each entry as a `{"variable_name": report_count}` mapping.
+        The `variables_not_reported_daily` CSV lists variables treated as non-daily for reporting diagnostics and
+        records each entry as a `{"variable_name": report_count}` mapping.
 
         Parameters
         ----------
@@ -1846,53 +1854,45 @@ class OutputManager(object):
         self._dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
 
     def _get_variables_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
-        """Builds a CSV-ready dictionary listing variables reported daily."""
+        """Builds a CSV-ready dictionary listing variables treated as daily for reporting diagnostics."""
 
-        variable_names: list[str] = []
-        simulation_length = self._get_simulation_length_days()
-
+        variable_names: set[str] = set()
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
             values = variable_data.get("values", [])
             if not isinstance(values, list):
                 continue
 
-            if not self._is_reported_daily(values, simulation_length):
+            if not self._is_reported_daily(variable_data):
                 continue
 
-            variable_names.extend(self._get_reported_variable_names(variable_name, values))
+            variable_names.update(self._get_reported_variable_names(variable_name, values))
 
-        return {"variable_name": {"values": variable_names}}
+        return {"variable_name": {"values": sorted(variable_names)}}
 
     def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
-        """Builds a CSV-ready dictionary listing variables not reported daily."""
-        variable_report_counts: list[str] = []
-        simulation_length = self._get_simulation_length_days()
+        """Builds a CSV-ready dictionary listing variables treated as non-daily for reporting diagnostics."""
+        variable_report_counts: set[str] = set()
 
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
             values = variable_data.get("values", [])
             if not isinstance(values, list):
                 continue
 
-            if self._is_reported_daily(values, simulation_length):
+            if self._is_reported_daily(variable_data):
                 continue
 
             reported_variable_names = self._get_reported_variable_names(variable_name, values)
-            variable_report_counts.extend(
-                [f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names]
+            variable_report_counts.update(
+                f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names
             )
 
-        return {"variable_report_count": {"values": variable_report_counts}}
+        return {"variable_report_count": {"values": sorted(variable_report_counts)}}
 
-    def _get_simulation_length_days(self) -> int | None:
-        """Returns the simulation length in days if OutputManager has a time object with that value."""
+    def _is_reported_daily(self, variable_data: dict[str, Any]) -> bool:
+        """Determines whether a variable should be treated as daily for reporting diagnostics."""
 
-        simulation_length = getattr(self.time, "simulation_length_days", None)
-        return simulation_length if isinstance(simulation_length, int) and simulation_length > 0 else None
-
-    def _is_reported_daily(self, values: list[Any], simulation_length: int | None) -> bool:
-        """Determines whether a variable was reported once per simulation day by count."""
-
-        return simulation_length is not None and len(values) == simulation_length
+        is_daily_variable = variable_data.get("is_daily_variable", False)
+        return is_daily_variable if isinstance(is_daily_variable, bool) else False
 
     def _get_reported_variable_names(self, variable_name: str, values: list[Any]) -> list[str]:
         """Returns nested variable names for dictionary-valued variables, otherwise the variable name."""

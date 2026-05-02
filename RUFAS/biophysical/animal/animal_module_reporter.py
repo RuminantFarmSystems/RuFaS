@@ -106,6 +106,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_animal_population.__name__,
             "data_origin": [("AnimalManager", "daily_updates")],
+            "is_daily_variable": True,
         }
         om.add_variable("sim_day", simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
@@ -162,6 +163,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "is_daily_variable": True,
             "units": (
                 (MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS)
                 if AnimalConfig.simulate_genetics
@@ -230,6 +232,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_average_genetics.__name__,
             "units": genetics_units,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         om.add_variable(f"{variable_name_prefix}_average_genetics", average_genetics, info_map)
 
@@ -264,6 +267,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_ration_per_animal.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "number_animals_in_pen": num_animals,
         }
 
@@ -284,6 +288,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_nutrient_amounts.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": NutritionSupply.UNITS,
             "number_animals_in_pen": num_animals,
         }
@@ -350,6 +355,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_average_nutrient_requirements.__name__,
             "number_animals_in_pen": num_animals,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": NutritionRequirements.UNITS,
         }
 
@@ -392,6 +398,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
 
         nutrient_evaluation_results = {
@@ -444,6 +451,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_me_diet.__name__,
             "number_animals_in_pen": num_animals,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
 
@@ -470,6 +478,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_herd_total_ration.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
         om.add_variable("ration_daily_feed_total_across_pens", herd_total_ration, info_map)
@@ -497,6 +506,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_ration_per_pen.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
 
@@ -509,6 +519,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
+            "is_daily_variable": True,
         }
         for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
             om.add_variable(
@@ -536,6 +547,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_manure_streams.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         MANURE_STREAM_UNITS = {
             "total_bedding_mass": MeasurementUnits.KILOGRAMS,
@@ -614,6 +626,7 @@ class AnimalModuleReporter:
             "function": (function_name := AnimalModuleReporter.report_manure_excretions.__name__),
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         for base_name, manure_excretion in manure_excretions.items():
             for manure_property, manure_value in asdict(manure_excretion).items():
@@ -651,6 +664,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
             "data_origin": [("HerdManager", "daily_update")],
+            "is_daily_variable": True,
         }
         om.add_variable(
             "sold_cow_oversupply_num",
@@ -935,6 +949,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_daily_pen_total.__name__,
             "units": MeasurementUnits.ANIMALS,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         om.add_variable(
             f"number_of_animals_in_pen_{pen_id}_{pen_animal_name}",
@@ -1139,6 +1154,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_305d_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "is_daily_variable": True,
         }
         om.add_variable(
             "milk_production_305days_herd_mean",

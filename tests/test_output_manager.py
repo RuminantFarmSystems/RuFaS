@@ -1294,20 +1294,20 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag, first_map_only",
+    "dummy_value, exclude_info_maps_flag, first_map_only, is_daily_variable",
     [
-        ("dummy_value", False, False),
-        (2, False, False),
-        (3.45, False, True),
-        (True, False, True),
-        ({"key": "value"}, False, True),
-        ([1, 2, 3], False, False),
-        ("dummy_value", True, False),
-        (2, True, False),
-        (3.45, True, True),
-        (True, True, True),
-        ({"key": "value"}, True, True),
-        ([1, 2, 3], True, True),
+        ("dummy_value", False, False, True),
+        (2, False, False, False),
+        (3.45, False, True, True),
+        (True, False, True, False),
+        ({"key": "value"}, False, True, True),
+        ([1, 2, 3], False, False, False),
+        ("dummy_value", True, False, True),
+        (2, True, False, False),
+        (3.45, True, True, True),
+        (True, True, True, False),
+        ({"key": "value"}, True, True, True),
+        ([1, 2, 3], True, True, False),
     ],
 )
 def test_add_to_pool(
@@ -1315,6 +1315,7 @@ def test_add_to_pool(
     dummy_value: Any,
     exclude_info_maps_flag: bool,
     first_map_only: bool,
+    is_daily_variable: bool,
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -1324,6 +1325,7 @@ def test_add_to_pool(
         "function": "dummy_func",
         "context": "dummy_context",
         "units": MeasurementUnits.ANIMALS.value,
+        "is_daily_variable": is_daily_variable,
     }
     key = "dummy_key"
     pool: dict[str, dict[str, Any]] = {}
@@ -1344,8 +1346,12 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Arrange
     info_map["more_context"] = "1234567890"
@@ -1364,16 +1370,46 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     elif not first_map_only:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
-            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
+            {
+                "context": "dummy_context",
+                "more_context": "1234567890",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Cleanup
     mock_output_manager._exclude_info_maps_flag = False
+
+
+def test_add_to_pool_defaults_missing_daily_flag_to_false(mock_output_manager: OutputManager) -> None:
+    """Unit test for defaulting missing daily reporting flags to False."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "dummy_key", "dummy_value", info_map)
+
+    assert pool["dummy_key"]["is_daily_variable"] is False
+    assert pool["dummy_key"]["info_maps"] == [
+        {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}
+    ]
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
@@ -1392,6 +1428,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     assert om2.variables_pool[key] == {
         "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
         "values": ["dummy_value"],
+        "is_daily_variable": False,
     }
 
 
@@ -1579,36 +1616,25 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
 
 
 def test_get_variables_reported_daily() -> None:
-    """Unit test for reporting variables observed once per simulation day."""
+    """Unit test for reporting variables explicitly marked as daily."""
 
     output_manager = OutputManager()
-    output_manager.time = MagicMock(simulation_length_days=4)
     output_manager._set_variables_pool(
         {
             "daily_variable": {
                 "values": [1, 2, 3, 4],
-                "info_maps": [
-                    {"simulation_day": 0, "units": "kg"},
-                    {"simulation_day": 1, "units": "kg"},
-                    {"simulation_day": 2, "units": "kg"},
-                    {"simulation_day": 3, "units": "kg"},
-                ],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": True,
             },
             "daily_nested_variable": {
                 "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}, {"a": 7, "b": 8}],
-                "info_maps": [
-                    {"simulation_day": 0, "units": {"a": "kg", "b": "kg"}},
-                    {"simulation_day": 1, "units": {"a": "kg", "b": "kg"}},
-                    {"simulation_day": 2, "units": {"a": "kg", "b": "kg"}},
-                    {"simulation_day": 3, "units": {"a": "kg", "b": "kg"}},
-                ],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 4,
+                "is_daily_variable": True,
             },
             "non_daily_variable": {
-                "values": [10, 20],
-                "info_maps": [
-                    {"simulation_day": 0, "units": "kg"},
-                    {"simulation_day": 2, "units": "kg"},
-                ],
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
             },
         }
     )
@@ -1621,35 +1647,25 @@ def test_get_variables_reported_daily() -> None:
 
 
 def test_get_variables_not_reported_daily() -> None:
-    """Unit test for reporting variables that were not observed once per simulation day."""
+    """Unit test for reporting variables explicitly marked as non-daily."""
 
     output_manager = OutputManager()
-    output_manager.time = MagicMock(simulation_length_days=4)
     output_manager._set_variables_pool(
         {
             "daily_variable": {
-                "values": [1, 2, 3, 4],
-                "info_maps": [
-                    {"simulation_day": 0, "units": "kg"},
-                    {"simulation_day": 1, "units": "kg"},
-                    {"simulation_day": 2, "units": "kg"},
-                    {"simulation_day": 3, "units": "kg"},
-                ],
+                "values": [1, 2],
+                "info_maps": [{"units": "kg"}] * 2,
+                "is_daily_variable": True,
             },
             "every_other_day_variable": {
-                "values": [10, 20],
-                "info_maps": [
-                    {"simulation_day": 0, "units": "kg"},
-                    {"simulation_day": 2, "units": "kg"},
-                ],
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
             },
             "irregular_nested_variable": {
-                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}],
-                "info_maps": [
-                    {"simulation_day": 0, "units": {"a": "kg", "b": "kg"}},
-                    {"simulation_day": 1, "units": {"a": "kg", "b": "kg"}},
-                    {"simulation_day": 3, "units": {"a": "kg", "b": "kg"}},
-                ],
+                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 2,
+                "is_daily_variable": False,
             },
         }
     )
@@ -1659,11 +1675,30 @@ def test_get_variables_not_reported_daily() -> None:
     assert actual == {
         "variable_report_count": {
             "values": [
-                '{"every_other_day_variable": 2}',
-                '{"irregular_nested_variable.a": 3}',
-                '{"irregular_nested_variable.b": 3}',
+                '{"every_other_day_variable": 4}',
+                '{"irregular_nested_variable.a": 2}',
+                '{"irregular_nested_variable.b": 2}',
             ]
         },
+    }
+
+
+def test_missing_daily_flag_defaults_to_non_daily() -> None:
+    """Unit test for treating variables without an explicit daily flag as non-daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "unmarked_variable": {
+                "values": [1, 2, 3],
+                "info_maps": [{"units": "kg"}] * 3,
+            },
+        }
+    )
+
+    assert output_manager._get_variables_reported_daily() == {"variable_name": {"values": []}}
+    assert output_manager._get_variables_not_reported_daily() == {
+        "variable_report_count": {"values": ['{"unmarked_variable": 3}']}
     }
 
 
