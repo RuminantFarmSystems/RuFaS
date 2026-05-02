@@ -1877,7 +1877,9 @@ class OutputManager(object):
                 continue
 
             reported_variable_names = self._get_reported_variable_names(variable_name, values)
-            variable_report_counts.extend([f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names])
+            variable_report_counts.extend(
+                [f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names]
+            )
 
         return {"variable_report_count": {"values": variable_report_counts}}
 
