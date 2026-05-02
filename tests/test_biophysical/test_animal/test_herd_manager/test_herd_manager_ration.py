@@ -179,19 +179,38 @@ def test_update_all_max_daily_feeds(herd_manager: HerdManager, mocker: MockerFix
     assert mock_update_single_max_daily_feed.call_args_list == expected_update_single_max_daily_feed_call_args_list
 
 
-def test_update_all_max_daily_feeds_not_simulate_animals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Unit test for end_ration_interval()."""
+def test_update_all_max_daily_feeds_not_simulate_animals(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for update_all_max_daily_feeds()."""
     herd_manager.simulate_animals = False
     dummy_rufas_ids = list(range(randint(0, 50)))
     dummy_next_harvest_dates = {rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids}
-    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=RufasTime)
+    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
+    mock_time = MagicMock(auto_spec=RufasTime)
 
-    mock_update_single_max_daily_feed = mocker.patch.object(herd_manager, "_update_single_max_daily_feed")
+    mock_update_single_max_daily_feed = mocker.patch.object(
+        herd_manager,
+        "_update_single_max_daily_feed",
+    )
 
-    result = herd_manager.update_all_max_daily_feeds(mock_total_inventory, dummy_next_harvest_dates, mock_time)
+    result = herd_manager.update_all_max_daily_feeds(
+        mock_total_inventory,
+        dummy_next_harvest_dates,
+        mock_time,
+    )
 
     assert result == IdealFeeds({})
-    mock_update_single_max_daily_feed.assert_not_called()
+    assert mock_update_single_max_daily_feed.call_count == len(dummy_rufas_ids)
+
+    for rufas_id in dummy_rufas_ids:
+        mock_update_single_max_daily_feed.assert_any_call(
+            rufas_id,
+            dummy_next_harvest_dates[rufas_id],
+            mock_total_inventory,
+            mock_time,
+        )
 
 
 @pytest.mark.parametrize(
@@ -231,11 +250,10 @@ def test_formulate_rations(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for formulate_rations() when animals are simulated and pens may be populated."""
-    available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
+    available_feeds, current_temperature, ration_interval_length = (
         mock_available_feeds(),
         30,
         30,
-        MagicMock(auto_spec=TotalInventory),
     )
     mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 15
@@ -268,7 +286,6 @@ def test_formulate_rations(
         available_feeds,
         current_temperature,
         ration_interval_length,
-        mock_total_inventory,
         mock_time.simulation_day,
     )
 
@@ -278,7 +295,7 @@ def test_formulate_rations(
     mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     expected_reformulate_ration_single_pen_call_args_list = [
-        call(pen, available_feeds, current_temperature, mock_total_inventory, 15) for pen in herd_manager.all_pens
+        call(pen, available_feeds, current_temperature, 15) for pen in herd_manager.all_pens
     ]
     assert mock_reformulate_ration_single_pen.call_args_list == expected_reformulate_ration_single_pen_call_args_list
 
@@ -296,11 +313,10 @@ def test_formulate_rations(
 def test_formulate_rations_not_simulate_animals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for formulate_rations()."""
     herd_manager.simulate_animals = False
-    available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
+    available_feeds, current_temperature, ration_interval_length = (
         mock_available_feeds(),
         30,
         30,
-        MagicMock(auto_spec=TotalInventory),
     )
 
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
@@ -314,7 +330,7 @@ def test_formulate_rations_not_simulate_animals(herd_manager: HerdManager, mocke
     ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
+        available_feeds, current_temperature, ration_interval_length, mock_time.simulation_day
     )
 
     assert result == RequestedFeed({})
@@ -331,11 +347,10 @@ def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFi
     """Unit test for formulate_rations()."""
     mocker.patch.object(Pen, "is_populated", new_callable=mocker.PropertyMock, return_value=False)
 
-    available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
+    available_feeds, current_temperature, ration_interval_length = (
         mock_available_feeds(),
         30,
         30,
-        MagicMock(auto_spec=TotalInventory),
     )
 
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
@@ -349,7 +364,7 @@ def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFi
     ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
+        available_feeds, current_temperature, ration_interval_length, mock_time.simulation_day
     )
 
     assert result == RequestedFeed({})
@@ -370,20 +385,17 @@ def test_reformulate_ration_single_pen(
     use_user_defined_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
 ) -> None:
     """Unit test for _reformulate_ration_single_pen()."""
-    mock_pen, available_feeds, current_temperature, mock_total_inventory = (
+    mock_pen, available_feeds, current_temperature = (
         MagicMock(auto_spec=Pen),
         mock_available_feeds(),
         30,
-        MagicMock(auto_spec=TotalInventory),
     )
     mock_formulate_optimized_ration = mocker.patch.object(mock_pen, "formulate_optimized_ration")
 
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(
-        mock_pen, available_feeds, current_temperature, mock_total_inventory, 15
-    )
+    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, 15)
 
     if use_user_defined_ration:
         mock_formulate_optimized_ration.assert_called_once_with(
@@ -392,7 +404,6 @@ def test_reformulate_ration_single_pen(
             current_temperature,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
-            mock_total_inventory,
             15,
         )
     else:
@@ -402,7 +413,6 @@ def test_reformulate_ration_single_pen(
             current_temperature,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
-            mock_total_inventory,
             15,
         )
 
@@ -590,7 +600,6 @@ def test_reformulate_ration_single_pen_lac_cow_zero_milk_updates_animals(
 
     pen_available_feeds = mock_available_feeds()
     current_temperature = 30.0
-    total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
     simulation_day = 15
 
     herd_manager.is_ration_defined_by_user = True
@@ -603,7 +612,6 @@ def test_reformulate_ration_single_pen_lac_cow_zero_milk_updates_animals(
         pen,
         pen_available_feeds,
         current_temperature,
-        total_inventory,
         simulation_day,
     )
 
@@ -616,7 +624,6 @@ def test_reformulate_ration_single_pen_lac_cow_zero_milk_updates_animals(
         current_temperature,
         herd_manager._max_daily_feeds,
         herd_manager.advance_purchase_allowance,
-        total_inventory,
         simulation_day,
     )
 
@@ -636,7 +643,6 @@ def test_reformulate_ration_single_pen_calf_branch(
 
     pen_available_feeds = mock_available_feeds()
     current_temperature = 30.0
-    total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
     simulation_day = 15
 
     herd_manager.is_ration_defined_by_user = is_ration_defined_by_user
@@ -655,7 +661,6 @@ def test_reformulate_ration_single_pen_calf_branch(
         pen,
         pen_available_feeds,
         current_temperature,
-        total_inventory,
         simulation_day,
     )
 
