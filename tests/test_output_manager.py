@@ -1628,9 +1628,7 @@ def test_add_to_pool_defaults_missing_daily_flag_to_false(mock_output_manager: O
     mock_output_manager._add_to_pool(pool, "dummy_key", "dummy_value", info_map)
 
     assert pool["dummy_key"]["is_daily_variable"] is False
-    assert pool["dummy_key"]["info_maps"] == [
-        {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}
-    ]
+    assert pool["dummy_key"]["info_maps"] == [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}]
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
