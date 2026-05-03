@@ -68,3 +68,6 @@ To render the docs use:
 ```shell
 quarto render
 ```
+
+## Troubleshooting
+<!-- TBD -->
