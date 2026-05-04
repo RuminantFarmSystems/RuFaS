@@ -152,7 +152,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     time.simulation_day = 0
     available_feeds: list[Any] = []
 
-    herd_manager = HerdManager(
+    HerdManager(
         weather=weather,
         time=time,
         is_ration_defined_by_user=False,
