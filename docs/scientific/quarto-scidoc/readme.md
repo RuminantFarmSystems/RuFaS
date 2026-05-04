@@ -32,10 +32,10 @@ file.
 * resources: contains the materials referenced by the source code to be included in the final documentation, organized
 into subfolders by data type:
 
-  - table_data: files that contain the data to be presented in the documentation
-  
-  - bib_files: BibTex files (`.bib`), from which in-text citations are pulled and the final bibliography are 
+  - `rufas.bib` (bare file): BibTex file from which in-text citations are pulled and the final bibliography is 
   constructed
+  
+  - table_data: files that contain the data to be presented in the documentation
   
   - images: pictures and other images referenced by the `.qmd` files.
   
