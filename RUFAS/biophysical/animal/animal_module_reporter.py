@@ -488,6 +488,11 @@ class AnimalModuleReporter:
                 manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
                 manure_stream_dict["mass"] = manure_stream.mass
                 if manure_stream.pen_manure_data is None:
+                    om.add_error(
+                        "Missing PenManureData for manure stream.",
+                        f"No PenManureData for {stream_name}: pen_manure_data must be present.",
+                        info_map=info_map
+                    )
                     raise ValueError(f"No PenManureData for {stream_name}: pen_manure_data must be present.")
                 manure_stream_dict["total_bedding_mass"] = manure_stream.pen_manure_data.total_bedding_mass
                 manure_stream_dict["total_bedding_volume"] = manure_stream.pen_manure_data.total_bedding_volume

@@ -370,7 +370,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Days in pregnancy setter error",
+                "Pregnant animal cannot be type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "days_in_pregnancy.setter"}
+            )
+            raise TypeError(f"Pregnant animal cannot be type CALF or Heifer_I.")
         self._days_in_pregnancy = days_in_pregnancy
 
     @property
@@ -441,7 +446,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Future cull date setter error",
+                "The animal attempting to be assigned a cull date is not a cow.",
+                info_map={"class": self.__class__.__name__, "function": "future_cull_date.setter"}
+            )
+            raise TypeError("The animal attempting to be assigned a cull date is not a cow.")
         self._future_cull_date = future_cull_date
 
     @property
@@ -479,7 +489,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Future death date setter error",
+                "The animal attempting to be assigned a future death date is not a cow.",
+                info_map={"class": self.__class__.__name__, "function": "future_death_date.setter"}
+            )
+            raise TypeError("The animal attempting to be assigned a future death date is not a cow.")
         self._future_death_date = future_death_date
 
     @property
@@ -499,7 +514,7 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            raise TypeError("The animal attempting to be assigned a daily horizontal distance is not a cow.")
         return self._daily_horizontal_distance
 
     @daily_horizontal_distance.setter
