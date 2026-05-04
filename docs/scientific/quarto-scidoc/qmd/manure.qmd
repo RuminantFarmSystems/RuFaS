@@ -1,5 +1,5 @@
 ::: {.module-header-row}
-![](resources/manure.png){width=140px}
+![](../resources/images/manure.png){width=140px}
 
 # Manure Module
 :::
@@ -11,7 +11,7 @@
 
 <!--just a figure-->
 ::: {.text-end}
-![](resources/manure.png){width=50%}
+![](../resources/images/manure.png){width=50%}
 :::
 
 

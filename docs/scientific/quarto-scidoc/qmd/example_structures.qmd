@@ -78,7 +78,7 @@ All figures and images must be uploaded in the "references." When you upload you
 
 ```markdown
 
-![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
 
 -->[Caption for the image or figure]
 --> #fig-animal-icon = #indicates the type of file-label-for-auditing
@@ -89,7 +89,7 @@ All figures and images must be uploaded in the "references." When you upload you
 The output is below : 
 
 
-![Animal module icon](resources/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
 
 ### Example of a Table
 

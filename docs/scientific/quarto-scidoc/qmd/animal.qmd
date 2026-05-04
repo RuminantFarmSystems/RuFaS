@@ -1,4 +1,4 @@
-![Animal module icon](resources/animal.png){width=35%}
+![Animal module icon](../resources/images/animal.png){width=35%}
 # Animal Module
 
 ## Introduction
@@ -262,7 +262,6 @@ For details about the variables included in each calculation, please refer to tb
 *Maintenance* The maintenance requirement is calculated based on metabolic body weight (body weight$^{0.75}$).
 
 * Lactating and Dry Cows
-::: {#eq-an-nrc-1}
 
 ## Animal-level Process and Management
 
@@ -289,19 +288,18 @@ These methods are further described by @Li2023
 
 ```{python}
 #| label: tbl-animal-growth-req-inputs
-#| tbl-cap: | 
-#|  Summary of the available inputs that are available and their definitions.
+#| tbl-cap: Summary of the available inputs that are available and their definitions.
 #| echo: false
 import pandas as pd
-from IPython.display import Markdown
+from IPython.display import Markdown, display
 tbl = pd.read_csv(
-  "resources/tables/animal-growth_required-inputs.csv",
+  "../resources/table_data/animal_tables/animal-growth_required-inputs.csv",
   dtype = {"Default": str, "Min": str, "Max": str},
   keep_default_na = False
 ).to_markdown(
   index = False,
 )
-Markdown(tbl)
+display(Markdown(tbl))
 ```
 
 [//]: # (\textbf{Expected Outputs} )
@@ -1308,7 +1306,7 @@ $$
 
 
 ### Examples of Equations
-
+::: {#eq-an-nrc-1}
 $$
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.2)}
 $$ {#eq-an-nrc-2}
@@ -1317,7 +1315,6 @@ $$
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
 $$
 :::
-
 
 
 ::: {#eq-an-nrc-2}
@@ -1372,5 +1369,796 @@ $$
 ::: {#eq-an-nrc-8}
 $$
 NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+$$
+:::
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Methane Emission and Manure Excretion
+
+### Manure Excretion
+
+**Introduction**
+
+The Manure Excretion Calculator module computes manure excretion for different animal categories, including calves, growing heifers, lactating cows, and dry cows. It calculates the quantities of total mass and nutrient composition in manure. The implementation is designed for flexibility, enabling integration with other RuFaS modules for modeling farm management scenarios. This module includes:
+
+- *Classes:* ManureExcretionCalculator
+- *Key Methods:*
+  - calculate_calf_manure
+  - calculate_heifer_manure
+  - calculate_cow_manure
+  - _calculate_lactating_cow_manure
+  - _calculate_dry_cow_manure
+  - _calculate_phosphorus_excretion_values
+
+This module integrates with the process_digestion method in the DigestiveSystem class to calculate manure excretion on a daily and per-animal basis. It plays a critical role in linking animal-level digestion processes with downstream environmental and nutrient management models.
+
+The module takes inputs that include general animal properties (e.g., body weight, nutrient intake, and nutrient compositions), milk production characteristics (e.g., fat and protein content), specific nutrient properties (e.g., urine phosphorus requirements), and animal categories (e.g., CALF, HEIFER, COW). The outputs from this module are detailed manure excretion metrics, such as total manure mass, nutrient content, and volatile solids. In addition, an animal-class specific methane potential is assigned to manure upon excretion. These outputs are used by the Manure Module for downstream calculations, including manure methane (CH<sub>4</sub>) emissions and nutrient balance tracking.
+
+**Required User Inputs**
+
+The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are drawn from pen ration files and animal module constants. They are organized into the following groups:
+
+| Variable | Definition | Units |
+|---|---|---|
+| body_weight | Body weight of the current animal | kg |
+| dry_matter_intake | Dry matter intake from pen ration | kg |
+| dry_matter_concentration | Dry matter intake from pen ration | kg |
+| crude_protein_conc | Crude protein concentration in the diet | % |
+| potassium_concentration | Potassium concentration in the diet | % |
+| ash_diet_content | Ash content in the diet | % |
+| neutral_detergent_fiber_concentration | Neutral detergent fiber concentration | % |
+| acid_detergent_fiber_concentrations | Acid detergent concentration | % |
+| nutrient_concentrations | Nutrient concentrations (e.g., CP, NDF, ADF, ash) | % |
+
+: General animal and diet inputs used to calculate nutrient intake and manure production. {#tbl-animal-general-inputs-manure-excretrion}
+
+| Variable | Definition | Units | Default |
+|---|---|---|---|
+| is_lactating | Indicates the cow's lactating status | Boolean | NA |
+| days_in_milk | Days post-parturition; for lactating cows only; Intermediate model output | days | NA |
+| milk_protein | Milk protein content; for lactating cows only | % | 3.2 |
+| daily_milk_production | Daily milk production; for lactating cows only | kg | NA |
+| body_weight | Body weight of the cow | kg | NA |
+| milk_fat | Milk fat content | % | 3.5 |
+| metabolizable_energy_intake | Metabolizable energy intake per kg DM | Mcal/kg DM | NA |
+
+: Cow related inputs, particularly relevant for lactating animals. {#tbl-animal-cow-inputs-manure-excretion}
+
+| Variable | Definition | Units |
+|---|---|---|
+| fecal_phosphorus | Amount of fecal phosphorus excreted by the current animal; Intermediate model output | g |
+|urine_phosphorus_required | Phosphorus required for urine production; Intermediate model output | g |
+| total_manure_excreted | Total manure excreted by the animal; Intermediate model output | kg |
+
+: Phosphorus related inputs relevant to lactating cows {#tbl-animal-p-inputs-manure-excretion}
+
+**Expected Outputs**
+
+The outputs from the Manure Excretion Calculator are organized into two main categories: manure excretion values and manure nutrient composition. These outputs are consistently generated across animal categories.
+
+| Category | Parameter | Definition | Units |
+|---|---|---|---|
+| Manure Excretion | urea | Concentration of urea in the urine | g/L |
+|&nbsp;| Urine | Amount of urine excreted | kg |
+|&nbsp;| Manure Mass | Total mass of manure excreted | kg |
+|&nbsp;| Total solids | Dry matter content of the manure | kg |
+|&nbsp;| Degradable volatile solids | Portion of the volatile solids that is degradable | kg |
+|&nbsp;| Non-degradable volatile solids | Portion of the volatile solids that is non-degradable | kg |
+| Manure Nutrient Composition | Manure methane potential | The maximum methane producing capacity of volatile solids from manure | m^3^ CH<sub>4</sub>/kg VS |
+|&nbsp;| Manure total ammoniacal nitrogen | Total ammoniacal nitrogen excreted in the manure | kg |
+|&nbsp;| Urine nitrogen | Amount of nitrogen excreted via urine | kg |
+|&nbsp;| Manure nitrogen | Total nitrogen excreted in manure | kg |
+|&nbsp;| Inorganic phosphorus fraction | Fraction of manure phosphorus that is inorganic |--|
+|&nbsp;| Organic phosphorus fraction | Fraction of manure phosphorus that is organic |--|
+|&nbsp;| Non-water inorganic phosphorus fraction| Portion of inorganic phosphorus not water-extractable |--|
+|&nbsp;| Non-water organic phosphorus not water-extractable | Portion of organic phosphorus not water-extractable |--|
+|&nbsp;| Total phosphorus excreted | Total amount of phosphorus excreted by the animal | g |
+|&nbsp;| Phosphorus fraction | Overall fraction of phosphorus in the manure |--|
+|&nbsp;| Potassium | Amount of potassium excreted in the manure | g |
+
+: Expected outputs from the manure excretion calculator. {#tbl-animal-outputs-manure-excretion}
+
+**Methodology**
+
+
+**1. Calf Manure Excretion (calculate_calf_manure)**
+
+
+**Manure excretions**
+
+Manure: amount of feces and urine excreted daily by a calf (kg/d)
+
+::: {#eq-an-exc-1}
+$$
+\text{total\_manure\_excreted} = 3.45 \times \text{dry\_matter\_intake} \qquad \text{[AN.EXC.1]}
+$$ 
+:::
+
+Urine: amount of urine in kg, this is an assumption
+
+::: {#eq-an-exc-2}
+$$
+\text{urine} = 2.0 \qquad \text{[AN.EXC.2]}
+$$ 
+:::
+
+Manure total solids: amount of dry material excreted by the calf (kg/d)
+
+::: {#eq-an-exc-3}
+$$
+\text{total\_solids} = 0.393 \times \text{dry\_matter\_intake} \qquad \text{[AN.EXC.3]}
+$$
+:::
+
+Total volatile solids (kg/d)
+
+::: {#eq-an-exc-4}
+$$
+\text{total\_volatile\_solids} = 0.0023 \times \text{body\_weight} \qquad \text{[AN.EXC.4]}
+$$
+:::
+
+Degradable volatile solids exretion (kg/d)
+
+::: {#eq-an-exc-5}
+$$
+\text{degradable\_volatile\_solids} = 0.9 \times \text{total\_volatile\_solids} \qquad \text{[AN.EXC.5]}
+$$
+:::
+
+Non-degradable volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-6}
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{[AN.EXC.6]}
+$$
+:::
+
+**Manure nutrient composition**
+
+Manure nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-7}
+$$
+\text{manure\_nitrogen} = \frac{\left(112.55 \times \text{dry\_matter\_intake} \times \frac{\text{crude\_protein}}{100}\right)}{1000} \qquad \text{[AN.EXC.7]}
+$$
+:::
+
+Urine nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-8}
+$$
+\text{urine\_nitrogen} = 0.45 \times \text{manure\_nitrogen} \qquad \text{[AN.EXC.8]}
+$$
+:::
+
+Manure total ammoniacal nitrogen (kg/d)
+
+::: {#eq-an-exc-9}
+$$
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{[ANC.EXC.9]}
+$$
+:::
+
+**2. Heifer Manure Excretion (calculate_heifer_manure)**
+
+**Manure excretions**
+
+Urine excretion (kg/d)
+
+::: {#eq-an-exc-10}
+$$
+\text{urine} = 9.0 \qquad \text{[AN.EXC.10]}
+$$
+:::
+
+Total manure excretion (kg/d)
+
+::: {#eq-an-exc-11}
+$$
+\text{total\_manure\_excreted} = (4.158 \times \text{dry\_matter\_intake}) - (0.246 \times \text{body\_weight}) \qquad \text{[AN.EXC.11]}
+$$ 
+:::
+
+Because the equations that predict total manure excreted and total solids excreted rely on different inputs, in some extreme cases, the total mass of manure excreted can be predicted to be very close to the predicted total solids excreted which is unrealistically dry. For this reason, we set a maximum manure dry matter content of 20\% for heifers and dry cows. If the mass predicted by equation [AN.EXC.11](#eq-an-ex-11) is not greater than (total solids/minimum dry matter) then, 
+
+::: {#eq-an-exc-11ALT}
+$$
+\text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}} \qquad \text{[AN.EXC.11ALT]}
+$$ 
+:::
+
+Total solids excretion (kg/d) - this is the same equation that is used for dry cows
+
+::: {#eq-an-exc-12}
+$$
+\text{total\_solids} = 0.178 \times \text{dry\_matter\_intake} + 2.733 \qquad \text{[AN.EXC.12]}
+$$
+:::
+
+Total volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-13}
+$$
+\text{total\_volatile\_solids} = 0.0071 \times \text{body\_weight} \qquad \text{[AN.EXC.13]}
+$$
+:::
+
+Degradable volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-5}
+$$
+\text{degradable\_volatile\_solids} = 0.9 \times \text{total\_volatile\_solids} \qquad \text{[AN.EXC.5]}
+$$
+:::
+
+Non-degradable volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-6}
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{[AN.EXC.6]}
+$$
+:::
+
+
+**Manure nutrient composition**
+
+Manure nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-14}
+$$
+\text{manure\_nitrogen} = 15.1 + 8.83 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000} \qquad \text{[AN.EXC.14]}
+$$
+:::
+
+Fecal nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-15}
+$$
+\text{fecal\_nitrogen} = 0.345 + 0.317 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000} \qquad \text{[AN.EXC.15]}
+$$
+:::
+
+Urine nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-16}
+$$
+\text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}} \qquad \text{[AN.EXC.16]}
+$$
+:::
+
+Manure total ammoniacal nitrogen (kg/d)
+
+::: {#eq-an-exc-9}
+$$
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{[AN.EXC.9]}
+$$
+:::
+
+Manure potassium excretion (g/d)
+
+::: {#eq-an-exc-17}
+$$
+\text{potassium} = 1000 \times \text{dry\_matter\_intake} \times \frac{\text{potassium\_concentration}}{100} \qquad \text{[AN.EXC.17]}
+$$
+:::
+
+
+**3. Lactating Cow Manure Excretion (\_calculate\_lactating\_cow\_manure)**
+
+**Manure exretions**
+
+Fecal water (kg/d): Calculate the amount of fecal water excreted (kg/d)
+
+::: {#eq-an-exc-18}
+$$
+\text{fecal\_water} = \left(1.987 \times \text{dry\_matter\_intake}\right) + \left(0.348 \times \text{acid\_detergent\_fiber\_concentrations}\right) - \left(0.412 \times \text{crude\_protein\_concentration}\right) - \left(0.074 \times \text{dry\_matter\_concentration}\right) - \left(0.0057 \times \text{days\_in\_milk}\right) \qquad \text{[AN.EXC.18]}
+$$
+::: 
+
+::: {#eq-an-exc-18}
+$$
+\begin{aligned}
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+\qquad \text{[AN.EXC.18]}
+\end{aligned}
+$$
+:::
+
+
+::: {#eq-an-exc-18}
+$$
+\begin{aligned}
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+\end{aligned}
+\tag*{[AN.EXC.18]}
+$$
+:::
+
+Total solids/Fecal dry matter (kg/d): Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids.
+
+::: {#eq-an-exc-19}
+$$
+\text{fecal\_solids} = 0.576 + \left(0.370 \times \text{dry\_matter\_intake}\right) - \left(0.075 \times \text{crude\_protein\_concentration}\right)+ \left(0.059 \times \text{acid\_detergent\_fiber\_concentrations}\right) \qquad \text{[AN.EXC.19]}
+$$ 
+:::
+
+Urine (kg/d)
+
+::: {#eq-an-exc-20}
+$$
+\text{urine} = -7.742 + \left(0.388 \times \text{dry\_matter\_intake}\right) + \left(0.726 \times \text{crude\_protein\_concentration}\right) + \left(2.066 + \text{milk\_protein}\right) \qquad \text{[AN.EXC.20]}
+$$ 
+:::
+
+Total manure exretion (kg/d)
+
+::: {#eq-an-exc-21}
+$$
+\text{total\_manure\_excreted} = \text{fecal\_water} + \text{fecal\_solids} + \text{urine} \qquad \text{[AN.EXC.21]}
+$$
+:::
+
+Organic matter intake (kg/d)
+
+::: {#eq-an-exc-22}
+$$
+\text{organic\_matter\_intake} = \text{dry\_matter\_intake} - \text{ash\_diet\_content} \qquad \text{[AN.EXC.22]}
+$$
+:::
+
+Degradable volatile solids (kg/d)
+
+::: {#eq-an-exc-23}
+$$
+\text{degradable\_volatile\_solids} = -1.017 + \left(0.364 \times \text{organic\_matter\_intake}\right) + \left(0.029 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.023 \times \text{crude\_protein\_concentration}\right) \qquad \text{[AN.EXC.23]}
+$$ 
+:::
+
+Total volatile solids exreted by a lactating cow (kg/d)
+
+::: {#eq-an-exc-24}
+$$
+\text{total\_volatile\_solids} = -1.201 + \left(0.402 \times \text{organic\_matter\_intake}\right) + \left(0.036 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.024 \times \text{crude\_protein\_concentration}\right) \qquad \text{[AN.EXC.24]}
+$$ 
+:::
+
+Non-degradable volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-6}
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{[AN.EXC.6]}
+$$ 
+:::
+
+**Manure nutrient composition**
+
+Total manure nitrogen (kg/d)
+
+::: {#eq-an-exc-25}
+$$
+\text{manure\_nitrogen} = 20.3 + 0.654 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000} \qquad \text{[AN.EXC.25]}
+$$
+:::
+
+Fecal nitrogen (kg/d)
+
+::: {#eq-an-exc-26}
+$$
+\text{fecal\_nitrogen} = \frac{\left(10.1 \times \text{dry\_matter\_intake} - 18.5 \right)}{1000} \qquad \text{[AN.EXC.26]}
+$$
+:::
+
+Urine nitrogen excretion (kg/d)
+
+::: {#eq-an-exc-16}
+$$
+\text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}} \qquad \text{[AN.EXC.16]}
+$$
+:::
+
+Manure total ammoniacal nitrogen (kg/d)
+
+::: {#eq-an-exc-9}
+$$
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{[AN.EXC.9]}
+$$ 
+:::
+
+Manure potassium excretion (g/d)
+
+::: {#eq-an-exc-27}
+$$
+\text{potassium} = \left(7.21 \times \text{dry\_matter\_intake}\right) + \left(15944 \times \frac{\text{potassium\_concentration}}{100}\right) - 164.5 \qquad \text{[AN.EXC.27]}
+$$ 
+:::
+
+
+
+**4. Dry Cow Manure Excretion (\_calculate\_dry\_cow\_manure)**
+
+**Manure excretions**
+
+Urine excretion (kg/d): Amount of urine excreted in kg with the assumption that 1.038 kg of urine is approximately 1 L. Due to lack of information, average excretion rate from dry cows is assumed.
+
+::: {#eq-an-exc-28}
+$$
+\text{urine} = 15.4 \qquad \text{[AN.EXC.28]}
+$$
+:::
+
+Total manure excretion (kg/d): Amount of feces and urine excreted daily by dry cows (kg/d)
+
+::: {#eq-an-exc-29}
+$$
+\text{total\_manure\_excreted} = \left(0.00711 \times \text{body\_weight}\right) + \left(0.324 \times \text{crude\_protein\_concentration}\right) + \left(0.259 \times \text{neutral\_detergent\_fiber\_concentration}\right) \qquad \text{[AN.EXC.29]}
+$$
+:::
+
+Because the equations that predict total manure excreted and total solids excreted rely on different inputs, in some extreme cases, the total mass of manure excreted can be predicted to be very close to the predicted total solids excreted which is unrealistically dry. For this reason, we set a maximum manure dry content of 20% for heifers and dry cows. If the mass predicted by equation [AN.EXC.11](#eq-an-ex-11) is not great than (total solids/maximum manure dry matter content) then,
+
+::: {#eq-an-exc-11ALT}
+$$
+\text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}} \qquad \text{[AN.EXC.11ALT]}
+$$
+:::
+
+Total solids excretion (kg/d) - this is the same equation used for lactating cows.
+
+::: {#eq-an-exc-12}
+$$
+\text{total\_solids} = 0.178 \times \text{dry\_matter\_intake} + 2.733 \qquad \text{[AN.EXC.12]}
+$$
+:::
+
+Organic matter intake (kg/d)
+
+::: {#eq-an-exc-22}
+$$
+\text{organic\_matter\_intake} = \text{dry\_matter\_intake} - \text{ash\_diet\_content} \qquad \text{[AN.EXC.22]}
+$$ 
+:::
+
+Degradable volatile solids (kg/d)
+
+::: {#eq-an-exc-23}
+$$
+\text{degradable\_volatile\_solids} = -1.017 + \left(0.364 \times \text{organic\_matter\_intake}\right) + \left(0.029 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.023 \times \text{crude\_protein\_concentration}\right) \qquad \text{[AN.EXC.23]}
+$$ 
+:::
+
+Total volatile solids excreted by a dry cow (kg/d)
+
+::: {#eq-an-exc-24}
+$$
+\text{total\_volatile\_solids} = -1.201 + \left(0.402 \times \text{organic\_matter\_intake}\right) + \left(0.036 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.024 \times \text{crude\_protein\_concentration}\right) \qquad \text{[AN.EXC.24]}
+$$ 
+:::
+
+Non-degradable volatile solids excretion (kg/d)
+
+::: {#eq-an-exc-6}
+$$
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{[AN.EXC.6]}
+$$ 
+:::
+
+
+**5. Manure Phosporus Excretion (\_calulate\_phosphorus\_excretion\_manure)**
+
+Total phosphorus fraction of feces
+
+::: {#eq-an-exc-30}
+$$
+\text{manure\_phosphorus\_fraction} = \frac{\text{fecal\_phosphorus} + \text{urine\_phosphorus\_required}}{\text{total\_manure\_excreted} \times 1000 g/kg} \qquad \text{[AN.EXC.30]}
+$$
+:::
+
+Inorganic phosphorus fraction
+
+::: {#eq-an-exc-31}
+$$
+\text{inorganic\_phosphorus\_fraction} = 0.50 \times \text{manure\_phosphorus\_fraction} \qquad \text{[AN.EXC.31]}
+$$ 
+:::
+
+Organic phosphorus fraction
+
+::: {#eq-an-exc-32}
+$$
+\text{organic\_phosphorus\_fraction} = 0.05 \times \text{manure\_phosphorus\_fraction} \qquad \text{[AN.EXC.32]}
+$$ 
+:::
+
+Milk phosphorus
+
+::: {#eq-an-exc-33}
+$$
+\text{phosphorus\_in\_milk} = 0.0009 \times \text{daily\_milk\_production} \times 1000 g/kg \qquad \text{[AN.EXC.33]}
+$$ 
+:::
+
+Manure phosphorus excreted by a cow (g/d)
+
+::: {#eq-an-exc-34}
+$$
+\text{manure\_phosphorus\_excreted} = \text{fecal\_phosphorus} + \text{urine\_phosphorus\_required} \qquad \text{[AN.EXC.34]}
+$$ 
+:::
+
+Total phosphorus excrete by a cow (g/d)
+
+::: {#eq-an-exc-35}
+$$
+\text{total\_phosphorus\_excreted} = \text{phosphorus\_in\_milk} + \text{fecal\_phosphorus} + \text{urine\_phosphorus\_required} \qquad \text{[AN.EXC.35]}
+$$ 
+:::
+
+
+**6. Manure Methane Potential**
+
+The methane potential of the manure volatile solids are set by the **get_manure_streams()** method based on the Animal Combination of the pen. If the Animal Combination is CALVES or GROWING, the methan potential is set to 0.17. If the Animal Combination is LAC_COW or CLOSE_UP, the methane potential is set to 0.24 [@Hanson2024].
+
+::: {.callout-note}
+All references may be found at the end of this document or are based on expert communication with V. Sempali from 2023 to 2024.
+::: 
+
+
+### Enteric Methane Emission
+
+**Introduction**
+
+The Enteric Methane Calculator module calculates daily enteric methane emissions for calves, heifers, lactating cows, and dry cows. Methane emissions are estimated based on animal characteristics, dietary intake, and a variety of animal category specific methane models. The IPCC model [@IPCC2006] is available for all animal classes except calves. The equation from Mills et al. [@Mills2003] is also available for dry and lactating cows and the Niu et al. [@Niu2018] equation is available for lactating cows. Finally, a separate equation published by Pattanaik et al. [@Pattanaik2003] is used for calves. Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the DigestiveSystem class and supports methane mitigation strategies using feed additives.
+
+- *Classes:* EntericMethaneCalculator
+- *Key Methods:*
+   - calculate_calf_manure
+   - calculate_heifer_manure
+   - calculate_cow_methane (lactating and dry cow methods are called within this method)
+   - calculate_lactating_cow_manure
+   - calculate_dry_cow_manure
+
+The calculated enteric methane emissions are directly output to the Output Manager to generate the final reports.
+
+**Required User Inputs**
+
+| Variable Name | Definition | Units |
+|---|---|---|
+| dry_matter_intake | Dry matter intake from pen ration | kg |
+| nutrient_concentrations | Nutrient concentrations (e.g., CP, NDF, ADF, ash) | % |
+
+: Animal and diet inputs used to calculate nutrient intake and manure production. {#tbl-animal-enteric-methane-general}
+
+
+| Variable Name | Definition | Units | Default | Max |
+|---|---|---|---|---|
+| body_weight | Body weight of the current animal | kg | -- | -- |
+| is_lactating | Indicates the cow's lactating status | Boolean | -- | -- |
+| milk_fat | Milk fat content | % | 3.5 | -- |
+| metabolizable_energy_intake | Metabolizable energy intake per kg of DM | Mcal/kg DM | -- | -- |
+
+: Cow specific inputs, particularly relevant for lactating animals. {#tbl-animal-enteric-methane-cow}
+
+
+| Variable Name | Definition | Default and Range |
+|---|---|---|
+| methane_model | Selected methane model for emission estimation | "Mutian", "Mills", "IPCC" |
+| methane_mitigation_method | Selected feed additive for methane mitigation | "3-NOP", "Monensin", "Essential Oils", "Seaweed" |
+| methane_mitigation_additive_-amount | Amount of additive used for methane mitigation (mg/kg DMI) | 3-NOP (70; 40-100), Monensin (24; 20-36), Essential Oils (0; 0-100), Seaweed (0; 0-100) |
+
+: Methane emissions model and mitigation strategy inputs. {#tbl-animal-enteric-methane-model}
+
+**Expected Outputs**
+
+This module predicts the daily enteric methane emissions for individual animals:
+
+| Category | Parameter | Definition | Units |
+|---|---|---|---|
+| Methane Emmissions | Daily enteric methane emissions | Estimated methane production per animal per day | g CH<sub>4</sub>/head/day |
+
+: Expected outputs. {#tbl-animal-enteric-methane-outputs}
+
+**Methodology**
+
+**1. Required Diet Composition Inputs**
+
+Based on dry matter intake and gross energy concentration from nutrient composition:
+
+::: {#eq-an-met-1}
+$$
+\text{soluble\_residue} = 100 - \text{ash\_concentration} - \text{neutral\_detergent\_fiber\_concentration} - \text{crude\_protein\_concentration} - \text{ethyl\_ester\_concentration} \qquad \text{[AN.MET.1]}
+$$
+:::
+
+
+::: {#eq-an-met-2}
+$$
+\text{gross\_energy\_concentration} = 0.263 \times \left(\text{crude\_protein\_concentration} + 0.522\right) \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right)  \times \text{soluble\_residue}   \qquad \text{[AN.MET.2]}
+$$
+:::
+
+
+::: {#eq-an-met-3}
+$$
+\text{starch\_acid\_detergent\_fiber\_concentration\_ratio} = -0.0011 \times \frac{\text{starch\_concentration}}{\text{acid\_detergent\_fiber\_concentrations}} \qquad \text{[AN.MET.3]}
+$$
+:::
+
+**2. Calf Methane Emissions (calculate_calf_methane)**
+
+Methance emissions are calculated using body weight. The selected methane model for other animal categories does not apply here. [@Pattanaik2003] reported no difference in calf methane production in crossbred calves. Methane emissions by calves are estimated from mean values observed in that study.
+
+::: {#eq-an-met-4}
+$$
+\text{methane\_emission} = \frac{0.013 \times \text{body\_weight}^{0.75} \times 4.184 J/Mcal}{0.05565} \qquad \text{[AN.MET.4]}
+$$
+:::
+
+
+**3. Heifer Methane Emissions (calculate_heifer_methane)**
+
+::: {#eq-an-met-5}
+$$
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} \qquad \text{[AN.MET.5]}
+$$
+:::
+
+**4. Lactating Cow Methane Emissions (calculate_cow_methane)**
+
+
+For lactating cows, the Mutian, Mills, or IPCC model is applied
+
+**Mutian Model**
+
+::: {#eq-an-met-6}
+$$
+\text{methane\_emission} = -126 + \left(11.3 \times \text{dry\_matter\_intake} \right) + \left(2.30 \times \text{neutral\_detergent\_fiber\_concentration}\right) + \left(28.8 \times \text{milk\_fat}\right) + \left(0.148 \times \text{body\_weight}\right)   \qquad \text{[AN.MET.6]}
+$$
+:::
+
+**Mills Model** Mills et al. [@Mills2003] parameterized Mitscherlich equations for a nonlinear model of methan emissions. The CNCPS and IFSM models use the Mitscherlich 3 equation.
+
+
+::: {#eq-an-met-7}
+$$
+\text{methane\_emission} = \frac{45.98 \times e^{- \left(\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045\right)} \times \text{metabolizable\_energy\_intake} \times 4.184}{0.05565} \qquad \text{(AN.MET.7)}
+$$
+:::
+
+
+**IPCC Model**
+
+::: {#eq-an-met-5}
+$$
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} \qquad \text{[AN.MET.5]}
+$$
+:::
+
+
+**5. Dry Cow Methane Emissions (\_calculate\_dry\_cow\_manure)**
+
+**Mills Model** Mills et al. [@Mills2003] parameterized Mitscherlich equations for a nonlinear model of methan emissions. The CNCPS and IFSM models use the Mitscherlich 3 equation.
+
+::: {#eq-an-met-7}
+$$
+\text{methane\_emission} = \frac{45.98 \times e^{- \left(\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045\right)} \times \text{metabolizable\_energy\_intake} \times 4.184}{0.05565} \qquad \text{(AN.MET.7)}
+$$
+:::
+
+**IPCC Model**
+
+::: {#eq-an-met-5}
+$$
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} \qquad \text{[AN.MET.5]}
+$$
+:::
+
+**6. Methane Mitigation**
+
+- Methane mitigation strategies are applied exclusively to lactating and dry cows. However, caution is advised when interpreting the outcomes for dry cows, as the equations used were developed based on datasets from lactating cows.
+- Currently, the implemented methane mitigation feed additives include 3-NOP and monensin, with essential oils and seaweed planned for future integration.
+- The detailed methodology for methane mitigation calculations will be provided in a separate document titled Methane Mitigation Calculator.
+        
+
+### Enteric Methane Mitigation
+
+**Introduction**
+
+The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield due to the inclusion of specific feed additives in animal diets. This module calculates methane mitigation effects on a per-animal basis by considering dietary composition, feed additive dosage, and the selected mitigation strategy.
+Currently, the module supports the following mitigation strategies:
+
+- 3-NOP (3-Nitrooxypropanol)
+- Monensin
+
+Future updates will include additional strategies such as essential oils and seaweed. The mitigation effects are first calculated as a percentage reduction in methane yield (methane production / DMI). Then this module integrates with the Enteric Methane Calculator to adjust the initially predicted enteric methane. 
+
+**Required User Inputs**
+
+The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield based on dietary composition and the use of specific feed additives. The inputs are organized into the following groups:
+
+| Variable Name | Definition | Default and Range |
+|---|---|---|
+| neutral_detergent_fiber_concentration | Neutral detergent fiber concentration, % DM | -- |
+| ethyl_ester_concentration | Ether extract (crude fat) concentration, % DM | -- |
+| starch_concentration | Starch concentration in the diet, % DM | -- |
+
+: General dietary fiber and fat concentration inputs. {#tbl-animal-enteric-mitigation-dietary-comp}
+
+| Variable Name | Definition | Default and Range |
+|---|---|---|
+| methane_mitigation_-method | Selected feed additive for methane mitigation | "3-NOP", "Monensin" |
+
+: Feed-based methane mitigation strategies. {#tbl-animal-enteric-mitigation-strategies}
+
+| Variable Name | Definition | Default and Range|
+|---|---|---|
+| methane_mitigation_additive_-amount | Dosage per kg of dry matter intake (DMI) | 3-NOP: 70 (40-100) mg/kg DMI; Monensin: 24 (20-36) mg/kg DMI |
+
+: Dosage of methane mitigation additives. {#tbl-animal-enteric-mitigation-dosage}
+
+**Expected Outputs**
+
+This module predicts the daily enteric methane emissions for individual animals:
+
+| Category | Parameter | Definition | Units |
+|---|---|---|---|
+| Methane Emissions | Daily enteric methane emissions | Estimated methane production per animal per day | g CH<sub>4</sub>/head/day |
+
+: Expected outputs. {#tbl-animal-enteric-mitigation-outputs}
+
+**Methodology**
+
+**3-NOP Methane Yield Reduction** Reduction is modeled as a function of additive dosage, NDF, EE, and starch concentrations.
+
+::: {#eq-an-met-8}
+$$
+\text{methane\_yield\_reduction} = -30.8 -  \left(0.226 \times \left(\text{methane\_mitigation\_additive\_amount} - 70.5 \right)\right) + \left(0.906 \times \left(\text{neutral\_detergent\_fiber\_concentration} - 32.9 \right)\right) + \left(3.871 \times \left(\text{ethyl\_ester\_concentration} - 4.2 \right)\right) - \left(0.337 \times \left(\text{starch\_concentration} - 21.1 \right)\right)   \qquad \text{[AN.MET.8]}
+$$
+:::
+
+**Monensin Methane Yield Reduction** Reduction is based on additive dosage and starch concentration.
+
+::: {#eq-an-met-9}
+$$
+\text{methane\_yield\_reduction} = 6.35 -  \left(0.277 \times \text{methane\_mitigation\_additive\_amount} \right) - \left(0.182 \times \text{starch\_concentration}\right)   \qquad \text{[AN.MET.9]}
+$$
+:::
+
+**Default Case** If no valid mitigation method is selected, the reduction defaults to 0%.
+
+**Adjust the Initial Predicted Enteric Methane (EntericMethaneCalculator.calculate_-cow_methane)** First, the initially predicted methane yield of the basal diet is calculated
+
+::: {#eq-an-met-10}
+$$
+\text{methane\_yield} = \frac{\text{methane\_emission}}{\text{dry\_matter\_intake}} \times 100 \qquad \text{[AN.MET.10]}
+$$
+:::
+
+Then the adjusted methane production is calculated based on methane yield reduction (%)
+
+::: {#eq-an-met-11}
+$$
+\text{adjusted\_methane\_emission} = \text{methane\_yield} \times \left(1 + \frac{\text{methane\_yield\_reduction}}{100}\right) \times \text{dry\_matter\_intake} \qquad \text{[AN.MET.11]}
 $$
 :::
