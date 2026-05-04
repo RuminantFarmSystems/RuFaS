@@ -69,3 +69,8 @@ DataCollectionApp/schema/*
 !DataCollectionApp/schema/.keep
 
 docs/_build/
+
+# Ignore some R files
+.Rproj*
+*.Rproj*
+.positai
