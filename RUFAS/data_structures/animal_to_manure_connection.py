@@ -80,11 +80,11 @@ class PenManureData:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
 
     def set_first_processor(self, processor_name: str) -> None:
-        "First-processor setter method."
+        """First-processor setter method."""
         self.first_processor = processor_name
 
     def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
-        "Setter method for total_bedding_mass and total_bedding_volume"
+        """Setter method for total_bedding_mass and total_bedding_volume."""
         self.total_bedding_mass = bedding_mass
         self.total_bedding_volume = bedding_volume
 
@@ -291,7 +291,7 @@ class ManureStream:
 
     @classmethod
     def make_empty_manure_stream(cls) -> "ManureStream":
-        """Factory method for making an empty ManureStreams."""
+        """Factory method for making an empty ManureStream."""
         return ManureStream(
             water=0.0,
             ammoniacal_nitrogen=0.0,

@@ -12,7 +12,7 @@ class BaseFieldManagementEvent:
     This module defines the various BaseFieldManagementEvent classes and helper functions.
 
     Events will facilitate scheduling of different management operations. At their core, they
-    are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur.
+    are simply pairs of attributes (``year`` and ``day``), indicating when particular operations should occur.
 
     Parameters
     ----------
@@ -138,7 +138,7 @@ class HarvestEvent(BaseFieldManagementEvent):
     crop_reference : str
         Name of the crop to be harvested.
     operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
-        A harvest operation from the Harvest Operations enum.
+        A harvest operation from the ``HarvestOperations`` enum.
     """
 
     def __init__(
