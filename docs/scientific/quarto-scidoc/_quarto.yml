@@ -14,10 +14,13 @@ book:
     - qmd/example_structures.qmd
     - qmd/animal.qmd
     - qmd/manure.qmd
+    - qmd/crop_and_soil.qmd
+    - qmd/feed_storage.qmd
+    - qmd/economics.qmd
 
 
 
-bibliography: resources/bib_files/rufas.bib
+bibliography: resources/rufas.bib
 
 format:
   html:
