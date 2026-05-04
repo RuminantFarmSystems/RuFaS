@@ -171,6 +171,16 @@ class HerdManager:
         self.initialize_pens(animal_config_data["pen_information"])
 
         herd_population = HerdFactory.post_animal_population
+        if herd_population is None:
+            self.om.add_error(
+                "Herd population is None.",
+                "Expected there to be a herd and got None from HerdFactory.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                }
+            )
+            raise RuntimeError("Herd population has not been initialized.")
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
             herd_population.calves,
             herd_population.heiferIs,
