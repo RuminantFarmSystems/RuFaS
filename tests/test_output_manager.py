@@ -2095,9 +2095,7 @@ def test_format_parsable_dict_lines_units_suppressed_for_ignored_keys(
     expected_has_units: bool,
 ) -> None:
     """Units omitted for keys in _VARIABLE_DUMP_KEYS_TO_IGNORE or when units empty."""
-    result = mock_output_manager._format_parsable_dict_lines(
-        "myvar", "myvar", "values", [key], units, format_option
-    )
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", [key], units, format_option)
 
     assert len(result) == 1
     has_units = f"({units})" in result[0]
@@ -2106,9 +2104,7 @@ def test_format_parsable_dict_lines_units_suppressed_for_ignored_keys(
 
 def test_format_parsable_dict_lines_basic_per_key_lines(mock_output_manager: OutputManager) -> None:
     """Basic format emits one line per key using name.key pattern."""
-    result = mock_output_manager._format_parsable_dict_lines(
-        "myvar", "myvar", "values", ["k1", "k2"], "kg", "basic"
-    )
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", ["k1", "k2"], "kg", "basic")
 
     assert len(result) == 2
     assert f"myvar.k1 (kg){os.linesep}" in result
@@ -2117,9 +2113,7 @@ def test_format_parsable_dict_lines_basic_per_key_lines(mock_output_manager: Out
 
 def test_format_parsable_dict_lines_verbose_uses_prefix(mock_output_manager: OutputManager) -> None:
     """Verbose/block format uses prefix and parsable_dict in each line."""
-    result = mock_output_manager._format_parsable_dict_lines(
-        "myvar", "    ", "values", ["k1"], "kg", "verbose"
-    )
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "    ", "values", ["k1"], "kg", "verbose")
 
     assert len(result) == 1
     assert f"    .values: k1 (kg){os.linesep}" in result
