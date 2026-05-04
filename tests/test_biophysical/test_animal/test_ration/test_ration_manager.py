@@ -1,4 +1,5 @@
 import math
+from typing import Any
 import pytest
 from pytest_mock import MockerFixture
 
@@ -10,38 +11,95 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 
 
 @pytest.fixture
-def valid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] | float]]:
+def valid_ration_config() -> dict[str, Any]:
     return {
-        "user_defined_ration_percentages": {
-            "calf": [{"feed_type": 101, "ration_percentage": 50.0}, {"feed_type": 102, "ration_percentage": 50.0}],
-            "growing": [{"feed_type": 201, "ration_percentage": 60.0}, {"feed_type": 202, "ration_percentage": 40.0}],
-            "close_up": [{"feed_type": 301, "ration_percentage": 70.0}, {"feed_type": 302, "ration_percentage": 30.0}],
-            "lac_cow": [{"feed_type": 401, "ration_percentage": 80.0}, {"feed_type": 402, "ration_percentage": 20.0}],
-            "tolerance": 0.1,
-        }
+        "ration_formulation_parameters": {
+            "user_defined_ration_tolerance": 0.1,
+        },
+        "rations": [
+            {
+                "animal_combination": "calf",
+                "feeds": [
+                    {"feed_type": 101, "ration_percentage": 50.0},
+                    {"feed_type": 102, "ration_percentage": 50.0},
+                ],
+            },
+            {
+                "animal_combination": "growing",
+                "feeds": [
+                    {"feed_type": 201, "ration_percentage": 60.0},
+                    {"feed_type": 202, "ration_percentage": 40.0},
+                ],
+            },
+            {
+                "animal_combination": "close_up",
+                "feeds": [
+                    {"feed_type": 301, "ration_percentage": 70.0},
+                    {"feed_type": 302, "ration_percentage": 30.0},
+                ],
+            },
+            {
+                "animal_combination": "lac_cow",
+                "feeds": [
+                    {"feed_type": 401, "ration_percentage": 80.0},
+                    {"feed_type": 402, "ration_percentage": 20.0},
+                ],
+            },
+        ],
     }
 
 
 @pytest.fixture
-def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] | float]]:
+def invalid_ration_config() -> dict[str, Any]:
     return {
-        "user_defined_ration_percentages": {
-            "calf": [{"feed_type": 101, "ration_percentage": 55.0}, {"feed_type": 102, "ration_percentage": 50.0}],
-            "growing": [{"feed_type": 201, "ration_percentage": 60.0}, {"feed_type": 202, "ration_percentage": 50.0}],
-            "close_up": [{"feed_type": 301, "ration_percentage": 90.0}, {"feed_type": 302, "ration_percentage": 10.0}],
-            "lac_cow": [{"feed_type": 401, "ration_percentage": 85.0}, {"feed_type": 402, "ration_percentage": 25.0}],
-            "tolerance": 0.1,
-        }
+        "ration_formulation_parameters": {
+            "user_defined_ration_tolerance": 0.1,
+        },
+        "rations": [
+            {
+                "animal_combination": "calf",
+                "feeds": [
+                    {"feed_type": 101, "ration_percentage": 55.0},
+                    {"feed_type": 102, "ration_percentage": 50.0},
+                ],
+            },
+            {
+                "animal_combination": "growing",
+                "feeds": [
+                    {"feed_type": 201, "ration_percentage": 60.0},
+                    {"feed_type": 202, "ration_percentage": 50.0},
+                ],
+            },
+            {
+                "animal_combination": "close_up",
+                "feeds": [
+                    {"feed_type": 301, "ration_percentage": 90.0},
+                    {"feed_type": 302, "ration_percentage": 10.0},
+                ],
+            },
+            {
+                "animal_combination": "lac_cow",
+                "feeds": [
+                    {"feed_type": 401, "ration_percentage": 85.0},
+                    {"feed_type": 402, "ration_percentage": 25.0},
+                ],
+            },
+        ],
     }
 
 
 def test_set_ration_feeds_maps_config_to_animal_combinations() -> None:
     """set_ration_feeds should initialize ration_feeds for all combos and map config lists correctly."""
-    ration_config: dict[str, list[int]] = {
-        "calf_feeds": [1, 2],
-        "growing_feeds": [3],
-        "close_up_feeds": [4, 5, 6],
-        "lac_cow_feeds": [7],
+    ration_config: dict[str, Any] = {
+        "rations": [
+            {"animal_combination": "calf", "feeds": [{"feed_type": 1}, {"feed_type": 2}]},
+            {
+                "animal_combination": "growing",
+                "feeds": [{"feed_type": 3}],
+            },
+            {"animal_combination": "close_up", "feeds": [{"feed_type": 4}, {"feed_type": 5}, {"feed_type": 6}]},
+            {"animal_combination": "lac_cow", "feeds": [{"feed_type": 7}]},
+        ]
     }
 
     RationManager.set_ration_feeds(ration_config)
@@ -51,10 +109,30 @@ def test_set_ration_feeds_maps_config_to_animal_combinations() -> None:
 
     assert set(ration_feeds.keys()) == set(AnimalCombination)
 
-    assert ration_feeds[AnimalCombination.CALF] == ration_config["calf_feeds"]
-    assert ration_feeds[AnimalCombination.GROWING] == ration_config["growing_feeds"]
-    assert ration_feeds[AnimalCombination.CLOSE_UP] == ration_config["close_up_feeds"]
-    assert ration_feeds[AnimalCombination.LAC_COW] == ration_config["lac_cow_feeds"]
+    assert ration_feeds[AnimalCombination.CALF] == [
+        feed["feed_type"]
+        for ration in ration_config["rations"]
+        if ration["animal_combination"] == "calf"
+        for feed in ration["feeds"]
+    ]
+    assert ration_feeds[AnimalCombination.GROWING] == [
+        feed["feed_type"]
+        for ration in ration_config["rations"]
+        if ration["animal_combination"] == "growing"
+        for feed in ration["feeds"]
+    ]
+    assert ration_feeds[AnimalCombination.CLOSE_UP] == [
+        feed["feed_type"]
+        for ration in ration_config["rations"]
+        if ration["animal_combination"] == "close_up"
+        for feed in ration["feeds"]
+    ]
+    assert ration_feeds[AnimalCombination.LAC_COW] == [
+        feed["feed_type"]
+        for ration in ration_config["rations"]
+        if ration["animal_combination"] == "lac_cow"
+        for feed in ration["feeds"]
+    ]
 
     for combo, value in ration_feeds.items():
         if combo not in {
@@ -86,7 +164,7 @@ def test_get_ration_feeds_returns_expected_list() -> None:
 def test_set_user_defined_ration_tolerance_updates_class_attribute() -> None:
     """set_user_defined_ration_tolerance should store the tolerance value from the config."""
     config: dict[str, dict[str, list[dict[str, int | float]] | float]] = {
-        "user_defined_ration_percentages": {"tolerance": 0.15}
+        "ration_formulation_parameters": {"user_defined_ration_tolerance": 0.15}
     }
 
     RationManager.set_user_defined_ration_tolerance(config)
