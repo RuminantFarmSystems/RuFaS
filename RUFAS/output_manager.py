@@ -160,6 +160,9 @@ class OutputManager(object):
     __instance = None
     pool_element_type = dict[str, list[Any]]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
+    _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
+        ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
+    )
 
     def __new__(cls) -> OutputManager:
         if not hasattr(cls, "instance"):
@@ -1903,7 +1906,7 @@ class OutputManager(object):
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
         self._dict_to_file_csv(data_dict, file_path_csv)
 
-    def dump_variable_names_and_contexts(  # noqa: C901
+    def dump_variable_names_and_contexts(
         self,
         path: Path,
         exclude_info_maps: bool,
@@ -1955,68 +1958,91 @@ class OutputManager(object):
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
         for name, variable_data in self._get_flat_variables_pool().items():
-            if "values" not in variable_data:
-                var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
-                continue
-
-            parsable_dicts = []
-
-            var_data_info_maps: list[Any] | None = []
-            if not exclude_info_maps and "info_maps" in variable_data:
-                parsable_dicts.append("info_maps")
-                var_data_info_maps = variable_data.get("info_maps")
-
-            units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
-            is_variable_nested = isinstance(variable_data["values"][0], dict)
-            if is_variable_nested:
-                parsable_dicts.append("values")
-            else:
-                var_list.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
-
-            prefix = name
-            if format_option == "block":
-                if f"{name}{os.linesep}" not in var_list:
-                    var_list.append(f"{name}{os.linesep}")
-                prefix = " " * len(name)
-            keys_to_ignore = [
-                "units",
-                "timestep",
-                "info_maps",
-                "prefix",
-                "suffix",
-                "data_origin",
-                "number_animals_in_pen",
-                "simulation_day",
-            ]
-            for parsable_dict in parsable_dicts:
-                keys = variable_data[parsable_dict][0].keys()
-                if format_option == "inline":
-                    var_list.append(
-                        f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
-                        if not parsable_dict.endswith("info_maps") and units
-                        else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
-                    )
-                else:
-                    for key in keys:
-                        if isinstance(units, dict):
-                            var_units = units.get(key, "")
-                        else:
-                            var_units = units
-                        if format_option == "basic":
-                            var_list.append(
-                                f"{name}.{key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore and var_units
-                                else f"{name}.{key}{os.linesep}"
-                            )
-                        else:
-                            var_list.append(
-                                f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore and var_units
-                                else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
-                            )
-
+            var_list.extend(self._format_variable_entry(name, variable_data, exclude_info_maps, format_option))
         file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
+
+    def _get_parsable_dicts(
+        self,
+        variable_data: dict[str, Any],
+        exclude_info_maps: bool,
+    ) -> tuple[list[str], list[Any]]:
+        """Returns parsable dict keys and info_maps data for a variable entry."""
+
+        parsable_dicts: list[str] = []
+        var_data_info_maps: list[Any] = []
+        if not exclude_info_maps and "info_maps" in variable_data:
+            parsable_dicts.append("info_maps")
+            var_data_info_maps = variable_data.get("info_maps", [])
+        return parsable_dicts, var_data_info_maps
+
+    def _format_variable_entry(
+        self,
+        name: str,
+        variable_data: dict[str, Any],
+        exclude_info_maps: bool,
+        format_option: str,
+    ) -> list[str]:
+        """Returns formatted lines for a single variable in the variable names dump."""
+
+        if "values" not in variable_data:
+            return [f"{name}: **NO VARIABLES**{os.linesep}"]
+
+        parsable_dicts, var_data_info_maps = self._get_parsable_dicts(variable_data, exclude_info_maps)
+        units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
+        is_variable_nested = isinstance(variable_data["values"][0], dict)
+
+        lines: list[str] = []
+        if is_variable_nested:
+            parsable_dicts.append("values")
+        else:
+            lines.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
+
+        prefix = name
+        if format_option == "block":
+            if f"{name}{os.linesep}" not in lines:
+                lines.append(f"{name}{os.linesep}")
+            prefix = " " * len(name)
+
+        for parsable_dict in parsable_dicts:
+            keys = variable_data[parsable_dict][0].keys()
+            lines.extend(self._format_parsable_dict_lines(name, prefix, parsable_dict, keys, units, format_option))
+
+        return lines
+
+    def _format_parsable_dict_lines(
+        self,
+        name: str,
+        prefix: str,
+        parsable_dict: str,
+        keys: list[str],
+        units: str | dict[str, str],
+        format_option: str,
+    ) -> list[str]:
+        """Returns formatted lines for one parsable dict (values or info_maps) within a variable entry."""
+
+        if format_option == "inline":
+            return [
+                (
+                    f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
+                    if not parsable_dict.endswith("info_maps") and units
+                    else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
+                )
+            ]
+
+        lines: list[str] = []
+        for key in keys:
+            var_units = units.get(key, "") if isinstance(units, dict) else units
+            show_units = key not in self._VARIABLE_DUMP_KEYS_TO_IGNORE and var_units
+            if format_option == "basic":
+                lines.append(f"{name}.{key} ({var_units}){os.linesep}" if show_units else f"{name}.{key}{os.linesep}")
+            else:
+                lines.append(
+                    f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
+                    if show_units
+                    else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
+                )
+        return lines
 
     def dump_all_nondata_pools(
         self,
