@@ -110,8 +110,6 @@ class HerdManager:
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
 
-        # self.simulate_animals = simulate_animals
-
         self.calves: list[Animal] = []
         self.heiferIs: list[Animal] = []
         self.heiferIIs: list[Animal] = []
@@ -172,7 +170,6 @@ class HerdManager:
 
         self.initialize_pens(animal_config_data["pen_information"])
 
-        # if self.simulate_animals:
         herd_population = HerdFactory.post_animal_population
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
             herd_population.calves,
@@ -185,8 +182,6 @@ class HerdManager:
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
-
-        # self._print_animal_num_warnings(animal_config_data["herd_information"])
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
@@ -413,53 +408,6 @@ class HerdManager:
             f"heiferIIIs: {len(self.heiferIIIs)}\t"
             f"cows: {len(self.cows)}\t"
         )
-
-    # def _print_animal_num_warnings(self, herd_data: dict[str, Any]) -> None:
-    #     """
-    #     If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
-    #         and logs how many warnings were generated
-    #     Otherwise, if simulate_animals is true, logs that it is true
-
-    #     Parameters
-    #     ----------
-    #     herd_data : Dict[str, Any]
-    #         dictionary containing information about the herd
-
-    #     """
-
-    #     animal_keys = {
-    #         "calf_num",
-    #         "heiferI_num",
-    #         "heiferII_num",
-    #         "heiferIII_num_springers",
-    #         "cow_num",
-    #     }
-
-    #     info_map = {
-    #         "class": self.__class__.__name__,
-    #         "function": self._print_animal_num_warnings.__name__,
-    #         "simulate_animals": self.simulate_animals,
-    #         "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
-    #     }
-
-    #     counter = 0
-
-    #     if not self.simulate_animals:
-    #         for key in animal_keys:
-    #             if herd_data[key] != 0:
-    #                 self.om.add_warning(
-    #                     f"invalid_{key}_warning",
-    #                     f"Warning: simulate_animals is false, but {key} is not.",
-    #                     info_map,
-    #                 )
-    #                 counter += 1
-    #         self.om.add_log(
-    #             "num_warnings_associated_with_simulate_animals",
-    #             f"{counter} warnings were associated with simulate_animals",
-    #             info_map,
-    #         )
-    #     else:
-    #         self.om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
 
     def _reset_daily_statistics(self) -> None:
         """Reset the daily herd statistics."""
@@ -1584,8 +1532,6 @@ class HerdManager:
             Feeds requested to be purchased for the newly formulated rations.
 
         """
-        # if not self.simulate_animals:
-        #     return RequestedFeed({})
         self.clear_pens()
         self.allocate_animals_to_pens(simulation_day)
 
