@@ -985,9 +985,7 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
     should_flush_im_pool = True
-    mock_handle_herd_initialization = mocker.patch.object(
-        TaskManager, "handle_herd_initialization", return_value=None
-    )
+    mock_handle_herd_initialization = mocker.patch.object(TaskManager, "handle_herd_initialization", return_value=None)
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
 
     TaskManager._handle_herd_init_tasks(
