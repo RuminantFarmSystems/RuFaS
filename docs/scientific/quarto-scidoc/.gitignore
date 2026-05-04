@@ -1,5 +1,5 @@
 # some quarto files
-.quarto/
+/.quarto/
 **/*.quarto_ipynb
 site_libs/
 
@@ -9,4 +9,5 @@ site_libs/
 # raw LaTeX files
 *.tex
 
-/.quarto/
+# audit output
+quarto_reference_audit.xlsx
