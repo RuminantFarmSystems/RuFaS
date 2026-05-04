@@ -1,0 +1,23 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "POST_PROCESSING",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
+      "output_prefix": "example_post_processing",
+      "log_verbosity": "logs",
+      "random_seed": 42,
+      "exclude_info_maps": false,
+      "run_eee": true,
+      "load_saved_output_pools": true,
+      "saved_output_pools": [
+        {
+          "path": "saved_output_pools/freestall_saved_pool_23-Apr-2026_Thu_17-52-54.json"
+        }
+      ],
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/example_cross_validation.json"
+      ]
+    }
+]
+}

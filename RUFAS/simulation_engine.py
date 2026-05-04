@@ -4,7 +4,6 @@ from enum import Enum
 import time as timer
 from datetime import date, timedelta
 
-from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
@@ -275,7 +274,6 @@ class SimulationEngine:
         if self.simulate_manure:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
 
-        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)

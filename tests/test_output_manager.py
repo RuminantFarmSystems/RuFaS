@@ -2063,7 +2063,7 @@ def test_load_multiple_variables_pools_from_files_mixed_descriptors(
     """Loads pools from a tuple(Path) and a dict(str path), passes correct info_map, and namespaces results."""
     pools_input: Sequence[tuple[str, Path] | dict[str, Any]] = [
         ("poolA", Path("a.json")),
-        {"name": "poolB", "path": "b.json"},
+        {"prefix": "poolB", "path": "b.json"},
     ]
 
     loaded_pool_a: dict[str, dict[str, Any]] = {"varA": {"values": [1], "info_maps": [{"units": "kg"}]}}
@@ -4065,7 +4065,7 @@ def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
 def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     output_manager = OutputManager()
 
-    info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
+    info_map = {"class": "OutputManager", "function": "save_variable_pool_to_file"}
 
     dummy_saved_pool_chunks_num = 0
     dummy_variable_pool: dict[str, dict[str, list[Any]]] = {
