@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, PropertyMock, call
 
 from pytest_mock import MockerFixture
 
-from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -151,7 +150,6 @@ def test_simulate(
     """
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
     mock_report_end_of_simulation = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" ".report_end_of_simulation"
@@ -187,8 +185,6 @@ def test_simulate(
         simulation_engine.herd_manager.cow_events_by_id,
         simulation_engine.herd_manager.animal_genetic_history_by_id,
     )
-
-    mock_estimate_emissions.assert_called_once()
 
 
 def test_execute_full_farm_daily_simulation(
