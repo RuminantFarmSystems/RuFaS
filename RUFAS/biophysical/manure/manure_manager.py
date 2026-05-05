@@ -851,10 +851,29 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(request)
+        if request.use_daily_spread_source:
+            daily_spread_storages, _ = self._split_storages_by_daily_spread()
+            request_result, is_nutrient_request_fulfilled = self._handle_nutrient_request_for_storages(
+                request=request, storages=daily_spread_storages
+            )
+            if request_result is not None:
+                self._remove_nutrients_from_storage(
+                    request_result,
+                    request.manure_type,
+                    include_daily_spread=True,
+                    update_nutrient_manager_pool=False,
+                )
+        else:
+            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
+                request
+            )
+            if request_result is not None:
+                self._remove_nutrients_from_storage(
+                    request_result,
+                    request.manure_type,
+                    include_daily_spread=False,
+                )
         self._record_manure_request_results(request_result, "on_farm_manure", time)
-        if request_result is not None:
-            self._remove_nutrients_from_storage(request_result, request.manure_type)
 
         if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
             self._om.add_log(
