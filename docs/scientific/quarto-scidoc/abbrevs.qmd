@@ -8,7 +8,7 @@ import pandas as pd
 from IPython.display import Markdown, display
 
 tab_data = pd.read_csv(
-  "../resources/table_data/tbl-abbrevs.csv",  # <-- adjust path if needed
+  "../resources/table_data/tbl-abbrev.csv",  # <-- adjust path if needed
   dtype={"value": str},
   keep_default_na=False
 )
