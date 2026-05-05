@@ -16,7 +16,7 @@ class ResiduePartition:
         provided.
     field_size : float, optional
         Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha)
+        not provided (ha).
 
     Attributes
     ----------
@@ -532,7 +532,7 @@ class ResiduePartition:
 
         Notes
         -----
-        The referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        The referenced soil (below ground) biomass calculation was not found in the pseudocode_crop, neither is any
         mention of biomass unit.
 
         """

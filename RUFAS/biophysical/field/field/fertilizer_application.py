@@ -10,9 +10,9 @@ class FertilizerApplication:
 
     Parameters
     ----------
-    soil : Soil, default=None
+    soil : Soil, optional
         Soil object to which fertilizer should be applied.
-    field_size : float, default=None
+    field_size : float, optional
         Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
         SoilData object is not provided (ha)
 

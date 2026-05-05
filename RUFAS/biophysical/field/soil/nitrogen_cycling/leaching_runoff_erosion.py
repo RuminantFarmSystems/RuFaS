@@ -54,7 +54,7 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----

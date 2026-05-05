@@ -13,7 +13,7 @@ class Decomposition:
     soil_data : SoilData, optional
         An instance of SoilData containing soil properties and carbon pool information. A new instance is created if not
         provided.
-    field_size : float, optional, default None
+    field_size : float, optional
         The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.
 
     Attributes
@@ -60,8 +60,6 @@ class Decomposition:
         """
         Calculate the temperature factor for each layer.
 
-        This function implements the "pseudocode_soil" S.6.A.1 and uses defaults drawn from defac: course soil.
-
         Parameters
         ----------
         layer_temp : float
@@ -72,13 +70,16 @@ class Decomposition:
         float
             Temperature effect (unitless).
 
+        References
+        ---------
+        "pseudocode_soil" S.6.A.1 and uses defaults drawn from defac: course soil.
+
         Notes
         -----
         This temperature factor is lower-bounded at 0.0 because if negative, it may result in a negative amount
         of decomposition, which in this context would be considered a bug.
 
         """
-        # S.6.A.4
         temp_factor = (
             y_inflection
             + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
@@ -97,27 +98,29 @@ class Decomposition:
         """
         Calculate the moisture factor for carbon decomposition for the layer.
 
-        This function implements the "pseudocode_soil" S.6.A.2 and uses defaults drawn from defac: course soil.
-
         Parameters
         ----------
         water_factor : float
             Relative water saturation (%).
         a_term : float, default 0.55
-            Coarse in defac row 3, column N
+            Coarse in defac row 3, column N.
         b_term : float, default 1.7
-            Coarse in defac row 4, column N
+            Coarse in defac row 4, column N.
         c_term : float, default -0.007
-            Coarse in defac row 5, column
+            Coarse in defac row 5, column.
         first_exponent : float, default 6.648115
-            First exponent in defac spreadsheet
+            First exponent in defac spreadsheet.
         second_exponent : float, default 3.22
-            Second exponent in defac spreadsheet
+            Second exponent in defac spreadsheet.
 
         Returns
         -------
         float
             Moisture factor (unitless).
+
+        References
+        ----------
+        This function implements the "pseudocode_soil" S.6.A.2 and uses defaults drawn from defac: course soil.
 
         Notes
         -----
@@ -129,7 +132,6 @@ class Decomposition:
         which is not meaningful.
 
         """
-        # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)
         base_2 = (water_factor - c_term) / (a_term - c_term)
 

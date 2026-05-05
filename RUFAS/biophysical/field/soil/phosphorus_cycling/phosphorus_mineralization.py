@@ -330,7 +330,7 @@ class PhosphorusMineralization:
 
         Parameters
         ----------
-        sorption_scalar
+        sorption_scalar : float
             The scalar used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and
             transferred to the active inorganic phosphorus pool (unitless).
 

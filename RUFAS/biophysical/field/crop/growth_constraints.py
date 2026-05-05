@@ -14,16 +14,16 @@ class GrowthConstraints:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         A `CropData` object containing crop specifications and tracked attributes. If not provided,
         a default `CropData` object is initialized with default values.
     water_stress : float, default 0.0
         Water stress for the day (unitless).
-    temp_stress : Optional[float], default None
+    temp_stress : float, optional
         Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float], default None
+    nitrogen_stress : float, optional
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float], default None
+    phosphorus_stress : float, optional
         Phosphorus stress for the day (unitless).
 
     Attributes
@@ -36,7 +36,7 @@ class GrowthConstraints:
         Temperature stress for the day (unitless).
     nitrogen_stress : Optional[float]
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float]
+    phosphorus_stress : float, optional
         Phosphorus stress for the day (unitless).
 
     Methods

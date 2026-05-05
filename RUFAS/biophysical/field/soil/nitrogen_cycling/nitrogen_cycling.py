@@ -18,8 +18,8 @@ class NitrogenCycling:
         The SoilData object used by this module to track and manage nitrogen cycling in the soil. If not provided,
         a new SoilData object will be created.
     field_size : float, optional
-        The size of the field in hectares (ha), utilized to initialize a SoilData object if one is not directly
-        supplied.
+        The size of the field in hectares utilized to initialize a SoilData object if one is not directly
+        supplied (ha).
 
     Attributes
     ----------

@@ -20,21 +20,21 @@ class PhosphorusUptake(NonWaterUptake):
         `CropData` instance is initialized with default values.
     nutrient_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]], default None
+    nutrient_shapes : list[float], optional
         First and second shape coefficients for the nitrogen uptake equations (unitless).
-    previous_nutrient : Optional[float], default None
+    previous_nutrient : float, optional
         Phosphorus value on the previous day (kg/ha).
-    total_nutrient_uptake : Optional[float], default None
+    total_nutrient_uptake : float, optional
         Total amount of phosphorus taken up by the plant (kg/ha).
-    potential_nutrient_uptake : Optional[float], default None
+    potential_nutrient_uptake : float, optional
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : list[float], optional
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
-    layer_nutrient_potentials : Optional[float], default None
+    layer_nutrient_potentials : float, optional
         Potential phosphorus uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float], default None
+    unmet_nutrient_demands : float, optional
         Unmet phosphorus demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float], default None
+    nutrient_requests : float, optional
         Phosphorus requested from each soil layer (kg/ha).
 
 

@@ -24,12 +24,12 @@ class CropManagement:
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    potential_harvest_index : Optional[float], default None
+    potential_harvest_index : Optional[float], optional
         Potential harvest index for a given day (unitless).
-    harvest_index : Optional[float], default None
+    harvest_index : Optional[float], optional
         Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
         (unitless).
-    cut_biomass : Optional[float], default None
+    cut_biomass : Optional[float], optional
         Total amount of the desired crop product (kg/ha).
     wet_yield_collected : float, default 0.0
         Amount of the desired crop product to be removed from the field (kg/ha).
@@ -37,22 +37,14 @@ class CropManagement:
         Dry matter mass collected at harvest (kg/ha).
     yield_residue : float, default 0.0
         Amount of dry matter residue created; unharvested yield (kg/ha).
-    yield_nitrogen : Optional[float], default None
+    yield_nitrogen : Optional[float], optional
         Nitrogen contained in the harvested yield (kg/ha).
-    yield_phosphorus : Optional[float], default None
+    yield_phosphorus : Optional[float], optional
         Phosphorus contained in the harvested yield (kg/ha).
     residue_nitrogen : float, default 0.0
         Amount of nitrogen in the residue from this plant (kg/ha).
     residue_phosphorus : float, default 0.0
         Amount of phosphorus in the residue from this plant (kg/ha).
-    root_distribution_param_da: float, default 145.0
-        Empirical root distribution parameter d_a (mm).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
-    root_distribution_param_c: float, default -1.165
-        Empirical root distribution parameter c (unitless).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1.
 
     Attributes
     ----------
@@ -82,14 +74,6 @@ class CropManagement:
         Amount of nitrogen in the residue from this plant (kg/ha).
     residue_phosphorus : float
         Amount of phosphorus in the residue from this plant (kg/ha).
-    root_distribution_param_da: float
-        Empirical root distribution parameter d_a (mm).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
-    root_distribution_param_c: float
-        Empirical root distribution parameter c (unitless).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1.
 
     Notes
     -----
@@ -128,10 +112,9 @@ class CropManagement:
         self.residue_nitrogen = residue_nitrogen
         self.residue_phosphorus = residue_phosphorus
 
-    # ---- Main Methods ----
     def manage_harvest(
         self,
-        harvest_operaion: HarvestOperation,
+        harvest_operation: HarvestOperation,
         field_name: str,
         field_size: float,
         time: RufasTime,
@@ -142,7 +125,7 @@ class CropManagement:
 
         Parameters
         ----------
-        harvest_operaion : HarvestOperation
+        harvest_operation : HarvestOperation
             The operation to be executed on this crop.
         field_name : str
             The name of the field that contains this crop.
@@ -158,25 +141,25 @@ class CropManagement:
         HarvestedCrop
             The harvested crop data structure containing mass and nutritional information associated with the
             harvest's yield.
+
         """
         self.determine_harvest_index()
 
         harvested_crop = None
-        if harvest_operaion in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
+        if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.harvest_efficiency)
             harvested_crop = self._get_harvested_crop(time, field_size, field_name)
 
-        if harvest_operaion in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
+        if harvest_operation in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
         self._record_yield(
-            harvest_operaion, field_name, field_size, time.current_calendar_year, time.current_julian_day
+            harvest_operation, field_name, field_size, time.current_calendar_year, time.current_julian_day
         )
         self._transfer_residue(soil_data, not self.data.is_alive)
 
         return harvested_crop
 
-    # ---- Sub Methods ----
     def kill(self) -> None:
         """
         Kills the plant, preventing it from growing further, and converts all biomass to residue.
@@ -206,6 +189,7 @@ class CropManagement:
         References
         ----------
         SWAT 5:2.4, 5:3.3
+
         """
         if self.data.do_harvest_index_override:
             self.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
@@ -219,14 +203,15 @@ class CropManagement:
                 self.data.water_deficiency,
             )
 
-    def cut_crop(self, collected_fraction: float = 0) -> None:
+    def cut_crop(self, collected_fraction: float = 0.0) -> None:
         """
         Performs a cut operation on the crop and, optionally, collects yield.
 
         Parameters
         ----------
-        collected_fraction: The fraction of the cut biomass that is collected. The remaining portion remains
-            in the field (between 0 and 1, inclusive).
+        collected_fraction : float, default 0.0
+            The fraction of the cut biomass that is collected. The remaining portion remains in the field (
+            between 0 and 1, inclusive).
 
         References
         ----------
@@ -482,8 +467,6 @@ class CropManagement:
         ----------
         soil_data : SoilData
             Object that tracks the attributes of the soil profile that contains this crop.
-        root_residue_mass : float
-            Dry matter mass of residue that is roots (kg / ha).
 
         """
         surface_layer = soil_data.soil_layers[0]
@@ -575,7 +558,7 @@ class CropManagement:
         Notes
         -----
         If the bottom depth of a soil layer extends past the maximum depth of the roots, then that soil layer contains
-        all of the crop's root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
+        all the crop's root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
         will not contain any of the crop's root mass.
 
         """

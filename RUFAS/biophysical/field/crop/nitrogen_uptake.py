@@ -12,32 +12,32 @@ class NitrogenUptake(NonWaterUptake):
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
     nutrient_distro_param : float, default 10.0
         Nitrogen uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]], default None
+    nutrient_shapes : list[float], optional
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nutrient: Optional[float], default None
+    previous_nutrient: float, optional
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : Optional[float], default None
+    potential_nutrient_uptake : float, optional
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : Optional[float], default None
+    layer_nutrient_potentials : float, optional
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float], default None
+    unmet_nutrient_demands : float, optional
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float], default None
+    nutrient_requests : float, optional
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : list[float], optional
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : Optional[float], default None
+    total_nutrient_uptake : float, optional
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : Optional[float], default None
+    fixed_nitrogen : float, optional
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : Optional[float], default None
+    nitrate_factor : float, optional
         Soil nitrate factor (unitless).
-    fixation_stage_factor : Optional[float], default None
+    fixation_stage_factor : float, optional
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes

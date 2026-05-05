@@ -35,8 +35,7 @@ class PlantCategory(Enum):
     TREE = "tree"
 
 
-# This is an arbitrary values to be used until a generalized and appropriate solution can be found for setting
-# species-specific dry matter digestibility amounts.
+# TODO: This is an arbitrary values to be used until we have a generalized solution - issue #2987
 DEFAULT_DRY_MATTER_DIGESTIBILITY: float = 40.0
 
 
@@ -112,8 +111,6 @@ class CropData:
     light_use_efficiency : float
         Light use efficiency of the plant (dg/MJ). Reference SWAT Appendix A - Model Databases, Table A-5 for these
         values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
-    minimum_cover_management_factor : float
-        Minimum cover and management factor for water erosion (unitless).
     yield_nitrogen_fraction : Optional[float]
         Fraction of nitrogen in yield (unitless).
     leaf_area_index : float
@@ -367,6 +364,11 @@ class CropData:
         References
         ----------
         SWAT Theoretical documentation section 5:2.1.4
+
+        Returns
+        -------
+        bool
+            True if the maturity is reached based on the fraction of potential heat units accumulated.
 
         """
         return self.heat_fraction >= 1.0

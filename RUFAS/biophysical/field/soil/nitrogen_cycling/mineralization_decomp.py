@@ -168,6 +168,8 @@ class MineralizationDecomposition:
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.8
+        Current return value is a temporary fix to replace the process based method for the effect of the soil C, N,
+         and P on the decomposition rate factor. # TODO: Check if the temporary solution is till intended = issue #2990
 
         Notes
         -----
@@ -181,8 +183,6 @@ class MineralizationDecomposition:
             carbon_phosphorus_ratio, 200
         )
         assert nitrogen_term is not None and phosphorus_term is not None
-        # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
-        # rate factor
         return 1
 
     @staticmethod
