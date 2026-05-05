@@ -242,7 +242,6 @@ class SimulationEngine:
                 self.time,
                 is_ration_defined_by_user=self.is_ration_defined_by_user,
                 available_feeds=self.available_feeds,
-                simulate_animals=self.simulate_animals,
             )
 
         if self.simulate_manure:

@@ -32,7 +32,6 @@ def config_json() -> dict[str, Any]:
         "end_date": "2018:243",
         "random_seed": 42,
         "set_seed": True,
-        "simulate_animals": True,
         "nutrient_standard": "NASEM",
         "FIPS_county_code": 55025,
         "include_detailed_values": True,
@@ -482,7 +481,6 @@ def mock_herd_manager(
     mock_time.simulation_day = 0
 
     mock_available_feeds: list[Feed] = [mock_feed] * 8
-    mock_simulate_animals = True
 
     im = InputManager()
 
@@ -528,7 +526,6 @@ def mock_herd_manager(
         mock_time,
         True,
         mock_available_feeds,
-        mock_simulate_animals,
     )
 
     return herd_manager, {
