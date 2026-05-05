@@ -56,7 +56,7 @@ OM,Organic matter,% of DM
 P,Phosphorus content,% of DM
 PAF,Processing adjustment factor,NA
 Parity,Number of lactations,count
-PrevTemp,Average daily temperature of last month,°C
+PrevTemp,Average daily temperature of last month,Celcius
 RDP,Ruminally degraded crude protein,% of DM
 ROM,Residual organic matter,% of DM
 RUP,Ruminally undegraded crude protein,% of DM

@@ -107,6 +107,38 @@ Our documentation include quite a few tables with long, detailed definitions and
 
 Instead, we have four excel files that correspond to each existing module. In each file, sheets are named by their label id (see next section for more on id logic). That way, you can auto-generate a .txt file with your table properly sized and formated using the make_grid_table.py (quarto-scidoc>scripts). The .txt file output will show up in quarto-scidoc>output>tables.
 
+#### Option 1 - generate from a .csv 
+This is the preferred method to generate a table because it is the most straightforward and requires the least amount of formatting. You can use the make_markdown_table function in the make_grid_table.py script to generate a markdown table from a .csv file. The .csv file should be formatted with the appropriate columns (Variable, Definition, Default, Min, Max) and should be saved in the resources/table_data folder. The name of your file should match the label used in the documentation. This will help with traceback and auditing. 
+
+All tables begin with the "tbl-" prefix followed with the 3 letter acronym for the module where the table belongs (e.g. "ani" for animal). The final segments (also separated by hyphens) should be short but descriptive. For example, the table of abbreviations is labeled "tbl-abbrevs" (it is outside of any module so no module abbreviation is used) and the corresponding .csv file is named "tbl-abbrev.csv".
+
+
+```markdown
+
+The main adjustments you will need to make are the label, tbl-cap (caption), and the file name in the make_markdown_table function. The rest of the code can be copied and pasted as is.
+
+
+```{python}
+#| label: tbl-abbrevs
+#| tbl-cap: "Abbreviations used in the RuFaS scientific documentation."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "resources/table_data/tbl-abbrev.csv",
+    colalign=("left", "left", "right"),
+    maxcolwidths=[None, 45, None],
+)
+
+print(md_tab)
+```
+
+#### Option 2 - extended
 ```markdown
 After you create your excel sheet in the module file of the data folder 
 (in this example it is animal.xslx).
@@ -294,71 +326,6 @@ Online, Misc, Website (RARE USAGE)
 
 ```
 If there are 2 articles with the same author and same year, add the recommended "a" or "b" (e.g. ```bibtex @LASTNAME_YEARa vs @LASTNAME_YEARb```) as they are referenced.
-
-# Equation examples (from Animal Documentation)
-
-## Nutrient Requirements of Dairy Cattle (NRC) {#sec-nrc}
-
-**Energy Requirements** For details about the variables included in each 
-calculation, please refer to the [energykey](energy requirements key).
-
-* **_Maintenance_** - The maintenance requirement is calculated based on metabolic body weight (body weight$^{0.75}$).
-
-  [Lactating and Dry Cows]{.underline}
-  
-  $$
-  CBW = MW * 0.06275
-  $$ {#eq-nrc-cbw}
-  
-  $$
-  CW = {(18 + (DOP - 190) * 0.665) * \left(\frac{CBW}{45}\right), \text{if } DOP > 190.0}
-  $$ {#eq-nrc-cw}
-  
-  *Otherwise*
-  
-  $$
-  NEmaint = 0.08 \times (BW - CW)^{0.75}
-  $$ {#eq-nrc-ne-maint}
-
-## Reformatted equations
-
-@eq-nrc-cbw may be visually improved by using the `\times` LaTeX
-command:
-
-$$
-CBW = MW \times 0.06275
-$$ {#eq-nrc-cbw-times}
-
-## Use alphanumeric equation labels
-
-Though Quarto does not allow custom cross-reference labels, you can
-include your own non-CR label with the `\tag` LaTeX command. The
-equation can still be cross-referenceable using a standard Quarto
-equation ID.
-
-$$
-CBW = MW * 0.06275 \tag{AN.NRC.2}
-$$ {#eq-an-nrc-2-tagged}
-
-See @eq-an-nrc-2-tagged.
-
-## Other equation Templates
-
-The energy balance is $E = mc^2$.
-
-$$
-E = mc^2
-$$ {#eq-energy}
-
-See Equation @eq-energy.
-
-$$
-\text{nutrient\_proportion\_to\_be\_removed} =
-\min\left(
-\frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
-1
-\right)
-$$ {#eq-nutrient-proportion}
 
 
 

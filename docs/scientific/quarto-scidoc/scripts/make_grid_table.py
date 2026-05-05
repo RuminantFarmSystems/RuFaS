@@ -136,6 +136,23 @@ def load_table(path: Path, sheet_name: str | None = None) -> pd.DataFrame:
 
     raise ValueError("Input must be a .csv, .xlsx, or .xls file.")
 
+def make_markdown_table(
+    input_file: str,
+    sheet: str | None = None,
+    colalign: tuple[str, ...] | None = None,
+    maxcolwidths: list[int | None] | None = None,
+) -> str:
+    """
+    Load a CSV/Excel file and return a markdown table string.
+    Designed for use inside Quarto Python chunks.
+    """
+    df = load_table(Path(input_file), sheet_name=sheet)
+
+    return df.to_markdown(
+        index=False,
+        colalign=colalign,
+        maxcolwidths=maxcolwidths,
+    )
 
 def main() -> None:
     parser = argparse.ArgumentParser(
