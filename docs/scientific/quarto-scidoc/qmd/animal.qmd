@@ -1,4 +1,4 @@
-![Animal module icon](../resources/images/animal.png){width=35%}
+![Animal module icon](../resources/images/ani_icon.png.png){width=35%}
 # Animal Module
 
 ## Introduction

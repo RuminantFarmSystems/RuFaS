@@ -62,8 +62,18 @@ There is no formal process to inform how you name, but it is recommended that
 it is descriptive of the item you are labeling and it is concise to make 
 referencing easier.
 
-There is more information about where these labels go in the respective tables 
-and figures relative to captions etc. the following sections.
+When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 3 letter module abbreviate: 
+- ani = Animal
+- man = Manure
+- soc = Soil and Crop
+- fee = Feed Storage
+- eco = Economics
+- con = Connecting or Gray Documents
+
+When uploading new images, screenshots, flowcharts or other image resources, the 3 letter abbreviations should be the LEADING part of the file name. The rest of the file name should be descriptive of the content of the image separated by underscores (_). If the image is used for a title page or representative of the larger model, the leading file name should be "rufas.""
+
+**Note** 
+Files that include flow charts should indicate such in the file. For example, a flow chart of the decision tree in the animal module should be names "ani_flow_decision_tree". Similarly, if the image is a screenshot of a section of code from the module, the file name should include 'code'. For example, a code screenshot for the manure module should be named "man_code_description" or something similar.
 
 ```
 
@@ -78,7 +88,7 @@ All figures and images must be uploaded in the "references." When you upload you
 
 ```markdown
 
-![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/ani_icon.png.png){#fig-animal-icon width=35%}
 
 -->[Caption for the image or figure]
 --> #fig-animal-icon = #indicates the type of file-label-for-auditing
@@ -89,7 +99,7 @@ All figures and images must be uploaded in the "references." When you upload you
 The output is below : 
 
 
-![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/ani_icon.png){#fig-animal-icon width=35%}
 
 ### Example of a Table
 
@@ -243,6 +253,7 @@ into markdown syntax:
 
 but only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).
 :::
+
 
 
 ## References
