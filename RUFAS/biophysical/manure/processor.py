@@ -156,6 +156,21 @@ class Processor(ABC):
         bool
             True if the ManureStream can be processed by the Processor, otherwise false.
 
+        Notes
+        -----
+        This check enforces consistency between the processor type and the structure
+        of the incoming manure stream:
+
+        - Housing emissions calculators require `pen_manure_data` to be present.
+        - Non-housing emissions calculators require `pen_manure_data` to be absent.
+
+        This validation is primarily used when assigning the first processor in a
+        manure processing chain. It ensures that only appropriate processor types
+        (e.g., handlers or compatible storages) are used as entry points for a given
+        manure stream.
+
+        A mismatch between processor type and manure stream structure will result in
+        the processor being considered incompatible.
         """
         is_valid_housing_emissions_calculator = (
             True if (self.is_housing_emissions_calculator and manure_stream.pen_manure_data is not None) else False
