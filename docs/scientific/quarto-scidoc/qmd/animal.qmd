@@ -71,7 +71,7 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 
 : Overview of the distinct phases by which animals are created and introduced to the herd. {#tbl-animal-simulation}
 
-**Relevant Inputs**
+#### Relevant Inputs
 
 | Variable | Definition | Default | Min | Max |
 |---|---|---|---|---|
@@ -88,7 +88,7 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 
 : User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section. {#tbl-animal-herd-inputs}
 
-**Relevant Outputs**
+#### Relevant Outputs
 
 
 After the animals have been selected from the animal population to create the initial herd, a summary of the Population (pre-selection pool, aka pre-animal-population) and of the Initial herd (selected animals, aka post-animal-population) is provided to the output manager. 
