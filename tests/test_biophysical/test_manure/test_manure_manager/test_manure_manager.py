@@ -6,7 +6,6 @@ import pytest
 from pytest_mock import MockerFixture, MockFixture
 
 from RUFAS.biophysical.manure.digester.digester import Digester
-from RUFAS.data_structures.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.manure_manager import STORAGE_CLASS_TO_TYPE, ManureManager
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
@@ -17,7 +16,11 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    FieldManureSupplier,
+    NutrientRequestResults,
+    NutrientRequest,
+)
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
