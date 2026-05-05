@@ -188,9 +188,9 @@ class Infiltration:
         saturation : float
             Amount of water in soil profile when saturated (mm).
         max_retention_parameter : float
-            Retention parameter calculated from curve number 1 (the driest conditions) (unitless).
+            Retention parameter calculated from curve number under the driest conditions (unitless).
         third_moisture_condition_retention_parameter : float
-            Retention parameter calculated from curve number 3 (the wettest conditions) (unitless).
+            Retention parameter calculated from curve number 3 under the wettest conditions (unitless).
 
         Returns
         -------
@@ -263,8 +263,7 @@ class Infiltration:
             Amount of water held in the soil profile excluding the amount of water held in
             the profile at the wilting point (mm).
         max_retention_parameter : float
-            Maximum retention parameter, calculated from curve number 1
-            (the driest conditions) (mm).
+            Maximum retention parameter, calculated from curve number 1 under the driest conditions (mm).
         first_shape_coefficient : float
             First shape coefficient (unitless).
         second_shape_coefficient : float
@@ -296,8 +295,7 @@ class Infiltration:
         Parameters
         ----------
         max_retention_parameter : float
-            Maximum retention parameter, calculated from curve number 1.
-            (the driest conditions) (mm).
+            Maximum retention parameter, calculated from curve number 1 under the driest conditions (mm).
         retention_parameter : float
             Retention parameter for a given day (mm).
 

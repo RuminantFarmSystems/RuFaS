@@ -1,7 +1,7 @@
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from math import inf
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -19,12 +19,12 @@ class SoilData:
     ----------
     name : string, optional, default "generic soil configuration"
         Name of the soil configuration.
-    soil_layers : List[LayerData], optional, default None
+    soil_layers : list[LayerData], optional
         List of soil layer data objects, where the top layer is the 0th element and the bottom is the nth element.
-    field_size : InitVar[float], default None
+    field_size : InitVar[float], optional
         Size of the field (ha).
         Note: this attribute is only used for initialization. After that, it cannot be used.
-    initial_water_content : float, default None
+    initial_water_content : float, optional
         Total soil water content at the beginning of a year, for use in determining annual change (mm).
     initial_nitrates_total : float, default None
         Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare).
@@ -38,17 +38,6 @@ class SoilData:
         Cumulative total of the volume of surface runoff that occurred in a year (mm per hectare).
     annual_runoff_fertilizer_phosphorus : float, default 0
         Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff (kg).
-    annual_runoff_machine_manure_inorganic_phosphorus : float, default 0
-        Cumulative total of inorganic phosphorus from machine-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_machine_manure_organic_phosphorus : float, default 0
-        Cumulative total of organic phosphorus from machine-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_grazing_manure_inorganic_phosphorus : float, default 0
-        Cumulative total of inorganic phosphorus from grazer-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_grazing_manure_organic_phosphorus : float, default 0
-        Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff (kg).
     annual_soil_phosphorus_runoff : float, default 0
         Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg / ha).
     annual_runoff_nitrates_total : float, default 0
@@ -405,7 +394,7 @@ class SoilData:
         """
         return [getattr(layer, attribute) for layer in self.soil_layers]
 
-    def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
+    def set_vectorized_layer_attribute(self, attribute: str, values: list[Any]) -> None:
         """
         Sets a given attribute for all layers in soil_data.
 
@@ -413,7 +402,7 @@ class SoilData:
         ----------
         attribute : str
             The LayerData attribute to set.
-        values : list[any]
+        values : list[Any]
             Values of the attribute to set for each layer.
 
         """
@@ -556,7 +545,7 @@ class SoilData:
         Returns
         -------
         float
-            The total amount of nitrates in the soil (kg per hectare).
+            The total amount of nitrates in the soil (kg / ha).
 
         """
         return sum(self.get_vectorized_layer_attribute("nitrate_content"))
@@ -651,11 +640,6 @@ class SoilData:
         Returns the fraction of fertilizer phosphorus removed from the available or recalcitrant pool based on the
         number of rain events.
 
-        Parameters
-        ----------
-        rain_events : int
-            The number of rain events.
-
         Returns
         -------
         float
@@ -695,7 +679,7 @@ class SoilData:
         Returns
         -------
         float
-            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg / ha).
 
         """
         emissions_from_active = sum(self.get_vectorized_layer_attribute("active_carbon_to_slow_loss"))

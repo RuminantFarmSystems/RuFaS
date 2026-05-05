@@ -120,7 +120,7 @@ class Denitrification:
         Returns
         -------
         float
-            The amount of nitrate that is denitrified in this soil layer (kg / ha)
+            The amount of nitrate that is denitrified in this soil layer (kg / ha).
 
         References
         ----------

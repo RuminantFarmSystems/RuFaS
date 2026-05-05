@@ -178,23 +178,21 @@ class Evaporation:
         References
         ----------
         SWAT Theoretical documentation 2:2.3.18, 19
+
         """
-        # calculate adjusted evaporative demand
         if soil_water_content < field_water_content:
-            # 2:2.3.18
             quotient = (2.5 * (soil_water_content - field_water_content)) / (
                 field_water_content - wilting_water_content
             )
             evaporative_demand_reduced = evaporative_demand * exp(quotient)
         else:
-            # 2:2.3.19
             evaporative_demand_reduced = evaporative_demand
 
         return evaporative_demand_reduced
 
     @staticmethod
     def _determine_amount_water_removed(
-        reduced_evaporative_demand,
+        reduced_evaporative_demand: float,
         soil_water_content: float,
         wilting_water_content: float,
     ) -> float:

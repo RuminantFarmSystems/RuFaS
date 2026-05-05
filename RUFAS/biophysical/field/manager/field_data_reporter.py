@@ -1,5 +1,3 @@
-from typing import List
-
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.crop.crop import Crop
 from RUFAS.biophysical.field.field.field import Field
@@ -14,17 +12,17 @@ class FieldDataReporter:
 
     Parameters
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of Field instances.
 
     Attributes
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of Field instances.
 
     """
 
-    def __init__(self, fields: List[Field]):
+    def __init__(self, fields: list[Field]):
         self.om = OutputManager()
         self.fields = fields
 

@@ -1,5 +1,5 @@
 from math import exp
-from typing import List, Optional
+from typing import Optional
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.nutrient_uptake import NutrientUptake
@@ -17,15 +17,15 @@ class WaterUptake(NutrientUptake):
         instance with generic crop parameters is created.
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]], default None
+    potential_water_uptakes : list[float], optional
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float, default 0.01
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
         (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
         can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]], default None
+    unmet_water_demands : list[float], optional
         Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]], default None
+    actual_water_uptakes : list[float], optional
         The actual amount of water to be removed from the soil (mm).
 
     Attributes
@@ -35,15 +35,15 @@ class WaterUptake(NutrientUptake):
         like root depth, growth rates, and environmental conditions affecting root expansion.
     water_distro_parameter : float
         Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]]
+    potential_water_uptakes : Optional[list[float]]
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
         (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
         can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]]
+    unmet_water_demands : Optional[list[float]]
         Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]]
+    actual_water_uptakes : Optional[list[float]]
         The actual amount of water to be removed from the soil (mm).
 
     References
@@ -56,10 +56,10 @@ class WaterUptake(NutrientUptake):
         self,
         crop_data: Optional[CropData] = None,
         water_distro_parameter: float = 10,
-        potential_water_uptakes: Optional[List[float]] = None,
+        potential_water_uptakes: Optional[list[float]] = None,
         water_compensation_factor: float = 0.01,
-        unmet_water_demands: Optional[List[float]] = None,
-        actual_water_uptakes: Optional[List[float]] = None,
+        unmet_water_demands: Optional[list[float]] = None,
+        actual_water_uptakes: Optional[list[float]] = None,
     ):
         super().__init__(crop_data)
         self.water_distro_parameter = water_distro_parameter
@@ -151,17 +151,26 @@ class WaterUptake(NutrientUptake):
     @classmethod
     def _take_up_water(
         cls,
-        potential_uptakes: List[float],
-        water_availabilities: List[float],
-        wilting_points: List[float],
-    ) -> List[float]:
+        potential_uptakes: list[float],
+        water_availabilities: list[float],
+        wilting_points: list[float],
+    ) -> list[float]:
         """
         Calculates the actual water taken up by the plant for each soil layer.
+
+        Parameters
+        ----------
+        potential_uptakes : list[float]
+            The potential water uptake from each layer of soil (mm).
+        water_availabilities : list[float]
+            The water available for each layer of soil (mm).
+        wilting_points : list[float]
+            The wilting point of each layers of soil (mm).
 
         Returns
         -------
         uptakes: list[float]
-            the actual water uptake from each layer of soil (mm)
+            The actual water uptake from each layer of soil (mm).
 
         Raises
         ------
@@ -203,10 +212,10 @@ class WaterUptake(NutrientUptake):
 
     @staticmethod
     def _reduce_efficiency_of_uptake(
-        potential_uptakes: List[float],
-        water_availabilities: List[float],
-        available_capacities: List[float],
-    ) -> List[float]:
+        potential_uptakes: list[float],
+        water_availabilities: list[float],
+        available_capacities: list[float],
+    ) -> list[float]:
         """
         Returns the potential water uptake for each layer after correcting for availability-dependent uptake
         efficiency.
@@ -276,10 +285,10 @@ class WaterUptake(NutrientUptake):
 
     @staticmethod
     def _adjust_water_uptakes(
-        potential_uptakes: List[float],
-        unmet_demands: List[float],
+        potential_uptakes: list[float],
+        unmet_demands: list[float],
         uptake_compensation: float,
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Adjusts the potential water uptakes for each layer based on drawing from deeper layers when possible.
 
@@ -320,9 +329,9 @@ class WaterUptake(NutrientUptake):
         root_depth: float,
         max_transpiration: float,
         water_distro_parameter: float,
-        upper_depths: List[float],
-        lower_depths: List[float],
-    ) -> List[float]:
+        upper_depths: list[float],
+        lower_depths: list[float],
+    ) -> list[float]:
         """
         Calculates the crop's maximum water uptake from each soil layer during the current day.
 

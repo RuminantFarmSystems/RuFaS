@@ -1,4 +1,4 @@
-from typing import List, Optional, Any
+from typing import Optional, Any
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
@@ -15,21 +15,21 @@ class ManureSchedule(Schedule):
     ----------
     name : str
         The name of the manure application schedule.
-    years : List[int]
+    years : list[int]
         The years in which the manure will be applied.
-    days : List[int]
+    days : list[int]
         The Julian days on which the manure will be applied within the specified years.
-    nitrogen_masses : List[float]
+    nitrogen_masses : list[float]
         The minimum masses of nitrogen to be applied in each manure application (kg).
-    phosphorus_masses : List[float]
+    phosphorus_masses : list[float]
         The minimum masses of phosphorus to be applied in each manure application (kg).
-    manure_types : List[ManureType]
+    manure_types : list[ManureType]
         The types of manure to be applied.
-    field_coverages : List[float]
+    field_coverages : list[float]
         The fractions of the field covered by manure applications (unitless).
-    application_depths : List[float], optional
+    application_depths : list[float], optional
         The depths at which the manure is to be injected into the soil for each application (mm).
-    surface_remainder_fractions : List[float], optional
+    surface_remainder_fractions : list[float], optional
         The fractions of each manure application that remain on the soil surface (unitless).
     pattern_skip : int, optional
         The number of years to skip between repetitions of the manure application pattern.
@@ -40,7 +40,7 @@ class ManureSchedule(Schedule):
 
     Attributes
     ----------
-    nitrogen_masses : List[float]
+    nitrogen_masses : list[float]
         Elongated list of nitrogen masses to ensure a mass value for each application year.
     phosphorus_masses : list[float]
         Elongated list of phosphorus masses to ensure a mass value for each application year.
@@ -71,9 +71,9 @@ class ManureSchedule(Schedule):
         phosphorus_masses: list[float],
         manure_types: list[ManureType],
         manure_supplement_methods: list[ManureSupplementMethod],
-        field_coverages: List[float],
-        application_depths: Optional[List[float]] = None,
-        surface_remainder_fractions: Optional[List[float]] = None,
+        field_coverages: list[float],
+        application_depths: Optional[list[float]] = None,
+        surface_remainder_fractions: Optional[list[float]] = None,
         pattern_skip: int = 0,
         pattern_repeat: int = 0,
     ):

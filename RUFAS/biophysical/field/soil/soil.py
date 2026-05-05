@@ -132,13 +132,13 @@ class Soil:
         potential_evapotranspiration : float
             Total potential evaporation and transpiration that can occur on the current day (mm).
         has_seasonal_high_water_table : bool
-            Whether the HRU has a seasonal high water table (True/False).
+            Whether the HRU has a seasonal high water table.
         maximum_soil_evaporation : float
             Maximum amount of water that can be evaporated from the soil profile on the current day (mm).
         avg_air_temp : float
             Average air temperature (degrees C).
         residue : float
-            Biomass separated from plants on the ground (kg per hectare).
+            Biomass separated from plants on the ground (kg / ha).
         minimum_cover_management_factor : float
             Minimum value for the cover and management factor for water erosion applicable to land cover/plant
             (unitless).

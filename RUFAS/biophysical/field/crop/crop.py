@@ -31,7 +31,7 @@ class Crop:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         A CropData object containing the attributes tracked throughout the simulation.
         If not provided, default specifications are used.
 
@@ -139,6 +139,7 @@ class Crop:
             The FieldData object that tracks field properties.
         soil_data : SoilData
             The SoilData object that tracks soil properties.
+
         """
         if self._data.is_mature or self._data.is_dormant:
             return
@@ -176,6 +177,7 @@ class Crop:
             Potential evapotranspiration on a given day (mm).
         soil_data : SoilData
             An instance of the SoilData class (unitless).
+
         """
 
         if self._data.in_growing_season:
@@ -202,8 +204,9 @@ class Crop:
 
         Returns
         -------
-        tuple
+        float
             Amount of precipitation that reaches the soil after this crop (mm).
+
         """
         canopy_water_excess_capacity = self._data.water_canopy_storage_capacity - self._data.canopy_water
 
@@ -277,6 +280,7 @@ class Crop:
             The soil data relevant for dormancy and biomass partitioning.
         soil : Soil
             The soil profile.
+
         """
         if daylength <= dormancy_threshold_daylength:
             self.enter_dormancy(rainfall, soil_data, soil)
@@ -330,11 +334,6 @@ class Crop:
         Crop
             A fully initialized Crop instance.
 
-        Notes
-        -----
-        This method starts by trying to determine if the crop is of a supported species, if so it passes
-        it to the supported crop creation method. If not, it passes it to the custom crop creation method.
-
         """
         crop_data = CropDataFactory.create_crop_data(crop_reference)
         crop = Crop(crop_data=crop_data)
@@ -356,6 +355,7 @@ class Crop:
             Whether heat-scheduled harvesting should be used.
         time : RufasTime
             The current time in the simulation.
+
         """
         self._data.use_heat_scheduling = use_heat_scheduled_harvesting
         self._data.id = crop_reference
@@ -369,6 +369,8 @@ class Crop:
 
         Parameters
         ----------
+        bottom_layer_depth : float
+            Depth of the bottom layer of the soil profile (mm).
 
         """
         self.data.max_root_depth = min(bottom_layer_depth, self.data.max_root_depth)

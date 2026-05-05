@@ -14,26 +14,26 @@ class NonWaterUptake(NutrientUptake):
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
     nutrient_distro_param : float, default 10.0
         Nutrient uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]], default None
+    nutrient_shapes : List[float], optional
         Shape coefficients for nutrient uptake equations (unitless).
-    previous_nutrient: Optional[float], default None
+    previous_nutrient: float, optional
         Nutrient in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : Optional[float], default None
+    potential_nutrient_uptake : float, optional
         Potential nutrient uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : Optional[float], default None
+    layer_nutrient_potentials : float, optional
         Potential nutrient uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float], default None
+    unmet_nutrient_demands : float, optional
         Unmet nutrient demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float], default None
+    nutrient_requests : float, optional
         Nutrient requested from each soil layer (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : list[float], optional
         Actual nutrient uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : Optional[float], default None
+    total_nutrient_uptake : float, optional
         Total nutrient uptake by the plant (kg/ha).
 
     Attributes
@@ -227,12 +227,13 @@ class NonWaterUptake(NutrientUptake):
 
         Returns
         -------
-        List[float]
+        list[float]
             The actual amounts of a resource extracted from the soil layers.
 
-        References
-        ----------
-        SWAT 5:2.3.8, 5:2.3.26
+        Raises
+        ------
+        ValueError
+            If requests and sources are not the same length.
 
         """
         info_map = {
@@ -356,7 +357,7 @@ class NonWaterUptake(NutrientUptake):
 
         Returns
         -------
-        List[float]
+        list[float]
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
@@ -465,6 +466,11 @@ class NonWaterUptake(NutrientUptake):
         float
             The potential amount of nutrient that can be taken up from the soil surface to the specified depth (kg/ha).
 
+        Raises
+        ------
+        ValueError
+            If nutrient_distribution_parameter is 0.
+
         References
         ----------
         SWAT 5:2.3.6, 5:2.3.24
@@ -556,7 +562,7 @@ class NonWaterUptake(NutrientUptake):
 
         Returns
         -------
-        List[float]
+        list[float]
             A list containing the first and second shape coefficients, respectively.
 
         Notes
@@ -848,17 +854,22 @@ class NonWaterUptake(NutrientUptake):
 
         Parameters
         ----------
-        layer_demands : List[float]
+        layer_demands : list[float]
             List of demands for the nutrient from each soil layer not met by the above layers.
         layer_uptake_potentials : List[float]
             List of maximum potential uptake of the nutrient from each soil layer.
-        layer_nutrient : List[float]
+        layer_nutrient : list[float]
             List of nutrient amounts available in each soil layer.
 
         Returns
         -------
         List[float]
             Amount of nutrient mass taken up from each soil layer.
+
+        Raises
+        ------
+        ValueError
+            If the soil layer related attributes have mismatching lengths.
 
         References
         ----------

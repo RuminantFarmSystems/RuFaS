@@ -14,7 +14,7 @@ class CarbonCycling:
 
     Parameters
     ----------
-    soil_data : Optional[SoilData], default None
+    soil_data : SoilData, optional
         An instance of `SoilData` containing initial soil properties and state. If not provided,
         a default instance with initialized values is used.
 
@@ -54,11 +54,11 @@ class CarbonCycling:
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall on the current day (mm)
+            Amount of rainfall on the current day (mm).
         temp_average : float
-            Average temperature on the current day (mm)
+            Average temperature on the current day (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         """
         self.decomposition.decompose()
@@ -73,7 +73,7 @@ class CarbonCycling:
         Parameters
         ----------
         field_size: float
-            Size of the field (ha)
+            Size of the field (ha).
 
         """
         for layer in self.data.soil_layers:
@@ -129,14 +129,14 @@ class CarbonCycling:
         Parameters
         ----------
         layer_thickness: float
-            thickness of soil layer (mm)
+            Thickness of soil layer (mm).
         field_size: float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            soil volume (cubic meters)
+            Soil volume (cubic meters).
 
         """
         return (
@@ -151,14 +151,14 @@ class CarbonCycling:
         Parameters
         ----------
         bulk_density: float
-            bulk density of the soil layer (Megagrams per cubic meter)
+            Bulk density of the soil layer (Megagrams per cubic meter).
         soil_volume: float
-            soil volume (cubic meters)
+            Soil volume (cubic meters).
 
         Returns
         -------
         float
-            mass of soil (Megagrams)
+            Mass of soil (Megagrams).
 
         """
         return bulk_density * soil_volume
@@ -173,16 +173,16 @@ class CarbonCycling:
         Parameters
         ----------
         active_carbon_amount: float
-            active carbon stored in the soil (kg/ha)
+            Active carbon stored in the soil (kg/ha).
         soil_mass: float
-            mass of soil (kg)
+            Mass of soil (kg).
         field_size: float
-            size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            fraction of active carbon in the soil (unitless)
+            Fraction of active carbon in the soil (unitless).
 
         References
         -------
@@ -199,16 +199,16 @@ class CarbonCycling:
         Parameters
         ----------
         slow_carbon_amount: float
-            slow carbon stored in the soil (kg/ha)
+            Slow carbon stored in the soil (kg/ha).
         soil_mass: float
-            mass of soil (kg)
+            Mass of soil (kg).
         field_size: float
-            size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            fraction of slow carbon in the soil (unitless)
+            Fraction of slow carbon in the soil (unitless).
 
         References
         -------
@@ -227,16 +227,16 @@ class CarbonCycling:
         Parameters
         ----------
         passive_carbon_amount: float
-            passive carbon stored in the soil (kg/ha)
+            Passive carbon stored in the soil (kg/ha).
         soil_mass: float
-            mass of soil (kg)
+            Mass of soil (kg).
         field_size: float
-            size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            fraction of passive carbon in the soil (unitless)
+            Fraction of passive carbon in the soil (unitless).
 
         References
         -------
@@ -257,16 +257,16 @@ class CarbonCycling:
         Parameters
         ----------
         soil_active_carbon_fraction: float
-            fraction of active carbon in the soil (unitless)
+            Fraction of active carbon in the soil (unitless).
         soil_slow_carbon_fraction: float
-            fraction of slow carbon in the soil (unitless)
+            Fraction of slow carbon in the soil (unitless).
         soil_passive_carbon_fraction: float
-            fraction of passive carbon in the soil (unitless)
+            Fraction of passive carbon in the soil (unitless).
 
         Returns
         -------
         float
-            the total fraction of carbon in the soil by mass(unitless)
+            The total fraction of carbon in the soil by mass (unitless).
 
         References
         -------
@@ -285,16 +285,16 @@ class CarbonCycling:
         Parameters
         ----------
         active_carbon_amount: float
-            active carbon stored in the soil (kg/ha)
+            Active carbon stored in the soil (kg/ha).
         slow_carbon_amount: float
-            slow carbon stored in the soil (kg/ha)
+            Slow carbon stored in the soil (kg/ha).
         passive_carbon_amount: float
-            passive carbon stored in the soil (kg/ha)
+            Passive carbon stored in the soil (kg/ha).
 
         Returns
         -------
         float
-            the total amount of soil carbon (kg/ha)
+            The total amount of soil carbon (kg/ha).
 
         References
         -------
@@ -315,16 +315,16 @@ class CarbonCycling:
         Parameters
         ----------
         plant_metabolic_active_carbon_loss: float
-            plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+            Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
         plant_structural_active_carbon_loss: float
-            plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+            Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
         plant_structural_slow_carbon_loss: float
-            plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+            Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
         Returns
         -------
         float
-            total amount plant carbon lost as CO2 (kg/ha)
+            Total amount plant carbon lost as CO2 (kg/ha).
 
         References
         -------
@@ -347,16 +347,16 @@ class CarbonCycling:
         Parameters
         ----------
         soil_metabolic_active_carbon_loss: float
-            soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+            Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
         soil_structural_active_carbon_loss: float
-            soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+            Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
         soil_structural_slow_carbon_loss: float
-            soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+            Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
         Returns
         -------
         float
-            total amount soil carbon lost as CO2 (kg/ha)
+            Total amount soil carbon lost as CO2 (kg/ha).
 
         References
         -------
@@ -375,16 +375,16 @@ class CarbonCycling:
         Parameters
         ----------
         active_carbon_to_slow_loss: float
-            active carbon lost as CO2 during decomposition into slow carbon (kg/ha)
+            Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).
         slow_carbon_co2_lost_amount: float
-            slow carbon lost as CO2 during decomposition (kg/ha)
+            Slow carbon lost as CO2 during decomposition (kg/ha).
         passive_carbon_co2_lost_amount: float
-            passive carbon lost as CO2 during decomposition (kg/ha)
+            Passive carbon lost as CO2 during decomposition (kg/ha).
 
         Returns
         -------
         float
-            amount of total carbon lost as CO2 during decomposition(kg/ha)
+            Amount of total carbon lost as CO2 during decomposition (kg/ha).
 
         References
         -------
@@ -405,15 +405,16 @@ class CarbonCycling:
         Parameters
         ----------
         total_plant_carbon_CO2_loss: float
-            total amount plant carbon lost as CO2 (kg/ha)
+            Total amount plant carbon lost as CO2 (kg/ha).
         total_soil_carbon_CO2_loss: float
-            total amount soil carbon lost as CO2 (kg/ha)
+            Total amount soil carbon lost as CO2 (kg/ha).
         total_decomposition_carbon_CO2_lost: float
-            amount of total carbon lost as CO2 during decomposition(kg/ha)
+            Amount of total carbon lost as CO2 during decomposition (kg/ha).
+
         Returns
         -------
         float
-            total amount of carbon lost as CO2 (kg/ha)
+            Total amount of carbon lost as CO2 (kg/ha).
 
         References
         -------

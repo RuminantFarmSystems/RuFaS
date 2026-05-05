@@ -13,10 +13,10 @@ class Percolation:
 
     Parameters
     ----------
-    soil_data : Optional[SoilData]
+    soil_data : SoilData, optional
         The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
         provided.
-    field_size : Optional[float], default=None
+    field_size : float, optional
         The size of the field (ha).
 
     Attributes
@@ -36,7 +36,7 @@ class Percolation:
         Parameters
         ----------
         has_seasonal_high_water_table : bool
-            A flag indicating whether the HRU has a seasonal high water table (True/False).
+            A flag indicating whether the HRU has a seasonal high water table.
 
         Notes
         -----
@@ -193,7 +193,7 @@ class Percolation:
         saturated_capacity_content : float
             Water content of the given soil layer when completely saturated (mm).
         is_seasonal_high_water_table : bool
-            Boolean indicating if HRU has a seasonal high water table (True/False).
+            Boolean indicating if HRU has a seasonal high water table.
 
         Returns
         -------
@@ -251,9 +251,7 @@ class Percolation:
             amount_to_percolate = Percolation._determine_percolation_to_next_layer(
                 water_to_percolate, time_step, percolation_time
             )
-            #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount
 
-            # move water from upper layer to lower layer
             return max(0, amount_to_percolate)

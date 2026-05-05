@@ -1,5 +1,5 @@
 from math import exp, log, sqrt
-from typing import List, Optional
+from typing import Optional
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.crop.crop_data import CropData
@@ -11,32 +11,28 @@ class LeafAreaIndex:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         A `CropData` instance containing crop specifications and attributes. Defaults to a new instance of `CropData` if
         not provided.
-    max_canopy_height : float, default None
-        Maximum canopy height for the plant (m).
-    lai_shapes : Optional[float], default None
+    lai_shapes : float, optional
         Shape coefficients for calculating leaf area index (unitless).
-    optimal_leaf_area_fraction : Optional[float], default None
+    optimal_leaf_area_fraction : float, optional
         Fraction of max leaf area index for current heat fraction (unitless).
-    canopy_height : Optional[float], default None
+    canopy_height : float, optional
         Current height of the plant (m).
-    leaf_area_added : Optional[float], default None
+    leaf_area_added : float, optional
         Leaf area index change during the day (unitless).
-    optimal_leaf_area_change : Optional[float], default None
+    optimal_leaf_area_change : float, optional
         Leaf area index added under ideal conditions (unitless).
-    previous_leaf_area_index : Optional[float], default None
+    previous_leaf_area_index : float, optional
         Leaf area index on the previous day (unitless).
-    previous_optimal_leaf_area_fraction : Optional[float], default None
+    previous_optimal_leaf_area_fraction : float, optional
         Optimal leaf area fraction on the previous day (unitless).
 
     Attributes
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
-    max_canopy_height : float
-        Maximum canopy height for the plant (m).
     lai_shapes : Optional[float]
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : Optional[float]
@@ -209,7 +205,7 @@ class LeafAreaIndex:
         second_heat_fraction: float,
         first_leaf_fraction: float,
         second_leaf_fraction: float,
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Calculates the shape coefficients for the optimal Leaf Area Index (LAI) formula.
 
@@ -226,8 +222,17 @@ class LeafAreaIndex:
 
         Returns
         -------
-        List[float]
+        list[float]
             A list of shape coefficients used in the optimal LAI formula.
+
+        Raises
+        ------
+        ValueError
+            If the first heat fraction is less than or equal to 0.
+            If the second heat fraction is less than or equal to 0.
+            If the first leaf fraction is less than or equal to 0 or greater than or equal to 1.
+            If the second leaf fraction is less than or equal to 0 or greater than or equal to 1.
+            If the first and second heat fractions are equal.
 
         """
         info_map = {

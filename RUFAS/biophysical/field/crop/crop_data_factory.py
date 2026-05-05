@@ -162,6 +162,11 @@ class CropDataFactory:
         ValueError
             If the specified crop configuration does not exist.
 
+        Notes
+        -----
+        This method starts by trying to determine if the crop is of a supported species, if so it passes
+        it to the supported crop creation method. If not, it passes it to the custom crop creation method.
+
         """
         if crop_type not in cls._crop_configurations.keys():
             info_map = {

@@ -142,14 +142,14 @@ class FieldData:
         Parameters
         ----------
         liter_amount : float
-            Volume to be converted (liters)
+            Volume to be converted (liters).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            Millimeter amount that is distributed evenly across the specified field area (mm)
+            Amount that is distributed evenly across the specified field area (mm).
 
         """
         amount_in_cubic_millimeters = liter_amount * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS
