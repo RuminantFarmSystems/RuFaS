@@ -22,6 +22,7 @@ class DailySpread(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
+        self.available_for_field_application = ManureStream.make_empty_manure_stream()
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -52,4 +53,18 @@ class DailySpread(Storage):
 
         """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
-        return super().process_manure(current_day_conditions, time)
+        output_streams = super().process_manure(current_day_conditions, time)
+        self.available_for_field_application = output_streams.get("manure", ManureStream.make_empty_manure_stream())
+        self._report_manure_stream(
+            self.available_for_field_application, "available_for_application", time.simulation_day
+        )
+        return {}
+
+    def set_available_for_field_application(self, stream: ManureStream) -> None:
+        """Set remaining manure available for daily spread field application."""
+        self.available_for_field_application = stream
+
+    def export_and_clear_remaining_available(self, time: RufasTime) -> None:
+        """Report and clear leftover daily spread manure at end of day."""
+        self._report_manure_stream(self.available_for_field_application, "exported_excess", time.simulation_day)
+        self.available_for_field_application = ManureStream.make_empty_manure_stream()
