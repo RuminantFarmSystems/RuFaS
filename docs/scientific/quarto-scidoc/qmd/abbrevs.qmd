@@ -1,0 +1,23 @@
+# Abbreviations
+
+```{python}
+#| label: tbl-abbrevs
+#| tbl-cap: "Table loaded from CSV file with pandas"
+
+import pandas as pd
+from IPython.display import Markdown
+
+tab_data = pd.read_csv(
+  "tbl-abbrevs.csv",
+  dtype={"value": str},
+  keep_default_na=False
+)
+
+md_tab = tab_data.to_markdown(
+    index=False,
+    colalign=("left", "left", "right"),
+    maxcolwidths=[None, 45, None],
+)
+
+Markdown(md_tab)
+```

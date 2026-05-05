@@ -23,7 +23,7 @@ require separate methodological descriptions and equations
 ### Methodology 
 - subsubsection header used to start descriptions
 
-**Relevant Inputs or Relevant Outputs** 
+#### Relevant Inputs or Relevant Outputs
 emphasized headers should be used to report the inputs and outputs of the 
 relevant subsection. These usually include tables and bulleted lists. Tables 
 of inputs should include: 
