@@ -1,5 +1,7 @@
 # Example Inserts
 
+
+
 ## Sectioning and Structure
 
 There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
@@ -63,12 +65,12 @@ it is descriptive of the item you are labeling and it is concise to make
 referencing easier.
 
 When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 3 letter module abbreviate: 
-- ani = Animal
-- man = Manure
-- soc = Soil and Crop
-- fee = Feed Storage
-- eco = Economics
-- con = Connecting or Gray Documents
+- an = Animal
+- ma = Manure
+- sc = Soil and Crop
+- fe = Feed Storage
+- ec = Economics
+- cx = Connecting or Gray Documents
 
 When uploading new images, screenshots, flowcharts or other image resources, the 3 letter abbreviations should be the LEADING part of the file name. The rest of the file name should be descriptive of the content of the image separated by underscores (_). If the image is used for a title page or representative of the larger model, the leading file name should be "rufas.""
 
@@ -118,7 +120,7 @@ If you are having trouble running this, be sure to check the sys.path.append loc
 
 ```{python}
 
-#| label: tbl-ani-example-struct
+#| label: tbl-an-example-struct
 #| tbl-cap: "This is an example caption for this example table."
 #| echo: false
 #| output: asis
@@ -129,7 +131,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-example-struct.csv",
+    "../resources/table_data/tbl-an-example-struct.csv",
 )
 
 print(md_tab)
@@ -311,3 +313,25 @@ python quarto_audit.py
 
 ```
 :::
+
+## Section Sign Up
+
+```{python}
+
+#| label: tbl-rufas-team-quarto-transfer
+#| tbl-cap: "This will help us practice how updating tables will look as we develop RuFaS. Please take this time to update the appropriate .csv files when you have decided what section you wish to work on."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("../scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-rufas-team-quarto-transfer.csv",
+)
+
+print(md_tab)
+
+```
