@@ -1346,8 +1346,7 @@ print(md_tab)
 
 **Expected Outputs**
 
-This module predicts the daily enteric methane emissions for individual animals: \\
-See [previous table](#tbl-an-output-methane).
+This module predicts the daily enteric methane emissions for individual animals: Below is the [previous table from the Emissions section](#tbl-an-output-methane).
 ```{python}
 
 
