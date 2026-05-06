@@ -137,7 +137,7 @@ class HeatUnits:
         ----------
         air_temperature : float, optional
             The average air temperature during the day (°C) used to determine the heat units via
-            ``self._determine_new_heat_units``. If None or if ``self.use_heat_unit_temperature=True``, then
+            ``self._determine_heat_unit_value``. If None or if ``self.use_heat_unit_temperature=True``, then
             ``self.heat_unit_temperature`` is used instead.
 
         """

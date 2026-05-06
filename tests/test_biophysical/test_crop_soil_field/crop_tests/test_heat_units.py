@@ -76,7 +76,7 @@ def test_accumulate_heat_units(mock_crop_data: CropData, temp: float | None, moc
     "use_alt,temp",
     [(True, 12), (True, 18), (True, 30), (True, None), (False, 12), (False, 18), (False, 30), (False, None)],
 )
-def test_assign_new_heat_units(mock_crop_data: CropData, use_alt: bool, temp: float | None) -> None:
+def test_assign_current_heat_units(mock_crop_data: CropData, use_alt: bool, temp: float | None) -> None:
     """check that assign_new_heat_units properly assigns heat units"""
     mock_crop_data.minimum_temperature = 15.0
     heat = HeatUnits(mock_crop_data, use_heat_unit_temperature=use_alt, heat_unit_temperature=25)
