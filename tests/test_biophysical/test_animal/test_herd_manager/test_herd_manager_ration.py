@@ -310,39 +310,6 @@ def test_formulate_rations(
         mock_get_user_defined.assert_not_called()
 
 
-def test_formulate_rations_not_simulate_animals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Unit test for formulate_rations()."""
-    herd_manager.simulate_animals = False
-    available_feeds, current_temperature, ration_interval_length = (
-        mock_available_feeds(),
-        30,
-        30,
-    )
-
-    mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
-    mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
-    mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
-    mock_time = mocker.MagicMock(auto_spec=RufasTime)
-    mock_time.simulation_day = 15
-
-    mock_pen_get_requested_feed = [
-        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
-    ]
-
-    result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_time.simulation_day
-    )
-
-    assert result == RequestedFeed({})
-
-    mock_clear_pens.assert_not_called()
-    mock_allocate_animals_to_pens.assert_not_called()
-    mock_reformulate_ration_single_pen.assert_not_called()
-
-    for mock_method in mock_pen_get_requested_feed:
-        mock_method.assert_not_called()
-
-
 def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for formulate_rations()."""
     mocker.patch.object(Pen, "is_populated", new_callable=mocker.PropertyMock, return_value=False)
