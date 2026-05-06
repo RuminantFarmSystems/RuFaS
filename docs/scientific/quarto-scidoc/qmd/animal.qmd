@@ -268,31 +268,42 @@ For details about the variables included in each calculation, please refer to tb
 
 ::: {#eq-an-nrc-1}
 $$
- CBW = MW * 0.06275
+\text{CBW = MW * 0.06275}
 $$
+<p style="text-align: right;">[AN.NRC.1]</p>
 :::
 
 
 ::: {#eq-an-nrc-2}
 $$
-CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
-\qquad \text{(AN.NRC.2)}
+
+\text {CW} = (18 + (\text{DOP} - 190)\cdot 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 \\
 $$
+<p style="text-align: right;">[AN.NRC.2]</p>
+
 :::
 
 *Otherwise*
 
 ::: {#eq-an-nrc-3}
 $$
-NEmaint = 0.08\cdot (BW - CW)^{0.75} \qquad \text{(AN.NRC.3)}
+NEmaint = 0.08\cdot (BW - CW)^{0.75} \\
 $$
+<p style="text-align: right;">[AN.NRC.3]</p>
 :::
+
+
+
+
 
 * Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight\(^{0.75}\)), body condition score, and the previous month's temperatures.
 
 ::: {#eq-an-nrc-1}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.1)}
+\begin{aligned}
+CBW = MW * 0.06275 \\
+\hfill \text{[AN.NRC.1]}
+\end{aligned}
 $$
 :::
 
@@ -300,8 +311,10 @@ $$
 
 ::: {#eq-an-nrc-2}
 $$
-CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0
-\qquad \text{(AN.NRC.2)}
+\begin{aligned}
+CW = (18 + (DOP - 190)\cdot 0.665)\left(\frac{CBW}{45}\right), \text{ if } DOP > 190.0 \\
+\hfill \text{[AN.NRC.2]}
+\end{aligned}
 $$
 :::
 
@@ -309,13 +322,19 @@ $$
 
 ::: {#eq-an-nrc-6}
 $$
-BCS9 = (BCS5 - 1) * 2 + 1 \qquad \text{(AN.NRC.6)}
+\begin{aligned}
+BCS9 = (BCS5 - 1) * 2 + 1 \\
+\hfill \text{[AN.NRC.6]}
+\end{aligned}
 $$
 :::
 
 ::: {#eq-an-nrc-7}
 $$
-NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \qquad \text{(AN.NRC.7)}
+\begin{aligned}
+NEmaint = (BW - CW)^{0.75}\cdot (0.086\cdot (0.8 + (BCS9 - 5)\cdot 0.05) + 0.0007 (20 - PrevTemp)) \\
+\hfill \text{[AN.NRC.7]}
+\end{aligned}
 $$
 :::
 
@@ -324,7 +343,10 @@ $$
 * Lactating and Dry Cows
 ::: {#eq-an-nrc-8}
 $$
-NEa1 = 0.0012\cdot BW \qquad \text{(AN.NRC.8)}
+\begin{aligned}
+NEa1 = 0.0012\cdot BW \\
+\hfill \text{[AN.NRC.8]}
+\end{aligned}
 $$
 :::
 

@@ -85,10 +85,12 @@ CROSSREF_PREFIXES = (
 # E = mc^2 \qquad \text{(AN.NRC.2)}
 # $$ {#eq-an-nrc-2}
 DISPLAY_EQUATION_RE = re.compile(
-    r"\$\$(?P<body>.*?)\$\$\s*\{#(?P<eq_id>eq-[A-Za-z0-9][A-Za-z0-9:_-]*)\}",
+    r":::\s*\{#(?P<eq_id>eq-[A-Za-z0-9][A-Za-z0-9:_-]*)\}\s*"
+    r"\$\$(?P<body>.*?)\$\$\s*"
+    r"(?P<label_html><div\s+class=[\"']eq-label[\"']>\s*\[?(?P<custom_id>[A-Za-z0-9.:-]+)\]?\s*</div>)?"
+    r"\s*:::",
     re.DOTALL,
 )
-
 # Visible custom IDs inside equation text, preferred pattern
 # \text{(AN.NRC.2)}
 EQ_CUSTOM_TEXT_RE = re.compile(r"\\text\s*\{\s*\(([^(){}]+)\)\s*\}")
@@ -394,13 +396,16 @@ def extract_equation_registry(text: str, relpath: str) -> list[dict]:
 
         custom_id = None
 
-        text_match = EQ_CUSTOM_TEXT_RE.search(eq_body)
-        if text_match:
-            custom_id = normalize_custom_equation_id(text_match.group(1))
+        if match.groupdict().get("custom_id"):
+            custom_id = normalize_custom_equation_id(match.group("custom_id"))
         else:
-            tag_match = EQ_CUSTOM_TAG_RE.search(eq_body)
-            if tag_match:
-                custom_id = normalize_custom_equation_id(tag_match.group(1))
+            text_match = EQ_CUSTOM_TEXT_RE.search(eq_body)
+            if text_match:
+                custom_id = normalize_custom_equation_id(text_match.group(1))
+            else:
+                tag_match = EQ_CUSTOM_TAG_RE.search(eq_body)
+                if tag_match:
+                    custom_id = normalize_custom_equation_id(tag_match.group(1))
 
         expected_id = expected_custom_equation_id(eq_id)
 
