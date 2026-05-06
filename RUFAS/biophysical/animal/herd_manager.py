@@ -323,28 +323,6 @@ class HerdManager:
         """
         return [cow.milk_statistics for cow in self.cows]
 
-    @property
-    def average_herd_305_days_milk_production(self) -> float:
-        """
-        Calculates the herd average total past 305-day milk production.
-
-        Returns
-        -------
-        float
-            The herd mean of latest_milk_production_305days.
-        """
-        lactating_cow_305_days_milk_production = list(
-            filter(
-                lambda x: x > 0,
-                [cow.milk_production.current_lactation_305_day_milk_produced for cow in self.cows if cow.is_milking],
-            )
-        )
-        return (
-            sum(lactating_cow_305_days_milk_production) / len(lactating_cow_305_days_milk_production)
-            if len(lactating_cow_305_days_milk_production) > 0
-            else 0.0
-        )
-
     @staticmethod
     def _get_cow_lactation_number(cow: Animal) -> int:
         """Returns the current lactation number for a cow."""
@@ -353,27 +331,33 @@ class HerdManager:
         return cow.calves
 
     @staticmethod
-    def _average_m305_for_cows(cows: list[Animal]) -> float:
-        """Returns the mean M305 value for the provided cohort of cows."""
+    def _average_305_day_milk_yield_for_cows(cows: list[Animal]) -> float:
+        """Returns the mean 305-day milk yield for the provided cohort of cows."""
         if not cows:
             return 0.0
 
-        return sum(cow.milk_production.mature_305_day_prediction for cow in cows) / len(cows)
+        return sum(cow.milk_production.milk_305_day_yield for cow in cows) / len(cows)
 
     @property
-    def average_l1_m305(self) -> float:
-        """Returns the mean M305 for cows in lactation 1."""
-        return self._average_m305_for_cows([cow for cow in self.cows if self._get_cow_lactation_number(cow) == 1])
+    def average_l1_305_day_milk_yield(self) -> float:
+        """Returns the mean 305-day milk yield for cows in lactation 1."""
+        return self._average_305_day_milk_yield_for_cows(
+            [cow for cow in self.cows if self._get_cow_lactation_number(cow) == 1]
+        )
 
     @property
-    def average_l2_m305(self) -> float:
-        """Returns the mean M305 for cows in lactation 2."""
-        return self._average_m305_for_cows([cow for cow in self.cows if self._get_cow_lactation_number(cow) == 2])
+    def average_l2_305_day_milk_yield(self) -> float:
+        """Returns the mean 305-day milk yield for cows in lactation 2."""
+        return self._average_305_day_milk_yield_for_cows(
+            [cow for cow in self.cows if self._get_cow_lactation_number(cow) == 2]
+        )
 
     @property
-    def average_l3_plus_m305(self) -> float:
-        """Returns the mean M305 for cows in lactation 3 or greater."""
-        return self._average_m305_for_cows([cow for cow in self.cows if self._get_cow_lactation_number(cow) >= 3])
+    def average_l3_plus_305_day_milk_yield(self) -> float:
+        """Returns the mean 305-day milk yield for cows in lactation 3 or greater."""
+        return self._average_305_day_milk_yield_for_cows(
+            [cow for cow in self.cows if self._get_cow_lactation_number(cow) >= 3]
+        )
 
     @property
     def all_animals(self) -> list[Animal]:
@@ -715,12 +699,11 @@ class HerdManager:
         AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, simulation_day)
         AnimalModuleReporter.report_manure_streams(herd_manager_output, simulation_day)
         AnimalModuleReporter.report_milk(self.daily_milk_report, simulation_day)
-        AnimalModuleReporter.report_305d_milk(self.average_herd_305_days_milk_production)
-        AnimalModuleReporter.report_m305(
-            self._average_m305_for_cows(self.cows),
-            self.average_l1_m305,
-            self.average_l2_m305,
-            self.average_l3_plus_m305,
+        AnimalModuleReporter.report_305_day_milk_yield(
+            self._average_305_day_milk_yield_for_cows(self.cows),
+            self.average_l1_305_day_milk_yield,
+            self.average_l2_305_day_milk_yield,
+            self.average_l3_plus_305_day_milk_yield,
         )
         self._report_ration(simulation_day)
         self._calculate_and_report_average_genetics(simulation_day)
@@ -896,7 +879,7 @@ class HerdManager:
         if not eligible_indices:
             return None
 
-        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.mature_305_day_prediction)
+        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.milk_305_day_yield)
 
     def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
         """Checks if surplus cows need to be sold based on herd size."""
@@ -2260,6 +2243,7 @@ class HerdManager:
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
 
-    def update_milk_305_day_yield_predictions(self) -> None:
+    def update_herd_305_day_milk_yields(self) -> None:
+        """Refresh each cow's 305-day milk yield estimate (used by reporting and culling)."""
         for cow in self.cows:
-            cow.update_mature_305_days_milk_production()
+            cow.update_305_day_milk_yield()

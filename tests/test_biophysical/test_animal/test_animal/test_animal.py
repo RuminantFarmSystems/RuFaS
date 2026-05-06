@@ -61,9 +61,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.rufas_time import RufasTime
 
 
-def _make_cow_for_305_day_milk_prediction(
-    days_in_milk: int, calves: int, current_lactation_305_day_milk_produced: float = 0.0
-) -> Animal:
+def _make_cow_for_305_day_milk_yield(days_in_milk: int, calves: int) -> Animal:
     cow = Animal.__new__(Animal)
     cow.animal_type = AnimalType.LAC_COW
     cow.days_in_milk = days_in_milk
@@ -74,44 +72,54 @@ def _make_cow_for_305_day_milk_prediction(
     cow.milk_production.wood_m = 2.0
     cow.milk_production.wood_n = 3.0
     cow.milk_production.milk_production_history = []
-    cow.milk_production.current_lactation_305_day_milk_produced = current_lactation_305_day_milk_produced
-    cow.milk_production.mature_305_day_prediction = 0.0
+    cow.milk_production.milk_305_day_yield = 0.0
     return cow
 
 
-def test_update_305_days_milk_production_for_partial_lactation() -> None:
-    """Test 305-day milk prediction for cows before day 305."""
-    cow = _make_cow_for_305_day_milk_prediction(days_in_milk=120, calves=1)
-    cow.milk_production.calculate_mature_305_day_milk_prediction.return_value = 8000.0
+def test_update_305_day_milk_yield_for_partial_lactation() -> None:
+    """Test that the 305-day milk yield uses the calculator for cows before day 305."""
+    cow = _make_cow_for_305_day_milk_yield(days_in_milk=120, calves=1)
+    cow.milk_production.calculate_305_day_milk_yield.return_value = 8000.0
 
-    cow.update_mature_305_days_milk_production()
+    cow.update_305_day_milk_yield()
 
-    cow.milk_production.calculate_mature_305_day_milk_prediction.assert_called_once_with(1.0, 2.0, 3.0, [], 120)
-    assert cow.milk_production.mature_305_day_prediction == pytest.approx(8000.0)
-
-
-def test_update_305_days_milk_production_for_completed_lactation() -> None:
-    """Test 305-day milk prediction for cows at or after day 305."""
-    cow = _make_cow_for_305_day_milk_prediction(days_in_milk=305, calves=1)
-    cow.milk_production.get_current_lactation_305_day_milk_produced.return_value = 9000.0
-
-    cow.update_mature_305_days_milk_production()
-
-    cow.milk_production.calculate_mature_305_day_milk_prediction.assert_not_called()
-    cow.milk_production.get_current_lactation_305_day_milk_produced.assert_called_once_with()
-    assert cow.milk_production.mature_305_day_prediction == pytest.approx(9000.0)
+    cow.milk_production.calculate_305_day_milk_yield.assert_called_once_with()
+    assert cow.milk_production.milk_305_day_yield == pytest.approx(8000.0)
 
 
-def test_update_305_days_milk_production_retains_value_for_dry_cow() -> None:
-    """Test that dry cows retain their lactation M305 value."""
-    cow = _make_cow_for_305_day_milk_prediction(days_in_milk=0, calves=1)
-    cow.milk_production.mature_305_day_prediction = 9100.0
+def test_update_305_day_milk_yield_for_completed_lactation() -> None:
+    """Test that cows at or past DIM 305 also go through the unified calculator."""
+    cow = _make_cow_for_305_day_milk_yield(days_in_milk=305, calves=1)
+    cow.milk_production.calculate_305_day_milk_yield.return_value = 9000.0
 
-    cow.update_mature_305_days_milk_production()
+    cow.update_305_day_milk_yield()
 
-    cow.milk_production.calculate_mature_305_day_milk_prediction.assert_not_called()
-    cow.milk_production.get_current_lactation_305_day_milk_produced.assert_not_called()
-    assert cow.milk_production.mature_305_day_prediction == pytest.approx(9100.0)
+    cow.milk_production.calculate_305_day_milk_yield.assert_called_once_with()
+    assert cow.milk_production.milk_305_day_yield == pytest.approx(9000.0)
+
+
+def test_update_305_day_milk_yield_retains_value_for_dry_cow_with_prior_yield() -> None:
+    """Dry cows that already have a value (from a prior lactation) retain it."""
+    cow = _make_cow_for_305_day_milk_yield(days_in_milk=0, calves=1)
+    cow.milk_production.milk_305_day_yield = 9100.0
+
+    cow.update_305_day_milk_yield()
+
+    cow.milk_production.calculate_305_day_milk_yield.assert_not_called()
+    assert cow.milk_production.milk_305_day_yield == pytest.approx(9100.0)
+
+
+def test_update_305_day_milk_yield_computes_for_dry_cow_with_no_prior_yield() -> None:
+    """Dry cows with no in-sim lactation yet (yield still at the 0.0 init default) are
+    populated with the pure Wood's-curve integral so they don't drag down the herd mean."""
+    cow = _make_cow_for_305_day_milk_yield(days_in_milk=0, calves=1)
+    cow.milk_production.milk_305_day_yield = 0.0
+    cow.milk_production.calculate_305_day_milk_yield.return_value = 11500.0
+
+    cow.update_305_day_milk_yield()
+
+    cow.milk_production.calculate_305_day_milk_yield.assert_called_once_with()
+    assert cow.milk_production.milk_305_day_yield == pytest.approx(11500.0)
 
 
 @pytest.fixture

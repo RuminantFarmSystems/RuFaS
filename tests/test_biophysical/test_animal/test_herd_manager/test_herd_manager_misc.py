@@ -66,8 +66,8 @@ def test_collect_daily_feed_request(herd_manager: HerdManager) -> None:
     assert result == expected_total_requested_feed
 
 
-def test_update_milk_305_day_yield_predictions(herd_manager: HerdManager) -> None:
-    """Unit test for update_milk_305_day_yield_predictions()."""
+def test_update_herd_305_day_milk_yields(herd_manager: HerdManager) -> None:
+    """Unit test for update_herd_305_day_milk_yields()."""
     cows = [
         mock_animal(AnimalType.LAC_COW, id=1),
         mock_animal(AnimalType.LAC_COW, id=2),
@@ -75,10 +75,10 @@ def test_update_milk_305_day_yield_predictions(herd_manager: HerdManager) -> Non
     ]
     herd_manager.cows = cows
 
-    herd_manager.update_milk_305_day_yield_predictions()
+    herd_manager.update_herd_305_day_milk_yields()
 
     for cow in cows:
-        cow.update_mature_305_days_milk_production.assert_called_once_with()
+        cow.update_305_day_milk_yield.assert_called_once_with()
 
 
 def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -> None:

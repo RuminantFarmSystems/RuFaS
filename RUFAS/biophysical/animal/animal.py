@@ -206,7 +206,6 @@ class Animal:
         self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
         self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
-        # self.mature_equivalent_milking_prediction_305_day: float = 0.0
 
         self._days_in_milk: int = 0
         self._milk_production_output_days_in_milk: int = 0
@@ -2465,25 +2464,24 @@ class Animal:
 
         return requirements
 
-    def update_mature_305_days_milk_production(self) -> None:
-        if self.days_in_milk == 0:
+    def update_305_day_milk_yield(self) -> None:
+        """
+        Update the cow's 305-day milk yield estimate.
+
+        Dry cows (DIM == 0) retain their previous estimate so a value carried over from
+        the prior lactation isn't wiped out. The exception is a dry cow that has never
+        had an in-sim lactation yet (estimate still at the 0.0 init default) — those fall
+        through to ``calculate_305_day_milk_yield``, which returns the pure Wood's-curve
+        integral when no current-lactation history exists. This avoids zero-valued dry
+        cows pulling the herd mean down at sim start.
+
+        For all other cows the estimate is recomputed from observed daily production
+        combined with Wood's curve predictions for any unobserved DIMs in 1..305.
+        """
+        if self.days_in_milk == 0 and self.milk_production.milk_305_day_yield > 0.0:
             return
 
-        if self.days_in_milk < 305:
-            self.milk_production.mature_305_day_prediction = (
-                self.milk_production.calculate_mature_305_day_milk_prediction(
-                    self.milk_production.wood_l,
-                    self.milk_production.wood_m,
-                    self.milk_production.wood_n,
-                    self.milk_production.milk_production_history,
-                    self.days_in_milk,
-                )
-            )
-            return
-
-        self.milk_production.mature_305_day_prediction = (
-            self.milk_production.get_current_lactation_305_day_milk_produced()
-        )
+        self.milk_production.milk_305_day_yield = self.milk_production.calculate_305_day_milk_yield()
 
     def update_genetic_history(self, simulation_day: int) -> None:
         """
