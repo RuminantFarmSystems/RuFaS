@@ -517,7 +517,7 @@ class AnimalConfig:
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
-        cls.milk_reduction_maximum = im.get_data("feed.milk_reduction_maximum")
+        cls.milk_reduction_maximum = im.get_data("feed.ration_formulation_parameters.milk_reduction_maximum")
 
         if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
             om = OutputManager()

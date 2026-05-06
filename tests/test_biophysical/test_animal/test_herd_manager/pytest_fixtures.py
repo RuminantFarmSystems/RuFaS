@@ -240,23 +240,91 @@ def animal_json() -> dict[str, Any]:
 @pytest.fixture
 def feed_json() -> dict[str, Any]:
     return {
-        "calf_feeds": [202, 216],
-        "growing_feeds": [2, 44, 51, 110, 167, 176, 231, 234],
-        "close_up_feeds": [2, 44, 51, 100, 110, 167, 231, 234],
-        "lac_cow_feeds": [2, 44, 51, 94, 110, 167, 231, 234],
-        "purchased_feeds": [
-            {"purchased_feed": 2, "purchased_feed_cost": 0.154},
-            {"purchased_feed": 44, "purchased_feed_cost": 0.208},
-            {"purchased_feed": 51, "purchased_feed_cost": 0.005},
-            {"purchased_feed": 94, "purchased_feed_cost": 0.01},
-            {"purchased_feed": 100, "purchased_feed_cost": 0.005},
-            {"purchased_feed": 110, "purchased_feed_cost": 0.005},
-            {"purchased_feed": 167, "purchased_feed_cost": 0.489},
-            {"purchased_feed": 176, "purchased_feed_cost": 0.005},
-            {"purchased_feed": 202, "purchased_feed_cost": 0.001},
-            {"purchased_feed": 216, "purchased_feed_cost": 1.0},
-            {"purchased_feed": 231, "purchased_feed_cost": 0.794},
-            {"purchased_feed": 234, "purchased_feed_cost": 0.331},
+        "feeds": [
+            {
+                "feed_type": 2,
+                "purchased_feed_cost": 0.154,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 44,
+                "purchased_feed_cost": 0.208,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 51,
+                "purchased_feed_cost": 0.005,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 94,
+                "purchased_feed_cost": 0.01,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 100,
+                "purchased_feed_cost": 0.005,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 110,
+                "purchased_feed_cost": 0.005,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 167,
+                "purchased_feed_cost": 0.489,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 176,
+                "purchased_feed_cost": 0.005,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 202,
+                "purchased_feed_cost": 0.001,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 216,
+                "purchased_feed_cost": 1.0,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 231,
+                "purchased_feed_cost": 0.794,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 234,
+                "purchased_feed_cost": 0.331,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
         ],
         "farm_grown_feeds": [1],
         "storage_options": [
@@ -283,113 +351,56 @@ def feed_json() -> dict[str, Any]:
                 "initial_dry_matter": 0,
             },
         ],
-        "user_defined_ration_percentages": {
-            "calf": [{"feed_type": 202, "ration_percentage": 50}, {"feed_type": 216, "ration_percentage": 50}],
-            "growing": [
-                {"feed_type": 2, "ration_percentage": 3.4},
-                {"feed_type": 44, "ration_percentage": 4.2},
-                {"feed_type": 51, "ration_percentage": 30.8},
-                {"feed_type": 110, "ration_percentage": 36.3},
-                {"feed_type": 167, "ration_percentage": 4.8},
-                {"feed_type": 176, "ration_percentage": 17.5},
-                {"feed_type": 231, "ration_percentage": 1.5},
-                {"feed_type": 234, "ration_percentage": 1.5},
-            ],
-            "close_up": [
-                {"feed_type": 2, "ration_percentage": 3.8},
-                {"feed_type": 44, "ration_percentage": 4.1},
-                {"feed_type": 51, "ration_percentage": 40.6},
-                {"feed_type": 94, "ration_percentage": 22.2},
-                {"feed_type": 110, "ration_percentage": 21.5},
-                {"feed_type": 167, "ration_percentage": 5.7},
-                {"feed_type": 231, "ration_percentage": 1.1},
-                {"feed_type": 234, "ration_percentage": 1.0},
-            ],
-            "lac_cow": [
-                {"feed_type": 2, "ration_percentage": 11.7},
-                {"feed_type": 44, "ration_percentage": 11.2},
-                {"feed_type": 51, "ration_percentage": 39.3},
-                {"feed_type": 100, "ration_percentage": 7.5},
-                {"feed_type": 110, "ration_percentage": 13.7},
-                {"feed_type": 167, "ration_percentage": 13.1},
-                {"feed_type": 231, "ration_percentage": 1.8},
-                {"feed_type": 234, "ration_percentage": 1.7},
-            ],
-            "tolerance": 0.1,
+        "ration_formulation_parameters": {
             "milk_reduction_maximum": 0.5,
+            "user_defined_ration_tolerance": 0.1,
         },
-        "allowances": [
+        "rations": [
             {
-                "purchased_feed": 2,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
+                "animal_combination": "calf",
+                "feeds": [
+                    {"feed_type": 202, "ration_percentage": 50},
+                    {"feed_type": 216, "ration_percentage": 50},
+                ],
             },
             {
-                "purchased_feed": 44,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
+                "animal_combination": "growing",
+                "feeds": [
+                    {"feed_type": 2, "ration_percentage": 3.4},
+                    {"feed_type": 44, "ration_percentage": 4.2},
+                    {"feed_type": 51, "ration_percentage": 30.8},
+                    {"feed_type": 110, "ration_percentage": 36.3},
+                    {"feed_type": 167, "ration_percentage": 4.8},
+                    {"feed_type": 176, "ration_percentage": 17.5},
+                    {"feed_type": 231, "ration_percentage": 1.5},
+                    {"feed_type": 234, "ration_percentage": 1.5},
+                ],
             },
             {
-                "purchased_feed": 51,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
+                "animal_combination": "close_up",
+                "feeds": [
+                    {"feed_type": 2, "ration_percentage": 3.8},
+                    {"feed_type": 44, "ration_percentage": 4.1},
+                    {"feed_type": 51, "ration_percentage": 40.6},
+                    {"feed_type": 94, "ration_percentage": 22.2},
+                    {"feed_type": 110, "ration_percentage": 21.5},
+                    {"feed_type": 167, "ration_percentage": 5.7},
+                    {"feed_type": 231, "ration_percentage": 1.1},
+                    {"feed_type": 234, "ration_percentage": 1.0},
+                ],
             },
             {
-                "purchased_feed": 94,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 100,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 110,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 167,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 176,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 202,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 216,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 231,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
-            },
-            {
-                "purchased_feed": 234,
-                "runtime_purchase_allowance": 1000.0,
-                "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0,
+                "animal_combination": "lac_cow",
+                "feeds": [
+                    {"feed_type": 2, "ration_percentage": 11.7},
+                    {"feed_type": 44, "ration_percentage": 11.2},
+                    {"feed_type": 51, "ration_percentage": 39.3},
+                    {"feed_type": 100, "ration_percentage": 7.5},
+                    {"feed_type": 110, "ration_percentage": 13.7},
+                    {"feed_type": 167, "ration_percentage": 13.1},
+                    {"feed_type": 231, "ration_percentage": 1.8},
+                    {"feed_type": 234, "ration_percentage": 1.7},
+                ],
             },
         ],
     }
@@ -400,8 +411,13 @@ def mock_get_data_side_effect(
     config_json: dict[str, Any],
     animal_json: dict[str, Any],
     feed_json: dict[str, Any],
-) -> list[Any]:
-    return [config_json, animal_json, feed_json, feed_json["allowances"]]
+) -> dict[str, Any]:
+    return {
+        "config": config_json,
+        "animal": animal_json,
+        "feed": feed_json,
+        "feed.feeds": feed_json["feeds"],
+    }
 
 
 @pytest.fixture
@@ -458,16 +474,27 @@ def mock_herd_manager(
     cows: list[Animal],
     replacement: list[Animal],
     mocker: MockerFixture,
-    mock_get_data_side_effect: list[Any],
+    mock_get_data_side_effect: dict[str, Any],
 ) -> tuple[HerdManager, dict[str, MagicMock]]:
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
     mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 0
+
     mock_available_feeds: list[Feed] = [mock_feed] * 8
     mock_simulate_animals = True
 
     im = InputManager()
-    mock_get_data: MagicMock = mocker.patch.object(im, "get_data", side_effect=mock_get_data_side_effect)
+
+    def get_data_side_effect(key: str) -> Any:
+        return mock_get_data_side_effect[key]
+
+    mock_get_data: MagicMock = mocker.patch.object(
+        im,
+        "get_data",
+        side_effect=get_data_side_effect,
+    )
+
     mock_initialize_animal_config: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
     )
@@ -477,11 +504,14 @@ def mock_herd_manager(
     mock_set_milk_quality: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
+
     mocker.patch(
-        "RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__", return_value=None
+        "RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
+        return_value=None,
     )
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
     mocker.patch("RUFAS.biophysical.animal.pen.Pen._initialize_beddings", return_value=None)
+
     HerdFactory.set_post_animal_population(
         AnimalPopulation(
             calves=calves,
@@ -493,7 +523,13 @@ def mock_herd_manager(
         )
     )
 
-    herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds, mock_simulate_animals)
+    herd_manager = HerdManager(
+        mock_weather,
+        mock_time,
+        True,
+        mock_available_feeds,
+        mock_simulate_animals,
+    )
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
@@ -607,7 +643,9 @@ def mock_pen(pen_id: int, animal_combination: AnimalCombination) -> Pen:
 
 @pytest.fixture
 def herd_manager(
-    mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
+    mock_herd: dict[str, list[Animal]],
+    mock_get_data_side_effect: dict[str, Any],
+    mocker: MockerFixture,
 ) -> HerdManager:
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],

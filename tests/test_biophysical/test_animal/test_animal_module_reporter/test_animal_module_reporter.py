@@ -1,5 +1,4 @@
 from dataclasses import asdict
-from typing import Any
 from unittest.mock import MagicMock, call
 from pytest_mock import MockerFixture
 import pytest
@@ -28,48 +27,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.user_constants import UserConstants
-
-
-@pytest.mark.parametrize(
-    "reference_variable_name, reference_variable_value, actual_variable_name, current_actual_variable_value,"
-    "actual_variable_value_to_add, simulation_day,expected_num_add_variable_calls",
-    [
-        ("ref_variable", [1, 2, 3, 4, 5], "dummy_variable", [2], 2, 1, 3),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [1, 2, 3], 2, 2, 0),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [], 2, 2, 2),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [1, 2, 3], 2, 0, 0),
-    ],
-)
-def test_data_padder(
-    reference_variable_name: str,
-    reference_variable_value: list[Any],
-    actual_variable_name: str,
-    current_actual_variable_value: list[Any],
-    actual_variable_value_to_add: Any,
-    simulation_day: int,
-    expected_num_add_variable_calls: int,
-    mocker: MockerFixture,
-) -> None:
-    """Unit test for data_padder()"""
-    om = OutputManager()
-    mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    om.variables_pool = {
-        reference_variable_name: {"values": reference_variable_value},
-    }
-    if current_actual_variable_value:
-        om.variables_pool[actual_variable_name] = {"values": current_actual_variable_value}
-
-    AnimalModuleReporter.data_padder(
-        reference_variable_name,
-        actual_variable_name,
-        actual_variable_value_to_add,
-        simulation_day,
-        info_map={},
-        first_info_map_only=True,
-        units={},
-    )
-
-    assert mock_om_add_variable.call_count == expected_num_add_variable_calls
 
 
 def test_report_milk(mocker: MockerFixture) -> None:
@@ -790,10 +747,9 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
 
 
 def test_report_manure_excretions(mocker: MockerFixture) -> None:
-    """Unit test for report_manure_excretions()"""
+    """Unit test for report_manure_excretions() without in-simulation padding."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    mock_data_padder = mocker.patch.object(AnimalModuleReporter, "data_padder")
 
     dummy_manure_excretion_data = AnimalManureExcretions(
         urea=1.1,
@@ -822,7 +778,6 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_excretions(manure_excretions_by_pen, 10)
 
-    assert mock_data_padder.call_count == 16 * len(manure_excretions_by_pen)
     assert mock_om_add_variable.call_count == 16 * len(manure_excretions_by_pen)
 
 
