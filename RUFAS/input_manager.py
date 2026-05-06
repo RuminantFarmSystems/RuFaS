@@ -50,7 +50,7 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "feed_storage_configurations",
     "feed_storage_instances",
 }
-PRROPERTIES_FILE_PATHS: dict[str, Path] = {
+PROPERTIES_FILE_PATHS: dict[str, Path] = {
     "default": Path("input/metadata/properties/default.json"),
     "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
     "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
@@ -184,9 +184,9 @@ class InputManager:
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
         if cross_validation_rules is not None and len(cross_validation_rules) > 0:
             for cross_validation_ruleset in cross_validation_rules:
-                cross_validation_blocks = cross_validation_ruleset.get("cross-validation", [])
+                cross_validation_blocks = cross_validation_ruleset.get("cross_validation", [])
                 for block in cross_validation_blocks:
-                    target_and_save_block = block.get("target_and_save", {})
+                    target_and_save_block = block.get("aliases", {})
                     target_and_save_result = self._extract_target_and_save_block(
                         target_and_save_block, eager_termination
                     )
@@ -658,12 +658,12 @@ class InputManager:
         try:
             self.om.add_log(
                 "load_properties_attempt",
-                f"Attempting to load properties from {PRROPERTIES_FILE_PATHS.values()}",
+                f"Attempting to load properties from {PROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 
             combined_properties: dict[str, Any] = {}
-            for properties_path in PRROPERTIES_FILE_PATHS.values():
+            for properties_path in PROPERTIES_FILE_PATHS.values():
                 if not properties_path.exists():
                     raise FileNotFoundError(f"Input Manager Error: Properties file not found at {properties_path}")
                 loaded_properties = self._load_data_from_json(properties_path)
@@ -672,7 +672,7 @@ class InputManager:
             self.__metadata["properties"] = combined_properties
             self.om.add_log(
                 "load_properties_success",
-                f"Successfully loaded properties from {PRROPERTIES_FILE_PATHS.values()}",
+                f"Successfully loaded properties from {PROPERTIES_FILE_PATHS.values()}",
                 info_map,
             )
 

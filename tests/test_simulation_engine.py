@@ -1187,7 +1187,6 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
         mock_time,
         is_ration_defined_by_user=mock_is_ration_defined_by_user,
         available_feeds=mock_available_feeds,
-        simulate_animals=True,
     )
     assert simulation_engine.herd_manager == mock_herd_manager
 

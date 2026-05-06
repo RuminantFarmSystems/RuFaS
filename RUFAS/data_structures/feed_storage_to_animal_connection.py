@@ -9,8 +9,8 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 """
-Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
-other input files and the RuFaS codebase.
+Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library used, and are used throughout
+other inputs and the RuFaS codebase.
 """
 RUFAS_ID = int
 
@@ -117,7 +117,7 @@ class Feed:
     is_wetforage : bool
         Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
-        The units with which the feed is measured.
+        The units with which the feed is measured (unitless).
     limit : float
         Upper limit of feed that is allowed to be used in a single animal's diet (kg).
     lower_limit : float
@@ -133,7 +133,7 @@ class Feed:
     purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
     buffer : float
-        Fraction of extra feed purchases to account for shrinkage.
+        Fraction of extra feed purchases to account for shrinkage (unitless).
 
     """
 
@@ -197,58 +197,107 @@ class NASEMFeed(Feed):
     DE_Base : float
         Digestible energy standard (Mcal / kg).
     copper : float
+        Copper (% dry matter).
     iron : float
+        Iron (% dry matter).
     manganese : float
+        Manganese (% dry matter).
     zinc : float
+        Zinc (% dry matter).
     molibdenum : float
+        Molibdenum (% dry matter).
     chromium : float
+        Chromium (% dry matter).
     cobalt : float
+        Cobalt (% dry matter).
     iodine : float
+        Iodine (% dry matter).
     selenium : float
+        Selenium (% dry matter).
     arginine : float
+        Arginine (% dry matter).
     histidine : float
+        Histidine (% dry matter).
     isoleucine : float
+        Isoleucine (% dry matter).
     leucine : float
+        Leucine (% dry matter).
     lysine : float
+        Lysine (% dry matter).
     methionine : float
+        Methionine (% dry matter).
     phenylalanine : float
+        Phenylalanine (% dry matter).
     threonine : float
+        Threonine (% dry matter).
     triptophan : float
+        Triptophan (% dry matter).
     valine : float
+        Valine (% dry matter).
     C120_FA : float
+        C120_FA (% dry matter).
     C140_FA : float
+        C140_FA (% dry matter).
     C160_FA : float
+        C160_FA (% dry matter).
     C161_FA : float
+        C161_FA (% dry matter).
     C180_FA : float
+        C180_FA (% dry matter).
     C181t_FA : float
+        C181t_FA (% dry matter).
     C181c_FA : float
+        C181c_FA (% dry matter).
     C182_FA : float
+        C182_FA (% dry matter).
     C183_FA : float
+        C183_FA (% dry matter).
     otherFA_FA : float
+        OtherFA_FA (% dry matter).
     NPN_source : float
         Non-protein nitrogen fraction (%).
     starch_digested : float
         Base starch digestibility (%).
     FA_dig : float
+        FA_dig (% dry matter).
     P_inorg : float
+        P_inorg (% dry matter).
     P_org : float
+        P_org (% dry matter).
     B_Carotene : float
+        B_Carotene (% dry matter).
     biotin : float
+        Biotin (% dry matter).
     choline : float
+        Choline (% dry matter).
     niacin : float
+        Niacin (% dry matter).
     Vit_A : float
+        Vita_A (% dry matter).
     Vit_D : float
+        Vit_D (% dry matter).
     Vit_E : float
+        Vit_E (% dry matter).
     Abs_calcium : float
+        Abs_calcium (% dry matter).
     Abs_phosphorus : float
+        Abs_phosphorus (% dry matter).
     Abs_sodium : float
+        Abs_sodium (% dry matter).
     Abs_chloride : float
+        Abs_chloride (% dry matter).
     Abs_potassium : float
+        Abs_potassium (% dry matter).
     Abs_copper : float
+        Abs_copper (% dry matter).
     Abs_iron : float
+        Abs_iron (% dry matter).
     Abs_magnesium : float
+        Abs_magnesium (% dry matter).
     Abs_manganesum : float
+        Abs_manganesum (% dry matter).
     Abs_zinc : float
+        Abs_zinc (% dry matter).
 
     """
 
