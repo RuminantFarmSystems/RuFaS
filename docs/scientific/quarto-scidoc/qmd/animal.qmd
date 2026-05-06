@@ -276,7 +276,6 @@ $$
 
 ::: {#eq-an-nrc-2}
 $$
-
 \text{CW} = (18 + (\text{DOP} - 190) \times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 <p style="text-align: right;">[AN.NRC.2]</p>
@@ -306,7 +305,6 @@ $$
 
 ::: {#eq-an-nrc-2}
 $$
-
 \text{CW} = (18 + (\text{DOP} - 190)\times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 <p style="text-align: right;">[AN.NRC.2]</p>
@@ -438,28 +436,26 @@ print(md_tab)
 
 The outputs from the Manure Excretion Calculator are organized into two main categories: manure excretion values and manure nutrient composition. These outputs are consistently generated across animal categories.
 
-| Category | Parameter | Definition | Units |
-|---|---|---|---|
-| Manure Excretion | urea | Concentration of urea in the urine | g/L |
-|&nbsp;| Urine | Amount of urine excreted | kg |
-|&nbsp;| Manure Mass | Total mass of manure excreted | kg |
-|&nbsp;| Total solids | Dry matter content of the manure | kg |
-|&nbsp;| Degradable volatile solids | Portion of the volatile solids that is degradable | kg |
-|&nbsp;| Non-degradable volatile solids | Portion of the volatile solids that is non-degradable | kg |
-| Manure Nutrient Composition | Manure methane potential | The maximum methane producing capacity of volatile solids from manure | m^3^ CH<sub>4</sub>/kg VS |
-|&nbsp;| Manure total ammoniacal nitrogen | Total ammoniacal nitrogen excreted in the manure | kg |
-|&nbsp;| Urine nitrogen | Amount of nitrogen excreted via urine | kg |
-|&nbsp;| Manure nitrogen | Total nitrogen excreted in manure | kg |
-|&nbsp;| Inorganic phosphorus fraction | Fraction of manure phosphorus that is inorganic |--|
-|&nbsp;| Organic phosphorus fraction | Fraction of manure phosphorus that is organic |--|
-|&nbsp;| Non-water inorganic phosphorus fraction| Portion of inorganic phosphorus not water-extractable |--|
-|&nbsp;| Non-water organic phosphorus not water-extractable | Portion of organic phosphorus not water-extractable |--|
-|&nbsp;| Total phosphorus excreted | Total amount of phosphorus excreted by the animal | g |
-|&nbsp;| Phosphorus fraction | Overall fraction of phosphorus in the manure |--|
-|&nbsp;| Potassium | Amount of potassium excreted in the manure | g |
 
-: Expected outputs from the manure excretion calculator. {#tbl-animal-outputs-manure-excretion}
+```{python}
 
+#| label: tbl-an-manexc-outputs
+#| tbl-cap: "Expected outputs from the manure excretion calculator."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("../scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-an-manexc-outputs.csv",
+)
+
+print(md_tab)
+
+```
 **Methodology**
 
 
@@ -710,7 +706,12 @@ Total solids/Fecal dry matter (kg/d): Calculate the amount of fecal dry matter e
 
 ::: {#eq-an-exc-19}
 $$
-\text{fecal\_solids} = 0.576 + \left(0.370 \times \text{dry\_matter\_intake}\right) - \left(0.075 \times \text{crude\_protein\_concentration}\right)+ \left(0.059 \times \text{acid\_detergent\_fiber\_concentrations}\right)
+\begin{aligned}
+\text{fecal\_solids} &= 0.576 \\
+&\quad + (0.370 \times \text{dry\_matter\_intake}) \\
+&\quad - (0.075 \times \text{crude\_protein\_concentration}) \\
+&\quad + (0.059 \times \text{acid\_detergent\_fiber\_concentrations})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.EXC.19]</p>
 
@@ -720,7 +721,12 @@ Urine (kg/d)
 
 ::: {#eq-an-exc-20}
 $$
-\text{urine} = -7.742 + \left(0.388 \times \text{dry\_matter\_intake}\right) + \left(0.726 \times \text{crude\_protein\_concentration}\right) + \left(2.066 + \text{milk\_protein}\right)
+\begin{aligned}
+\text{urine} &= -7.742 \\
+&\quad + (0.388 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.726 \times \text{crude\_protein\_concentration}) \\
+&\quad + (2.066 \times \text{milk\_protein})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.EXC.20]</p>
 
@@ -749,7 +755,12 @@ Degradable volatile solids (kg/d)
 
 ::: {#eq-an-exc-23}
 $$
-\text{degradable\_volatile\_solids} = -1.017 + \left(0.364 \times \text{organic\_matter\_intake}\right) + \left(0.029 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.023 \times \text{crude\_protein\_concentration}\right)
+\begin{aligned}
+\text{degradable\_volatile\_solids} &= -1.017 \\
+&\quad + (0.364 \times \text{organic\_matter\_intake}) \\
+&\quad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+&\quad - (0.023 \times \text{crude\_protein\_concentration})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.EXC.23]</p>
 
@@ -759,7 +770,12 @@ Total volatile solids exreted by a lactating cow (kg/d)
 
 ::: {#eq-an-exc-24}
 $$
-\text{total\_volatile\_solids} = -1.201 + \left(0.402 \times \text{organic\_matter\_intake}\right) + \left(0.036 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.024 \times \text{crude\_protein\_concentration}\right)
+\begin{aligned}
+\text{total\_volatile\_solids} &= -1.201 \\
+&\quad + (0.402 \times \text{organic\_matter\_intake}) \\
+&\quad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+&\quad - (0.024 \times \text{crude\_protein\_concentration})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.EXC.24]</p>
 
@@ -770,7 +786,9 @@ Non-degradable volatile solids excretion (kg/d)
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} 
 $$
-<p style="text-align: right;">see [AN.EXC.6](#eq-an-exc-6)</p>
+<p style="text-align: right;">see [[AN.EXC.6]](#eq-an-exc-6)</p>
+
+
 **Manure nutrient composition**
 
 Total manure nitrogen (kg/d)
@@ -799,7 +817,7 @@ Urine nitrogen excretion (kg/d)
 $$
 \text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}}
 $$
-See [AN.EXC.16](#eq-an-exc-16).
+<p style="text-align: right;">see [[AN.EXC.16]](#eq-an-exc-16)</p>
 
 
 
@@ -809,7 +827,8 @@ Manure total ammoniacal nitrogen (kg/d)
 $$
 \text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen}
 $$
-See [AN.EXC.9](#eq-an-exc-9).
+
+<p style="text-align: right;">see [[AN.EXC.9]](#eq-an-exc-9)</p>
 
 :::
 
@@ -843,7 +862,11 @@ Total manure excretion (kg/d): Amount of feces and urine excreted daily by dry c
 
 ::: {#eq-an-exc-29}
 $$
-\text{total\_manure\_excreted} = \left(0.00711 \times \text{body\_weight}\right) + \left(0.324 \times \text{crude\_protein\_concentration}\right) + \left(0.259 \times \text{neutral\_detergent\_fiber\_concentration}\right) 
+\begin{aligned}
+\text{total\_manure\_excreted} &= (0.00711 \times \text{body\_weight}) \\
+&\quad + (0.324 \times \text{crude\_protein\_concentration}) \\
+&\quad + (0.259 \times \text{neutral\_detergent\_fiber\_concentration})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.EXC.29]</p>
 
@@ -855,9 +878,7 @@ Because the equations that predict total manure excreted and total solids excret
 $$
 \text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}}
 $$
-See [AN.EXC.11ALT](#eq-an-exc-11ALT).
-
-
+<p style="text-align: right;">see [[AN.EXC.11ALT]](#eq-an-exc-11ALT)</p>
 
 Total solids excretion (kg/d) - this is the same equation used for lactating cows.
 
@@ -865,7 +886,7 @@ Total solids excretion (kg/d) - this is the same equation used for lactating cow
 $$
 \text{total\_solids} = 0.178 \times \text{dry\_matter\_intake} + 2.733
 $$
-See [AN.EXC.12](#eq-an-exc-12).
+<p style="text-align: right;">see [[AN.EXC.12]](#eq-an-exc-12)</p>
 
 
 
@@ -875,38 +896,46 @@ Organic matter intake (kg/d)
 $$
 \text{organic\_matter\_intake} = \text{dry\_matter\_intake} - \text{ash\_diet\_content}
 $$
-See [AN.EXC.22](#eq-an-exc-22).
-
+<p style="text-align: right;">see [[AN.EXC.22]](#eq-an-exc-22)</p>
 
 
 Degradable volatile solids (kg/d)
 
 
 $$
-\text{degradable\_volatile\_solids} = -1.017 + \left(0.364 \times \text{organic\_matter\_intake}\right) + \left(0.029 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.023 \times \text{crude\_protein\_concentration}\right) 
+\begin{aligned}
+\text{degradable\_volatile\_solids} &= -1.017 \\
+&\quad + (0.364 \times \text{organic\_matter\_intake}) \\
+&\quad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+&\quad - (0.023 \times \text{crude\_protein\_concentration})
+\end{aligned}
 $$
-See [AN.EXC.23](#eq-an-exc-23).
-
+<p style="text-align: right;">see [[AN.EXC.23]](#eq-an-exc-23)</p>
 
 Total volatile solids excreted by a dry cow (kg/d)
 
 
 $$
-\text{total\_volatile\_solids} = -1.201 + \left(0.402 \times \text{organic\_matter\_intake}\right) + \left(0.036 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.024 \times \text{crude\_protein\_concentration}\right)
+\begin{aligned}
+\text{total\_volatile\_solids} &= -1.201 \\
+&\quad + (0.402 \times \text{organic\_matter\_intake}) \\
+&\quad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+&\quad - (0.024 \times \text{crude\_protein\_concentration})
+\end{aligned}
 $$
-See [AN.EXC.24](#eq-an-exc-24).
+<p style="text-align: right;">see [[AN.EXC.24]](#eq-an-exc-24)</p>
 
 
 
 Non-degradable volatile solids excretion (kg/d)
 
-::: {#eq-an-exc-6}
+
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids}
 $$
-See [AN.EXC.6](#eq-an-exc-6).
+<p style="text-align: right;">see [[AN.EXC.6]](#eq-an-exc-6)</p>
 
-:::
+
 
 
 **5. Manure Phosporus Excretion (\_calulate\_phosphorus\_excretion\_manure)**
@@ -1101,7 +1130,13 @@ Based on dry matter intake and gross energy concentration from nutrient composit
 
 ::: {#eq-an-met-1}
 $$
-\text{soluble\_residue} = 100 - \text{ash\_concentration} - \text{neutral\_detergent\_fiber\_concentration} - \text{crude\_protein\_concentration} - \text{ethyl\_ester\_concentration} 
+\begin{aligned}
+\text{soluble\_residue} &= 100 \\
+&\quad - \text{ash\_concentration} \\
+&\quad - \text{neutral\_detergent\_fiber\_concentration} \\
+&\quad - \text{crude\_protein\_concentration} \\
+&\quad - \text{ethyl\_ester\_concentration}
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.1]</p>
 
@@ -1111,7 +1146,13 @@ $$
 
 ::: {#eq-an-met-2}
 $$
-\text{gross\_energy\_concentration} = 0.263 \times \left(\text{crude\_protein\_concentration} + 0.522\right) \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right)  \times \text{soluble\_residue}
+\begin{aligned}
+\text{gross\_energy\_concentration} &= 0.263 \\
+&\quad \times \left(\text{crude\_protein\_concentration} + 0.522\right) \\
+&\quad \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \\
+&\quad \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right) \\
+&\quad \times \text{soluble\_residue}
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.2]</p>
 
@@ -1158,7 +1199,13 @@ For lactating cows, the Mutian, Mills, or IPCC model is applied
 
 ::: {#eq-an-met-6}
 $$
-\text{methane\_emission} = -126 + \left(11.3 \times \text{dry\_matter\_intake} \right) + \left(2.30 \times \text{neutral\_detergent\_fiber\_concentration}\right) + \left(28.8 \times \text{milk\_fat}\right) + \left(0.148 \times \text{body\_weight}\right)
+\begin{aligned}
+\text{methane\_emission} &= -126 \\
+&\quad + (11.3 \times \text{dry\_matter\_intake}) \\
+&\quad + (2.30 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+&\quad + (28.8 \times \text{milk\_fat}) \\
+&\quad + (0.148 \times \text{body\_weight})
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.6]</p>
 
@@ -1169,7 +1216,21 @@ $$
 
 ::: {#eq-an-met-7}
 $$
-\text{methane\_emission} = \frac{45.98 \times e^{- \left(\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045\right)} \times \text{metabolizable\_energy\_intake} \times 4.184}{0.05565}
+\begin{aligned}
+\text{methane\_emission}
+&\quad =
+\frac{
+45.98
+\times e^{- \left(
+\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio}
++ 0.0045
+\right)}
+\times \text{metabolizable\_energy\_intake}
+\times 4.184
+}{
+0.05565
+}
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.7]</p>
 
@@ -1190,23 +1251,33 @@ $$
 
 **Mills Model** Mills et al. [@Mills2003] parameterized Mitscherlich equations for a nonlinear model of methan emissions. The CNCPS and IFSM models use the Mitscherlich 3 equation.
 
-::: {#eq-an-met-7}
 $$
-\text{methane\_emission} = \frac{45.98 \times e^{- \left(\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045\right)} \times \text{metabolizable\_energy\_intake} \times 4.184}{0.05565}
+\begin{aligned}
+\text{methane\_emission}
+&\quad =
+\frac{
+45.98
+\times e^{- \left(
+\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio}
++ 0.0045
+\right)}
+\times \text{metabolizable\_energy\_intake}
+\times 4.184
+}{
+0.05565
+}
+\end{aligned}
 $$
-<p style="text-align: right;">[AN.MET.7]</p>
-
-:::
+<p style="text-align: right;">see [[AN.EXC.7]](#eq-an-exc-7)</p>
 
 **IPCC Model**
 
-:::
-$$
-\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} \qquad \text{[AN.MET.5]}
-$$
-See [AN.MET.5](#eq-an-met-5).
 
-:::
+$$
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} 
+$$
+<p style="text-align: right;">see [[AN.EXC.5]](#eq-an-exc-5)</p>
+
 
 **6. Methane Mitigation**
 
@@ -1303,7 +1374,13 @@ print(md_tab)
 
 ::: {#eq-an-met-8}
 $$
-\text{methane\_yield\_reduction} = -30.8 -  \left(0.226 \times \left(\text{methane\_mitigation\_additive\_amount} - 70.5 \right)\right) + \left(0.906 \times \left(\text{neutral\_detergent\_fiber\_concentration} - 32.9 \right)\right) + \left(3.871 \times \left(\text{ethyl\_ester\_concentration} - 4.2 \right)\right) - \left(0.337 \times \left(\text{starch\_concentration} - 21.1 \right)\right)   
+\begin{aligned}
+\text{methane\_yield\_reduction} &= -30.8 \\
+&\quad - \left(0.226 \times \left(\text{methane\_mitigation\_additive\_amount} - 70.5 \right)\right) \\
+&\quad + \left(0.906 \times \left(\text{neutral\_detergent\_fiber\_concentration} - 32.9 \right)\right) \\
+&\quad + \left(3.871 \times \left(\text{ethyl\_ester\_concentration} - 4.2 \right)\right) \\
+&\quad - \left(0.337 \times \left(\text{starch\_concentration} - 21.1 \right)\right)
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.8]</p>
 
@@ -1313,7 +1390,11 @@ $$
 
 ::: {#eq-an-met-9}
 $$
-\text{methane\_yield\_reduction} = 6.35 -  \left(0.277 \times \text{methane\_mitigation\_additive\_amount} \right) - \left(0.182 \times \text{starch\_concentration}\right)
+\begin{aligned}
+\text{methane\_yield\_reduction} &= 6.35 \\
+&\quad - \left(0.277 \times \text{methane\_mitigation\_additive\_amount} \right) \\
+&\quad - \left(0.182 \times \text{starch\_concentration}\right)
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.9]</p>
 
@@ -1335,8 +1416,21 @@ Then the adjusted methane production is calculated based on methane yield reduct
 
 ::: {#eq-an-met-11}
 $$
-\text{adjusted\_methane\_emission} = \text{methane\_yield} \times \left(1 + \frac{\text{methane\_yield\_reduction}}{100}\right) \times \text{dry\_matter\_intake}
+\begin{aligned}
+\text{adjusted\_methane\_emission}
+&=
+\text{methane\_yield}
+\times
+\left(
+1 +
+\frac{\text{methane\_yield\_reduction}}{100}
+\right)
+\times
+\text{dry\_matter\_intake}
+\end{aligned}
 $$
 <p style="text-align: right;">[AN.MET.11]</p>
 
 :::
+
+## References

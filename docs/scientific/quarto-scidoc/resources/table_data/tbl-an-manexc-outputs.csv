@@ -1,0 +1,18 @@
+ Category , Parameter , Definition , Units 
+ Manure Excretion , urea , Concentration of urea in the urine , g/L 
+, Urine , Amount of urine excreted , kg 
+, Manure Mass , Total mass of manure excreted , kg 
+, Total solids , Dry matter content of the manure , kg 
+, Degradable volatile solids , Portion of the volatile solids that is degradable , kg 
+, Non-degradable volatile solids , Portion of the volatile solids that is non-degradable , kg 
+ Manure Nutrient Composition , Manure methane potential , The maximum methane producing capacity of volatile solids from manure , m^3^ CH<sub>4</sub>/kg VS 
+, Manure total ammoniacal nitrogen , Total ammoniacal nitrogen excreted in the manure , kg 
+, Urine nitrogen , Amount of nitrogen excreted via urine , kg 
+, Manure nitrogen , Total nitrogen excreted in manure , kg 
+, Inorganic phosphorus fraction , Fraction of manure phosphorus that is inorganic ,--
+, Organic phosphorus fraction , Fraction of manure phosphorus that is organic ,--
+, Non-water inorganic phosphorus fraction, Portion of inorganic phosphorus not water-extractable ,--
+, Non-water organic phosphorus not water-extractable , Portion of organic phosphorus not water-extractable ,--
+, Total phosphorus excreted , Total amount of phosphorus excreted by the animal , g 
+, Phosphorus fraction , Overall fraction of phosphorus in the manure ,--
+, Potassium , Amount of potassium excreted in the manure , g 
