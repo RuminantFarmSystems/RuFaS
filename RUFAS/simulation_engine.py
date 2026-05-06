@@ -21,8 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     TotalInventory,
 )
-from RUFAS.data_structures.field_manure_supplier import FieldManureSupplier
-from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import FieldManureSupplier, ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
@@ -243,7 +242,6 @@ class SimulationEngine:
                 self.time,
                 is_ration_defined_by_user=self.is_ration_defined_by_user,
                 available_feeds=self.available_feeds,
-                simulate_animals=self.simulate_animals,
             )
 
         if self.simulate_manure:
@@ -391,8 +389,6 @@ class SimulationEngine:
                 crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in harvest_schedule_crops
             ]
             harvest_schedule_crops = harvest_schedule_crops.union(crops_to_get_next_harvest_dates)
-            # TODO figure out where this goes and when it should happen in Animals-only simulation
-            # - also should this check on `_should_recalculate_feed_planning` be happening in this function at all?
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
     def _build_harvest_schedule(self, harvested_crops: list[HarvestedCrop]) -> dict[str, date | None]:
@@ -463,7 +459,6 @@ class SimulationEngine:
         next_harvest_dates_with_rufas_ids: dict[RUFAS_ID, date],
     ) -> IdealFeeds:
         """Wrapper function for HerdManager daily max feeds update."""
-        # TODO figure out what data to send to this function and where to call it if there is no feed module.
         return self.herd_manager.update_all_max_daily_feeds(
             total_projected_inventory, next_harvest_dates_with_rufas_ids, self.time
         )
