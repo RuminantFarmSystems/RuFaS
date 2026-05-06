@@ -40,8 +40,8 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     NutrientStandard,
     RUFAS_ID,
-    TotalInventory,
     AdvancePurchaseAllowance,
+    TotalInventory,
 )
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
@@ -82,7 +82,6 @@ class HerdManager:
         time: RufasTime,
         is_ration_defined_by_user: bool,
         available_feeds: list[Feed],
-        simulate_animals: bool,
     ) -> None:
         """
         Initializes the pens and the animal herd in the simulation with data from
@@ -98,8 +97,6 @@ class HerdManager:
             True if user-defined rations are used for the herd, otherwise false.
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
-        simulate_animals : bool
-            True if animals should be simulated, otherwise false.
         """
         self.im = InputManager()
         self.om = OutputManager()
@@ -112,8 +109,6 @@ class HerdManager:
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
-
-        self.simulate_animals = simulate_animals
 
         self.calves: list[Animal] = []
         self.heiferIs: list[Animal] = []
@@ -153,9 +148,20 @@ class HerdManager:
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
-        allowances = self.im.get_data("feed.allowances")
-        sorted_allowances = sorted(allowances, key=lambda x: x["purchased_feed"])
-        self.advance_purchase_allowance = AdvancePurchaseAllowance(sorted_allowances)
+        feeds: list[dict[str, int | float]] = self.im.get_data("feed.feeds")
+
+        purchase_allowances = [
+            {
+                "purchased_feed": feed["feed_type"],
+                "runtime_purchase_allowance": feed["runtime_purchase_allowance"],
+                "advance_purchase_allowance": feed["advance_purchase_allowance"],
+                "planning_cycle_allowance": feed["planning_cycle_allowance"],
+            }
+            for feed in feeds
+        ]
+
+        sorted_purchased_allowances = sorted(purchase_allowances, key=lambda x: x["purchased_feed"])
+        self.advance_purchase_allowance = AdvancePurchaseAllowance(sorted_purchased_allowances)
 
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
         nutrient_standard = NutrientStandard(config_data["nutrient_standard"])
@@ -164,21 +170,28 @@ class HerdManager:
 
         self.initialize_pens(animal_config_data["pen_information"])
 
-        if self.simulate_animals:
-            herd_population = HerdFactory.post_animal_population
-            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
-                herd_population.calves,
-                herd_population.heiferIs,
-                herd_population.heiferIIs,
-                herd_population.heiferIIIs,
-                herd_population.cows,
-                herd_population.replacement,
+        herd_population = HerdFactory.post_animal_population
+        if herd_population is None:
+            self.om.add_error(
+                "Herd population is None.",
+                "Expected there to be a herd and got None from HerdFactory.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                },
             )
+            raise RuntimeError("Herd population has not been initialized.")
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market = (
+            herd_population.calves,
+            herd_population.heiferIs,
+            herd_population.heiferIIs,
+            herd_population.heiferIIIs,
+            herd_population.cows,
+            herd_population.replacement,
+        )
 
-            self.allocate_animals_to_pens(time.simulation_day)
-            self.initialize_nutrient_requirements(weather, time, available_feeds)
-
-        self._print_animal_num_warnings(animal_config_data["herd_information"])
+        self.allocate_animals_to_pens(time.simulation_day)
+        self.initialize_nutrient_requirements(weather, time, available_feeds)
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
@@ -406,53 +419,6 @@ class HerdManager:
             f"cows: {len(self.cows)}\t"
         )
 
-    def _print_animal_num_warnings(self, herd_data: dict[str, Any]) -> None:
-        """
-        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
-            and logs how many warnings were generated
-        Otherwise, if simulate_animals is true, logs that it is true
-
-        Parameters
-        ----------
-        herd_data : Dict[str, Any]
-            dictionary containing information about the herd
-
-        """
-
-        animal_keys = {
-            "calf_num",
-            "heiferI_num",
-            "heiferII_num",
-            "heiferIII_num_springers",
-            "cow_num",
-        }
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._print_animal_num_warnings.__name__,
-            "simulate_animals": self.simulate_animals,
-            "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
-        }
-
-        counter = 0
-
-        if not self.simulate_animals:
-            for key in animal_keys:
-                if herd_data[key] != 0:
-                    self.om.add_warning(
-                        f"invalid_{key}_warning",
-                        f"Warning: simulate_animals is false, but {key} is not.",
-                        info_map,
-                    )
-                    counter += 1
-            self.om.add_log(
-                "num_warnings_associated_with_simulate_animals",
-                f"{counter} warnings were associated with simulate_animals",
-                info_map,
-            )
-        else:
-            self.om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
-
     def _reset_daily_statistics(self) -> None:
         """Reset the daily herd statistics."""
         self.herd_statistics.reset_daily_stats()
@@ -552,19 +518,12 @@ class HerdManager:
         removed_animals: list[Animal],
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """Call the corresponding functions to update the herd structure and reassign animals to new pens."""
-        self._handle_graduated_animals(
-            graduated_animals, available_feeds, current_day_conditions, total_inventory, simulation_day
-        )
-        self._handle_newly_added_animals(
-            newborn_calves, available_feeds, current_day_conditions, total_inventory, simulation_day
-        )
-        self._handle_newly_added_animals(
-            newly_added_animals, available_feeds, current_day_conditions, total_inventory, simulation_day
-        )
+        self._handle_graduated_animals(graduated_animals, available_feeds, current_day_conditions, simulation_day)
+        self._handle_newly_added_animals(newborn_calves, available_feeds, current_day_conditions, simulation_day)
+        self._handle_newly_added_animals(newly_added_animals, available_feeds, current_day_conditions, simulation_day)
 
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
@@ -611,7 +570,6 @@ class HerdManager:
         available_feeds: list[Feed],
         time: RufasTime,
         weather: Weather,
-        total_inventory: TotalInventory,
     ) -> None:
         """Apply animal additions, removals, and herd-size adjustments after daily routines run."""
         newly_added_animals: list[Animal] = []
@@ -630,7 +588,6 @@ class HerdManager:
             removed_animals=removed_animals,
             available_feeds=available_feeds,
             current_day_conditions=weather.get_current_day_conditions(time),
-            total_inventory=total_inventory,
             simulation_day=time.simulation_day,
         )
 
@@ -690,7 +647,10 @@ class HerdManager:
         self._calculate_and_report_average_genetics(simulation_day)
 
     def execute_daily_routines(
-        self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
+        self,
+        available_feeds: list[Feed],
+        time: RufasTime,
+        weather: Weather,
     ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
@@ -707,8 +667,6 @@ class HerdManager:
             An instance of the RufasTime object representing the current time and simulation day.
         weather : Weather
             An object providing weather conditions affecting herd activities.
-        total_inventory : TotalInventory
-            Object representing the total inventory of herd-related resources.
 
         Returns
         -------
@@ -752,7 +710,6 @@ class HerdManager:
             available_feeds,
             time,
             weather,
-            total_inventory,
         )
 
         self.record_pen_history(time.simulation_day)
@@ -993,7 +950,6 @@ class HerdManager:
         graduated_animals: list[Animal],
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1007,8 +963,6 @@ class HerdManager:
             Nutrition information of feeds available to formulate animals rations with.
         current_day_conditions : CurrentDayConditions
             Object representing the current conditions of the day.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
         simulation_day : int
             Day of simulation.
 
@@ -1016,16 +970,13 @@ class HerdManager:
         for animal in graduated_animals:
             self._remove_animal_from_pen_and_id_map(animal)
             self._update_animal_array(animal)
-            self._add_animal_to_pen_and_id_map(
-                animal, available_feeds, current_day_conditions, total_inventory, simulation_day
-            )
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, simulation_day)
 
     def _handle_newly_added_animals(
         self,
         new_animals: list[Animal],
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1039,16 +990,12 @@ class HerdManager:
             Nutrition information of feeds available to formulate animals rations with.
         current_day_conditions : CurrentDayConditions
             Object representing the current conditions of the day.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
         simulation_day: int
             Day of simulation.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(
-                animal, available_feeds, current_day_conditions, total_inventory, simulation_day
-            )
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, simulation_day)
             self._add_animal_to_new_array(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -1071,7 +1018,6 @@ class HerdManager:
         animal: Animal,
         available_feeds: list[Feed],
         current_day_conditions: CurrentDayConditions,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1085,8 +1031,6 @@ class HerdManager:
             Nutrition information of feeds available to formulate animals rations with.
         current_day_conditions : CurrentDayConditions
             Object representing the current conditions of the day.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
         simulation_day : int
             Day of simulation.
 
@@ -1115,7 +1059,6 @@ class HerdManager:
                 pen=pen_with_min_stocking_density,
                 pen_available_feeds=pen_available_feeds,
                 current_temperature=current_day_conditions.mean_air_temperature,
-                total_inventory=total_inventory,
                 simulation_day=simulation_day,
             )
 
@@ -1535,8 +1478,6 @@ class HerdManager:
             The maximum daily feeds for each feed type.
 
         """
-        if not self.simulate_animals:
-            return IdealFeeds({})
         for rufas_id in next_harvest_dates.keys():
             self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
@@ -1579,7 +1520,6 @@ class HerdManager:
         available_feeds: list[Feed],
         current_temperature: float,
         ration_interval_length: int,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> RequestedFeed:
         """
@@ -1593,8 +1533,6 @@ class HerdManager:
             Current temperature (C).
         ration_interval_length : int
             Length of the ration interval (days).
-        total_inventory : TotalInventory
-            The total inventory of all available feeds.
         simulation_day : int
             Day of simulation.
 
@@ -1604,8 +1542,6 @@ class HerdManager:
             Feeds requested to be purchased for the newly formulated rations.
 
         """
-        if not self.simulate_animals:
-            return RequestedFeed({})
         self.clear_pens()
         self.allocate_animals_to_pens(simulation_day)
 
@@ -1619,9 +1555,7 @@ class HerdManager:
             else:
                 ration_feed_ids = RationManager.get_ration_feeds(pen.animal_combination)
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, ration_feed_ids)
-            self._reformulate_ration_single_pen(
-                pen, pen_available_feeds, current_temperature, total_inventory, simulation_day
-            )
+            self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, simulation_day)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
 
@@ -1630,7 +1564,6 @@ class HerdManager:
         pen: Pen,
         pen_available_feeds: list[Feed],
         current_temperature: float,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1644,8 +1577,6 @@ class HerdManager:
             List of available feeds in this pen.
         current_temperature : float
             Current temperature (C).
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
         simulation_day : int
             Day of simulation.
 
@@ -1668,7 +1599,6 @@ class HerdManager:
                 current_temperature,
                 self._max_daily_feeds,
                 self.advance_purchase_allowance,
-                total_inventory,
                 simulation_day,
             )
 

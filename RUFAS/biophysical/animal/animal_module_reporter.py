@@ -1,6 +1,5 @@
 import sys
 from dataclasses import asdict
-from typing import Any
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
@@ -28,66 +27,6 @@ om = OutputManager()
 
 
 class AnimalModuleReporter:
-
-    @classmethod
-    def data_padder(
-        cls,
-        reference_variable: str,
-        full_variable_to_add: str,
-        thing_to_add: Any,
-        simulation_day: int,
-        info_map: dict[str, Any],
-        first_info_map_only: bool,
-        units: dict[str, MeasurementUnits] | MeasurementUnits,
-    ) -> None:
-        """
-        Pads a variable in OutputManager for entries that it "missed" relative to another variable.
-
-        This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there
-        may be a mismatch in variable lengths.
-        A common case would be when a variable is stored in OutputManager by pen, and additional pens are created
-        during the simulation.
-
-        This method checks the length of a reference variable (in the previous example, Pen 0) in OutputManager and the
-        variable of interest (in the previous example, a newly created Pen 15), and if there is a
-        mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the
-        variable to add is one less than the reference variable using "blank" data.
-
-        Parameters
-        ----------
-        reference_variable : str
-            The "reference" variable name as found in om.variables_pool. In the case of a pen, this should be pen 0 (as
-            it will always be instantiated at the start of the simulation).
-        full_variable_to_add: str
-            The variable name as found in om.variables_pool.
-        thing_to_add : Any
-            The variable data to pad the om.variables_pool with.
-        simulation_day: int
-            The day of the simulation.
-        info_map: Dict[str, Any]
-            The info_map to use when padding.
-        first_info_map_only: bool
-            Whether to only add the info_map for the first padding entry, or to add it for all entries.
-        units: Dict[str, str] | str
-            Units for the variable being added, in the format provided in the main call to add_variable,
-            (e.g., the one following the call of data_padder).
-
-        """
-        if simulation_day > 0 and reference_variable in om.variables_pool:
-            if full_variable_to_add in om.variables_pool:
-                current_output_length = len(list(om.variables_pool[full_variable_to_add].values())[0])
-            else:
-                current_output_length = 0
-            length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
-            if length_difference > 1:
-                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
-                for _ in range(0, length_difference - 1):
-                    om.add_variable(
-                        short_variable_to_add,
-                        thing_to_add,
-                        info_map=dict(info_map, **{"units": units}),
-                        first_info_map_only=first_info_map_only,
-                    )
 
     @classmethod
     def report_daily_animal_population(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
@@ -610,25 +549,13 @@ class AnimalModuleReporter:
             "potassium": MeasurementUnits.GRAMS,
         }
         info_map = {
-            "class": (class_name := AnimalModuleReporter.__name__),
-            "function": (function_name := AnimalModuleReporter.report_manure_excretions.__name__),
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_manure_excretions.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
         }
         for base_name, manure_excretion in manure_excretions.items():
             for manure_property, manure_value in asdict(manure_excretion).items():
-                reference_base = list(manure_excretions.keys())[0]
-                reference_variable = f"{class_name}.{function_name}.{reference_base}_{str(manure_property)}"
-                variable_to_add = f"{class_name}.{function_name}.{base_name}_{str(manure_property)}"
-                AnimalModuleReporter.data_padder(
-                    reference_variable,
-                    variable_to_add,
-                    0,
-                    simulation_day,
-                    info_map=info_map,
-                    first_info_map_only=True,
-                    units=pen_manure_data_units[manure_property],
-                )
                 om.add_variable(
                     f"{base_name}_{str(manure_property)}",
                     manure_value,

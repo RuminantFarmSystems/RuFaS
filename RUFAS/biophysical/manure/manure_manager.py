@@ -3,7 +3,6 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any
 
-from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
@@ -20,7 +19,11 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    FieldManureSupplier,
+    NutrientRequest,
+    NutrientRequestResults,
+)
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -819,9 +822,7 @@ class ManureManager:
                 result_row_names.append(row_name)
         return result_row_names
 
-    def request_nutrients(
-        self, request: NutrientRequest, simulate_animals: bool, time: RufasTime
-    ) -> NutrientRequestResults:
+    def request_nutrients(self, request: NutrientRequest, time: RufasTime) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
@@ -841,8 +842,6 @@ class ManureManager:
         ----------
         request : NutrientRequest
             The specific nutrient request, including quantities of nitrogen and phosphorus.
-        simulate_animals : bool
-            Indicates whether animals are being simulated.
         time : RufasTime
             The current time in the simulation.
 
@@ -855,29 +854,24 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        if simulate_animals:
-            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
-                request
-            )
-            self._record_manure_request_results(request_result, "on_farm_manure", time)
-            if request_result is not None:
-                self._remove_nutrients_from_storage(request_result, request.manure_type)
+        request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(request)
+        self._record_manure_request_results(request_result, "on_farm_manure", time)
+        if request_result is not None:
+            self._remove_nutrients_from_storage(request_result, request.manure_type)
 
-            if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
-                self._om.add_log(
-                    "Supplemental manure needed",
-                    "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
-                    {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
-                )
-                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
-                supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
-                self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
-                if request_result is None:
-                    return supplemental_manure
-                return request_result + supplemental_manure
-            return request_result
-        else:
-            return FieldManureSupplier.request_nutrients(request)
+        if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
+            self._om.add_log(
+                "Supplemental manure needed",
+                "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
+                {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
+            )
+            amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
+            supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
+            self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
+            if request_result is None:
+                return supplemental_manure
+            return request_result + supplemental_manure
+        return request_result
 
     def _remove_nutrients_from_storage(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
         """
