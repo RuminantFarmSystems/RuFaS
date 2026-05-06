@@ -130,9 +130,27 @@ def load_table(path: Path, sheet_name: str | None = None) -> pd.DataFrame:
     suffix = path.suffix.lower()
 
     if suffix == ".csv":
-        return pd.read_csv(path)
+        try:
+            return pd.read_csv(
+                path,
+                dtype=str,
+                keep_default_na=False,
+                encoding="utf-8",
+            )
+        except UnicodeDecodeError:
+            return pd.read_csv(
+                path,
+                dtype=str,
+                keep_default_na=False,
+                encoding="cp1252",
+            )
+
     if suffix in {".xlsx", ".xls"}:
-        return pd.read_excel(path, sheet_name=sheet_name or 0)
+        return pd.read_excel(
+            path,
+            sheet_name=sheet_name or 0,
+            dtype=str,
+        ).fillna("")
 
     raise ValueError("Input must be a .csv, .xlsx, or .xls file.")
 
@@ -147,6 +165,9 @@ def make_markdown_table(
     Designed for use inside Quarto Python chunks.
     """
     df = load_table(Path(input_file), sheet_name=sheet)
+
+    df = df.fillna("")
+    df = df.map(lambda x: "" if pd.isna(x) else str(x).replace("\n", " "))
 
     return df.to_markdown(
         index=False,

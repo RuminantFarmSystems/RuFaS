@@ -107,112 +107,38 @@ Our documentation include quite a few tables with long, detailed definitions and
 
 Instead, we have four excel files that correspond to each existing module. In each file, sheets are named by their label id (see next section for more on id logic). That way, you can auto-generate a .txt file with your table properly sized and formated using the make_grid_table.py (quarto-scidoc>scripts). The .txt file output will show up in quarto-scidoc>output>tables.
 
-#### Option 1 - generate from a .csv 
+#### Option 1 - Generate Directly from a .csv File
 This is the preferred method to generate a table because it is the most straightforward and requires the least amount of formatting. You can use the make_markdown_table function in the make_grid_table.py script to generate a markdown table from a .csv file. The .csv file should be formatted with the appropriate columns (Variable, Definition, Default, Min, Max) and should be saved in the resources/table_data folder. The name of your file should match the label used in the documentation. This will help with traceback and auditing. 
 
 All tables begin with the "tbl-" prefix followed with the 3 letter acronym for the module where the table belongs (e.g. "ani" for animal). The final segments (also separated by hyphens) should be short but descriptive. For example, the table of abbreviations is labeled "tbl-abbrevs" (it is outside of any module so no module abbreviation is used) and the corresponding .csv file is named "tbl-abbrev.csv".
 
-
-```markdown
-
 The main adjustments you will need to make are the label, tbl-cap (caption), and the file name in the make_markdown_table function. The rest of the code can be copied and pasted as is.
 
+If you are having trouble running this, be sure to check the sys.path.append location and the actual .csv file location.
 
 ```{python}
-#| label: tbl-abbrevs
-#| tbl-cap: "Abbreviations used in the RuFaS scientific documentation."
+
+#| label: tbl-ani-example-struct
+#| tbl-cap: "This is an example caption for this example table."
 #| echo: false
 #| output: asis
 
 import sys
-sys.path.append("scripts")
+sys.path.append("../scripts")
 
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "resources/table_data/tbl-abbrev.csv",
-    colalign=("left", "left", "right"),
-    maxcolwidths=[None, 45, None],
+    "../resources/table_data/tbl-ani-example-struct.csv",
 )
 
 print(md_tab)
-```
-
-#### Option 2 - extended
-```markdown
-After you create your excel sheet in the module file of the data folder 
-(in this example it is animal.xslx).
-
-
-
-
-python scripts\make_grid_table.py data\animal.xlsx `
---sheet "EXAMPLE" `
---widths "24,40,4,6,12" `
---caption "This is an example caption." `
---label "tbl-example-inputs" `
---output output\tables\example_table_file.txt
-
-
-The text file will generate something similar to what you see below:
-
-+--------------------------+------------------------------------------+------+--------+--------------+
-| Variable                 | Definition                               | Defa | Min    | Max          |
-|                          |                                          | ult  |        |              |
-+==========================+==========================================+======+========+==============+
-| id                       | The index of the pen                     |      | 0.0    |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| pen_name                 | The name or identifier of a given pen    |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
-|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
-|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
-|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
-|                          | LAC_COWS = Lactating Cows                |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-
-: This is an example caption. {#tbl-example-inputs}
-
-: This is an example caption. {#tbl-example-inputs}
-
-
-Remember, you will need to update 
---sheet (the sheet name should match the label)
---caption (to relevant description)
---label (follow label structure in next section)
---output (file name only)
-
-Optional: 
---widths is preset to recommended sizing for the table. If it does not 
-work for your table, feel free to adjust as needed. 
-
-
 
 ```
 
 
-
-After you copy and paste the table from the .txt file into your .qmd, this is what your table would look like.
-
-
-+--------------------------+------------------------------------------+------+--------+--------------+
-| Variable                 | Definition                               | Defa | Min    | Max          |
-|                          |                                          | ult  |        |              |
-+==========================+==========================================+======+========+==============+
-| id                       | The index of the pen                     |      | 0.0    |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| pen_name                 | The name or identifier of a given pen    |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
-|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
-|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
-|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
-|                          | LAC_COWS = Lactating Cows                |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-
-: This is an example caption. {#tbl-example-inputs}
-
-
+### Option 2 - Create a .csv File before Generating the Table from your File
+A comprehensive, step-by-step guide to this process is available in qmd > scripts > quarto_python_test > python_tables_example files created by Clay. They also add some description details to option 1, so it may be good to review regardless of your preferred option.
 
 ## Equation Templates and ID Logic
 If you are adding equations, it is important that you continue to use the ID logic that has been described ... 
@@ -223,12 +149,16 @@ The audit label and crosslinking is tracked by #eq-an-nrc-2026.
 It is important to follow the custom label structure even for 
 the invisible reference to make tracking easier. 
 
-The actual custom labeling is written as \text
+All equation text or variables and custom equation IDs should use the \text function to ensure that formating is consistent throughout the Sci Doc. 
+
+For extremely long equations, you may create manual breaks with the \qquad function.
 
 ::: {#eq-an-nrc-2026} 
+
 $$
 CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
 $$
+
 :::
 
 Below is how the equation can be linked in other parts of the text: 
@@ -347,7 +277,7 @@ quarto render --to pdf
 
 ```
 *For audit review*
-You can find the output in the quarto-scidoc folder.
+You can find the output in resources > reference-audit folder.
 
 ```{{markdown}}
 

@@ -1,0 +1,4 @@
+Variable,Definition,Default,Min,Max
+id,The index of the pen,NA,0,NA
+pen_name,The name or identifier of a given pen,NA,,
+animal_combination,The valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows,,,"CALF, GROWING, CLOSE_UP, LAC_COWS"
