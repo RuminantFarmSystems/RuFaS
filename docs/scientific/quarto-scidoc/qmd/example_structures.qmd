@@ -153,12 +153,11 @@ All equation text or variables and custom equation IDs should use the \text func
 
 For extremely long equations, you may create manual breaks with the \qquad function.
 
-::: {#eq-an-nrc-2026} 
-
+::: {#eq-an-nrc-2026}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\text{CBW = MW * 0.06275}
 $$
-
+<p style="text-align: right;">[AN.NRC.2026]</p>
 :::
 
 Below is how the equation can be linked in other parts of the text: 
@@ -171,8 +170,10 @@ This is how your equation and the linking should appear.
 
 ::: {#eq-an-nrc-2026}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\text{CBW = MW * 0.06275}
 $$
+<p style="text-align: right;">[AN.NRC.2026]</p>
+
 :::
 
 See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.

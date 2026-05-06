@@ -1,0 +1,3 @@
+ Variable Name , Definition , Default and Range 
+ methane_mitigation_-method , Selected feed additive for methane mitigation ," ""3-NOP"", ""Monensin"" "
+ methane_mitigation_additive_-amount , Dosage per kg of dry matter intake (DMI) , 3-NOP: 70 (40-100) mg/kg DMI; Monensin: 24 (20-36) mg/kg DMI 

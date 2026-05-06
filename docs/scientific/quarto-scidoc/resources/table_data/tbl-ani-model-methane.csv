@@ -1,0 +1,4 @@
+ Variable Name , Definition , Default and Range 
+ methane_model , Selected methane model for emission estimation ," ""Mutian"", ""Mills"", ""IPCC"" "
+ methane_mitigation_method , Selected feed additive for methane mitigation ," ""3-NOP"", ""Monensin"", ""Essential Oils"", ""Seaweed"" "
+ methane_mitigation_additive_-amount , Amount of additive used for methane mitigation (mg/kg DMI) ," 3-NOP (70; 40-100), Monensin (24; 20-36), Essential Oils (0; 0-100), Seaweed (0; 0-100) "
