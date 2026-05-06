@@ -1,0 +1,50 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Abbreviations\n",
+        "\n",
+        "Below is a table of abbreviations used in the RuFaS scientific documentation. This table is intended to help readers understand the various abbreviations and acronyms that may be encountered throughout the documentation."
+      ],
+      "id": "0a2a6eb0"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: tbl-abbrevs\n",
+        "#| tbl-cap: Abbreviations used in the RuFaS scientific documentation.\n",
+        "#| echo: false\n",
+        "#| output: asis\n",
+        "\n",
+        "import sys\n",
+        "sys.path.append(\"scripts\")\n",
+        "\n",
+        "from make_grid_table import make_markdown_table\n",
+        "\n",
+        "md_tab = make_markdown_table(\n",
+        "    \"resources/table_data/tbl-abbrev.csv\",\n",
+        "    colalign=(\"left\", \"left\", \"right\"),\n",
+        "    maxcolwidths=[None, 45, None],\n",
+        ")\n",
+        "\n",
+        "print(md_tab)"
+      ],
+      "id": "tbl-abbrevs",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "C:\\Users\\gmg228\\AppData\\Local\\Python\\pythoncore-3.14-64\\share\\jupyter\\kernels\\python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

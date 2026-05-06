@@ -51,7 +51,7 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 
 ```{python}
 
-#| label: tbl-ani-sim-outline
+#| label: tbl-an-sim-outline
 #| tbl-cap: "Overview of the distinct phases by which animals are created and introduced to the herd."
 #| echo: false
 #| output: asis
@@ -62,7 +62,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-sim-outline.csv",
+    "../resources/table_data/tbl-an-sim-outline.csv",
 )
 
 print(md_tab)
@@ -73,7 +73,7 @@ print(md_tab)
 
 ```{python}
 
-#| label: tbl-ani-herd-inputs
+#| label: tbl-an-herd-inputs
 #| tbl-cap: "User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section."
 #| echo: false
 #| output: asis
@@ -84,7 +84,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-herd-inputs.csv",
+    "../resources/table_data/tbl-an-herd-inputs.csv",
 )
 
 print(md_tab)
@@ -144,7 +144,7 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 
 ```{python}
 
-#| label: tbl-animal-grp-inputs
+#| label: tbl-an-grp-inputs
 #| tbl-cap: "User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here."
 #| echo: false
 #| output: asis
@@ -155,7 +155,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-grp-inputs.csv",
+    "../resources/table_data/tbl-an-grp-inputs.csv",
 )
 
 print(md_tab)
@@ -185,7 +185,7 @@ To translate from the AnimalTypes needed to track an animal’s life stages and 
 
 ```{python}
 
-#| label: tbl-ani-def-grp
+#| label: tbl-an-def-grp
 #| tbl-cap: "Summary of animal types and their grouping included in this module."
 #| echo: false
 #| output: asis
@@ -196,7 +196,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-def-grp.csv",
+    "../resources/table_data/tbl-an-def-grp.csv",
 )
 
 print(md_tab)
@@ -268,7 +268,7 @@ For details about the variables included in each calculation, please refer to tb
 
 ::: {#eq-an-nrc-1}
 $$
-CBW = MW \times 0.06275
+\text{CBW} = \text{MW} \times 0.06275
 $$
 <p style="text-align: right;">[AN.NRC.1]</p>
 :::
@@ -277,7 +277,7 @@ $$
 ::: {#eq-an-nrc-2}
 $$
 
-CW = (18 + (DOP - 190) \times 0.665)\left(\frac{CBW}{45}\right), \text{if DOP} > 190.0 
+\text{CW} = (18 + (\text{DOP} - 190) \times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 <p style="text-align: right;">[AN.NRC.2]</p>
 
@@ -287,20 +287,18 @@ $$
 
 ::: {#eq-an-nrc-3}
 $$
-NEmaint = 0.08\times (BW - CW)^{0.75} 
+\text{NEmaint} = 0.08\times (\text{BW} - \text{CW})^{0.75} 
 $$
 <p style="text-align: right;">[AN.NRC.3]</p>
+
 :::
 
 
-
-
-
-* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight\(^{0.75}\)), body condition score, and the previous month's temperatures.
+* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight^0.75), body condition score, and the previous month's temperatures.
 
 ::: {#eq-an-nrc-1}
 $$
-CBW = MW \times 0.06275
+\text{CBW} = \text{MW} \times 0.06275
 $$
 <p style="text-align: right;">[AN.NRC.1]</p>
 :::
@@ -309,7 +307,7 @@ $$
 ::: {#eq-an-nrc-2}
 $$
 
-CW = (18 + (\text{DOP} - 190)\times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+\text{CW} = (18 + (\text{DOP} - 190)\times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 <p style="text-align: right;">[AN.NRC.2]</p>
 
@@ -319,7 +317,7 @@ $$
 
 ::: {#eq-an-nrc-6}
 $$
-BCS9 = (BCS5 - 1) \times 2 + 1 
+\text{BCS9} = (\text{BCS5} - 1) \times 2 + 1 
 $$
 <p style="text-align: right;">[AN.NRC.6]</p>
 
@@ -327,7 +325,7 @@ $$
 
 ::: {#eq-an-nrc-7}
 $$
-NEmaint = (BW - CW)^{0.75}\times (0.086\times (0.8 + (BCS9 - 5)\times 0.05) + 0.0007 \times (20 - PrevTemp)) 
+\text{NEmaint} = (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 5)\times 0.05) + 0.0007 \times (20 - \text{PrevTemp})) 
 $$
 <p style="text-align: right;">[AN.NRC.7]</p>
 
@@ -336,9 +334,11 @@ $$
 *Activity* Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
 
 * Lactating and Dry Cows
+
+
 ::: {#eq-an-nrc-8}
 $$
-NEa1 = 0.0012\times BW 
+\text{NEa1} = 0.0012\times \text{BW} 
 $$
 <p style="text-align: right;">[AN.NRC.8]</p>
 
@@ -373,7 +373,7 @@ The Manure Excretion Calculator module computes manure excretion metrics for var
 
 ```{python}
 
-#| label: tbl-ani-gen-manexc-inputs
+#| label: tbl-an-gen-manexc-inputs
 #| tbl-cap: "General animal and diet inputs used to calculate nutrient intake and manure production."
 #| echo: false
 #| output: asis
@@ -384,7 +384,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-gen-manexc-inputs.csv",
+    "../resources/table_data/tbl-an-gen-manexc-inputs.csv",
 )
 
 print(md_tab)
@@ -395,18 +395,18 @@ print(md_tab)
 
 
 ```{python}
-#| label: tbl-ani-cow-input-manexc
+#| label: tbl-an-cow-input-manexc
 #| tbl-cap: "Cow related inputs, particularly relevant for lactating animals."
 #| echo: false
 #| output: asis
 
 import sys
-sys.path.append("scripts")
+sys.path.append("../scripts")
 
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "resources/table_data/tbl-ani-cow-input-manexc.csv",
+    "../resources/table_data/tbl-an-cow-input-manexc.csv",
 )
 
 print(md_tab)
@@ -417,7 +417,7 @@ print(md_tab)
 
 ```{python}
 
-#| label: tbl-ani-cow-phos-input-manexc
+#| label: tbl-an-cow-phos-input-manexc
 #| tbl-cap: "Phosphorus related inputs relevant to lactating cows."
 #| echo: false
 #| output: asis
@@ -428,7 +428,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-cow-phos-input-manexc.csv",
+    "../resources/table_data/tbl-an-cow-phos-input-manexc.csv",
 )
 
 print(md_tab)
@@ -590,7 +590,7 @@ Because the equations that predict total manure excreted and total solids excret
 $$
 \text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}} 
 $$
-<p style="text-align: right;">[AN.EXC.8ALT]</p>
+<p style="text-align: right;">[AN.EXC.11ALT]</p>
 
 :::
 
@@ -604,6 +604,7 @@ $$
 
 :::
 
+
 Total volatile solids excretion (kg/d)
 
 ::: {#eq-an-exc-13}
@@ -616,23 +617,21 @@ $$
 
 Degradable volatile solids excretion (kg/d)
 
-::: 
+
 $$
 \text{degradable\_volatile\_solids} = 0.9 \times \text{total\_volatile\_solids}
 $$
 See [AN.EXC.5](#eq-an-exc-5).
 
-:::
+
 
 Non-degradable volatile solids excretion (kg/d)
 
-::: 
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} 
 $$
 See [AN.EXC.6](#eq-an-exc-6).
 
-:::
 
 
 **Manure nutrient composition**
@@ -669,13 +668,13 @@ $$
 
 Manure total ammoniacal nitrogen (kg/d)
 
-::: 
+
 $$
-\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{[AN.EXC.9]}
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} 
 $$
 See [AN.EXC.9](#eq-an-exc-9).
 
-:::
+
 
 Manure potassium excretion (g/d)
 
@@ -768,14 +767,10 @@ $$
 
 Non-degradable volatile solids excretion (kg/d)
 
-::: 
 $$
-\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} \qquad \text{[AN.EXC.6]}
+\text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} 
 $$
-See [AN.EXC.6](#eq-an-exc-6).
-
-:::
-
+<p style="text-align: right;">see [AN.EXC.6](#eq-an-exc-6)</p>
 **Manure nutrient composition**
 
 Total manure nitrogen (kg/d)
@@ -800,19 +795,19 @@ $$
 
 Urine nitrogen excretion (kg/d)
 
-::: 
+ 
 $$
-\text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}} \qquad \text{[AN.EXC.16]}
+\text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}}
 $$
 See [AN.EXC.16](#eq-an-exc-16).
 
-:::
+
 
 Manure total ammoniacal nitrogen (kg/d)
 
 ::: {#eq-an-exc-9}
 $$
-\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen} \qquad \text{[AN.EXC.9]}
+\text{manure\_total\_ammoniacal\_nitrogen} = \text{urine\_nitrogen}
 $$
 See [AN.EXC.9](#eq-an-exc-9).
 
@@ -856,53 +851,52 @@ $$
 
 Because the equations that predict total manure excreted and total solids excreted rely on different inputs, in some extreme cases, the total mass of manure excreted can be predicted to be very close to the predicted total solids excreted which is unrealistically dry. For this reason, we set a maximum manure dry content of 20% for heifers and dry cows. If the mass predicted by equation [AN.EXC.11](#eq-an-ex-11) is not great than (total solids/maximum manure dry matter content) then,
 
-::: 
+
 $$
-\text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}} \qquad \text{[AN.EXC.11ALT]}
+\text{total\_manure\_excreted} = \frac{\text{total\_solids}}{\text{dry\_matter\_manure}}
 $$
 See [AN.EXC.11ALT](#eq-an-exc-11ALT).
 
-:::
+
 
 Total solids excretion (kg/d) - this is the same equation used for lactating cows.
 
-::: 
+
 $$
 \text{total\_solids} = 0.178 \times \text{dry\_matter\_intake} + 2.733
 $$
 See [AN.EXC.12](#eq-an-exc-12).
 
-:::
+
 
 Organic matter intake (kg/d)
 
-::: 
+
 $$
 \text{organic\_matter\_intake} = \text{dry\_matter\_intake} - \text{ash\_diet\_content}
 $$
 See [AN.EXC.22](#eq-an-exc-22).
 
-:::
+
 
 Degradable volatile solids (kg/d)
 
-:::
+
 $$
 \text{degradable\_volatile\_solids} = -1.017 + \left(0.364 \times \text{organic\_matter\_intake}\right) + \left(0.029 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.023 \times \text{crude\_protein\_concentration}\right) 
 $$
 See [AN.EXC.23](#eq-an-exc-23).
 
-:::
 
 Total volatile solids excreted by a dry cow (kg/d)
 
-::: 
+
 $$
 \text{total\_volatile\_solids} = -1.201 + \left(0.402 \times \text{organic\_matter\_intake}\right) + \left(0.036 \times \text{neutral\_detergent\_fiber\_concentration}\right) - \left(0.024 \times \text{crude\_protein\_concentration}\right)
 $$
 See [AN.EXC.24](#eq-an-exc-24).
 
-:::
+
 
 Non-degradable volatile solids excretion (kg/d)
 
@@ -1013,7 +1007,7 @@ The calculated enteric methane emissions are directly output to the Output Manag
 
 ```{python}
 
-#| label: tbl-ani-gen-enteric-met
+#| label: tbl-an-gen-enteric-met
 #| tbl-cap: "Animal and diet inputs used to calculate nutrient intake and manure production."
 #| echo: false
 #| output: asis
@@ -1024,7 +1018,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-gen-enteric-met.csv",
+    "../resources/table_data/tbl-an-gen-enteric-met.csv",
 )
 
 print(md_tab)
@@ -1034,7 +1028,7 @@ print(md_tab)
 
 ```{python}
 
-#| label: tbl-ani-cow-enteric-met
+#| label: tbl-an-cow-enteric-met
 #| tbl-cap: "Cow specific inputs, particularly relevant for lactating animals."
 #| echo: false
 #| output: asis
@@ -1045,7 +1039,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-cow-enteric-met.csv",
+    "../resources/table_data/tbl-an-cow-enteric-met.csv",
 )
 
 print(md_tab)
@@ -1054,7 +1048,7 @@ print(md_tab)
 
 ```{python}
 
-#| label: tbl-ani-model-methane
+#| label: tbl-an-model-methane
 #| tbl-cap: "Methane emissions model and mitigation strategy inputs."
 #| echo: false
 #| output: asis
@@ -1065,7 +1059,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-model-methane.csv",
+    "../resources/table_data/tbl-an-model-methane.csv",
 )
 
 print(md_tab)
@@ -1079,7 +1073,7 @@ This module predicts the daily enteric methane emissions for individual animals:
 
 ```{python}
 
-#| label: tbl-ani-output-methane
+#| label: tbl-an-output-methane
 #| tbl-cap: "Expected outputs of the methane model."
 #| echo: false
 #| output: asis
@@ -1090,7 +1084,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-output-methane.csv",
+    "../resources/table_data/tbl-an-output-methane.csv",
 )
 
 print(md_tab)
@@ -1239,7 +1233,7 @@ The Methane Mitigation Calculator module evaluates the reduction in enteric meth
 
 ```{python}
 
-#| label: tbl-ani-enter-met-diet-mitigate
+#| label: tbl-an-enter-met-diet-mitigate
 #| tbl-cap: "General dietary fiber and fat concentration inputs."
 #| echo: false
 #| output: asis
@@ -1250,7 +1244,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-enter-met-diet-mitigate.csv",
+    "../resources/table_data/tbl-an-enter-met-diet-mitigate.csv",
 )
 
 print(md_tab)
@@ -1260,7 +1254,7 @@ print(md_tab)
 
 ```{python}
 
-#| label: tbl-ani-enter-met-additive-type-dose
+#| label: tbl-an-enter-met-additive-type-dose
 #| tbl-cap: "Feed based mitigation strategies and dosing."
 #| echo: false
 #| output: asis
@@ -1271,7 +1265,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-enter-met-additive-type-dose.csv",
+    "../resources/table_data/tbl-an-enter-met-additive-type-dose.csv",
 )
 
 print(md_tab)
@@ -1281,8 +1275,8 @@ print(md_tab)
 
 **Expected Outputs**
 
-This module predicts the daily enteric methane emissions for individual animals:
-See [previous table](#tbl-ani-output-methane).
+This module predicts the daily enteric methane emissions for individual animals: \\
+See [previous table](#tbl-an-output-methane).
 ```{python}
 
 
@@ -1296,7 +1290,7 @@ sys.path.append("../scripts")
 from make_grid_table import make_markdown_table
 
 md_tab = make_markdown_table(
-    "../resources/table_data/tbl-ani-output-methane.csv",
+    "../resources/table_data/tbl-an-output-methane.csv",
 )
 
 print(md_tab)
