@@ -1978,6 +1978,198 @@ def test_dump_variable_names_and_contexts_no_values(
     mock_list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
 
 
+def test_get_parsable_dicts_excludes_info_maps(mock_output_manager: OutputManager) -> None:
+    """Returns empty lists when exclude_info_maps is True."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=True)
+
+    assert parsable_dicts == []
+    assert var_data_info_maps == []
+
+
+def test_get_parsable_dicts_includes_info_maps(mock_output_manager: OutputManager) -> None:
+    """Returns info_maps key and data when exclude_info_maps is False and info_maps present."""
+    info_maps_data = [{"units": "kg"}, {"units": "lb"}]
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": info_maps_data,
+    }
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=False)
+
+    assert parsable_dicts == ["info_maps"]
+    assert var_data_info_maps == info_maps_data
+
+
+def test_get_parsable_dicts_no_info_maps_key(mock_output_manager: OutputManager) -> None:
+    """Returns empty lists when info_maps key is absent."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=False)
+
+    assert parsable_dicts == []
+    assert var_data_info_maps == []
+
+
+def test_format_variable_entry_no_values(mock_output_manager: OutputManager) -> None:
+    """Returns NO VARIABLES line when values key is absent."""
+    result = mock_output_manager._format_variable_entry("myvar", {"info_maps": []}, False, "verbose")
+
+    assert result == [f"myvar: **NO VARIABLES**{os.linesep}"]
+
+
+def test_format_variable_entry_flat_with_units(mock_output_manager: OutputManager) -> None:
+    """Non-nested values with units emits name-with-units line."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    result = mock_output_manager._format_variable_entry("weight", variable_data, False, "verbose")
+
+    assert f"weight (kg){os.linesep}" in result
+
+
+def test_format_variable_entry_flat_no_units(mock_output_manager: OutputManager) -> None:
+    """Non-nested values without units emits bare name line."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    result = mock_output_manager._format_variable_entry("weight", variable_data, True, "verbose")
+
+    assert f"weight{os.linesep}" in result
+    assert any("()" in line for line in result) is False
+
+
+def test_format_variable_entry_nested_values_appends_values_to_parsable_dicts(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Nested values causes values dict to be passed to _format_parsable_dict_lines."""
+    variable_data: dict[str, Any] = {
+        "values": [{"k1": 1, "k2": 2}],
+    }
+    mock_format_lines = mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    mock_output_manager._format_variable_entry("myvar", variable_data, True, "verbose")
+
+    called_parsable_dicts = [call.args[2] for call in mock_format_lines.call_args_list]
+    assert "values" in called_parsable_dicts
+
+
+def test_format_variable_entry_block_flat_no_units_no_duplicate(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with flat no-units variable: bare name line not duplicated."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, True, "block")
+
+    assert result.count(f"myvar{os.linesep}") == 1
+
+
+def test_format_variable_entry_block_flat_with_units_appends_bare_name(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with flat variable that has units: bare name line appended after name(units) line."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, False, "block")
+
+    assert f"myvar (kg){os.linesep}" in result
+    assert f"myvar{os.linesep}" in result
+
+
+def test_format_variable_entry_block_nested_appends_bare_name(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with nested values: bare name line appended (lines starts empty), prefix is spaces."""
+    variable_data: dict[str, Any] = {"values": [{"k1": 1}]}
+    mock_format_lines = mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, True, "block")
+
+    assert f"myvar{os.linesep}" in result
+    prefix_arg = mock_format_lines.call_args.args[1]
+    assert prefix_arg == " " * len("myvar")
+
+
+@pytest.mark.parametrize(
+    "keys, units, parsable_dict, expected_fragment",
+    [
+        (["k1", "k2"], "kg", "values", "myvar.values: ['k1', 'k2'] (kg)"),
+        (["k1", "k2"], "", "values", "myvar.values: ['k1', 'k2']"),
+        (["k1"], "kg", "info_maps", "myvar.info_maps: ['k1']"),
+    ],
+)
+def test_format_parsable_dict_lines_inline(
+    mock_output_manager: OutputManager,
+    keys: list[str],
+    units: str,
+    parsable_dict: str,
+    expected_fragment: str,
+) -> None:
+    """Inline format emits single line with key list."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", parsable_dict, keys, units, "inline")
+
+    assert len(result) == 1
+    assert expected_fragment in result[0]
+
+
+@pytest.mark.parametrize(
+    "format_option, units, key, expected_has_units",
+    [
+        ("basic", "kg", "my_key", True),
+        ("basic", "kg", "units", False),
+        ("basic", "kg", "timestep", False),
+        ("basic", "", "my_key", False),
+        ("verbose", "kg", "my_key", True),
+        ("verbose", "kg", "units", False),
+        ("verbose", "", "my_key", False),
+    ],
+)
+def test_format_parsable_dict_lines_units_suppressed_for_ignored_keys(
+    mock_output_manager: OutputManager,
+    format_option: str,
+    units: str,
+    key: str,
+    expected_has_units: bool,
+) -> None:
+    """Units omitted for keys in _VARIABLE_DUMP_KEYS_TO_IGNORE or when units empty."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", [key], units, format_option)
+
+    assert len(result) == 1
+    has_units = f"({units})" in result[0]
+    assert has_units == expected_has_units
+
+
+def test_format_parsable_dict_lines_basic_per_key_lines(mock_output_manager: OutputManager) -> None:
+    """Basic format emits one line per key using name.key pattern."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", ["k1", "k2"], "kg", "basic")
+
+    assert len(result) == 2
+    assert f"myvar.k1 (kg){os.linesep}" in result
+    assert f"myvar.k2 (kg){os.linesep}" in result
+
+
+def test_format_parsable_dict_lines_verbose_uses_prefix(mock_output_manager: OutputManager) -> None:
+    """Verbose/block format uses prefix and parsable_dict in each line."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "    ", "values", ["k1"], "kg", "verbose")
+
+    assert len(result) == 1
+    assert f"    .values: k1 (kg){os.linesep}" in result
+
+
+def test_format_parsable_dict_lines_dict_units(mock_output_manager: OutputManager) -> None:
+    """Per-key dict units resolved correctly; missing key gets empty string."""
+    units_dict = {"k1": "kg", "k2": "lb"}
+    result = mock_output_manager._format_parsable_dict_lines(
+        "myvar", "myvar", "values", ["k1", "k2", "k3"], units_dict, "basic"
+    )
+
+    assert f"myvar.k1 (kg){os.linesep}" in result
+    assert f"myvar.k2 (lb){os.linesep}" in result
+    assert f"myvar.k3{os.linesep}" in result
+
+
 def test_set_variables_pool_with_override(
     mock_output_manager: OutputManager,
 ) -> None:
