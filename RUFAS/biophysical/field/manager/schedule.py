@@ -129,7 +129,7 @@ class Schedule:
 
         Returns
         -------
-        list
+        list[Any]
             List of instantiated event objects.
 
         """
@@ -165,7 +165,7 @@ class Schedule:
 
         Returns
         -------
-        list
+        list[Any]
             list of prepared event arguments for event initialization.
 
         """

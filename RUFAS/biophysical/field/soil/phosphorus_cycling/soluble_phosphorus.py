@@ -211,7 +211,7 @@ class SolublePhosphorus:
             Concentration of phosphorus in the soil layer (mg phosphorous per kg soil).
         isotherm_slope : float
             Slope of the phosphorus sorption isotherm (unitless).
-        isotherm_intercept
+        isotherm_intercept : float
              Intercept of the phosphorus sorption isotherm (unitless).
 
         Returns

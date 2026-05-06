@@ -17,7 +17,7 @@ class SoilErosion:
     ----------
     soil_data : SoilData, optional
         The SoilData object used by this module to track and simulate erosion.
-    field_size : float, optional, default=None
+    field_size : float, optional
         The size of the field (ha).
 
     Attributes
@@ -54,11 +54,11 @@ class SoilErosion:
         Parameters
         ----------
         field_size : float
-            Size of the field that contains this Soil object (hectares).
+            Size of the field that contains this Soil object (ha).
         minimum_cover_management_factor : float
             Minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless).
         surface_residue : float
-            Amount of residue on the soil surface (kg per hectare).
+            Amount of residue on the soil surface (kg / ha).
         rainfall : float
             Amount of rain that fell on the field on the current day (mm).
 
@@ -313,8 +313,21 @@ class SoilErosion:
 
     @staticmethod
     def _determine_support_practice_factor() -> float:
-        """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
-        stripcropping, and/or terracing)"""
+        """
+        Determine the support practice factor (only applies to fields that are doing contour tillage/planting,
+        stripcropping, and/or terracing).
+
+        Returns
+        -------
+        float
+            The support practice factor (unitless).
+
+        References
+        ----------
+        SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+        stripcropping, and/or terracing)
+
+        """
         return 1
 
     @staticmethod
@@ -525,7 +538,7 @@ class SoilErosion:
         return rain_during_time_of_concentration / time_of_concentration
 
     @staticmethod
-    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
+    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope: float) -> float:
         """
         Calculates the time of concentration for the subbasin.
 

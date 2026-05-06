@@ -15,11 +15,11 @@ class TillageApplication:
 
     Parameters
     ----------
-    field_data : FieldData, default=None
+    field_data : FieldData, optional
         FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.
-    soil_data : SoilData, default=None
+    soil_data : SoilData, optional
         SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
-    field_size : float, default=None
+    field_size : float, optional
         Size of the field (ha)
 
     Attributes
@@ -59,7 +59,7 @@ class TillageApplication:
         soil_data : SoilData, optional
             SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
         field_size : float, optional
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -182,13 +182,13 @@ class TillageApplication:
         Parameters
         ----------
         pool_name : str
-            Name of the soil attribute that should be mixed within the soil profile (unitless)
+            Name of the soil attribute that should be mixed within the soil profile (unitless).
         tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
+            The lowest depth the tilling implement reaches (mm).
         mixing_fraction : float
-            Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)
+            Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless).
         offset_top_layer : bool, optional, by default=False
-            A flag that determines whether to offset the top layer of soil in redistribution calculations
+            A flag that determines whether to offset the top layer of soil in redistribution calculations.
 
         References
         ----------
@@ -259,12 +259,12 @@ class TillageApplication:
         attribute_name : str
             attribute of the manure pool instance from which to get the data.
         incorporation_fraction : float
-            Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
+            Fraction of stuff incorporated into the soil profile from the soil surface (unitless).
 
         Returns
         -------
         float
-            Amount removed from soil surface and added to the top soil layer (units vary)
+            Amount removed from soil surface and added to the top soil layer (units vary).
 
         Raises
         ------
@@ -314,11 +314,11 @@ class TillageApplication:
         Parameters
         ----------
         tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
+            The lowest depth the tilling implement reaches (mm).
         incorporation_fraction : float
-            Fraction of soil surface pool incorporated into the soil profile (unitless)
+            Fraction of soil surface pool incorporated into the soil profile (unitless).
         mixing_fraction : float
-            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
         implement : TillageImplement
             The tillage implement used to execute this application.
         year : int

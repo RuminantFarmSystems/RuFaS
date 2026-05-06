@@ -45,7 +45,7 @@ class Manure:
         field_size : float
             The size of the field (ha).
         mean_air_temperature : float
-            Mean air temperature on the current day (degrees C).
+            Mean air temperature on the current day (Celsius).
 
         Notes
         -----

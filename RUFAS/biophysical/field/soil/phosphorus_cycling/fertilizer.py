@@ -1,5 +1,5 @@
 from math import exp, log
-from typing import Dict, Optional
+from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.soil_data import SoilData
@@ -195,7 +195,7 @@ class Fertilizer:
 
     def _determine_leached_phosphorus(
         self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Determine the amount of phosphorus removed from the specified pool and partition the loss between soil
         absorption and runoff.
@@ -213,7 +213,7 @@ class Fertilizer:
 
         Returns
         -------
-        dict
+        dict[str, float]
             Dictionary with amounts of phosphorus lost to runoff and soil absorption (both in kg).
 
         """
@@ -293,7 +293,7 @@ class Fertilizer:
 
         References
         ----------
-        pseudocode_soil [S.5.C.I.1], SurPhos [14]
+        pseudocode_soil S.5.C.I.1, SurPhos [14]
             (Note: constants differ between the documents, prefer the ones from pseudocode_soil)
 
         Notes
@@ -307,8 +307,7 @@ class Fertilizer:
     def _determine_phosphorus_distribution_factor(rainfall: float, runoff: float) -> float:
         """
         Determine the phosphorus distribution factor for use in determining how leached fertilizer phosphorus is
-        distributed
-        between infiltration and runoff.
+        distributed between infiltration and runoff.
 
         Parameters
         ----------
@@ -324,7 +323,7 @@ class Fertilizer:
 
         References
         ----------
-        pseudocode_soil [S.5.C.II.2], SurPhos [15]
+        pseudocode_soil S.5.C.II.2, SurPhos [15]
 
         """
         return 0.034 * exp(3.4 * (runoff / rainfall))
@@ -357,7 +356,7 @@ class Fertilizer:
 
         References
         ----------
-        pseudocode_soil [S.5.C.II.3], SurPhos [16]
+        pseudocode_soil S.5.C.II.3, SurPhos [16]
 
         """
         return (fertilizer_phosphorus * fraction_phosphorus_released * distribution_factor) / total_rainfall

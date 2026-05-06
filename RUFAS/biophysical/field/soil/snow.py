@@ -12,12 +12,17 @@ class Snow:
     This class provides methods for calculating snow pack temperature, snow melting, and
     updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
 
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The object that tracks all soil variables throughout the simulation.
+    field_size : float, optional
+        The field size (ha).
+
     Attributes
     ----------
     soil_data : Optional[SoilData]
         The object that tracks all soil variables throughout the simulation.
-    field_size : Optional[float]
-        The field size (ha).
 
     Methods
     -------
@@ -141,16 +146,6 @@ class Snow:
         temperatures, and snow melting, based on the provided current day weather data
         and day of the simulation.
 
-        Notes
-        -----
-        - If the current snow content is negative, a ValueError is raised.
-        - If the snow content is 0.0, 'previous_day_snow_temperature' and 'current_day_snow_temperature' are set to None
-          and 'snow_content' and 'snow_melt_amount' is set to 0.0.
-        - Before calculating the current day snow temperature, 'previous_day_snow_temperature' is set to the value of
-          'current_day_snow_temperature' from the last iteration. If 'current_day_snow_temperature' is None,
-          'previous_day_snow_temperature' is set to the average air temperature of the current day.
-
-
         Parameters
         ----------
         current_day_conditions : CurrentDayConditions
@@ -166,6 +161,15 @@ class Snow:
         ------
         ValueError
             If the snow_content is < 0.0.
+
+        Notes
+        -----
+        - If the current snow content is negative, a ValueError is raised.
+        - If the snow content is 0.0, 'previous_day_snow_temperature' and 'current_day_snow_temperature' are set to None
+          and 'snow_content' and 'snow_melt_amount' is set to 0.0.
+        - Before calculating the current day snow temperature, 'previous_day_snow_temperature' is set to the value of
+          'current_day_snow_temperature' from the last iteration. If 'current_day_snow_temperature' is None,
+          'previous_day_snow_temperature' is set to the average air temperature of the current day.
 
         """
         if self.soil_data.snow_content < 0.0:

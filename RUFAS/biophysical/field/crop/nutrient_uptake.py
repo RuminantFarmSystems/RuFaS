@@ -10,7 +10,7 @@ class NutrientUptake(ABC):
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
 
@@ -59,8 +59,13 @@ class NutrientUptake(ABC):
 
         Parameters
         ----------
-        actual_nutrient_uptakes : Optional[List[float]]
+        actual_nutrient_uptakes : list[float]
             Actual nutrient uptake from each soil layer (kg/ha or mm).
+
+        Returns
+        -------
+        float
+            Total nutrient extracted from each soil layer (kg/ha).
 
         """
         return sum(actual_nutrient_uptakes)
