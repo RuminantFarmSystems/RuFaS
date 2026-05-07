@@ -2,6 +2,7 @@ from math import exp
 from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class Evaporation:
@@ -126,12 +127,16 @@ class Evaporation:
         float
             Evaporative demand for given layer of soil (mm).
 
+        Raises
+        ------
+        ValueError
+            If invalid bottom or top layer depths are found.
+
         References
         ----------
         SWAT Theoretical documentation 2:2.3.16, 17
 
         """
-        # Check layer integrity
         if (
             top_depth is None
             or top_depth < 0
@@ -139,6 +144,14 @@ class Evaporation:
             or bottom_depth < 0
             or (bottom_depth <= top_depth)
         ):
+            OutputManager().add_error(
+                "Invalid layer depths",
+                "Missing or illegal values for top or bottom depths",
+                info_map={
+                    "class": Evaporation.__name__,
+                    "function": Evaporation._determine_layer_evaporative_demand.__name__
+                }
+            )
             raise ValueError("Missing or illegal values for top or bottom depths")
 
         # Calculate evaporative demand at top of layer

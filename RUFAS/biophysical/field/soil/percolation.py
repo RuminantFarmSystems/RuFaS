@@ -3,6 +3,7 @@ from typing import Optional
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class Percolation:
@@ -137,12 +138,26 @@ class Percolation:
         float
             Travel time for percolation (hours).
 
+        Raises
+        ------
+        ValueError
+            If saturated hydraulic conductivity is <= 0.
+
         References
         ----------
         SWAT 2:3.2.4
 
         """
         if saturated_hydraulic_conductivity <= 0:
+            OutputManager().add_error(
+                "Percolation travel time error",
+                "Saturated hydraulic conductivity must be greater than 0 "
+                f"and got {saturated_hydraulic_conductivity}",
+                info_map={
+                    "class": Percolation.__name__,
+                    "function": Percolation._determine_percolation_travel_time.__name__
+                }
+            )
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
         return (saturation - field_capacity_content) / saturated_hydraulic_conductivity
 
