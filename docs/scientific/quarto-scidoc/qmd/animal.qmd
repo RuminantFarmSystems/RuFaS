@@ -485,57 +485,41 @@ daily tissue mobilized during lactation.
 [[**AN.BWT.18**]]{.aside .content-visible when-format="html"}
 
 $$     
-\text{bodyweight\_tissue\_change} = \frac{P_1}{P_2} \times exp\bigg(1 - \frac{\text{DIM}}{P_2}\bigg) + \
-  \text{DIM} \times exp\bigg(1 - \frac{\text{DIM}}{P_2}\bigg)
+\text{bodyweight\_tissue\_change} = \frac{\text{P1}}{\text{P2}} \times \
+  exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg) + \
+  \text{DIM} \times exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
 $$
 
-Where $P_1$ and $P_2$ are parameters with distinct values for primiparous and multiparous cows:
+Where P1 and P2 are parameters with distinct values for primiparous and multiparous cows:
 
-```{.latex}
-\begin{table}[h!]
+```{python}
+#| label: tbl-animal-growth-params
+#| tbl-cap: Summary of the available inputs that are available and their definitions.
+#| echo: false
+import pandas as pd
+from IPython.display import Markdown, display
 
-\centering
+tbl = pd.read_csv(
+  "../resources/table_data/animal_tables/animal-bwt-parameters.csv"
+).to_markdown(
+  index = False
+)
 
-\renewcommand{\arraystretch}{1.3}
-
-
-\begin{tabular}{@{} L{3cm} L{3cm} L{3cm} @{}}
-
-\toprule
-
-\multicolumn{1}{c}{\textbf{Parameter}} & 
-
-\multicolumn{1}{c}{\textbf{Primiparous}} & 
-
-\multicolumn{1}{c}{\textbf{Multiparous}} \\
-
-\midrule
-
-P\textsubscript{1}    & 20   & 65 \\
-
-P\textsubscript{2}    & 40 & 70 \\
-
-\bottomrule
-
-\end{tabular}
-
-\end{table}
+display(Markdown(tbl))
 ```
 
 During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is 
 estimated on the last day of lactation as: 
-
-
 
 :::{.content-visible when-format="pdf"}
 [AN.BWT.19]
 :::
 [[**AN.BWT.19**]]{.aside .content-visible when-format="html"}
 $$
-\text{tissue\_changed} = P_1 \times \frac{\text{DIMlast}}{P_2} \times exp \bigg(1 - \frac{\text{DIMlast}}{P_2}\bigg) + \
-  \text{DIM} \times exp \bigg(1 - \frac{\text{DIM}}{P_2}\bigg)
+\text{tissue\_changed} = \text{P1} \times \frac{\text{DIMlast}}{\text{P2}} \times \
+  exp \bigg(1 - \frac{\text{DIMlast}}{\text{P2}}\bigg) + \
+  \text{DIM} \times exp \bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
 $$
-
 
 and 
 
