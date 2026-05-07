@@ -267,7 +267,9 @@ For details about the variables included in each calculation, please refer to tb
 
 ### RuFaS Bodyweight and Growth
 
-**Introduction** An animal’s bodyweight is initialized at birth according to a user defined normal distribution.
+#### Introduction 
+
+An animal’s bodyweight is initialized at birth according to a user defined normal distribution.
 Depending on her life stage, her bodyweight is then updated daily by adding their daily growth (commonly referred to 
 as average daily gain), conceptus weight change, and tissue accretion and depletion associated with tissue mobilization 
 to support lactation. The changes associated with each life stage are:
@@ -284,7 +286,7 @@ changes that occur in lactation.
     
 These methods are further described by @Li2023
 
-**Required User Inputs** 
+#### Required User Inputs
 
 ```{python}
 #| label: tbl-animal-growth-req-inputs
@@ -302,391 +304,239 @@ tbl = pd.read_csv(
 display(Markdown(tbl))
 ```
 
-[//]: # (\textbf{Expected Outputs} )
+#### Expected Outputs
 
-[//]: # (\begin{itemize})
+- `herd_statistics.avg_cow_body_weight` (kg): the daily average bodyweight of all cows in the herd 
+- `Pen_[pen ID]_[pen animal combination].avg_BW` (kg): the daily average bodyweight of all animals in each pen
+- `sold_weight` (kg)
 
-[//]: # (    \item herd\_statistics.avg\_cow\_body\_weight &#40;kg&#41;: the daily average bodyweight of all cows in the herd )
+#### Methodology
 
-[//]: # (    \item Pen\_[pen ID]\_[pen animal combination].avg\_BW &#40;kg&#41;: the daily average bodyweight of all animals in each pen)
+Most methods determining the bodyweight of animals in RuFaS are implemented in growth.py. 
+    
+The function evaluate_body_weight_change in growth.py calls the appropriate bodyweight change functions for each animal 
+depending on their life stage and sums the appropriate changes into a single variable called `daily_growth.` 
 
-[//]: # (    \item sold\_weight &#40;kg&#41;)
+After setting the daily bodyweight change in the daily_growth variable, the evaluate_body_weight_change function 
+updates each animal's bodyweight by adding it to the current body_weight. Thus for all animals, the final updated 
+body_weight is set as:
 
-[//]: # (\end{itemize})
 
-[//]: # (\vspace{0.5cm})
+$$
+\text{body\_weight\_updated} = \text{body\_weight\_current} + \text{daily\_growth}
+$$
+[[**AN.BWT.5**]]{.aside}
 
-[//]: # ()
-[//]: # (    \paragraph{Methodology} )
+#### Calf Birth Weight
 
-[//]: # (    )
-[//]: # (    Most methods determining the bodyweight of animals in RuFaS are implemented in growth.py. )
+Calf birth weight is assigned in reproduction.py using a random draw from a truncated normal distribution 
+based on user inputs for the breed-specific average and standard deviation of the birthweight. The distribution is 
+truncated at +/- 2 SD from the mean to prevent extremely small or large calves. 
 
-[//]: # (    )
-[//]: # (    The function evaluate\_body\_weight\_change in growth.py calls the appropriate bodyweight change functions for each animal depending on their life stage and sums the appropriate changes into a single variable called daily\_growth. )
 
-[//]: # ()
-[//]: # (    After setting the daily bodyweight change in the daily\_growth variable, the evaluate\_body\_weight\_change function updates each animal's bodyweight by adding it to the current body\_weight. Thus for all animals, the final updated body\_weight is set as:)
+$$
+\text{Birth Weight} = \text{Random N} (\text{average\_birth\_weight\_by\_breed}, \text{std\_std\_birth\_by\_breed}) 
+$$
+[[**AN.BWT.6**]]{.aside}
 
-[//]: # (    \vspace{0.25cm})
+Note - truncated at 2 standard deviations in [AN.BWT.6](#eq-one)
 
-[//]: # (    )
-[//]: # (    \begin{center})
+#### Calf Growth 
 
-[//]: # (    \&#40;\text{body\_weight}_{\text{updated}} = \text{body\_weight}_{\text{current}} + \text{daily\_growth}\&#41;        )
+Calves are assumed to double their weight between birth and weaning based on recommendations 
+in the @nrc2001. Thus the target average daily gain is estimated as:
 
-[//]: # (    \end{center})
 
-[//]: # ()
-[//]: # (\begin{itemize})
+$$
+\text{target\_average\_daily\_gain} = \frac{\text{birth weight}}{\text{wean day}}
+$$
+[[**AN.BWT.7**]]{.aside}
 
-[//]: # (    \item \textbf{Calf Birth Weight} is assigned in reproduction.py using a random draw from a truncated normal distribution based on user inputs for the breed-specific average and standard deviation of the birthweight. The distribution is truncated at +/- 2 SD from the mean to prevent extremely small or large calves. )
+#### Non Pregnant Heifer Growth
 
-[//]: # (    \vspace{0.5cm})
+The daily growth for non-pregnant heifers is estimated through an average daily 
+gain to reach 55% of their manure bodyweight by the time they are pregnant. Because the actual age at pregnancy 
+is not known, a user input for the target_heifer_preg_day is used to estimate the target average daily growth or ADG. 
+A minimum daily growth rate of 0.5 kg/d is enforced so if the estimated daily_growth is less than 0.5 kg/d, the 
+minimum value is used. 
 
-[//]: # (    )
-[//]: # (\begin{center})
 
-[//]: # (    \&#40;Birth\ Weight = Random\ N\ &#40;average\_birth\_weight\_by\_breed,\ std\_std\_birth\_by\_breed&#41;\&#41; )
+$$    
+\text{target\_average\_daily\_gain} = \
+  min \bigg(\frac{0.55×\text{MSBW}-\text{SBW}}{abs(\text{target heifer pregnant age}-\text{age})},0.5\bigg)
+$$
+[[**AN.BWT.8**]]{.aside}
+    
+Where MSBW is mature shrunk bodyweight (0.96 x mature bodyweight) and SBW is shrunk bodyweight (0.96 x bodyweight)
 
-[//]: # (    )
-[//]: # (    *Note - truncated at 2 standard deviations)
+#### Pregnant Heifer Growth
 
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.6]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # ()
-[//]: # (    \item \textbf{Calf Growth} Calves are assumed to double their weight between birth and weaning based on recommendations in the \cite{nrc2001}. Thus the target average daily gain is estimated as:)
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # ()
-[//]: # (\begin{center})
-
-[//]: # (    )
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{birth\ weight}{wean\ day}\&#41;)
-
-[//]: # (    )
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.7]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \item \textbf{Non Pregnant Heifer Growth} The daily growth for non-pregnant heifers is estimated through an average daily gain to reach 55\% of their manure bodyweight by the time they are pregnant. Because the actual age at pregnancy is not known, a user input for the target\_heifer\_preg\_day is used to estimate the target average daily growth or ADG. A minimum daily growth rate of 0.5 kg/d is enforced so if the estimated daily\_growth is less than 0.5 kg/d, the minimum value is used. )
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # ( \begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = min&#40;\frac{0.55×MSBW-SBW}{abs&#40;target heifer pregnant age-age&#41;}\&#41;,0.5&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.8]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    Where MSBW is mature shrunk bodyweight &#40;0.96 x mature bodyweight&#41; and SBW is shrunk bodyweight &#40;0.96 x bodyweight&#41;)
-
-[//]: # (    )
-[//]: # (    \item \textbf{Pregnant Heifer Growth} Heifers are targeted to grow to 82\% of their mature body weight by the time of their first calving. A gestation length is set at conception. The ADG of pregnant heifers is calculated based on the target heifer's body weight, gestation length, and days in pregnancy. The gestation length for each animal is set at conception by calculate\_gestation\_length in reproduction.py.)
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # ( )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{0.82×MSBW-SBW}{gestation length - days in pregnancy}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.9]}\par})
-
-[//]: # (    )
-[//]: # (    \item \textbf{Parity 1 and 2 Cow Growth} The daily growth of cows is calculated based on the target of reaching 92\% of the mature body weight by the end of the 1st lactation, and full mature body weight at the end of the 2nd lactation. Before pregnancy, the daily growth is estimated based on the calving interval and during pregnancy the daily growth is calculated based on days until calving. )
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \paragraph{Parity 1 Animals:})
-
-[//]: # (    \vspace{0.25cm})
-
-[//]: # (    )
-[//]: # (    \textbf{\textit{If not pregnant:}})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{&#40;0.92-0.82&#41; × MSBW}{calving\_interval}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.10]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \textbf{\textit{If pregnant:}})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{0.92 × MSBW - bodyweight}{gestation\_length - DIP}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.11]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # ()
-[//]: # (    \paragraph{Parity 2 Animals})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # ()
-[//]: # (    )
-[//]: # (    \textbf{\textit{If not pregnant:}})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{&#40;1 - 0.92&#41; × MSBW}{calving\_interval}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.12]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \textbf{\textit{If pregnant:}})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;target\_average\_daily\_gain = \frac{&#40;MSBW - bodyweight&#41;}{gestation\_length - DIP}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.13]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (The gestation length for cows is estimated with the same methods that are used for heifers and the calving interval is set either as the average herd calving interval or the animal’s own calving interval which is calculated as the age at her second calving minus her age at first calving as part of the daily\_reproduction\_update in animal.py.)
-
-[//]: # ()
-[//]: # (    \item \textbf{Conceptus Growth} is estimated the same way for both heifers and cows using a non-linear model for animals that are greater than 50 days in pregnancy based on the methods developed by \textcite{Korver1985}. )
-
-[//]: # (    \vspace{0.25cm})
-
-[//]: # (    )
-[//]: # (    If the heifer or cow days in pregnancy is greater than 50  and less than the gestation length:)
-
-[//]: # ()
-[//]: # (    First the expected total conceptus weight is estimated using an empirical equation based on the calf birth weight and the gestation length:)
-
-[//]: # (     \vspace{0.5cm})
-
-[//]: # (     )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;conceptus\_total\_weight = &#40;0.0148\ *\ gestation\_length&#41; × calf\_birth\_weight\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.14]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    Then an animal specific conceptus parameter is calculated:)
-
-[//]: # (     \vspace{0.5cm})
-
-[//]: # (     )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;conceptus\_parameter = \frac{total\_conceptus\_weight^\frac{1}{3}}{gestation\_length - 50}\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.15]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    Finally, the conceptus growth is estimated as:)
-
-[//]: # (     \vspace{0.5cm})
-
-[//]: # (     )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;conceptus\_growth = 3\ *\ conceptus\ parameter^3\ *\ &#40;DIP - 50&#41;^2\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.16]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    When days\_in\_pregnancy = gestation\_length and the animal calves, then conceptus growth is set to the negative value of the current conceptus\_weight such that the weight of the calf and placenta are subtracted from the cow’s bodyweight when her bodyweight is updated.)
-
-[//]: # (        \vspace{0.5cm})
-
-[//]: # (        )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;conceptus\_growth = conceptus\_weight\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.17]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \item \textbf{Tissue Change Due to Lactation} Lactation related tissue changes are estimated by a non-linear model presented by \textcite{Galvao2013} that estimates the daily tissue mobilized during lactation. )
-
-[//]: # (     \vspace{0.5cm})
-
-[//]: # (     )
-[//]: # (\begin{center})
-
-[//]: # (    \&#40;bodyweight\_tissue\_change = \frac{P1}{P2}\ *\ exp\ &#40;1\ -\ \frac{DIM}{P2}&#41;\ +\ DIM\ x\ exp\ &#40;1\ -\ \frac{DIM}{P2}&#41;\&#41;)
-
-[//]: # (\end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.18]}\par})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    Where P\textsubscript{1} and P\textsubscript{2} are parameters with distinct values for primiparous and multiparous cows:)
-
-[//]: # ()
-[//]: # (    \begin{table}[h!])
-
-[//]: # (    \centering)
-
-[//]: # (    \renewcommand{\arraystretch}{1.3})
-
-[//]: # ()
-[//]: # (    \begin{tabular}{@{} L{3cm} L{3cm} L{3cm} @{}})
-
-[//]: # (    \toprule)
-
-[//]: # (    \multicolumn{1}{c}{\textbf{Parameter}} & )
-
-[//]: # (    \multicolumn{1}{c}{\textbf{Primiparous}} & )
-
-[//]: # (    \multicolumn{1}{c}{\textbf{Multiparous}} \\)
-
-[//]: # (    \midrule)
-
-[//]: # (    P\textsubscript{1}    & 20   & 65 \\)
-
-[//]: # (    P\textsubscript{2}    & 40 & 70 \\)
-
-[//]: # (    \bottomrule)
-
-[//]: # (    \end{tabular})
-
-[//]: # (    \end{table})
-
-[//]: # ()
-[//]: # ()
-[//]: # (    During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is estimated on the last day of lactation as: )
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    \begin{center})
-
-[//]: # (    \&#40;tissue\_changed = P_1\ *\ \frac{DIMlast}{P_2}\ *\ exp\ &#40;1\ -\ \frac{DIMlast}{P_2}&#41;\ +\ DIM\ *\ exp\ &#40;1\ -\ \frac{DIM}{P_2}&#41;\&#41;)
-
-[//]: # (    \end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.19]}\par})
-
-[//]: # (         \vspace{0.5cm})
-
-[//]: # (         )
-[//]: # (    \begin{center})
-
-[//]: # (    \&#40;bodyweight\_tissue\_change = \frac{tissue\ changed}{gestation\ length\ -\ DIPdry}\&#41;)
-
-[//]: # (    \end{center})
-
-[//]: # (    \vspace{0.5cm})
-
-[//]: # (    )
-[//]: # (    {\raggedleft \textbf{[AN.BWT.20]}\par})
-
-[//]: # (\end{itemize})
-
+Heifers are targeted to grow to 82% of their mature body weight by the time of their 
+first calving. A gestation length is set at conception. The ADG of pregnant heifers is calculated based on the target 
+heifer's body weight, gestation length, and days in pregnancy. The gestation length for each animal is set at 
+conception by calculate_gestation_length in reproduction.py.
  
+
+$$
+\text{target\_average\_daily\_gain} = \frac{0.82 \times \text{MSBW}-\text{SBW}}{\text{gestation length} - \
+  \text{days in pregnancy}}
+$$
+[[**AN.BWT.9**]]{.aside}
+
+#### Parity 1 and 2 Cow Growth
+
+The daily growth of cows is calculated based on the target of reaching 92% of the 
+mature body weight by the end of the 1st lactation, and full mature body weight at the end of the 2nd lactation. Before 
+pregnancy, the daily growth is estimated based on the calving interval and during pregnancy the daily growth is 
+calculated based on days until calving. 
+
+##### Parity 1 Animals:
+
+If not pregnant:
+
+
+$$    
+\text{target\_average\_daily\_gain} = \frac{(0.92-0.82) \times \text{MSBW}}{\text{calving\_interval}}
+$$
+[[**AN.BWT.10**]]{.aside}
+
+If pregnant:    
+
+
+$$    
+\text{target\_average\_daily\_gain} = \frac{0.92 \times \text{MSBW} - \text{bodyweight}}{\text{gestation\_length} - \text{DIP}}
+$$
+[[**AN.BWT.11**]]{.aside}
+
+##### Parity 2 Animals
+
+If not pregnant:
+
+
+$$    
+\text{target\_average\_daily\_gain} = \frac{(1 - 0.92) \times \text{MSBW}}{\text{calving\_interval}}
+$$
+[[**AN.BWT.12**]]{.aside}
+    
+If pregnant:
+
+$$    
+\text{target\_average\_daily\_gain} = \frac{(\text{MSBW} - \text{bodyweight})}{\text{gestation\_length} - \text{DIP}}
+$$
+[[**AN.BWT.13**]]{.aside}
+    
+    
+The gestation length for cows is estimated with the same methods that are used for heifers and the calving interval 
+is set either as the average herd calving interval or the animal’s own calving interval which is calculated as the age 
+at her second calving minus her age at first calving as part of the daily_reproduction_update in animal.py.
+
+
+#### Conceptus Growth
+
+Conceptus growth is estimated the same way for both heifers and cows using a non-linear model for animals that are 
+greater than 50 days in pregnancy based on the methods developed by @Korver1985. 
+
+    
+If the heifer or cow days in pregnancy is greater than 50  and less than the gestation length:
+
+
+First the expected total conceptus weight is estimated using an empirical equation based on the calf birth weight and the gestation length:
+
+
+$$     
+\text{conceptus\_total\_weight} = (0.0148 \times \text{gestation\_length}) × \text{calf\_birth\_weight}
+$$
+[[**AN.BWT.14**]]{.aside}
+
+Then an animal specific conceptus parameter is calculated:
+
+
+$$     
+\text{conceptus\_parameter} = \frac{\text{total\_conceptus\_weight}^\frac{1}{3}}{\text{gestation\_length} - 50}
+$$
+[[**AN.BWT.15**]]{.aside}
+
+Finally, the conceptus growth is estimated as:
+
+
+$$     
+\text{conceptus\_growth} = 3 \times \text{conceptus parameter}^3 \times (\text{DIP} - 50)^2
+$$
+[[**AN.BWT.16**]]{.aside}
+    
+When days_in_pregnancy = gestation_length and the animal calves, then conceptus growth is set to the negative value of 
+the current conceptus_weight such that the weight of the calf and placenta are subtracted from the cow’s bodyweight 
+when her bodyweight is updated.
+
+
+$$        
+\text{conceptus\_growth} = \text{conceptus\_weight}
+$$
+[[**AN.BWT.17**]]{.aside}
+
+#### Tissue Change Due to Lactation
+
+Lactation related tissue changes are estimated by a non-linear model presented by @Galvao2013 that estimates the 
+daily tissue mobilized during lactation. 
+
+[[**AN.BWT.18**]]{.aside}
+
+$$     
+\text{bodyweight\_tissue\_change} = \frac{P_1}{P_2} \times exp\bigg(1 - \frac{\text{DIM}}{P_2}\bigg) + \
+  \text{DIM} \times exp\bigg(1 - \frac{\text{DIM}}{P_2}\bigg)
+$$
+
+Where $P_1$ and $P_2$ are parameters with distinct values for primiparous and multiparous cows:
+
+```{.latex}
+\begin{table}[h!]
+
+\centering
+
+\renewcommand{\arraystretch}{1.3}
+
+
+\begin{tabular}{@{} L{3cm} L{3cm} L{3cm} @{}}
+
+\toprule
+
+\multicolumn{1}{c}{\textbf{Parameter}} & 
+
+\multicolumn{1}{c}{\textbf{Primiparous}} & 
+
+\multicolumn{1}{c}{\textbf{Multiparous}} \\
+
+\midrule
+
+P\textsubscript{1}    & 20   & 65 \\
+
+P\textsubscript{2}    & 40 & 70 \\
+
+\bottomrule
+
+\end{tabular}
+
+\end{table}
+```
+
+During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is 
+estimated on the last day of lactation as: 
+
+
+$$
+\text{tissue\_changed} = P_1 \times \frac{\text{DIMlast}}{P_2} \times exp \bigg(1 - \frac{\text{DIMlast}}{P_2}\bigg) + \
+  \text{DIM} \times exp \bigg(1 - \frac{\text{DIM}}{P_2}\bigg)
+$$
+[[**AN.BWT.19**]]{.aside}
+
+
+and 
+
+$$
+\text{bodyweight\_tissue\_change} = \frac{\text{tissue changed}}{\text{gestation length} - \text{DIPdry}}
+$$
+[[**AN.BWT.20**]]{.aside}
+
 
 ### Animal Reproduction
 
@@ -1793,8 +1643,6 @@ $$
 \text{potassium} = \left(7.21 \times \text{dry\_matter\_intake}\right) + \left(15944 \times \frac{\text{potassium\_concentration}}{100}\right) - 164.5 \qquad \text{[AN.EXC.27]}
 $$ 
 :::
-
-
 
 **4. Dry Cow Manure Excretion (\_calculate\_dry\_cow\_manure)**
 
