@@ -287,9 +287,8 @@ v1.0.0
 - [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
 - [2679](https://github.com/RuminantFarmSystems/RuFaS/pull/2679) - [minor change] [Feed] [InputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation.
 - [2675](https://github.com/RuminantFarmSystems/RuFaS/pull/2675) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Fixes and clarifies data fixing error messaging for IM.
-- [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Adds Purchased Feed Buffer defaults.
+- [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2674](https://github.com/RuminantFarmSystems/RuFaS/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
-- [2678](https://github.com/RuminantFarmSystems/RuFaS/pull/2678) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2688](https://github.com/RuminantFarmSystems/RuFaS/pull/2688) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Hot fix to correct the missing part of 2640.
 - [2689](https://github.com/RuminantFarmSystems/RuFaS/pull/2689) - [minor change] [InputManager] [InputChange] [NoOutputChange] Add support for multiple properties files.
 - [2701](https://github.com/RuminantFarmSystems/RuFaS/pull/2701) - [minor change] [EEEManager] [NoInputChange] [NoOutputChange] Hot fix to correct the failure in EEEManager..
