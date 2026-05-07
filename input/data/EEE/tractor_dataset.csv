@@ -15,7 +15,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 714,cereal_rye_hay,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 715,cereal_rye_hay,small,collection,,0,Small rectangular baler,0,0,0,0,1200,2,0,1,FALSE,6
 716,cereal_rye_grain,small,planting,,3.18,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
-717,cereal_rye_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,0
+717,cereal_rye_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,1
 718,cereal_rye_grain,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 719,cereal_rye_silage,small,planting,,3.18,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
 720,cereal_rye_silage,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
@@ -30,7 +30,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 729,soybean_hay,small,planting,,3.18,Corn planter; 6-row (4.6 m),900,0,0,4.6,2450,0,0,0,TRUE,
 730,soybean_hay,small,collection,,0,Small rectangular baler,0,0,0,0,1200,2,0,1,FALSE,6
 731,soybean_grain,small,planting,,3.18,Corn planter; 6-row (4.6 m),900,0,0,4.6,2450,0,0,0,TRUE,
-732,soybean_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,0
+732,soybean_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,1
 733,tall_fescue_hay,small,planting,,1.27,Corn planter; 6-row (4.6 m),900,0,0,4.6,2450,0,0,0,TRUE,
 734,tall_fescue_hay,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 735,tall_fescue_hay,small,windrowing,,0,Single rake; 9 ft (2.7 m),0,0,0,2.7,400,0,1,0,FALSE,
@@ -47,7 +47,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 746,triticale_hay,small,collection,,0,Small rectangular baler,0,0,0,0,1200,2,0,1,FALSE,6
 747,triticale_hay,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 748,triticale_grain,small,planting,,3.81,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
-749,triticale_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,0
+749,triticale_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,1
 750,triticale_grain,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 751,triticale_silage,small,planting,,3.81,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
 752,triticale_silage,small,collection,,0,Small forage harvester,0,0,0,0,1000,6,0,4,FALSE,8
@@ -59,7 +59,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 758,winter_wheat_hay,small,collection,,0,Small rectangular baler,0,0,0,0,1200,2,0,1,FALSE,6
 759,winter_wheat_hay,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 760,winter_wheat_grain,small,planting,,3.18,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
-761,winter_wheat_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,0
+761,winter_wheat_grain,small,collection,,0,Combine header; 6 row,0,0,0,4.6,2000,35,0,1.6,FALSE,1
 762,winter_wheat_grain,small,mowing,,0,Disk mower-conditioner;10 ft (3.0 m),0,0,0,3.1,1860,0,5,0,FALSE,
 763,winter_wheat_silage,small,planting,,3.18,Grain drill; 12 ft (3.7 m),200,0,0,3.7,1650,0,0,0,TRUE,
 764,winter_wheat_silage,small,collection,,0,Small forage harvester,0,0,0,0,1000,6,0,4,FALSE,8
@@ -83,7 +83,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 782,cereal_rye_hay,medium,collection,,0,Medium rectangular baler,0,0,0,0,1450,2,0,1,FALSE,8
 783,cereal_rye_hay,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 784,cereal_rye_grain,medium,planting,,3.18,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
-785,cereal_rye_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,0
+785,cereal_rye_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,1
 786,cereal_rye_grain,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 787,cereal_rye_silage,medium,planting,,3.18,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
 788,cereal_rye_silage,medium,collection,,0,Medium forage harvester,0,0,0,0,1400,6,0,4,FALSE,14
@@ -98,7 +98,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 797,soybean_hay,medium,planting,,3.18,Corn planter; 8-row (6.1 m),900,0,0,6.1,3650,0,0,0,TRUE,
 798,soybean_hay,medium,collection,,0,Medium rectangular baler,0,0,0,0,1450,2,0,1,FALSE,8
 799,soybean_grain,medium,planting,,3.18,Corn planter; 8-row (6.1 m),900,0,0,6.1,3650,0,0,0,TRUE,
-800,soybean_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,0
+800,soybean_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,1
 801,tall_fescue_hay,medium,planting,,1.27,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
 802,tall_fescue_hay,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 803,tall_fescue_hay,medium,windrowing,,0,Tandem rake; 18 ft (5.4 m),0,0,0,5.4,800,0,1,0,FALSE,
@@ -115,7 +115,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 814,triticale_hay,medium,collection,,0,Medium rectangular baler,0,0,0,0,1450,2,0,1,FALSE,8
 815,triticale_hay,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 816,triticale_grain,medium,planting,,3.81,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
-817,triticale_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,0
+817,triticale_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,1
 818,triticale_grain,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 819,triticale_silage,medium,planting,,3.81,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
 820,triticale_silage,medium,collection,,0,Medium forage harvester,0,0,0,0,1400,6,0,4,FALSE,14
@@ -126,7 +126,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 825,winter_wheat_hay,medium,collection,,0,Medium rectangular baler,0,0,0,0,1450,2,0,1,FALSE,8
 826,winter_wheat_hay,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 827,winter_wheat_grain,medium,planting,,3.18,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
-828,winter_wheat_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,0
+828,winter_wheat_grain,medium,collection,,0,Combine header; 8 row,0,0,0,6.1,3000,35,0,1.6,FALSE,1
 829,winter_wheat_grain,medium,mowing,,0,Disk mower-conditioner;13 ft (4.0 m),0,0,0,4,2600,0,5,0,FALSE,
 830,winter_wheat_silage,medium,planting,,3.18,Grain drill; 16 ft (4.9 m),200,0,0,4.9,2200,0,0,0,TRUE,
 831,winter_wheat_silage,medium,collection,,0,Medium forage harvester,0,0,0,0,1400,6,0,4,FALSE,14
@@ -150,7 +150,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 849,cereal_rye_hay,large,collection,,0,Large rectangular baler,0,0,0,0,1650,4,0,1.3,FALSE,11
 850,cereal_rye_hay,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 851,cereal_rye_grain,large,planting,,3.18,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
-852,cereal_rye_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,0
+852,cereal_rye_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,1
 853,cereal_rye_grain,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 854,cereal_rye_silage,large,planting,,3.18,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
 855,cereal_rye_silage,large,collection,,0,Large forage harvester,0,0,0,0,1900,6,0,4,FALSE,20
@@ -165,7 +165,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 864,soybean_hay,large,planting,,3.18,Corn planter;12-row (9.1 m),900,0,0,9.1,6000,0,0,0,TRUE,
 865,soybean_hay,large,collection,,0,Large rectangular baler,0,0,0,0,1650,4,0,1.3,FALSE,11
 866,soybean_grain,large,planting,,3.18,Corn planter;12-row (9.1 m),900,0,0,9.1,6000,0,0,0,TRUE,
-867,soybean_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,0
+867,soybean_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,1
 868,tall_fescue_hay,large,planting,,1.27,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
 869,tall_fescue_hay,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 870,tall_fescue_hay,large,windrowing,,0,Tandem rake; 18 ft (5.4 m),0,0,0,5.4,800,0,1,0,FALSE,
@@ -182,7 +182,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 881,triticale_hay,large,collection,,0,Large rectangular baler,0,0,0,0,1650,4,0,1.3,FALSE,11
 882,triticale_hay,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 883,triticale_grain,large,planting,,3.81,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
-884,triticale_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,0
+884,triticale_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,1
 885,triticale_grain,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 886,triticale_silage,large,planting,,3.81,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
 887,triticale_silage,large,collection,,0,Large forage harvester,0,0,0,0,1900,6,0,4,FALSE,20
@@ -194,7 +194,7 @@ ID,Crop Type or Tillage Implement,Tractor Size,Operation,Operation,Depth,Tractor
 893,winter_wheat_hay,large,collection,,0,Large rectangular baler,0,0,0,0,1650,4,0,1.3,FALSE,11
 894,winter_wheat_hay,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 895,winter_wheat_grain,large,planting,,3.18,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
-896,winter_wheat_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,0
+896,winter_wheat_grain,large,collection,,0,Combine header; 12 row,0,0,0,9.1,4000,35,0,1.6,FALSE,1
 897,winter_wheat_grain,large,mowing,,0,Disk mower-conditioner;17 ft (5.2 m),0,0,0,5.2,3586,0,5,0,FALSE,
 898,winter_wheat_silage,large,planting,,3.18,Grain drill; 20 ft (6.1 m),200,0,0,6.1,2700,0,0,0,TRUE,
 899,winter_wheat_silage,large,collection,,0,Large forage harvester,0,0,0,0,1900,6,0,4,FALSE,20
