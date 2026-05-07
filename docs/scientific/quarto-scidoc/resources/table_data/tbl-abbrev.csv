@@ -1,0 +1,69 @@
+Abbreviation,Definition,Units
+ADF,Acid detergent fiber,% of DM
+ADG,Average daily weight gain,g/d
+Age1stBred,First breeding age,month
+BCS5,Body condition score,1-5 scale
+BW,Body weight,kg
+Ca,Calcium content,% of DM
+CBW,Calf birth weight,kg
+CI,Calving interval,d
+cm,centimeter,cm
+Cost,Feed cost,$/kg DM
+CP,Crude protein,% of DM
+d,days,d
+DE,Digestible energy,Mcal/kg
+DIM,Days in milk,d
+DM,Dry matter,% as-fed
+DMI,Dry matter intake,kg/d
+DOP,Days of pregnancy,d
+dRUP,RUP degradability,% of RUP
+EE,Ether extract (% crude fat),% DM
+EndCP,Endogenous crude protein,kg/d
+EndN,Endogenous nitrogen,kg/d
+EQSBW,Equivalent shrunk body weight,kg
+FA,Fatty acids,g/100g FA
+FIPS,Federal Information Processing Standards,NA
+g,grams,g
+GE,Gross energy,Mcal/kg
+GrUterW,Gravid uterine weight,kg
+Kd,Rumen protein degradation rate,%/h
+kg,kilograms,kg
+kJ,kilojoule,kJ
+L,liters,L
+m,meter,m
+max,maximum,NA
+Mcal,Megacalorie,Mcal
+MCP,Microbial crude protein,kg/d
+ME,Metabolizable energy,Mcal/kg
+MICP,Microbial crude protein,kg/d
+min,minimum,NA
+mL,milliliters,mL
+MN,Microbial nitrogen,kg/d
+MP,Metabolizable protein,kg/d
+MTP,Microbial true protein,kg/d
+MW,Mature body weight,kg
+MY,Milk yield,kg/d
+N,Nitrogen,% of DM
+NASEM,National Academies of Sciences Engineering and Medicine,NA
+NDF,Neutral detergent fiber,% of DM
+NEG,Net energy for growth,Mcal/kg
+NEL,Net energy for lactation,Mcal/kg
+NEM,Net energy for maintenance,Mcal/kg
+nNDF,Nondigestible neutral detergent fiber,% of DM
+NPN,Non-protein nitrogen,% of DM
+NRC,National Research Council,NA
+OM,Organic matter,% of DM
+P,Phosphorus content,% of DM
+PAF,Processing adjustment factor,NA
+Parity,Number of lactations,count
+PrevTemp,Average daily temperature of last month,°C
+RDP,Ruminally degraded crude protein,% of DM
+ROM,Residual organic matter,% of DM
+RUP,Ruminally undegraded crude protein,% of DM
+s,seconds,s
+TAN,Total ammoniacal nitrogen,kg/d
+TDN,Total digestible nutrients,% of DM
+TP,True protein,% of DM
+USDA,United States Department of Agriculture,NA
+UterW,Uterine weight,kg
+WSC,Water soluble carbohydrates,% of DM
