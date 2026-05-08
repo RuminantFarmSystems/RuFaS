@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.phosphorus_cycling.fertilizer import Fertilizer
 from RUFAS.biophysical.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.biophysical.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
@@ -35,7 +33,7 @@ class PhosphorusCycling:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
         self.manure = Manure(self.data)

@@ -75,11 +75,8 @@ v1.0.0
 - [2809](https://github.com/RuminantFarmSystems/RuFaS/pull/2809) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Reorders grouping of attributes in some HerdStatistics methods, updates docstrings.
 - [2983](https://github.com/RuminantFarmSystems/RuFaS/pull/2983) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Deleted data padder function in AnimalModuleReporter.
 - [2984](https://github.com/RuminantFarmSystems/RuFaS/pull/2984) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds manure stream compatibility check to Separators to enforce that Separators cannot be first processors in a chain.
-- [2942](https://github.com/RuminantFarmSystems/RuFaS/pull/2942) - [minor change] [NoInputChange] [NoOutputChange] prevents herd initialization from happening when `simulate_animals` is `false` and resolves logically impossible functionality in `HerdManager` around what to do if `HerdManager` exists when `simulate_animals` is `false`.
-- [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange][OutputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability.
-- [2986](https://github.com/RuminantFarmSystems/RuFaS/pull/2986) - [minor change] [NoInputChange][NoOutputChange] updates docstrings for shared data structures and moves `FieldManureSupplier` from standalone module into `manure_to_crop_soil_connection.py`.
-- [2937](https://github.com/RuminantFarmSystems/RuFaS/pull/2937) - [minor change] [DataValidator] [InputChange] [NoOutputChange] Adds cross-validation support for complex data structures (`list`/`dict` operands and `for_each` iteration blocks) with `filter` and `enforce` modes.
-- [2977](https://github.com/RuminantFarmSystems/RuFaS/pull/2977) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Refactors `OutputManager.dump_variable_names_and_contexts()` by extracting logic into `_get_parsable_dicts()`, `_format_variable_entry()`, and `_format_parsable_dict_lines()`, and moves ignored keys to a class-level constant `_VARIABLE_DUMP_KEYS_TO_IGNORE`.
+- [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange] [OutputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability.
+- [2991](https://github.com/RuminantFarmSystems/RuFaS/pull/2991) - [minor change] [NoInputChange] [NoOutputChange] Updated the docstrings in the Crop and Soil module.
 
 ### v1.0.0
 
