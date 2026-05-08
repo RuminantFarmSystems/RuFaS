@@ -1,5 +1,7 @@
 # Example Inserts
 
+
+
 ## Sectioning and Structure
 
 There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
@@ -23,7 +25,7 @@ require separate methodological descriptions and equations
 ### Methodology 
 - subsubsection header used to start descriptions
 
-**Relevant Inputs or Relevant Outputs** 
+#### Relevant Inputs or Relevant Outputs
 emphasized headers should be used to report the inputs and outputs of the 
 relevant subsection. These usually include tables and bulleted lists. Tables 
 of inputs should include: 
@@ -62,8 +64,18 @@ There is no formal process to inform how you name, but it is recommended that
 it is descriptive of the item you are labeling and it is concise to make 
 referencing easier.
 
-There is more information about where these labels go in the respective tables 
-and figures relative to captions etc. the following sections.
+When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 3 letter module abbreviate: 
+- an = Animal
+- ma = Manure
+- sc = Soil and Crop
+- fe = Feed Storage
+- ec = Economics
+- cx = Connecting or Gray Documents
+
+When uploading new images, screenshots, flowcharts or other image resources, the 3 letter abbreviations should be the LEADING part of the file name. The rest of the file name should be descriptive of the content of the image separated by underscores (_). If the image is used for a title page or representative of the larger model, the leading file name should be "rufas.""
+
+**Note** 
+Files that include flow charts should indicate such in the file. For example, a flow chart of the decision tree in the animal module should be names "ani_flow_decision_tree". Similarly, if the image is a screenshot of a section of code from the module, the file name should include 'code'. For example, a code screenshot for the manure module should be named "man_code_description" or something similar.
 
 ```
 
@@ -78,7 +90,7 @@ All figures and images must be uploaded in the "references." When you upload you
 
 ```markdown
 
-![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/ani_icon.png.png){#fig-animal-icon width=35%}
 
 -->[Caption for the image or figure]
 --> #fig-animal-icon = #indicates the type of file-label-for-auditing
@@ -89,7 +101,7 @@ All figures and images must be uploaded in the "references." When you upload you
 The output is below : 
 
 
-![Animal module icon](../resources/images/animal.png){#fig-animal-icon width=35%}
+![Animal module icon](../resources/images/ani_icon.png){#fig-animal-icon width=35%}
 
 ### Example of a Table
 
@@ -97,80 +109,38 @@ Our documentation include quite a few tables with long, detailed definitions and
 
 Instead, we have four excel files that correspond to each existing module. In each file, sheets are named by their label id (see next section for more on id logic). That way, you can auto-generate a .txt file with your table properly sized and formated using the make_grid_table.py (quarto-scidoc>scripts). The .txt file output will show up in quarto-scidoc>output>tables.
 
-```markdown
-After you create your excel sheet in the module file of the data folder 
-(in this example it is animal.xslx).
+#### Option 1 - Generate Directly from a .csv File
+This is the preferred method to generate a table because it is the most straightforward and requires the least amount of formatting. You can use the make_markdown_table function in the make_grid_table.py script to generate a markdown table from a .csv file. The .csv file should be formatted with the appropriate columns (Variable, Definition, Default, Min, Max) and should be saved in the resources/table_data folder. The name of your file should match the label used in the documentation. This will help with traceback and auditing. 
 
+All tables begin with the "tbl-" prefix followed with the 3 letter acronym for the module where the table belongs (e.g. "ani" for animal). The final segments (also separated by hyphens) should be short but descriptive. For example, the table of abbreviations is labeled "tbl-abbrevs" (it is outside of any module so no module abbreviation is used) and the corresponding .csv file is named "tbl-abbrev.csv".
 
+The main adjustments you will need to make are the label, tbl-cap (caption), and the file name in the make_markdown_table function. The rest of the code can be copied and pasted as is.
 
+If you are having trouble running this, be sure to check the sys.path.append location and the actual .csv file location.
 
-python scripts\make_grid_table.py data\animal.xlsx `
---sheet "EXAMPLE" `
---widths "24,40,4,6,12" `
---caption "This is an example caption." `
---label "tbl-example-inputs" `
---output output\tables\example_table_file.txt
+```{python}
 
+#| label: tbl-an-example-struct
+#| tbl-cap: "This is an example caption for this example table."
+#| echo: false
+#| output: asis
 
-The text file will generate something similar to what you see below:
+import sys
+sys.path.append("../scripts")
 
-+--------------------------+------------------------------------------+------+--------+--------------+
-| Variable                 | Definition                               | Defa | Min    | Max          |
-|                          |                                          | ult  |        |              |
-+==========================+==========================================+======+========+==============+
-| id                       | The index of the pen                     |      | 0.0    |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| pen_name                 | The name or identifier of a given pen    |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
-|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
-|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
-|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
-|                          | LAC_COWS = Lactating Cows                |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
+from make_grid_table import make_markdown_table
 
-: This is an example caption. {#tbl-example-inputs}
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-an-example-struct.csv",
+)
 
-: This is an example caption. {#tbl-example-inputs}
-
-
-Remember, you will need to update 
---sheet (the sheet name should match the label)
---caption (to relevant description)
---label (follow label structure in next section)
---output (file name only)
-
-Optional: 
---widths is preset to recommended sizing for the table. If it does not 
-work for your table, feel free to adjust as needed. 
-
-
+print(md_tab)
 
 ```
 
 
-
-After you copy and paste the table from the .txt file into your .qmd, this is what your table would look like.
-
-
-+--------------------------+------------------------------------------+------+--------+--------------+
-| Variable                 | Definition                               | Defa | Min    | Max          |
-|                          |                                          | ult  |        |              |
-+==========================+==========================================+======+========+==============+
-| id                       | The index of the pen                     |      | 0.0    |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| pen_name                 | The name or identifier of a given pen    |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-| animal_combination       | The valid combinations of animal types   |      |        | CALF,        |
-|                          | that can be in a pen. CALF = Calves;     |      |        | GROWING,     |
-|                          | GROWING = HeiferI's and HeiferII's;      |      |        | CLOSE_UP,    |
-|                          | CLOSE_UP = HeiferIII's and Dry Cows;     |      |        | LAC_COWS     |
-|                          | LAC_COWS = Lactating Cows                |      |        |              |
-+--------------------------+------------------------------------------+------+--------+--------------+
-
-: This is an example caption. {#tbl-example-inputs}
-
-
+### Option 2 - Create a .csv File before Generating the Table from your File
+A comprehensive, step-by-step guide to this process is available in qmd > scripts > quarto_python_test > python_tables_example files created by Clay. They also add some description details to option 1, so it may be good to review regardless of your preferred option.
 
 ## Equation Templates and ID Logic
 If you are adding equations, it is important that you continue to use the ID logic that has been described ... 
@@ -181,12 +151,20 @@ The audit label and crosslinking is tracked by #eq-an-nrc-2026.
 It is important to follow the custom label structure even for 
 the invisible reference to make tracking easier. 
 
-The actual custom labeling is written as \text
+All equation text or variables and custom equation IDs should use the \text function to ensure that formating is consistent throughout the Sci Doc. 
 
-::: {#eq-an-nrc-2026} 
+For extremely long equations, you may create manual breaks with the \qquad function.
+
+::: {#eq-an-nrc-2026}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\text{CBW} = \text{MW} \times 0.06275
 $$
+<p style="text-align: right;">[AN.NRC.2026]</p>
+
+All letters or acronyms included in equations should be wihtin the \text{} function to ensure consistent formatting and avoid stray italices.
+Multiplication may be indicated with a \times
+
+
 :::
 
 Below is how the equation can be linked in other parts of the text: 
@@ -199,11 +177,33 @@ This is how your equation and the linking should appear.
 
 ::: {#eq-an-nrc-2026}
 $$
-CBW = MW * 0.06275 \qquad \text{(AN.NRC.2026)}
+\text{CBW} = \text{MW} \times 0.06275
 $$
+<p style="text-align: right;">[AN.NRC.2026]</p>
+
 :::
 
 See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+
+
+
+Some equations may be too long to fit on a single line and within the margins. Unfortunately, you will need to manually break the equation into multiple lines. 
+
+To do this, you can use the \qquad function to create a break in the equation. Be sure to use the \text function for all variables and text to ensure consistent formatting throughout the document.
+```markdown
+
+$$
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+$$
+
+<p style="text-align: right;">[AN.EXC.18]</p>
+
+```
+
 
 
 ## Callouts, Recommendations, or Notes
@@ -245,6 +245,7 @@ but only the markdown works for all document types (html, pdf, word document, pr
 :::
 
 
+
 ## References
 
 Before adding a new reference to "rufas.bib," check the file to ensure it has not already been added. All references should be listed alphabetically and then by year (most recent at the top). 
@@ -284,71 +285,6 @@ Online, Misc, Website (RARE USAGE)
 ```
 If there are 2 articles with the same author and same year, add the recommended "a" or "b" (e.g. ```bibtex @LASTNAME_YEARa vs @LASTNAME_YEARb```) as they are referenced.
 
-# Equation examples (from Animal Documentation)
-
-## Nutrient Requirements of Dairy Cattle (NRC) {#sec-nrc}
-
-**Energy Requirements** For details about the variables included in each 
-calculation, please refer to the [energykey](energy requirements key).
-
-* **_Maintenance_** - The maintenance requirement is calculated based on metabolic body weight (body weight$^{0.75}$).
-
-  [Lactating and Dry Cows]{.underline}
-  
-  $$
-  CBW = MW * 0.06275
-  $$ {#eq-nrc-cbw}
-  
-  $$
-  CW = {(18 + (DOP - 190) * 0.665) * \left(\frac{CBW}{45}\right), \text{if } DOP > 190.0}
-  $$ {#eq-nrc-cw}
-  
-  *Otherwise*
-  
-  $$
-  NEmaint = 0.08 \times (BW - CW)^{0.75}
-  $$ {#eq-nrc-ne-maint}
-
-## Reformatted equations
-
-@eq-nrc-cbw may be visually improved by using the `\times` LaTeX
-command:
-
-$$
-CBW = MW \times 0.06275
-$$ {#eq-nrc-cbw-times}
-
-## Use alphanumeric equation labels
-
-Though Quarto does not allow custom cross-reference labels, you can
-include your own non-CR label with the `\tag` LaTeX command. The
-equation can still be cross-referenceable using a standard Quarto
-equation ID.
-
-$$
-CBW = MW * 0.06275 \tag{AN.NRC.2}
-$$ {#eq-an-nrc-2-tagged}
-
-See @eq-an-nrc-2-tagged.
-
-## Other equation Templates
-
-The energy balance is $E = mc^2$.
-
-$$
-E = mc^2
-$$ {#eq-energy}
-
-See Equation @eq-energy.
-
-$$
-\text{nutrient\_proportion\_to\_be\_removed} =
-\min\left(
-\frac{\text{mass\_requested\_nutrient}}{\text{manure\_nutrient\_available}},
-1
-\right)
-$$ {#eq-nutrient-proportion}
-
 
 
 ::: {.callout-note}
@@ -369,7 +305,7 @@ quarto render --to pdf
 
 ```
 *For audit review*
-You can find the output in the quarto-scidoc folder.
+You can find the output in resources > reference-audit folder.
 
 ```{{markdown}}
 
@@ -377,3 +313,25 @@ python quarto_audit.py
 
 ```
 :::
+
+## Section Sign Up
+
+```{python}
+
+#| label: tbl-rufas-team-quarto-transfer
+#| tbl-cap: "This will help us practice how updating tables will look as we develop RuFaS. Please take this time to update the appropriate .csv files when you have decided what section you wish to work on."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("../scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-rufas-team-quarto-transfer.csv",
+)
+
+print(md_tab)
+
+```

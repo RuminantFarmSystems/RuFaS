@@ -1,0 +1,23 @@
+# Abbreviations
+
+Below is a table of abbreviations used in the RuFaS scientific documentation. This table is intended to help readers understand the various abbreviations and acronyms that may be encountered throughout the documentation.
+
+```{python}
+#| label: tbl-abbrevs
+#| tbl-cap: "Abbreviations used in the RuFaS scientific documentation."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "resources/table_data/tbl-abbrev.csv",
+    colalign=("left", "left", "right"),
+    maxcolwidths=[None, 45, None],
+)
+
+print(md_tab)
+```

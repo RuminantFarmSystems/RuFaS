@@ -1,6 +1,6 @@
 # Preface: A Day in the Life on a RuFaS Farm
 
-![](resources/images/rufas.png){width=90}
+![](resources/images/rufas_icon.png){width=90}
 
 This document provides a high-level overview of the daily operations of
 a ruminant farm, as modeled by RuFaS. The overview will be through the

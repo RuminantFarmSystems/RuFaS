@@ -9,6 +9,7 @@ def read_tbl(path: str | Path, **kwargs) -> pd.DataFrame:
     """
     Imports a table as a pandas.DataFrame
 
+<<<<<<< HEAD
     Parameters
     ----------
     path: str | Path
@@ -168,3 +169,15 @@ def import_table(path: str | Path, read_opts: dict | None = None, **display_opts
 
     # display the table
     display_md_tbl(tbl, **display_opts)
+
+    
+def display_mdtab(tab: pd.DataFrame, **kwargs) -> None:
+    """
+    display a markdown table (deprecated: use display_md_tbl instead)
+    """
+    tab = tab.fillna("")
+    tab = tab.map(
+        lambda x: str(x).replace("\n", "<br>") if pd.notna(x) else ""
+    )
+
+    print(tab.to_markdown(index=False, **kwargs))
