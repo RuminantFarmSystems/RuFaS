@@ -55,5 +55,19 @@
   ],
   "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure", "manure", "manure", "manure"],
   "pattern_repeat": 1,
-  "pattern_skip": 4
+  "pattern_skip": 4,
+  "daily_spread": {
+    "is_daily_spreading": false,
+    "nitrogen_spread_amount": 0.0,
+    "phosphorus_spread_amount": 0.0,
+    "potassium_spread_amount": 0.0,
+    "max_nitrogen": 0.0,
+    "max_phosphorus": 0.0,
+    "max_potassium": 0.0,
+    "coverage_fraction": 1.0,
+    "application_depth": 0.0,
+    "surface_remainder_fraction": 1.0,
+    "manure_type": "solid",
+    "supplement_manure_nutrient_deficiencies": "none"
+  }
 }

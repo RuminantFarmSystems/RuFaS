@@ -99,14 +99,15 @@ class Field:
 
     def __init__(
         self,
-        field_data: FieldData | None = None,
-        soil: Soil | None = None,
-        plantings: List[PlantingEvent] | None = None,
-        harvestings: List[HarvestEvent] | None = None,
-        tillage_events: List[TillageEvent] | None = None,
-        fertilizer_events: List[FertilizerEvent] | None = None,
-        fertilizer_mixes: Dict[str, Dict[str, float]] | None = None,
-        manure_events: List[ManureEvent] | None = None,
+        field_data: Optional[FieldData] = None,
+        soil: Optional[Soil] = None,
+        plantings: Optional[List[PlantingEvent]] = None,
+        harvestings: Optional[List[HarvestEvent]] = None,
+        tillage_events: Optional[List[TillageEvent]] = None,
+        fertilizer_events: Optional[List[FertilizerEvent]] = None,
+        fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
+        manure_events: Optional[List[ManureEvent]] = None,
+        daily_spread_settings: Optional[dict[str, Any]] = None,
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
@@ -139,6 +140,7 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: list[ManureEvent] = manure_events or []
+        self.daily_spread_settings = daily_spread_settings
 
     def manage_field(
         self,
@@ -1054,7 +1056,43 @@ class Field:
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
             manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+
+        daily_spread_event = self._create_daily_spread_event(time)
+        if daily_spread_event is not None:
+            manure_request = self._create_manure_request(daily_spread_event)
+            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, daily_spread_event, manure_request))
         return manure_requests
+
+    def _create_daily_spread_event(self, time: RufasTime) -> ManureEvent | None:
+        """Creates a daily manure event from daily spread settings, if enabled."""
+        if not self.daily_spread_settings:
+            return None
+        if not self.daily_spread_settings.get("is_daily_spreading", False):
+            return None
+
+        manure_type = ManureType(self.daily_spread_settings.get("manure_type", ManureType.SOLID.value))
+        manure_supplement_method = ManureSupplementMethod(
+            self.daily_spread_settings.get(
+                "supplement_manure_nutrient_deficiencies",
+                ManureSupplementMethod.NONE.value,
+            )
+        )
+        nitrogen_spread_amount = self.daily_spread_settings.get("nitrogen_spread_amount", 0.0)
+        phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
+        nitrogen_cap = self.daily_spread_settings.get("max_nitrogen", nitrogen_spread_amount)
+        phosphorus_cap = self.daily_spread_settings.get("max_phosphorus", phosphorus_spread_amount)
+        return ManureEvent(
+            nitrogen_mass=min(nitrogen_spread_amount, nitrogen_cap),
+            phosphorus_mass=min(phosphorus_spread_amount, phosphorus_cap),
+            manure_type=manure_type,
+            manure_supplement_method=manure_supplement_method,
+            field_coverage=self.daily_spread_settings.get("coverage_fraction", 1.0),
+            application_depth=self.daily_spread_settings.get("application_depth", 0.0),
+            surface_remainder_fraction=self.daily_spread_settings.get("surface_remainder_fraction", 1.0),
+            year=time.current_calendar_year,
+            day=time.current_julian_day,
+            is_daily_spread=True,
+        )
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
         """
@@ -1094,6 +1132,7 @@ class Field:
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
             use_supplemental_manure=use_supplemental_manure,
+            use_daily_spread_source=bool(getattr(event, "is_daily_spread", False)),
         )
 
     def _check_crop_harvest_schedule(
@@ -1272,8 +1311,8 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
-            "average_clay_percent": MeasurementUnits.PERCENT,
             "field_name": MeasurementUnits.UNITLESS,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1287,8 +1326,8 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
-            "average_clay_percent": self.soil.data.average_clay_percent,
             "field_name": self.field_data.name,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         self.om.add_variable("crop_planting", value, info_map)
 
