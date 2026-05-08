@@ -629,8 +629,7 @@ class ManureApplication:
                 f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.',
                 info_map={
                     "class": ManureApplication.__name__,
-                    "function":
-                    ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__,
+                    "function": ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__,
                 },
             )
             raise ValueError(f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.')

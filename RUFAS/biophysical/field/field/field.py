@@ -296,7 +296,7 @@ class Field:
                     "suffix": f"field='{self.field_data.name}'",
                     "year": year,
                     "day": day,
-                }
+                },
             )
             raise KeyError(
                 f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
