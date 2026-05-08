@@ -339,7 +339,7 @@ class FieldManager:
         -------
         list[ManureEvent]
             A list of generated manure events.
-        
+
         Raises
         ------
         ValueError
@@ -527,10 +527,7 @@ class FieldManager:
             OutputManager().add_error(
                 "Soil layer configs not provided",
                 "Configuration for soil layers must be provided.",
-                info_map={
-                    "class": FieldManager.__name__,
-                    "function": FieldManager._setup_soil.__name__
-                }
+                info_map={"class": FieldManager.__name__, "function": FieldManager._setup_soil.__name__},
             )
             raise ValueError("Configuration for soil layers must be provided.")
         soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
@@ -599,10 +596,7 @@ class FieldManager:
             OutputManager().add_error(
                 "Bottom depth not provided",
                 "Bottom depth is required for each soil layer.",
-                info_map={
-                    "class": FieldManager.__name__,
-                    "function": FieldManager._setup_soil_layer.__name__
-                }
+                info_map={"class": FieldManager.__name__, "function": FieldManager._setup_soil_layer.__name__},
             )
             raise KeyError("Bottom depth is required for each soil layer.")
 

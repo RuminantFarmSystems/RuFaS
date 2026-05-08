@@ -100,10 +100,7 @@ class SoilErosion:
             OutputManager().add_error(
                 "NoneType accumulated runoff",
                 "SoilData accumulated_runoff cannot be NoneType",
-                info_map={
-                    "class": SoilErosion.__name__,
-                    "function": SoilErosion.erode.__name__
-                }
+                info_map={"class": SoilErosion.__name__, "function": SoilErosion.erode.__name__},
             )
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
@@ -329,8 +326,8 @@ class SoilErosion:
                 f"got {minimum_cover_management_factor}",
                 info_map={
                     "class": SoilErosion.__name__,
-                    "function": SoilErosion._determine_cover_management_factor.__name__
-                }
+                    "function": SoilErosion._determine_cover_management_factor.__name__,
+                },
             )
             raise ValueError("Minimum cover and management cannot be less than or equal to 0")
         first_multiplicative_term = log(0.8) - log(minimum_cover_management_factor)

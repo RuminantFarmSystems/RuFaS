@@ -873,7 +873,7 @@ class Pen:
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self._apply_bedding.__name__,
-                }
+                },
             )
             raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
         num_animals = manure_stream.pen_manure_data.num_animals
@@ -963,7 +963,7 @@ class Pen:
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self._calculate_manure_surface_area.__name__,
-                }
+                },
             )
             raise ValueError(f"Invalid pen type: {self.pen_type}")
 

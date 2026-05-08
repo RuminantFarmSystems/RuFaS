@@ -123,10 +123,7 @@ class ManureSchedule(Schedule):
             OutputManager().add_error(
                 "Invalid ManureType",
                 f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._validate_manure_parameters.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._validate_manure_parameters.__name__},
             )
             raise ValueError(
                 error_header + f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'."

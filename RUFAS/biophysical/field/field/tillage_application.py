@@ -292,8 +292,8 @@ class TillageApplication:
                 f"'{type(data_container)}'.",
                 info_map={
                     "class": TillageApplication.__name__,
-                    "function": TillageApplication._remove_amount_incorporated.__name__
-                }
+                    "function": TillageApplication._remove_amount_incorporated.__name__,
+                },
             )
             raise TypeError(
                 "Expected object containing data to be type 'SoilData' or 'FieldData', received type "

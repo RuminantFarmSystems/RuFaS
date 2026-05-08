@@ -59,10 +59,7 @@ class ContinuousMix(Digester):
             self._om.add_error(
                 "Continuous Mix receive manure error",
                 f"Continuous mix digester {self.name} received an invalid manure stream.",
-                info_map={
-                    "class": ContinuousMix.__name__,
-                    "function": ContinuousMix.receive_manure.__name__
-                }
+                info_map={"class": ContinuousMix.__name__, "function": ContinuousMix.receive_manure.__name__},
             )
             raise ValueError(f"Continuous mix digester {self.name} received an invalid manure stream.")
         self._manure_in_digester += manure

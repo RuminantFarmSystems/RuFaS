@@ -58,8 +58,8 @@ class SoilConfigFactory:
                         f"{attribute} is not a valid attribute of SoilData",
                         info_map={
                             "class": SoilConfigFactory.__name__,
-                            "function": SoilConfigFactory.create_soil_data.__name__
-                        }
+                            "function": SoilConfigFactory.create_soil_data.__name__,
+                        },
                     )
                     raise AttributeError(f"{attribute} is not a valid attribute of SoilData")
 

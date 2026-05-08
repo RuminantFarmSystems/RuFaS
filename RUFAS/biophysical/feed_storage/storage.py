@@ -183,10 +183,7 @@ class Storage:
                 "Exceeds feed storage capacity error",
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
                 f"exceeds the storage capacity ({self.capacity})",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.receive_crop.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.receive_crop.__name__},
             )
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "

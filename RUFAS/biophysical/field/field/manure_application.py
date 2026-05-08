@@ -179,10 +179,7 @@ class ManureApplication:
                     "Invalid water extractable inorganic phos fraction",
                     "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
                     f"received '{water_extractable_inorganic_phosphorus_fraction}'.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self.apply_machine_manure.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self.apply_machine_manure.__name__},
                 )
                 raise ValueError(
                     "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
@@ -527,8 +524,8 @@ class ManureApplication:
                 f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.",
                 info_map={
                     "class": ManureApplication.__name__,
-                    "function": ManureApplication._determine_moisture_factor.__name__
-                }
+                    "function": ManureApplication._determine_moisture_factor.__name__,
+                },
             )
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
         return min(0.9, (1 - dry_matter_fraction))
@@ -632,8 +629,7 @@ class ManureApplication:
                 f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.',
                 info_map={
                     "class": ManureApplication.__name__,
-                    "function":
-                    ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__
-                }
+                    "function": ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__,
+                },
             )
             raise ValueError(f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.')

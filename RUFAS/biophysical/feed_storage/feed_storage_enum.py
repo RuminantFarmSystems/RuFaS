@@ -54,9 +54,6 @@ class StorageType(Enum):
             OutputManager().add_error(
                 "Unknown storage type error",
                 f"Error trying to get unknown storage type: {storage_type}.",
-                info_map={
-                    "class": cls.__name__,
-                    "function": cls.get_storage_class.__name__
-                }
+                info_map={"class": cls.__name__, "function": cls.get_storage_class.__name__},
             )
             raise ValueError(f"Unknown storage type: {storage_type}.")

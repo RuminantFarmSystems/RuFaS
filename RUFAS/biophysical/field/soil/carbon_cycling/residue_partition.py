@@ -269,8 +269,8 @@ class ResiduePartition:
                 + str(nitrogen_fraction_plant_residue),
                 info_map={
                     "class": ResiduePartition.__name__,
-                    "function": ResiduePartition._determine_plant_lignin_nitrogen_fraction.__name__
-                }
+                    "function": ResiduePartition._determine_plant_lignin_nitrogen_fraction.__name__,
+                },
             )
             raise ValueError(
                 "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
@@ -630,8 +630,8 @@ class ResiduePartition:
                 + str(nitrogen_fraction_plant_residue),
                 info_map={
                     "class": ResiduePartition.__name__,
-                    "function": ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.__name__
-                }
+                    "function": ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.__name__,
+                },
             )
             raise ValueError(
                 "Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received "

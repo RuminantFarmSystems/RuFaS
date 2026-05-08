@@ -243,10 +243,7 @@ class ManureManager:
                 self._om.add_error(
                     "Manure Processor Adjacency Matrix Error",
                     f"The diagonal for origin {origin} is not 0.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._validate_adjacency_matrix.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
                 )
                 raise ValueError(f"The diagonal for origin {origin} is not 0.")
             column_sum = sum(destinations.values())
@@ -254,10 +251,7 @@ class ManureManager:
                 self._om.add_error(
                     "Manure Processor Adjacency Matrix Error",
                     f"Sum for {origin} column must be 0 or 1, but got {column_sum}",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._validate_adjacency_matrix.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
                 )
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
@@ -297,10 +291,7 @@ class ManureManager:
             self._om.add_error(
                 "Manure Processor Adjacency Matrix Error",
                 "Cycle detected — topological sort not possible.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._traverse_adjacency_matrix.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._traverse_adjacency_matrix.__name__},
             )
             raise ValueError("Cycle detected — topological sort not possible.")
 
@@ -350,10 +341,7 @@ class ManureManager:
                         "Manure Processor Adjacency Matrix Error",
                         f"Invalid output split in '{separator_name}': destination '{destination}' "
                         f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})",
-                        info_map={
-                            "class": self.__class__.__name__,
-                            "function": self._merge_separator_rows.__name__
-                        }
+                        info_map={"class": self.__class__.__name__, "function": self._merge_separator_rows.__name__},
                     )
                     raise ValueError(
                         f"Invalid output split in '{separator_name}': destination '{destination}' "
@@ -556,8 +544,8 @@ class ManureManager:
                 f"Unknown Processor: no processor config found for {unknown_processor_names}.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._check_for_unknown_processor_names.__name__
-                }
+                    "function": self._check_for_unknown_processor_names.__name__,
+                },
             )
             raise ValueError(f"Unknown Processor: no processor config found for {unknown_processor_names}.")
 

@@ -296,20 +296,14 @@ class SoilData:
             OutputManager().add_error(
                 "NoneType field_size",
                 "'field_size' attribute is NoneType, must be given value when SoilData is initialized.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
         elif field_size <= 0:
             OutputManager().add_error(
                 "Invalid field_size",
                 f"Expected field_size to be greater than 0, received {field_size}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
@@ -330,10 +324,7 @@ class SoilData:
                 "Invalid top soil layer bottom depth",
                 "Expected bottom depth of top soil layer must be 20 mm or greater, received "
                 f"'{self.soil_layers[0].bottom_depth}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise ValueError(
                 "Expected bottom depth of top soil layer must be 20 mm or greater, received "
@@ -657,10 +648,7 @@ class SoilData:
         OutputManager().add_error(
             "Invalid cover type",
             f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'.",
-            info_map={
-                "class": self.__class__.__name__,
-                "function": "cover_factor.property"
-            }
+            info_map={"class": self.__class__.__name__, "function": "cover_factor.property"},
         )
         raise ValueError(
             f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'."

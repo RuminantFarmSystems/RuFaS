@@ -161,8 +161,8 @@ class Storage(Processor):
                 f"phase_shift is {self.phase_shift}.",
                 info_map={
                     "class": Storage.__name__,
-                    "function": Storage._determine_outdoor_storage_temperature.__name__
-                }
+                    "function": Storage._determine_outdoor_storage_temperature.__name__,
+                },
             )
             raise ValueError("No data for outdoor storage temperature calculations.")
 
@@ -336,10 +336,7 @@ class Storage(Processor):
             Storage._om.add_error(
                 "Storage arrhenius exponent calculation error",
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}",
-                info_map={
-                    "class": Storage.__name__,
-                    "function": Storage._calculate_arrhenius_exponent.__name__
-                }
+                info_map={"class": Storage.__name__, "function": Storage._calculate_arrhenius_exponent.__name__},
             )
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"

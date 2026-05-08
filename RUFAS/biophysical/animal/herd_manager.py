@@ -1249,7 +1249,7 @@ class HerdManager:
                 "The length of the allocation plan must match the number of pens. "
                 f"Got allocation_plan of length {len(allocation_plan)} with "
                 f"animal_pens number of {len(animal_pens)}",
-                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__}
+                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__},
             )
             raise ValueError("The length of the allocation plan must match the number of pens.")
         elif sum(allocation_plan) != len(animals):
@@ -1258,7 +1258,7 @@ class HerdManager:
                 "The sum of the allocation plan must match the number of animals. "
                 f"Got allocation_plan sum of {sum(allocation_plan)} with "
                 f"animal_pens number of {len(animal_pens)}",
-                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__}
+                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__},
             )
             raise ValueError("The sum of the allocation plan must match the number of animals.")
 
@@ -1312,8 +1312,8 @@ class HerdManager:
                 f"max_stocking_density must be > 0 and got {max_stocking_density}.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._calculate_max_animal_spaces_per_pen.__name__
-                }
+                    "function": self._calculate_max_animal_spaces_per_pen.__name__,
+                },
             )
             raise ValueError("The number of stalls and maximum stocking density must be greater than or equal to 0.")
 
@@ -1905,7 +1905,7 @@ class HerdManager:
                 f"dry_cows_daily_milk_production should be <= 0 and got {dry_cows_daily_milk_production}, "
                 f"AND dry_cows_milk_fat_kg must be <= 0 and got {dry_cows_milk_fat_kg},"
                 f"AND dry_cows_milk_protein_kg must be <= 0 and got {dry_cows_milk_protein_kg}.",
-                info_map
+                info_map,
             )
             raise ValueError("Unexpected milking from dry cows")
 

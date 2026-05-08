@@ -154,8 +154,8 @@ class Percolation:
                 f"and got {saturated_hydraulic_conductivity}",
                 info_map={
                     "class": Percolation.__name__,
-                    "function": Percolation._determine_percolation_travel_time.__name__
-                }
+                    "function": Percolation._determine_percolation_travel_time.__name__,
+                },
             )
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
         return (saturation - field_capacity_content) / saturated_hydraulic_conductivity

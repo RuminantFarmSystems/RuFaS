@@ -148,8 +148,8 @@ class Evaporation:
                 "Missing or illegal values for top or bottom depths",
                 info_map={
                     "class": Evaporation.__name__,
-                    "function": Evaporation._determine_layer_evaporative_demand.__name__
-                }
+                    "function": Evaporation._determine_layer_evaporative_demand.__name__,
+                },
             )
             raise ValueError("Missing or illegal values for top or bottom depths")
 

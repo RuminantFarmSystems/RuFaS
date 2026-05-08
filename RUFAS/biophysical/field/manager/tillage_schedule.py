@@ -93,10 +93,7 @@ class TillageSchedule(Schedule):
             OutputManager().add_error(
                 "invalid tillage depths",
                 f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._validate_tillage_parameters.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._validate_tillage_parameters.__name__},
             )
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."

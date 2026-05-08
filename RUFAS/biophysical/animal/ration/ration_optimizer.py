@@ -1006,7 +1006,7 @@ class RationOptimizer:
             info_map={
                 "class": self.__class__.__name__,
                 "function": self._select_constraints.__name__,
-            }
+            },
         )
         raise ValueError(f"Invalid animal combination: {animal_combination}")
 

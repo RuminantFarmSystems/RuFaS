@@ -123,20 +123,14 @@ class FieldData:
                 OutputManager().add_error(
                     "Watering amount error",
                     f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self.__post_init__.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
                 )
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
                 OutputManager().add_error(
                     "Watering interval error",
                     f"Expected watering interval to be >= 0, received '{self.watering_interval}'.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self.__post_init__.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
                 )
                 raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
 

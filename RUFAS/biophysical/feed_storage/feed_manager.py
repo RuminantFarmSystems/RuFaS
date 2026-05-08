@@ -835,10 +835,7 @@ class FeedManager:
         self._om.add_error(
             "Feed Storage lookup error.",
             f"No rufas id found for crop name '{crop_name}'.",
-            info_map={
-                "class": self.__class__.__name__,
-                "function": self._lookup_storage_rufas_id.__name__
-            },
+            info_map={"class": self.__class__.__name__, "function": self._lookup_storage_rufas_id.__name__},
         )
         raise ValueError(f"No rufas id found for crop name '{crop_name}'.")
 

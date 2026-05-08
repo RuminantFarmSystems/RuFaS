@@ -72,9 +72,6 @@ class ProcessorType(Enum):
             OutputManager().add_error(
                 "Bad manure processor type",
                 f"Unknown processor type: {processor_type}.",
-                info_map={
-                    "class": ProcessorType.__name__,
-                    "function": ProcessorType.get_processor_class.__name__
-                }
+                info_map={"class": ProcessorType.__name__, "function": ProcessorType.get_processor_class.__name__},
             )
             raise ValueError(f"Unknown manure processor type: {processor_type}.")

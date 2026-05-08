@@ -224,8 +224,8 @@ class SolidsStorageCalculator:
                 f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.",
                 info_map={
                     "class": SolidsStorageCalculator.__name__,
-                    "function": SolidsStorageCalculator.calculate_ifsm_methane_emission.__name__
-                }
+                    "function": SolidsStorageCalculator.calculate_ifsm_methane_emission.__name__,
+                },
             )
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = methane_production_potential

@@ -176,10 +176,7 @@ class Snow:
             OutputManager().add_error(
                 "Negative snow content",
                 f"Snow Content should not be a negative number and got {self.soil_data.snow_content}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.update_snow.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.update_snow.__name__},
             )
             raise ValueError("Snow Content should not be a negative number.")
 

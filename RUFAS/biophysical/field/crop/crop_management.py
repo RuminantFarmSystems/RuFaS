@@ -245,10 +245,7 @@ class CropManagement:
             self.om.add_error(
                 "Collected fraction error",
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.cut_crop.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.cut_crop.__name__},
             )
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."

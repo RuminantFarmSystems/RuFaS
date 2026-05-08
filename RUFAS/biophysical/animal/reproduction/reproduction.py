@@ -172,7 +172,7 @@ class Reproduction:
         -------
         ReproductionOutputs
             Updated reproduction outputs for the animal.
-        
+
         Raises
         ------
         TypeError
@@ -204,10 +204,7 @@ class Reproduction:
             OutputManager().add_error(
                 "Reproduction Update Error",
                 f"Unknown animal type: {reproduction_data_stream.animal_type}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.reproduction_update.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.reproduction_update.__name__},
             )
             raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}.")
 
@@ -317,8 +314,8 @@ class Reproduction:
                 f"Invalid cow repro program: {self.cow_reproduction_program}.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._validate_cow_reproduction_program.__name__
-                }
+                    "function": self._validate_cow_reproduction_program.__name__,
+                },
             )
             raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}.")
 
@@ -414,8 +411,8 @@ class Reproduction:
                 f"Invalid heifer repro program: {self.heifer_reproduction_program}.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._execute_heifer_reproduction_protocol.__name__
-                }
+                    "function": self._execute_heifer_reproduction_protocol.__name__,
+                },
             )
             raise ValueError(f"Invalid heifer repro program: {self.heifer_reproduction_program}")
 
@@ -512,10 +509,7 @@ class Reproduction:
             OutputManager().add_error(
                 "Heifer Reproduction Setter Error",
                 f"Invalid repro program: {repro_program}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._set_heifer_reproduction_program.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._set_heifer_reproduction_program.__name__},
             )
             raise ValueError(f"Invalid repro program: {repro_program}")
 
@@ -548,10 +542,7 @@ class Reproduction:
             OutputManager().add_error(
                 "Cow Reproduction Setter Error",
                 f"Invalid repro program: {repro_program}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._set_cow_reproduction_program.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._set_cow_reproduction_program.__name__},
             )
             raise ValueError(f"Invalid repro program: {repro_program}.")
 
@@ -780,10 +771,7 @@ class Reproduction:
                 OutputManager().add_error(
                     "Hormone Delivery Error",
                     f"Invalid hormone: {hormone}.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._deliver_hormones.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self._deliver_hormones.__name__},
                 )
                 raise ValueError(f"Invalid hormone: {hormone}.")
 
@@ -898,10 +886,7 @@ class Reproduction:
                     "Hormone Schedule Error",
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.heifer_reproduction_sub_program}",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._set_up_hormone_schedule.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
                 )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
@@ -918,10 +903,7 @@ class Reproduction:
                     "Hormone Schedule Error",
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.cow_ovsynch_program}",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._set_up_hormone_schedule.__name__
-                    }
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
                 )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "

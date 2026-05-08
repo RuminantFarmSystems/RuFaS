@@ -437,10 +437,7 @@ class LayerData:
                 "Invalid layer values",
                 "Expected positive values for top and bottom depths of soil layer where top < bottom, "
                 f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise ValueError(
                 "Expected positive values for top and bottom depths of soil layer where top < bottom, "
@@ -451,20 +448,14 @@ class LayerData:
             OutputManager().add_error(
                 "Invalid field_size",
                 "'field_size' attribute is NoneType, must be given value when LayerData is initialized.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
         elif field_size <= 0:
             OutputManager().add_error(
                 "Invalid field_size",
                 f"Expected field_size to be greater than 0, received '{field_size}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
             )
             raise ValueError(f"Expected field_size to be greater than 0, received '{field_size}'.")
 

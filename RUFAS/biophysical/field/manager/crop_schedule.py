@@ -136,10 +136,7 @@ class CropSchedule(Schedule):
                 "Final harvest operation not a kill operation",
                 f"'{self.name}': expected the final harvest operation to be the only one that kills the "
                 f"crop, received '{self.harvest_operations}'.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._validate_harvest_parameters.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self._validate_harvest_parameters.__name__},
             )
             raise ValueError(
                 f"'{self.name}': expected the final harvest operation to be the only one that kills the "

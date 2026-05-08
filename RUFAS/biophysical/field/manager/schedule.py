@@ -232,10 +232,7 @@ class Schedule:
                 "Parameter length mismatch",
                 f"Provided parameters are: {', '.join(f'{key}={value}' for key, value in kwargs.items())}. "
                 f"Lengths are: {lengths}.",
-                info_map={
-                    "class": Schedule.__name__,
-                    "function": Schedule.validate_equal_lengths.__name__
-                }
+                info_map={"class": Schedule.__name__, "function": Schedule.validate_equal_lengths.__name__},
             )
             raise ValueError(
                 f"{header} Mismatch in length of parameters. "
@@ -289,10 +286,7 @@ class Schedule:
             OutputManager().add_error(
                 "Days not valid",
                 f"'{name}': " + f"expected all days to be in range [1, 366], received '{days}'.",
-                info_map={
-                    "class": Schedule.__name__,
-                    "function": Schedule._validate_parameters.__name__
-                }
+                info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
             )
             raise ValueError(f"'{name}': " + f"expected all days to be in range [1, 366], received '{days}'.")
 
@@ -301,10 +295,7 @@ class Schedule:
                 OutputManager().add_error(
                     "All values not non-negative",
                     f"'{name}': " + f"expected all {parameter_name} to be" f" in >= 0, received '{parameter}'.",
-                    info_map={
-                        "class": Schedule.__name__,
-                        "function": Schedule._validate_parameters.__name__
-                    }
+                    info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
                 )
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be" f" in >= 0, received '{parameter}'."
@@ -316,10 +307,7 @@ class Schedule:
                     f"'{name}': " + f"expected all {parameter_name} to be in"
                     f" range [0.0, 1.0], "
                     f"received '{parameter}'.",
-                    info_map={
-                        "class": Schedule.__name__,
-                        "function": Schedule._validate_parameters.__name__
-                    }
+                    info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
                 )
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"

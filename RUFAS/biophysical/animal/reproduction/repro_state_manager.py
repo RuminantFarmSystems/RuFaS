@@ -82,10 +82,7 @@ class ReproStateManager:
             OutputManager().add_error(
                 "ReproStateManager Error",
                 f"Attempting to re-enter the same state: {state} during entering process.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.enter.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.enter.__name__},
             )
             raise ValueError(f"Attempting to re-enter the same state: {state}")
         self._states.add(state)
@@ -115,10 +112,7 @@ class ReproStateManager:
             OutputManager().add_error(
                 "ReproStateManager Error",
                 f"Attempting to exit a state that is not entered: {state}.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.exit.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.exit.__name__},
             )
             raise ValueError(f"Attempting to exit a state that is not entered: {state}")
         self._states.remove(state)

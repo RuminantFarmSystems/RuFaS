@@ -142,10 +142,7 @@ class WaterUptake(NutrientUptake):
                 "Soil water extraction error",
                 "actual_water_uptakes should be the same length as the number of soil layers but got "
                 f"{len(soil_data.soil_layers)} soil layers and {len(self.actual_water_uptakes)} water uptakes",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self.extract_water_from_soil.__name__
-                }
+                info_map={"class": self.__class__.__name__, "function": self.extract_water_from_soil.__name__},
             )
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
 
@@ -197,10 +194,7 @@ class WaterUptake(NutrientUptake):
                 "potential_uptakes, water_availabilities, and wilting_points must be of equal length but got "
                 f"{len(potential_uptakes)} potential uptakes and {len(water_availabilities)} water availabilities "
                 f"and {len(wilting_points)} wilting points.",
-                info_map={
-                    "class": WaterUptake.__name__,
-                    "function": WaterUptake._take_up_water.__name__
-                }
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._take_up_water.__name__},
             )
             raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
 
@@ -269,10 +263,7 @@ class WaterUptake(NutrientUptake):
                 "potential_uptakes, water_availabilities, and available_capacities must be of equal length but got "
                 f"{len(potential_uptakes)} potential uptakes and {len(water_availabilities)} water availabilities "
                 f"and {len(available_capacities)} available capacities.",
-                info_map={
-                    "class": WaterUptake.__name__,
-                    "function": WaterUptake._reduce_efficiency_of_uptake.__name__
-                }
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._reduce_efficiency_of_uptake.__name__},
             )
             raise Exception("potential_uptakes, water_availabilities, and available_capacities must be of equal length")
 
@@ -351,10 +342,7 @@ class WaterUptake(NutrientUptake):
                 "Water uptake adjustment error",
                 "potential_uptakes and unmet_demands must be the same length but got "
                 f"{len(potential_uptakes)} potential uptakes and {len(unmet_demands)} unmet demands.",
-                info_map={
-                    "class": WaterUptake.__name__,
-                    "function": WaterUptake._adjust_water_uptakes.__name__
-                }
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._adjust_water_uptakes.__name__},
             )
             raise Exception("potential_uptakes and unmet_demands must be the same length.")
 
@@ -408,8 +396,8 @@ class WaterUptake(NutrientUptake):
                 f"{len(upper_depths)} upper depths and {len(lower_depths)} lower depths.",
                 info_map={
                     "class": WaterUptake.__name__,
-                    "function": WaterUptake._find_stratified_max_water_uptakes.__name__
-                }
+                    "function": WaterUptake._find_stratified_max_water_uptakes.__name__,
+                },
             )
             raise Exception("upper_depths and lower_depths must be the same length")
 

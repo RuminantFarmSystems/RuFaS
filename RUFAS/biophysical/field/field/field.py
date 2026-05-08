@@ -290,7 +290,7 @@ class Field:
                 "Incorrect fertilizer mix error",
                 f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                 f"received '{self.available_fertilizer_mixes}'.",
-                info_map
+                info_map,
             )
             raise KeyError(
                 f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
@@ -725,8 +725,8 @@ class Field:
                 "soil_layers is not initialized",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._validate_application_depth_and_fraction.__name__
-                }
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
             )
             raise ValueError("soil_layers is not initialized")
 
@@ -737,8 +737,8 @@ class Field:
                 "bottom_depth is not set for the last soil layer",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._validate_application_depth_and_fraction.__name__
-                }
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
             )
             raise ValueError("bottom_depth is not set for the last soil layer")
 
