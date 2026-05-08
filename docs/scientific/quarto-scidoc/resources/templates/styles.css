@@ -51,3 +51,88 @@ figure figcaption {
 mjx-container[jax="CHTML"][display="true"] mjx-tag {
   display: none !important;
 }
+
+/* =========================================
+   TABLE STYLING
+========================================= */
+
+/* Remove alternating row striping */
+table tbody tr:nth-child(odd),
+table tbody tr:nth-child(even) {
+  background-color: white !important;
+}
+
+/* Keep all cells white */
+table td,
+table th {
+  background-color: white !important;
+}
+
+/* Cleaner table appearance */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Header styling */
+table th {
+  border-bottom: 1px solid #999;
+  font-weight: bold;
+}
+
+/* Body borders */
+table td {
+  border-bottom: 1px solid #ddd;
+}
+
+
+/* Force Quarto/Bootstrap striped tables to white */
+.table-striped > tbody > tr:nth-of-type(odd) > *,
+.table-striped > tbody > tr:nth-of-type(even) > *,
+.quarto-bootstrap table.table-striped > tbody > tr:nth-of-type(odd) > *,
+.quarto-bootstrap table.table-striped > tbody > tr:nth-of-type(even) > * {
+  --bs-table-bg-type: white !important;
+  --bs-table-accent-bg: white !important;
+  background-color: white !important;
+  box-shadow: none !important;
+}
+
+/* Also remove striping from plain Quarto tables */
+table.table tbody tr,
+table.table tbody tr > *,
+table tbody tr,
+table tbody tr > * {
+  background-color: white !important;
+  box-shadow: none !important;
+}
+
+/* =========================================
+   TABLE ALIGNMENT
+========================================= */
+
+/* Center all table headers */
+table th {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Left-align text-heavy columns */
+table td:nth-child(1),
+table td:nth-child(2) {
+  text-align: left;
+  vertical-align: top;
+}
+
+/* Center numeric columns */
+table td:nth-child(3),
+table td:nth-child(4),
+table td:nth-child(5) {
+  text-align: center;
+  vertical-align: top;
+}
+
+/* Optional: control definition column width */
+table th:nth-child(2),
+table td:nth-child(2) {
+  width: 45%;
+}
