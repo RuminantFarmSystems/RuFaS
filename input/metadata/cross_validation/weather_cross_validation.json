@@ -1,8 +1,8 @@
 {
-  "cross-validation": [
+  "cross_validation": [
     {
       "description": "weather high, low, and average temperature arrays must have equal lengths",
-      "target_and_save": {
+      "aliases": {
         "variables": {
           "weather_high": "weather.high",
           "weather_low": "weather.low",
@@ -12,31 +12,43 @@
       "rules": [
         {
           "left_hand": {
-            "ordered_variables": [
-              "weather_high"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_high"
+              ]
+            }
           },
           "right_hand": {
-            "ordered_variables": [
-              "weather_low"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_low"
+              ]
+            }
           },
           "relationship": "is_equal_length"
         },
         {
           "left_hand": {
-            "ordered_variables": [
-              "weather_high"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_high"
+              ]
+            }
           },
           "right_hand": {
-            "ordered_variables": [
-              "weather_avg"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_avg"
+              ]
+            }
           },
           "relationship": "is_equal_length"
         }
@@ -44,19 +56,31 @@
     },
     {
       "description": "weather daily high temperatures must be greater than or equal to daily averages",
+      "aliases": {
+        "variables": {
+          "weather_high": "weather.high",
+          "weather_avg": "weather.avg"
+        }
+      },
       "rules": [
         {
           "left_hand": {
-            "ordered_variables": [
-              "weather_high"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_high"
+              ]
+            }
           },
           "right_hand": {
-            "ordered_variables": [
-              "weather_avg"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_avg"
+              ]
+            }
           },
           "relationship": "greater_or_equal_to"
         }
@@ -64,19 +88,31 @@
     },
     {
       "description": "weather daily average temperatures must be greater than or equal to daily lows",
+      "aliases": {
+        "variables": {
+          "weather_avg": "weather.avg",
+          "weather_low": "weather.low"
+        }
+      },
       "rules": [
         {
           "left_hand": {
-            "ordered_variables": [
-              "weather_avg"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_avg"
+              ]
+            }
           },
           "right_hand": {
-            "ordered_variables": [
-              "weather_low"
-            ],
-            "apply_to": "individual"
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "weather_low"
+              ]
+            }
           },
           "relationship": "greater_or_equal_to"
         }
