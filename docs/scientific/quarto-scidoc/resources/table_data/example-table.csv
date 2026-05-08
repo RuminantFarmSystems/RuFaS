@@ -1,0 +1,5 @@
+,name,description,value
+0,descriptive_integer,"This is a variable whose description is extremely long and will make the table not fit on the entire page unless some formatting trickery occurs, which pandas should be able to accommodate. I hope.",15
+1,concise_decimal,This is a short description,98.6
+2,tiny_decimal,A very small value,0.0001
+3,missing_value,No value present,NA

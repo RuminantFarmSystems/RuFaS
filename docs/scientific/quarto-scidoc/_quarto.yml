@@ -19,6 +19,8 @@ book:
     - qmd/economics.qmd
 
 
+execute: 
+  echo: false
 
 bibliography: resources/rufas.bib
 

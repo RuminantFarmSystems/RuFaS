@@ -1,5 +1,8 @@
 ![Animal module icon](../resources/images/animal.png){width=35%}
+
 # Animal Module
+<!-- reuse code to import functions from "../scripts/": -->
+ {{< include _import-from-scripts.qmd >}} 
 
 ## Introduction
 The Animal Module simulates individual animals on a daily basis throughout each stage of life from birth until removal from the herd. In addition to the dynamic Monte-Carlo models that determine the occurrence of events throughout each animal’s life, the Animal Module uses process-based, dynamic models to simulate the following processes:
@@ -291,20 +294,10 @@ These methods are further described by @Li2023
 ```{python}
 #| label: tbl-animal-growth-req-inputs
 #| tbl-cap: Summary of the available inputs that are available and their definitions.
-#| echo: false
-import pandas as pd
-from IPython.display import Markdown, display
-tbl = pd.read_csv(
-  "../resources/table_data/animal_tables/animal-growth_required-inputs.csv",
-  dtype = {"Default": str, "Min": str, "Max": str},
-  keep_default_na = False
-).to_markdown(
-  index = False,
-  maxcolwidths = [None, 32, 10, 4, 4],
-  tablefmt = "colon_grid",
+import_table(
+  "../resources/table_data/animal/animal-growth_required-inputs.csv",
   colalign = ["left", "left", "right", "right", "right"]
 )
-display(Markdown(tbl))
 ```
 
 #### Expected Outputs
@@ -347,7 +340,7 @@ Note - truncated at 2 standard deviations in [AN.BWT.6](#eq-one)
 #### Calf Growth 
 
 Calves are assumed to double their weight between birth and weaning based on recommendations 
-in the @nrc2001. Thus the target average daily gain is estimated as:
+in the @nrc_2001. Thus the target average daily gain is estimated as:
 
 
 $$
@@ -495,31 +488,24 @@ Where P1 and P2 are parameters with distinct values for primiparous and multipar
 ```{python}
 #| label: tbl-animal-growth-params
 #| tbl-cap: Summary of the available inputs that are available and their definitions.
-#| echo: false
-import pandas as pd
-from IPython.display import Markdown, display
-
-tbl = pd.read_csv(
-  "../resources/table_data/animal_tables/animal-bwt-parameters.csv"
-).to_markdown(
-  index = False
+import_table(
+  "../resources/table_data/animal/animal-bwt-parameters.csv"
 )
-
-display(Markdown(tbl))
 ```
 
 During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is 
 estimated on the last day of lactation as: 
 
-:::{.content-visible when-format="pdf"}
-[AN.BWT.19]
-:::
 [[**AN.BWT.19**]]{.aside .content-visible when-format="html"}
 $$
 \text{tissue\_changed} = \text{P1} \times \frac{\text{DIMlast}}{\text{P2}} \times \
   exp \bigg(1 - \frac{\text{DIMlast}}{\text{P2}}\bigg) + \
   \text{DIM} \times exp \bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
 $$
+
+:::{.content-visible when-format="pdf"}
+\begin{flushright} [\textbf{AN.BWT.19}] \end{flushright}
+:::
 
 and 
 
